@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="fr.alcyons.phimr4.PAD.ServicePADActivity">
+
+    <LinearLayout
+        android:id="@+id/barreDeTitre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bleu_fonce_alcyons"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Votre commande à envoyer"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/listeView"
+        android:layout_below="@+id/barreDeTitre"
+        android:layout_above="@+id/envoyerCommandeLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:descendantFocusability="afterDescendants">
+
+    </ListView>
+
+    <LinearLayout
+        android:id="@+id/envoyerCommandeLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/envoyerButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/vert"
+            android:clickable="true"
+            android:text="Envoyer"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:onClick="onClick_EnvoyerButton" />
+
+    </LinearLayout>
+
+</RelativeLayout>

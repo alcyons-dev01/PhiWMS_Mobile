@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@android:color/white"
+    android:layout_margin="0dp">
+
+    <LinearLayout
+        android:id="@+id/contenuPage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        android:orientation="vertical">
+
+        <ListView
+            android:id="@+id/listeView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:descendantFocusability="afterDescendants">
+
+        </ListView>
+
+        <LinearLayout
+            android:id="@+id/layout_aucune_action"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_margin="15dp"
+            android:paddingTop="200dp">
+
+            <TextView
+                android:id="@+id/textviewTextAction"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/noir"
+                android:textSize="16dp"
+                android:text="Vous avez aucunes actions utilisateurs à la date du jour"/>
+
+            <Button
+                android:id="@+id/boutonRetourBureau"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="REtour au bureau"
+                android:textColor="@color/blanc"
+                android:background="@color/bleu_clair_alcyons"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+</LinearLayout>

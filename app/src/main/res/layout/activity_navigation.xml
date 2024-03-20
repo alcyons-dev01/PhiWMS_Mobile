@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:id="@+id/layoutRecherche"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="5dp"
+        android:padding="3dp"
+        android:weightSum="1"
+        android:gravity="center_vertical"
+        android:background="@drawable/background_element_liste_noir"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/lancerScanService"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:background="@drawable/ic_datamatrix"
+            android:backgroundTint="@color/bleu_clair_alcyons"/>
+
+        <EditText
+            android:id="@+id/rechercheService"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="15dp"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:hint="Chercher un service"/>
+
+
+        <ImageView
+            android:id="@+id/closeRecherche"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/ic_clear"
+            android:backgroundTint="@color/noir"/>
+
+    </LinearLayout>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layoutRecherche"
+        android:orientation="vertical">
+
+        <ListView
+            android:id="@+id/listeView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:descendantFocusability="afterDescendants">
+        </ListView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/swipeRefreshLayout"
+        android:background="@color/bleu_fonce_alcyons"
+        android:weightSum="2">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:layout_marginLeft="10dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/ic_phimr4_logo"/>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:layout_marginRight="10dp"
+            android:gravity="right|center_vertical">
+
+            <TextView
+                android:id="@+id/versionApplication"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/blanc"
+                android:text=""/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>
+

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Voici les CGU de PhiMR4"/>
+
+    <Button
+        android:id="@+id/boutonRetourCgu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Retour"
+        android:backgroundTint="@color/bleu_clair_alcyons"
+        android:textColor="@color/blanc"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

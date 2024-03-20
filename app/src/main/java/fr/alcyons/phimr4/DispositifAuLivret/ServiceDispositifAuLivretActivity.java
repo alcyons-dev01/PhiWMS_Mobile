@@ -1,0 +1,305 @@
+package fr.alcyons.phimr4.DispositifAuLivret;
+
+
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import androidx.appcompat.view.menu.ActionMenuItemView;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+
+import fr.alcyons.phimr4.BarcodeSearch.BarcodeCaptureActivity;
+import fr.alcyons.phimr4.BarcodeSearch.ScannerSearchOnlyActivity;
+import fr.alcyons.phimr4.Classes.Produit;
+import fr.alcyons.phimr4.ListViewAdapters.DispositifAdapter;
+import fr.alcyons.phimr4.ListeActivity.ListeCategorieActivity;
+import fr.alcyons.phimr4.ListeActivity.ListeFournisseurActivity;
+import fr.alcyons.phimr4.Outils.Alerte;
+import fr.alcyons.phimr4.Outils.CodesEchangesActivites;
+import fr.alcyons.phimr4.Outils.OutilsDecodage;
+import fr.alcyons.phimr4.R;
+import fr.alcyons.phimr4.ServiceActivity;
+
+
+public class ServiceDispositifAuLivretActivity extends ServiceActivity {
+
+    DispositifAdapter dispositifAdapter;
+    ListView dispositifListView;
+    List<Produit> dispositifList;
+    FloatingActionMenu floatingActionMenu;
+    FloatingActionButton boutonRechercheNom;
+    FloatingActionButton fabTriFournisseur;
+    FloatingActionButton fabTriCategorie;
+    FloatingActionButton boutonRecherche;
+
+    PackageManager pm;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        invalidateOptionsMenu();
+        // Récupération de la liste des dispositifs
+        if (dispositifList == null) {
+            dispositifList = gestionnaireProduit.getAllDispositifs(db);
+            dispositifAdapter.notifyDataSetChanged();
+        } else {
+            dispositifAdapter = new DispositifAdapter(ServiceDispositifAuLivretActivity.this, dispositifList);
+            dispositifListView.setAdapter(dispositifAdapter);
+        }
+        // Afficher le nombre de dispositifs
+        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(dispositifList.size()));
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_service_dispositif_au_livret);
+
+        //gestion du package manager
+        pm = ServiceDispositifAuLivretActivity.this.getPackageManager();
+
+        floatingActionMenu = (FloatingActionMenu) findViewById(R.id.material_design_android_floating_action_menu);
+
+        // Récupération de la liste des dispositifs
+        if (dispositifList == null) {
+            dispositifList = gestionnaireProduit.getAllDispositifs(db);
+        }
+
+        // Afficher le nombre de dispositifs
+        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(dispositifList.size()));
+
+        // Création de l'adapter
+        dispositifAdapter = new DispositifAdapter(ServiceDispositifAuLivretActivity.this, dispositifList);
+
+        // Affichage de la liste
+        dispositifListView = (ListView) findViewById(R.id.listeView);
+        dispositifListView.setDivider(footer);
+        dispositifListView.setAdapter(dispositifAdapter);
+
+        //Récupérer le bouton pour activer la recherche par nom
+        boutonRechercheNom = (FloatingActionButton) findViewById(R.id.boutonRechercheNom);
+        boutonRechercheNom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((ActionMenuItemView) findViewById(R.id.rechercheMenu)).callOnClick();
+                floatingActionMenu.close(true);
+            }
+        });
+
+        // Récupérer le bouton de filtrage des médicaments par fournisseur et le gérer
+        fabTriFournisseur = (FloatingActionButton) findViewById(R.id.fabTriFournisseur);
+        fabTriFournisseur.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent serviceDispositifAuLivretIntent = new Intent(ServiceDispositifAuLivretActivity.this, ListeFournisseurActivity.class);
+                Bundle serviceDispositifAuLivretBundle = ServiceDispositifAuLivretActivity.super.getBundle();
+                serviceDispositifAuLivretBundle.putString("produitClasse_numero", "2");
+                serviceDispositifAuLivretIntent.putExtras(serviceDispositifAuLivretBundle);
+                ServiceDispositifAuLivretActivity.this.startActivityForResult(serviceDispositifAuLivretIntent, CodesEchangesActivites.RETOUR_NOM_FOURNISSEUR);
+                floatingActionMenu.close(true);
+            }
+        });
+
+        // Récupérer le bouton de filtrage des médicaments par catégorie et le gérer
+        fabTriCategorie = (FloatingActionButton) findViewById(R.id.fabTriCategorie);
+        fabTriCategorie.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent serviceDispositifAuLivretIntent = new Intent(ServiceDispositifAuLivretActivity.this, ListeCategorieActivity.class);
+                Bundle serviceDispositifAuLivretBundle = ServiceDispositifAuLivretActivity.super.getBundle();
+                serviceDispositifAuLivretBundle.putString("produitClasse_numero", "2");
+                serviceDispositifAuLivretIntent.putExtras(serviceDispositifAuLivretBundle);
+                ServiceDispositifAuLivretActivity.this.startActivityForResult(serviceDispositifAuLivretIntent, CodesEchangesActivites.RETOUR_NOM_CATEGORIE);
+                floatingActionMenu.close(true);
+            }
+        });
+
+        // Gérer le clic sur un élément
+        dispositifListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Produit dispositif_Selectionne = (Produit) dispositifAdapter.getItem(position);
+                appelerDetailDispositif(dispositif_Selectionne);
+            }
+        });
+
+        // Gérer la recherche par DataMatrix
+        boutonRecherche = (FloatingActionButton) findViewById(R.id.boutonRechercheDataMatrix);
+
+        boutonRecherche.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent serviceDispositifAuLivretIntent = null;
+                Bundle scanDispositifBundle = ServiceDispositifAuLivretActivity.super.getBundle();
+                scanDispositifBundle.putBoolean("isBoutonSuppressionExistant", true);
+
+                if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+                {
+                    serviceDispositifAuLivretIntent = new Intent(ServiceDispositifAuLivretActivity.this, ScannerSearchOnlyActivity.class);
+                }
+                else
+                {
+                    if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
+                    {
+                        serviceDispositifAuLivretIntent = new Intent(ServiceDispositifAuLivretActivity.this, BarcodeCaptureActivity.class);
+                    }
+                    else
+                    {
+                        serviceDispositifAuLivretIntent = new Intent(ServiceDispositifAuLivretActivity.this, ScannerSearchOnlyActivity.class);
+                    }
+                }
+
+                serviceDispositifAuLivretIntent.putExtras(scanDispositifBundle);
+                ServiceDispositifAuLivretActivity.this.startActivityForResult(serviceDispositifAuLivretIntent, CodesEchangesActivites.RETOUR_CODE_GS1);
+                floatingActionMenu.close(true);
+            }
+        });
+
+
+    }
+
+    // Lorsqu'on lance une nouvelle activity avec " startActivityForResult ", action à réaliser à la fin de l'activity lancé suivant le " CodesEchangesActivites " passé
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case (CodesEchangesActivites.RETOUR_CODE_GS1): {
+                // Gestion du décodage d'un code GS1
+                if (resultCode == ServiceDispositifAuLivretActivity.RESULT_OK) {
+                    String code = data.getStringExtra("code");
+                    if(!code.contentEquals(""))
+                    {
+                        Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(code);
+                        List<Produit> produit_List = new ArrayList<>();
+                        if (gs1Decoupe.size() != 0) {
+                            // Si le code est valide, on récupère les éléments correspondants en BDD
+                            produit_List = gestionnaireProduit.getDispositifsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+                            if (produit_List.size() == 1) {
+                                appelerDetailDispositif(produit_List.get(0));
+                            } else if (produit_List.size() > 1) {
+                                Alerte.afficherAlerte(ServiceDispositifAuLivretActivity.this, "Attention", "Plusieurs médicaments correspondent à ce code", "alerte");
+                                dispositifList = produit_List;
+                                onResume();
+                            } else {
+                                Toast toast = Toast.makeText(ServiceDispositifAuLivretActivity.this, "Le produit scanné n'est pas un dispositif", Toast.LENGTH_LONG);
+                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                toast.show();
+                            }
+                        } else {
+                            // Si le code est invalide, on affiche un message d'erreur
+                            Toast toast = Toast.makeText(ServiceDispositifAuLivretActivity.this, "Le code fourni n'est pas un code GS1, veuillez réessayer.", Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+                        }
+                    }
+                }
+                break;
+            }
+            case CodesEchangesActivites.RETOUR_NOM_FOURNISSEUR: {
+                if (resultCode == ServiceDispositifAuLivretActivity.RESULT_OK) {
+                    String fournisseur_Selectionne = data.getStringExtra("fournisseur_Selectionne");
+                    List<Produit> produit_List = new ArrayList<>();
+                    produit_List = gestionnaireProduit.getDispositifsParFournisseur(db, fournisseur_Selectionne);
+                    if (produit_List.size() >= 1) {
+                        dispositifList = produit_List;
+                        Collections.sort(dispositifList, new Comparator<Produit>() {
+
+                            @Override
+                            public int compare(Produit o1, Produit o2) {
+                                return o1.getDesignation_interne().compareTo(o2.getDesignation_interne());
+                            }
+                        });
+                        onResume();
+                    } else {
+                        Toast toast = Toast.makeText(ServiceDispositifAuLivretActivity.this, "Aucun dispositif ne correspond", Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    }
+                }
+                break;
+            }
+            case CodesEchangesActivites.RETOUR_NOM_CATEGORIE: {
+                if (resultCode == ServiceDispositifAuLivretActivity.RESULT_OK) {
+                    String categorie_Selectionne = data.getStringExtra("categorie_Selectionne");
+                    List<Produit> produit_List = new ArrayList<>();
+                    produit_List = gestionnaireProduit.getDispositifsParCategorie(db, categorie_Selectionne);
+                    if (produit_List.size() >= 1) {
+                        dispositifList = produit_List;
+                        Collections.sort(dispositifList, new Comparator<Produit>() {
+
+                            @Override
+                            public int compare(Produit o1, Produit o2) {
+                                return o1.getDesignation_interne().compareTo(o2.getDesignation_interne());
+                            }
+                        });
+                        onResume();
+                    } else {
+                        Toast toast = Toast.makeText(ServiceDispositifAuLivretActivity.this, "Aucun dispositif ne correspond", Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    }
+                }
+                break;
+            }
+        }
+        invalidateOptionsMenu();
+    }
+
+    // Nécessaire afin d'avoir l'item Search
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.prepareOptionsMenu(menu, dispositifAdapter, null, "Désignation produit...");
+        return true;
+    }
+
+    public void appelerDetailDispositif(Produit dispositifSelectionne) {
+        // Appel de l'activité de détail d'un dispositif (fiche d'un dispositif)
+        Intent serviceDispositifAuLivretIntent = new Intent(ServiceDispositifAuLivretActivity.this, DetailDispositifAuLivretActivity.class);
+        Bundle serviceDispositifAuLivretBundle = new Bundle();
+        List<Integer> produitID_List = new ArrayList<>();
+
+        for (int i = 0; i < dispositifAdapter.getCount(); i++) {
+            Produit produit = (Produit) dispositifAdapter.getItem(i);
+            produitID_List.add(produit.getID_produit());
+        }
+        serviceDispositifAuLivretBundle.putIntegerArrayList("produitID_List", (ArrayList<Integer>) produitID_List);
+        serviceDispositifAuLivretBundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+        serviceDispositifAuLivretBundle.putInt("serviceSelectionneID", serviceActuel.getId());
+        serviceDispositifAuLivretBundle.putInt("produitID_Selectionne", dispositifSelectionne.getID_produit());
+        serviceDispositifAuLivretIntent.putExtras(serviceDispositifAuLivretBundle);
+        ServiceDispositifAuLivretActivity.this.startActivity(serviceDispositifAuLivretIntent);
+    }
+
+    // Si le FloatingMenu est ouvert, au clic sur bouton Back le ferme sinon arret de l'activity
+    @Override
+    public void onBackPressed() {
+        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(dispositifList.size()));
+        if (floatingActionMenu.isOpened()) {
+            floatingActionMenu.close(true);
+            return;
+        }
+        List<Produit> dispositifsEnBDD = gestionnaireProduit.getAllDispositifs(db);
+        if (dispositifList.size() != dispositifsEnBDD.size()) {
+            dispositifList = dispositifsEnBDD;
+            onResume();
+        } else {
+            super.onBackPressed();
+        }
+    }
+}

@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PrisePhoto.PrisePhotoV2">
+
+    <LinearLayout
+        android:id="@+id/layoutProduit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/bleu_fonce_alcyons"
+        android:paddingLeft="10dp"
+        android:padding="5dp">
+
+        <TextView
+            android:id="@+id/Designationproduit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18dp"
+            android:textColor="@color/blanc"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/Referenceproduit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16dp"
+            android:textColor="@color/blanc"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/layoutImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        app:layout_constraintTop_toBottomOf="@+id/layoutProduit">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="21dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/background_cadre_orange">
+
+            <ImageView
+                android:id="@+id/vue1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
+
+            <ImageView
+                android:id="@+id/vue1Plus"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:src="@drawable/ic_add" />
+
+            <TextView
+                android:id="@+id/textVue1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Vue 1"
+                android:textColor="@color/noir"
+                android:textSize="18dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="21dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/background_cadre_orange">
+
+            <ImageView
+                android:id="@+id/vue2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
+
+            <ImageView
+                android:id="@+id/vue2Plus"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:src="@drawable/ic_add" />
+
+            <TextView
+                android:id="@+id/textVue2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Vue 2"
+                android:textColor="@color/noir"
+                android:textSize="18dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutImage2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        app:layout_constraintTop_toBottomOf="@+id/layoutImage">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="21dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/background_cadre_orange">
+
+            <ImageView
+                android:id="@+id/vue3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
+
+            <ImageView
+                android:id="@+id/vue3Plus"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:src="@drawable/ic_add"/>
+
+            <TextView
+                android:id="@+id/textVue3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Vue 3"
+                android:textColor="@color/noir"
+                android:textSize="18dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="21dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/background_cadre_orange">
+
+            <ImageView
+                android:id="@+id/vue4"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
+
+            <ImageView
+                android:id="@+id/vue4Plus"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:src="@drawable/ic_add" />
+
+            <TextView
+                android:id="@+id/textVue4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Vue 4"
+                android:textColor="@color/noir"
+                android:textSize="18dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutImage2">
+
+        <Button
+            android:id="@+id/button_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:background="@color/bleu_clair_alcyons"
+            android:textColor="@color/blanc"
+            android:text="Prendre les photos en rafale" />
+
+        <Button
+            android:id="@+id/button_validationPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:layout_marginTop="10dp"
+            android:background="@color/vert"
+            android:textColor="@color/blanc"
+            android:text="Valider les vues de la références"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/button_SuppressionPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:layout_marginTop="10dp"
+            android:background="@color/rouge"
+            android:textColor="@color/blanc"
+            android:text="Supprimer les photos sélectionnés"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/button_RetourSuppression"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:layout_marginTop="10dp"
+            android:background="@color/grey_color_fonce"
+            android:textColor="@color/blanc"
+            android:text="Retour à la prise des vues"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

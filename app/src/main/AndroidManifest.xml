@@ -1,0 +1,1099 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="fr.alcyons.phimr4">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!--uses-permission android:name="android.permission.WAKE_LOCK" /-->
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ALLOW_ALL_HOSTNAME_VERIFIER" />
+    <uses-permission android:name="com.symbol.emdk.permission.EMDK"/>
+
+    <!--permission android:name="android.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+    <uses-permission android:name="android.permission.C2D_MESSAGE" /-->
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_app_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_phi_round"
+        android:supportsRtl="true"
+        android:largeHeap="true"
+        android:theme="@style/AppTheme"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:requestLegacyExternalStorage="true"
+        android:usesCleartextTraffic="true"
+        tools:replace="allowBackup">
+
+        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+
+<!--        <uses-library android:name="com.symbol.emdk" android:required="false"/>-->
+
+
+        <!-- Authentification -->
+        <activity
+            android:name="fr.alcyons.phimr4.AuthentificationActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+
+        <!-- ORIGINAL -->
+        <activity
+            android:name="fr.alcyons.phimr4.OriginalActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- TEST -->
+        <activity
+            android:name="fr.alcyons.phimr4.Outils.TestActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Service Activity -->
+        <activity
+            android:name="fr.alcyons.phimr4.ServiceActivity"
+            android:parentActivityName="fr.alcyons.phimr4.MenuActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Service En Création Activity -->
+        <activity
+            android:name="fr.alcyons.phimr4.ServiceEnCreationActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Service Avec Connexion Activity-->
+        <activity
+            android:name="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <!-- FIREBASE -->
+        <service android:name="fr.alcyons.phimr4.FirebaseManager.MyFirebaseInstanceIdService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+        <service android:name="fr.alcyons.phimr4.FirebaseManager.MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- Authentification -->
+        <activity
+            android:name="fr.alcyons.phimr4.ActionUtilisateur.ServiceActionUtilisateurActivity"
+            android:windowSoftInputMode="stateHidden"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
+        <!-- Navigation -->
+        <activity
+            android:name="fr.alcyons.phimr4.Navigation.NavigationActivity"
+            android:windowSoftInputMode="stateHidden"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.ActionUtilisateur.DetailsActionActivity"
+            android:windowSoftInputMode="stateHidden"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
+        <activity android:name="fr.alcyons.phimr4.MenuActivity"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="stateHidden"
+            />
+
+        <!-- BarcodeSearch -->
+        <activity
+            android:name="fr.alcyons.phimr4.BarcodeSearch.BarcodeCaptureActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|keyboardHidden"/>
+        <activity
+            android:name="fr.alcyons.phimr4.BarcodeSearch.ScannerSearchOnlyActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name="fr.alcyons.phimr4.BarcodeSearch.ScannerPreparationPleinVideActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name="fr.alcyons.phimr4.BarcodeSearch.ScannerEmplacementActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"/>
+       <activity
+            android:name="fr.alcyons.phimr4.BarcodeSearch.ScannerPreparationActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name="fr.alcyons.phimr4.BarcodeSearch.ScannerProduitActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name="fr.alcyons.phimr4.BarcodeSearch.ScannerDocumentActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name="fr.alcyons.phimr4.BarcodeSearch.BarcodeGeneral"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar.Fullscreen"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name="fr.alcyons.phimr4.BarcodeSearch.BarcodePreparationActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar.Fullscreen"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name="fr.alcyons.phimr4.BarcodeSearch.BarcodeCaptureWithTakePicture"
+            android:parentActivityName="fr.alcyons.phimr4.BarcodeSearch.BarcodeCaptureActivity"
+            android:theme="@style/AppTheme.NoActionBar.Fullscreen"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name="fr.alcyons.phimr4.BarcodeSearch.negative.BarcodeCaptureNegativeActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"/>
+
+        <!-- Clavier -->
+        <activity
+            android:name="fr.alcyons.phimr4.BarcodeSearch.KeyboardActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysVisible"/>
+
+        <!-- Prise de photo -->
+        <activity
+            android:name="fr.alcyons.phimr4.PrisePhoto.PrisePhoto"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.PrisePhoto.PrisePhotoV2"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.PrisePhoto.CameraActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- Depot Selecteur Multiple -->
+        <activity
+            android:name="fr.alcyons.phimr4.DepotSelecteur.DepotSelecteurMultipleActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- Depot Selecteur Simple -->
+        <activity
+            android:name="fr.alcyons.phimr4.DepotSelecteur.DepotSelecteurSimpleActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+
+        <!-- PHARMACIEN -->
+        <!-- Verrou Pharmacie -->
+        <activity
+            android:name="fr.alcyons.phimr4.VerrouPharmacie.ServiceVerrouPharmacieActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.VerrouPharmacie.DetailVerrouPharmacieActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Quarantaine -->
+        <activity
+            android:name="fr.alcyons.phimr4.Quarantaine.ServiceQuarantaineActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.Quarantaine.DetailQuarantaineActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- MAGASINIER -->
+        <!-- Inventaire Scanner -->
+        <activity
+            android:name="fr.alcyons.phimr4.InventaireScanner.ServiceInventaireScannerActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.InventaireScanner.DetailInventaireScannerActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Reception PUI -->
+        <activity
+            android:name="fr.alcyons.phimr4.ReceptionPUI.ServiceReceptionPuiActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.ReceptionPUI.DetailReceptionPuiActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.ReceptionPUI.ListeLotReceptionPuiActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.ReceptionPUI.ZoneEtEmplacementSelecteurMultipleActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.ReceptionPUI.CreationLotManuelReceptionPUIActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- Controle des retours -->
+        <activity
+            android:name="fr.alcyons.phimr4.ControleDesRetours.ServiceControleRetoursActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.ControleDesRetours.DetailsControleRetoursActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.ControleDesRetours.ListeZoneCreationActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.ControleDesRetours.ListeEmplacementCreationActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.ControleDesRetours.ListeLotsControleDesRetoursActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.ControleDesRetours.CreationLotControleDesRetoursActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Retour PUI -->
+        <activity
+            android:name="fr.alcyons.phimr4.RetourPUI.ServiceRetourPUIActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.RetourPUI.DetailRetourPUIActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.RetourPUI.ListeEmplacementRetourPUIActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Retour Fournisseur -->
+        <activity
+            android:name="fr.alcyons.phimr4.RetourFournisseur.ServiceRetourFournisseurActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.RetourFournisseur.DetailRetourFournisseurActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Destruction -->
+        <activity
+            android:name="fr.alcyons.phimr4.Destruction.ServiceDestructionActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.Destruction.DetailDestructionActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Plan de placement -->
+        <activity
+            android:name="fr.alcyons.phimr4.PlanDePlacement.ServicePlanDePlacementActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.PlanDePlacement.ListeProduitsPlanDePlacementActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.PlanDePlacement.DetailProduitPlanDePlacementActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.PlanDePlacement.ListeZonesActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.PlanDePlacement.ListeEmplacementActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.PlanDePlacement.ListeDepotsActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Identification par Scan -->
+        <activity
+            android:name="fr.alcyons.phimr4.IdentificationParScan.ServiceIdentificationParScanActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.IdentificationParScan.ListeProduitsIdentificationParScanActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.IdentificationParScan.DetailProduitIdentificationParScanActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Zones et Emplacements -->
+        <activity
+            android:name="fr.alcyons.phimr4.ZonesEtEmplacements.ListeZonesParDepotActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.ZonesEtEmplacements.DetailZoneSaisieActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.ZonesEtEmplacements.DetailZoneActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.ZonesEtEmplacements.ListeEmplacementsParZoneActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.ZonesEtEmplacements.ServiceZonesEtEmplacementsActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- CHAUFFEURS -->
+        <!-- Livraison -->
+        <activity
+            android:name="fr.alcyons.phimr4.Livraison.ServiceLivraisonActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.Livraison.DepotSelecteurLivraison"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.Livraison.NewServiceLivraison"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.Livraison.ListeDetailsLivraisonActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.Livraison.InformationLivraisonActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.Livraison.SignatureLivraisonActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/Animation.AppCompat.Dialog"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.Livraison.ListePointDeLivraison"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.Livraison.ListeLivraisonDepot"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- INFIRMIERS -->
+        <!-- Utiliser -->
+        <activity
+            android:name="fr.alcyons.phimr4.Utiliser.ServiceUtiliserActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.Utiliser.DetailUtiliserActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Demande Protocole PAD -->
+        <activity
+            android:name="fr.alcyons.phimr4.DemandeProtocolePAD.ServiceDemandeProtocolePADActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.DemandeProtocolePAD.ListeProtocolePatientActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.DemandeProtocolePAD.InformationProtocolePatientActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Demande Dotation PAD-->
+        <activity
+            android:name="fr.alcyons.phimr4.DemandeDotationPAD.ServiceDemandeDotationPADActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.DemandeDotationPAD.ListeDotationPatientActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.DemandeDotationPAD.InformationDotationPatientActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Demande Réassort -->
+        <activity
+            android:name="fr.alcyons.phimr4.DemandeReassort.fragment.DetailDemandeReassortActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.DemandeReassort.ServiceDemandeReassortActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.DemandeReassort.ListeReassortServiceActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.DemandeReassort.InformationDemandeReassortActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Dotation Service -->
+        <activity
+            android:name="fr.alcyons.phimr4.DotationService.fragment.DetailDotationServiceActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.DotationService.InformationDotationServiceActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.DotationService.ServiceDotationServiceActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.DotationService.ListeDotationServiceActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Demande Particulière -->
+        <activity android:name=".DemandeParticuliere.ServiceDemandeParticuliereActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <activity android:name=".DemandeParticuliere.ListeProduitActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <activity android:name=".DemandeParticuliere.ListeDemandeParticuliereActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <activity android:name=".DemandeParticuliere.InformationDemandeParticuliereActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Retour Demande -->
+        <activity
+            android:name="fr.alcyons.phimr4.RetourDemande.ServiceRetourDemandeActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.RetourDemande.ListeProduitActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.RetourDemande.DetailRetourDemandeActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- COMMUN -->
+        <!-- Paramètres -->
+        <activity
+            android:name="fr.alcyons.phimr4.ParametresServeur.ServiceParametresServeurActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Medicamenet au Livret -->
+        <activity
+            android:name="fr.alcyons.phimr4.MedicamentAuLivret.ServiceMedicamentAuLivretActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.MedicamentAuLivret.DetailMedicamentAuLivretActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_un_medicament_au_livret"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name="fr.alcyons.phimr4.ListeActivity.ListeFournisseurActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.ListeActivity.ListeCategorieActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Dispositif au Livret -->
+        <activity
+            android:name="fr.alcyons.phimr4.DispositifAuLivret.DetailDispositifAuLivretActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_un_dispositif_au_livret"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name="fr.alcyons.phimr4.DispositifAuLivret.ServiceDispositifAuLivretActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Stock -->
+        <activity
+            android:name="fr.alcyons.phimr4.Stock.ServiceStockActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.Stock.ListeStockActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.Stock.DetailStockActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.Stock.ListeReferenceActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.Stock.newDetailStockActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Notification -->
+        <activity
+            android:name="fr.alcyons.phimr4.Notifications.ServiceNotificationsActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize">
+            <intent-filter>
+                <action android:name="ServiceNotificationsActivity"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="fr.alcyons.phimr4.Notifications.EnvoyerNotificationActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- MULTI_PERIMETRE -->
+        <!-- Préparation PAD et PUF -->
+        <activity
+            android:name="fr.alcyons.phimr4.PreparationPUFetPAD.ServicePreparationPadActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.PreparationPUFetPAD.CreationLotActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.PreparationPUFetPAD.DetailPreparationActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.PreparationPUFetPAD.ListeLotPreparationActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.PreparationPUFetPAD.ServicePreparationPufActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <!-- Demande PleinVide-->
+        <activity
+            android:name="fr.alcyons.phimr4.DemandePleinVide.ServiceDemandePleinVideActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.DemandePleinVide.DetailDotationPleinVideActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- Demande dotation globale-->
+        <activity
+            android:name="fr.alcyons.phimr4.DemandeDotationGlobale.ServiceDemandeDotationGlobaleActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.DemandeDotationGlobale.ListeDotationGlobaleActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- PAD -->
+        <activity
+            android:name="fr.alcyons.phimr4.PAD.ServicePADActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.PAD.DetailPADComposantPrescriptionActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.PAD.DetailPADDotationActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.PAD.DetailPADActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+
+
+        <!-- Vérification Connexion-->
+        <activity
+            android:name="fr.alcyons.phimr4.VerificationConnexion.VerificationConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+<!--        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="223687929ef24ea9d1f86f1c6ff533084172b1cd"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>-->
+
+        <!-- Sérialisation -->
+        <activity
+            android:name="fr.alcyons.phimr4.Serialisation.ServiceSerialisationActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.Serialisation.DetailProduitResultatSerialisationActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- Apercu phot Activity -->
+        <activity
+            android:name="fr.alcyons.phimr4.Outils.OutilsGestionPhotoApercu"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- Activity Preparation UF&PAD pour revue ADH -->
+        <activity
+            android:name="fr.alcyons.phimr4.PreparationPUFetPADScannee.ServicePreparationPadScanneeActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.PreparationPUFetPADScannee.DetailPreparationScanneeActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.PreparationPUFetPADScannee.ListeLotPreparationScanneeActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.PreparationPUFetPADScannee.Creation_Lot_Stock_Emplacement"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="fr.alcyons.phimr4.PreparationPUFetPADScannee.ServicePreparationPufScanneeActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"/>
+
+
+        <!-- Reception Scannée -->
+        <activity
+            android:name="fr.alcyons.phimr4.ReceptionScanne.ServiceReceptionScanneeActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.ReceptionScanne.ListeLotReceptionScanneeActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.ReceptionScanne.AjoutManuelReceptionScanneeActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.ReceptionScanne.CreationLotAjoutManuelActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.ReceptionScanne.DetailReceptionScanneeActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.ReceptionScanne.ScanProduitActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.ReceptionScanne.ZoneEtEmplacementReceptionScanneeSelecteurMultipleActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- Reception PAD -->
+        <activity
+            android:name="fr.alcyons.phimr4.ReceptionPAD.ServiceReceptionPadActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.ReceptionPAD.DetailReceptionPadActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.ReceptionPAD.AjoutManuelProduitReceptionPADActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- Contrôle des retours scannée -->
+        <activity
+            android:name="fr.alcyons.phimr4.ControleDesRetoursScannee.ServiceControleRetoursScanneeActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.ControleDesRetoursScannee.CreationLotControleDesRetoursScanneeActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.ControleDesRetoursScannee.DetailControleRetoursScanneeActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.ControleDesRetoursScannee.ListeEmplacementCreationScanneeActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.ControleDesRetoursScannee.ListeLotsControleDesRetoursScaneeActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.ControleDesRetoursScannee.ListeZoneCreationScanneeActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- Connexion Directe -->
+        <activity
+            android:name="fr.alcyons.phimr4.ConnexionDirecte.ServiceConnexionDirecteActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- Parametres utilisateur -->
+        <activity
+            android:name="fr.alcyons.phimr4.ParametresUtilisateur.ServiceParametreUtilisateurActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- Parametres utilisateur -->
+        <activity
+            android:name="fr.alcyons.phimr4.TestMail.TestMailActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- CGU -->
+        <activity
+            android:name="fr.alcyons.phimr4.CGU.CguActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- WebView -->
+        <activity
+            android:name="fr.alcyons.phimr4.Navigation.WebViewServiceActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- Verrou pharmacie interne-->
+        <activity
+            android:name="fr.alcyons.phimr4.VerrouPharmacieInterne.ServiceVerrouPharmacieInterneActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phimr4.VerrouPharmacieInterne.DetailVerrouPharmacieInterneActivity"
+            android:parentActivityName="fr.alcyons.phimr4.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize"/>
+
+    </application>
+
+</manifest>

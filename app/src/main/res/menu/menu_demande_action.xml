@@ -1,0 +1,34 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_informations"
+        android:orderInCategory="100"
+        android:title="Informations"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_prochaineLivraison"
+        android:orderInCategory="100"
+        android:title="Prochaine livraison"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_demandeUrgente"
+        android:orderInCategory="100"
+        android:title="Demande Urgente"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_commentaire"
+        android:orderInCategory="100"
+        android:title="Commentaire"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_envoyerDemande"
+        android:orderInCategory="100"
+        android:title="Envoyer demande"
+        app:showAsAction="never" />
+
+</menu>

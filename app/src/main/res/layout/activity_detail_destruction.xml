@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/white">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@android:color/white">
+
+        <LinearLayout
+            android:id="@+id/barreDeTitre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:background="@color/bleu_fonce_alcyons"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/intitule"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="Intitule"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/numero"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="numéro"
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/zoneListView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/separateur"
+            android:layout_below="@id/barreDeTitre"
+            android:orientation="vertical"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
+
+            <include layout="@layout/liste_view" />
+
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/separateur"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_above="@+id/boutonSave"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@android:color/darker_gray" />
+
+        <RelativeLayout
+            android:id="@+id/zoneInfos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/separateur"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_toLeftOf="@+id/boutonSave"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/labelCommentaire"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Commentaire : "
+                android:textColor="@android:color/holo_blue_light"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/commentaire"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/black"
+                android:fontFamily="sans-serif"
+                android:layout_below="@+id/labelCommentaire"
+                android:inputType="text"
+                android:imeOptions="actionDone"
+                android:textColor="@android:color/black"
+                android:textColorHint="@android:color/black"
+                android:textCursorDrawable="@null" />
+        </RelativeLayout>
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/boutonSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@drawable/ic_check"
+            app:fab_colorNormal="@color/vert"
+            app:fab_colorPressed="@color/vert"
+            app:fab_colorRipple="@color/vert"
+            app:fab_size="normal" />
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
