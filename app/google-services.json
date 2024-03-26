@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "662498921125",
+    "project_id": "phiwmsmobile",
+    "storage_bucket": "phiwmsmobile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:662498921125:android:2331165c5ec95e80f9db4c",
+        "android_client_info": {
+          "package_name": "fr.alcyons.phiwms_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7F8gUqHEOK6bpg-lxpB7yKH3gEikkWJE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
