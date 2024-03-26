@@ -1,1 +1,0 @@
-include ':app', ':com.symbol.emdk.wizard.core', ':com.symbol.emdk.wizard.intellijIdea'
