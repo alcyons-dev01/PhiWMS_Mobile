@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/white">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@android:color/white">
+
+        <LinearLayout
+            android:id="@+id/barreDeTitre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/blanc"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/nomListe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:paddingLeft="5dp"
+                android:background="@color/bleu_clair_alcyons"/>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@color/orange"
+                android:layout_weight="4"
+                android:paddingLeft="5dp"
+                android:paddingVertical="5dp">
+
+                <TextView
+                    android:id="@+id/nbElementInAdapter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/titre"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Références à commander"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginLeft="5dp"/>
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/layoutBoutonEnvoyer"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:background="@drawable/background_plain_vert_alcyons"
+                android:layout_weight="10"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:layout_marginVertical="5dp"
+                android:layout_marginHorizontal="5dp"
+                android:gravity="center_vertical"
+                android:layout_gravity="center_vertical">
+
+                <LinearLayout
+                    android:id="@+id/layoutTextAEnvoyer"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="9"
+                    android:weightSum="3"
+                    android:layout_marginStart="5dp">
+
+                    <TextView
+                        android:id="@+id/textEnvoi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="À clôturer"
+                        android:textColor="#000000"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:layout_marginLeft="10dp"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"/>
+
+                    <TextView
+                        android:id="@+id/dateEnvoiListe"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:text=""
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layoutValider"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="right">
+
+                    <ImageView
+                        android:id="@+id/iconEnvoi"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_gravity="center"
+                        android:textAlignment="center"
+                        android:background="@drawable/ic_send_black"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:background="@drawable/contour_gestion_statut_action_soumise">
+
+                <ImageView
+                    android:id="@+id/iconRecherche"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_gravity="center"
+                    android:textAlignment="center"
+                    android:title="Search"
+                    android:background="@drawable/ic_search_black"/>
+
+                <EditText
+                    android:id="@+id/searchBarPleinVide"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="10dp"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:hint="Rechercher un détail dotation"/>
+
+                <ImageView
+                    android:id="@+id/removeSearch"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_gravity="center"
+                    android:textAlignment="center"
+                    android:title="Search"
+                    android:visibility="gone"
+                    android:background="@drawable/ic_croix_noir"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/barreDeTitre"
+            android:orientation="vertical"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
+
+            <ListView
+                android:id="@+id/listeView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:descendantFocusability="afterDescendants">
+
+            </ListView>
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    </RelativeLayout>
+
+
+</LinearLayout>

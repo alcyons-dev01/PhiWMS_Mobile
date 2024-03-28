@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/background_element_liste"
+        android:paddingBottom="15dp"
+        android:paddingTop="15dp">
+
+
+        <RelativeLayout
+            android:id="@+id/titreDispositif"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/layoutNomDispositif"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/nomDispositif"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="#000000"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutSecondaire"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/layoutNomDispositif"
+                android:layout_marginTop="10dp"
+                android:weightSum="10">
+
+                <TextView
+                    android:id="@+id/nomFournisseur"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_weight="5"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text=""
+                    android:textColor="#000000" />
+
+                <TextView
+                    android:id="@+id/type"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_weight="5"
+                    android:gravity="end"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text=""
+                    android:textColor="#000000" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/separateur1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@id/layoutSecondaire"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:contentDescription="@string/separateur"
+                android:background="@android:color/holo_blue_light" />
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/separateur1"
+                android:layout_marginTop="10dp">
+
+                <TableRow
+                    android:id="@+id/tableRowHaut"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"
+                    android:weightSum="25">
+
+                    <ImageView
+                        android:id="@+id/symboleusageunique"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:contentDescription="@string/usageUnique"
+                        android:background="@drawable/ic_symboleusageunique"
+                        android:visibility="invisible" />
+
+                    <ImageView
+                        android:id="@+id/symbolefragile"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:contentDescription="@string/fragile"
+                        android:background="@drawable/ic_symbolefragile"
+                        android:visibility="invisible" />
+
+                    <ImageView
+                        android:id="@+id/symboletemperature"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:contentDescription="@string/temperature"
+                        android:background="@drawable/ic_symboletemperatureambiante"
+                        android:visibility="invisible" />
+
+                    <ImageView
+                        android:id="@+id/symboleausec"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:contentDescription="@string/auSec"
+                        android:background="@drawable/ic_symboleausec"
+                        android:visibility="invisible" />
+
+                    <ImageView
+                        android:id="@+id/symboleabrilumiere"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:contentDescription="@string/aLAbriDeLaLumiere"
+                        android:background="@drawable/ic_symboleabrilumiere"
+                        android:visibility="invisible" />
+
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tableRowBas"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"
+                    android:weightSum="25">
+
+                    <ImageView
+                        android:id="@+id/symbolesterilisation"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:contentDescription="@string/sterilisation"
+                        android:background="@drawable/ic_symbolenonsterile"
+                        android:visibility="invisible" />
+
+                    <ImageView
+                        android:id="@+id/symbolenepasresteriliser"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:contentDescription="@string/nePasResteriliser"
+                        android:background="@drawable/ic_symbolenepasresteriliser"
+                        android:visibility="invisible" />
+
+                    <ImageView
+                        android:id="@+id/symbolerisquesubstancepresancelatex"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:contentDescription="@string/risquesubstancepresancelatex"
+                        android:background="@drawable/ic_symbolerisquesubstancepresencelatex"
+                        android:visibility="invisible" />
+
+                    <ImageView
+                        android:id="@+id/symbolerisquesubstancepresancepht"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:contentDescription="@string/risquesubstancepresancepht"
+                        android:background="@drawable/ic_symbolerisquesubstancepresencepht"
+                        android:visibility="invisible" />
+
+                    <ImageView
+                        android:id="@+id/symbolerisquesubstancepresance"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:contentDescription="@string/risquesubstancepresance"
+                        android:background="@drawable/ic_symbolerisquesubstancepresence"
+                        android:visibility="invisible" />
+
+                </TableRow>
+
+            </TableLayout>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>

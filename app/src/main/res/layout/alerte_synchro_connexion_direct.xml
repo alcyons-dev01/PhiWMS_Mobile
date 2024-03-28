@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/bleu_fonce_alcyons"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="Veuillez patienter"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ProgressBar
+
+            android:id="@+id/barDeProgression"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:indeterminate="false"
+            android:layout_gravity="center"
+            android:progressDrawable="@drawable/progress_circular"
+            android:secondaryProgress="100"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/TextSynchronisation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Synchronisation en cours"
+                android:textColor="@android:color/black"
+                android:textSize="15sp" />
+
+            <com.tomer.fadingtextview.FadingTextView
+                android:id="@+id/fadingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:texts="@array/alerte_synchro"
+                app:timeout="200"
+                android:textAppearance="@style/testSizeAlert"
+                android:textColor="@color/noir"/>
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+</ScrollView>

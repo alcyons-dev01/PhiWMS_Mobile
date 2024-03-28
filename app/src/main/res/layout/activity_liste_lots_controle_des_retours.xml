@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="fr.alcyons.phimr4.RetourPUI.ListeEmplacementRetourPUIActivity">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        tools:layout_editor_absoluteX="2dp"
+        tools:layout_editor_absoluteY="-33dp">
+
+        <LinearLayout
+            android:id="@+id/barreDeTitre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:background="@color/bleu_fonce_alcyons"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/designationProduit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:text="désignation"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/zoneListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/separateur"
+            android:layout_below="@id/barreDeTitre"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
+
+            <include layout="@layout/liste_view" />
+
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/separateur"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignBottom="@+id/boutonAddManuel"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="110dp"
+            android:background="@android:color/darker_gray" />
+
+        <LinearLayout
+            android:id="@+id/layout_qte_declarer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/zoneListView"
+            android:layout_margin="10dp"
+            android:paddingBottom="10dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Quantité déclarée : "
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/qteDeclaree"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="12"
+                android:textColor="@android:color/holo_red_light"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/boutonAddManuel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="15dp"
+            android:src="@drawable/ic_plus"
+            app:fab_colorNormal="@android:color/holo_green_light"
+            app:fab_colorPressed="@android:color/holo_green_light"
+            app:fab_colorRipple="@android:color/holo_green_light"
+            app:fab_label="Ajout manuel"
+            app:fab_size="normal" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/boutonAddScan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/boutonAddManuel"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/ic_datamatrix"
+            app:fab_colorNormal="@android:color/holo_blue_light"
+            app:fab_colorPressed="@android:color/holo_blue_light"
+            app:fab_colorRipple="@android:color/holo_blue_light"
+            app:fab_label="Ajout par scan"
+            app:fab_size="normal" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/boutonValider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="15dp"
+            android:src="@drawable/ic_check"
+            app:fab_colorNormal="@color/vert"
+            app:fab_colorPressed="@color/vert"
+            app:fab_colorRipple="@color/vert"
+            app:fab_label="Valider"
+            app:fab_size="normal" />
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

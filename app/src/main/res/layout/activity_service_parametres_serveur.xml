@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="fr.alcyons.phimr4.ParametresServeur.ServiceParametresServeurActivity">
+
+    <LinearLayout
+        android:id="@+id/parametreServeur"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@+id/parametreUtilisateur">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/bleu_fonce_alcyons"
+        android:gravity="center"
+        android:padding="5dp"
+        android:weightSum="1">
+
+        <ImageView
+            android:id="@+id/flecheRetour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_arrow_back"
+            android:backgroundTint="@color/blanc"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Préférence Réseaux"
+            android:textColor="@android:color/white"
+            android:fontFamily="sans-serif"
+            android:textSize="20sp"
+            android:gravity="center" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/texteIntro"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/formulaireConnexion"
+            android:layout_margin="10dp"
+            android:gravity="center_vertical"
+            android:text="@string/parametreServeurIntroduction" />
+
+        <LinearLayout
+            android:id="@+id/formulaireConnexion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
+
+            <EditText
+                android:id="@+id/ipServeur"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/black"
+                android:digits="0123456789."
+                android:fontFamily="sans-serif"
+                android:hint="@string/parametreIpServeur"
+                android:inputType="numberDecimal"
+                android:nextFocusDown="@+id/numeroPort"
+                android:maxLines="1"
+                android:textColor="@android:color/black"
+                android:textColorHint="@android:color/black"
+                android:textCursorDrawable="@null" />
+
+            <EditText
+                android:id="@+id/numeroPort"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/black"
+                android:fontFamily="sans-serif"
+                android:hint="@string/parametreNumeroPort"
+                android:inputType="number"
+                android:textColor="@android:color/black"
+                android:textColorHint="@android:color/black"
+                android:textCursorDrawable="@null" />
+
+            <EditText
+                android:id="@+id/versionAPI"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/black"
+                android:fontFamily="sans-serif"
+                android:hint="@string/parametreNumeroVersionApi"
+                android:inputType="number"
+                android:textColor="@android:color/black"
+                android:textColorHint="@android:color/black"
+                android:textCursorDrawable="@null" />
+
+            <Button
+                android:id="@+id/boutonAlcyonsParametre"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:layout_weight="5"
+                android:background="@color/bleu_fonce_alcyons"
+                android:text="Parametre alcyons"
+                android:textColor="@android:color/white"
+                android:visibility="gone"/>
+
+
+                <Button
+                    android:id="@+id/boutonTestConnexion"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@android:color/holo_green_light"
+                    android:text="@string/tester"
+                    android:textColor="@android:color/white"
+                    android:onClick="TesteConnexion"/>
+
+                <Button
+                    android:id="@+id/boutonValider"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@color/bleu_clair_alcyons"
+                    android:text="@string/valider"
+                    android:textColor="@android:color/white"
+                    android:onClick="Connexion"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>

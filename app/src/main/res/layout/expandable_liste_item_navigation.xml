@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:weightSum="3">
+
+    <ImageView
+        android:id="@+id/statutService"
+        android:layout_gravity="center_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_play"
+        android:backgroundTint="@color/bleu_clair_alcyons"
+        android:contentDescription="@string/statutService" />
+
+    <TextView
+        android:id="@+id/expandedListItem"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:paddingBottom="10dp"
+        android:paddingEnd="?android:attr/expandableListPreferredChildPaddingLeft"
+        android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"
+        android:paddingStart="?android:attr/expandableListPreferredChildPaddingLeft"
+        android:paddingTop="10dp"
+        android:text=""
+        android:textColor="@color/bleu_clair_alcyons" />
+
+    <ImageView
+        android:id="@+id/separateur"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        android:background="@drawable/grey_color_fonce" />
+
+    <TextView
+        android:id="@+id/indicateurService"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:paddingBottom="10dp"
+        android:textStyle="bold"
+        android:paddingEnd="?android:attr/expandableListPreferredChildPaddingLeft"
+        android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"
+        android:paddingStart="?android:attr/expandableListPreferredChildPaddingLeft"
+        android:paddingTop="10dp"
+        android:text="" />
+
+</LinearLayout>

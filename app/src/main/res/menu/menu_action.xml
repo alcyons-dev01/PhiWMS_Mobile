@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menuRecherche"
+        android:icon="@drawable/ic_search"
+        android:title="@string/date"
+        app:showAsAction="ifRoom"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/menuInformation"
+        android:icon="@drawable/ic_info_outline"
+        android:title="@string/information"
+        app:showAsAction="ifRoom"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/menuSend"
+        android:icon="@drawable/ic_send_black_24dp"
+        android:title="@string/envoyer"
+        app:showAsAction="always"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/menuAdd"
+        android:icon="@drawable/ic_add_black_24dp"
+        android:title="@string/ajouter"
+        app:showAsAction="always"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/menuDatamatrix"
+        android:icon="@drawable/ic_datamatrix"
+        android:title="@string/scanner"
+        app:showAsAction="ifRoom"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/menuPhoto"
+        android:icon="@drawable/ic_photo_camera"
+        android:title="@string/prendre_une_photo"
+        app:showAsAction="ifRoom"
+        android:visible="false"/>
+
+    <item
+        android:id="@+id/menuDelete"
+        android:icon="@drawable/ic_delete"
+        android:title="@string/supprimer"
+        app:showAsAction="ifRoom"
+        android:visible="false"/>
+
+    <item
+        android:id="@+id/menuSave"
+        android:icon="@drawable/ic_check"
+        android:title="@string/enregistrer"
+        app:showAsAction="ifRoom"
+        android:visible="false"/>
+
+    <item
+        android:id="@+id/menuSaveCircle"
+        android:icon="@drawable/ic_check_circle_white"
+        android:title="@string/enregistrer"
+        app:showAsAction="ifRoom"
+        android:visible="false"/>
+
+    <item
+        android:id="@+id/menuEdit"
+        android:icon="@drawable/ic_bouton_modif"
+        android:title="@string/editer"
+        app:showAsAction="ifRoom"
+        android:visible="false"/>
+
+    <item
+        android:id="@+id/menuDate"
+        android:icon="@drawable/ic_date_white"
+        android:title="@string/date"
+        app:showAsAction="ifRoom"
+        android:visible="false"/>
+
+</menu>

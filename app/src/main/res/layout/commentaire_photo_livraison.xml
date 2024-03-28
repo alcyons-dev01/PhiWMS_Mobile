@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Commentaire "
+                android:textColor="@color/noir"
+                android:textSize="16dp"
+                android:textStyle="bold"
+                android:layout_marginLeft="10dp"
+                android:layout_gravity="center_vertical"/>
+
+            <TextView
+                android:id="@+id/layoutFermePAD"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="ANNULER"
+                android:layout_weight="1"
+                android:textColor="@color/rouge"
+                android:textStyle="bold"
+                android:layout_gravity="center_vertical|end"
+                android:gravity="right"
+                android:layout_marginRight="10dp"
+                android:textSize="20dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/commentaireEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Saisie un commentaire"
+                android:lines="10"
+                android:imeOptions="actionDone"
+                android:background="@color/blanc"
+                android:layout_margin="5dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:weightSum="2">
+
+            <LinearLayout
+                android:id="@+id/boutonPhoto"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/bleu_clair_alcyons"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_margin="10dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/ic_photo_camera"/>
+
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/boutonValider"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Valider"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:background="@color/vert"
+                android:layout_marginLeft="5dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

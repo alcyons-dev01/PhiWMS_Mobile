@@ -1,0 +1,73 @@
+package com.example.phiwms_mobile.Classes;
+
+import android.database.Cursor;
+
+import com.example.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
+import com.example.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
+
+/**
+ * Created by quentinlanusse on 27/04/2017.
+ */
+
+public class ElementASynchroniser {
+    private int phiMR4UUID;
+    private String tableConcernee;
+    private String action;
+    private int idDansTableConcernee;
+    private int idOrigine4D;
+
+    public ElementASynchroniser(String tableConcernee, String action, int idDansTableConcernee, int idOrigine4D) {
+        this.tableConcernee = tableConcernee;
+        this.action = action;
+        this.idDansTableConcernee = idDansTableConcernee;
+        this.idOrigine4D = idOrigine4D;
+    }
+
+    public ElementASynchroniser(Cursor cursor) {
+        this.tableConcernee = cursor.getString(ElementASynchroniserOpenHelper.Constantes.NUM_COL_TABLE_CONCERNEE_ELEMENT_A_SYNCHRONISER);
+        this.action = cursor.getString(ElementASynchroniserOpenHelper.Constantes.NUM_COL_ACTION_ELEMENT_A_SYNCHRONISER);
+        this.idDansTableConcernee = cursor.getInt(ElementASynchroniserOpenHelper.Constantes.NUM_COL_ID_DANS_TABLE_CONCERNEE_ELEMENT_A_SYNCHRONISER);
+        this.idOrigine4D = cursor.getInt(ElementASynchroniserOpenHelper.Constantes.NUM_COL_ID_ORIGINE_4D);
+        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+    }
+
+    public int getIdOrigine4D() {
+        return idOrigine4D;
+    }
+
+    public void setIdOrigine4D(int idOrigine4D) {
+        this.idOrigine4D = idOrigine4D;
+    }
+
+    public int getPhiMR4UUID() {
+        return phiMR4UUID;
+    }
+
+    public void setPhiMR4UUID(int phiMR4UUID) {
+        this.phiMR4UUID = phiMR4UUID;
+    }
+
+    public String getTableConcernee() {
+        return tableConcernee;
+    }
+
+    public void setTableConcernee(String tableConcernee) {
+        this.tableConcernee = tableConcernee;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public int getIdDansTableConcernee() {
+        return idDansTableConcernee;
+    }
+
+    public void setIdDansTableConcernee(int idDansTableConcernee) {
+        this.idDansTableConcernee = idDansTableConcernee;
+    }
+}

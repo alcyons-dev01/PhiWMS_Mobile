@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_retournerAuScanne"
+        android:orderInCategory="100"
+        android:title="Retourner au scanne"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_envoyerDemande"
+        android:orderInCategory="100"
+        android:title="Envoyer demande"
+        app:showAsAction="never" />
+
+</menu>
