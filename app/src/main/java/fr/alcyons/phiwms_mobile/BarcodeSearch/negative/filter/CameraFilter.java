@@ -26,7 +26,7 @@ import java.nio.FloatBuffer;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.negative.opengl.MyGLUtils;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.negative.opengl.RenderBuffer;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)

@@ -111,7 +111,7 @@ public class FournisseurOpenHelper extends DBOpenHelper {
         // Insertion du dépot en BDD
         long rowId = db.insert(Constantes.TABLE_FOURNISSEUR, null, contentValues);
 
-        fournisseur.setPhiMR4UUID((int) rowId);
+        fournisseur.setphiwms_mobileUUID((int) rowId);
 
         return rowId;
     }
@@ -370,7 +370,7 @@ public class FournisseurOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_FOURNISSEUR = "CREATE TABLE " + Constantes.TABLE_FOURNISSEUR
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_RAISONSOCIALE_FOURNISSEUR + " " + Constantes.TYPE_COL_RAISONSOCIALE_FOURNISSEUR + " ,"
                 + Constantes.CLE_COL_COMMANDE_ADRESSE1_FOURNISSEUR + " " + Constantes.TYPE_COL_COMMANDE_ADRESSE1_FOURNISSEUR + " ,"
                 + Constantes.CLE_COL_COMMANDE_ADRESSE2_FOURNISSEUR + " " + Constantes.TYPE_COL_COMMANDE_ADRESSE2_FOURNISSEUR + " ,"

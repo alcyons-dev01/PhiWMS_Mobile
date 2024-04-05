@@ -38,7 +38,7 @@ public class Stock_Lot implements Serializable, Comparable {
     private String rien;
     private String Peremption_date;
     private String Quarantaine;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Stock_Lot(int _UID, String ref_Depot, int ID_Produit, String ref_Produit, String numero_Lot, String peremption_AAAAMM, double qte_Invent, double qte_Entree, double qte_Sortie, String SYS_DT_MAJ, String SYS_HEURE_MAJ, String SYS_USER_MAJ, double qte_Actuelle, String date_Creation, String date_Der_Entree, String date_Der_Sortie, String date_Inventaire, double qte_Av_Inventaire, String rien, String peremption_date, String quarantaine) {
         this._UID = _UID;
@@ -114,15 +114,15 @@ public class Stock_Lot implements Serializable, Comparable {
         this.rien = cursor.getString(Stock_LotOpenHelper.Constantes.NUM_COL_RIEN_STOCK_LOT);
         this.Peremption_date = cursor.getString(Stock_LotOpenHelper.Constantes.NUM_COL_PEREMPTION_DATE_STOCK_LOT);
         this.Quarantaine = cursor.getString(Stock_LotOpenHelper.Constantes.NUM_COL_QUARANTAINE_STOCK_LOT);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int get_UID() {
@@ -310,7 +310,7 @@ public class Stock_Lot implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Stock_Lot stock_lot = (Stock_Lot) obj;
 
-        if (this.getPhiMR4UUID() == stock_lot.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == stock_lot.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.get_UID() > stock_lot.get_UID() ? 1 : -1;

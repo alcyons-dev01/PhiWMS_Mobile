@@ -47,7 +47,7 @@ public class Retour implements Serializable, Comparable {
     private String Prenom_Chauffeur;
     private String Transporteur;
     private String Signature_Chauffeur;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Retour(int _UID, String numero, String ref_Depot_Origine, int code_Patient, String intitulé, String ref_Depot_Dest, String statut, String date_retour, double montant_TTC, String commentaire, String motif, String devise, String SYS_DT_MAJ, String SYS_HEURE_MAJ, String SYS_USER_MAJ, String en_Attente_de, String date_Reprise, String date_Validation, String provenance_Reference, Boolean avoir_Attendu) {
         this._UID = _UID;
@@ -156,7 +156,7 @@ public class Retour implements Serializable, Comparable {
         this.Date_Validation = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_DATE_VALIDATION_RETOUR);
         this.Provenance_Reference = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_PROVENANCE_REFERENCE_RETOUR);
         this.Avoir_Attendu = recupererBooleen(cursor, RetourOpenHelper.Constantes.NUM_COL_AVOIR_ATTENDU_RETOUR);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }*/
 
     public Retour(Cursor cursor) {
@@ -180,16 +180,16 @@ public class Retour implements Serializable, Comparable {
         this.Prenom_Chauffeur = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_PRENOM_CHAUFFEUR_RETOUR);
         this.Transporteur = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_TRANSPORTEUR_RETOUR);
         this.Signature_Chauffeur = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_SIGNATURE_CHAUFFEUR);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int get_UID() {
@@ -448,7 +448,7 @@ public class Retour implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Retour retour = (Retour) obj;
 
-        if (this.getPhiMR4UUID() == retour.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == retour.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.get_UID() > retour.get_UID() ? 1 : -1;

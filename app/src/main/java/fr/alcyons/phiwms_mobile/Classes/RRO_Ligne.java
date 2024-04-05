@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.RRO_LigneOpenHelper;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
@@ -37,7 +36,7 @@ public class RRO_Ligne implements Serializable, Comparable {
     private String Devise;
     private int ID_Mvt;
     private int Classe_N;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public RRO_Ligne(int RRO_UID, String ref_Frs, String type_Pdt, double quantite, double PU, String designation, int code_Pdt, String categorie, String unite, double conditionnement, int code_Frs, String fournisseur, double montant_HT, int _UID, double tx_TVA, double mt_TTC_Ligne, String devise, int ID_Mvt, int classe_N) {
         this.RRO_UID = RRO_UID;
@@ -107,15 +106,15 @@ public class RRO_Ligne implements Serializable, Comparable {
         this.Devise = cursor.getString(RRO_LigneOpenHelper.Constantes.NUM_COL_DEVISE_RRO_LIGNE);
         this.ID_Mvt = cursor.getInt(RRO_LigneOpenHelper.Constantes.NUM_COL_ID_MVT_RRO_LIGNE);
         this.Classe_N = cursor.getInt(RRO_LigneOpenHelper.Constantes.NUM_COL_CLASSE_N_RRO_LIGNE);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getRRO_UID() {

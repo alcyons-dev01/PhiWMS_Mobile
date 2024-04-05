@@ -33,7 +33,7 @@ import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by quentinlanusse on 13/04/2017.

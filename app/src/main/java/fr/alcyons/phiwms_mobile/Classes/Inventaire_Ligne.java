@@ -43,7 +43,7 @@ public class Inventaire_Ligne implements Serializable, Comparable {
     private int ID;
     private int _UID;
     private String Classe;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Inventaire_Ligne(int produitID, String produit_Reference, String fournisseur, String categorie, String designation, double stock_theorique, double stock_Physique, String depotReference, String _SYS_DT_MAJ, String _SYS_HEURE_MAJ, String _SYS_USER_MAJ, String zone, int ID_Inv, Boolean _NePasImprimer, double PUHT, double tvaTx, Boolean suspendu, double valeur_TTC, double ecart, String unite, double conditionnement_Achat, int ID, int _UID, String classe) {
         this.ProduitID = produitID;
@@ -140,15 +140,15 @@ public class Inventaire_Ligne implements Serializable, Comparable {
         this.ID = cursor.getInt(Inventaire_LigneOpenHelper.Constantes.NUM_COL_ID_INVENTAIRE_LIGNE);
         this._UID = cursor.getInt(Inventaire_LigneOpenHelper.Constantes.NUM_COL__UID_INVENTAIRE_LIGNE);
         this.Classe = cursor.getString(Inventaire_LigneOpenHelper.Constantes.NUM_COL_CLASSE_INVENTAIRE_LIGNE);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getProduitID() {
@@ -360,7 +360,7 @@ public class Inventaire_Ligne implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Inventaire_Ligne inventaire_ligne = (Inventaire_Ligne) obj;
 
-        if (this.getPhiMR4UUID() == inventaire_ligne.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == inventaire_ligne.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.get_UID() > inventaire_ligne.get_UID() ? 1 : -1;

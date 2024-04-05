@@ -14,9 +14,9 @@ public class TableTraceOpenHelper extends DBOpenHelper {
         super(context, name, factory, version);
     }
 
-    public static TableTrace getTableTraceByPhiMR4UUID(SQLiteDatabase db, int id){
+    public static TableTrace getTableTraceByphiwms_mobileUUID(SQLiteDatabase db, int id){
         TableTrace objet=null;
-        Cursor cursor=db.rawQuery(" SELECT * FROM " + Constantes.TABLE_TABLE_TRACE + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID+"=? ", new String[]{String.valueOf(id)});
+        Cursor cursor=db.rawQuery(" SELECT * FROM " + Constantes.TABLE_TABLE_TRACE + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID+"=? ", new String[]{String.valueOf(id)});
         if(cursor.getCount()==1){
             cursor.moveToFirst();objet=new TableTrace(cursor);
         }
@@ -33,10 +33,10 @@ public class TableTraceOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_CODE_RETOURNE, objet.getCodeRetourne());
         contentValues.put(Constantes.CLE_COL_USER, objet.getUser());
         contentValues.put(Constantes.CLE_COL_USERID, objet.getUserID());
-     //   contentValues.put(DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID, objet.getPhiMR4UUID());
+     //   contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, objet.getphiwms_mobileUUID());
 
         long rowID = db.insert(Constantes.TABLE_TABLE_TRACE, null, contentValues);
-        objet.setPhiMR4UUID((int) rowID);
+        objet.setphiwms_mobileUUID((int) rowID);
         return rowID;
     }
 
@@ -73,7 +73,7 @@ public class TableTraceOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_TABLE_TRACE = " CREATE TABLE  " + Constantes.TABLE_TABLE_TRACE
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + "    PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + "    PRIMARY KEY,"
                 + Constantes.CLE_COL_ID_TABLE_TRACE + " " + Constantes.TYPE_COL_TABLE_TRACE + " , "
                 + Constantes.CLE_COL_DATE + " " + Constantes.TYPE_COL_DATE + " , "
                 + Constantes.CLE_COL_SERVICE + " " + Constantes.TYPE_COL_SERVICE + " , "

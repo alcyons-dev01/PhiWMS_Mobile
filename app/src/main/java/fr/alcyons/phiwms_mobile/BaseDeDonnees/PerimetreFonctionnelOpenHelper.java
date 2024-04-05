@@ -52,7 +52,7 @@ public class PerimetreFonctionnelOpenHelper extends DBOpenHelper {
         // Insertion du périmètre fonctionnel en BDD
         long rowID = db.insert(Constantes.TABLE_PERIMETRE_FONCTIONNEL, null, contentValues);
 
-        perimetreFonctionnel.setPhiMR4UUID((int) rowID);
+        perimetreFonctionnel.setphiwms_mobileUUID((int) rowID);
 
         return rowID;
     }
@@ -120,7 +120,7 @@ public class PerimetreFonctionnelOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_PERIMETRE_FONCTIONNEL = "CREATE TABLE "
                 + Constantes.TABLE_PERIMETRE_FONCTIONNEL + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_NOM_PERIMETRE_FONCTIONNEL + " " + Constantes.TYPE_COL_NOM_PERIMETRE_FONCTIONNEL + ","
                 + Constantes.CLE_COL_ID_PERIMETRE_FONCTIONNEL + " " + Constantes.TYPE_COL_ID_PERIMETRE_FONCTIONNEL
                 + ");";

@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.FactureOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
 /**
@@ -57,7 +56,7 @@ public class Facture implements Serializable, Comparable {
     private int Bordereau_UID;
     private Boolean Import;
     private String CommandeNumero;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Facture(int ID_Facture, String numéro, double fact_HT, double fact_TVA, double fact_TTC, double com_HT, double com_TVA, double com_TTC, int code_fournisseu, String fournisseur, String date_fact, String echéance, double solde, String soldée_le, String statut, double ecart_I_HT, double ecart_I_TVA, double ecart_I_TTC, double calc_HT, double calc_TVA, double calc_TTC, double frais_HT, double frais_TVA, double frais_TTC, String date_comptable, String date_ecriture, String piece, String devise, String SYS_DT_MAJ, String SYS_HEURE_MAJ, String SYS_USER_MAJ, String mode_reglement, Boolean pharmacie, Boolean litige, Boolean transmise, int num_Semaine, String reception_Date, int bordereau_UID, Boolean anImport, String commandeNumero) {
         this.ID_Facture = ID_Facture;
@@ -190,15 +189,15 @@ public class Facture implements Serializable, Comparable {
         this.Bordereau_UID = cursor.getInt(FactureOpenHelper.Constantes.NUM_COL_BORDEREAU_UID_FACTURE);
         this.Import = OutilsGestionClasses.recupererBooleen(cursor, FactureOpenHelper.Constantes.NUM_COL_IMPORT_FACTURE);
         this.CommandeNumero = cursor.getString(FactureOpenHelper.Constantes.NUM_COL_COMMANDENUMERO_FACTURE);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getID_Facture() {
@@ -590,7 +589,7 @@ public class Facture implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Facture facture = (Facture) obj;
 
-        if (this.getPhiMR4UUID() == facture.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == facture.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.getID_Facture() > facture.getID_Facture() ? 1 : -1;

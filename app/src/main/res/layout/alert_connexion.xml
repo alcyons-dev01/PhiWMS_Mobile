@@ -47,7 +47,7 @@
                 android:adjustViewBounds="true"
                 android:baselineAligned="true"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_phimr4_logo" />
+                android:src="@drawable/ic_phiwms_mobile_logo" />
         </LinearLayout>
 
         <LinearLayout

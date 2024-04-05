@@ -58,7 +58,7 @@ public class SYS_Mvt_Stock_TypeOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_SYS_MVT_STOCK_TYPE = "CREATE TABLE " + Constantes.TABLE_SYS_MVT_STOCK_TYPE
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_TYM_RUID_SYS_MVT_STOCK_TYPE + " " + Constantes.TYPE_COL_TYM_RUID_SYS_MVT_STOCK_TYPE + " ,"
                 + Constantes.CLE_COL_TYM_LIB_SYS_MVT_STOCK_TYPE + " " + Constantes.TYPE_COL_TYM_LIB_SYS_MVT_STOCK_TYPE + " ,"
                 + Constantes.CLE_COL_TYM_SENS_ENTREE_SYS_MVT_STOCK_TYPE + " " + Constantes.TYPE_COL_TYM_SENS_ENTREE_SYS_MVT_STOCK_TYPE + " ,"

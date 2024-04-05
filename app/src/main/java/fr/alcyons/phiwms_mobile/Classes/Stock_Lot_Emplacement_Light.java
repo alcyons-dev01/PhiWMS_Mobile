@@ -25,7 +25,7 @@ public class Stock_Lot_Emplacement_Light implements Comparable {
     private int Qte_Preparer = 0;
     private String Serie;
     private int _UID = 0;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Stock_Lot_Emplacement_Light(JSONObject jsonObject) {
         try {
@@ -66,15 +66,15 @@ public class Stock_Lot_Emplacement_Light implements Comparable {
         this.Produit_Code = cursor.getInt(Stock_Lot_EmplacementLightOpenHelper.Constantes.NUM_COL_PRODUIT_CODE_STOCK_LOT_EMPLACEMENT);
         this.Qte_Preparer = cursor.getInt(Stock_Lot_EmplacementLightOpenHelper.Constantes.NUM_COL_QTE_PREPARER_STOCK_LOT_EMPLACEMENT);
         this.Serie = cursor.getString(Stock_Lot_EmplacementLightOpenHelper.Constantes.NUM_COL_SERIE);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getQte_Preparer() {
@@ -180,7 +180,7 @@ public class Stock_Lot_Emplacement_Light implements Comparable {
     @Override
     public int compareTo(Object obj) {
 
-        if (this.getPhiMR4UUID() == ((Stock_Lot_Emplacement_Light) obj).getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == ((Stock_Lot_Emplacement_Light) obj).getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.get_UID() > ((Stock_Lot_Emplacement_Light) obj).get_UID() ? 1 : -1;

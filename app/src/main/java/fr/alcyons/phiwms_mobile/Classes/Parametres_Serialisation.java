@@ -34,7 +34,7 @@ public class Parametres_Serialisation {
     private String franceMVO_tan;
     private boolean franceMVO_termesEtConditions;
     private boolean moduleVision;
-    private int phiMR4UUID=-1;
+    private int phiwms_mobileUUID=-1;
 
     public Parametres_Serialisation(JSONObject jsonObject){
         try{
@@ -241,11 +241,11 @@ public class Parametres_Serialisation {
         this.moduleVision = moduleVision;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 }

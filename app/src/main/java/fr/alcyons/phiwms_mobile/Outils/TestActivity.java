@@ -7,8 +7,8 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.phiwms_mobile.ParametresUtilisateur.ServiceParametreUtilisateurActivity;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.ParametresUtilisateur.ServiceParametreUtilisateurActivity;
+import fr.alcyons.phiwms_mobile.R;
 
 
 public class TestActivity extends AppCompatActivity {

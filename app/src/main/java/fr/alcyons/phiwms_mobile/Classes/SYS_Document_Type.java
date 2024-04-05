@@ -28,7 +28,7 @@ public class SYS_Document_Type implements Serializable, Comparable {
     private String TYD_DESIGNATION;
     private String SYS_HEURE_MAJ;
     private String rien;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public SYS_Document_Type(int TYD_ID, String TYD_CODE, String TYD_DEPOT, String TYD_TYM_CODE1, String TYD_TYM_CODE2, String TYD_DT_CREAT, String SYS_DT_MAJ, String SYS_USER_MAJ, String TYD_DESIGNATION, String SYS_HEURE_MAJ, String rien) {
         this.TYD_ID = TYD_ID;
@@ -74,15 +74,15 @@ public class SYS_Document_Type implements Serializable, Comparable {
         this.TYD_DESIGNATION = cursor.getString(SYS_Document_TypeOpenHelper.Constantes.NUM_COL_TYD_DESIGNATION_SYS_DOCUMENT_TYPE);
         this.SYS_HEURE_MAJ = cursor.getString(SYS_Document_TypeOpenHelper.Constantes.NUM_COL_SYS_HEURE_MAJ_SYS_DOCUMENT_TYPE);
         this.rien = cursor.getString(SYS_Document_TypeOpenHelper.Constantes.NUM_COL_RIEN_SYS_DOCUMENT_TYPE);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getTYD_ID() {
@@ -213,7 +213,7 @@ public class SYS_Document_Type implements Serializable, Comparable {
     public int compareTo(Object obj) {
         SYS_Document_Type sys_document_type = (SYS_Document_Type) obj;
 
-        if (this.getPhiMR4UUID() == sys_document_type.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == sys_document_type.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.getTYD_ID() > sys_document_type.getTYD_ID() ? 1 : -1;

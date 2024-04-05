@@ -8,7 +8,6 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.Composants_patientOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
@@ -37,7 +36,7 @@ public class Composants_patient implements Serializable, Comparable {
     private int Montant_TTC_Ligne;
     private int Montant_HT_Ligne;
     private int _UID;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Composants_patient(JSONObject jsonObject) {
         try {
@@ -79,7 +78,7 @@ public class Composants_patient implements Serializable, Comparable {
         this.Montant_TTC_Ligne = cursor.getInt(Composants_patientOpenHelper.Constantes.NUM_COL_MONTANT_TTC_LIGNE_COMPOSANTS_PATIENT);
         this.Montant_HT_Ligne = cursor.getInt(Composants_patientOpenHelper.Constantes.NUM_COL_MONTANT_HT_LIGNE_COMPOSANTS_PATIENT);
         this._UID = cursor.getInt(Composants_patientOpenHelper.Constantes.NUM_COL__UID_COMPOSANTS_PATIENT);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
     public int getProtocolePatient_UID() {
@@ -210,12 +209,12 @@ public class Composants_patient implements Serializable, Comparable {
         this._UID = _UID;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public JSONObject toJson() {
@@ -263,7 +262,7 @@ public class Composants_patient implements Serializable, Comparable {
                 ", Montant_TTC_Ligne=" + Montant_TTC_Ligne +
                 ", Montant_HT_Ligne=" + Montant_HT_Ligne +
                 ", _UID=" + _UID +
-                ", phiMR4UUID=" + phiMR4UUID +
+                ", phiwms_mobileUUID=" + phiwms_mobileUUID +
                 '}';
     }
 
@@ -271,17 +270,17 @@ public class Composants_patient implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         Composants_patient composants_patient = (Composants_patient) obj;
 
-        if (this.getPhiMR4UUID() == composants_patient.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == composants_patient.getphiwms_mobileUUID()) {
             return 0;
         } else {
-            return this.getPhiMR4UUID() > composants_patient.getPhiMR4UUID() ? 1 : -1;
+            return this.getphiwms_mobileUUID() > composants_patient.getphiwms_mobileUUID() ? 1 : -1;
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
-        if (((Composants_patient) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
+        if (((Composants_patient) obj).getphiwms_mobileUUID() == this.getphiwms_mobileUUID()) {
             valeurARetourner = true;
         }
 

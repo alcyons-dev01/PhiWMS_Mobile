@@ -54,12 +54,10 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ObjetReceptionScannee;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.TableTrace;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.Produit_PreparationScanneeAdapter;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.Produit_ReceptionPADAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.Mail;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 public class ScannerPreparationPleinVideActivity extends ServiceActivity {

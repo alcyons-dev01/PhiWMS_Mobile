@@ -35,7 +35,7 @@ public class Detail_Dot implements Serializable, Comparable {
     private int Valeur_TTC;
     private int Stock_minimum;
     private String PleinVide_Adressage;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Detail_Dot(JSONObject jsonObject) {
         try {
@@ -75,7 +75,7 @@ public class Detail_Dot implements Serializable, Comparable {
         this.Valeur_TTC = cursor.getInt(Detail_DotOpenHelper.Constantes.NUM_COL_VALEUR_TTC_DETAIL_DOT);
         this.Stock_minimum = cursor.getInt(Detail_DotOpenHelper.Constantes.NUM_COL_STOCK_MINIMUM_DETAIL_DOT);
         this.PleinVide_Adressage = cursor.getString(Detail_DotOpenHelper.Constantes.NUM_COL_PLEINVIDE_ADRESSAGE_DETAIL_DOT);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
     public int getDotation_UID() {
@@ -190,12 +190,12 @@ public class Detail_Dot implements Serializable, Comparable {
         Stock_minimum = stock_minimum;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public String getPleinVide_Adressage() {
@@ -235,17 +235,17 @@ public class Detail_Dot implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         Detail_Dot detail_dot = (Detail_Dot) obj;
 
-        if (this.getPhiMR4UUID() == detail_dot.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == detail_dot.getphiwms_mobileUUID()) {
             return 0;
         } else {
-            return this.getPhiMR4UUID() > detail_dot.getPhiMR4UUID() ? 1 : -1;
+            return this.getphiwms_mobileUUID() > detail_dot.getphiwms_mobileUUID() ? 1 : -1;
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
-        if (((Detail_Dot) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
+        if (((Detail_Dot) obj).getphiwms_mobileUUID() == this.getphiwms_mobileUUID()) {
             valeurARetourner = true;
         }
 

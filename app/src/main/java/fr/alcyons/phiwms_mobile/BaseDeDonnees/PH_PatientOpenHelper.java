@@ -101,13 +101,13 @@ public class PH_PatientOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_DOCUMENT_PARTAGE_PH_PATIENT, objet.getDocument_partage());
         contentValues.put(Constantes.CLE_COL_DISCIPLINE_MEDICALE_PH_PATIENT, objet.getDiscipline_Medicale());
         long rowID = db.insert(Constantes.TABLE_PH_PATIENT, null, contentValues);
-        objet.setPhiMR4UUID((int) rowID);
+        objet.setphiwms_mobileUUID((int) rowID);
         return rowID;
     }
 
-    public static PH_Patient getPH_PatientByPhiMR4UUID(SQLiteDatabase db, int id) {
+    public static PH_Patient getPH_PatientByphiwms_mobileUUID(SQLiteDatabase db, int id) {
         PH_Patient phPatient = null;
-        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_PATIENT + " WHERE " + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=? ",
+        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_PATIENT + " WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=? ",
                 new String[]{String.valueOf(id)});
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
@@ -364,7 +364,7 @@ public class PH_PatientOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_PH_PATIENT = " CREATE TABLE       " + Constantes.TABLE_PH_PATIENT
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + "    PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + "    PRIMARY KEY,"
                 + Constantes.CLE_COL__PATIENTUID_PH_PATIENT + "  " + Constantes.TYPE_COL__PATIENTUID_PH_PATIENT + " , "
                 + Constantes.CLE_COL_CIVILITE_PH_PATIENT + "  " + Constantes.TYPE_COL_CIVILITE_PH_PATIENT + " , "
                 + Constantes.CLE_COL_NOM_NAISSANCE_PH_PATIENT + "  " + Constantes.TYPE_COL_NOM_NAISSANCE_PH_PATIENT + " , "

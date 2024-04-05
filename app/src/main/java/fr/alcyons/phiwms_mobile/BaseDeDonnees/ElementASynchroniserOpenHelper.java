@@ -141,20 +141,11 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
             case PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT:
                 url += ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriRequetePH_Reliquat;
                 break;
-            case PreparationOpenHelper.Constantes.TABLE_PREPARATION:
-                url += ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriRequetePreparations;
-                break;
-            case Preparation_LigneOpenHelper.Constantes.TABLE_PREPARATION_LIGNE:
-                url += ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriRequetePreparation_Lignes;
-                break;
             case PH_UtiliserOpenHelper.Constantes.TABLE_PH_UTILISER:
                 url += ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriRequetePhUtiliser;
                 break;
             case PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION:
                 url += ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriRequetePHSerialisation;
-                break;
-            case SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE:
-                url += ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriRequeteSurveillanceReference;
                 break;
             case ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR:
                 url += ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriRequeteActionUtilisateur;
@@ -223,7 +214,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                     body.put("depot_emplacement", emplacementJson);
                     break;
                 case ProduitOpenHelper.Constantes.TABLE_PRODUIT:
-                    Produit produitAEnvoyer = ProduitOpenHelper.getProduitByPhiMR4UUID(db, element.getIdDansTableConcernee());
+                    Produit produitAEnvoyer = ProduitOpenHelper.getProduitByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
                     if (produitAEnvoyer == null) {
                         // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
                         return;
@@ -234,7 +225,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                     }
                     break;
                 case RetourOpenHelper.Constantes.TABLE_RETOUR:
-                    Retour retourAEnvoyer = RetourOpenHelper.getRetourByPhiMR4UUID(db, element.getIdDansTableConcernee());
+                    Retour retourAEnvoyer = RetourOpenHelper.getRetourByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
                     if (retourAEnvoyer == null) {
                         // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
                         return;
@@ -245,7 +236,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                     }
                     break;
                 case Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE:
-                    Retour_Ligne retour_ligne = Retour_LigneOpenHelper.getRetourLigneByPhiMR4UUID(db, element.getIdDansTableConcernee());
+                    Retour_Ligne retour_ligne = Retour_LigneOpenHelper.getRetourLigneByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
                     if (retour_ligne == null) {
                         // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
                         return;
@@ -256,7 +247,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                     }
                     break;
                 case PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION:
-                    PH_Preparation phPreparation = PH_PreparationOpenHelper.getPH_PreparationByPhiMR4UUID(db, element.getIdDansTableConcernee());
+                    PH_Preparation phPreparation = PH_PreparationOpenHelper.getPH_PreparationByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
                     if (phPreparation == null) {
                         // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
                         return;
@@ -267,7 +258,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                     }
                     break;
                 case PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE:
-                    PH_Preparation_Ligne phPreparationLigne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByPhiMR4UUID(db, element.getIdDansTableConcernee());
+                    PH_Preparation_Ligne phPreparationLigne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
                     if (phPreparationLigne == null) {
                         // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
                         return;
@@ -283,7 +274,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                     }
                     break;
                 case Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT:
-                    Stock_Lot_Emplacement_Light stockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByPhiMR4UUID(db, element.getIdDansTableConcernee());
+                    Stock_Lot_Emplacement_Light stockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
                     if (stockLotEmplacement == null) {
                         // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
                         return;
@@ -294,7 +285,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                     }
                     break;
                 case InventaireOpenHelper.Constantes.TABLE_INVENTAIRE:
-                    Inventaire inventaire = InventaireOpenHelper.getInventaireByPhiMR4UUID(db, element.getIdDansTableConcernee());
+                    Inventaire inventaire = InventaireOpenHelper.getInventaireByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
                     if (inventaire == null) {
                         // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
                         return;
@@ -305,7 +296,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                     }
                     break;
                 case Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP:
-                    Inventaire_Ligne_Temp inventaireLigneTemp = Inventaire_Ligne_TempOpenHelper.getInventaireLigneTempByPhiMR4UUID(db, element.getIdDansTableConcernee());
+                    Inventaire_Ligne_Temp inventaireLigneTemp = Inventaire_Ligne_TempOpenHelper.getInventaireLigneTempByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
                     if (inventaireLigneTemp == null) {
                         return;
                     }
@@ -315,7 +306,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                     }
                     break;
                 case CommandeOpenHelper.Constantes.TABLE_COMMANDE:
-                    Commande commande = CommandeOpenHelper.getCommandeByPhiMR4UUID(db, element.getIdDansTableConcernee());
+                    Commande commande = CommandeOpenHelper.getCommandeByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
                     if (commande == null) {
                         return;
                     }
@@ -325,7 +316,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                     }
                     break;
                 case PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT:
-                    PH_Reliquat phReliquat = PH_ReliquatOpenHelper.getPH_ReliquatByPhiMR4UUID(db, element.getIdDansTableConcernee());
+                    PH_Reliquat phReliquat = PH_ReliquatOpenHelper.getPH_ReliquatByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
                     if (phReliquat == null) {
                         return;
                     }
@@ -334,30 +325,8 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                         body.put("ph_reliquat", phReliquatJSONObject);
                     }
                     break;
-                case PreparationOpenHelper.Constantes.TABLE_PREPARATION:
-                    Preparation Preparation = PreparationOpenHelper.getPreparationsByPhiMR4UUID(db, element.getIdDansTableConcernee());
-                    if (Preparation == null) {
-                        // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
-                        return;
-                    }
-                    JSONObject PrepJson = Preparation.toJson();
-                    if (PrepJson != null) {
-                        body.put("preparation", PrepJson);
-                    }
-                    break;
-                case Preparation_LigneOpenHelper.Constantes.TABLE_PREPARATION_LIGNE:
-                    Preparation_Ligne PreparationLigne = Preparation_LigneOpenHelper.getPreparationLigneByPhiMR4UUID(db, element.getIdDansTableConcernee());
-                    if (PreparationLigne == null) {
-                        // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
-                        return;
-                    }
-                    JSONObject PrepLigneJson = PreparationLigne.toJson();
-                    if (PrepLigneJson != null) {
-                        body.put("Preparation_Ligne", PrepLigneJson);
-                    }
-                    break;
                 case PH_UtiliserOpenHelper.Constantes.TABLE_PH_UTILISER:
-                    PH_Utiliser phUtiliser = PH_UtiliserOpenHelper.getPH_UtiliserByPhiMR4UUID(db, element.getIdDansTableConcernee());
+                    PH_Utiliser phUtiliser = PH_UtiliserOpenHelper.getPH_UtiliserByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
                     if (phUtiliser == null) {
                         // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
                         return;
@@ -374,7 +343,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                     }
                     break;
                 case PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION:
-                    PH_Serialisation serialisation = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, element.getIdDansTableConcernee());
+                    PH_Serialisation serialisation = PH_SerialisationOpenHelper.getPH_SerialisationByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
                     if (serialisation == null) {
                         // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
                         return;
@@ -384,19 +353,8 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                         body.put("ph_serialisation", SerialisationJSON);
                     }
                     break;
-                case SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE:
-                    SurveillanceReference surveillanceReference = SurveillanceReferenceOpenHelper.getSurveillanceReferenceByPhiMR4UUID(db, element.getIdDansTableConcernee());
-                    if (surveillanceReference == null) {
-                        // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
-                        return;
-                    }
-                    JSONObject surveillanceReferenceJSON = surveillanceReference.toJson();
-                    if (surveillanceReferenceJSON != null) {
-                        body.put("surveillanceReference", surveillanceReferenceJSON);
-                    }
-                    break;
                 case ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR:
-                    ActionUtilisateur actionUtilisateur = ActionUtilisateurOpenHelper.getActionUtilisateurByPhiMR4UUID(db, element.getIdDansTableConcernee());
+                    ActionUtilisateur actionUtilisateur = ActionUtilisateurOpenHelper.getActionUtilisateurByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
                     if (actionUtilisateur == null) {
                         // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
                         return;
@@ -408,7 +366,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                     }
                     break;
                 case ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE:
-                    ActionUtilisateur_Ligne actionUtilisateurLigne = ActionUtilisateur_LigneOpenHelper.getActionUtilisateurByPhiMR4UUID(db, element.getIdDansTableConcernee());
+                    ActionUtilisateur_Ligne actionUtilisateurLigne = ActionUtilisateur_LigneOpenHelper.getActionUtilisateurByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
                     if (actionUtilisateurLigne == null) {
                         // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
                         return;
@@ -419,7 +377,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                     }
                     break;
                 case TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE:
-                    TableTrace TableTrace = TableTraceOpenHelper.getTableTraceByPhiMR4UUID(db, element.getIdDansTableConcernee());
+                    TableTrace TableTrace = TableTraceOpenHelper.getTableTraceByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
                     if (TableTrace == null) {
                         // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
                         return;
@@ -463,7 +421,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                                 Depot_Zone zoneAModifier = ZoneOpenHelper.getUneZoneByID(db, element.getIdDansTableConcernee());
                                 zoneAModifier.setEmplacements(EmplacementOpenHelper.getEmplacementsParZone(db, zoneAModifier));
 
-                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " = " + element.getIdDansTableConcernee(), null);
+                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + element.getIdDansTableConcernee(), null);
 
                                 zoneAModifier.setZoneID(nouvelId);
 
@@ -476,8 +434,8 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                                     if (rowIdEmplacement == -1) {
                                         Alerte.afficherAlerte(context, "Erreur", "Veuillez contacter la société Alcyons (erreur MAJ idEmplacement)", "alerte");
                                     } else {
-                                        long rowID = ajouterElementASynchroniser(db, EmplacementOpenHelper.Constantes.TABLE_DEPOT_EMPLACEMENT, emplacementCourant.getPhiMR4UUID(), emplacementCourant.get_UID(), ActionsEAS.MAJ);
-                                        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_ELEMENT_A_SYNCHRONISER + " WHERE " + Constantes.CLE_COL_ID_DANS_TABLE_CONCERNEE_ELEMENT_A_SYNCHRONISER + "=?", new String[]{String.valueOf(emplacementCourant.getPhiMR4UUID())});
+                                        long rowID = ajouterElementASynchroniser(db, EmplacementOpenHelper.Constantes.TABLE_DEPOT_EMPLACEMENT, emplacementCourant.getphiwms_mobileUUID(), emplacementCourant.get_UID(), ActionsEAS.MAJ);
+                                        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_ELEMENT_A_SYNCHRONISER + " WHERE " + Constantes.CLE_COL_ID_DANS_TABLE_CONCERNEE_ELEMENT_A_SYNCHRONISER + "=?", new String[]{String.valueOf(emplacementCourant.getphiwms_mobileUUID())});
                                         if (cursor.getCount() == 1) {
                                             cursor.moveToFirst();
                                             ElementASynchroniser elementASynchroniser = new ElementASynchroniser(cursor);
@@ -490,67 +448,57 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                                 break;
                             case EmplacementOpenHelper.Constantes.TABLE_DEPOT_EMPLACEMENT:
                                 contentValues.put(EmplacementOpenHelper.Constantes.CLE_COL_UID_DEPOT_EMPLACEMENT, nouvelId);
-                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " = " + element.getIdDansTableConcernee(), null);
+                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + element.getIdDansTableConcernee(), null);
                                 break;
                             case ProduitOpenHelper.Constantes.TABLE_PRODUIT:
                                 contentValues.put(ProduitOpenHelper.Constantes.CLE_COL_ID_PRODUIT, nouvelId);
-                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + element.getIdDansTableConcernee(), null);
+                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + element.getIdDansTableConcernee(), null);
                                 break;
                             case RetourOpenHelper.Constantes.TABLE_RETOUR:
                                 contentValues.put(RetourOpenHelper.Constantes.CLE_COL__UID_RETOUR, nouvelId);
-                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + element.getIdDansTableConcernee(), null);
+                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + element.getIdDansTableConcernee(), null);
                                 break;
                             case Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE:
                                 contentValues.put(Retour_LigneOpenHelper.Constantes.CLE_COL__UID_RETOUR_LIGNE, nouvelId);
-                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + element.getIdDansTableConcernee(), null);
+                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + element.getIdDansTableConcernee(), null);
                                 break;
                             case PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION:
                                 contentValues.put(PH_PreparationOpenHelper.Constantes.CLE_COL_UID_PH_PREPARATION, nouvelId);
-                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + element.getIdDansTableConcernee(), null);
+                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + element.getIdDansTableConcernee(), null);
                                 break;
                             case PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE:
                                 contentValues.put(PH_Preparation_LigneOpenHelper.Constantes.CLE_COL__UID_PH_PREPARATION_LIGNE, nouvelId);
-                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + element.getIdDansTableConcernee(), null);
+                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + element.getIdDansTableConcernee(), null);
                                 break;
                             case Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT:
                                 contentValues.put(Stock_Lot_EmplacementLightOpenHelper.Constantes.CLE_COL__UID_STOCK_LOT_EMPLACEMENT, nouvelId);
-                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + element.getIdDansTableConcernee(), null);
+                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + element.getIdDansTableConcernee(), null);
                                 break;
                             case InventaireOpenHelper.Constantes.TABLE_INVENTAIRE:
-                                rowId = db.delete(InventaireOpenHelper.Constantes.TABLE_INVENTAIRE, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
+                                rowId = db.delete(InventaireOpenHelper.Constantes.TABLE_INVENTAIRE, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
                                 break;
                             case Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP:
-                                rowId = db.delete(Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
+                                rowId = db.delete(Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
                                 break;
                             case CommandeOpenHelper.Constantes.TABLE_COMMANDE:
-                                rowId = db.delete(CommandeOpenHelper.Constantes.TABLE_COMMANDE, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
+                                rowId = db.delete(CommandeOpenHelper.Constantes.TABLE_COMMANDE, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
                                 break;
                             case PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT:
-                                rowId = db.delete(PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
-                                break;
-                            case PreparationOpenHelper.Constantes.TABLE_PREPARATION:
-                                rowId = db.delete(PreparationOpenHelper.Constantes.TABLE_PREPARATION, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
-                                break;
-                            case Preparation_LigneOpenHelper.Constantes.TABLE_PREPARATION_LIGNE:
-                                rowId = db.delete(Preparation_LigneOpenHelper.Constantes.TABLE_PREPARATION_LIGNE, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
+                                rowId = db.delete(PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
                                 break;
                             case PH_UtiliserOpenHelper.Constantes.TABLE_PH_UTILISER:
-                                rowId = db.delete(PH_UtiliserOpenHelper.Constantes.TABLE_PH_UTILISER, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
+                                rowId = db.delete(PH_UtiliserOpenHelper.Constantes.TABLE_PH_UTILISER, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
                                 break;
                             case TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE:
-                                rowId = db.delete(TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
+                                rowId = db.delete(TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
                                 break;
                             case PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION:
                                 contentValues.put(PH_SerialisationOpenHelper.Constantes.CLE_COL__UID_PH_SERIALISATION, nouvelId);
-                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " = " + element.getIdDansTableConcernee(), null);
-                                break;
-                            case SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE:
-                                contentValues.put(SurveillanceReferenceOpenHelper.Constantes.CLE_COL__UID_SURVEILLANCEREFERENCE, nouvelId);
-                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " = " + element.getIdDansTableConcernee(), null);
+                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + element.getIdDansTableConcernee(), null);
                                 break;
                             case ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR:
                                 contentValues.put(ActionUtilisateurOpenHelper.Constantes.CLE_COL_ID_ACTION_UTILISATEUR, nouvelId);
-                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " = " + element.getIdDansTableConcernee(), null);
+                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + element.getIdDansTableConcernee(), null);
                                 if(finalAncien_id_action != nouvelId)
                                 {
                                     List<ActionUtilisateur_Ligne> actionligne = ActionUtilisateur_LigneOpenHelper.getLigneByAction(db, finalAncien_id_action);
@@ -558,14 +506,14 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                                     {
                                         actioncourant.setIdActionUtilisateur(nouvelId);
                                         ActionUtilisateur_LigneOpenHelper.mettreAJourActionUtilisateurLigne(db, actioncourant);
-                                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, actioncourant.getPhiMR4UUID(), actioncourant.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, actioncourant.getphiwms_mobileUUID(), actioncourant.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                                     }
                                     toutSynchroniser(context, db, utilisateur, true);
                                 }
                                 break;
                             case ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE:
                                 contentValues.put(ActionUtilisateur_LigneOpenHelper.Constantes.CLE_COL_ID_ACTION_UTILISATEUR_LIGNE, nouvelId);
-                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " = " + element.getIdDansTableConcernee(), null);
+                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + element.getIdDansTableConcernee(), null);
                                 break;
                         }
                         if (rowId == -1) {
@@ -669,17 +617,8 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                 case PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT:
                     body.put("ph_reliquatIdListe", listeId);
                     break;
-                case PreparationOpenHelper.Constantes.TABLE_PREPARATION:
-                    body.put("preparationIdListe", listeId);
-                    break;
-                case Preparation_LigneOpenHelper.Constantes.TABLE_PREPARATION_LIGNE:
-                    body.put("preparation_ligneIdListe", listeId);
-                    break;
                 case PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION:
                     body.put("ph_serialisation", listeId);
-                    break;
-                case SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE:
-                    body.put("surveillanceReference", listeId);
                     break;
                 case ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR:
                     body.put("ActionUtilisateur", listeId);
@@ -707,7 +646,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                                         List<Depot_Emplacement> emplacements = EmplacementOpenHelper.getEmplacementsParZoneID(db, element.getIdDansTableConcernee());
                                         for (Depot_Emplacement emplacement : emplacements
                                                 ) {
-                                            ajouterElementASynchroniser(db, EmplacementOpenHelper.Constantes.TABLE_DEPOT_EMPLACEMENT, emplacement.getPhiMR4UUID(), emplacement.get_UID(), ActionsEAS.SUPPR);
+                                            ajouterElementASynchroniser(db, EmplacementOpenHelper.Constantes.TABLE_DEPOT_EMPLACEMENT, emplacement.getphiwms_mobileUUID(), emplacement.get_UID(), ActionsEAS.SUPPR);
                                             Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_ELEMENT_A_SYNCHRONISER + " WHERE " + Constantes.CLE_COL_ID_DANS_TABLE_CONCERNEE_ELEMENT_A_SYNCHRONISER + "=?", new String[]{String.valueOf(emplacement.get_UID())});
                                             if (cursor.getCount() == 1) {
                                                 cursor.moveToFirst();
@@ -716,39 +655,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                                             }
                                         }
                                         break;
-                                    case EmplacementOpenHelper.Constantes.TABLE_DEPOT_EMPLACEMENT:
-                                        break;
-                                    case ProduitOpenHelper.Constantes.TABLE_PRODUIT:
-                                        break;
-                                    case RetourOpenHelper.Constantes.TABLE_RETOUR:
-                                        break;
-                                    case Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE:
-                                        break;
-                                    case PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION:
-                                        break;
-                                    case PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE:
-                                        break;
-                                    case Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT:
-                                        break;
-                                    case InventaireOpenHelper.Constantes.TABLE_INVENTAIRE:
-                                        break;
-                                    case Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP:
-                                        break;
-                                    case CommandeOpenHelper.Constantes.TABLE_COMMANDE:
-                                        break;
-                                    case PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT:
-                                        break;
-                                    case PreparationOpenHelper.Constantes.TABLE_PREPARATION:
-                                        break;
-                                    case Preparation_LigneOpenHelper.Constantes.TABLE_PREPARATION_LIGNE:
-                                        break;
-                                    case PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION:
-                                        break;
-                                    case SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE:
-                                        break;
-                                    case ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR:
-                                        break;
-                                    case ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE:
+                                    default:
                                         break;
                                 }
                             }
@@ -836,7 +743,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_ELEMENT_A_SYNCHRONISER = "CREATE TABLE "
                 + TABLE_ELEMENT_A_SYNCHRONISER + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + CLE_COL_TABLE_CONCERNEE_ELEMENT_A_SYNCHRONISER + " " + Constantes.TYPE_COL_TABLE_CONCERNEE_ELEMENT_A_SYNCHRONISER + ","
                 + CLE_COL_ID_DANS_TABLE_CONCERNEE_ELEMENT_A_SYNCHRONISER + " " + Constantes.TYPE_COL_ID_DANS_TABLE_CONCERNEE_ELEMENT_A_SYNCHRONISER + ","
                 + CLE_COL_ACTION_ELEMENT_A_SYNCHRONISER + " " + Constantes.TYPE_COL_ACTION_ELEMENT_A_SYNCHRONISER + ","

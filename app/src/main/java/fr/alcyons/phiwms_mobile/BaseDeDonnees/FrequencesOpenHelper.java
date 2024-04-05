@@ -117,7 +117,7 @@ public class FrequencesOpenHelper extends DBOpenHelper {
         public static final String CREATION_TABLE_FREQUENCES = "CREATE TABLE " +
                 Constantes.TABLE_FREQUENCES +
                 "(" +
-                DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY, " +
+                DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY, " +
                 Constantes.CLE_COL__UID_FREQUENCES + " " + Constantes.TYPE_COL__UID_FREQUENCES + ", " +
                 Constantes.CLE_COL_IDENT_FREQUENCES + " " + Constantes.TYPE_COL_IDENT_FREQUENCES + ", " +
                 Constantes.CLE_COL_CODAGE_FREQUENCES + " " + Constantes.TYPE_COL_CODAGE_FREQUENCES + ", " +

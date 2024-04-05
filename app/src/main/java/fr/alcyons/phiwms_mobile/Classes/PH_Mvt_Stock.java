@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Mvt_StockOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
 /**
@@ -36,7 +35,7 @@ public class PH_Mvt_Stock implements Serializable, Comparable {
     private String MVT_Stock_Zone;
     private String MVT_stock_emplacement;
     private int _UID;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public PH_Mvt_Stock(int MVT_ID, int MVT_PDT_CODE, String MVT_DEP_ORIG, String MVT_DEP_DEST, String MVT_TYD_CODE, String MVT_NUM_DOC, double MVT_QTE, double MVT_PRIX_UNIT, String MVT_DT_CREAT, String MVT_DT_MVT, String SYS_DT_MAJ, String SYS_USER_MAJ, String rien, String SYS_HEURE_MAJ, int MVT_ID_Commande_Ligne, double HMV_PRIX_UNITAIRE_TTC_FACT, String MVT_Stock_Zone, String MVT_stock_emplacement, int _UID) {
         this.MVT_ID = MVT_ID;
@@ -106,15 +105,15 @@ public class PH_Mvt_Stock implements Serializable, Comparable {
         this.MVT_Stock_Zone = cursor.getString(PH_Mvt_StockOpenHelper.Constantes.NUM_COL_MVT_STOCK_ZONE_PH_MVT_STOCK);
         this.MVT_stock_emplacement = cursor.getString(PH_Mvt_StockOpenHelper.Constantes.NUM_COL_MVT_STOCK_EMPLACEMENT_PH_MVT_STOCK);
         this._UID = cursor.getInt(PH_Mvt_StockOpenHelper.Constantes.NUM_COL__UID_PH_MVT_STOCK);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getMVT_ID() {
@@ -315,7 +314,7 @@ public class PH_Mvt_Stock implements Serializable, Comparable {
     public int compareTo(Object obj) {
         PH_Mvt_Stock ph_mvt_stock = (PH_Mvt_Stock) obj;
 
-        if (this.getPhiMR4UUID() == ph_mvt_stock.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == ph_mvt_stock.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.get_UID() > ph_mvt_stock.get_UID() ? 1 : -1;

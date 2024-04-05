@@ -56,13 +56,13 @@ import javax.net.ssl.X509TrustManager;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
-import com.example.phiwms_mobile.DispositifAuLivret.DetailDispositifAuLivretActivity;
-import com.example.phiwms_mobile.IdentificationParScan.DetailProduitIdentificationParScanActivity;
-import com.example.phiwms_mobile.MedicamentAuLivret.DetailMedicamentAuLivretActivity;
+import fr.alcyons.phiwms_mobile.DispositifAuLivret.DetailDispositifAuLivretActivity;
+import fr.alcyons.phiwms_mobile.IdentificationParScan.DetailProduitIdentificationParScanActivity;
+import fr.alcyons.phiwms_mobile.MedicamentAuLivret.DetailMedicamentAuLivretActivity;
 import fr.alcyons.phiwms_mobile.OriginalActivity;
-import com.example.phiwms_mobile.PAD.DetailPADActivity;
-import com.example.phiwms_mobile.PAD.DetailPADComposantPrescriptionActivity;
-import com.example.phiwms_mobile.PAD.DetailPADDotationActivity;
+import fr.alcyons.phiwms_mobile.PAD.DetailPADActivity;
+import fr.alcyons.phiwms_mobile.PAD.DetailPADComposantPrescriptionActivity;
+import fr.alcyons.phiwms_mobile.PAD.DetailPADDotationActivity;
 
 /**
  * Created by jessica on 08/11/2017.
@@ -76,9 +76,9 @@ public class MedicalObjective {
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
     private String urlBase = "https://medicalobjective.alcyons.fr";
-    private String urlSave = "/api/produits/phimr4/";
-    private String urlGetImage = "/api/produits/phimr4/image/";
-    private String urlGetURL = "/api/produits/phimr4/url/";
+    private String urlSave = "/api/produits/phiwms_mobile/";
+    private String urlGetImage = "/api/produits/phiwms_mobile/image/";
+    private String urlGetURL = "/api/produits/phiwms_mobile/url/";
     private SQLiteDatabase db;
     private Utilisateur utilisateurConnecte;
     private Context context;

@@ -30,7 +30,7 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.camera.CameraSource;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.camera.CameraSourcePreview;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.camera.GraphicOverlay;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 public class BarcodeGeneral extends ServiceActivity {

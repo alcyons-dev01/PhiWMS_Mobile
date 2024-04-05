@@ -25,7 +25,7 @@ public class Notification implements Serializable, Comparable {
     private Boolean aEteGeree = false;
     private String date;
     private String channel;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
 
     public Notification(int ID, String Titre, String Body, String Color, String Tag, Boolean AEteGeree, String Date, String Channel) {
@@ -64,7 +64,7 @@ public class Notification implements Serializable, Comparable {
         this.aEteGeree = OutilsGestionClasses.recupererBooleen(notificationCursor, NotificationOpenHelper.Constantes.NUM_COL_AETEGEREE_NOTIFICATION);
         this.date = notificationCursor.getString(NotificationOpenHelper.Constantes.NUM_COL_DATE_NOTIFICATION);
         this.channel = notificationCursor.getString(NotificationOpenHelper.Constantes.NUM_COL_CHANNEL_NOTIFICATION);
-        this.phiMR4UUID = notificationCursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = notificationCursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
     public int getId() {
@@ -131,12 +131,12 @@ public class Notification implements Serializable, Comparable {
         this.channel = channel;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     @Override
@@ -156,7 +156,7 @@ public class Notification implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Notification notification = (Notification) obj;
 
-        if (this.getPhiMR4UUID() == notification.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == notification.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.getId() > notification.getId() ? 1 : -1;

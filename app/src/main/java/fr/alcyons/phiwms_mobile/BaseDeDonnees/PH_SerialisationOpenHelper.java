@@ -24,9 +24,9 @@ public class PH_SerialisationOpenHelper extends DBOpenHelper {
         super(context, name, factory, version);
     }
 
-    public static PH_Serialisation getPH_SerialisationByPhiMR4UUID(SQLiteDatabase db, int id) {
+    public static PH_Serialisation getPH_SerialisationByphiwms_mobileUUID(SQLiteDatabase db, int id) {
         PH_Serialisation objet = null;
-        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_SERIALISATION + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=? ", new String[]{String.valueOf(id)});
+        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_SERIALISATION + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=? ", new String[]{String.valueOf(id)});
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
             objet = new PH_Serialisation(cursor);
@@ -194,9 +194,9 @@ public class PH_SerialisationOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_MVTTYPE_PH_SERIALISATION, objet.getMvtType());
         contentValues.put(Constantes.CLE_COL_MVTUID_PH_SERIALISATION, objet.getMvtUID());
         contentValues.put(Constantes.CLE_COL_RAISON_PH_SERIALISATION, objet.getRaison());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID    , objet.getSerialexpressUUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID    , objet.getSerialexpressUUID());
 
-        long rowID = db.update(Constantes.TABLE_PH_SERIALISATION, contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + objet.getSerialexpressUUID(), null);
+        long rowID = db.update(Constantes.TABLE_PH_SERIALISATION, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + objet.getSerialexpressUUID(), null);
 
         return rowID;
     }
@@ -280,7 +280,7 @@ public class PH_SerialisationOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_PH_SERIALISATION = " CREATE TABLE       " + Constantes.TABLE_PH_SERIALISATION
                 + "(" +
-                DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + "    PRIMARY KEY,"
+                DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + "    PRIMARY KEY,"
                 + Constantes.CLE_COL__UID_PH_SERIALISATION + " " + Constantes.TYPE_COL__UID_PH_SERIALISATION + " , "
                 + Constantes.CLE_COL_PRODUITUID_PH_SERIALISATION + " " + Constantes.TYPE_COL_PRODUITUID_PH_SERIALISATION + " , "
                 + Constantes.CLE_COL_DATAMATRIX_PH_SERIALISATION + " " + Constantes.TYPE_COL_DATAMATRIX_PH_SERIALISATION + " , "

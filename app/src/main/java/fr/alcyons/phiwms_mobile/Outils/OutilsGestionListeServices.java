@@ -1,6 +1,6 @@
 package fr.alcyons.phiwms_mobile.Outils;
 
-import android.annotation.TargetApi;
+/*import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -14,64 +14,59 @@ import android.widget.SearchView;
 import java.util.Collections;
 import java.util.List;
 
-import com.example.phiwms_mobile.ActionUtilisateur.ServiceActionUtilisateurActivity;
+import fr.alcyons.phiwms_mobile.ActionUtilisateur.ServiceActionUtilisateurActivity;
 import fr.alcyons.phiwms_mobile.CGU.CguActivity;
 import fr.alcyons.phiwms_mobile.Classes.PerimetreFonctionnel;
 import fr.alcyons.phiwms_mobile.Classes.Service;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
-import com.example.phiwms_mobile.ControleDesRetoursScannee.ServiceControleRetoursScanneeActivity;
-import com.example.phiwms_mobile.DemandeDotationGlobale.ServiceDemandeDotationGlobaleActivity;
-import com.example.phiwms_mobile.DemandeDotationPAD.ServiceDemandeDotationPADActivity;
-import com.example.phiwms_mobile.DemandeParticuliere.ServiceDemandeParticuliereActivity;
-import com.example.phiwms_mobile.DemandePleinVide.ServiceDemandePleinVideActivity;
-import com.example.phiwms_mobile.DemandeProtocolePAD.ServiceDemandeProtocolePADActivity;
-import com.example.phiwms_mobile.DemandeReassort.ServiceDemandeReassortActivity;
-import com.example.phiwms_mobile.Destruction.ServiceDestructionActivity;
-import com.example.phiwms_mobile.DispositifAuLivret.ServiceDispositifAuLivretActivity;
-import com.example.phiwms_mobile.DotationService.ServiceDotationServiceActivity;
-import com.example.phiwms_mobile.IdentificationParScan.ListeProduitsIdentificationParScanActivity;
-import com.example.phiwms_mobile.InventaireScanner.ServiceInventaireScannerActivity;
+import fr.alcyons.phiwms_mobile.ControleDesRetoursScannee.ServiceControleRetoursScanneeActivity;
+import fr.alcyons.phiwms_mobile.DemandeDotationGlobale.ServiceDemandeDotationGlobaleActivity;
+import fr.alcyons.phiwms_mobile.DemandeDotationPAD.ServiceDemandeDotationPADActivity;
+import fr.alcyons.phiwms_mobile.DemandeParticuliere.ServiceDemandeParticuliereActivity;
+import fr.alcyons.phiwms_mobile.DemandePleinVide.ServiceDemandePleinVideActivity;
+import fr.alcyons.phiwms_mobile.DemandeProtocolePAD.ServiceDemandeProtocolePADActivity;
+import fr.alcyons.phiwms_mobile.DemandeReassort.ServiceDemandeReassortActivity;
+import fr.alcyons.phiwms_mobile.Destruction.ServiceDestructionActivity;
+import fr.alcyons.phiwms_mobile.DispositifAuLivret.ServiceDispositifAuLivretActivity;
+import fr.alcyons.phiwms_mobile.DotationService.ServiceDotationServiceActivity;
+import fr.alcyons.phiwms_mobile.IdentificationParScan.ListeProduitsIdentificationParScanActivity;
+import fr.alcyons.phiwms_mobile.InventaireScanner.ServiceInventaireScannerActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.ServiceAdapter;
-import com.example.phiwms_mobile.Livraison.DepotSelecteurLivraison;
-import com.example.phiwms_mobile.Livraison.ListePointDeLivraison;
-import com.example.phiwms_mobile.Livraison.ServiceLivraisonActivity;
-import com.example.phiwms_mobile.MedicamentAuLivret.ServiceMedicamentAuLivretActivity;
+import fr.alcyons.phiwms_mobile.Livraison.DepotSelecteurLivraison;
+import fr.alcyons.phiwms_mobile.Livraison.ListePointDeLivraison;
+import fr.alcyons.phiwms_mobile.Livraison.ServiceLivraisonActivity;
+import fr.alcyons.phiwms_mobile.MedicamentAuLivret.ServiceMedicamentAuLivretActivity;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
-import com.example.phiwms_mobile.Notifications.ServiceNotificationsActivity;
-import com.example.phiwms_mobile.PAD.ServicePADActivity;
+import fr.alcyons.phiwms_mobile.Notifications.ServiceNotificationsActivity;
+import fr.alcyons.phiwms_mobile.PAD.ServicePADActivity;
 import fr.alcyons.phiwms_mobile.ParametresServeur.ServiceParametresServeurActivity;
-import com.example.phiwms_mobile.ParametresUtilisateur.ServiceParametreUtilisateurActivity;
-import com.example.phiwms_mobile.PlanDePlacement.ListeProduitsPlanDePlacementActivity;
-import com.example.phiwms_mobile.PreparationPUFetPAD.ServicePreparationPadActivity;
-import com.example.phiwms_mobile.PreparationPUFetPAD.ServicePreparationPufActivity;
-import com.example.phiwms_mobile.PreparationPUFetPADScannee.ServicePreparationPadScanneeActivity;
-import com.example.phiwms_mobile.PreparationPUFetPADScannee.ServicePreparationPufScanneeActivity;
-import com.example.phiwms_mobile.Quarantaine.ServiceQuarantaineActivity;
-import com.example.phiwms_mobile.R;
-import com.example.phiwms_mobile.ReceptionPAD.ServiceReceptionPadActivity;
-import com.example.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity;
-import com.example.phiwms_mobile.ReceptionScanne.ServiceReceptionScanneeActivity;
-import com.example.phiwms_mobile.RetourDemande.ServiceRetourDemandeActivity;
-import com.example.phiwms_mobile.RetourFournisseur.ServiceRetourFournisseurActivity;
-import com.example.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity;
-import com.example.phiwms_mobile.Serialisation.ServiceSerialisationActivity;
+import fr.alcyons.phiwms_mobile.ParametresUtilisateur.ServiceParametreUtilisateurActivity;
+import fr.alcyons.phiwms_mobile.PlanDePlacement.ListeProduitsPlanDePlacementActivity;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ServicePreparationPadActivity;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ServicePreparationPufActivity;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPADScannee.ServicePreparationPadScanneeActivity;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPADScannee.ServicePreparationPufScanneeActivity;
+import fr.alcyons.phiwms_mobile.Quarantaine.ServiceQuarantaineActivity;
+import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.ReceptionPAD.ServiceReceptionPadActivity;
+import fr.alcyons.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity;
+import fr.alcyons.phiwms_mobile.ReceptionScanne.ServiceReceptionScanneeActivity;
+import fr.alcyons.phiwms_mobile.RetourDemande.ServiceRetourDemandeActivity;
+import fr.alcyons.phiwms_mobile.RetourFournisseur.ServiceRetourFournisseurActivity;
+import fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity;
+import fr.alcyons.phiwms_mobile.Serialisation.ServiceSerialisationActivity;
 import fr.alcyons.phiwms_mobile.ServiceEnCreationActivity;
-import com.example.phiwms_mobile.Stock.ServiceStockActivity;
-import com.example.phiwms_mobile.TestMail.TestMailActivity;
-import com.example.phiwms_mobile.Utiliser.ServiceUtiliserActivity;
-import com.example.phiwms_mobile.VerrouPharmacie.ServiceVerrouPharmacieActivity;
-import com.example.phiwms_mobile.VerrouPharmacieInterne.ServiceVerrouPharmacieInterneActivity;
-import com.example.phiwms_mobile.ZonesEtEmplacements.ServiceZonesEtEmplacementsActivity;
+import fr.alcyons.phiwms_mobile.Stock.ServiceStockActivity;
+import fr.alcyons.phiwms_mobile.TestMail.TestMailActivity;
+import fr.alcyons.phiwms_mobile.Utiliser.ServiceUtiliserActivity;
+import fr.alcyons.phiwms_mobile.VerrouPharmacie.ServiceVerrouPharmacieActivity;
+import fr.alcyons.phiwms_mobile.VerrouPharmacieInterne.ServiceVerrouPharmacieInterneActivity;
+import fr.alcyons.phiwms_mobile.ZonesEtEmplacements.ServiceZonesEtEmplacementsActivity;*/
 
-/**
- * Created by quentinlanusse on 19/04/2017.
- */
-
-@TargetApi(Build.VERSION_CODES.M)
 public class OutilsGestionListeServices {
 
-    public static void genererListViewServicesParPerimetreFonctionnel(final Context context, final Utilisateur utilisateurConnecte, PerimetreFonctionnel perimetreFonctionnelConcerne, final boolean finirActivite, final List<String> serviceIndicateurNom, final List<Integer> serviceIndicateurValeur) {
+   /* public static void genererListViewServicesParPerimetreFonctionnel(final Context context, final Utilisateur utilisateurConnecte, PerimetreFonctionnel perimetreFonctionnelConcerne, final boolean finirActivite, final List<String> serviceIndicateurNom, final List<Integer> serviceIndicateurValeur) {
 
         // Récupération de la liste_view à remplir
         ListView listViewServices = (ListView) ((Activity) context).findViewById(R.id.listViewNavigation);
@@ -136,9 +131,6 @@ public class OutilsGestionListeServices {
     public static Class recupererActiviteCorrespondanteAUnService(Service serviceConcerne) {
         Class activiteDemandee = ServiceEnCreationActivity.class;
         switch (serviceConcerne.getNom()) {
-            /*
-            * Pharmacie
-            * */
             case "Quarantaine":
                 return ServiceQuarantaineActivity.class;
             case "Verrou Pharmacie Préparation externe":
@@ -147,9 +139,6 @@ public class OutilsGestionListeServices {
                 return ServiceVerrouPharmacieActivity.class;
             case "Verrou Pharmacie Préparation interne":
                 return ServiceVerrouPharmacieInterneActivity.class;
-            /*
-            * Magasinier
-            * */
             case "Inventaire scanner":
                 return ServiceInventaireScannerActivity.class;
             case "Réception PUI":
@@ -177,16 +166,10 @@ public class OutilsGestionListeServices {
                 return ServiceZonesEtEmplacementsActivity.class;
             case "Réception Scannée":
                 return ServiceReceptionScanneeActivity.class;
-            /*
-            * Chauffeur
-            * */
             case "Livraison":
                 //return DepotSelecteurLivraison.class;
                 //return ServiceLivraisonActivity.class;
                 return ListePointDeLivraison.class;
-            /*
-            * Infirmiers
-            * */
             case "Utiliser":
                 return ServiceUtiliserActivity.class;
             case "Demande Particuliere":
@@ -201,9 +184,6 @@ public class OutilsGestionListeServices {
                 return ServiceDemandeProtocolePADActivity.class;
             case "Retour Demandé":
                 return ServiceRetourDemandeActivity.class;
-            /*
-            * Commun
-            * */
             case "Médicament au Livret":
                 return ServiceMedicamentAuLivretActivity.class;
             case "Dispositif au Livret":
@@ -226,14 +206,8 @@ public class OutilsGestionListeServices {
                 return TestMailActivity.class;
             case "CGU":
                 return CguActivity.class;
-            /*
-            *Patient
-             */
             case "Commander":
                 return ServicePADActivity.class;
-            /*
-            * Multi-Perimetre
-            * */
             case "Préparation PAD":
                 return ServicePreparationPadActivity.class;
             case "Préparation PAD Scan":
@@ -246,14 +220,11 @@ public class OutilsGestionListeServices {
                 return ServiceDemandePleinVideActivity.class;
             case "Demande Dotation Globale":
                 return ServiceDemandeDotationGlobaleActivity.class;
-            /*
-             *Commun
-             */
             case "Actions utilisateurs":
                 return ServiceActionUtilisateurActivity.class;
 
         }
 
         return activiteDemandee;
-    }
+    }*/
 }

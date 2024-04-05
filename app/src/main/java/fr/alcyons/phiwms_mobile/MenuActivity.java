@@ -4,7 +4,7 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 import androidx.core.view.MenuItemCompat;
 import androidx.appcompat.widget.SearchView;

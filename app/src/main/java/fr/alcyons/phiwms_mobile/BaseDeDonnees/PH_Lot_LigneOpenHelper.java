@@ -83,7 +83,7 @@ public class PH_Lot_LigneOpenHelper extends DBOpenHelper {
         // Insertion du dépot en BDD
         long rowId = db.insert(Constantes.TABLE_PH_LOT_LIGNE, null, contentValues);
 
-        ph_lot_ligne.setPhiMR4UUID((int) rowId);
+        ph_lot_ligne.setphiwms_mobileUUID((int) rowId);
 
         return rowId;
     }
@@ -98,9 +98,9 @@ public class PH_Lot_LigneOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_QUANTITE, ph_lot_ligne.getQuantite());
         contentValues.put(Constantes.CLE_COL_NUM_SERIE, ph_lot_ligne.getNumSerie());
         contentValues.put(Constantes.CLE_COL_NUM_VERROUILLER, ph_lot_ligne.isVerrouiller());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID, ph_lot_ligne.getPhiMR4UUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, ph_lot_ligne.getphiwms_mobileUUID());
 
-        return db.update(Constantes.TABLE_PH_LOT_LIGNE, contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " = " + String.valueOf(ph_lot_ligne.getPhiMR4UUID()), null);
+        return db.update(Constantes.TABLE_PH_LOT_LIGNE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + String.valueOf(ph_lot_ligne.getphiwms_mobileUUID()), null);
     }
 
     public static class Constantes implements BaseColumns {
@@ -136,7 +136,7 @@ public class PH_Lot_LigneOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_PH_LOT_LIGNE = "CREATE TABLE "
                 + Constantes.TABLE_PH_LOT_LIGNE + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_UID + " " + Constantes.TYPE_COL_UID + ","
                 + Constantes.CLE_COL_NUM_DOC + " " + Constantes.TYPE_COL_NUM_DOC + ","
                 + Constantes.CLE_COL_NUM_LOT + " " + Constantes.TYPE_COL_NUM_LOT + ","

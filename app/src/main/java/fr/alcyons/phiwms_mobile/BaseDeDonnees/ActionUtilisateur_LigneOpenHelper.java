@@ -37,7 +37,7 @@ public class ActionUtilisateur_LigneOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_NOM_PRODUIT, objet.getNom_Produit());
 
         long rowID = db.insert(Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, null, contentValues);
-        objet.setPhiMR4UUID((int) rowID);
+        objet.setphiwms_mobileUUID((int) rowID);
         return rowID;
     }
 
@@ -52,17 +52,17 @@ public class ActionUtilisateur_LigneOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_EMPLACEMENT_ID, objet.getEmplacementId());
         contentValues.put(Constantes.CLE_COL_QUANTITE, objet.getQuantite());
         contentValues.put(Constantes.CLE_COL_NOM_PRODUIT, objet.getNom_Produit());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID, objet.getPhiMR4UUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, objet.getphiwms_mobileUUID());
 
 
-        long rowId = db.update(Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + objet.getPhiMR4UUID(), null);
+        long rowId = db.update(Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + objet.getphiwms_mobileUUID(), null);
 
         return rowId;
     }
 
-    public static ActionUtilisateur_Ligne getActionUtilisateurByPhiMR4UUID(SQLiteDatabase db, int id) {
+    public static ActionUtilisateur_Ligne getActionUtilisateurByphiwms_mobileUUID(SQLiteDatabase db, int id) {
         ActionUtilisateur_Ligne actionUtilisateur_ligne = null;
-        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_ACTION_UTILISATEUR_LIGNE + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " =? ", new String[]{String.valueOf(id)});
+        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_ACTION_UTILISATEUR_LIGNE + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " =? ", new String[]{String.valueOf(id)});
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
             actionUtilisateur_ligne = new ActionUtilisateur_Ligne(cursor);
@@ -123,7 +123,7 @@ public class ActionUtilisateur_LigneOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_ACTION_UTILISATEUR_LIGNE = " CREATE TABLE  " + Constantes.TABLE_ACTION_UTILISATEUR_LIGNE
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + "    PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + "    PRIMARY KEY,"
                 + Constantes.CLE_COL_ID_ACTION_UTILISATEUR_LIGNE + " " + Constantes.TYPE_COL_ID_ACTION_UTILISATEUR_LIGNE + " , "
                 + Constantes.CLE_COL_ID_ACTION_UTILISATEUR + " " + Constantes.TYPE_COL_ID_ACTION_UTILISATEUR + " , "
                 + Constantes.CLE_COL_TABLE_CONCERNEE + " " + Constantes.TYPE_COL_TABLE_CONCERNEE + " , "

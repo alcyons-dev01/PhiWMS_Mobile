@@ -38,7 +38,7 @@ import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.MenuActivity;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 public class HeaderFooter extends PdfPageEventHelper {
     /** Alternating phrase for the header. */

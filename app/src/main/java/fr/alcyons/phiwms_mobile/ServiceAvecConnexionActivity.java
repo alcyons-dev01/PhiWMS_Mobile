@@ -14,8 +14,6 @@ import com.android.volley.VolleyError;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 
-import com.example.phiwms_mobile.R;
-
 public class ServiceAvecConnexionActivity extends ServiceActivity {
 
     /*

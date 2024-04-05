@@ -6,7 +6,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.SurveillanceReferenceOpenHelper;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
@@ -85,7 +84,7 @@ public class SurveillanceReference {
         this.produitLot = cursor.getString(SurveillanceReferenceOpenHelper.Constantes.NUM_COL_PRODUITLOT_SURVEILLANCEREFERENCE);
         this.produitDatePéremption = cursor.getString(SurveillanceReferenceOpenHelper.Constantes.NUM_COL_PRODUITDATEPEREMPTION_SURVEILLANCEREFERENCE);
         this.produitNumeroSerie = cursor.getString(SurveillanceReferenceOpenHelper.Constantes.NUM_COL_PRODUITNUMEROSERIE_SURVEILLANCEREFERENCE);
-        this.serialexpressUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.serialexpressUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
     public JSONObject toJson() {

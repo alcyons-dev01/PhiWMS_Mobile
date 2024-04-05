@@ -31,7 +31,7 @@ public class SYS_Mvt_Stock_Type implements Serializable, Comparable {
     int TYM_SENS_ATTENDU;
     String SYS_HEURE_MAJ;
     String XSYS_USER_MAJ;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public SYS_Mvt_Stock_Type(int TYM_ID, String TYM_RUID, String TYM_LIB, int TYM_SENS_ENTREE, int TYM_SENS_SORTIE, int TYM_SENS_INVENTAIRE, String TYM_TYPE_MAJ, String TYM_DT_CREATION, String SYS_DT_MAJ, String SYS_USER_MAJ, int TYM_SENS_ATTENDU, String SYS_HEURE_MAJ, String XSYS_USER_MAJ) {
         this.TYM_ID = TYM_ID;
@@ -83,15 +83,15 @@ public class SYS_Mvt_Stock_Type implements Serializable, Comparable {
         TYM_SENS_ATTENDU = cursor.getInt(SYS_Mvt_Stock_TypeOpenHelper.Constantes.NUM_COL_TYM_SENS_ATTENDU_SYS_MVT_STOCK_TYPE);
         SYS_HEURE_MAJ = cursor.getString(SYS_Mvt_Stock_TypeOpenHelper.Constantes.NUM_COL_SYS_HEURE_MAJ_SYS_MVT_STOCK_TYPE);
         XSYS_USER_MAJ = cursor.getString(SYS_Mvt_Stock_TypeOpenHelper.Constantes.NUM_COL_XSYS_USER_MAJ_SYS_MVT_STOCK_TYPE);
-        phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getTYM_ID() {
@@ -240,7 +240,7 @@ public class SYS_Mvt_Stock_Type implements Serializable, Comparable {
     public int compareTo(Object obj) {
         SYS_Mvt_Stock_Type sys_mvt_stock_type = (SYS_Mvt_Stock_Type) obj;
 
-        if (this.getPhiMR4UUID() == sys_mvt_stock_type.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == sys_mvt_stock_type.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.getTYM_ID() > sys_mvt_stock_type.getTYM_ID() ? 1 : -1;

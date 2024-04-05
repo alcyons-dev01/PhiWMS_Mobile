@@ -27,7 +27,7 @@ public class Service implements Serializable, Comparable {
     private String lien_video;
     private String whitePaper;
     private int score;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Service(int id, String nom, int ordre, int idPerimetreFonctionnel, String nomPerimetrefonctionnel, String statut, int indicateur, String description, String lien_video, String whitePaper, int score) {
         this.id = id;
@@ -43,7 +43,7 @@ public class Service implements Serializable, Comparable {
         this.score = score;
     }
 
-    public Service(int id, String nom, int ordre, int idPerimetreFonctionnel, String nomPerimetrefonctionnel, String statut, int indicateur, String description, String lien_video, String whitePaper, int score, int phiMR4UUID) {
+    public Service(int id, String nom, int ordre, int idPerimetreFonctionnel, String nomPerimetrefonctionnel, String statut, int indicateur, String description, String lien_video, String whitePaper, int score, int phiwms_mobileUUID) {
         this.id = id;
         this.nom = nom;
         this.ordre = ordre;
@@ -55,7 +55,7 @@ public class Service implements Serializable, Comparable {
         this.description = description;
         this.whitePaper = whitePaper;
         this.score = score;
-        this.phiMR4UUID = phiMR4UUID;
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public Service(Cursor cursor) {
@@ -69,16 +69,16 @@ public class Service implements Serializable, Comparable {
         this.description = cursor.getString(ServiceOpenHelper.Constantes.NUM_COL_DESCRIPTION_SERVICE);
         this.lien_video = cursor.getString(ServiceOpenHelper.Constantes.NUM_COL_VIDEO_SERVICE);
         this.whitePaper = cursor.getString(ServiceOpenHelper.Constantes.NUM_COL_WHITEPAPER_SERVICE);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
         this.score = cursor.getInt(ServiceOpenHelper.Constantes.NUM_COL_SCORE);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getId() {
@@ -190,7 +190,7 @@ public class Service implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Service service = (Service) obj;
 
-        if (this.getPhiMR4UUID() == ((Service) obj).getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == ((Service) obj).getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.getId() > ((Service) obj).getId() ? 1 : -1;

@@ -39,7 +39,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.Mail;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 public class ServiceParametresServeurActivity extends AppCompatActivity {
 

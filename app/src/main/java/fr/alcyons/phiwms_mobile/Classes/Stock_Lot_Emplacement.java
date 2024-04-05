@@ -32,7 +32,7 @@ public class Stock_Lot_Emplacement implements Serializable, Comparable {
     private int Qte_Deplacer;
     private String date_dernier_controle;
     private String Serie;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
 
     public Stock_Lot_Emplacement(String SYS, int _UID, int produit_Code, String depot_Reference, String zone, String emplacement, String lot, double qte, String peremptionDate, String produit_Designation, String SYS_UniqueID, int qte_Deplacer, String date_dernier_controle) {
@@ -82,15 +82,15 @@ public class Stock_Lot_Emplacement implements Serializable, Comparable {
         this.Qte = cursor.getDouble(Stock_Lot_EmplacementLightOpenHelper.Constantes.NUM_COL_QTE_STOCK_LOT_EMPLACEMENT);
         this.peremptionDate = cursor.getString(Stock_Lot_EmplacementLightOpenHelper.Constantes.NUM_COL_PEREMPTIONDATE_STOCK_LOT_EMPLACEMENT);
         this.Serie = cursor.getString(Stock_Lot_EmplacementLightOpenHelper.Constantes.NUM_COL_SERIE);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public String getSYS() {
@@ -222,7 +222,7 @@ public class Stock_Lot_Emplacement implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Stock_Lot_Emplacement stock_lot_emplacement = (Stock_Lot_Emplacement) obj;
 
-        if (this.getPhiMR4UUID() == stock_lot_emplacement.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == stock_lot_emplacement.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.get_UID() > stock_lot_emplacement.get_UID() ? 1 : -1;

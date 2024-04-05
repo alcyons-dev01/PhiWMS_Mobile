@@ -88,7 +88,7 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsEncodage;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.ParametresServeur.ServiceParametresServeurActivity;
 
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 import fr.alcyons.phiwms_mobile.VerificationConnexion.VerificationConnexionActivity;
 //import com.github.aakira.expandablelayout.ExpandableRelativeLayout;
@@ -898,7 +898,7 @@ public class AuthentificationActivity extends AppCompatActivity {
     public void mettreAJourBDD() {
         String token = utilisateurConnecte.getToken();
         gestionnaireElementASynchroniser.toutSynchroniser(AuthentificationActivity.this, db, utilisateurConnecte, true);
-        gestionnaireService.insererBDDLocaleServicesEtPerimetresFonctionnelsPhiMR4(AuthentificationActivity.this, db, token, utilisateurConnecte);
+        gestionnaireService.insererBDDLocaleServicesEtPerimetresFonctionnelsphiwms_mobile(AuthentificationActivity.this, db, token, utilisateurConnecte);
         gestionnaireZone.insererBDDLocaleDepotsZones(AuthentificationActivity.this, db, token, utilisateurConnecte);
         gestionnaireDepot.insererBDDLocaleDepots(AuthentificationActivity.this, db, token, utilisateurConnecte);
         gestionnaireEmplacement.insererBDDLocaleDepotsEmplacements(AuthentificationActivity.this, db, token, utilisateurConnecte);

@@ -27,7 +27,7 @@ public class ActionUtilisateur implements Serializable, Comparable {
     private int ChampsParentId;
     private String CheminPhoto;
     private String ActionName;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public ActionUtilisateur(int Id, int UserId, String Date, int ServiceId, int EtablissementId, String Statut, int ChampsParentId, String CheminPhoto, String ActionName) {
         this.Id = Id;
@@ -91,15 +91,15 @@ public class ActionUtilisateur implements Serializable, Comparable {
         this.ChampsParentId = cursor.getInt(ActionUtilisateurOpenHelper.Constantes.NUM_COL_CHAMPS_PARENT_ID);
         this.CheminPhoto = cursor.getString(ActionUtilisateurOpenHelper.Constantes.NUM_COL_CHEMIN_PHOTO);
         this.ActionName = cursor.getString(ActionUtilisateurOpenHelper.Constantes.NUM_COL_ACTION_NAME);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getId() {
@@ -212,7 +212,7 @@ public class ActionUtilisateur implements Serializable, Comparable {
     public int compareTo(Object obj) {
         ActionUtilisateur actionUtilisateur = (ActionUtilisateur) obj;
 
-        if (this.getPhiMR4UUID() == actionUtilisateur.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == actionUtilisateur.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.getId() > actionUtilisateur.getId() ? 1 : -1;

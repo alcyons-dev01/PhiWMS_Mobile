@@ -23,7 +23,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.TableTraceOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.TableTrace;
 
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 public class ScannerEmplacementActivity  extends ServiceActivity {
@@ -139,7 +139,7 @@ public class ScannerEmplacementActivity  extends ServiceActivity {
                                 rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                                 if(rowId != -1)
                                 {
-                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                                 }
                             }
                             code = s.toString().substring(0, s.length() - 1);

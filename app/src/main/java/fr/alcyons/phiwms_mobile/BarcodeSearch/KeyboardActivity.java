@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.PleinVideContexte;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 /**

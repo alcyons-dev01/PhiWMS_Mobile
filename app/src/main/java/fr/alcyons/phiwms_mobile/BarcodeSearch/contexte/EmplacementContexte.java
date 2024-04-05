@@ -19,7 +19,7 @@ import fr.alcyons.phiwms_mobile.Classes.TableTrace;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by jessica on 07/06/2018.
@@ -71,7 +71,7 @@ public class EmplacementContexte {
             long rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
             if(rowId != -1)
             {
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
             }
         }
         if (chaine.startsWith("PHITAGPLACE+")) {

@@ -28,7 +28,7 @@ public class Depot_Zone implements Serializable, Comparable {
     private String Depot_Reference;
     private String Type_Emplacement;
     private List<Depot_Emplacement> emplacements;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Depot_Zone(int id, String zoneName, double zoneLongitude, double zoneLatitude, String dataMatrixReference, int depotID, String conservation, String depot_Reference, String type_Emplacement) {
         this.ZoneID = id;
@@ -84,15 +84,15 @@ public class Depot_Zone implements Serializable, Comparable {
         this.Depot_Reference = cursorZones.getString(ZoneOpenHelper.Constantes.NUM_COL_DEPOT_REFERENCE_DEPOT_ZONE);
         this.Type_Emplacement = cursorZones.getString(ZoneOpenHelper.Constantes.NUM_COL_TYPE_EMPLACEMENT_DEPOT_ZONE);
         this.emplacements = new ArrayList<>();
-        this.phiMR4UUID = cursorZones.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursorZones.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getZoneID() {
@@ -201,7 +201,7 @@ public class Depot_Zone implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Depot_Zone depot_zone = (Depot_Zone) obj;
 
-        if (this.getPhiMR4UUID() == depot_zone.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == depot_zone.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.getZoneID() > depot_zone.getZoneID() ? 1 : -1;

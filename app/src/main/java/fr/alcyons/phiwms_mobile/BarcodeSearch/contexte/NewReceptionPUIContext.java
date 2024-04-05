@@ -23,7 +23,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.SurveillanceReferenceOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
@@ -38,8 +37,8 @@ import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.GestionCodeErreurNMVO;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
-import com.example.phiwms_mobile.OutilsSerialisation.EnvoyerMailSurveillance;
-import com.example.phiwms_mobile.OutilsSerialisation.Serialisation;
+import fr.alcyons.phiwms_mobile.OutilsSerialisation.EnvoyerMailSurveillance;
+import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
 
 public class NewReceptionPUIContext {
     private Context context;
@@ -354,7 +353,7 @@ public class NewReceptionPUIContext {
 
                                 serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, (int) ph_serialisation_uid);
                                 if (serialisation_courante == null) {
-                                    serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int) ph_serialisation_uid);
+                                    serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByphiwms_mobileUUID(db, (int) ph_serialisation_uid);
                                 }
 
                                 resultat = serialisation_courante.getResultat();
@@ -775,7 +774,7 @@ public class NewReceptionPUIContext {
 
                             serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, (int) ph_serialisation_uid);
                             if (serialisation_courante == null) {
-                                serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int) ph_serialisation_uid);
+                                serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByphiwms_mobileUUID(db, (int) ph_serialisation_uid);
                             }
 
                             resultat = serialisation_courante.getResultat();

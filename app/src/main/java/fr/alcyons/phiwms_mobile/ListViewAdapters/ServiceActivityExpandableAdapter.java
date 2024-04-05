@@ -18,7 +18,7 @@ import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.Classes.PerimetreFonctionnel;
 import fr.alcyons.phiwms_mobile.Classes.Service;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by olivier on 11/04/2019.

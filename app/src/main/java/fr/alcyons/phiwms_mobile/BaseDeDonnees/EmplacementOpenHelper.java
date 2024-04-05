@@ -30,7 +30,7 @@ import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by quentinlanusse on 01/06/2017.
@@ -97,7 +97,7 @@ public class EmplacementOpenHelper extends DBOpenHelper {
         // Insertion du dépot en BDD
         long rowId = db.insert(Constantes.TABLE_DEPOT_EMPLACEMENT, null, contentValues);
 
-        depotEmplacement.setPhiMR4UUID((int) rowId);
+        depotEmplacement.setphiwms_mobileUUID((int) rowId);
 
         return rowId;
     }
@@ -112,7 +112,7 @@ public class EmplacementOpenHelper extends DBOpenHelper {
             String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriRequeteDepotsEmplacements;
             RequestQueue requestQueue = new Volley().newRequestQueue(context);
 
-            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                     new Response.Listener<JSONObject>() {
 
                         @Override
@@ -200,7 +200,7 @@ public class EmplacementOpenHelper extends DBOpenHelper {
     }
 
     public static long supprimerUnEmplacementEnBDD(SQLiteDatabase db, Depot_Emplacement emplacement) {
-        return db.delete(Constantes.TABLE_DEPOT_EMPLACEMENT, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(emplacement.getPhiMR4UUID())});
+        return db.delete(Constantes.TABLE_DEPOT_EMPLACEMENT, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(emplacement.getphiwms_mobileUUID())});
     }
 
     public static Depot_Emplacement getUnEmplacementZoneEtNom(SQLiteDatabase db, Depot_Zone depotZone, String depotEmplacementAdressage) {
@@ -284,10 +284,10 @@ public class EmplacementOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_DEPOT_REFERENCE_DEPOT_EMPLACEMENT, emplacement.getDepot_Reference());
         contentValues.put(Constantes.CLE_COL_CODE_GLN_DEPOT_EMPLACEMENT, emplacement.getCode_GLN());
 
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID, emplacement.getPhiMR4UUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, emplacement.getphiwms_mobileUUID());
 
         // Insertion du dépot en BDD
-        return db.update(Constantes.TABLE_DEPOT_EMPLACEMENT, contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " = " + String.valueOf(emplacement.getPhiMR4UUID()), null);
+        return db.update(Constantes.TABLE_DEPOT_EMPLACEMENT, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + String.valueOf(emplacement.getphiwms_mobileUUID()), null);
     }
 
     public static class Constantes implements BaseColumns {
@@ -336,7 +336,7 @@ public class EmplacementOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_DEPOT_EMPLACEMENT = "CREATE TABLE "
                 + Constantes.TABLE_DEPOT_EMPLACEMENT + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_ADRESSAGE_DEPOT_EMPLACEMENT + " " + Constantes.TYPE_COL_ADRESSAGE_DEPOT_EMPLACEMENT + ","
                 + Constantes.CLE_COL_HALL_DEPOT_EMPLACEMENT + " " + Constantes.TYPE_COL_HALL_DEPOT_EMPLACEMENT + ","
                 + Constantes.CLE_COL_PALETIER_DEPOT_EMPLACEMENT + " " + Constantes.TYPE_COL_PALETIER_DEPOT_EMPLACEMENT + ","

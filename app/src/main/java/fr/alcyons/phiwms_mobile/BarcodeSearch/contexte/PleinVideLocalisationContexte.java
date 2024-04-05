@@ -12,7 +12,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DotationOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Dotation;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by jessica on 07/06/2018.

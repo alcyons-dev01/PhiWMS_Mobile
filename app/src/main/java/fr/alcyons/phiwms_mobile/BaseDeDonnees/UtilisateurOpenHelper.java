@@ -93,7 +93,7 @@ public class UtilisateurOpenHelper extends DBOpenHelper {
         // Insertion de l'utilisateur en BDD
         long rowID = db.insert(Constantes.TABLE_UTILISATEUR, null, contentValues);
 
-        utilisateur.setPhiMR4UUID((int) rowID);
+        utilisateur.setphiwms_mobileUUID((int) rowID);
 
         return rowID;
     }
@@ -114,7 +114,7 @@ public class UtilisateurOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_DEPOT_UID_UTILISATEUR, utilisateur.getDepot_UID());
         contentValues.put(Constantes.CLE_COL_ETABLISSEMENT_UTILISATEUR, utilisateur.getEtablissement());
         contentValues.put(Constantes.CLE_COL_ETABLISSEMENT_ID_UTILISATEUR, utilisateur.getEtablissementId());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID, utilisateur.getPhiMR4UUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, utilisateur.getphiwms_mobileUUID());
         if (utilisateur.getServicesHabilites() != null) {
             String listeServices = "{ \"Services\": [";
             for (Service service : utilisateur.getServicesHabilites()
@@ -141,7 +141,7 @@ public class UtilisateurOpenHelper extends DBOpenHelper {
         }
 
 
-        long rowID = db.update(Constantes.TABLE_UTILISATEUR, contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + utilisateur.getPhiMR4UUID(), null);
+        long rowID = db.update(Constantes.TABLE_UTILISATEUR, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + utilisateur.getphiwms_mobileUUID(), null);
 
         return rowID;
     }
@@ -165,7 +165,7 @@ public class UtilisateurOpenHelper extends DBOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put(Constantes.CLE_COL_TOKEN_UTILISATEUR, utilisateur.getToken());
 
-        long rowId = db.update(Constantes.TABLE_UTILISATEUR, contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " = " + utilisateur.getPhiMR4UUID(), null);
+        long rowId = db.update(Constantes.TABLE_UTILISATEUR, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + utilisateur.getphiwms_mobileUUID(), null);
 
         return rowId;
     }
@@ -174,7 +174,7 @@ public class UtilisateurOpenHelper extends DBOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put(Constantes.CLE_COL_ETABLISSEMENT_UTILISATEUR, utilisateur.getEtablissement());
 
-        long rowId = db.update(Constantes.TABLE_UTILISATEUR, contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " = " + utilisateur.getPhiMR4UUID(), null);
+        long rowId = db.update(Constantes.TABLE_UTILISATEUR, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + utilisateur.getphiwms_mobileUUID(), null);
 
         return rowId;
     }
@@ -246,7 +246,7 @@ public class UtilisateurOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_UTILISATEUR = "CREATE TABLE "
                 + Constantes.TABLE_UTILISATEUR + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_IDENTIFIANT_UTILISATEUR + " " + Constantes.TYPE_COL_IDENTIFIANT_UTILISATEUR + ","
                 + Constantes.CLE_COL_MDP_UTILISATEUR + " " + Constantes.TYPE_COL_MDP_UTILISATEUR + ","
                 + Constantes.CLE_COL_MAIL_UTILISATEUR + " " + Constantes.TYPE_COL_MAIL_UTILISATEUR + ","

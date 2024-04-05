@@ -94,7 +94,7 @@ public class Inventaire_LigneOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_INVENTAIRE_LIGNE = "CREATE TABLE " + Constantes.TABLE_INVENTAIRE_LIGNE
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_PRODUIT_REFERENCE_INVENTAIRE_LIGNE + " " + Constantes.TYPE_COL_PRODUIT_REFERENCE_INVENTAIRE_LIGNE + " ,"
                 + Constantes.CLE_COL_FOURNISSEUR_INVENTAIRE_LIGNE + " " + Constantes.TYPE_COL_FOURNISSEUR_INVENTAIRE_LIGNE + " ,"
                 + Constantes.CLE_COL_CATEGORIE_INVENTAIRE_LIGNE + " " + Constantes.TYPE_COL_CATEGORIE_INVENTAIRE_LIGNE + " ,"

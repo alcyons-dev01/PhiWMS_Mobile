@@ -24,7 +24,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.SurveillanceReferenceOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.UtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
@@ -39,10 +38,10 @@ import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.GestionCodeErreurNMVO;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
-import com.example.phiwms_mobile.OutilsSerialisation.EnvoyerMailSurveillance;
-import com.example.phiwms_mobile.OutilsSerialisation.GestionResultatNMVO;
-import com.example.phiwms_mobile.OutilsSerialisation.Serialisation;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.OutilsSerialisation.EnvoyerMailSurveillance;
+import fr.alcyons.phiwms_mobile.OutilsSerialisation.GestionResultatNMVO;
+import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by olivier on 28/03/2019.
@@ -275,7 +274,7 @@ public class PreparationContexte {
                         PH_Serialisation serialisation = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, (int)ph_serialisation_uid);
                         if(serialisation == null)
                         {
-                            serialisation = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int)ph_serialisation_uid);
+                            serialisation = PH_SerialisationOpenHelper.getPH_SerialisationByphiwms_mobileUUID(db, (int)ph_serialisation_uid);
                         }
 
                         resultat = serialisation.getResultat();

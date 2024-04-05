@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.Editable;
 
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by olivier on 11/04/2019.

@@ -79,7 +79,7 @@ public class Retour_LigneOpenHelper extends DBOpenHelper {
         // Insertion du dépot en BDD
         long rowId = db.insert(Constantes.TABLE_RETOUR_LIGNE, null, contentValues);
 
-        retour_ligne.setPhiMR4UUID((int) rowId);
+        retour_ligne.setphiwms_mobileUUID((int) rowId);
 
         return rowId;
     }
@@ -113,9 +113,9 @@ public class Retour_LigneOpenHelper extends DBOpenHelper {
         return retourLigne;
     }
 
-    public static Retour_Ligne getRetourLigneByPhiMR4UUID(SQLiteDatabase db, int id) {
+    public static Retour_Ligne getRetourLigneByphiwms_mobileUUID(SQLiteDatabase db, int id) {
         Retour_Ligne retourLigne = null;
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_RETOUR_LIGNE + " WHERE  " + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(id)});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_RETOUR_LIGNE + " WHERE  " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(id)});
 
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
@@ -161,15 +161,15 @@ public class Retour_LigneOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_RETOURPUI_EMPLACEMENT_RETOUR_LIGNE, retour_ligne.getRetourPUI_Emplacement());
         contentValues.put(Constantes.CLE_COL_EMPLACEMENTORIGINE_RETOUR_LIGNE, retour_ligne.getEmplacementOrigine());
         contentValues.put(Constantes.CLE_COL_PATIENTID_RETOUR_LIGNE, retour_ligne.getPatientID());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID, retour_ligne.getPhiMR4UUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, retour_ligne.getphiwms_mobileUUID());
         contentValues.put(Constantes.CLE_COL_RETOURPUI_ZONE_RETOUR_LIGNE, retour_ligne.getRetourPUI_Zone());
         contentValues.put(Constantes.CLE_COL_SERIE_RETOURNER, retour_ligne.getSerie_Retourner());
 
-        return db.update(Constantes.TABLE_RETOUR_LIGNE, contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + retour_ligne.getPhiMR4UUID(), null);
+        return db.update(Constantes.TABLE_RETOUR_LIGNE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + retour_ligne.getphiwms_mobileUUID(), null);
     }
 
     public static void supprimerUnRetourLigne(SQLiteDatabase db, Retour_Ligne retour_ligne) {
-        db.delete(Constantes.TABLE_RETOUR_LIGNE, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + retour_ligne.getPhiMR4UUID(), null);
+        db.delete(Constantes.TABLE_RETOUR_LIGNE, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + retour_ligne.getphiwms_mobileUUID(), null);
     }
 
     public static class Constantes implements BaseColumns {
@@ -277,7 +277,7 @@ public class Retour_LigneOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_RETOUR_LIGNE = "CREATE TABLE " + Constantes.TABLE_RETOUR_LIGNE
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_CODE_PRODUIT_RETOUR_LIGNE + " " + Constantes.TYPE_COL_CODE_PRODUIT_RETOUR_LIGNE + " ,"
                 + Constantes.CLE_COL_PRODUIT_REFERENCE_RETOUR_LIGNE + " " + Constantes.TYPE_COL_PRODUIT_REFERENCE_RETOUR_LIGNE + " ,"
                 + Constantes.CLE_COL_QTE_RETOURNER_RETOUR_LIGNE + " " + Constantes.TYPE_COL_QTE_RETOURNER_RETOUR_LIGNE + " ,"

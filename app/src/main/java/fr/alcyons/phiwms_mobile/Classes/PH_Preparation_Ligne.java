@@ -65,7 +65,7 @@ public class PH_Preparation_Ligne implements Serializable, Comparable {
     private String SerieNumero;
     private Integer _UID_4D;
     private boolean Verrouiller;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public PH_Preparation_Ligne(int preparationID, int _UID, int produitID, String produitDesignation, int qte_APreparer, int qte_livrer, String produitReference, String zoneDepot, String produitCategorie, int qte_RAL, int produitCondDistrib, boolean suivi_Par_Lot, String lotNumero, String depot_Destinataire_Reference, int qte_besoin, int qte_Demander, int qte_preparer)
     {
@@ -177,7 +177,7 @@ public class PH_Preparation_Ligne implements Serializable, Comparable {
         this.Suivi_Par_Serie = ph_preparation_ligne.isSuivi_Par_Serie();
         this.Serialiser_Reception = ph_preparation_ligne.isSerialiser_Reception();
         this.SerieNumero = ph_preparation_ligne.getSerieNumero();
-        this.phiMR4UUID = ph_preparation_ligne.getPhiMR4UUID();
+        this.phiwms_mobileUUID = ph_preparation_ligne.getphiwms_mobileUUID();
         this._UID_4D = ph_preparation_ligne.get_UID_4D();
         this.Verrouiller = ph_preparation_ligne.isVerrouiller();
     }
@@ -465,7 +465,7 @@ public class PH_Preparation_Ligne implements Serializable, Comparable {
         this.SerieNumero = cursor.getString(PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_SERIE_NUMERO);
         this._UID_4D = cursor.getInt(PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_UID_4D);
         this.Verrouiller = OutilsGestionClasses.recupererBooleen(cursor, PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_VERROUILLER);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 /*
 
@@ -485,17 +485,17 @@ public class PH_Preparation_Ligne implements Serializable, Comparable {
         this.Qte_preparer = cursor.getInt(PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_QTE_PREPARER_PH_PREPARATION_LIGNE);
         this.LotNumero = cursor.getString(PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_LOTNUMERO_PH_PREPARATION_LIGNE);
         this.Suivi_Par_Lot = recupererBooleen(cursor, PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_SUIVI_PAR_LOT_PH_PREPARATION_LIGNE);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 */
 
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getPreparationID() {
@@ -884,7 +884,7 @@ public class PH_Preparation_Ligne implements Serializable, Comparable {
     public int compareTo(Object obj) {
         PH_Preparation_Ligne ph_preparation_ligne = (PH_Preparation_Ligne) obj;
 
-        if (this.getPhiMR4UUID() == ph_preparation_ligne.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == ph_preparation_ligne.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.get_UID() > ph_preparation_ligne.get_UID() ? 1 : -1;

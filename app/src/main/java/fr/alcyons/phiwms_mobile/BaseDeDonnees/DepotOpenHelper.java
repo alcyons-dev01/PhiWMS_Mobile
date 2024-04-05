@@ -32,7 +32,7 @@ import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 import static java.lang.Math.acos;
 import static java.lang.Math.cos;
@@ -228,7 +228,7 @@ public class DepotOpenHelper extends DBOpenHelper {
         // Insertion du dépot en BDD
         long rowId = db.insert(Constantes.TABLE_DEPOT, null, contentValues);
 
-        depot.setPhiMR4UUID((int) rowId);
+        depot.setphiwms_mobileUUID((int) rowId);
 
         return rowId;
     }
@@ -248,7 +248,7 @@ public class DepotOpenHelper extends DBOpenHelper {
             String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriRequeteDepots;
             RequestQueue requestQueue = new Volley().newRequestQueue(context);
 
-            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                     new Response.Listener<JSONObject>() {
 
                         @Override
@@ -702,7 +702,7 @@ public class DepotOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_DEPOT = "CREATE TABLE "
                 + Constantes.TABLE_DEPOT + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_DEPOT_REFERENCE_DEPOT + " " + Constantes.TYPE_COL_DEPOT_REFERENCE_DEPOT + ","
                 + Constantes.CLE_COL_NOM_DEPOT + " " + Constantes.TYPE_COL_NOM_DEPOT + ","
                 + Constantes.CLE_COL_ADRESSE1_DEPOT + " " + Constantes.TYPE_COL_ADRESSE1_DEPOT + ","

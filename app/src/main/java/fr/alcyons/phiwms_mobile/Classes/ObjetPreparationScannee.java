@@ -21,7 +21,7 @@ public class ObjetPreparationScannee implements Comparable{
     private int Qte_Preparer = 0;
     private String Serie;
     private int _UID = 0;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public ObjetPreparationScannee(JSONObject jsonObject) {
         try {
@@ -51,12 +51,12 @@ public class ObjetPreparationScannee implements Comparable{
         this.Serie = numSerie;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getQte_Preparer() {
@@ -162,7 +162,7 @@ public class ObjetPreparationScannee implements Comparable{
     @Override
     public int compareTo(Object obj) {
 
-        if (this.getPhiMR4UUID() == ((ObjetPreparationScannee) obj).getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == ((ObjetPreparationScannee) obj).getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.get_UID() > ((ObjetPreparationScannee) obj).get_UID() ? 1 : -1;

@@ -44,7 +44,7 @@ public class Frequences {
     String SYS_DT_MAJ;
     String SYS_HEURE_MAJ;
     String SYS_USER_MAJ;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Frequences(JSONObject jsonObject) {
         try {
@@ -326,12 +326,12 @@ public class Frequences {
         this.SYS_USER_MAJ = SYS_USER_MAJ;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public JSONObject toJson() {

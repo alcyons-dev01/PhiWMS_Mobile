@@ -53,7 +53,7 @@ public class SYS_Document_TypeOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_SYS_DOCUMENT_TYPE = "CREATE TABLE " + Constantes.TABLE_SYS_DOCUMENT_TYPE
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_TYD_CODE_SYS_DOCUMENT_TYPE + " " + Constantes.TYPE_COL_TYD_CODE_SYS_DOCUMENT_TYPE + " ,"
                 + Constantes.CLE_COL_TYD_DEPOT_SYS_DOCUMENT_TYPE + " " + Constantes.TYPE_COL_TYD_DEPOT_SYS_DOCUMENT_TYPE + " ,"
                 + Constantes.CLE_COL_TYD_TYM_CODE1_SYS_DOCUMENT_TYPE + " " + Constantes.TYPE_COL_TYD_TYM_CODE1_SYS_DOCUMENT_TYPE + " ,"

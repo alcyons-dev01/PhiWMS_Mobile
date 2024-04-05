@@ -86,11 +86,11 @@ import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne_ControleRetour_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 
-import com.example.phiwms_mobile.ControleDesRetours.ListeEmplacementCreationActivity;
-import com.example.phiwms_mobile.ControleDesRetours.ListeZoneCreationActivity;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeEmplacementCreationActivity;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeZoneCreationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 public class BarcodePreparationActivity extends ServiceActivity {
@@ -916,7 +916,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
                                 Stock_Lot_Emplacement_Light stock_lot_emplacement_light = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, lotCourant.getStockLotEmplacementID());
                                 stock_lot_emplacement_light.setEmplacement(emplacementSelectionner.getAdressage());
                                 Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_lot_emplacement_light);*/
-                                //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, stock_lot_emplacement_light.getPhiMR4UUID(), stock_lot_emplacement_light.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
+                                //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, stock_lot_emplacement_light.getphiwms_mobileUUID(), stock_lot_emplacement_light.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
                             }
                             break;
                         case CodesEchangesActivites.RETOUR_SCANNER:

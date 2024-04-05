@@ -44,7 +44,7 @@ public class Dotation implements Serializable, Comparable {
     private boolean INSTALLATION;
     private boolean PLEINVIDE;
     private int protocole_UID;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     private String dateLivraison;
 
@@ -102,7 +102,7 @@ public class Dotation implements Serializable, Comparable {
         this.INSTALLATION = OutilsGestionClasses.recupererBooleen(cursor, DotationOpenHelper.Constantes.NUM_COL_INSTALLATION_DOTATION);
         this.PLEINVIDE = OutilsGestionClasses.recupererBooleen(cursor, DotationOpenHelper.Constantes.NUM_COL_PLEINVIDE_DOTATION);
         this.protocole_UID = cursor.getInt(DotationOpenHelper.Constantes.NUM_COL_PROTOCOLE_UID_DOTATION);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
     public int get_UID() {
@@ -273,12 +273,12 @@ public class Dotation implements Serializable, Comparable {
         this.INSTALLATION = INSTALLATION;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public boolean isPLEINVIDE() {
@@ -363,7 +363,7 @@ public class Dotation implements Serializable, Comparable {
                 ", INSTALLATION=" + INSTALLATION +
                 ", PLEINVIDE=" + PLEINVIDE +
                 ", protocole_UID=" + protocole_UID +
-                ", phiMR4UUID=" + phiMR4UUID +
+                ", phiwms_mobileUUID=" + phiwms_mobileUUID +
                 '}';
     }
 
@@ -371,17 +371,17 @@ public class Dotation implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         Dotation dotation = (Dotation) obj;
 
-        if (this.getPhiMR4UUID() == dotation.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == dotation.getphiwms_mobileUUID()) {
             return 0;
         } else {
-            return this.getPhiMR4UUID() > dotation.getPhiMR4UUID() ? 1 : -1;
+            return this.getphiwms_mobileUUID() > dotation.getphiwms_mobileUUID() ? 1 : -1;
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
-        if (((Dotation) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
+        if (((Dotation) obj).getphiwms_mobileUUID() == this.getphiwms_mobileUUID()) {
             valeurARetourner = true;
         }
 

@@ -45,18 +45,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import fr.alcyons.phimr4.BarcodeSearch.KeyboardActivity;
-import fr.alcyons.phimr4.BaseDeDonnees.ProduitOpenHelper;
-import fr.alcyons.phimr4.Classes.Produit;
-import fr.alcyons.phimr4.Outils.Alerte;
-import fr.alcyons.phimr4.Outils.CodesEchangesActivites;
-import fr.alcyons.phimr4.Outils.OutilsGestionConnexionReseau;
-import fr.alcyons.phimr4.PrisePhoto.camera.CameraSource;
-import fr.alcyons.phimr4.PrisePhoto.camera.GraphicOverlay;
-import fr.alcyons.phimr4.R;
-import fr.alcyons.phimr4.ServiceActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.KeyboardActivity;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.Outils.Alerte;
+import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
+import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
+import fr.alcyons.phiwms_mobile.PrisePhoto.camera.CameraSource;
+import fr.alcyons.phiwms_mobile.PrisePhoto.camera.GraphicOverlay;
+import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.ServiceActivity;
 
-import static fr.alcyons.phimr4.Outils.CodesEchangesActivites.RETOUR_PRISE_PHOTO;
+import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_PRISE_PHOTO;
 
 public class CameraActivity extends ServiceActivity {
     private static final String TAG = "CameraActivity";

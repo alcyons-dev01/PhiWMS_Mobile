@@ -42,7 +42,7 @@ public class Utilisateur implements Serializable {
 
     private int EtablissementId;
     private int lastPerimetreId;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
 
     public Utilisateur(int id, String identifiant, String mdp, String mail, String nom, String prenom, boolean active, int planHabilitation, boolean bloque, int depot_UID, String token, String Etablissement, int perimetreFonctionnelId, int EtablissementId) {
@@ -98,7 +98,7 @@ public class Utilisateur implements Serializable {
         this.Etablissement = cursor.getString(UtilisateurOpenHelper.Constantes.NUM_COL_ETABLISSEMENT_UTILISATEUR);
         this.lastPerimetreId = cursor.getInt(UtilisateurOpenHelper.Constantes.NUM_COL_LAST_PERIMETRE);
         this.EtablissementId = cursor.getInt(UtilisateurOpenHelper.Constantes.NUM_COL_ETABLISSEMENT_ID_UTILISATEUR);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
     public Utilisateur(JSONObject utilisateurJson) {
@@ -129,12 +129,12 @@ public class Utilisateur implements Serializable {
         this.channels = channels;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public double getLongitude() {

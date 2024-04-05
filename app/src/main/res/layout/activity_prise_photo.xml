@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/topLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:keepScreenOn="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:gravity="center">
+
+        <fr.alcyons.phiwms_mobile.PrisePhoto.camera.CameraSourcePreview
+            android:id="@+id/preview"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:foregroundGravity="center_horizontal">
+
+            <fr.alcyons.phiwms_mobile.PrisePhoto.camera.GraphicOverlay
+                android:id="@+id/graphicOverlay"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:foregroundGravity="center_horizontal"
+                android:gravity="center" />
+
+        </fr.alcyons.phiwms_mobile.PrisePhoto.camera.CameraSourcePreview>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bleu_fonce_alcyons"
+        android:text="Prendre la photo du produit"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textSize="20sp" />
+
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/boutonFermeture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/banner"
+        android:layout_marginEnd="14dp"
+        android:layout_marginRight="14dp"
+        android:src="@drawable/ic_clear"
+        app:fab_size="mini" />
+
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/flash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/banner"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:src="@drawable/ic_flash"
+        app:fab_colorNormal="@android:color/darker_gray"
+        app:fab_colorPressed="@android:color/darker_gray"
+        app:fab_colorRipple="@android:color/darker_gray"
+        app:fab_size="mini" />
+
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/takePictureButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="15dp"
+        android:src="@drawable/ic_photo_camera"
+        app:fabSize="mini"
+        app:fab_colorNormal="@color/bleu_clair_alcyons"
+        app:fab_colorPressed="@color/bleu_clair_alcyons"
+        app:fab_colorRipple="@color/bleu_clair_alcyons" />
+
+</RelativeLayout>

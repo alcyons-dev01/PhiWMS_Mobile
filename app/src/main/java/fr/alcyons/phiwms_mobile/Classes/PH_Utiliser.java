@@ -40,7 +40,7 @@ public class PH_Utiliser implements Serializable, Comparable {
     String peremptionDate;
     int controleQuantite;
     boolean produitSoumisTracabilite;
-    private int phiMR4UUID=-1;
+    private int phiwms_mobileUUID=-1;
 
     public PH_Utiliser(int _UID, double lat, double lng, int quantiteUtilisee, int zoneUID, int emplacementUID, int depotUID, String photoNom, int photoUID, int produitUID, String utilisationDate, String utilisationHeure, boolean controleEffectue, String lot, String peremptionDate, int controleQuantite, boolean produitSoumisTracabilite){
         this._UID = _UID;
@@ -302,12 +302,12 @@ public class PH_Utiliser implements Serializable, Comparable {
         this.produitSoumisTracabilite = produitSoumisTracabilite;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
 
@@ -315,17 +315,17 @@ public class PH_Utiliser implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         PH_Utiliser phUtiliser = (PH_Utiliser) obj;
 
-        if (this.getPhiMR4UUID() == phUtiliser.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == phUtiliser.getphiwms_mobileUUID()) {
             return 0;
         } else {
-            return this.getPhiMR4UUID() > phUtiliser.getPhiMR4UUID() ? 1 : -1;
+            return this.getphiwms_mobileUUID() > phUtiliser.getphiwms_mobileUUID() ? 1 : -1;
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
-        if (((PH_Utiliser) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
+        if (((PH_Utiliser) obj).getphiwms_mobileUUID() == this.getphiwms_mobileUUID()) {
             valeurARetourner = true;
         }
 

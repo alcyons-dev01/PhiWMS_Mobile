@@ -32,7 +32,7 @@ import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by olivier on 11/04/2019.
@@ -61,7 +61,7 @@ public class ActionUtilisateurOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_ACTION_NAME, objet.getActionName());
 
         long rowID = db.insert(Constantes.TABLE_ACTION_UTILISATEUR, null, contentValues);
-        objet.setPhiMR4UUID((int) rowID);
+        objet.setphiwms_mobileUUID((int) rowID);
         return rowID;
     }
 
@@ -77,16 +77,16 @@ public class ActionUtilisateurOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_CHAMPS_PARENT_ID, actionUtilisateur.getChampsParentId());
         contentValues.put(Constantes.CLE_COL_CHEMIN_PHOTO, actionUtilisateur.getCheminPhoto());
         contentValues.put(Constantes.CLE_COL_ACTION_NAME, actionUtilisateur.getActionName());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID, actionUtilisateur.getPhiMR4UUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, actionUtilisateur.getphiwms_mobileUUID());
 
-        long rowId = db.update(Constantes.TABLE_ACTION_UTILISATEUR, contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + actionUtilisateur.getPhiMR4UUID(), null);
+        long rowId = db.update(Constantes.TABLE_ACTION_UTILISATEUR, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + actionUtilisateur.getphiwms_mobileUUID(), null);
 
         return rowId;
     }
 
-    public static ActionUtilisateur getActionUtilisateurByPhiMR4UUID(SQLiteDatabase db, int id) {
+    public static ActionUtilisateur getActionUtilisateurByphiwms_mobileUUID(SQLiteDatabase db, int id) {
         ActionUtilisateur actionUtilisateur = null;
-        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_ACTION_UTILISATEUR + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " =? ", new String[]{String.valueOf(id)});
+        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_ACTION_UTILISATEUR + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " =? ", new String[]{String.valueOf(id)});
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
             actionUtilisateur = new ActionUtilisateur(cursor);
@@ -217,7 +217,7 @@ public class ActionUtilisateurOpenHelper extends DBOpenHelper {
 
             viderTableActionUtilisateur(db);
 
-            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, new Response.Listener<JSONObject>() {
+            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
@@ -339,7 +339,7 @@ public class ActionUtilisateurOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_ACTION_UTILISATEUR = " CREATE TABLE  " + Constantes.TABLE_ACTION_UTILISATEUR
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + "    PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + "    PRIMARY KEY,"
                 + Constantes.CLE_COL_ID_ACTION_UTILISATEUR + " " + Constantes.TYPE_COL_ID_ACTION_UTILISATEUR + " , "
                 + Constantes.CLE_COL_USERID_ACTION_UTILISATEUR + " " + Constantes.TYPE_COL_USERID_ACTION_UTILISATEUR + " , "
                 + Constantes.CLE_COL_DATE_ACTION_UTILISATEUR + " " + Constantes.TYPE_COL_DATE_ACTION_UTILISATEUR + " , "

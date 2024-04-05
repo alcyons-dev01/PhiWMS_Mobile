@@ -17,7 +17,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.TableTraceOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.TableTrace;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by olivier on 27/06/2019.
@@ -54,7 +54,7 @@ public class ZoneEtEmplacementContext {
             long rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
             if(rowId != -1)
             {
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
             }
         }
         code = gestionPrefixe(s.toString());
@@ -87,7 +87,7 @@ public class ZoneEtEmplacementContext {
             long rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
             if(rowId != -1)
             {
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
             }
         }
         code = gestionPrefixe(chaine);

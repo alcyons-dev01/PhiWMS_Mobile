@@ -101,7 +101,7 @@ public class Parametres_SerialisationOpenHelper  extends DBOpenHelper {
 
         public static final String CREATION_TABLE_PARAMETRES_SERIALISATION = " CREATE TABLE       " + Constantes.TABLE_PARAMETRES_SERIALISATION
                 +"("+
-                DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID+"    PRIMARY KEY,"
+                DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID+"    PRIMARY KEY,"
                 + Constantes.CLE_COL_ID_PARAMETRES_SERIALISATION + "   " + Constantes.TYPE_COL_ID_PARAMETRES_SERIALISATION + " , "
                 + Constantes.CLE_COL_SERVEURAPI_HOST_PARAMETRES_SERIALISATION + "   " + Constantes.TYPE_COL_SERVEURAPI_HOST_PARAMETRES_SERIALISATION + " , "
                 + Constantes.CLE_COL_SERVEURLDAP_HOST_PARAMETRES_SERIALISATION + "   " + Constantes.TYPE_COL_SERVEURLDAP_HOST_PARAMETRES_SERIALISATION + " , "

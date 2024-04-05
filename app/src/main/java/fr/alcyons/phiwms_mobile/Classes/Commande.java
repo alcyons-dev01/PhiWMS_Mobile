@@ -72,7 +72,7 @@ public class Commande implements Serializable, Comparable {
     private String Transitaire_Metropole;
     private String Transitaire_Local;
     private String Transport_Type;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Commande(int ID_commande, String numero, int ID_Frs, String commentaire, double mt_ht, double mt_TVA, double taux_TVA, String date_Cde, String date_Liv, String fournisseur, String ville_Frs, String devise, double frais_de_port, String situation, String date_echeance, String modalités, String facture_Date, double mt_TTC, String situation2, String ref_Depot_Dest, String ville_Dest, int ID_Depot, String struct_depot, String SYS_DT_MAJ, String SYS_HEURE_MAJ, String SYS_USER_MAJ, int delai_Livraison, Boolean urgent, String date_Liv2, String CB_Bon_Commande, String livraison_Autre, Boolean depot_adresse_2, String code_analytique, int protocole_Patient_ID, String patient_identite, String patient_IPP, String livrerDate, String BLNumero, String factureDate, String factureNumero, int nbColisTotal_CE, int nbPaletteTotal_CE, int poidsTotal_CE, String avaliser_Par_UserInitiale, int avaliser_Par_UserID, String avaliser_Le, int volume_Total, Boolean anImport, String transitaire_Metropole, String transitaire_Local, String transport_Type) {
         this.ID_commande = ID_commande;
@@ -290,7 +290,7 @@ public class Commande implements Serializable, Comparable {
         this.Transitaire_Metropole = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_TRANSITAIRE_METROPOLE_COMMANDE);
         this.Transitaire_Local = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_TRANSITAIRE_LOCAL_COMMANDE);
         this.Transport_Type = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_TRANSPORT_TYPE_COMMANDE);
-        this.phiMR4UUID = commandeCursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = commandeCursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }*/
 
     public Commande(Cursor commandeCursor) {
@@ -304,15 +304,15 @@ public class Commande implements Serializable, Comparable {
         this.Patient_identite = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_PATIENT_IDENTITE_COMMANDE);
         this.NbColisTotal_CE = commandeCursor.getInt(CommandeOpenHelper.Constantes.NUM_COL_NBCOLISTOTAL_CE_COMMANDE);
         this.PoidsTotal_CE = commandeCursor.getInt(CommandeOpenHelper.Constantes.NUM_COL_POIDSTOTAL_CE_COMMANDE);
-        this.phiMR4UUID = commandeCursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = commandeCursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getID_commande() {
@@ -752,7 +752,7 @@ public class Commande implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Commande commande = (Commande) obj;
 
-        if (this.getPhiMR4UUID() == commande.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == commande.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.getID_commande() > commande.getID_commande() ? 1 : -1;

@@ -166,9 +166,9 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         // Version de la BDD
         public static final int DATABASE_VERSION = 1;
 
-        public static final String CLE_COL_PHIMR4UUID = "phiMR4UUID";
-        public static final int NUM_COL_PHIMR4UUID = 0;
-        public static final String TYPE_COL_PHIMR4UUID = "INTEGER";
+        public static final String CLE_COL_phiwms_mobileUUID = "phiwms_mobileUUID";
+        public static final int NUM_COL_phiwms_mobileUUID = 0;
+        public static final String TYPE_COL_phiwms_mobileUUID = "INTEGER";
 
     }
 

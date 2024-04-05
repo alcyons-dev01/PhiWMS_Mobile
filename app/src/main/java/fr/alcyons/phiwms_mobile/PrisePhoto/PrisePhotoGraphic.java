@@ -4,7 +4,7 @@ import android.graphics.Canvas;
 
 import com.google.android.gms.vision.barcode.Barcode;
 
-import fr.alcyons.phimr4.PrisePhoto.camera.GraphicOverlay;
+import fr.alcyons.phiwms_mobile.PrisePhoto.camera.GraphicOverlay;
 
 /**
  * Created by jessica on 08/11/2017.

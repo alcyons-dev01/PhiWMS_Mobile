@@ -6,7 +6,7 @@
     android:layout_height="fill_parent"
     android:background="@color/bleu_fonce_alcyons"
     android:theme="@style/AppTheme"
-    tools:context="com.example.phiwms_mobile.fr.example.phiwms_mobile.AuthentificationActivity">
+    tools:context="fr.alcyons.phiwms_mobile.fr.example.phiwms_mobile.AuthentificationActivity">
 
     <RelativeLayout
         android:layout_width="fill_parent"

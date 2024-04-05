@@ -35,7 +35,7 @@ import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by quentinlanusse on 20/06/2017.
@@ -116,7 +116,7 @@ public class RetourOpenHelper extends DBOpenHelper {
         // Insertion du dépot en BDD
         long rowId = db.insert(Constantes.TABLE_RETOUR, null, contentValues);
 
-        retour.setPhiMR4UUID((int) rowId);
+        retour.setphiwms_mobileUUID((int) rowId);
 
         return rowId;
     }
@@ -129,7 +129,7 @@ public class RetourOpenHelper extends DBOpenHelper {
         String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteQuarantaine;
         RequestQueue requestQueue = new Volley().newRequestQueue(context);
 
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                 new Response.Listener<JSONObject>() {
 
                     @Override
@@ -256,7 +256,7 @@ public class RetourOpenHelper extends DBOpenHelper {
         String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteControleRetours;
         RequestQueue requestQueue = new Volley().newRequestQueue(context);
 
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                 new Response.Listener<JSONObject>() {
 
                     @Override
@@ -380,7 +380,7 @@ public class RetourOpenHelper extends DBOpenHelper {
         String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteRetourPUI;
         RequestQueue requestQueue = new Volley().newRequestQueue(context);
 
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                 new Response.Listener<JSONObject>() {
 
                     @Override
@@ -492,7 +492,7 @@ public class RetourOpenHelper extends DBOpenHelper {
         String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteRetourFournisseur;
         RequestQueue requestQueue = new Volley().newRequestQueue(context);
 
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                 new Response.Listener<JSONObject>() {
 
                     @Override
@@ -601,7 +601,7 @@ public class RetourOpenHelper extends DBOpenHelper {
         String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteDestruction;
         RequestQueue requestQueue = new Volley().newRequestQueue(context);
 
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                 new Response.Listener<JSONObject>() {
 
                     @Override
@@ -744,9 +744,9 @@ public class RetourOpenHelper extends DBOpenHelper {
         return retour;
     }
 
-    public static Retour getRetourByPhiMR4UUID(SQLiteDatabase db, int id) {
+    public static Retour getRetourByphiwms_mobileUUID(SQLiteDatabase db, int id) {
         Retour retour = null;
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_RETOUR + " WHERE " + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(id)});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_RETOUR + " WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(id)});
 
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
@@ -785,13 +785,13 @@ public class RetourOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_PRENOM_CHAUFFEUR_RETOUR, retour.getPrenom_Chauffeur());
         contentValues.put(Constantes.CLE_COL_TRANSPORTEUR_RETOUR, retour.getTransporteur());
         contentValues.put(Constantes.CLE_COL_SIGNATURE_CHAUFFEUR, retour.getSignature_Chauffeur());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID, retour.getPhiMR4UUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, retour.getphiwms_mobileUUID());
 
-        return db.update(Constantes.TABLE_RETOUR, contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + String.valueOf(retour.getPhiMR4UUID()), null);
+        return db.update(Constantes.TABLE_RETOUR, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + String.valueOf(retour.getphiwms_mobileUUID()), null);
     }
 
     public static void supprimerUnRetour(SQLiteDatabase db, Retour retour) {
-        db.delete(Constantes.TABLE_RETOUR, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(retour.getPhiMR4UUID())});
+        db.delete(Constantes.TABLE_RETOUR, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(retour.getphiwms_mobileUUID())});
     }
 
     public static List<Retour> getRetoursByEnAttenteDe(SQLiteDatabase db, String critereEnAttenteDe) {
@@ -888,7 +888,7 @@ public class RetourOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_RETOUR = "CREATE TABLE " + TABLE_RETOUR
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_NUMERO_RETOUR + " " + Constantes.TYPE_COL_NUMERO_RETOUR + " ,"
                 + Constantes.CLE_COL_REF_DEPOT_ORIGINE_RETOUR + " " + Constantes.TYPE_COL_REF_DEPOT_ORIGINE_RETOUR + " ,"
                 + Constantes.CLE_COL_CODE_PATIENT_RETOUR + " " + Constantes.TYPE_COL_CODE_PATIENT_RETOUR + " ,"

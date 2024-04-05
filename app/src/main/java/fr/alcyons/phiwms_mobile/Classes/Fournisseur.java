@@ -99,7 +99,7 @@ public class Fournisseur implements Serializable, Comparable {
     private String Transitaire_Local;
     private Boolean Import_DDP;
     private String Devise_Facturation;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Fournisseur(int _UID, String numero, String raisonSociale)
     {
@@ -365,15 +365,15 @@ public class Fournisseur implements Serializable, Comparable {
         this.Transitaire_Local = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_TRANSITAIRE_LOCAL_FOURNISSEUR);
         this.Import_DDP = OutilsGestionClasses.recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_IMPORT_DDP_FOURNISSEUR);
         this.Devise_Facturation = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_DEVISE_FACTURATION_FOURNISSEUR);
-        this.phiMR4UUID = cursorFournisseur.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursorFournisseur.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public String getNumero() {
@@ -1049,7 +1049,7 @@ public class Fournisseur implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Fournisseur fournisseur = (Fournisseur) obj;
 
-        if (this.getPhiMR4UUID() == fournisseur.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == fournisseur.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.get_UID() > fournisseur.get_UID() ? 1 : -1;

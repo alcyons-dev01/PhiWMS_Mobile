@@ -38,8 +38,8 @@ import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
-import com.example.phiwms_mobile.OutilsSerialisation.Serialisation;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by olivier on 06/06/2019.

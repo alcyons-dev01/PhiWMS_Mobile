@@ -120,7 +120,7 @@ public class PH_Serialisation implements Serializable, Comparable {
         this.mvtType = cursor.getString(PH_SerialisationOpenHelper.Constantes.NUM_COL_MVTTYPE_PH_SERIALISATION);
         this.mvtUID = cursor.getString(PH_SerialisationOpenHelper.Constantes.NUM_COL_MVTUID_PH_SERIALISATION);
         this.raison = cursor.getString(PH_SerialisationOpenHelper.Constantes.NUM_COL_RAISON_PH_SERIALISATION);
-        this.serialexpressUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.serialexpressUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
 

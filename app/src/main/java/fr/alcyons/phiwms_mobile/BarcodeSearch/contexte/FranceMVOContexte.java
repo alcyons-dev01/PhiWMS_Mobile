@@ -24,7 +24,6 @@ import java.util.Random;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.SurveillanceReferenceOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.UtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
@@ -36,10 +35,10 @@ import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.GestionCodeErreurNMVO;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
-import com.example.phiwms_mobile.OutilsSerialisation.EnvoyerMailSurveillance;
-import com.example.phiwms_mobile.OutilsSerialisation.GestionResultatNMVO;
-import com.example.phiwms_mobile.OutilsSerialisation.Serialisation;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.OutilsSerialisation.EnvoyerMailSurveillance;
+import fr.alcyons.phiwms_mobile.OutilsSerialisation.GestionResultatNMVO;
+import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by olivier on 05/03/2019.
@@ -205,7 +204,7 @@ public class FranceMVOContexte  {
                         PH_Serialisation serialisation = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, (int)ph_serialisation_uid);
                         if(serialisation == null)
                         {
-                            serialisation = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int)ph_serialisation_uid);
+                            serialisation = PH_SerialisationOpenHelper.getPH_SerialisationByphiwms_mobileUUID(db, (int)ph_serialisation_uid);
                         }
 
 

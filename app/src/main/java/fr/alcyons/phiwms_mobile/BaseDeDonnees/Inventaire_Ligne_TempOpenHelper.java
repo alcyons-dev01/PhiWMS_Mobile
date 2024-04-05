@@ -56,7 +56,7 @@ public class Inventaire_Ligne_TempOpenHelper extends DBOpenHelper {
         // Insertion du dépot en BDD
         long rowId = db.insert(Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, null, contentValues);
 
-        inventaire_ligne_temp.setPhiMR4UUID((int) rowId);
+        inventaire_ligne_temp.setphiwms_mobileUUID((int) rowId);
 
         return rowId;
     }
@@ -91,7 +91,7 @@ public class Inventaire_Ligne_TempOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_PEREMPTIONDATE_INVENTAIRE_LIGNE_TEMP, inventaire_ligne_temp.getPeremptionDate());
         contentValues.put(Constantes.CLE_COL__UID_INVENTAIRE_LIGNE_TEMP, inventaire_ligne_temp.get_UID());
 
-        return db.update(Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(inventaire_ligne_temp.getPhiMR4UUID())});
+        return db.update(Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(inventaire_ligne_temp.getphiwms_mobileUUID())});
     }
 
     public static void supprimerTousLesInventaireLigneTempsParDepot(SQLiteDatabase db, Depot depot) {
@@ -112,10 +112,10 @@ public class Inventaire_Ligne_TempOpenHelper extends DBOpenHelper {
         return inventaireLigneTempList;
     }
 
-    public static Inventaire_Ligne_Temp getInventaireLigneTempByPhiMR4UUID(SQLiteDatabase db, int id) {
+    public static Inventaire_Ligne_Temp getInventaireLigneTempByphiwms_mobileUUID(SQLiteDatabase db, int id) {
         Inventaire_Ligne_Temp inventaireLigneTemp = null;
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_INVENTAIRE_LIGNE_TEMP + " WHERE " + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(id)});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_INVENTAIRE_LIGNE_TEMP + " WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(id)});
 
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
@@ -128,7 +128,7 @@ public class Inventaire_Ligne_TempOpenHelper extends DBOpenHelper {
     }
 
     public static void supprimerInventaireLigneTempEnBDD(SQLiteDatabase db, Inventaire_Ligne_Temp inventaireLigneTemp) {
-        db.delete(Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(inventaireLigneTemp.getPhiMR4UUID())});
+        db.delete(Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(inventaireLigneTemp.getphiwms_mobileUUID())});
     }
 
     public static class Constantes implements BaseColumns {
@@ -216,7 +216,7 @@ public class Inventaire_Ligne_TempOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_INVENTAIRE_LIGNE_TEMP = "CREATE TABLE " + Constantes.TABLE_INVENTAIRE_LIGNE_TEMP
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_PRODUITREFERENCE_INVENTAIRE_LIGNE_TEMP + " " + Constantes.TYPE_COL_PRODUITREFERENCE_INVENTAIRE_LIGNE_TEMP + " ,"
                 + Constantes.CLE_COL_FOURNISSEURNOM_INVENTAIRE_LIGNE_TEMP + " " + Constantes.TYPE_COL_FOURNISSEURNOM_INVENTAIRE_LIGNE_TEMP + " ,"
                 + Constantes.CLE_COL_CATEGORIE_INVENTAIRE_LIGNE_TEMP + " " + Constantes.TYPE_COL_CATEGORIE_INVENTAIRE_LIGNE_TEMP + " ,"

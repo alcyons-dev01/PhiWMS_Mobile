@@ -15,7 +15,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.PerimetreFonctionnelOpenHelper;
 public class PerimetreFonctionnel implements Serializable {
     private int id;
     private String nom;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public PerimetreFonctionnel(int id, String nom) {
         this.id = id;
@@ -25,15 +25,15 @@ public class PerimetreFonctionnel implements Serializable {
     public PerimetreFonctionnel(Cursor cursor) {
         this.id = cursor.getInt(PerimetreFonctionnelOpenHelper.Constantes.NUM_COL_ID_PERIMETRE_FONCTIONNEL);
         this.nom = cursor.getString(PerimetreFonctionnelOpenHelper.Constantes.NUM_COL_NOM_PERIMETRE_FONCTIONNEL);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getId() {

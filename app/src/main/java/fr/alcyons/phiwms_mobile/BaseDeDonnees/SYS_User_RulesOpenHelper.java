@@ -54,7 +54,7 @@ public class SYS_User_RulesOpenHelper extends DBOpenHelper {
 
         long rowID = db.insert(Constantes.TABLE_SYS_USER_RULES, null, contentValues);
 
-        objet.setPhiMR4UUID((int) rowID);
+        objet.setphiwms_mobileUUID((int) rowID);
 
         return rowID;
     }
@@ -157,7 +157,7 @@ public class SYS_User_RulesOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_SYS_USER_RULES = " CREATE TABLE       " + Constantes.TABLE_SYS_USER_RULES
                 + "(" +
-                DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + "    PRIMARY KEY,"
+                DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + "    PRIMARY KEY,"
                 + Constantes.CLE_COL_NOM_SYS_USER_RULES + "   " + Constantes.TYPE_COL_NOM_SYS_USER_RULES + " , "
                 + Constantes.CLE_COL_PROFIL_SYS_USER_RULES + "   " + Constantes.TYPE_COL_PROFIL_SYS_USER_RULES + " , "
                 + Constantes.CLE_COL_INITIALE_SYS_USER_RULES + "   " + Constantes.TYPE_COL_INITIALE_SYS_USER_RULES + " , "

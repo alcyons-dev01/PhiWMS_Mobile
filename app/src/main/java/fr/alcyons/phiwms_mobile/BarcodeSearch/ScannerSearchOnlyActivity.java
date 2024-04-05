@@ -65,13 +65,10 @@ import fr.alcyons.phiwms_mobile.Classes.ObjetReceptionScannee;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.TableTrace;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.Produit_PreparationScanneeAdapter;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.Produit_ReceptionPADAdapter;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.Produit_ReceptionScanneeAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.Mail;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
@@ -576,7 +573,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                                 rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                                 if(rowId != -1)
                                 {
-                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                                 }
                             }
                             code = s.toString().substring(0, s.length() - 1);
@@ -588,7 +585,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                                 rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                                 if(rowId != -1)
                                 {
-                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                                 }
                             }
                             documentScannerContext.onTextWatcher(s);
@@ -601,7 +598,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                                 rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                                 if(rowId != -1)
                                 {
-                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                                 }
                             }
                             zoneEtEmplacementContext.onTextWatcher(s);
@@ -623,7 +620,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                                 rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                                 if(rowId != -1)
                                 {
-                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                                 }
                             }
                             LinearResultatFranceMVO.setVisibility(View.GONE);
@@ -716,7 +713,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                                 rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                                 if(rowId != -1)
                                 {
-                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                                 }
                             }
                             LinearResultatFranceMVO.setVisibility(View.GONE);
@@ -790,7 +787,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                                 rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                                 if(rowId != -1)
                                 {
-                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                                 }
                             }
                             LinearResultatFranceMVO.setVisibility(View.GONE);
@@ -864,7 +861,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                                 rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                                 if(rowId != -1)
                                 {
-                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                                 }
                             }
                             if(produitContexte.stringList != null)
@@ -953,7 +950,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                                 rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                                 if(rowId != -1)
                                 {
-                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                                 }
                             }
                                 code = s.toString().substring(0, s.length() - 1);
@@ -965,7 +962,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                                 rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                                 if(rowId != -1)
                                 {
-                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                                 }
                             }
                             documentScannerContext.onTextWatcher(s);
@@ -978,7 +975,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                                 rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                                 if(rowId != -1)
                                 {
-                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                                 }
                             }
                             zoneEtEmplacementContext.onTextWatcher(s);
@@ -1000,7 +997,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                                 rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                                 if(rowId != -1)
                                 {
-                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                                 }
                             }
                             LinearResultatFranceMVO.setVisibility(View.GONE);
@@ -1093,7 +1090,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                                 rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                                 if(rowId != -1)
                                 {
-                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                                 }
                             }
                             LinearResultatFranceMVO.setVisibility(View.GONE);
@@ -1167,7 +1164,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                                 rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                                 if(rowId != -1)
                                 {
-                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                                 }
                             }
                             LinearResultatFranceMVO.setVisibility(View.GONE);
@@ -1241,7 +1238,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                                 rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                                 if(rowId != -1)
                                 {
-                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                                 }
                             }
                             if(produitContexte.stringList != null)

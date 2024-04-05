@@ -64,12 +64,12 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne_ControleRetour_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
-import com.example.phiwms_mobile.ControleDesRetours.ListeEmplacementCreationActivity;
-import com.example.phiwms_mobile.ControleDesRetours.ListeZoneCreationActivity;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeEmplacementCreationActivity;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeZoneCreationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.Mail;
-import com.example.phiwms_mobile.PAD.ServicePADActivity;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.PAD.ServicePADActivity;
+import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
@@ -1455,7 +1455,7 @@ public class ScannerPreparationActivity extends ServiceActivity {
                                 {
                                     ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
                                 }
-                                //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, stock_lot_emplacement_light.getPhiMR4UUID(), stock_lot_emplacement_light.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
+                                //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, stock_lot_emplacement_light.getphiwms_mobileUUID(), stock_lot_emplacement_light.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
                             }
                         break;
                     }

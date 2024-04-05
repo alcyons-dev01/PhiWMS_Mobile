@@ -31,7 +31,7 @@ public class PH_Reassort implements Serializable, Comparable {
     private boolean SynchroDM_Medicament;
     private boolean SynchroDM_DMDMS;
     private int Valorisation_TTC;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public PH_Reassort(JSONObject jsonObject) {
 
@@ -62,7 +62,7 @@ public class PH_Reassort implements Serializable, Comparable {
         this.SynchroDM_Medicament = OutilsGestionClasses.recupererBooleen(cursor, PH_ReassortOpenHelper.Constantes.NUM_COL_SYNCHRODM_MEDICAMENT_PH_REASSORT);
         this.SynchroDM_DMDMS = OutilsGestionClasses.recupererBooleen(cursor, PH_ReassortOpenHelper.Constantes.NUM_COL_SYNCHRODM_DMDMS_PH_REASSORT);
         this.Valorisation_TTC = cursor.getInt(PH_ReassortOpenHelper.Constantes.NUM_COL_VALORISATION_TTC_PH_REASSORT);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
     public int getCode() {
@@ -145,12 +145,12 @@ public class PH_Reassort implements Serializable, Comparable {
         Valorisation_TTC = valorisation_TTC;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public JSONObject toJson() {
@@ -186,7 +186,7 @@ public class PH_Reassort implements Serializable, Comparable {
                 ", SynchroDM_Medicament=" + SynchroDM_Medicament +
                 ", SynchroDM_DMDMS=" + SynchroDM_DMDMS +
                 ", Valorisation_TTC=" + Valorisation_TTC +
-                ", phiMR4UUID=" + phiMR4UUID +
+                ", phiwms_mobileUUID=" + phiwms_mobileUUID +
                 '}';
     }
 
@@ -194,17 +194,17 @@ public class PH_Reassort implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         PH_Reassort ph_reassort = (PH_Reassort) obj;
 
-        if (this.getPhiMR4UUID() == ph_reassort.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == ph_reassort.getphiwms_mobileUUID()) {
             return 0;
         } else {
-            return this.getPhiMR4UUID() > ph_reassort.getPhiMR4UUID() ? 1 : -1;
+            return this.getphiwms_mobileUUID() > ph_reassort.getphiwms_mobileUUID() ? 1 : -1;
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
-        if (((PH_Reassort) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
+        if (((PH_Reassort) obj).getphiwms_mobileUUID() == this.getphiwms_mobileUUID()) {
             valeurARetourner = true;
         }
 

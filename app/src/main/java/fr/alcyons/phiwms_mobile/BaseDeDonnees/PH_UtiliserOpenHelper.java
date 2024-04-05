@@ -79,7 +79,7 @@ public class PH_UtiliserOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_PH_UTILISER = " CREATE TABLE       " + Constantes.TABLE_PH_UTILISER
                 +"("+
-                DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID+"    PRIMARY KEY,"
+                DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID+"    PRIMARY KEY,"
                 + Constantes.CLE_COL__UID_PH_UTILISER + "   " + Constantes.TYPE_COL__UID_PH_UTILISER + " , "
                 + Constantes.CLE_COL_LAT_PH_UTILISER + "   " + Constantes.TYPE_COL_LAT_PH_UTILISER + " , "
                 + Constantes.CLE_COL_LNG_PH_UTILISER + "   " + Constantes.TYPE_COL_LNG_PH_UTILISER + " , "
@@ -126,7 +126,7 @@ public class PH_UtiliserOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_CONTROLEQUANTITE_PH_UTILISER, objet.getControleQuantite());
         contentValues.put(Constantes.CLE_COL_PRODUITSOUMISTRACABILITE_PH_UTILISER, objet.isProduitSoumisTracabilite());
         long rowID=db.insert(Constantes.TABLE_PH_UTILISER, null, contentValues);
-        objet.setPhiMR4UUID((int)rowID);
+        objet.setphiwms_mobileUUID((int)rowID);
         return rowID;
     }
 
@@ -134,9 +134,9 @@ public class PH_UtiliserOpenHelper extends DBOpenHelper {
         super(context, name, factory, version);
     }
 
-    public static PH_Utiliser getPH_UtiliserByPhiMR4UUID(SQLiteDatabase db, int id){
+    public static PH_Utiliser getPH_UtiliserByphiwms_mobileUUID(SQLiteDatabase db, int id){
         PH_Utiliser objet=null;
-        Cursor cursor=db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_UTILISER + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID+"=? ", new String[]{String.valueOf(id)});
+        Cursor cursor=db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_UTILISER + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID+"=? ", new String[]{String.valueOf(id)});
         if(cursor.getCount()==1){
             cursor.moveToFirst();
             objet=new PH_Utiliser(cursor);

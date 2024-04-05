@@ -4,7 +4,6 @@ import android.database.Cursor;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.slf4j.helpers.NOPLogger;
 
 import java.io.Serializable;
 
@@ -27,7 +26,7 @@ public class ActionUtilisateur_Ligne implements Serializable, Comparable {
     private int EmplacementId;
     private int Quantite;
     private String Nom_Produit;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public ActionUtilisateur_Ligne(int Id, int IdActionUtilisateur, String TableConcerne, int NumChamps, String GS1, int EmplacementId, int Quantite, String Nom_Produit) {
         this.Id = Id;
@@ -89,7 +88,7 @@ public class ActionUtilisateur_Ligne implements Serializable, Comparable {
         this.Quantite = cursor.getInt(ActionUtilisateur_LigneOpenHelper.Constantes.NUM_COL_NUM_QUANTITE);
         this.Nom_Produit = cursor.getString(ActionUtilisateur_LigneOpenHelper.Constantes.NUM_COL_NUM_NOM_PRODUIT);
 
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
     public int getId() {
@@ -124,12 +123,12 @@ public class ActionUtilisateur_Ligne implements Serializable, Comparable {
         NumChamps = numChamps;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public String getGS1() {
@@ -201,7 +200,7 @@ public class ActionUtilisateur_Ligne implements Serializable, Comparable {
     public int compareTo(Object obj) {
         ActionUtilisateur_Ligne actionUtilisateur_ligne = (ActionUtilisateur_Ligne) obj;
 
-        if (this.getPhiMR4UUID() == actionUtilisateur_ligne.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == actionUtilisateur_ligne.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.getId() > actionUtilisateur_ligne.getId() ? 1 : -1;

@@ -39,7 +39,7 @@ public class ParametreUtilisateurOpenHelper extends DBOpenHelper {
 
     public static Boolean getConnexionDirecte(SQLiteDatabase db) {
         int connexionDirecte = 0;
-        Boolean activer;
+        boolean activer;
 
         Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PARAMETRES_UTILISATEUR, null);
         if (cursor.getCount() == 1) {
@@ -49,11 +49,7 @@ public class ParametreUtilisateurOpenHelper extends DBOpenHelper {
         cursor.close();
         cursor = null;
 
-        if (connexionDirecte == 0) {
-            activer = false;
-        } else {
-            activer = true;
-        }
+        activer = connexionDirecte != 0;
 
         return activer;
     }

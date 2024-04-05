@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.Facture_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
 /**
@@ -44,7 +43,7 @@ public class Facture_Ligne implements Serializable, Comparable {
     private String SYS_USER_MAJ;
     private String Section_Analytique;
     private double PU_FactDevise;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
 
     public Facture_Ligne(int _UID, int facture_UID, String ref_Frs, double qté_FACT, double qté_Com, double qté_LIV, double PU_COM, double taux_Tva, double MHT_com, double MHT_Fact, double PU_Fact, String commande, String désignation, double TTC_Com, double TTC_Fact, int code_produit, int code_piece, String categorie, double fact_tva, int code_ligne_C, int code_ligne_ST, String devise, String SYS_DT_MAJ, String SYS_HEURE_MAJ, String SYS_USER_MAJ, String section_Analytique, double PU_FactDevise) {
@@ -140,15 +139,15 @@ public class Facture_Ligne implements Serializable, Comparable {
         this.SYS_USER_MAJ = cursor.getString(Facture_LigneOpenHelper.Constantes.NUM_COL_SYS_USER_MAJ_FACTURE_LIGNE);
         this.Section_Analytique = cursor.getString(Facture_LigneOpenHelper.Constantes.NUM_COL_SECTION_ANALYTIQUE_FACTURE_LIGNE);
         this.PU_FactDevise = cursor.getDouble(Facture_LigneOpenHelper.Constantes.NUM_COL_PU_FACTDEVISE_FACTURE_LIGNE);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int get_UID() {
@@ -384,7 +383,7 @@ public class Facture_Ligne implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Facture_Ligne facture_ligne = (Facture_Ligne) obj;
 
-        if (this.getPhiMR4UUID() == facture_ligne.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == facture_ligne.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.get_UID() > facture_ligne.get_UID() ? 1 : -1;

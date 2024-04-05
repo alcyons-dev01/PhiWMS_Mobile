@@ -19,7 +19,7 @@ import android.content.Context;
 import android.opengl.GLES20;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.negative.opengl.MyGLUtils;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)

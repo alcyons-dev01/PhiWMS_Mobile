@@ -71,7 +71,7 @@ public class EVENTOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_MOISREFERENCE_EVENT, objet.getMoisReference());
         contentValues.put(Constantes.CLE_COL_TOURNEEID_EVENT, objet.getTourneeID());
         long rowID = db.insert(Constantes.TABLE_EVENT, null, contentValues);
-        objet.setPhiMR4UUID((int) rowID);
+        objet.setphiwms_mobileUUID((int) rowID);
         return rowID;
     }
 
@@ -113,7 +113,7 @@ public class EVENTOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_EVENT = " CREATE TABLE       " + Constantes.TABLE_EVENT
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + "    PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + "    PRIMARY KEY,"
                 + Constantes.CLE_COL__UID_EVENT + " " + Constantes.TYPE_COL__UID_EVENT + " , "
                 + Constantes.CLE_COL_DATE_EVENT_EVENT + " " + Constantes.TYPE_COL_DATE_EVENT_EVENT + " , "
                 + Constantes.CLE_COL_ID_RESSOURCE_EVENT + " " + Constantes.TYPE_COL_ID_RESSOURCE_EVENT + " , "

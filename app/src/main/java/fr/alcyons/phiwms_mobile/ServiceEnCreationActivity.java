@@ -2,8 +2,6 @@ package fr.alcyons.phiwms_mobile;
 
 import android.os.Bundle;
 
-import com.example.phiwms_mobile.R;
-
 public class ServiceEnCreationActivity extends ServiceActivity {
 
     @Override

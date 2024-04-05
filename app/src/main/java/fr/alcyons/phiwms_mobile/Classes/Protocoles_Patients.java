@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.Protocoles_PatientsOpenHelper;
 
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
 
@@ -69,7 +68,7 @@ public class Protocoles_Patients implements Serializable, Comparable {
     private String Validation_Pharmaceutique_Date;
     private String Validation_Pharmaceutique_Par;
     private String discipline_Medicale;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Protocoles_Patients(JSONObject jsonObject) {
         try {
@@ -175,7 +174,7 @@ public class Protocoles_Patients implements Serializable, Comparable {
         this.Validation_Pharmaceutique_Date = cursor.getString(Protocoles_PatientsOpenHelper.Constantes.NUM_COL_VALIDATION_PHARMACEUTIQUE_DATE_PROTOCOLES_PATIENTS);
         this.Validation_Pharmaceutique_Par = cursor.getString(Protocoles_PatientsOpenHelper.Constantes.NUM_COL_VALIDATION_PHARMACEUTIQUE_PAR_PROTOCOLES_PATIENTS);
         this.discipline_Medicale = cursor.getString(Protocoles_PatientsOpenHelper.Constantes.NUM_COL_DISCIPLINE_MEDICALE_PROTOCOLES_PATIENTS);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
 
     }
 
@@ -563,12 +562,12 @@ public class Protocoles_Patients implements Serializable, Comparable {
         this.discipline_Medicale = discipline_Medicale;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public JSONObject toJson() {
@@ -680,7 +679,7 @@ public class Protocoles_Patients implements Serializable, Comparable {
                 ", Validation_Pharmaceutique_Date='" + Validation_Pharmaceutique_Date + '\'' +
                 ", Validation_Pharmaceutique_Par='" + Validation_Pharmaceutique_Par + '\'' +
                 ", discipline_Medicale='" + discipline_Medicale + '\'' +
-                ", phiMR4UUID=" + phiMR4UUID +
+                ", phiwms_mobileUUID=" + phiwms_mobileUUID +
                 '}';
     }
 
@@ -688,17 +687,17 @@ public class Protocoles_Patients implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         Protocoles_Patients protocoles_patients = (Protocoles_Patients) obj;
 
-        if (this.getPhiMR4UUID() == protocoles_patients.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == protocoles_patients.getphiwms_mobileUUID()) {
             return 0;
         } else {
-            return this.getPhiMR4UUID() > protocoles_patients.getPhiMR4UUID() ? 1 : -1;
+            return this.getphiwms_mobileUUID() > protocoles_patients.getphiwms_mobileUUID() ? 1 : -1;
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
-        if (((Protocoles_Patients) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
+        if (((Protocoles_Patients) obj).getphiwms_mobileUUID() == this.getphiwms_mobileUUID()) {
             valeurARetourner = true;
         }
 

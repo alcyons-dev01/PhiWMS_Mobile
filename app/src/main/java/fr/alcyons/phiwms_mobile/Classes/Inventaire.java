@@ -35,7 +35,7 @@ public class Inventaire implements Serializable, Comparable {
     private int NBLignes;
     private double Valeur_TTC;
     private double Valeur_PUMP_TTC;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Inventaire(int inventaire_ID, String cycle, String inventaireDate, String cycleDateDebut, String _SYS_DT_MAJ, String _SYS_USER_MAJ, String _SYS_HEURE_MAJ, String cycleDateFin, Boolean clotureActive, String objet, String mode_Comptabilisation, String depotReference, String depotNom, String operateur, int NBLignes, double valeur_TTC, double valeur_PUMP_TTC) {
         this.Inventaire_ID = inventaire_ID;
@@ -100,15 +100,15 @@ public class Inventaire implements Serializable, Comparable {
         this.NBLignes = cursor.getInt(InventaireOpenHelper.Constantes.NUM_COL_NBLIGNES_INVENTAIRE);
         this.Valeur_TTC = cursor.getDouble(InventaireOpenHelper.Constantes.NUM_COL_VALEUR_TTC_INVENTAIRE);
         this.Valeur_PUMP_TTC = cursor.getDouble(InventaireOpenHelper.Constantes.NUM_COL_VALEUR_PUMP_TTC_INVENTAIRE);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getInventaire_ID() {
@@ -264,7 +264,7 @@ public class Inventaire implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Inventaire inventaire = (Inventaire) obj;
 
-        if (this.getPhiMR4UUID() == inventaire.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == inventaire.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.getInventaire_ID() > inventaire.getInventaire_ID() ? 1 : -1;

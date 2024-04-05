@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.Photo_Stock_DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
 /**
@@ -78,7 +77,7 @@ public class Photo_Stock_Depot implements Serializable, Comparable {
     private int _UID;
     private int QTE_COMMANDE;
     private int QTE_RAF;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Photo_Stock_Depot(int code_Produit, String ref_Depot, int annee, int mois, int STOCK_DEBUT, int QTE_ENTREE_CDE, int QTE_SORTIE_DELIV, int QTE_ENTREE_DELIV, int QTE_SORTIE_RETOUR, int QTE_ENTREE_RETOUR, int QTE_SORTIE_REGUL, int QTE_ENTREE_REGUL, int QTE_SORTIE_ECART, int QTE_ENTREE_ECART, int STOCK_FIN, double VALEUR_STOCK_FIN, double VALEUR_STOCK_DEBUT, String CATEGORIE, String REFERENCE, String DESIGNATION, String SYS_DT_MAJ, String SYS_HEURE_MAJ, String SYS_USER_MAJ, double prix_Unit, int consommation_mensuelle, int qte_Entree, int qte_sortie, String ref_Cycle, int consommation_Trimestrielle, Boolean livraison_Directe, int ID_Inv, double conso_Journaliere, int conso_Q1, int conso_Q2, int conso_Q3, int conso_Q4, int conso_S1, int conso_S2, int conso_S3, int conso_S4, int conso_S5, double PMP_TTC_Fin_mois, int qte_Entree_Facturee, double PMP_TTC_Debut_mois, double valeur_Achats_HT, double valeur_Achats_TTC, String ref_Cycle_Depot_Pdt, String ref_Depot_Pdt, double TVA, String fournisseur, int classe_id, int QTE_Administrer, int seance_NB, int QTE_Retour_PUI, int QTE_Retour_FRS, int QTE_Destruction, int QTE_Ordonner, int QTE_SeanceNB, int _UID, int QTE_COMMANDE, int QTE_RAF) {
         this.Code_Produit = code_Produit;
@@ -274,15 +273,15 @@ public class Photo_Stock_Depot implements Serializable, Comparable {
         this._UID = cursor.getInt(Photo_Stock_DepotOpenHelper.Constantes.NUM_COL__UID_PHOTO_STOCK_DEPOT);
         this.QTE_COMMANDE = cursor.getInt(Photo_Stock_DepotOpenHelper.Constantes.NUM_COL_QTE_COMMANDE_PHOTO_STOCK_DEPOT);
         this.QTE_RAF = cursor.getInt(Photo_Stock_DepotOpenHelper.Constantes.NUM_COL_QTE_RAF_PHOTO_STOCK_DEPOT);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getCode_Produit() {
@@ -862,7 +861,7 @@ public class Photo_Stock_Depot implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Photo_Stock_Depot photo_stock_depot = (Photo_Stock_Depot) obj;
 
-        if (this.getPhiMR4UUID() == photo_stock_depot.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == photo_stock_depot.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.get_UID() > photo_stock_depot.get_UID() ? 1 : -1;

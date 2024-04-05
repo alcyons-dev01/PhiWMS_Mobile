@@ -22,13 +22,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.alcyons.phimr4.BaseDeDonnees.ProduitOpenHelper;
-import fr.alcyons.phimr4.Classes.Produit;
-import fr.alcyons.phimr4.OriginalActivity;
-import fr.alcyons.phimr4.Outils.CodesEchangesActivites;
-import fr.alcyons.phimr4.Outils.OutilsGestionConnexionReseau;
-import fr.alcyons.phimr4.R;
-import fr.alcyons.phimr4.ServiceActivity;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.OriginalActivity;
+import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
+import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
+import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 public class PrisePhotoV2  extends ServiceActivity {
 

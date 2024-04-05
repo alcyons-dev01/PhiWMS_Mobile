@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.Histo_Mvt_StockOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
@@ -53,7 +52,7 @@ public class Histo_Mvt_Stock implements Serializable, Comparable {
     private String HMV_Nom_Patient;
     private String HMV_DEPOT_DEST_REF;
     private double TVA;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Histo_Mvt_Stock(int HMV_ID, int HMV_PDT_CODE, String HMV_PDT_REF, String HMV_REF_DEPOT, String HMV_TYD_CODE, String HMV_NUM_DOC, String HMV_TYM_CODE, double HMV_QTE, double HMV_STOCK_AVANT, double HMV_STOCK_APRES, double HMV_PRIX_COM, double HMV_PRIX_AVANT, double HMV_PRIX_APRES, String HMV_DT_CREAT, String HMV_DT_MVT, String SYS_DT_MAJ, String SYS_USER_MAJ, String SYS_HEURE_MAJ, String HMV_AAAAMM, String HMV_DepotProduit, Boolean retour_Frs, String abreviation_Prescripteur, String date_Prescription, int num_Ordonancier, String prescripteur, int HMV_ID_Commande_Ligne, double HMV_PRIX_Fact, Boolean liquidé, double HMV_Qté_Fact, double HMV_Total_Qté_Fact, int HMV_Id_Patient, String HMV_Nom_Patient, String HMV_DEPOT_DEST_REF, double TVA) {
         this.HMV_ID = HMV_ID;
@@ -168,15 +167,15 @@ public class Histo_Mvt_Stock implements Serializable, Comparable {
         this.HMV_Nom_Patient = cursor.getString(Histo_Mvt_StockOpenHelper.Constantes.NUM_COL_HMV_NOM_PATIENT_HISTO_MVT_STOCK);
         this.HMV_DEPOT_DEST_REF = cursor.getString(Histo_Mvt_StockOpenHelper.Constantes.NUM_COL_HMV_DEPOT_DEST_REF_HISTO_MVT_STOCK);
         this.TVA = cursor.getDouble(Histo_Mvt_StockOpenHelper.Constantes.NUM_COL_TVA_HISTO_MVT_STOCK);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getHMV_ID() {
@@ -513,7 +512,7 @@ public class Histo_Mvt_Stock implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Histo_Mvt_Stock histo_mvt_stock = (Histo_Mvt_Stock) obj;
 
-        if (this.getPhiMR4UUID() == histo_mvt_stock.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == histo_mvt_stock.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.getHMV_ID() > histo_mvt_stock.getHMV_ID() ? 1 : -1;

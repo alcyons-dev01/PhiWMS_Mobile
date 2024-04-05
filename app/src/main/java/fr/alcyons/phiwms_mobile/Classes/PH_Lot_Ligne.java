@@ -22,7 +22,7 @@ public class PH_Lot_Ligne implements Serializable, Comparable {
     private int quantite;
     private String numSerie;
     private boolean verrouiller;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public PH_Lot_Ligne(int UID, int docLigneId, String numLot, String datePeremption, int quantite, String numSerie)
     {
@@ -56,15 +56,15 @@ public class PH_Lot_Ligne implements Serializable, Comparable {
         this.quantite = cursor.getInt(PH_Lot_LigneOpenHelper.Constantes.NUM_COL_QUANTITE);
         this.numSerie = cursor.getString(PH_Lot_LigneOpenHelper.Constantes.NUM_COL_NUM_SERIE);
         this.verrouiller = OutilsGestionClasses.recupererBooleen(cursor, PH_Lot_LigneOpenHelper.Constantes.NUM_COL_NUM_VERROUILLER);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getUID() {
@@ -148,7 +148,7 @@ public class PH_Lot_Ligne implements Serializable, Comparable {
     public int compareTo(Object obj) {
         PH_Lot_Ligne ph_lot_ligne = (PH_Lot_Ligne) obj;
 
-        if (this.getPhiMR4UUID() == ph_lot_ligne.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == ph_lot_ligne.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.getUID() > ph_lot_ligne.getUID() ? 1 : -1;

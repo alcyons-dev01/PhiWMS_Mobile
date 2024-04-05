@@ -40,7 +40,7 @@ public class PH_Reassort_LigneOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL__UID_PH_REASSORT_LIGNE, objet.get_UID());
 
         long rowID = db.insert(Constantes.TABLE_PH_REASSORT_LIGNE, null, contentValues);
-        objet.setPhiMR4UUID((int) rowID);
+        objet.setphiwms_mobileUUID((int) rowID);
         return rowID;
     }
 
@@ -59,7 +59,7 @@ public class PH_Reassort_LigneOpenHelper extends DBOpenHelper {
     }
 
     public void supprimerUnPH_Reassort_Ligne(SQLiteDatabase db, PH_Reassort_Ligne ph_reassort_ligne) {
-        db.delete(Constantes.TABLE_PH_REASSORT_LIGNE, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(ph_reassort_ligne.getPhiMR4UUID())});
+        db.delete(Constantes.TABLE_PH_REASSORT_LIGNE, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(ph_reassort_ligne.getphiwms_mobileUUID())});
     }
 
     public static class Constantes implements BaseColumns {
@@ -106,7 +106,7 @@ public class PH_Reassort_LigneOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_PH_REASSORT_LIGNE = " CREATE TABLE       " + Constantes.TABLE_PH_REASSORT_LIGNE
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + "    PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + "    PRIMARY KEY,"
                 + Constantes.CLE_COL_REASSORT_UID_PH_REASSORT_LIGNE + " " + Constantes.TYPE_COL_REASSORT_UID_PH_REASSORT_LIGNE + " , "
                 + Constantes.CLE_COL_PRODUIT_ID_PH_REASSORT_LIGNE + " " + Constantes.TYPE_COL_PRODUIT_ID_PH_REASSORT_LIGNE + " , "
                 + Constantes.CLE_COL_DESIGNATION_INT_PH_REASSORT_LIGNE + " " + Constantes.TYPE_COL_DESIGNATION_INT_PH_REASSORT_LIGNE + " , "

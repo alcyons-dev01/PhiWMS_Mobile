@@ -58,12 +58,11 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ServiceOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.PerimetreFonctionnel;
 import fr.alcyons.phiwms_mobile.Classes.Service;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.ConnexionDirecteExpandableAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionListeServices;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhraseSnackbar;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 /**
@@ -580,7 +579,7 @@ public class ServiceConnexionDirecteActivity extends ServiceAvecConnexionActivit
         {
             //synchronisation des éléments communs
             gestionnaireElementASynchroniser.toutSynchroniser(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte, true);
-            gestionnaireService.insererBDDLocaleServicesEtPerimetresFonctionnelsPhiMR4(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
+            gestionnaireService.insererBDDLocaleServicesEtPerimetresFonctionnelsphiwms_mobile(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
             gestionnaireDepot.insererBDDLocaleDepots(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
             gestionnaireProduit.insererBDDLocaleProduits(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
         }

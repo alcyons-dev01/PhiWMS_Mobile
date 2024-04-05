@@ -14,7 +14,7 @@ import java.util.Date;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.camera.CameraSource;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotos;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 
 /**

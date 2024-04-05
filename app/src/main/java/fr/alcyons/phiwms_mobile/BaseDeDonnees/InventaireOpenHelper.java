@@ -40,16 +40,16 @@ public class InventaireOpenHelper extends DBOpenHelper {
 
         long rowID = db.insert(Constantes.TABLE_INVENTAIRE, null, contentValues);
 
-        inventaire.setPhiMR4UUID((int) rowID);
+        inventaire.setphiwms_mobileUUID((int) rowID);
 
         return rowID;
     }
 
 
-    public static Inventaire getInventaireByPhiMR4UUID(SQLiteDatabase db, int id) {
+    public static Inventaire getInventaireByphiwms_mobileUUID(SQLiteDatabase db, int id) {
         Inventaire inventaire = null;
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_INVENTAIRE + " WHERE " + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(id)});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_INVENTAIRE + " WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(id)});
 
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
@@ -120,7 +120,7 @@ public class InventaireOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_INVENTAIRE = "CREATE TABLE " + Constantes.TABLE_INVENTAIRE
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_CYCLE_INVENTAIRE + " " + Constantes.TYPE_COL_CYCLE_INVENTAIRE + " ,"
                 + Constantes.CLE_COL_INVENTAIREDATE_INVENTAIRE + " " + Constantes.TYPE_COL_INVENTAIREDATE_INVENTAIRE + " ,"
                 + Constantes.CLE_COL_CYCLEDATEDEBUT_INVENTAIRE + " " + Constantes.TYPE_COL_CYCLEDATEDEBUT_INVENTAIRE + " ,"

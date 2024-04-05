@@ -5,8 +5,6 @@ import android.database.Cursor;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.Prescription_patientOpenHelper;
-
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
@@ -48,7 +46,7 @@ public class Prescription_patient {
     String SYS_USER_MAJ;
     String SYS_DT_MAJ;
     String SYS_HEURE_MAJ;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
 
     public Prescription_patient(JSONObject jsonObject) {
@@ -371,12 +369,12 @@ public class Prescription_patient {
         this.SYS_HEURE_MAJ = SYS_HEURE_MAJ;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public JSONObject toJson() {

@@ -85,7 +85,7 @@ public class Stock_LotOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_STOCK_LOT = "CREATE TABLE " + Constantes.TABLE_STOCK_LOT
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_REF_DEPOT_STOCK_LOT + " " + Constantes.TYPE_COL_REF_DEPOT_STOCK_LOT + " ,"
                 + Constantes.CLE_COL_ID_PRODUIT_STOCK_LOT + " " + Constantes.TYPE_COL_ID_PRODUIT_STOCK_LOT + " ,"
                 + Constantes.CLE_COL_REF_PRODUIT_STOCK_LOT + " " + Constantes.TYPE_COL_REF_PRODUIT_STOCK_LOT + " ,"

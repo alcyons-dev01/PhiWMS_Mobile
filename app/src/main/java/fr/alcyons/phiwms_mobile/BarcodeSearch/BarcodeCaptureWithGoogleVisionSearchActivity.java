@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import com.example.phiwms_mobile.BarcodeSearch.camera.CameraSource;
-import com.example.phiwms_mobile.Outils.Alerte;
-import com.example.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
-import com.example.phiwms_mobile.Outils.PackageManagerUtils;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.camera.CameraSource;
+import fr.alcyons.phiwms_mobile.Outils.Alerte;
+import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
+import fr.alcyons.phiwms_mobile.Outils.PackageManagerUtils;
+import fr.alcyons.phiwms_mobile.R;
 
 
 public class BarcodeCaptureWithGoogleVisionSearchActivity extends BarcodeCaptureActivity {

@@ -29,7 +29,7 @@ import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.Classes.PH_RetourMotif;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by jessica on 29/11/2017.
@@ -50,7 +50,7 @@ public class PH_RetourMotifOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL__UID_PH_RETOURMOTIF, objet.get_UID());
         contentValues.put(Constantes.CLE_COL_MOTIFRETOUR_PH_RETOURMOTIF, objet.getMotifRetour());
         long rowID = db.insert(Constantes.TABLE_PH_RETOURMOTIF, null, contentValues);
-        objet.setPhiMR4UUID((int) rowID);
+        objet.setphiwms_mobileUUID((int) rowID);
         return rowID;
     }
 
@@ -81,7 +81,7 @@ public class PH_RetourMotifOpenHelper extends DBOpenHelper {
 
             viderTablePH_RetourMotif(db);
 
-            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, new Response.Listener<JSONObject>() {
+            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null, new Response.Listener<JSONObject>() {
 
                 @Override
                 public void onResponse(JSONObject response) {
@@ -168,7 +168,7 @@ public class PH_RetourMotifOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_PH_RETOURMOTIF = " CREATE TABLE       " + Constantes.TABLE_PH_RETOURMOTIF
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + "    PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + "    PRIMARY KEY,"
                 + Constantes.CLE_COL__UID_PH_RETOURMOTIF + " " + Constantes.TYPE_COL__UID_PH_RETOURMOTIF + " , "
                 + Constantes.CLE_COL_MOTIFRETOUR_PH_RETOURMOTIF + " " + Constantes.TYPE_COL_MOTIFRETOUR_PH_RETOURMOTIF
                 + " ); ";

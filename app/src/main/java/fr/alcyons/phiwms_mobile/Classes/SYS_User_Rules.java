@@ -44,7 +44,7 @@ public class SYS_User_Rules {
     private String Serialisation_tan;
     private String Serialisation_clientLoginId;
     private boolean SerialisationTermsEtConditions;
-    private int phiMR4UUID=-1;
+    private int phiwms_mobileUUID=-1;
     
     public SYS_User_Rules(JSONObject jsonObject){
         try{
@@ -327,12 +327,12 @@ public class SYS_User_Rules {
         SerialisationTermsEtConditions = serialisationTermsEtConditions;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public JSONObject toJson(){

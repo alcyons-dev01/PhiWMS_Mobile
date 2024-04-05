@@ -10,7 +10,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
  */
 
 public class ElementASynchroniser {
-    private int phiMR4UUID;
+    private int phiwms_mobileUUID;
     private String tableConcernee;
     private String action;
     private int idDansTableConcernee;
@@ -28,7 +28,7 @@ public class ElementASynchroniser {
         this.action = cursor.getString(ElementASynchroniserOpenHelper.Constantes.NUM_COL_ACTION_ELEMENT_A_SYNCHRONISER);
         this.idDansTableConcernee = cursor.getInt(ElementASynchroniserOpenHelper.Constantes.NUM_COL_ID_DANS_TABLE_CONCERNEE_ELEMENT_A_SYNCHRONISER);
         this.idOrigine4D = cursor.getInt(ElementASynchroniserOpenHelper.Constantes.NUM_COL_ID_ORIGINE_4D);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
     public int getIdOrigine4D() {
@@ -39,12 +39,12 @@ public class ElementASynchroniser {
         this.idOrigine4D = idOrigine4D;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public String getTableConcernee() {

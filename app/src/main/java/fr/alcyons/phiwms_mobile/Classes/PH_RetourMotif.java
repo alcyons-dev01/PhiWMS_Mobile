@@ -20,7 +20,7 @@ public class PH_RetourMotif implements Serializable, Comparable {
 
     private int _UID;
     private String motifRetour;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public PH_RetourMotif(JSONObject jsonObject) {
         try {
@@ -52,12 +52,12 @@ public class PH_RetourMotif implements Serializable, Comparable {
         this.motifRetour = motifRetour;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public JSONObject toJson() {
@@ -76,17 +76,17 @@ public class PH_RetourMotif implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         PH_RetourMotif ph_retourMotif = (PH_RetourMotif) obj;
 
-        if (this.getPhiMR4UUID() == ph_retourMotif.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == ph_retourMotif.getphiwms_mobileUUID()) {
             return 0;
         } else {
-            return this.getPhiMR4UUID() > ph_retourMotif.getPhiMR4UUID() ? 1 : -1;
+            return this.getphiwms_mobileUUID() > ph_retourMotif.getphiwms_mobileUUID() ? 1 : -1;
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
-        if (((PH_RetourMotif) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
+        if (((PH_RetourMotif) obj).getphiwms_mobileUUID() == this.getphiwms_mobileUUID()) {
             valeurARetourner = true;
         }
 

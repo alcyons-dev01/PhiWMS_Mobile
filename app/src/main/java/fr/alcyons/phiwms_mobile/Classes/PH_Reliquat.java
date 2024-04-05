@@ -69,7 +69,7 @@ public class PH_Reliquat implements Serializable, Comparable {
     private boolean SerialiserReception;
     private String Serie;
     private String BL_Numero;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public PH_Reliquat(int reliquat_UID, int produitID, String produit_Reference, int PU_commande, String designationCourte, String unite, String fournisseurNom, int fournisseurID, int qteCommande, int qteLivraison, int qteReliquat_X, Boolean reliquatEncours, String entreeDate, String commandeNumero, String commandeDate, int conditionnementAchat, int conditionnementDistribution, int commandeLigneID, int qteReliquat_Y, String devise, String depotReference, String _SYS_DT_MAJ, String _SYS_HEURE_MAJ, String patientIPP, String patientNom)
     {
@@ -218,7 +218,7 @@ public class PH_Reliquat implements Serializable, Comparable {
         this.tech_UID = cursor.getInt(PH_ReliquatOpenHelper.Constantes.NUM_COL_TECH_UID_PH_RELIQUAT);
         this.Zone = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_ZONE_PH_RELIQUAT);
         this.Emplacement = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_EMPLACEMENT_PH_RELIQUAT);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
 
     }*/
 
@@ -243,7 +243,7 @@ public class PH_Reliquat implements Serializable, Comparable {
         this.Emplacement = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_EMPLACEMENT_PH_RELIQUAT);
         this.BL_Numero = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_BL_Numero);
         this.ScanValue = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_SCANVALUE_PH_RELIQUAT);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
 
     }
 
@@ -259,12 +259,12 @@ public class PH_Reliquat implements Serializable, Comparable {
         Reliquat_UID = reliquat_UID;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getPU_commande() {
@@ -774,7 +774,7 @@ public class PH_Reliquat implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         PH_Reliquat ph_reliquat = (PH_Reliquat) obj;
 
-        if (this.getPhiMR4UUID() == ph_reliquat.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == ph_reliquat.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.getReliquat_UID() > ph_reliquat.getReliquat_UID() ? 1 : -1;

@@ -17,7 +17,7 @@ public class TableTrace {
     String codeRetourne;
     String user;
     int userID;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public TableTrace(int id, String date, String service, String situation, String codeRetourne, String user, int userID)
     {
@@ -38,7 +38,7 @@ public class TableTrace {
         this.codeRetourne = cursor.getString(TableTraceOpenHelper.Constantes.NUM_COL_CODE_RETOURNE);
         this.user = cursor.getString(TableTraceOpenHelper.Constantes.NUM_COL_USER);
         this.userID = cursor.getInt(TableTraceOpenHelper.Constantes.NUM_COL_USERID);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
 
@@ -98,12 +98,12 @@ public class TableTrace {
         this.userID = userID;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public JSONObject toJson() {

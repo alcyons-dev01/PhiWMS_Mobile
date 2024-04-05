@@ -22,9 +22,9 @@ import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_Preparation_Adapte;
 
-import com.example.phiwms_mobile.ControleDesRetours.ListeEmplacementCreationActivity;
-import com.example.phiwms_mobile.ControleDesRetours.ListeZoneCreationActivity;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeEmplacementCreationActivity;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeZoneCreationActivity;
+import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 public class ScannerProduitActivity extends ServiceActivity {

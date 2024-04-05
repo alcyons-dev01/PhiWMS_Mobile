@@ -61,7 +61,7 @@ public class Commande_LigneOpenHelper extends DBOpenHelper {
         // Insertion du dépot en BDD
         long rowId = db.insert(Constantes.TABLE_COMMANDE_LIGNE, null, contentValues);
 
-        commande_ligne.setPhiMR4UUID((int) rowId);
+        commande_ligne.setphiwms_mobileUUID((int) rowId);
 
         return rowId;
     }
@@ -188,7 +188,7 @@ public class Commande_LigneOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_COMMANDE_LIGNE = "CREATE TABLE " + Constantes.TABLE_COMMANDE_LIGNE
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_RIEN_COMMANDE_LIGNE + " " + Constantes.TYPE_COL_RIEN_COMMANDE_LIGNE + " ,"
                 + Constantes.CLE_COL_PRODUIT_REFERENCE_COMMANDE_LIGNE + " " + Constantes.TYPE_COL_PRODUIT_REFERENCE_COMMANDE_LIGNE + " ,"
                 + Constantes.CLE_COL_TYPE_PRODUIT_COMMANDE_LIGNE + " " + Constantes.TYPE_COL_TYPE_PRODUIT_COMMANDE_LIGNE + " ,"

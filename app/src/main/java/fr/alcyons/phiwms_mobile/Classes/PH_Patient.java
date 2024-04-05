@@ -96,7 +96,7 @@ public class PH_Patient implements Serializable, Comparable {
     private String Photo_lien;
     private String Document_partage;
     private String discipline_Medicale;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public PH_Patient(JSONObject jsonObject) {
         try {
@@ -258,7 +258,7 @@ public class PH_Patient implements Serializable, Comparable {
         this.Photo_lien = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_PHOTO_LIEN_PH_PATIENT);
         this.Document_partage = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_DOCUMENT_PARTAGE_PH_PATIENT);
         // this.discipline_Medicale = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_DISCIPLINE_MEDICALE_PH_PATIENT);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
     public int get_patientUID() {
@@ -869,12 +869,12 @@ public class PH_Patient implements Serializable, Comparable {
         this.discipline_Medicale = discipline_Medicale;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public JSONObject toJson() {
@@ -1042,7 +1042,7 @@ public class PH_Patient implements Serializable, Comparable {
                 ", Photo_lien='" + Photo_lien + '\'' +
                 ", Document_partage='" + Document_partage + '\'' +
                 ", discipline_Medicale='" + discipline_Medicale + '\'' +
-                ", phiMR4UUID=" + phiMR4UUID +
+                ", phiwms_mobileUUID=" + phiwms_mobileUUID +
                 '}';
     }
 
@@ -1050,17 +1050,17 @@ public class PH_Patient implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         PH_Patient ph_patient = (PH_Patient) obj;
 
-        if (this.getPhiMR4UUID() == ph_patient.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == ph_patient.getphiwms_mobileUUID()) {
             return 0;
         } else {
-            return this.getPhiMR4UUID() > ph_patient.getPhiMR4UUID() ? 1 : -1;
+            return this.getphiwms_mobileUUID() > ph_patient.getphiwms_mobileUUID() ? 1 : -1;
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
-        if (((PH_Patient) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
+        if (((PH_Patient) obj).getphiwms_mobileUUID() == this.getphiwms_mobileUUID()) {
             valeurARetourner = true;
         }
 

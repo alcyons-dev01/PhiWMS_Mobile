@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.Photo_Stock_EtablissementOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
 /**
@@ -57,7 +56,7 @@ public class Photo_Stock_Etablissement implements Serializable, Comparable {
     int _UID;
     int QTE_COMMANDE;
     int QTE_RAF;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Photo_Stock_Etablissement(int code_Produit, int annee, int mois, String ref_Cycle, double STOCK_DEBUT, double QTE_ENTREE_CDE, double QTE_SORTIE_DELIV, double QTE_ENTREE_DELIV, double QTE_SORTIE_RETOUR, double QTE_ENTREE_RETOUR, double QTE_SORTIE_REGUL, double QTE_ENTREE_REGUL, double QTE_SORTIE_ECART, double QTE_ENTREE_ECART, double STOCK_FIN, double VALEUR_STOCK_FIN, double VALEUR_STOCK_DEBUT, String CATEGORIE, String REFERENCE, String DESIGNATION, double PRIX_UNIT_HT, double consommation_mensuelle, double qte_Entree, double qte_Sortie, double consommation_Trimestrielle, double conso_Journaliere, double conso_Q1, double conso_Q2, double conso_Q3, double conso_Q4, double conso_S1, double conso_S2, double conso_S3, double conso_S4, double conso_S5, double rien, double PMP_TTC, int _UID, int QTE_COMMANDE, int QTE_RAF) {
         Code_Produit = code_Produit;
@@ -190,15 +189,15 @@ public class Photo_Stock_Etablissement implements Serializable, Comparable {
         _UID = cursor.getInt(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL__UID_PHOTO_STOCK_ETABLISSEMENT);
         QTE_COMMANDE = cursor.getInt(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_QTE_COMMANDE_PHOTO_STOCK_ETABLISSEMENT);
         QTE_RAF = cursor.getInt(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_QTE_RAF_PHOTO_STOCK_ETABLISSEMENT);
-        phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getCode_Produit() {
@@ -590,7 +589,7 @@ public class Photo_Stock_Etablissement implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Photo_Stock_Etablissement photo_stock_etablissement = (Photo_Stock_Etablissement) obj;
 
-        if (this.getPhiMR4UUID() == photo_stock_etablissement.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == photo_stock_etablissement.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.get_UID() > photo_stock_etablissement.get_UID() ? 1 : -1;

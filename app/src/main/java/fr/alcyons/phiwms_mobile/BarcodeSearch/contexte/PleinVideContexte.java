@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by jessica on 07/06/2018.

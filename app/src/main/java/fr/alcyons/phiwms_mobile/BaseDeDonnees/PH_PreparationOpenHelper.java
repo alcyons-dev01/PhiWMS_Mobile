@@ -39,7 +39,7 @@ import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by quentinlanusse on 20/06/2017.
@@ -116,7 +116,7 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
         // Insertion du dépot en BDD
         long rowId = db.insert(Constantes.TABLE_PH_PREPARATION, null, contentValues);
 
-        ph_preparation.setPhiMR4UUID((int) rowId);
+        ph_preparation.setphiwms_mobileUUID((int) rowId);
 
         return rowId;
     }
@@ -178,9 +178,9 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_DELIVRANCE_VALIDER_A, ph_preparation.getDelivranceValider_A());
         contentValues.put(Constantes.CLE_COL_DELIVRANCE_VALIDER_LE, ph_preparation.getDelivranceValider_Le());
         contentValues.put(Constantes.CLE_COL_DELIVRANCE_VALIDER_PAR, ph_preparation.getDelivranceValider_Par());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID, ph_preparation.getPhiMR4UUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, ph_preparation.getphiwms_mobileUUID());
 
-        return db.update(Constantes.TABLE_PH_PREPARATION, contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + ph_preparation.getPhiMR4UUID(), null);
+        return db.update(Constantes.TABLE_PH_PREPARATION, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + ph_preparation.getphiwms_mobileUUID(), null);
     }
 
     public static PH_Preparation getPH_PreparationByID(SQLiteDatabase db, int id) {
@@ -211,10 +211,10 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
         return phPreparation;
     }
 
-    public static PH_Preparation getPH_PreparationByPhiMR4UUID(SQLiteDatabase db, int id) {
+    public static PH_Preparation getPH_PreparationByphiwms_mobileUUID(SQLiteDatabase db, int id) {
         PH_Preparation phPreparation = null;
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION + " WHERE " + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(id)});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION + " WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(id)});
 
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
@@ -530,7 +530,7 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
         String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteVerrouPharmacie;
         RequestQueue requestQueue = new Volley().newRequestQueue(context);
 
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                 new Response.Listener<JSONObject>() {
 
                     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -650,7 +650,7 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
         String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequetePreparationPUF;
         RequestQueue requestQueue = new Volley().newRequestQueue(context);
 
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                 new Response.Listener<JSONObject>() {
 
                     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -782,7 +782,7 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
         String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequetePreparationPAD;
         RequestQueue requestQueue = new Volley().newRequestQueue(context);
 
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                 new Response.Listener<JSONObject>() {
 
                     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -909,7 +909,7 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
         String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteServiceLivraison;
         RequestQueue requestQueue = new Volley().newRequestQueue(context);
 
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                 new Response.Listener<JSONObject>() {
 
                     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -1027,7 +1027,7 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
     }
 
     public static void supprimerUnPhPreparation(SQLiteDatabase db, PH_Preparation ph_preparation) {
-        db.delete(Constantes.TABLE_PH_PREPARATION, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(ph_preparation.getPhiMR4UUID())});
+        db.delete(Constantes.TABLE_PH_PREPARATION, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(ph_preparation.getphiwms_mobileUUID())});
     }
 
     public static final class Constantes implements BaseColumns {
@@ -1199,7 +1199,7 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_PH_PREPARATION = "CREATE TABLE " + Constantes.TABLE_PH_PREPARATION
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_SERVICE_PH_PREPARATION + " " + Constantes.TYPE_COL_SERVICE_PH_PREPARATION + " ,"
                 + Constantes.CLE_COL_ERREUR_VALID_PH_PREPARATION + " " + Constantes.TYPE_COL_ERREUR_VALID_PH_PREPARATION + " ,"
                 + Constantes.CLE_COL_PHIE_TAG_PH_PREPARATION + " " + Constantes.TYPE_COL_PHIE_TAG_PH_PREPARATION + " ,"

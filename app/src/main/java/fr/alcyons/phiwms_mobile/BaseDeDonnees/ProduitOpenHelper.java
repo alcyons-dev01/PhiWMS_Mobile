@@ -30,7 +30,7 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 
 /**
@@ -312,10 +312,10 @@ public class ProduitOpenHelper extends DBOpenHelper {
         return produit;
     }
 
-    public static Produit getProduitByPhiMR4UUID(SQLiteDatabase db, int id) {
+    public static Produit getProduitByphiwms_mobileUUID(SQLiteDatabase db, int id) {
         Produit produit = null;
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(id)});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(id)});
 
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
@@ -481,7 +481,7 @@ public class ProduitOpenHelper extends DBOpenHelper {
 
         long rowId = db.insert(Constantes.TABLE_PRODUIT, null, contentValues);
 
-        produit.setPhiMR4UUID((int) rowId);
+        produit.setphiwms_mobileUUID((int) rowId);
 
         return rowId;
     }
@@ -501,7 +501,7 @@ public class ProduitOpenHelper extends DBOpenHelper {
             String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriRequeteProduits;
             RequestQueue requestQueue = new Volley().newRequestQueue(context);
 
-            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                     new Response.Listener<JSONObject>() {
 
                         @Override
@@ -742,9 +742,9 @@ public class ProduitOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_CODE_INCONNU, produit.getCodeInconnue());
         contentValues.put(Constantes.CLE_COL_SUIVI_SERIALISATION, produit.isSuivi_Serialisation());
         contentValues.put(Constantes.CLE_COL_SERIALISER_RECEPTION_DELIVRANCE, produit.isSerialiser_Reception_Delivrance());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID, produit.getPhiMR4UUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, produit.getphiwms_mobileUUID());
 
-        long rowId = db.update(Constantes.TABLE_PRODUIT, contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + produit.getPhiMR4UUID(), null);
+        long rowId = db.update(Constantes.TABLE_PRODUIT, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + produit.getphiwms_mobileUUID(), null);
         return rowId;
     }
 
@@ -1186,7 +1186,7 @@ public class ProduitOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_PRODUIT = "CREATE TABLE "
                 + Constantes.TABLE_PRODUIT + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT + " " + Constantes.TYPE_COL_DESIGNATION_INTERNE_PRODUIT + ","
                 + Constantes.CLE_COL_REF_FOURNI_PRODUIT + " " + Constantes.TYPE_COL_REF_FOURNI_PRODUIT + ","
                 + Constantes.CLE_COL_INFORMATION_IMPORTANTES_PRODUIT + " " + Constantes.TYPE_COL_INFORMATION_IMPORTANTES_PRODUIT + ","

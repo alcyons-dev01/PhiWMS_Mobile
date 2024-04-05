@@ -48,7 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import fr.alcyons.phimr4.PrisePhoto.PrisePhotoGraphic;
+import fr.alcyons.phiwms_mobile.PrisePhoto.PrisePhotoGraphic;
 
 // Note: This requires Google Play Services 8.1 or higher, due to using indirect byte buffers for
 // storing images.

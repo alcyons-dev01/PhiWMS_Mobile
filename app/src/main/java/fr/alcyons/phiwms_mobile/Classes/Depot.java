@@ -104,7 +104,7 @@ public class Depot implements Serializable, Comparable {
     private int Etablissement_UID;
     private String FInessGeo;
     private int Nombre_Postes;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Depot(int Depot_UID, String Depot_Reference, String Nom, String Adresse1, String CP, String Ville, String Tel, String Structure)
     {
@@ -336,7 +336,7 @@ public class Depot implements Serializable, Comparable {
         this.Etablissement_UID = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_ETABLISSEMENT_UID_DEPOT);
         this.FInessGeo = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_FINESSGEO_DEPOT);
         this.Nombre_Postes = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_NOMBRE_POSTES_DEPOT);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }*/
 
     public Depot(Cursor cursor) {
@@ -364,16 +364,16 @@ public class Depot implements Serializable, Comparable {
         this.Etablissement_UID = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_ETABLISSEMENT_UID_DEPOT);
         this.PAD_IPP = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_IPP_DEPOT);
         this.PAD_Patient = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_Patient_DEPOT);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
         this.Archive = OutilsGestionClasses.recupererBooleen(cursor, DepotOpenHelper.Constantes.NUM_COL_ARCHIVE_DEPOT);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public boolean intToBoolean(int x) {
@@ -1105,7 +1105,7 @@ public class Depot implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Depot depot = (Depot) obj;
 
-        if (this.getPhiMR4UUID() == depot.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == depot.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return -1;

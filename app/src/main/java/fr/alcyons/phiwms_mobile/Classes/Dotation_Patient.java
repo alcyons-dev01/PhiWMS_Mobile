@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.Dotation_PatientOpenHelper;
 
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
 
@@ -38,7 +37,7 @@ public class Dotation_Patient implements Serializable, Comparable {
     private int Montant_HT_Ligne;
     private double Qte_Commande;
     private int _UID;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Dotation_Patient(JSONObject jsonObject) {
         try {
@@ -82,7 +81,7 @@ public class Dotation_Patient implements Serializable, Comparable {
         this.Montant_HT_Ligne = cursor.getInt(Dotation_PatientOpenHelper.Constantes.NUM_COL_MONTANT_HT_LIGNE_DOTATION_PATIENT);
         this.Qte_Commande = cursor.getDouble(Dotation_PatientOpenHelper.Constantes.NUM_COL_QTE_COMMANDE_DOTATION_PATIENT);
         this._UID = cursor.getInt(Dotation_PatientOpenHelper.Constantes.NUM_COL__UID_DOTATION_PATIENT);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
     public int getProtocolePatient_UID() {
@@ -221,12 +220,12 @@ public class Dotation_Patient implements Serializable, Comparable {
         this._UID = _UID;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public JSONObject toJson() {
@@ -277,7 +276,7 @@ public class Dotation_Patient implements Serializable, Comparable {
                 ", Montant_HT_Ligne=" + Montant_HT_Ligne +
                 ", Qte_Commande=" + Qte_Commande +
                 ", _UID=" + _UID +
-                ", phiMR4UUID=" + phiMR4UUID +
+                ", phiwms_mobileUUID=" + phiwms_mobileUUID +
                 '}';
     }
 
@@ -285,17 +284,17 @@ public class Dotation_Patient implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         Dotation_Patient dotation_patient = (Dotation_Patient) obj;
 
-        if (this.getPhiMR4UUID() == dotation_patient.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == dotation_patient.getphiwms_mobileUUID()) {
             return 0;
         } else {
-            return this.getPhiMR4UUID() > dotation_patient.getPhiMR4UUID() ? 1 : -1;
+            return this.getphiwms_mobileUUID() > dotation_patient.getphiwms_mobileUUID() ? 1 : -1;
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
-        if (((Dotation_Patient) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
+        if (((Dotation_Patient) obj).getphiwms_mobileUUID() == this.getphiwms_mobileUUID()) {
             valeurARetourner = true;
         }
 

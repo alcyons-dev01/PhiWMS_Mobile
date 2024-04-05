@@ -36,13 +36,13 @@ public class PH_ReassortOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_VALORISATION_TTC_PH_REASSORT, objet.getValorisation_TTC());
 
         long rowID = db.insert(Constantes.TABLE_PH_REASSORT, null, contentValues);
-        objet.setPhiMR4UUID((int) rowID);
+        objet.setphiwms_mobileUUID((int) rowID);
         return rowID;
     }
 
-    public static PH_Reassort getPH_ReassortByPhiMR4UUID(SQLiteDatabase db, int id) {
+    public static PH_Reassort getPH_ReassortByphiwms_mobileUUID(SQLiteDatabase db, int id) {
         PH_Reassort phReassort = null;
-        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_REASSORT + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=? ", new String[]{String.valueOf(id)});
+        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_REASSORT + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=? ", new String[]{String.valueOf(id)});
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
             phReassort = new PH_Reassort(cursor);
@@ -69,7 +69,7 @@ public class PH_ReassortOpenHelper extends DBOpenHelper {
 
 
     public void supprimerUnePH_Reassort(SQLiteDatabase db, PH_Reassort ph_reassort) {
-        db.delete(Constantes.TABLE_PH_REASSORT, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(ph_reassort.getPhiMR4UUID())});
+        db.delete(Constantes.TABLE_PH_REASSORT, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(ph_reassort.getphiwms_mobileUUID())});
     }
 
     public static class Constantes implements BaseColumns {
@@ -108,7 +108,7 @@ public class PH_ReassortOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_PH_REASSORT = " CREATE TABLE       " + Constantes.TABLE_PH_REASSORT
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + "    PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + "    PRIMARY KEY,"
                 + Constantes.CLE_COL_CODE_PH_REASSORT + " " + Constantes.TYPE_COL_CODE_PH_REASSORT + " , "
                 + Constantes.CLE_COL_LISTE_PH_REASSORT + " " + Constantes.TYPE_COL_LISTE_PH_REASSORT + " , "
                 + Constantes.CLE_COL_SYS_DT_MAJ_PH_REASSORT + " " + Constantes.TYPE_COL_SYS_DT_MAJ_PH_REASSORT + " , "

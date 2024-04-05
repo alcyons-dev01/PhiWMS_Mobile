@@ -48,7 +48,7 @@ public class Detail_DotOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_PLEINVIDE_ADRESSAGE_DETAIL_DOT, objet.getPleinVide_Adressage());
 
         long rowID = db.insert(Constantes.TABLE_DETAIL_DOT, null, contentValues);
-        objet.setPhiMR4UUID((int) rowID);
+        objet.setphiwms_mobileUUID((int) rowID);
         return rowID;
     }
 
@@ -183,7 +183,7 @@ public class Detail_DotOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_DETAIL_DOT = " CREATE TABLE       " + Constantes.TABLE_DETAIL_DOT
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + "    PRIMARY KEY, "
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + "    PRIMARY KEY, "
                 + Constantes.CLE_COL_DOTATION_UID_DETAIL_DOT + " " + Constantes.TYPE_COL_DOTATION_UID_DETAIL_DOT + " , "
                 + Constantes.CLE_COL_CODE_PRODUIT_DETAIL_DOT + " " + Constantes.TYPE_COL_CODE_PRODUIT_DETAIL_DOT + " , "
                 + Constantes.CLE_COL_DESIGNATION_DETAIL_DOT + " " + Constantes.TYPE_COL_DESIGNATION_DETAIL_DOT + " , "

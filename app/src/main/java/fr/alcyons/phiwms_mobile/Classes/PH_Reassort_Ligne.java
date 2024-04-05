@@ -31,7 +31,7 @@ public class PH_Reassort_Ligne implements Serializable, Comparable {
     private String SYS_USER_MAJ;
     private int stock_Minimum;
     private int _UID;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public PH_Reassort_Ligne(JSONObject jsonObject) {
         try {
@@ -67,7 +67,7 @@ public class PH_Reassort_Ligne implements Serializable, Comparable {
         this.SYS_USER_MAJ = cursor.getString(PH_Reassort_LigneOpenHelper.Constantes.NUM_COL_SYS_USER_MAJ_PH_REASSORT_LIGNE);
         this.stock_Minimum = cursor.getInt(PH_Reassort_LigneOpenHelper.Constantes.NUM_COL_STOCK_MINIMUM_PH_REASSORT_LIGNE);
         this._UID = cursor.getInt(PH_Reassort_LigneOpenHelper.Constantes.NUM_COL__UID_PH_REASSORT_LIGNE);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
     public int getReassort_UID() {
@@ -174,12 +174,12 @@ public class PH_Reassort_Ligne implements Serializable, Comparable {
         this._UID = _UID;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public JSONObject toJson() {
@@ -209,17 +209,17 @@ public class PH_Reassort_Ligne implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         PH_Reassort_Ligne ph_reassort_ligne = (PH_Reassort_Ligne) obj;
 
-        if (this.getPhiMR4UUID() == ph_reassort_ligne.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == ph_reassort_ligne.getphiwms_mobileUUID()) {
             return 0;
         } else {
-            return this.getPhiMR4UUID() > ph_reassort_ligne.getPhiMR4UUID() ? 1 : -1;
+            return this.getphiwms_mobileUUID() > ph_reassort_ligne.getphiwms_mobileUUID() ? 1 : -1;
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
-        if (((PH_Reassort_Ligne) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
+        if (((PH_Reassort_Ligne) obj).getphiwms_mobileUUID() == this.getphiwms_mobileUUID()) {
             valeurARetourner = true;
         }
 
@@ -245,7 +245,7 @@ public class PH_Reassort_Ligne implements Serializable, Comparable {
                 ", SYS_USER_MAJ='" + SYS_USER_MAJ + '\'' +
                 ", stock_Minimum=" + stock_Minimum +
                 ", _UID=" + _UID +
-                ", phiMR4UUID=" + phiMR4UUID +
+                ", phiwms_mobileUUID=" + phiwms_mobileUUID +
                 '}';
     }
 }

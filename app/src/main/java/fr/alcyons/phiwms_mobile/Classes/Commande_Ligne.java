@@ -54,7 +54,7 @@ public class Commande_Ligne implements Serializable, Comparable {
     private int NbPalette;
     private double Poids;
     private double RAF_HT;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
 
     public Commande_Ligne(int commande_UID, int rien, String produit_Reference, String type_produit, double qté_COM, double PU_Com, double remise, String désignation, int code_produit, String catégorie, String unité, double conditionnement, int code_fournisseu, String fournisseur, double montant_HT, int _UID, double tx_TVA, double MTTC_ligne, Boolean peremption, double qte_RAL, double qte_RAF, Boolean gratuit, String devise, String SYS_DT_MAJ, String SYS_HEURE_MAJ, String SYS_USER_MAJ, String num_BL, double RAFF_TTC, String section_Analytique, int ID_MVT, double PU_FACT, double qte_Fact, int classe_N, int nbColis, int nbPalette, double poids, double RAF_HT) {
@@ -180,15 +180,15 @@ public class Commande_Ligne implements Serializable, Comparable {
         this.NbPalette = cursorCommande_ligne.getInt(Commande_LigneOpenHelper.Constantes.NUM_COL_NBPALETTE_COMMANDE_LIGNE);
         this.Poids = cursorCommande_ligne.getDouble(Commande_LigneOpenHelper.Constantes.NUM_COL_POIDS_COMMANDE_LIGNE);
         this.RAF_HT = cursorCommande_ligne.getDouble(Commande_LigneOpenHelper.Constantes.NUM_COL_RAF_HT_COMMANDE_LIGNE);
-        this.phiMR4UUID = cursorCommande_ligne.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursorCommande_ligne.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getCommande_UID() {

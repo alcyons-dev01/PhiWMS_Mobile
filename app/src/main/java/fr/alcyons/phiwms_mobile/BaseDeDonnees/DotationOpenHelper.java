@@ -31,7 +31,7 @@ import fr.alcyons.phiwms_mobile.Classes.Dotation;
 import fr.alcyons.phiwms_mobile.Classes.EVENT;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by jessica on 02/10/2017.
@@ -72,13 +72,13 @@ public class DotationOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_PLEINVIDE_DOTATION, objet.isPLEINVIDE());
         contentValues.put(Constantes.CLE_COL_PROTOCOLE_UID_DOTATION, objet.getProtocole_UID());
         long rowID = db.insert(Constantes.TABLE_DOTATION, null, contentValues);
-        objet.setPhiMR4UUID((int) rowID);
+        objet.setphiwms_mobileUUID((int) rowID);
         return rowID;
     }
 
-    public static Dotation getDotationByPhiMR4UUID(SQLiteDatabase db, int id) {
+    public static Dotation getDotationByphiwms_mobileUUID(SQLiteDatabase db, int id) {
         Dotation dotation = null;
-        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_DOTATION + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " =? ", new String[]{String.valueOf(id)});
+        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_DOTATION + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " =? ", new String[]{String.valueOf(id)});
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
             dotation = new Dotation(cursor);
@@ -182,7 +182,7 @@ public class DotationOpenHelper extends DBOpenHelper {
             viderTableDotation(db);
             Detail_DotOpenHelper.viderTableDetail_Dot(db);
 
-            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, new Response.Listener<JSONObject>() {
+            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
@@ -352,7 +352,7 @@ public class DotationOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_DOTATION = " CREATE TABLE       " + Constantes.TABLE_DOTATION
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + "    PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + "    PRIMARY KEY,"
                 + Constantes.CLE_COL__UID_DOTATION + " " + Constantes.TYPE_COL__UID_DOTATION + " , "
                 + Constantes.CLE_COL_INTITULE_DOTATION + " " + Constantes.TYPE_COL_INTITULE_DOTATION + " , "
                 + Constantes.CLE_COL_REF_DEPOT_DOTATION + " " + Constantes.TYPE_COL_REF_DEPOT_DOTATION + " , "

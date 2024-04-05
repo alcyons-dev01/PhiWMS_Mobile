@@ -50,7 +50,7 @@ public class Retour_Ligne implements Serializable, Comparable {
     private String emplacementOrigine;
     String Serie_Retourner;
     private int patientID;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Retour_Ligne(int retour_UID, int code_produit, String produit_Reference, double qte_Retourner, String produit_Fournisseur, double produit_PUHT, double produit_TVA, String produit_Designation, double montant_TTC, int piece_Code, String date_validation, String destination, String devise, double qte_avant_retour, String SYS_DT_MAJ, String SYS_HEURE_MAJ, String SYS_USER_MAJ, String lot, String patientIdentite, int _UID, double qte_Demander, String lot_Retourner, String peremptionDate, int destruction_Qte, int retourPui_Qte, int retourFrs_Qte, int quarantaine_Qte_Demander, String retourPUI_Emplacement, String retourPUI_Zone, String emplacementOrigine, int patientID) {
         this.retour_UID = retour_UID;
@@ -266,7 +266,7 @@ public class Retour_Ligne implements Serializable, Comparable {
         this.RetourPUI_Zone = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_RETOURPUI_ZONE_RETOUR_LIGNE);
         this.emplacementOrigine = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_EMPLACEMENTORIGINE_RETOUR_LIGNE);
         this.patientID = cursor.getInt(Retour_LigneOpenHelper.Constantes.NUM_COL_PATIENTID_RETOUR_LIGNE);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }*/
 
     public Retour_Ligne(Cursor cursor) {
@@ -289,15 +289,15 @@ public class Retour_Ligne implements Serializable, Comparable {
         this.Serie_Retourner = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_SERIE_RETOURNER);
         this.RetourPUI_Emplacement = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_RETOURPUI_EMPLACEMENT_RETOUR_LIGNE);
         this.RetourPUI_Zone = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_RETOURPUI_ZONE_RETOUR_LIGNE);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getRetour_UID() {
@@ -616,7 +616,7 @@ public class Retour_Ligne implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Retour_Ligne retour_ligne = (Retour_Ligne) obj;
 
-        if (this.getPhiMR4UUID() == retour_ligne.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == retour_ligne.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.get_UID() > retour_ligne.get_UID() ? 1 : -1;

@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 import me.leolin.shortcutbadger.ShortcutBadger;
 
 import static android.content.ContentValues.TAG;

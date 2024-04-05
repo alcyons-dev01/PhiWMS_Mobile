@@ -157,7 +157,7 @@ public class Produit implements Serializable, Comparable {
     private String codeInconnue;
     private boolean Suivi_Serialisation;
     private boolean Serialiser_Reception_Delivrance;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
 
     public Produit(int ID_produit, String Designation_ext, String Categorie, String Designation_interne, String SYS_USER_MAJ, String GTIN)
@@ -541,7 +541,7 @@ public class Produit implements Serializable, Comparable {
         this.UCD_NomCourt = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_UCD_NOMCOURT_PRODUIT);
         this.PHIE_Synchro = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_PHIE_SYNCHRO_PRODUIT);
         this.codeInconnue = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_CODE_INCONNU);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }*/
 
     public Produit(Cursor cursor) {
@@ -610,16 +610,16 @@ public class Produit implements Serializable, Comparable {
         this.Taux_de_TVA = cursor.getDouble(ProduitOpenHelper.Constantes.NUM_COL_TAUX_DE_TVA_PRODUIT);
         this.Suivi_Serialisation = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_SUIVI_SERIALISATION);
         this.Serialiser_Reception_Delivrance = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_SERIALISER_RECEPTION_DELIVRANCE);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
 
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getID_produit() {

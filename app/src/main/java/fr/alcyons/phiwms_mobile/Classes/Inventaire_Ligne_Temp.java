@@ -49,7 +49,7 @@ public class Inventaire_Ligne_Temp implements Serializable, Comparable {
     private String lot;
     private String PeremptionDate;
     private int _UID;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Inventaire_Ligne_Temp(int produitID, String produitReference, String fournisseurNom, String categorie, String designation, double stockTheorique, double stockPhysique, String depotReference, String _SYS_DT_MAJ, String _SYS_HEURE_MAJ, String _SYS_USER_MAJ, String zone, int inventaire_ID, Boolean _NePasImprimer, double PUHT, double tvaTx, Boolean suspendu, double valeurTTC, double ecart, String unite, double cond_Achat, String classe, String emplacement, String lot, String peremptionDate, int _UID) {
         this.produitID = produitID;
@@ -141,7 +141,7 @@ public class Inventaire_Ligne_Temp implements Serializable, Comparable {
         this.lot = cursor.getString(Inventaire_Ligne_TempOpenHelper.Constantes.NUM_COL_LOT_INVENTAIRE_LIGNE_TEMP);
         this.PeremptionDate = cursor.getString(Inventaire_Ligne_TempOpenHelper.Constantes.NUM_COL_PEREMPTIONDATE_INVENTAIRE_LIGNE_TEMP);
         this._UID = cursor.getInt(Inventaire_Ligne_TempOpenHelper.Constantes.NUM_COL__UID_INVENTAIRE_LIGNE_TEMP);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
     public Inventaire_Ligne_Temp(Produit produit, Map<String, String> gs1Decoupe, Depot depot) {
@@ -213,12 +213,12 @@ public class Inventaire_Ligne_Temp implements Serializable, Comparable {
         return new_gs1;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getProduitID() {

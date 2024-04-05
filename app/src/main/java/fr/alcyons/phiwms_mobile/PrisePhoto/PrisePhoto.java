@@ -38,14 +38,14 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import fr.alcyons.phimr4.OriginalActivity;
-import fr.alcyons.phimr4.Outils.Alerte;
-import fr.alcyons.phimr4.Outils.CodesEchangesActivites;
-import fr.alcyons.phimr4.Outils.OutilsGestionConnexionReseau;
-import fr.alcyons.phimr4.PrisePhoto.camera.CameraSource;
-import fr.alcyons.phimr4.PrisePhoto.camera.CameraSourcePreview;
-import fr.alcyons.phimr4.PrisePhoto.camera.GraphicOverlay;
-import fr.alcyons.phimr4.R;
+import fr.alcyons.phiwms_mobile.OriginalActivity;
+import fr.alcyons.phiwms_mobile.Outils.Alerte;
+import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
+import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
+import fr.alcyons.phiwms_mobile.PrisePhoto.camera.CameraSource;
+import fr.alcyons.phiwms_mobile.PrisePhoto.camera.CameraSourcePreview;
+import fr.alcyons.phiwms_mobile.PrisePhoto.camera.GraphicOverlay;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by jessica on 08/11/2017.

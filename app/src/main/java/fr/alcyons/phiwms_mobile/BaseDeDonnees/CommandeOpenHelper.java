@@ -33,10 +33,10 @@ import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 import static fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper.viderTablePH_Reliquat;
-import static com.example.phiwms_mobile.OutilsSerialisation.WS_MIXED_BULK.handler;
+import static fr.alcyons.phiwms_mobile.OutilsSerialisation.WS_MIXED_BULK.handler;
 
 /**
  * Created by quentinlanusse on 19/06/2017.
@@ -132,7 +132,7 @@ public class CommandeOpenHelper extends DBOpenHelper {
         // Insertion du dépot en BDD
         long rowId = db.insert(Constantes.TABLE_COMMANDE, null, contentValues);
 
-        commande.setPhiMR4UUID((int) rowId);
+        commande.setphiwms_mobileUUID((int) rowId);
 
         return rowId;
     }
@@ -190,9 +190,9 @@ public class CommandeOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_TRANSITAIRE_METROPOLE_COMMANDE, commande.getTransitaire_Metropole());
         contentValues.put(Constantes.CLE_COL_TRANSITAIRE_LOCAL_COMMANDE, commande.getTransitaire_Local());
         contentValues.put(Constantes.CLE_COL_TRANSPORT_TYPE_COMMANDE, commande.getTransport_Type());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID, commande.getPhiMR4UUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, commande.getphiwms_mobileUUID());
 
-        return db.update(Constantes.TABLE_COMMANDE, contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + commande.getPhiMR4UUID(), null);
+        return db.update(Constantes.TABLE_COMMANDE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + commande.getphiwms_mobileUUID(), null);
 
     }
 
@@ -210,7 +210,7 @@ public class CommandeOpenHelper extends DBOpenHelper {
         }
         RequestQueue requestQueue = new Volley().newRequestQueue(context);
 
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                 new Response.Listener<JSONObject>() {
 
                     @Override
@@ -250,8 +250,8 @@ public class CommandeOpenHelper extends DBOpenHelper {
                                         PH_Reliquat reliquatCourant = new PH_Reliquat((phReliquatJSONArray.getJSONObject(j)));
 
 
-                                        long phReliquatPHiMR4ID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, reliquatCourant);
-                                        if (phReliquatPHiMR4ID != -1) {
+                                        long phReliquatphiwms_mobileID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, reliquatCourant);
+                                        if (phReliquatphiwms_mobileID != -1) {
                                             phReliquatPresent = true;
                                         }
                                     }
@@ -311,7 +311,7 @@ public class CommandeOpenHelper extends DBOpenHelper {
         }
         RequestQueue requestQueue = new Volley().newRequestQueue(context);
 
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                 new Response.Listener<JSONObject>() {
 
                     @Override
@@ -351,8 +351,8 @@ public class CommandeOpenHelper extends DBOpenHelper {
                                         PH_Reliquat reliquatCourant = new PH_Reliquat((phReliquatJSONArray.getJSONObject(j)));
 
 
-                                        long phReliquatPHiMR4ID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, reliquatCourant);
-                                        if (phReliquatPHiMR4ID != -1) {
+                                        long phReliquatphiwms_mobileID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, reliquatCourant);
+                                        if (phReliquatphiwms_mobileID != -1) {
                                             phReliquatPresent = true;
                                         }
                                     }
@@ -412,7 +412,7 @@ public class CommandeOpenHelper extends DBOpenHelper {
         }
         RequestQueue requestQueue = new Volley().newRequestQueue(context);
 
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,null,
                 new Response.Listener<JSONObject>() {
 
                     @Override
@@ -452,8 +452,8 @@ public class CommandeOpenHelper extends DBOpenHelper {
                                         PH_Reliquat reliquatCourant = new PH_Reliquat((phReliquatJSONArray.getJSONObject(j)));
 
 
-                                        long phReliquatPHiMR4ID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, reliquatCourant);
-                                        if (phReliquatPHiMR4ID != -1) {
+                                        long phReliquatphiwms_mobileID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, reliquatCourant);
+                                        if (phReliquatphiwms_mobileID != -1) {
                                             phReliquatPresent = true;
                                         }
                                     }
@@ -552,10 +552,10 @@ public class CommandeOpenHelper extends DBOpenHelper {
         return commande;
     }
 
-    public static Commande getCommandeByPhiMR4UUID(SQLiteDatabase db, int phimr4uuid) {
+    public static Commande getCommandeByphiwms_mobileUUID(SQLiteDatabase db, int phiwms_mobileuuid) {
         Commande commande = null;
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_COMMANDE + " WHERE " + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(phimr4uuid)});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_COMMANDE + " WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(phiwms_mobileuuid)});
 
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
@@ -768,7 +768,7 @@ public class CommandeOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_COMMANDE = "CREATE TABLE " +
                 Constantes.TABLE_COMMANDE + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_NUMERO_COMMANDE + " " + Constantes.TYPE_COL_NUMERO_COMMANDE + " ,"
                 + Constantes.CLE_COL_ID_FRS_COMMANDE + " " + Constantes.TYPE_COL_ID_FRS_COMMANDE + " ,"
                 + Constantes.CLE_COL_COMMENTAIRE_COMMANDE + " " + Constantes.TYPE_COL_COMMENTAIRE_COMMANDE + " ,"

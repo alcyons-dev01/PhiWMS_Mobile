@@ -59,7 +59,7 @@ public class Stock implements Serializable, Comparable {
     private double SeuilAlerte;
     private Boolean produitSelect;
     private int _UID;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Stock(int produit_UID, String depot_Reference, String STO_DT_INVENTAIRE, double STO_QTE_INVENT, String STO_DT_DER_ENTREE, double STO_QTE_ENTREE, String STO_DT_DER_SORTIE, double STO_QTE_SORTIE, double STO_QTE_AVANT_INVENT, double STO_QTE_ATTENDUE, double quantite_Actuelle, double STO_PRIX, double STO_VAL_ENTREES, double STO_VAL_SORTIES, double STO_VAL_INVENT, int STO_JOURS_ROTATION, String STO_DT_CREAT, String SYS_DT_MAJ, String SYS_USER_MAJ, String SYS_HEURE_MAJ, double TVA, String categorie, String produit_Reference, String designation, Boolean arret_distribution, double valeur_HT, double valeur_TTC, String ZONE_STOCKAGE, String fournisseur, Boolean livraison_Directe, double PUMP_HT_Derniere_cloture, double valeur_PUMP_HT, double valeur_PUMP_TTC, double PUMP_TTC_Derniere_cloture, int classification, Boolean inventaire_Fin_de_Mois, Boolean RAZ_Stock_Inventaire, double seuilAlerte, int _UID) {
         this.Produit_UID = produit_UID;
@@ -248,7 +248,7 @@ public class Stock implements Serializable, Comparable {
         this.RAZ_Stock_Inventaire = OutilsGestionClasses.recupererBooleen(cursor, StockOpenHelper.Constantes.NUM_COL_RAZ_STOCK_INVENTAIRE_STOCK);
         this.SeuilAlerte = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_SEUILALERTE_STOCK);
         this._UID = cursor.getInt(StockOpenHelper.Constantes.NUM_COL__UID_STOCK);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }*/
 
     public Stock(Cursor cursor) {
@@ -259,15 +259,15 @@ public class Stock implements Serializable, Comparable {
         this.Designation = cursor.getString(StockOpenHelper.Constantes.NUM_COL_DESIGNATION_STOCK);
         this.Fournisseur = cursor.getString(StockOpenHelper.Constantes.NUM_COL_FOURNISSEUR_STOCK);
         this._UID = cursor.getInt(StockOpenHelper.Constantes.NUM_COL__UID_STOCK);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getProduit_UID() {
@@ -654,7 +654,7 @@ public class Stock implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Stock stock = (Stock) obj;
 
-        if (this.getPhiMR4UUID() == stock.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == stock.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.get_UID() > stock.get_UID() ? 1 : -1;

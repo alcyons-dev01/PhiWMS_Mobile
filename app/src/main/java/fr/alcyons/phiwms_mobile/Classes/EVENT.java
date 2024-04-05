@@ -30,7 +30,7 @@ public class EVENT implements Serializable, Comparable {
     private String Mois_livraison;
     private String moisReference;
     private int TourneeID;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public EVENT(JSONObject jsonObject) {
         try {
@@ -62,7 +62,7 @@ public class EVENT implements Serializable, Comparable {
         this.Mois_livraison = cursor.getString(EVENTOpenHelper.Constantes.NUM_COL_MOIS_LIVRAISON_EVENT);
         this.moisReference = cursor.getString(EVENTOpenHelper.Constantes.NUM_COL_MOISREFERENCE_EVENT);
         this.TourneeID = cursor.getInt(EVENTOpenHelper.Constantes.NUM_COL_TOURNEEID_EVENT);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
     public int get_UID() {
@@ -153,12 +153,12 @@ public class EVENT implements Serializable, Comparable {
         TourneeID = tourneeID;
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public JSONObject toJson() {
@@ -196,7 +196,7 @@ public class EVENT implements Serializable, Comparable {
                 ", Mois_livraison='" + Mois_livraison + '\'' +
                 ", moisReference='" + moisReference + '\'' +
                 ", TourneeID=" + TourneeID +
-                ", phiMR4UUID=" + phiMR4UUID +
+                ", phiwms_mobileUUID=" + phiwms_mobileUUID +
                 '}';
     }
 
@@ -204,17 +204,17 @@ public class EVENT implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         EVENT event = (EVENT) obj;
 
-        if (this.getPhiMR4UUID() == event.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == event.getphiwms_mobileUUID()) {
             return 0;
         } else {
-            return this.getPhiMR4UUID() > event.getPhiMR4UUID() ? 1 : -1;
+            return this.getphiwms_mobileUUID() > event.getphiwms_mobileUUID() ? 1 : -1;
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
-        if (((EVENT) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
+        if (((EVENT) obj).getphiwms_mobileUUID() == this.getphiwms_mobileUUID()) {
             valeurARetourner = true;
         }
 

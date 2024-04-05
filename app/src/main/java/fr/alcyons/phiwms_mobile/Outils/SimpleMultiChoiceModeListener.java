@@ -10,11 +10,7 @@ import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
 
-import fr.alcyons.phiwms_mobile.ListViewAdapters.Depot_EmplacementAdapter;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.Depot_ZoneAdapter;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.Emplacement_RetourPUIAdapter;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.NotificationAdapter;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by jessica on 15/12/2017.

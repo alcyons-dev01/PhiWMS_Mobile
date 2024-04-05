@@ -31,7 +31,7 @@ import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by quentinlanusse on 01/06/2017.
@@ -82,16 +82,16 @@ public class ServiceOpenHelper extends DBOpenHelper {
                         int score = 0;
 
                         Service serviceBDD = ServiceOpenHelper.getServiceByID(db, id);
-                        int phimr4uuid = 0;
+                        int phiwms_mobileuuid = 0;
                         if(serviceBDD != null)
                         {
-                            phimr4uuid = serviceBDD.getPhiMR4UUID();
+                            phiwms_mobileuuid = serviceBDD.getphiwms_mobileUUID();
                             descriptionServiceCourant = serviceBDD.getDescription();
                             videoServiceCourant = serviceBDD.getLien_video();
                             whitePaperServiceCourant = serviceBDD.getWhitePaper();
                             score = serviceBDD.getScore();
                         }
-                        Service service = new Service(id, nom, ordre, idPerimetreFonctionnel, nomPerimetrefonctionnel, statut, indicateur, descriptionServiceCourant, videoServiceCourant, whitePaperServiceCourant, score, phimr4uuid);
+                        Service service = new Service(id, nom, ordre, idPerimetreFonctionnel, nomPerimetrefonctionnel, statut, indicateur, descriptionServiceCourant, videoServiceCourant, whitePaperServiceCourant, score, phiwms_mobileuuid);
                         serviceList.add(service);
                     }
                 }
@@ -171,7 +171,7 @@ public class ServiceOpenHelper extends DBOpenHelper {
         // Insertion du service en BDD
         long rowID = db.insert(Constantes.TABLE_SERVICE, null, contentValues);
 
-        service.setPhiMR4UUID((int) rowID);
+        service.setphiwms_mobileUUID((int) rowID);
 
         return rowID;
     }
@@ -192,7 +192,7 @@ public class ServiceOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_SCORE, service.getScore());
 
         // Insertion du service en BDD
-        return db.update(Constantes.TABLE_SERVICE, contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + service.getPhiMR4UUID(), null);
+        return db.update(Constantes.TABLE_SERVICE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + service.getphiwms_mobileUUID(), null);
 
     }
 
@@ -200,7 +200,7 @@ public class ServiceOpenHelper extends DBOpenHelper {
         db.delete(Constantes.TABLE_SERVICE, null, null);
     }
 
-    public void insererBDDLocaleServicesEtPerimetresFonctionnelsPhiMR4(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
+    public void insererBDDLocaleServicesEtPerimetresFonctionnelsphiwms_mobile(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
         final String tableNom = "Service";
         final String erreurSynchronisationLibelle = "Services non synchronisés";
 
@@ -215,7 +215,7 @@ public class ServiceOpenHelper extends DBOpenHelper {
             String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriRequeteServices;
             RequestQueue requestQueueServices = Volley.newRequestQueue(context);
 
-            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                     new Response.Listener<JSONObject>() {
 
                         @Override
@@ -367,7 +367,7 @@ public class ServiceOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_SERVICE = "CREATE TABLE "
                 + Constantes.TABLE_SERVICE + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_NOM_SERVICE + " " + Constantes.TYPE_COL_NOM_SERVICE + ","
                 + Constantes.CLE_COL_ORDRE_SERVICE + " " + Constantes.TYPE_COL_ORDRE_SERVICE + ","
                 + Constantes.CLE_COL_ID_PERIMETRE_FONCTIONNEL_SERVICE + " " + Constantes.TYPE_COL_ID_PERIMETRE_FONCTIONNEL_SERVICE + ","

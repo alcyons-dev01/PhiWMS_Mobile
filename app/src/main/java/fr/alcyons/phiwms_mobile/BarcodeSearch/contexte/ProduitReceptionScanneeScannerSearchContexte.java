@@ -26,7 +26,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.SurveillanceReferenceOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.TableTraceOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
@@ -42,9 +41,9 @@ import fr.alcyons.phiwms_mobile.Outils.GestionCodeErreurNMVO;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 
-import com.example.phiwms_mobile.OutilsSerialisation.EnvoyerMailSurveillance;
-import com.example.phiwms_mobile.OutilsSerialisation.Serialisation;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.OutilsSerialisation.EnvoyerMailSurveillance;
+import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by olivier on 20/05/2019.
@@ -166,7 +165,7 @@ public class ProduitReceptionScanneeScannerSearchContexte
                         rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                         if(rowId != -1)
                         {
-                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                         }
                     }
 
@@ -253,7 +252,7 @@ public class ProduitReceptionScanneeScannerSearchContexte
 
                                     serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, (int) ph_serialisation_uid);
                                     if (serialisation_courante == null) {
-                                        serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int) ph_serialisation_uid);
+                                        serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByphiwms_mobileUUID(db, (int) ph_serialisation_uid);
                                     }
 
                                     resultat = serialisation_courante.getResultat();

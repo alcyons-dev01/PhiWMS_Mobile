@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
 /**
@@ -72,7 +71,7 @@ public class Preparation_Ligne implements Serializable, Comparable {
     private double Qte_CommandeLiv3;
     private double Qte_CommandeLiv4;
     private double Qte_CommandeLiv5;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Preparation_Ligne(int _UID, String du, String au, String réf_depot, String code_IPP, String nom, int code_prod, int code_frs, String frs, String produit, String ref_prod, double conso_prévue, double conso_Cond, String cycle, String statut, double RAD, int code_Cycle, Boolean livraison_directe, double RAC, int code_depot, String catégorie, String n_Commande, int code_ligne_com, double stock_Actuel, double stock_Final, Boolean prioritaire, double stock_sécurité, String date_commande, String date_livraison, String date_Délivrance, double cond_Achat, double cond_Distribution, Boolean respect_cond_achat, double stock_Idéal, String SYS_DT_MAJ, String SYS_HEURE_MAJ, String SYS_USER_MAJ, Boolean patient, String réf_Antenne, int ID_Prevision, double pxrix_Unit, double mt_HT, double tx_TVA, double mt_TTC, Boolean dotation_Protocole, double reste_A_Consomme, double qte_Besoin, Boolean prescription, int nb_Patient, double qte_CommandeLiv1, double qte_CommandeLiv2, double reliquat, double qte_CommandeLiv3, double qte_CommandeLiv4, double qte_CommandeLiv5) {
         this._UID = _UID;
@@ -254,15 +253,15 @@ public class Preparation_Ligne implements Serializable, Comparable {
         this.Qte_CommandeLiv3 = cursor.getDouble(Preparation_LigneOpenHelper.Constantes.NUM_COL_QTE_COMMANDELIV3_PREPARATION_LIGNE);
         this.Qte_CommandeLiv4 = cursor.getDouble(Preparation_LigneOpenHelper.Constantes.NUM_COL_QTE_COMMANDELIV4_PREPARATION_LIGNE);
         this.Qte_CommandeLiv5 = cursor.getDouble(Preparation_LigneOpenHelper.Constantes.NUM_COL_QTE_COMMANDELIV5_PREPARATION_LIGNE);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int get_UID() {
@@ -788,7 +787,7 @@ public class Preparation_Ligne implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Preparation_Ligne preparation_ligne = (Preparation_Ligne) obj;
 
-        if (this.getPhiMR4UUID() == preparation_ligne.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == preparation_ligne.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.get_UID() > preparation_ligne.get_UID() ? 1 : -1;

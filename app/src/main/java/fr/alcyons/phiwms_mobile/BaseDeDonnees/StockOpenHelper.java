@@ -43,7 +43,7 @@ public class StockOpenHelper extends DBOpenHelper {
         // Insertion du dépot en BDD
         long rowId = db.insert(Constantes.TABLE_STOCK, null, contentValues);
 
-        stock.setPhiMR4UUID((int) rowId);
+        stock.setphiwms_mobileUUID((int) rowId);
 
         return rowId;
     }
@@ -223,7 +223,7 @@ public class StockOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_STOCK = "CREATE TABLE " + Constantes.TABLE_STOCK
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_DEPOT_REFERENCE_STOCK + " " + Constantes.TYPE_COL_DEPOT_REFERENCE_STOCK + " ,"
                 + Constantes.CLE_COL_STO_DT_INVENTAIRE_STOCK + " " + Constantes.TYPE_COL_STO_DT_INVENTAIRE_STOCK + " ,"
                 + Constantes.CLE_COL_STO_QTE_INVENT_STOCK + " " + Constantes.TYPE_COL_STO_QTE_INVENT_STOCK + " ,"

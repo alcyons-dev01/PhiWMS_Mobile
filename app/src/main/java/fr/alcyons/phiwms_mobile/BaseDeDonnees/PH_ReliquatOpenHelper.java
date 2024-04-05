@@ -100,7 +100,7 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_BL_Numero, objet.getBL_Numero());
 
         long rowID = db.insert(Constantes.TABLE_PH_RELIQUAT, null, contentValues);
-        objet.setPhiMR4UUID((int) rowID);
+        objet.setphiwms_mobileUUID((int) rowID);
         return rowID;
     }
 
@@ -154,14 +154,14 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_SERIALISATION_RECEPTION, ph_Reliquat.isSerialiserReception());
         contentValues.put(Constantes.CLE_COL_SERIE, ph_Reliquat.getSerie());
         contentValues.put(Constantes.CLE_COL_BL_Numero, ph_Reliquat.getBL_Numero());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID, ph_Reliquat.getPhiMR4UUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, ph_Reliquat.getphiwms_mobileUUID());
 
-        return db.update(Constantes.TABLE_PH_RELIQUAT, contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + ph_Reliquat.getPhiMR4UUID(), null);
+        return db.update(Constantes.TABLE_PH_RELIQUAT, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + ph_Reliquat.getphiwms_mobileUUID(), null);
     }
 
-    public static PH_Reliquat getPH_ReliquatByPhiMR4UUID(SQLiteDatabase db, int id) {
+    public static PH_Reliquat getPH_ReliquatByphiwms_mobileUUID(SQLiteDatabase db, int id) {
         PH_Reliquat phReliquat = null;
-        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_RELIQUAT + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=? ", new String[]{String.valueOf(id)});
+        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_RELIQUAT + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=? ", new String[]{String.valueOf(id)});
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
             phReliquat = new PH_Reliquat(cursor);
@@ -233,7 +233,7 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
     }
 
     public void supprimerUnPhReliquat(SQLiteDatabase db, PH_Reliquat ph_reliquat) {
-        db.delete(Constantes.TABLE_PH_RELIQUAT, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(ph_reliquat.getPhiMR4UUID())});
+        db.delete(Constantes.TABLE_PH_RELIQUAT, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(ph_reliquat.getphiwms_mobileUUID())});
     }
 
     public static class Constantes implements BaseColumns {
@@ -386,7 +386,7 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_PH_RELIQUAT = " CREATE TABLE       " + Constantes.TABLE_PH_RELIQUAT
                 + "(" +
-                DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + "    PRIMARY KEY,"
+                DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + "    PRIMARY KEY,"
                 + Constantes.CLE_COL_RELIQUAT_UID_PH_RELIQUAT + " " + Constantes.TYPE_COL_RELIQUAT_UID_PH_RELIQUAT + " , "
                 + Constantes.CLE_COL_PRODUITID_PH_RELIQUAT + "   " + Constantes.TYPE_COL_PRODUITID_PH_RELIQUAT + " , "
                 + Constantes.CLE_COL_PRODUIT_REFERENCE_PH_RELIQUAT + "   " + Constantes.TYPE_COL_PRODUIT_REFERENCE_PH_RELIQUAT + " , "

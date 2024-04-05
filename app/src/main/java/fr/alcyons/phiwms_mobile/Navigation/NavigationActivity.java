@@ -38,18 +38,16 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.NotificationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ServiceOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.UtilisateurOpenHelper;
-import com.example.phiwms_mobile.BuildConfig;
+import fr.alcyons.phiwms_mobile.BuildConfig;
 import fr.alcyons.phiwms_mobile.Classes.PerimetreFonctionnel;
 import fr.alcyons.phiwms_mobile.Classes.Service;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.ListPerimetreAdapter;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.NavigationAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionListeServices;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotoApercu;
 import fr.alcyons.phiwms_mobile.PrisePhoto.PrisePhoto;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 import com.github.clans.fab.FloatingActionButton;
 
@@ -193,14 +191,14 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                                 String videoServiceCourant = planHabilitationJSONObject.getString("video");
                                 String whitePaperServiceCourant= planHabilitationJSONObject.getString("whitepaper");
                                 int score = planHabilitationJSONObject.getInt("score");
-                                int phimr4uuid = 0;
+                                int phiwms_mobileuuid = 0;
                                 Service serviceBDD = ServiceOpenHelper.getServiceByID(db, idServiceCourant);
                                 if(serviceBDD != null)
                                 {
-                                    phimr4uuid = serviceBDD.getPhiMR4UUID();
+                                    phiwms_mobileuuid = serviceBDD.getphiwms_mobileUUID();
                                 }
 
-                                Service service = new Service(idServiceCourant, nomServiceCourant, ordreServiceCourant, idPerimetreFonctionnelServiceCourant, nomPerimetreFonctionnelServiceCourant, statutServiceCourant, indicateurServiceCourant, descriptionServiceCourant, videoServiceCourant, whitePaperServiceCourant, score, phimr4uuid);
+                                Service service = new Service(idServiceCourant, nomServiceCourant, ordreServiceCourant, idPerimetreFonctionnelServiceCourant, nomPerimetreFonctionnelServiceCourant, statutServiceCourant, indicateurServiceCourant, descriptionServiceCourant, videoServiceCourant, whitePaperServiceCourant, score, phiwms_mobileuuid);
                                 serviceList.add(service);
                             }
                             utilisateurConnecte.setServicesHabilites(serviceList);
@@ -484,7 +482,7 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                     if (serviceSelectionne != null) {
 
                         Class classe_demande = OutilsGestionListeServices.recupererActiviteCorrespondanteAUnService(serviceSelectionne);
-                        if (classe_demande.getName().contentEquals("com.example.phiwms_mobile.ServiceEnCreationActivity")) {
+                        if (classe_demande.getName().contentEquals("fr.alcyons.phiwms_mobile.ServiceEnCreationActivity")) {
                             afficherSnackBar("EnCoursDeDeveloppement");
                         } else {
                             serviceSelectionne.setScore(serviceSelectionne.getScore()+1);

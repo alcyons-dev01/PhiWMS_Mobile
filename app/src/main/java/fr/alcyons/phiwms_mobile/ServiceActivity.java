@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
-import com.example.phiwms_mobile.R;
 import com.google.android.material.navigation.NavigationView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -186,7 +185,7 @@ public class ServiceActivity extends MenuActivity {
                     if (serviceSelectionne != null) {
 
                         Class classe_demande = OutilsGestionListeServices.recupererActiviteCorrespondanteAUnService(serviceSelectionne);
-                        if(classe_demande.getName().contentEquals("com.example.phiwms_mobile.ServiceEnCreationActivity"))
+                        if(classe_demande.getName().contentEquals("fr.alcyons.phiwms_mobile.ServiceEnCreationActivity"))
                         {
                             afficherSnackBar("EnCoursDeDeveloppement");
                         }
@@ -195,7 +194,7 @@ public class ServiceActivity extends MenuActivity {
                             //on gere le score du service
                             serviceSelectionne.setScore(serviceSelectionne.getScore()+1);
                             ServiceOpenHelper.mettreAJourUnServiceEnBD(db, serviceSelectionne);
-                            gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ServiceOpenHelper.Constantes.TABLE_SERVICE, serviceSelectionne.getPhiMR4UUID(), serviceSelectionne.getId(), DBOpenHelper.ActionsEAS.MAJ);
+                            gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ServiceOpenHelper.Constantes.TABLE_SERVICE, serviceSelectionne.getphiwms_mobileUUID(), serviceSelectionne.getId(), DBOpenHelper.ActionsEAS.MAJ);
 
                             // Appeler l'activité correspondante au service sélectionné
                             Intent intentVersService = new Intent(context, classe_demande);
@@ -259,7 +258,7 @@ public class ServiceActivity extends MenuActivity {
 
             toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
-            getSupportActionBar().setIcon(R.drawable.ic_phimr4_logo);
+            getSupportActionBar().setIcon(R.drawable.ic_phiwms_mobile_logo);
             getSupportActionBar().setTitle("");
 
             if(serviceActuel != null)

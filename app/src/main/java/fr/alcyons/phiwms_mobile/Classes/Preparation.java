@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
 /**
@@ -44,7 +43,7 @@ public class Preparation implements Serializable, Comparable {
     private String Date_Livraison3;
     private String Date_Livraison4;
     private String Date_Livraison5;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
 
     public Preparation(int ID, String ref_depot, String cycle, int ID_Cycle, int annee, int mois, double montant_HT, double montant_TTC, Boolean validée, Boolean proposée, String cycle_Depot, Boolean domicile, String statut, String date_inventaire, String date_Livraison2, double montant_TVA, int ID_Depot, String num_Bon_Prev, String date_Livraison1, Boolean preparation_Nominative, String IPP_Patient, String nom_Patient, String CB_Bon_Commande_Patient, String date_Prevision, String date_Livraison3, String date_Livraison4, String date_Livraison5) {
@@ -143,15 +142,15 @@ public class Preparation implements Serializable, Comparable {
         this.Date_Livraison3 = cursor.getString(PreparationOpenHelper.Constantes.NUM_COL_DATE_LIVRAISON3_PREPARATION);
         this.Date_Livraison4 = cursor.getString(PreparationOpenHelper.Constantes.NUM_COL_DATE_LIVRAISON4_PREPARATION);
         this.Date_Livraison5 = cursor.getString(PreparationOpenHelper.Constantes.NUM_COL_DATE_LIVRAISON5_PREPARATION);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getID() {
@@ -425,7 +424,7 @@ public class Preparation implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Preparation preparation = (Preparation) obj;
 
-        if (this.getPhiMR4UUID() == preparation.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == preparation.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.getID() > preparation.getID() ? 1 : -1;

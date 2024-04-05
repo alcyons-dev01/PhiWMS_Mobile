@@ -28,7 +28,7 @@ public class Depot_Emplacement implements Serializable, Comparable {
     private int DepotID;
     private String Depot_Reference;
     private String Code_GLN;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public Depot_Emplacement(String adressage, String hall, String paletier, String alveole, String niveau, int zoneID, int depotID, String depot_Reference, String Code_GLN) {
         this.Adressage = adressage;
@@ -73,15 +73,15 @@ public class Depot_Emplacement implements Serializable, Comparable {
         this.Depot_Reference = cursor.getString(EmplacementOpenHelper.Constantes.NUM_COL_DEPOT_REFERENCE_DEPOT_EMPLACEMENT);
         this.Depot_Reference = cursor.getString(EmplacementOpenHelper.Constantes.NUM_COL_CODE_GLN_DEPOT_EMPLACEMENT);
         this.Code_GLN = cursor.getString(EmplacementOpenHelper.Constantes.NUM_COL_CODE_GLN_DEPOT_EMPLACEMENT);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int get_UID() {
@@ -181,7 +181,7 @@ public class Depot_Emplacement implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Depot_Emplacement depot_emplacement = (Depot_Emplacement) obj;
 
-        if (this.getPhiMR4UUID() == depot_emplacement.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == depot_emplacement.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.get_UID() > depot_emplacement.get_UID() ? 1 : -1;

@@ -74,7 +74,7 @@ public class PH_Preparation implements Serializable, Comparable {
     private String delivranceValider_A;
     private String delivranceValider_Le;
     private int delivranceValider_Par;
-    private int phiMR4UUID = -1;
+    private int phiwms_mobileUUID = -1;
 
     public PH_Preparation(int UID, String PHIE_Tag, String saisie_Le, String a_tel_heure, int qte_demandee, boolean livree, boolean validee, String origine, String liste, int depotDestinataireID, String depotDestinataireReference, String SYS_DT_MAJ, String SYS_HEURE_MAJ, String SYS_USER_MAJ, String prescription_date, String depotOrigineReference, int depotOrigineID, String commentaires, String preparationDate, String livraisonPrevueDate, int montant_HT, int montant_TTC, int poids, int commande_ID, String preparateur, String statut, String livraisonDate, String previsionDateDebut, String previsionDateFin, boolean URGENT, int preparateur_userID, int pharmacien_userID, int volume, int paletteNB, int ColisNB, int Conteneur_NB, String numero_scelle)
     {
@@ -300,7 +300,7 @@ public class PH_Preparation implements Serializable, Comparable {
         this.pharmacien_userID = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_PHARMACIEN_USERID_PH_PREPARATION);
         this.Volume = cursor.getDouble(PH_PreparationOpenHelper.Constantes.NUM_COL_VOLUME_PH_PREPARATION);
         this.PaletteNB = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_PALETTENB_PH_PREPARATION);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }*/
 
 
@@ -330,7 +330,7 @@ public class PH_Preparation implements Serializable, Comparable {
         this.Conteneur_NB = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_CONTENEUR_NB);
         this.numero_scelle = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_NUMERO_SCELLE);
         this.PaletteNB = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_PALETTENB_PH_PREPARATION);
-        this.phiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_PHIMR4UUID);
+        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
         this.Preparateur = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_PREPARATEUR_PH_PREPARATION);
         this.pharmacien_userID = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_PHARMACIEN_USERID_PH_PREPARATION);
         this.delivranceValider_A = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_DELIVRANCE_VALIDER_A);
@@ -340,12 +340,12 @@ public class PH_Preparation implements Serializable, Comparable {
         this.TempsPreparation = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_TEMPS_PREPARATION);
     }
 
-    public int getPhiMR4UUID() {
-        return phiMR4UUID;
+    public int getphiwms_mobileUUID() {
+        return phiwms_mobileUUID;
     }
 
-    public void setPhiMR4UUID(int phiMR4UUID) {
-        this.phiMR4UUID = phiMR4UUID;
+    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+        this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
     public int getUID() {
@@ -810,7 +810,7 @@ public class PH_Preparation implements Serializable, Comparable {
     public int compareTo(Object obj) {
         PH_Preparation ph_preparation = (PH_Preparation) obj;
 
-        if (this.getPhiMR4UUID() == ph_preparation.getPhiMR4UUID()) {
+        if (this.getphiwms_mobileUUID() == ph_preparation.getphiwms_mobileUUID()) {
             return 0;
         } else {
             return this.getUID() > ph_preparation.getUID() ? 1 : -1;

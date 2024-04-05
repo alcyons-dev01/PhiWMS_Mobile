@@ -46,7 +46,7 @@ public class Stock_Lot_EmplacementLightOpenHelper extends DBOpenHelper {
         // Insertion du dépot en BDD
         long rowId = db.insert(Constantes.TABLE_STOCK_LOT_EMPLACEMENT, null, contentValues);
 
-        stock_lot_emplacement.setPhiMR4UUID((int) rowId);
+        stock_lot_emplacement.setphiwms_mobileUUID((int) rowId);
 
         return rowId;
     }
@@ -64,9 +64,9 @@ public class Stock_Lot_EmplacementLightOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_PEREMPTIONDATE_STOCK_LOT_EMPLACEMENT, stock_lot_emplacement.getPeremptionDate());
         contentValues.put(Constantes.CLE_COL_QTE_PREPARER_STOCK_LOT_EMPLACEMENT, stock_lot_emplacement.getQte_Preparer());
         contentValues.put(Constantes.CLE_COL_SERIE, stock_lot_emplacement.getSerie());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID, stock_lot_emplacement.getPhiMR4UUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, stock_lot_emplacement.getphiwms_mobileUUID());
 
-        return db.update(Constantes.TABLE_STOCK_LOT_EMPLACEMENT, contentValues, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=" + stock_lot_emplacement.getPhiMR4UUID(), null);
+        return db.update(Constantes.TABLE_STOCK_LOT_EMPLACEMENT, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + stock_lot_emplacement.getphiwms_mobileUUID(), null);
     }
 
     public static List<Stock_Lot_Emplacement_Light> getStockLotEmplacementByStock(SQLiteDatabase db, Stock stock) {
@@ -85,7 +85,7 @@ public class Stock_Lot_EmplacementLightOpenHelper extends DBOpenHelper {
     }
 
     public static void supprimerUnStockLotEmplacement(SQLiteDatabase db, Stock_Lot_Emplacement_Light stockLotEmplacement) {
-        db.delete(Constantes.TABLE_STOCK_LOT_EMPLACEMENT, DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(stockLotEmplacement.getPhiMR4UUID())});
+        db.delete(Constantes.TABLE_STOCK_LOT_EMPLACEMENT, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(stockLotEmplacement.getphiwms_mobileUUID())});
     }
 
     public static List<Stock_Lot_Emplacement_Light> getAllStock_Lot_EmplacementsByProduitIDEtCommandeNumero(SQLiteDatabase db, Produit produit, String critereCommandeNumero) {
@@ -163,9 +163,9 @@ public class Stock_Lot_EmplacementLightOpenHelper extends DBOpenHelper {
         return stockLotEmplacementLight;
     }
 
-    public static Stock_Lot_Emplacement_Light getStock_Lot_EmplacementByPhiMR4UUID(SQLiteDatabase db, int id) {
+    public static Stock_Lot_Emplacement_Light getStock_Lot_EmplacementByphiwms_mobileUUID(SQLiteDatabase db, int id) {
         Stock_Lot_Emplacement_Light stockLotEmplacementLight = null;
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_STOCK_LOT_EMPLACEMENT + " WHERE  " + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + "=?", new String[]{String.valueOf(id)});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_STOCK_LOT_EMPLACEMENT + " WHERE  " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(id)});
 
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
@@ -215,7 +215,7 @@ public class Stock_Lot_EmplacementLightOpenHelper extends DBOpenHelper {
 
         public static final String CREATION_TABLE_STOCK_LOT_EMPLACEMENT = "CREATE TABLE " + Constantes.TABLE_STOCK_LOT_EMPLACEMENT
                 + "("
-                + DBOpenHelper.Constantes.CLE_COL_PHIMR4UUID + " " + DBOpenHelper.Constantes.TYPE_COL_PHIMR4UUID + " PRIMARY KEY,"
+                + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
                 + Constantes.CLE_COL_PRODUIT_CODE_STOCK_LOT_EMPLACEMENT + " " + Constantes.TYPE_COL_PRODUIT_CODE_STOCK_LOT_EMPLACEMENT + " ,"
                 + Constantes.CLE_COL_DEPOT_REFERENCE_STOCK_LOT_EMPLACEMENT + " " + Constantes.TYPE_COL_DEPOT_REFERENCE_STOCK_LOT_EMPLACEMENT + " ,"
                 + Constantes.CLE_COL_ZONE_STOCK_LOT_EMPLACEMENT + " " + Constantes.TYPE_COL_ZONE_STOCK_LOT_EMPLACEMENT + " ,"

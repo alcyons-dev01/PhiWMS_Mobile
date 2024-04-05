@@ -14,8 +14,8 @@ import android.widget.TextView;
 import com.github.gcacace.signaturepad.views.SignaturePad;
 
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
-import com.example.phiwms_mobile.Livraison.InformationLivraisonActivity;
-import com.example.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.Livraison.InformationLivraisonActivity;
+import fr.alcyons.phiwms_mobile.R;
 
 /**
  * Created by olivier on 09/01/2018.
