@@ -15,7 +15,6 @@
  */
 package fr.alcyons.phiwms_mobile.BarcodeSearch;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -33,11 +32,7 @@ import android.hardware.Camera;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.core.app.ActivityCompat;
 import android.text.Editable;
-import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
@@ -59,12 +54,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+
 import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -83,9 +82,9 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.EmplacementReceptionScann
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.FranceMVOContexte;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.PleinVideContexte;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.PleinVideLocalisationContexte;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.PreparationContexte;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.PreparationScanneeContexte;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.PreparationScanneeScanProduitContext;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.PreparationContexte;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.ProduitContexte;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.ProduitReceptionScanneeContexte;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.ReceptionPADContexte;
@@ -95,6 +94,7 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.negative.BarcodeCaptureNegativeAct
 import fr.alcyons.phiwms_mobile.Classes.ObjetReceptionScannee;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_Preparation_Adapte;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.PleinVideBarcodeAdapter;
+import fr.alcyons.phiwms_mobile.Manifest;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
@@ -294,12 +294,12 @@ public class BarcodeCaptureActivity extends ServiceActivity {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        setContentView(R.layout.activity_barcode_capture);
+        setContentView(layout.activity_barcode_capture);
 
         //initialisation des images pour le scan attendu
-        layout_image_datamatrix = (LinearLayout) findViewById(R.id.layout_image_datamatrix);
-        layout_image_document = (LinearLayout) findViewById(R.id.layout_image_document);
-        layout_image_codebarre = (LinearLayout) findViewById(R.id.layout_image_codebarre);
+        layout_image_datamatrix = (LinearLayout) findViewById(id.layout_image_datamatrix);
+        layout_image_document = (LinearLayout) findViewById(id.layout_image_document);
+        layout_image_codebarre = (LinearLayout) findViewById(id.layout_image_codebarre);
 
         // SON
         //toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
@@ -347,44 +347,44 @@ public class BarcodeCaptureActivity extends ServiceActivity {
         }
 
         // GRAPHIQUE
-        mPreview = (CameraSourcePreview) findViewById(R.id.preview);
-        mGraphicOverlay = (GraphicOverlay<BarcodeGraphic>) findViewById(R.id.graphicOverlay);
-        boutonSuppression = (FloatingActionButton) findViewById(R.id.boutonFermeture);
-        clavierMode = (FloatingActionButton) findViewById(R.id.clavierMode);
+        mPreview = (CameraSourcePreview) findViewById(id.preview);
+        mGraphicOverlay = (GraphicOverlay<BarcodeGraphic>) findViewById(id.graphicOverlay);
+        boutonSuppression = (FloatingActionButton) findViewById(id.boutonFermeture);
+        clavierMode = (FloatingActionButton) findViewById(id.clavierMode);
         clavierMode.setVisibility(View.GONE);
         //floatingActionMenu = (FloatingActionMenu) findViewById(R.id.floatingMenu);
-        compteurScan = (TextView) findViewById(R.id.compteurScan);
-        message = (TextView) findViewById(R.id.message);
-        messageFranceMVO = (TextView) findViewById(R.id.messageFranceMVO);
-        compteurReliquat = (TextView) findViewById(R.id.compteurReliquat);
-        rayonnageSelect = (TextView) findViewById(R.id.rayonnageSelect);
-        layoutlogoscan = (LinearLayout) findViewById(R.id.layoutlogoscan);
-        linearRayonnage = (LinearLayout) findViewById(R.id.linearRayonnage);
-        changeMode = (FloatingActionButton) findViewById(R.id.changeMode);
-        effacerEmplacement = (ImageView) findViewById(R.id.effacerEmplacement);
-        DesignationProduitScannee = (TextView) findViewById(R.id.DesignationProduitScannee);
-        layoutProduitPreparationADH = (LinearLayout) findViewById(R.id.layoutProduitPreparationADH);
-        quantiteProduitScannee = (EditText) findViewById(R.id.quantiteProduitScannee);
+        compteurScan = (TextView) findViewById(id.compteurScan);
+        message = (TextView) findViewById(id.message);
+        messageFranceMVO = (TextView) findViewById(id.messageFranceMVO);
+        compteurReliquat = (TextView) findViewById(id.compteurReliquat);
+        rayonnageSelect = (TextView) findViewById(id.rayonnageSelect);
+        layoutlogoscan = (LinearLayout) findViewById(id.layoutlogoscan);
+        linearRayonnage = (LinearLayout) findViewById(id.linearRayonnage);
+        changeMode = (FloatingActionButton) findViewById(id.changeMode);
+        effacerEmplacement = (ImageView) findViewById(id.effacerEmplacement);
+        DesignationProduitScannee = (TextView) findViewById(id.DesignationProduitScannee);
+        layoutProduitPreparationADH = (LinearLayout) findViewById(id.layoutProduitPreparationADH);
+        quantiteProduitScannee = (EditText) findViewById(id.quantiteProduitScannee);
         message.setVisibility(View.GONE);
-        LinearTextProduitReceptionScanne = (LinearLayout) findViewById(R.id.LinearTextProduitReceptionScanne);
-        layout_emplacement_scannee = (LinearLayout) findViewById(R.id.layout_emplacement_scannee);
+        LinearTextProduitReceptionScanne = (LinearLayout) findViewById(id.LinearTextProduitReceptionScanne);
+        layout_emplacement_scannee = (LinearLayout) findViewById(id.layout_emplacement_scannee);
         //pour la réception scannée
-        designationProduitReceptionScannee = (TextView) findViewById(R.id.designationProduitReceptionScannee);
-        CodeListe = (TextView) findViewById(R.id.CodeListe);
-        referenceProduitReceptionScannee = (TextView) findViewById(R.id.referenceProduitReceptionScannee);
-        qteProduitReceptionScannee = (TextView) findViewById(R.id.qteProduitReceptionScannee);
-        numeroLotProduitReceptionScannee = (TextView) findViewById(R.id.numeroLotProduitReceptionScannee);
-        peremptionProduitReceptionScannee = (TextView) findViewById(R.id.peremptionProduitReceptionScannee);
-        textPresentationRefProduitScannee = (TextView) findViewById(R.id.textPresentationRefProduitScannee);
-        nomEmplacementProduitReceptionScannee = (TextView) findViewById(R.id.nomEmplacementProduitReceptionScannee);
-        nomZoneProduitReceptionScannee = (TextView) findViewById(R.id.nomZoneProduitReceptionScannee);
-        boutonValiderProduitReceptionScannee = (ImageView) findViewById(R.id.boutonValiderProduitReceptionScannee);
-        LinearZoneEmplacementProduitReceptionScanne = (LinearLayout) findViewById(R.id.LinearZoneEmplacementProduitReceptionScanne);
-        imageViewArmature2 = (ImageView) findViewById(R.id.imageViewArmature2);
-        imageViewArmature1 = (ImageView) findViewById(R.id.imageViewArmature1);
-        boutonModifierEmplacementReceptionScanne = (ImageView) findViewById(R.id.boutonModifierEmplacementReceptionScanne);
-        listeReferencePleinVide = (LinearLayout) findViewById(R.id.listeReferencePleinVide);
-        listViewDemandePleinVide = (ListView) findViewById(R.id.listViewDemandePleinVide);
+        designationProduitReceptionScannee = (TextView) findViewById(id.designationProduitReceptionScannee);
+        CodeListe = (TextView) findViewById(id.CodeListe);
+        referenceProduitReceptionScannee = (TextView) findViewById(id.referenceProduitReceptionScannee);
+        qteProduitReceptionScannee = (TextView) findViewById(id.qteProduitReceptionScannee);
+        numeroLotProduitReceptionScannee = (TextView) findViewById(id.numeroLotProduitReceptionScannee);
+        peremptionProduitReceptionScannee = (TextView) findViewById(id.peremptionProduitReceptionScannee);
+        textPresentationRefProduitScannee = (TextView) findViewById(id.textPresentationRefProduitScannee);
+        nomEmplacementProduitReceptionScannee = (TextView) findViewById(id.nomEmplacementProduitReceptionScannee);
+        nomZoneProduitReceptionScannee = (TextView) findViewById(id.nomZoneProduitReceptionScannee);
+        boutonValiderProduitReceptionScannee = (ImageView) findViewById(id.boutonValiderProduitReceptionScannee);
+        LinearZoneEmplacementProduitReceptionScanne = (LinearLayout) findViewById(id.LinearZoneEmplacementProduitReceptionScanne);
+        imageViewArmature2 = (ImageView) findViewById(id.imageViewArmature2);
+        imageViewArmature1 = (ImageView) findViewById(id.imageViewArmature1);
+        boutonModifierEmplacementReceptionScanne = (ImageView) findViewById(id.boutonModifierEmplacementReceptionScanne);
+        listeReferencePleinVide = (LinearLayout) findViewById(id.listeReferencePleinVide);
+        listViewDemandePleinVide = (ListView) findViewById(id.listViewDemandePleinVide);
 
         changeMode.setLabelText("Datamatrix inversé");
 
@@ -433,8 +433,8 @@ public class BarcodeCaptureActivity extends ServiceActivity {
         // Initialisation du CONTEXTE
         if (scannerContexte != null) {
             scannerContexteInt = Integer.parseInt(scannerContexte);
-            switch (scannerContexteInt) {
-                case R.string.scannerContexteEmplacement:
+            switch (scannerContexte) {
+                case R.R.string.scannerContexteEmplacement:
                     bannerTexte = emplacementContexte.bannerTexte;
                     compteurReliquat.setVisibility(View.GONE);
                     compteurScan.setVisibility(View.GONE);
@@ -498,7 +498,7 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                             preparationScanneeScanProduitContext.emplacementProduitCourant = "";
                             preparationScanneeScanProduitContext.zoneProduitCourant = "";
                             LinearZoneEmplacementProduitReceptionScanne.setBackgroundResource(android.R.color.transparent);
-                            ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
+                            ((TextView) findViewById(id.banner)).setText(bannerTexte);
                             boutonModifierEmplacementReceptionScanne.setVisibility(View.GONE);
                             preparationScanneeScanProduitContext.scanEmplacement = true;
                         }
@@ -546,7 +546,7 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                             preparationScanneeContexte.emplacementProduitCourant = "";
                             preparationScanneeContexte.zoneProduitCourant = "";
                             LinearZoneEmplacementProduitReceptionScanne.setBackgroundResource(android.R.color.transparent);
-                            ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
+                            ((TextView) findViewById(id.banner)).setText(bannerTexte);
                             boutonModifierEmplacementReceptionScanne.setVisibility(View.GONE);
                             preparationScanneeContexte.scanEmplacement = true;
                         }
@@ -557,7 +557,7 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                     //rayonnageSelect.setText(intent.getExtras().getString("EmplacementSelect"));
                     break;
                 case R.string.scannerContexteDocument:
-                    ((ImageView)findViewById(R.id.changeMode)).setVisibility(View.GONE);
+                    ((ImageView)findViewById(id.changeMode)).setVisibility(View.GONE);
 /*
                     ((ImageView)findViewById(R.id.scannerMode)).setVisibility(View.GONE);
 */
@@ -567,7 +567,7 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                     bannerTexte = documentContext.bannerTexte;
                     break;
                 case R.string.scannerContexteAuthentification:
-                    ((ImageView)findViewById(R.id.changeMode)).setVisibility(View.GONE);
+                    ((ImageView)findViewById(id.changeMode)).setVisibility(View.GONE);
                     //((ImageView)findViewById(R.id.scannerMode)).setVisibility(View.GONE);
                     layout_image_codebarre.setVisibility(View.GONE);
                     layout_image_document.setVisibility(View.GONE);
@@ -575,14 +575,14 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                     bannerTexte = authentificationContext.bannerTexte;
                     break;
                 case R.string.scannerContexteService:
-                    ((ImageView)findViewById(R.id.changeMode)).setVisibility(View.GONE);
+                    ((ImageView)findViewById(id.changeMode)).setVisibility(View.GONE);
                     layout_image_codebarre.setVisibility(View.GONE);
                     layout_image_document.setVisibility(View.GONE);
                     layout_image_datamatrix.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
                     bannerTexte = serviceContexte.bannerTexte;
                     break;
                 case R.string.scannerContexteZoneEtEmplacement:
-                    ((ImageView)findViewById(R.id.changeMode)).setVisibility(View.GONE);
+                    ((ImageView)findViewById(id.changeMode)).setVisibility(View.GONE);
                     layout_image_codebarre.setVisibility(View.GONE);
                     layout_image_document.setVisibility(View.GONE);
                     layout_image_datamatrix.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -653,7 +653,7 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                             produitReceptionScanneeContexte.emplacementProduitCourant = "";
                             produitReceptionScanneeContexte.zoneProduitCourant = "";
                             LinearZoneEmplacementProduitReceptionScanne.setBackgroundResource(android.R.color.transparent);
-                            ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
+                            ((TextView) findViewById(id.banner)).setText(bannerTexte);
                             boutonModifierEmplacementReceptionScanne.setVisibility(View.GONE);
                             produitReceptionScanneeContexte.scanEmplacement = true;
                         }
@@ -679,7 +679,7 @@ public class BarcodeCaptureActivity extends ServiceActivity {
         }
 
         // Mise à jour GRAPHIQUE
-        ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
+        ((TextView) findViewById(id.banner)).setText(bannerTexte);
 
             // MODE RAFALE ?
         compteurScan.setVisibility(View.GONE);
@@ -774,7 +774,7 @@ public class BarcodeCaptureActivity extends ServiceActivity {
             boutonSuppression.setVisibility(View.VISIBLE);
         }
 
-        ((FloatingActionButton) findViewById(R.id.flash)).setOnClickListener(new View.OnClickListener() {
+        ((FloatingActionButton) findViewById(id.flash)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mCameraSource.getFlashMode().equals(Camera.Parameters.FLASH_MODE_OFF)) {
@@ -921,9 +921,9 @@ public class BarcodeCaptureActivity extends ServiceActivity {
 
         if (!modePhoto) {
 
-            ((FloatingActionButton) findViewById(R.id.takePictureButton)).setVisibility(View.GONE);
+            ((FloatingActionButton) findViewById(id.takePictureButton)).setVisibility(View.GONE);
 
-            ((FloatingActionButton) findViewById(R.id.scannerMode)).setOnClickListener(new View.OnClickListener() {
+            ((FloatingActionButton) findViewById(id.scannerMode)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent newIntent = new Intent(BarcodeCaptureActivity.this, ScannerSearchOnlyActivity.class);
@@ -1059,7 +1059,7 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                 }
             });
 
-            ((FloatingActionButton) findViewById(R.id.clavierMode)).setOnClickListener(new View.OnClickListener() {
+            ((FloatingActionButton) findViewById(id.clavierMode)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent clavierMode_Intent = new Intent(BarcodeCaptureActivity.this, KeyboardActivity.class);
@@ -1077,10 +1077,10 @@ public class BarcodeCaptureActivity extends ServiceActivity {
             });
 
         } else {
-            ((FloatingActionButton) findViewById(R.id.scannerMode)).setVisibility(View.GONE);
+            ((FloatingActionButton) findViewById(id.scannerMode)).setVisibility(View.GONE);
         }
 
-        ((EditText) findViewById(R.id.contenuCode)).addTextChangedListener(new TextWatcher() {
+        ((EditText) findViewById(id.contenuCode)).addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -1226,7 +1226,7 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                         finish();
                     }
                     else{
-                        ((EditText) findViewById(R.id.contenuCode)).setText("");
+                        ((EditText) findViewById(id.contenuCode)).setText("");
                     }
                 }
             }
@@ -1275,13 +1275,13 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                 case R.string.scannerContextePleinVideLocalisation:
                     pleinVideLocalisationContexte.onActivityResult(requestCode, data);
                     if(!pleinVideLocalisationContexte.code.isEmpty()){
-                        ((EditText) findViewById(R.id.contenuCode)).setText(pleinVideLocalisationContexte.code + "\n");
+                        ((EditText) findViewById(id.contenuCode)).setText(pleinVideLocalisationContexte.code + "\n");
                     }
                     break;
                 case R.string.scannerContexteDocument:
                     documentContext.onActivityResult(requestCode, data);
                     if(documentContext.code != null && !documentContext.code.isEmpty()){
-                        ((EditText) findViewById(R.id.contenuCode)).setText(documentContext.code + "\n");
+                        ((EditText) findViewById(id.contenuCode)).setText(documentContext.code + "\n");
                     }
                     break;
                 case R.string.scannerContexteAuthentification:
@@ -1290,34 +1290,34 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                     {
                         if(!authentificationContext.username.isEmpty() && !authentificationContext.password.isEmpty())
                         {
-                            ((EditText) findViewById(R.id.contenuCode)).setText("PHITAGID:"+authentificationContext.username+"PHITAGMDP:"+authentificationContext.password+"\n");
+                            ((EditText) findViewById(id.contenuCode)).setText("PHITAGID:"+authentificationContext.username+"PHITAGMDP:"+authentificationContext.password+"\n");
                         }
                     }
                     break;
                 case R.string.scannerContexteFranceMVO:
                     franceMVOContexte.onActivityResult(requestCode, data);
                     if(!franceMVOContexte.code.isEmpty()){
-                        ((EditText) findViewById(R.id.contenuCode)).setText(franceMVOContexte.code + "\n");
+                        ((EditText) findViewById(id.contenuCode)).setText(franceMVOContexte.code + "\n");
                     }
                     break;
                 case R.string.scannerContextePreparationADHScanProduit:
                     preparationScanneeScanProduitContext.onActivityResult(requestCode, data);
                     if(!preparationScanneeScanProduitContext.code.isEmpty()){
-                        ((EditText) findViewById(R.id.contenuCode)).setText(preparationScanneeScanProduitContext.code + "\n");
+                        ((EditText) findViewById(id.contenuCode)).setText(preparationScanneeScanProduitContext.code + "\n");
                     }
                     break;
                 case R.string.scannerContextePreparation:
                     preparationContexte.onActivityResult(requestCode, data);
                     if(!preparationContexte.code.isEmpty())
                     {
-                        ((EditText) findViewById(R.id.contenuCode)).setText(preparationContexte.code+"\n");
+                        ((EditText) findViewById(id.contenuCode)).setText(preparationContexte.code+"\n");
                     }
                     break;
                 case R.string.scannerContextePreparationADH:
                     preparationScanneeContexte.onActivityResult(requestCode, data);
                     if(!preparationScanneeContexte.code.isEmpty())
                     {
-                        ((EditText) findViewById(R.id.contenuCode)).setText(preparationScanneeContexte.code+"\n");
+                        ((EditText) findViewById(id.contenuCode)).setText(preparationScanneeContexte.code+"\n");
                     }
                     boutonSuppression.callOnClick();
                     break;
@@ -1346,7 +1346,7 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                 default:
                     produitContexte.onActivityResult(requestCode, data);
                     if(!produitContexte.code.isEmpty()){
-                        ((EditText) findViewById(R.id.contenuCode)).setText(produitContexte.code + "\n");
+                        ((EditText) findViewById(id.contenuCode)).setText(produitContexte.code + "\n");
                     }
                     break;
             }
@@ -1383,7 +1383,7 @@ public class BarcodeCaptureActivity extends ServiceActivity {
             }
         };
 
-        findViewById(R.id.topLayout).setOnClickListener(listener);
+        findViewById(id.topLayout).setOnClickListener(listener);
         Snackbar.make(mGraphicOverlay, R.string.permission_camera_rationale,
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.ok, listener)
@@ -1685,12 +1685,12 @@ public class BarcodeCaptureActivity extends ServiceActivity {
 
                 if (scannerContexte.contentEquals(scannerContexteProduit)) {
                     if (produitContexte.onTap(best.rawValue)) {
-                        ((EditText) findViewById(R.id.contenuCode)).setText(best.rawValue + "\n");
+                        ((EditText) findViewById(id.contenuCode)).setText(best.rawValue + "\n");
                     }
                 }
                 if (scannerContexte.contentEquals(scannerContexteFranceMVO)) {
                     if (franceMVOContexte.onTap(best.rawValue)) {
-                        ((EditText) findViewById(R.id.contenuCode)).setText(best.rawValue + "\n");
+                        ((EditText) findViewById(id.contenuCode)).setText(best.rawValue + "\n");
                     }
                 }
                 if (scannerContexte.contentEquals(scannerContextePreparationADHScanProdui)) {
@@ -1699,7 +1699,7 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                         preparationScanneeScanProduitContext.scanEmplacement = true;
                     }
                     if (preparationScanneeScanProduitContext.onTap(best.rawValue)) {
-                        ((EditText) findViewById(R.id.contenuCode)).setText(best.rawValue + "\n");
+                        ((EditText) findViewById(id.contenuCode)).setText(best.rawValue + "\n");
                         if(preparationScanneeScanProduitContext.scanEmplacement)
                         {
                             nomEmplacementProduitReceptionScannee.setVisibility(View.VISIBLE);
@@ -1785,22 +1785,22 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                                 }
                             });
                         }
-                        ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
+                        ((TextView) findViewById(id.banner)).setText(bannerTexte);
                     }
                 }
                 if (scannerContexte.contentEquals(scannerContexteEmplacement)) {
                     if (emplacementContexte.onTap(best.rawValue)) {
-                        ((EditText) findViewById(R.id.contenuCode)).setText(emplacementContexte.code + "\n");
+                        ((EditText) findViewById(id.contenuCode)).setText(emplacementContexte.code + "\n");
                     }
                 }
                 if (scannerContexte.contentEquals(scannerContexteEmplacementReceptionScannee)) {
                     if (emplacementReceptionScanneeContexte.onTap(best.rawValue)) {
-                        ((EditText) findViewById(R.id.contenuCode)).setText(emplacementReceptionScanneeContexte.code + "\n");
+                        ((EditText) findViewById(id.contenuCode)).setText(emplacementReceptionScanneeContexte.code + "\n");
                     }
                 }
                 if (scannerContexte.contentEquals(scannerContextePreparation)) {
                     if (preparationContexte.onTap(best.rawValue)) {
-                        ((EditText) findViewById(R.id.contenuCode)).setText(preparationContexte.code + "\n");
+                        ((EditText) findViewById(id.contenuCode)).setText(preparationContexte.code + "\n");
                     }
                 }
                 if (scannerContexte.contentEquals(scannerContextePreparationADH)) {
@@ -1809,7 +1809,7 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                         preparationScanneeContexte.scanEmplacement = true;
                     }
                     if (preparationScanneeContexte.onTap(best.rawValue)) {
-                        ((EditText) findViewById(R.id.contenuCode)).setText(preparationScanneeContexte.code + "\n");
+                        ((EditText) findViewById(id.contenuCode)).setText(preparationScanneeContexte.code + "\n");
                         if(preparationScanneeContexte.scanEmplacement)
                         {
                             nomEmplacementProduitReceptionScannee.setVisibility(View.VISIBLE);
@@ -1895,16 +1895,16 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                                 }
                             });
                         }
-                        ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
+                        ((TextView) findViewById(id.banner)).setText(bannerTexte);
                     }
                 }
                 if (scannerContexte.contentEquals(scannerContextePleinVide)) {
                     if(best.rawValue.contentEquals("PHITAGACTION_Ajouter") && !pleinVideAjouter){
                         pleinVideAjouter = true;
-                        ((FloatingActionButton) findViewById(R.id.clavierMode)).callOnClick();
+                        ((FloatingActionButton) findViewById(id.clavierMode)).callOnClick();
                     }
                     else {
-                        ((EditText) findViewById(R.id.contenuCode)).setText(best.rawValue + "\n");
+                        ((EditText) findViewById(id.contenuCode)).setText(best.rawValue + "\n");
                         if(best.rawValue.contentEquals("PHITAGACTION_Valider")){
                             boutonSuppression.callOnClick();
                         }
@@ -1912,27 +1912,27 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                 }
                 if(scannerContexte.contentEquals(scannerContextePleinVideLocalisation)){
                     //toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
-                    ((EditText) findViewById(R.id.contenuCode)).setText(best.rawValue + "\n");
+                    ((EditText) findViewById(id.contenuCode)).setText(best.rawValue + "\n");
                 }
                 if(scannerContexte.contentEquals(scannerContexteDocument)){
                     //toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
-                    ((EditText) findViewById(R.id.contenuCode)).setText(best.rawValue + "\n");
+                    ((EditText) findViewById(id.contenuCode)).setText(best.rawValue + "\n");
                 }
                 if(scannerContexte.contentEquals(scannerContexteAuthentification)){
                     //toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
-                    ((EditText) findViewById(R.id.contenuCode)).setText(best.rawValue + "\n");
+                    ((EditText) findViewById(id.contenuCode)).setText(best.rawValue + "\n");
                 }
                 if(scannerContexte.contentEquals(scannerContextService)){
                     //toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
-                    ((EditText) findViewById(R.id.contenuCode)).setText(best.rawValue + "\n");
+                    ((EditText) findViewById(id.contenuCode)).setText(best.rawValue + "\n");
                 }
                 if(scannerContexte.contentEquals(scannerContexteZoneEtEmplacement)){
                     //toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
-                    ((EditText) findViewById(R.id.contenuCode)).setText(best.rawValue + "\n");
+                    ((EditText) findViewById(id.contenuCode)).setText(best.rawValue + "\n");
                 }
                 if(scannerContexte.contentEquals(scannerContexteProduitReceptionScannee)){
                     //toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
-                    ((EditText) findViewById(R.id.contenuCode)).setText(best.rawValue + "\n");
+                    ((EditText) findViewById(id.contenuCode)).setText(best.rawValue + "\n");
                     bannerTexte = produitReceptionScanneeContexte.bannerTexte;
 
                     if(produitReceptionScanneeContexte.scanEmplacement)
@@ -2026,11 +2026,11 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                         bannerTexte = "Scanner une référence";
                     }
 
-                    ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
+                    ((TextView) findViewById(id.banner)).setText(bannerTexte);
                 }
                 if(scannerContexte.contentEquals(scannerContexteReceptionPAD)){
                     //toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
-                    ((EditText) findViewById(R.id.contenuCode)).setText(best.rawValue + "\n");
+                    ((EditText) findViewById(id.contenuCode)).setText(best.rawValue + "\n");
                     bannerTexte = receptionPADContexte.bannerTexte;
 
                     referenceProduitReceptionScannee.setText(receptionPADContexte.referenceProduitCourant);
@@ -2099,11 +2099,11 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                         }
                     });
                     bannerTexte = "Scanner une référence";
-                    ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
+                    ((TextView) findViewById(id.banner)).setText(bannerTexte);
                 }
                 if(scannerContexte.contentEquals(scannerContexteControleDesRetours)){
                     //toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
-                    ((EditText) findViewById(R.id.contenuCode)).setText(best.rawValue + "\n");
+                    ((EditText) findViewById(id.contenuCode)).setText(best.rawValue + "\n");
                     bannerTexte = controleDesRetourScanContext.bannerTexte;
 
                     referenceProduitReceptionScannee.setText(controleDesRetourScanContext.referenceProduitCourant);
@@ -2174,7 +2174,7 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                         }
                     });
                     bannerTexte = "Scanner une référence";
-                    ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
+                    ((TextView) findViewById(id.banner)).setText(bannerTexte);
                 }
             //}
             return true;
@@ -2187,20 +2187,17 @@ public class BarcodeCaptureActivity extends ServiceActivity {
 /*        if (floatingActionMenu.isOpened()) {
             floatingActionMenu.close(true);
         } else*/
-        if(scannerContexte.contentEquals(scannerContexteAuthentification))
-        {
+        super.onBackPressed();
+        if (scannerContexte.contentEquals(scannerContexteAuthentification)) {
             BarcodeCaptureActivity.this.finish();
-        }
-        else if(scannerContexte.contentEquals(scannerContextePleinVideLocalisation))
-        {
+        } else if (scannerContexte.contentEquals(scannerContextePleinVideLocalisation)) {
             Intent resultIntent = new Intent();
             Bundle extras = new Bundle();
             extras.putString("code", "");
             resultIntent.putExtras(extras);
             setResult(CodesEchangesActivites.RESULT_PLEINVIDE_LOCALISATION, resultIntent);
             finish();
-        }
-        else if (modeRafale) {
+        } else if (modeRafale) {
             // Dans le cas du mode rafale on subodore que le fait de backPresser est équivalent à cliquer sur bouton suppression
             boutonSuppression.callOnClick();
         } else {
@@ -2275,12 +2272,12 @@ public class BarcodeCaptureActivity extends ServiceActivity {
         Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
         if(message.contentEquals("Produit préparé"))
         {
-            layout.setBackgroundColor(getResources().getColor(R.color.vert3, null));
+            layout.setBackgroundColor(getResources().getColor(color.vert3, null));
 
         }
         else if(message.contentEquals("Produit déjà préparé en intégralité"))
         {
-            layout.setBackgroundColor(getResources().getColor(R.color.rouge2, null));
+            layout.setBackgroundColor(getResources().getColor(color.rouge2, null));
             //toneGen1.startTone(ToneGenerator.TONE_CDMA_HIGH_PBX_SSL,250);
             //Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
             // Vibrate for 500 milliseconds
@@ -2293,10 +2290,10 @@ public class BarcodeCaptureActivity extends ServiceActivity {
         }
         else
         {
-            layout.setBackgroundColor(getResources().getColor(R.color.rouge2, null));
+            layout.setBackgroundColor(getResources().getColor(color.rouge2, null));
         }
 
-        TextView textView = (TextView) layout.findViewById(R.id.snackbar_text);
+        TextView textView = (TextView) layout.findViewById(id.snackbar_text);
         textView.setGravity(Gravity.CENTER_HORIZONTAL);
         textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
@@ -2328,11 +2325,11 @@ public class BarcodeCaptureActivity extends ServiceActivity {
         LayoutInflater inflater = BarcodeCaptureActivity.this.getLayoutInflater();
         View layout = inflater.inflate(R.layout.alerte_france_mvo, null);
 
-        TextView DesignationProduitFranceMVO = (TextView) layout.findViewById(R.id.DesignationProduitFranceMVO);
-        TextView NumeroSerieFranceMVO = (TextView) layout.findViewById(R.id.NumeroSerieFranceMVO);
-        TextView ResultatFranceMVO = (TextView) layout.findViewById(R.id.ResultatFranceMVO);
-        TextView MotifFranceMVO = (TextView) layout.findViewById(R.id.MotifFranceMVO);
-        LinearLayout fermerAlerteLinearLayout = (LinearLayout) layout.findViewById(R.id.fermerAlerteLinearLayout);
+        TextView DesignationProduitFranceMVO = (TextView) layout.findViewById(id.DesignationProduitFranceMVO);
+        TextView NumeroSerieFranceMVO = (TextView) layout.findViewById(id.NumeroSerieFranceMVO);
+        TextView ResultatFranceMVO = (TextView) layout.findViewById(id.ResultatFranceMVO);
+        TextView MotifFranceMVO = (TextView) layout.findViewById(id.MotifFranceMVO);
+        LinearLayout fermerAlerteLinearLayout = (LinearLayout) layout.findViewById(id.fermerAlerteLinearLayout);
 
         DesignationProduitFranceMVO.setText(produitDesignation);
         NumeroSerieFranceMVO.setText(numeroSerie);
