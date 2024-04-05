@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="fr.alcyons.phimr4.ServiceActivity">
+    tools:context="com.example.phiwms_mobile.fr.example.phiwms_mobile.ServiceActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -49,7 +49,7 @@
             android:id="@+id/contenuPage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"></LinearLayout>
+            android:orientation="vertical" />
 
 
     </LinearLayout>

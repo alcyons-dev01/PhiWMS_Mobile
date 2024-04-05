@@ -259,5 +259,12 @@
     <string name="envoyer">Envoyer</string>
     <string name="information">Information</string>
     <string name="todo">TODO</string>
+    <string name="se_connecter">Se connecter</string>
+    <string name="nbele">nbEle</string>
+    <string name="l_ments_synchroniser">Éléments à synchroniser</string>
+    <string name="mot_de_passe">Mot de passe</string>
+    <string name="identifiant">Identifiant</string>
+    <string name="bouton_scan">bouton scan</string>
+    <string name="logophiwms">logoPhiWMS</string>
 
 </resources>

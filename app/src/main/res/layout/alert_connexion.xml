@@ -388,7 +388,7 @@
                 android:textColor="@android:color/black" />
         </LinearLayout>
 
-        <com.github.aakira.expandablelayout.ExpandableRelativeLayout
+        <!--<com.github.aakira.expandablelayout.ExpandableRelativeLayout
             android:id="@+id/expandableLayout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -467,7 +467,7 @@
 
             </LinearLayout>
 
-        </com.github.aakira.expandablelayout.ExpandableRelativeLayout>
+        </com.github.aakira.expandablelayout.ExpandableRelativeLayout>-->
 
 
     </LinearLayout>
