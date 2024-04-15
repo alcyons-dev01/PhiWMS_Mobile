@@ -79,7 +79,7 @@ public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
         // Insertion du dépot en BDD
         long rowId = db.insert(Constantes.TABLE_PH_PREPARATION_LIGNE, null, contentValues);
 
-        ph_preparation_ligne.setphiwms_mobileUUID((int) rowId);
+        ph_preparation_ligne.setPhiMR4UUID((int) rowId);
 
         return rowId;
     }

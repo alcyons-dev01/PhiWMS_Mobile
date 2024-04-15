@@ -28,6 +28,7 @@ import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity
 //import fr.alcyons.phiwms_mobile.DemandeProtocolePAD.ServiceDemandeProtocolePADActivity;
 //import fr.alcyons.phiwms_mobile.DemandeReassort.ServiceDemandeReassortActivity;
 //import fr.alcyons.phiwms_mobile.Destruction.ServiceDestructionActivity;
+import fr.alcyons.phiwms_mobile.Destruction.ServiceDestructionActivity;
 import fr.alcyons.phiwms_mobile.DispositifAuLivret.ServiceDispositifAuLivretActivity;
 //import fr.alcyons.phiwms_mobile.DotationService.ServiceDotationServiceActivity;
 import fr.alcyons.phiwms_mobile.IdentificationParScan.ListeProduitsIdentificationParScanActivity;
@@ -58,6 +59,8 @@ import fr.alcyons.phiwms_mobile.ReceptionPAD.ServiceReceptionPadActivity;
 //import fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity;
 //import fr.alcyons.phiwms_mobile.Serialisation.ServiceSerialisationActivity;
 import fr.alcyons.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity;
+import fr.alcyons.phiwms_mobile.RetourFournisseur.ServiceRetourFournisseurActivity;
+import fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity;
 import fr.alcyons.phiwms_mobile.ServiceEnCreationActivity;
 import fr.alcyons.phiwms_mobile.VerrouPharmacie.ServiceVerrouPharmacieActivity;
 //import fr.alcyons.phiwms_mobile.Stock.ServiceStockActivity;
@@ -139,7 +142,7 @@ public class OutilsGestionListeServices {
             case "Verrou Pharmacie Préparation externe":
                 return ServiceVerrouPharmacieActivity.class;
             case "Verrou Pharmacie Préparation Externe":
-                //return ServiceVerrouPharmacieActivity.class;
+                return ServiceVerrouPharmacieActivity.class;
             case "Verrou Pharmacie Préparation interne":
                // return ServiceVerrouPharmacieInterneActivity.class;
             case "Inventaire scanner":
@@ -154,11 +157,11 @@ public class OutilsGestionListeServices {
             case "Contrôle des retours Scan":
               //  return ServiceControleRetoursScanneeActivity.class;
             case "Retour PUI":
-              //  return ServiceRetourPUIActivity.class;
+                return ServiceRetourPUIActivity.class;
             case "Retour Frs":
-              //  return ServiceRetourFournisseurActivity.class;
+                return ServiceRetourFournisseurActivity.class;
             case "Destruction":
-               // return ServiceDestructionActivity.class;
+                return ServiceDestructionActivity.class;
             case "Plan de Placements":
                 //return ServicePlanDePlacementActivity.class;
               //  return ListeProduitsPlanDePlacementActivity.class;

@@ -59,7 +59,7 @@ public class RetourAdapter extends ArrayAdapter implements Filterable {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_retour_new, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_retour, parent, false);
         }
 
         RetourViewHolder viewHolder = (RetourViewHolder) convertView.getTag();

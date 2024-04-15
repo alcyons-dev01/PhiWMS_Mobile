@@ -90,7 +90,7 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail_controle_retours_new);
+        setContentView(R.layout.activity_detail_controle_retours);
 
         //initialisation du context
         context = DetailsControleRetoursActivity.this;
