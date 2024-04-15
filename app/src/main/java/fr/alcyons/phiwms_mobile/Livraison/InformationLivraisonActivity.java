@@ -54,6 +54,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Preparation_Ligne_LivraisonAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.Dialogue;
@@ -160,7 +161,7 @@ public class InformationLivraisonActivity extends ServiceActivity {
             ph_preparation_Selectionne.setLivree(true);
             PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, ph_preparation_Selectionne);
 
-            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation_Selectionne.getphiwms_mobileUUID(), ph_preparation_Selectionne.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation_Selectionne.getPhiMR4UUID(), ph_preparation_Selectionne.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
 
             // Tentative de lancer la sychronisation
             if (OutilsGestionConnexionReseau.isServerAccessible(InformationLivraisonActivity.this)) {
@@ -189,7 +190,7 @@ public class InformationLivraisonActivity extends ServiceActivity {
                 }
 
                 PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, preparation_ligne_courant);
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, preparation_ligne_courant.getphiwms_mobileUUID(), preparation_ligne_courant.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, preparation_ligne_courant.getPhiMR4UUID(), preparation_ligne_courant.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
 
                 //gestion des actions lignes
                 Random randomactionligne = new Random();
@@ -359,12 +360,12 @@ public class InformationLivraisonActivity extends ServiceActivity {
                 {
                     preparation_ligne.setQte_livrer(0);
                     PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, preparation_ligne);
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, preparation_ligne.getphiwms_mobileUUID(), preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, preparation_ligne.getPhiMR4UUID(), preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
                 }
                 PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, ph_preparation_Selectionne);
 
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation_Selectionne.getphiwms_mobileUUID(), ph_preparation_Selectionne.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
-                gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getphiwms_mobileUUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation_Selectionne.getPhiMR4UUID(), ph_preparation_Selectionne.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+                gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
 
                 // Tentative de lancer la sychronisation
                 if (OutilsGestionConnexionReseau.isServerAccessible(InformationLivraisonActivity.this)) {
@@ -700,10 +701,7 @@ public class InformationLivraisonActivity extends ServiceActivity {
 
     @Override
     public void onBackPressed() {
-        /*Intent serviceLivraison_Intent = new Intent(InformationLivraisonActivity.this, ServiceLivraisonActivity.class);
-        Bundle serviceLivraison_Bundle = InformationLivraisonActivity.super.getBundle();
-        serviceLivraison_Intent.putExtras(serviceLivraison_Bundle);
-        InformationLivraisonActivity.this.startActivity(serviceLivraison_Intent);*/
+        super.onBackPressed();
         Intent serviceLivraison_Intent = new Intent(InformationLivraisonActivity.this, ListePointDeLivraison.class);
         Bundle serviceLivraison_Bundle = InformationLivraisonActivity.super.getBundle();
         serviceLivraison_Intent.putExtras(serviceLivraison_Bundle);
@@ -728,7 +726,7 @@ public class InformationLivraisonActivity extends ServiceActivity {
         PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, ph_preparation);
 
         // Ajout du PH_Preparation au ElementASynchroniser
-        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation.getphiwms_mobileUUID(), ph_preparation.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation.getPhiMR4UUID(), ph_preparation.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
 
         // Tentative de lancer la sychronisation
         if (OutilsGestionConnexionReseau.isServerAccessible(InformationLivraisonActivity.this)) {

@@ -77,7 +77,7 @@ public class SYS_Document_Type implements Serializable, Comparable {
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -213,7 +213,7 @@ public class SYS_Document_Type implements Serializable, Comparable {
     public int compareTo(Object obj) {
         SYS_Document_Type sys_document_type = (SYS_Document_Type) obj;
 
-        if (this.getphiwms_mobileUUID() == sys_document_type.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == sys_document_type.getPhiMR4UUID()) {
             return 0;
         } else {
             return this.getTYD_ID() > sys_document_type.getTYD_ID() ? 1 : -1;

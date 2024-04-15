@@ -159,7 +159,7 @@ public class ReceptionPADScannerContexte {
                     rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                     if(rowId != -1)
                     {
-                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                     }
                 }
 
@@ -328,18 +328,6 @@ public class ReceptionPADScannerContexte {
 
                                         SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
 
-                                        long rowUID_surveillance = SurveillanceReferenceOpenHelper.insererSurveillanceReferenceEnBDD(db, new_surveillance_reference);
-
-                                        if (rowUID_surveillance != -1) {
-                                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE, new_surveillance_reference.getSerialexpressUUID(), new_surveillance_reference.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
-
-                                            try {
-                                                EnvoyerMailSurveillance class_mail = new EnvoyerMailSurveillance();
-                                                class_mail.EnvoyerMailSerialisation(new_surveillance_reference.get_UID(), utilisateurConnecte.getMail(), db);
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
 
                                         ((ScannerSearchOnlyActivity) context).afficherAlerteFranceMVO(produit.getDesignation_interne(), resultat, serie, motif);
 
@@ -565,7 +553,7 @@ public class ReceptionPADScannerContexte {
                     rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                     if(rowId != -1)
                     {
-                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                     }
                 }
                 List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));

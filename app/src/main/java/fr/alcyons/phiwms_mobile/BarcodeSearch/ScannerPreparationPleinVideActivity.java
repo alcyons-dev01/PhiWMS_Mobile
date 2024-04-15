@@ -2,6 +2,7 @@ package fr.alcyons.phiwms_mobile.BarcodeSearch;
 
 import static android.view.View.GONE;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -54,6 +55,9 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ObjetReceptionScannee;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.TableTrace;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.Produit_PreparationScanneeAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.Produit_ReceptionPADAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.Produit_ReceptionScanneeAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.Mail;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
@@ -102,7 +106,7 @@ public class ScannerPreparationPleinVideActivity extends ServiceActivity {
     TextView nomZoneReceptionScannee;
     TextView nomEmplacementReceptionScannee;
     ExpandableListView ListViewProduitReceptionScannee;
-    fr.alcyons.phiwms_mobile.ListViewAdapters.Produit_ReceptionScanneeAdapter Produit_ReceptionScanneeAdapter;
+    Produit_ReceptionScanneeAdapter ProduitReceptionScanneeAdapter;
     Produit_ReceptionPADAdapter receptionPADExpandableAdapter;
     Produit_PreparationScanneeAdapter produitPreparationScanneeAdapter;
     DocumentScannerContext documentScannerContext;
@@ -194,25 +198,22 @@ public class ScannerPreparationPleinVideActivity extends ServiceActivity {
         documentScannerContext = new DocumentScannerContext(this, db);
 
         // Initialisation du CONTEXTE
-        switch (scannerContexteInt) {
-            case R.string.scannerContextePleinVide:
-                bannerTexte = intent.getExtras().getString("dotationIntitule");
-                pleinVideContexte.stringList = stringList;
-                pleinVideContexte.detailDotPleinVide_AdressageList = intent.getExtras().getStringArrayList("detailDotPleinVide_AdressageList");
-                break;
-            case R.string.scannerContextePleinVideLocalisation:
-                bannerTexte = pleinVideLocalisationContexte.bannerTexte;
-                break;
-
-            case R.string.scannerContexteService:
-                message.setVisibility(GONE);
-                compteurScan.setVisibility(GONE);
-                bannerTexte = "Scannez un service";
-                break;
-            default:
-
-                break;
+        if(scannerContexteInt == R.string.scannerContextePleinVide) {
+            bannerTexte = intent.getExtras().getString("dotationIntitule");
+            pleinVideContexte.stringList = stringList;
+            pleinVideContexte.detailDotPleinVide_AdressageList = intent.getExtras().getStringArrayList("detailDotPleinVide_AdressageList");
         }
+        else if(scannerContexteInt == R.string.scannerContextePleinVideLocalisation)
+        {
+            bannerTexte = pleinVideLocalisationContexte.bannerTexte;
+        }
+        else if(scannerContexteInt == R.string.scannerContexteService)
+        {
+            message.setVisibility(GONE);
+            compteurScan.setVisibility(GONE);
+            bannerTexte = "Scannez un service";
+        }
+
         // Mise à jour GRAPHIQUE
         ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
 
@@ -297,20 +298,17 @@ public class ScannerPreparationPleinVideActivity extends ServiceActivity {
                 if (s.toString().endsWith("\n")) {
 
                     code = "";
-                    switch (scannerContexteInt) {
-                        case R.string.scannerContextePleinVide:
-                            pleinVideContexte.onTextWatcher(s);
-                            compteurScan.setText(String.valueOf(pleinVideContexte.stringList.size()) + " produit(s) scanné(s)");
-                            break;
-                        case R.string.scannerContextePleinVideLocalisation:
-                            pleinVideLocalisationContexte.onTextWatcher(s);
-                            code = pleinVideLocalisationContexte.code;
-                            break;
-                        default:
 
-                            break;
+                    if(scannerContexteInt == R.string.scannerContextePleinVide)
+                    {
+                        pleinVideContexte.onTextWatcher(s);
+                        compteurScan.setText(String.valueOf(pleinVideContexte.stringList.size()) + " produit(s) scanné(s)");
                     }
-
+                    else if(scannerContexteInt == R.string.scannerContextePleinVideLocalisation)
+                    {
+                        pleinVideLocalisationContexte.onTextWatcher(s);
+                        code = pleinVideLocalisationContexte.code;
+                    }
 
                     if(code != null && !code.isEmpty()){
                         Intent resultIntent = new Intent();
@@ -348,19 +346,17 @@ public class ScannerPreparationPleinVideActivity extends ServiceActivity {
                 if (s.toString().endsWith("\n")) {
 
                     code = "";
-                    switch (scannerContexteInt) {
-                        case R.string.scannerContextePleinVide:
-                            pleinVideContexte.onTextWatcher(s);
-                            compteurScan.setText(String.valueOf(pleinVideContexte.stringList.size()) + " produit(s) scanné(s)");
-                            break;
-                        case R.string.scannerContextePleinVideLocalisation:
-                            pleinVideLocalisationContexte.onTextWatcher(s);
-                            code = pleinVideLocalisationContexte.code;
-                            break;
-                        default:
-                            break;
-                    }
 
+                    if(scannerContexteInt == R.string.scannerContextePleinVide)
+                    {
+                        pleinVideContexte.onTextWatcher(s);
+                        compteurScan.setText(String.valueOf(pleinVideContexte.stringList.size()) + " produit(s) scanné(s)");
+                    }
+                    else if(scannerContexteInt == R.string.scannerContextePleinVideLocalisation)
+                    {
+                        pleinVideLocalisationContexte.onTextWatcher(s);
+                        code = pleinVideLocalisationContexte.code;
+                    }
 
                     if(!code.isEmpty()){
                         Intent resultIntent = new Intent();
@@ -380,9 +376,10 @@ public class ScannerPreparationPleinVideActivity extends ServiceActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         Intent scannerSearchOnlyIntent = new Intent();
         Bundle scannerSearchOnlyBundle = new Bundle();
-        scannerSearchOnlyBundle.putString("code","");
+        scannerSearchOnlyBundle.putString("code", "");
         scannerSearchOnlyBundle.putStringArrayList("stringList", (ArrayList) pleinVideContexte.stringList);
         scannerSearchOnlyIntent.putExtras(scannerSearchOnlyBundle);
         ScannerPreparationPleinVideActivity.this.setResult(RESULT_OK, scannerSearchOnlyIntent);
@@ -407,7 +404,7 @@ public class ScannerPreparationPleinVideActivity extends ServiceActivity {
 
     //method to expand all groups
     private void expandAll() {
-        int count = Produit_ReceptionScanneeAdapter.getGroupCount();
+        int count = ProduitReceptionScanneeAdapter.getGroupCount();
         for (int i = 0; i < count; i++) {
             ListViewProduitReceptionScannee.expandGroup(i);
         }
@@ -431,20 +428,6 @@ public class ScannerPreparationPleinVideActivity extends ServiceActivity {
 
     public void afficherAlerteFranceMVO(String produitDesignation, String resultat, String numeroSerie, String motif)
     {
-       /* toneGen1.startTone(ToneGenerator.TONE_CDMA_HIGH_PBX_SSL,250);
-        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-// Vibrate for 500 milliseconds
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            v.vibrate(VibrationEffect.createOneShot(800, VibrationEffect.DEFAULT_AMPLITUDE));
-        } else {
-            //deprecated in API 26
-            v.vibrate(500);
-        }*/
-
-/*        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(ScannerSearchOnlyActivity.this);
-        LayoutInflater inflater = ScannerSearchOnlyActivity.this.getLayoutInflater();
-        View layout = inflater.inflate(R.layout.alerte_france_mvo, null);*/
-
         TextView DesignationProduitFranceMVO = (TextView) findViewById(R.id.DesignationProduitFranceMVO);
         TextView NumeroSerieFranceMVO = (TextView) findViewById(R.id.NumeroSerieFranceMVO);
         TextView ResultatFranceMVO = (TextView) findViewById(R.id.ResultatFranceMVO);
@@ -462,7 +445,7 @@ public class ScannerPreparationPleinVideActivity extends ServiceActivity {
         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 
         Snackbar snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>" + message + "</b>", 0), Snackbar.LENGTH_LONG);
-        Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
+        @SuppressLint("RestrictedApi") Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
         if(message.contentEquals("Produit préparé"))
         {
             layout.setBackgroundColor(getResources().getColor(R.color.vert3, null));
@@ -481,7 +464,7 @@ public class ScannerPreparationPleinVideActivity extends ServiceActivity {
             }
         }
 
-        TextView textView = (TextView) layout.findViewById(R.id.snackbar_text);
+        TextView textView = (TextView) layout.findViewById(com.google.android.material.R.id.snackbar_text);
         textView.setGravity(Gravity.CENTER_HORIZONTAL);
         textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);

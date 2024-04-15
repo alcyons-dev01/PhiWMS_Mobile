@@ -40,14 +40,11 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Utiliser;
-import fr.alcyons.phiwms_mobile.Classes.Preparation;
-import fr.alcyons.phiwms_mobile.Classes.Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Service;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
-import fr.alcyons.phiwms_mobile.Classes.SurveillanceReference;
 import fr.alcyons.phiwms_mobile.Classes.TableTrace;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
@@ -434,8 +431,8 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                                     if (rowIdEmplacement == -1) {
                                         Alerte.afficherAlerte(context, "Erreur", "Veuillez contacter la société Alcyons (erreur MAJ idEmplacement)", "alerte");
                                     } else {
-                                        long rowID = ajouterElementASynchroniser(db, EmplacementOpenHelper.Constantes.TABLE_DEPOT_EMPLACEMENT, emplacementCourant.getphiwms_mobileUUID(), emplacementCourant.get_UID(), ActionsEAS.MAJ);
-                                        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_ELEMENT_A_SYNCHRONISER + " WHERE " + Constantes.CLE_COL_ID_DANS_TABLE_CONCERNEE_ELEMENT_A_SYNCHRONISER + "=?", new String[]{String.valueOf(emplacementCourant.getphiwms_mobileUUID())});
+                                        long rowID = ajouterElementASynchroniser(db, EmplacementOpenHelper.Constantes.TABLE_DEPOT_EMPLACEMENT, emplacementCourant.getPhiMR4UUID(), emplacementCourant.get_UID(), ActionsEAS.MAJ);
+                                        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_ELEMENT_A_SYNCHRONISER + " WHERE " + Constantes.CLE_COL_ID_DANS_TABLE_CONCERNEE_ELEMENT_A_SYNCHRONISER + "=?", new String[]{String.valueOf(emplacementCourant.getPhiMR4UUID())});
                                         if (cursor.getCount() == 1) {
                                             cursor.moveToFirst();
                                             ElementASynchroniser elementASynchroniser = new ElementASynchroniser(cursor);
@@ -506,7 +503,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                                     {
                                         actioncourant.setIdActionUtilisateur(nouvelId);
                                         ActionUtilisateur_LigneOpenHelper.mettreAJourActionUtilisateurLigne(db, actioncourant);
-                                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, actioncourant.getphiwms_mobileUUID(), actioncourant.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, actioncourant.getPhiMR4UUID(), actioncourant.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                                     }
                                     toutSynchroniser(context, db, utilisateur, true);
                                 }
@@ -646,7 +643,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                                         List<Depot_Emplacement> emplacements = EmplacementOpenHelper.getEmplacementsParZoneID(db, element.getIdDansTableConcernee());
                                         for (Depot_Emplacement emplacement : emplacements
                                                 ) {
-                                            ajouterElementASynchroniser(db, EmplacementOpenHelper.Constantes.TABLE_DEPOT_EMPLACEMENT, emplacement.getphiwms_mobileUUID(), emplacement.get_UID(), ActionsEAS.SUPPR);
+                                            ajouterElementASynchroniser(db, EmplacementOpenHelper.Constantes.TABLE_DEPOT_EMPLACEMENT, emplacement.getPhiMR4UUID(), emplacement.get_UID(), ActionsEAS.SUPPR);
                                             Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_ELEMENT_A_SYNCHRONISER + " WHERE " + Constantes.CLE_COL_ID_DANS_TABLE_CONCERNEE_ELEMENT_A_SYNCHRONISER + "=?", new String[]{String.valueOf(emplacement.get_UID())});
                                             if (cursor.getCount() == 1) {
                                                 cursor.moveToFirst();

@@ -302,7 +302,7 @@ public class PH_Utiliser implements Serializable, Comparable {
         this.produitSoumisTracabilite = produitSoumisTracabilite;
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -315,17 +315,17 @@ public class PH_Utiliser implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         PH_Utiliser phUtiliser = (PH_Utiliser) obj;
 
-        if (this.getphiwms_mobileUUID() == phUtiliser.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == phUtiliser.getPhiMR4UUID()) {
             return 0;
         } else {
-            return this.getphiwms_mobileUUID() > phUtiliser.getphiwms_mobileUUID() ? 1 : -1;
+            return this.getPhiMR4UUID() > phUtiliser.getPhiMR4UUID() ? 1 : -1;
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
-        if (((PH_Utiliser) obj).getphiwms_mobileUUID() == this.getphiwms_mobileUUID()) {
+        if (((PH_Utiliser) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
             valeurARetourner = true;
         }
 

@@ -85,7 +85,7 @@ public class ServiceOpenHelper extends DBOpenHelper {
                         int phiwms_mobileuuid = 0;
                         if(serviceBDD != null)
                         {
-                            phiwms_mobileuuid = serviceBDD.getphiwms_mobileUUID();
+                            phiwms_mobileuuid = serviceBDD.getPhiMR4UUID();
                             descriptionServiceCourant = serviceBDD.getDescription();
                             videoServiceCourant = serviceBDD.getLien_video();
                             whitePaperServiceCourant = serviceBDD.getWhitePaper();
@@ -192,7 +192,7 @@ public class ServiceOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_SCORE, service.getScore());
 
         // Insertion du service en BDD
-        return db.update(Constantes.TABLE_SERVICE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + service.getphiwms_mobileUUID(), null);
+        return db.update(Constantes.TABLE_SERVICE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + service.getPhiMR4UUID(), null);
 
     }
 

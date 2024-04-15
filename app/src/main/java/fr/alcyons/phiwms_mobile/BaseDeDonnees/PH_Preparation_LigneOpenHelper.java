@@ -132,10 +132,10 @@ public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_SERIE_NUMERO, ph_preparation_ligne.getSerieNumero());
         contentValues.put(Constantes.CLE_COL_UID_4D, ph_preparation_ligne.get_UID_4D());
         contentValues.put(Constantes.CLE_COL_VERROUILLER, ph_preparation_ligne.isVerrouiller());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, ph_preparation_ligne.getphiwms_mobileUUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, ph_preparation_ligne.getPhiMR4UUID());
 
 
-        long rowId = db.update(Constantes.TABLE_PH_PREPARATION_LIGNE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + ph_preparation_ligne.getphiwms_mobileUUID(), null);
+        long rowId = db.update(Constantes.TABLE_PH_PREPARATION_LIGNE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + ph_preparation_ligne.getPhiMR4UUID(), null);
 
         return rowId;
     }
@@ -323,7 +323,7 @@ public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
     }
 
     public static void supprimerUnPhPreparationLigne(SQLiteDatabase db, PH_Preparation_Ligne ph_preparation_ligne) {
-        db.delete(Constantes.TABLE_PH_PREPARATION_LIGNE, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(ph_preparation_ligne.getphiwms_mobileUUID())});
+        db.delete(Constantes.TABLE_PH_PREPARATION_LIGNE, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(ph_preparation_ligne.getPhiMR4UUID())});
     }
 
     public static void supprimerPHPreparationLigneByPreparation(SQLiteDatabase db, PH_Preparation phPreparation) {

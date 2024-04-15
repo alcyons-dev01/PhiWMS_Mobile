@@ -1,19 +1,28 @@
 package fr.alcyons.phiwms_mobile;
 
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
 
+import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhraseSnackbar;
 import fr.alcyons.phiwms_mobile.R;
 
 import androidx.core.view.MenuItemCompat;
 import androidx.appcompat.widget.SearchView;
 
+import android.text.Html;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -142,12 +151,12 @@ public class MenuActivity extends OriginalActivity {
     }
 
     public void afficherSnackBar(String nomService) {
-       /* String erreur = OutilsGestionPhraseSnackbar.obtenirPhraseSnackbar(nomService);
+        String erreur = OutilsGestionPhraseSnackbar.obtenirPhraseSnackbar(nomService);
         Snackbar snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>"+erreur+"</b>", 0), Snackbar.LENGTH_LONG);
 
-        Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
+        @SuppressLint("RestrictedApi") Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
         layout.setBackgroundColor(getResources().getColor(R.color.rouge2, null));
-        TextView textView = layout.findViewById(R.id.snackbar_text);
+        TextView textView = layout.findViewById(com.google.android.material.R.id.snackbar_text);
         textView.setGravity(Gravity.CENTER_HORIZONTAL);
         textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
@@ -156,6 +165,6 @@ public class MenuActivity extends OriginalActivity {
         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackBarView.getChildAt(0).getLayoutParams();
         params.gravity = Gravity.FILL_HORIZONTAL | Gravity.BOTTOM;
         snackBarView.getChildAt(0).setLayoutParams(params);
-        snackbar.show();*/
+        snackbar.show();
     }
 }

@@ -178,9 +178,9 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_DELIVRANCE_VALIDER_A, ph_preparation.getDelivranceValider_A());
         contentValues.put(Constantes.CLE_COL_DELIVRANCE_VALIDER_LE, ph_preparation.getDelivranceValider_Le());
         contentValues.put(Constantes.CLE_COL_DELIVRANCE_VALIDER_PAR, ph_preparation.getDelivranceValider_Par());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, ph_preparation.getphiwms_mobileUUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, ph_preparation.getPhiMR4UUID());
 
-        return db.update(Constantes.TABLE_PH_PREPARATION, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + ph_preparation.getphiwms_mobileUUID(), null);
+        return db.update(Constantes.TABLE_PH_PREPARATION, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + ph_preparation.getPhiMR4UUID(), null);
     }
 
     public static PH_Preparation getPH_PreparationByID(SQLiteDatabase db, int id) {
@@ -1027,7 +1027,7 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
     }
 
     public static void supprimerUnPhPreparation(SQLiteDatabase db, PH_Preparation ph_preparation) {
-        db.delete(Constantes.TABLE_PH_PREPARATION, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(ph_preparation.getphiwms_mobileUUID())});
+        db.delete(Constantes.TABLE_PH_PREPARATION, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(ph_preparation.getPhiMR4UUID())});
     }
 
     public static final class Constantes implements BaseColumns {

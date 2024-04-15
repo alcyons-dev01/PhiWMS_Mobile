@@ -1,6 +1,6 @@
 package fr.alcyons.phiwms_mobile.Outils;
 
-/*import android.annotation.TargetApi;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -14,59 +14,62 @@ import android.widget.SearchView;
 import java.util.Collections;
 import java.util.List;
 
-import fr.alcyons.phiwms_mobile.ActionUtilisateur.ServiceActionUtilisateurActivity;
+//import fr.alcyons.phiwms_mobile.ActionUtilisateur.ServiceActionUtilisateurActivity;
 import fr.alcyons.phiwms_mobile.CGU.CguActivity;
 import fr.alcyons.phiwms_mobile.Classes.PerimetreFonctionnel;
 import fr.alcyons.phiwms_mobile.Classes.Service;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
-import fr.alcyons.phiwms_mobile.ControleDesRetoursScannee.ServiceControleRetoursScanneeActivity;
-import fr.alcyons.phiwms_mobile.DemandeDotationGlobale.ServiceDemandeDotationGlobaleActivity;
-import fr.alcyons.phiwms_mobile.DemandeDotationPAD.ServiceDemandeDotationPADActivity;
-import fr.alcyons.phiwms_mobile.DemandeParticuliere.ServiceDemandeParticuliereActivity;
-import fr.alcyons.phiwms_mobile.DemandePleinVide.ServiceDemandePleinVideActivity;
-import fr.alcyons.phiwms_mobile.DemandeProtocolePAD.ServiceDemandeProtocolePADActivity;
-import fr.alcyons.phiwms_mobile.DemandeReassort.ServiceDemandeReassortActivity;
-import fr.alcyons.phiwms_mobile.Destruction.ServiceDestructionActivity;
+//import fr.alcyons.phiwms_mobile.ControleDesRetoursScannee.ServiceControleRetoursScanneeActivity;
+//import fr.alcyons.phiwms_mobile.DemandeDotationGlobale.ServiceDemandeDotationGlobaleActivity;
+//import fr.alcyons.phiwms_mobile.DemandeDotationPAD.ServiceDemandeDotationPADActivity;
+//import fr.alcyons.phiwms_mobile.DemandeParticuliere.ServiceDemandeParticuliereActivity;
+//import fr.alcyons.phiwms_mobile.DemandePleinVide.ServiceDemandePleinVideActivity;
+//import fr.alcyons.phiwms_mobile.DemandeProtocolePAD.ServiceDemandeProtocolePADActivity;
+//import fr.alcyons.phiwms_mobile.DemandeReassort.ServiceDemandeReassortActivity;
+//import fr.alcyons.phiwms_mobile.Destruction.ServiceDestructionActivity;
 import fr.alcyons.phiwms_mobile.DispositifAuLivret.ServiceDispositifAuLivretActivity;
-import fr.alcyons.phiwms_mobile.DotationService.ServiceDotationServiceActivity;
+//import fr.alcyons.phiwms_mobile.DotationService.ServiceDotationServiceActivity;
 import fr.alcyons.phiwms_mobile.IdentificationParScan.ListeProduitsIdentificationParScanActivity;
-import fr.alcyons.phiwms_mobile.InventaireScanner.ServiceInventaireScannerActivity;
+//import fr.alcyons.phiwms_mobile.InventaireScanner.ServiceInventaireScannerActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.ServiceAdapter;
-import fr.alcyons.phiwms_mobile.Livraison.DepotSelecteurLivraison;
+//import fr.alcyons.phiwms_mobile.Livraison.DepotSelecteurLivraison;
 import fr.alcyons.phiwms_mobile.Livraison.ListePointDeLivraison;
 import fr.alcyons.phiwms_mobile.Livraison.ServiceLivraisonActivity;
 import fr.alcyons.phiwms_mobile.MedicamentAuLivret.ServiceMedicamentAuLivretActivity;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
-import fr.alcyons.phiwms_mobile.Notifications.ServiceNotificationsActivity;
-import fr.alcyons.phiwms_mobile.PAD.ServicePADActivity;
+//import fr.alcyons.phiwms_mobile.Notifications.ServiceNotificationsActivity;
+//import fr.alcyons.phiwms_mobile.PAD.ServicePADActivity;
 import fr.alcyons.phiwms_mobile.ParametresServeur.ServiceParametresServeurActivity;
 import fr.alcyons.phiwms_mobile.ParametresUtilisateur.ServiceParametreUtilisateurActivity;
-import fr.alcyons.phiwms_mobile.PlanDePlacement.ListeProduitsPlanDePlacementActivity;
-import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ServicePreparationPadActivity;
-import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ServicePreparationPufActivity;
-import fr.alcyons.phiwms_mobile.PreparationPUFetPADScannee.ServicePreparationPadScanneeActivity;
-import fr.alcyons.phiwms_mobile.PreparationPUFetPADScannee.ServicePreparationPufScanneeActivity;
+//import fr.alcyons.phiwms_mobile.PlanDePlacement.ListeProduitsPlanDePlacementActivity;
+//import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ServicePreparationPadActivity;
+//import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ServicePreparationPufActivity;
+//import fr.alcyons.phiwms_mobile.PreparationPUFetPADScannee.ServicePreparationPadScanneeActivity;
+//import fr.alcyons.phiwms_mobile.PreparationPUFetPADScannee.ServicePreparationPufScanneeActivity;
+//import fr.alcyons.phiwms_mobile.Quarantaine.ServiceQuarantaineActivity;
 import fr.alcyons.phiwms_mobile.Quarantaine.ServiceQuarantaineActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ReceptionPAD.ServiceReceptionPadActivity;
+//import fr.alcyons.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity;
+//import fr.alcyons.phiwms_mobile.ReceptionScanne.ServiceReceptionScanneeActivity;
+//import fr.alcyons.phiwms_mobile.RetourDemande.ServiceRetourDemandeActivity;
+//import fr.alcyons.phiwms_mobile.RetourFournisseur.ServiceRetourFournisseurActivity;
+//import fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity;
+//import fr.alcyons.phiwms_mobile.Serialisation.ServiceSerialisationActivity;
 import fr.alcyons.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity;
-import fr.alcyons.phiwms_mobile.ReceptionScanne.ServiceReceptionScanneeActivity;
-import fr.alcyons.phiwms_mobile.RetourDemande.ServiceRetourDemandeActivity;
-import fr.alcyons.phiwms_mobile.RetourFournisseur.ServiceRetourFournisseurActivity;
-import fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity;
-import fr.alcyons.phiwms_mobile.Serialisation.ServiceSerialisationActivity;
 import fr.alcyons.phiwms_mobile.ServiceEnCreationActivity;
-import fr.alcyons.phiwms_mobile.Stock.ServiceStockActivity;
-import fr.alcyons.phiwms_mobile.TestMail.TestMailActivity;
-import fr.alcyons.phiwms_mobile.Utiliser.ServiceUtiliserActivity;
 import fr.alcyons.phiwms_mobile.VerrouPharmacie.ServiceVerrouPharmacieActivity;
-import fr.alcyons.phiwms_mobile.VerrouPharmacieInterne.ServiceVerrouPharmacieInterneActivity;
-import fr.alcyons.phiwms_mobile.ZonesEtEmplacements.ServiceZonesEtEmplacementsActivity;*/
+//import fr.alcyons.phiwms_mobile.Stock.ServiceStockActivity;
+//import fr.alcyons.phiwms_mobile.TestMail.TestMailActivity;
+//import fr.alcyons.phiwms_mobile.Utiliser.ServiceUtiliserActivity;
+//import fr.alcyons.phiwms_mobile.VerrouPharmacie.ServiceVerrouPharmacieActivity;
+//import fr.alcyons.phiwms_mobile.VerrouPharmacieInterne.ServiceVerrouPharmacieInterneActivity;
+//import fr.alcyons.phiwms_mobile.ZonesEtEmplacements.ServiceZonesEtEmplacementsActivity;
 
 public class OutilsGestionListeServices {
 
-   /* public static void genererListViewServicesParPerimetreFonctionnel(final Context context, final Utilisateur utilisateurConnecte, PerimetreFonctionnel perimetreFonctionnelConcerne, final boolean finirActivite, final List<String> serviceIndicateurNom, final List<Integer> serviceIndicateurValeur) {
+    public static void genererListViewServicesParPerimetreFonctionnel(final Context context, final Utilisateur utilisateurConnecte, PerimetreFonctionnel perimetreFonctionnelConcerne, final boolean finirActivite, final List<String> serviceIndicateurNom, final List<Integer> serviceIndicateurValeur) {
 
         // Récupération de la liste_view à remplir
         ListView listViewServices = (ListView) ((Activity) context).findViewById(R.id.listViewNavigation);
@@ -136,95 +139,95 @@ public class OutilsGestionListeServices {
             case "Verrou Pharmacie Préparation externe":
                 return ServiceVerrouPharmacieActivity.class;
             case "Verrou Pharmacie Préparation Externe":
-                return ServiceVerrouPharmacieActivity.class;
+                //return ServiceVerrouPharmacieActivity.class;
             case "Verrou Pharmacie Préparation interne":
-                return ServiceVerrouPharmacieInterneActivity.class;
+               // return ServiceVerrouPharmacieInterneActivity.class;
             case "Inventaire scanner":
-                return ServiceInventaireScannerActivity.class;
+               // return ServiceInventaireScannerActivity.class;
             case "Réception PUI":
                 return ServiceReceptionPuiActivity.class;
             case "Réception PAD":
                 return ServiceReceptionPadActivity.class;
             case "Contrôle des retours":
                 //return ServiceControleRetoursActivity.class;
-                return ServiceControleRetoursScanneeActivity.class;
+               // return ServiceControleRetoursScanneeActivity.class;
             case "Contrôle des retours Scan":
-                return ServiceControleRetoursScanneeActivity.class;
+              //  return ServiceControleRetoursScanneeActivity.class;
             case "Retour PUI":
-                return ServiceRetourPUIActivity.class;
+              //  return ServiceRetourPUIActivity.class;
             case "Retour Frs":
-                return ServiceRetourFournisseurActivity.class;
+              //  return ServiceRetourFournisseurActivity.class;
             case "Destruction":
-                return ServiceDestructionActivity.class;
+               // return ServiceDestructionActivity.class;
             case "Plan de Placements":
                 //return ServicePlanDePlacementActivity.class;
-                return ListeProduitsPlanDePlacementActivity.class;
+              //  return ListeProduitsPlanDePlacementActivity.class;
             case "Identification Par Scan":
                 //return ServiceIdentificationParScanActivity.class;
                 return ListeProduitsIdentificationParScanActivity.class;
             case "Zones et Emplacements":
-                return ServiceZonesEtEmplacementsActivity.class;
+               // return ServiceZonesEtEmplacementsActivity.class;
             case "Réception Scannée":
-                return ServiceReceptionScanneeActivity.class;
+                //return ServiceReceptionScanneeActivity.class;
             case "Livraison":
                 //return DepotSelecteurLivraison.class;
                 //return ServiceLivraisonActivity.class;
                 return ListePointDeLivraison.class;
             case "Utiliser":
-                return ServiceUtiliserActivity.class;
+               // return ServiceUtiliserActivity.class;
             case "Demande Particuliere":
-                return ServiceDemandeParticuliereActivity.class;
+               // return ServiceDemandeParticuliereActivity.class;
             case "Dotation Service":
-                return ServiceDotationServiceActivity.class;
+               // return ServiceDotationServiceActivity.class;
             case "Demande Réassort":
-                return ServiceDemandeReassortActivity.class;
+               // return ServiceDemandeReassortActivity.class;
             case "Demande Dotation PAD":
-                return ServiceDemandeDotationPADActivity.class;
+               // return ServiceDemandeDotationPADActivity.class;
             case "Demande Protocole PAD":
-                return ServiceDemandeProtocolePADActivity.class;
+               // return ServiceDemandeProtocolePADActivity.class;
             case "Retour Demandé":
-                return ServiceRetourDemandeActivity.class;
+                //return ServiceRetourDem//andeActivity.class;
             case "Médicament au Livret":
                 return ServiceMedicamentAuLivretActivity.class;
             case "Dispositif au Livret":
                 return ServiceDispositifAuLivretActivity.class;
             case "Stock":
-                return ServiceStockActivity.class;
+              //  return ServiceStockActivity.class;
             case "Notifications":
-                return ServiceNotificationsActivity.class;
+               // return ServiceNotificationsActivity.class;
             case "Réseaux":
                 return ServiceParametresServeurActivity.class;
             case "Notification":
-                return ServiceNotificationsActivity.class;
+              //  return ServiceNotificationsActivity.class;
             case "ConnexionDirecte":
                 return ServiceConnexionDirecteActivity.class;
             case "Serialisation":
-                return ServiceSerialisationActivity.class;
+               // return ServiceSerialisationActivity.class;
             case "Utilisation":
                 return ServiceParametreUtilisateurActivity.class;
             case "Mail":
-                return TestMailActivity.class;
+               // return TestMailActivity.class;
             case "CGU":
                 return CguActivity.class;
             case "Commander":
-                return ServicePADActivity.class;
+               // return ServicePADActivity.class;
             case "Préparation PAD":
-                return ServicePreparationPadActivity.class;
+              //  return ServicePreparationPadActivity.class;
             case "Préparation PAD Scan":
-                return ServicePreparationPadScanneeActivity.class;
+              //  return ServicePreparationPadScanneeActivity.class;
             case "Préparation UF":
-                return ServicePreparationPufActivity.class;
+              //  return ServicePreparationPufActivity.class;
             case "Préparation UF Scan":
-                return ServicePreparationPufScanneeActivity.class;
+              //  return ServicePreparationPufScanneeActivity.class;
             case "Demande PleinVide":
-                return ServiceDemandePleinVideActivity.class;
+                //return ServiceDemandePleinVideActivity.class;
             case "Demande Dotation Globale":
-                return ServiceDemandeDotationGlobaleActivity.class;
+               // return ServiceDemandeDotationGlobaleActivity.class;
             case "Actions utilisateurs":
-                return ServiceActionUtilisateurActivity.class;
+               // return ServiceActionUtilisateurActivity.class;
 
         }
 
         return activiteDemandee;
-    }*/
+    }
 }

@@ -76,7 +76,7 @@ public class Depot_Emplacement implements Serializable, Comparable {
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -181,7 +181,7 @@ public class Depot_Emplacement implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Depot_Emplacement depot_emplacement = (Depot_Emplacement) obj;
 
-        if (this.getphiwms_mobileUUID() == depot_emplacement.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == depot_emplacement.getPhiMR4UUID()) {
             return 0;
         } else {
             return this.get_UID() > depot_emplacement.get_UID() ? 1 : -1;

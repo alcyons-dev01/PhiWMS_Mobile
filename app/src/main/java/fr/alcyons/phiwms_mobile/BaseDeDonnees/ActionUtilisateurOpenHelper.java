@@ -77,9 +77,9 @@ public class ActionUtilisateurOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_CHAMPS_PARENT_ID, actionUtilisateur.getChampsParentId());
         contentValues.put(Constantes.CLE_COL_CHEMIN_PHOTO, actionUtilisateur.getCheminPhoto());
         contentValues.put(Constantes.CLE_COL_ACTION_NAME, actionUtilisateur.getActionName());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, actionUtilisateur.getphiwms_mobileUUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, actionUtilisateur.getPhiMR4UUID());
 
-        long rowId = db.update(Constantes.TABLE_ACTION_UTILISATEUR, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + actionUtilisateur.getphiwms_mobileUUID(), null);
+        long rowId = db.update(Constantes.TABLE_ACTION_UTILISATEUR, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + actionUtilisateur.getPhiMR4UUID(), null);
 
         return rowId;
     }

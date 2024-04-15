@@ -188,7 +188,7 @@ public class SignatureLivraisonActivity extends ServiceActivity {
         PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, ph_preparation);
 
         // Ajout du PH_Preparation au ElementASynchroniser
-        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation.getphiwms_mobileUUID(), ph_preparation.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation.getPhiMR4UUID(), ph_preparation.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
 
         // Tentative de lancer la sychronisation
         if (OutilsGestionConnexionReseau.isServerAccessible(SignatureLivraisonActivity.this)) {

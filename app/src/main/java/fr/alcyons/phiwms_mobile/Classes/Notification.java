@@ -131,7 +131,7 @@ public class Notification implements Serializable, Comparable {
         this.channel = channel;
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -156,7 +156,7 @@ public class Notification implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Notification notification = (Notification) obj;
 
-        if (this.getphiwms_mobileUUID() == notification.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == notification.getPhiMR4UUID()) {
             return 0;
         } else {
             return this.getId() > notification.getId() ? 1 : -1;

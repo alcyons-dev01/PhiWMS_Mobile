@@ -368,7 +368,7 @@ public class Depot implements Serializable, Comparable {
         this.Archive = OutilsGestionClasses.recupererBooleen(cursor, DepotOpenHelper.Constantes.NUM_COL_ARCHIVE_DEPOT);
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -1105,7 +1105,7 @@ public class Depot implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Depot depot = (Depot) obj;
 
-        if (this.getphiwms_mobileUUID() == depot.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == depot.getPhiMR4UUID()) {
             return 0;
         } else {
             return -1;

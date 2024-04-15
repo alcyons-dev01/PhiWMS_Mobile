@@ -86,7 +86,7 @@ public class SYS_Mvt_Stock_Type implements Serializable, Comparable {
         phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -240,7 +240,7 @@ public class SYS_Mvt_Stock_Type implements Serializable, Comparable {
     public int compareTo(Object obj) {
         SYS_Mvt_Stock_Type sys_mvt_stock_type = (SYS_Mvt_Stock_Type) obj;
 
-        if (this.getphiwms_mobileUUID() == sys_mvt_stock_type.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == sys_mvt_stock_type.getPhiMR4UUID()) {
             return 0;
         } else {
             return this.getTYM_ID() > sys_mvt_stock_type.getTYM_ID() ? 1 : -1;

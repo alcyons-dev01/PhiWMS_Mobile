@@ -194,7 +194,7 @@ public class ServiceActivity extends MenuActivity {
                             //on gere le score du service
                             serviceSelectionne.setScore(serviceSelectionne.getScore()+1);
                             ServiceOpenHelper.mettreAJourUnServiceEnBD(db, serviceSelectionne);
-                            gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ServiceOpenHelper.Constantes.TABLE_SERVICE, serviceSelectionne.getphiwms_mobileUUID(), serviceSelectionne.getId(), DBOpenHelper.ActionsEAS.MAJ);
+                            gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ServiceOpenHelper.Constantes.TABLE_SERVICE, serviceSelectionne.getPhiMR4UUID(), serviceSelectionne.getId(), DBOpenHelper.ActionsEAS.MAJ);
 
                             // Appeler l'activité correspondante au service sélectionné
                             Intent intentVersService = new Intent(context, classe_demande);
@@ -258,7 +258,7 @@ public class ServiceActivity extends MenuActivity {
 
             toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
-            getSupportActionBar().setIcon(R.drawable.ic_phiwms_mobile_logo);
+            getSupportActionBar().setIcon(R.mipmap.ic_logo_phiwms);
             getSupportActionBar().setTitle("");
 
             if(serviceActuel != null)

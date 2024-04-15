@@ -91,59 +91,6 @@ public class Demande_PUI implements Serializable {
 
     }
 
-    // Demande Dotation PAD
-    public Demande_PUI(Dotation_Patient dotation_patient, Produit produit, double stock_pui, double stock_destinataire) {
-        this.code_produit = dotation_patient.getCode_Produit();
-        this.catégorie = dotation_patient.getCategorie();
-        this.désignation = dotation_patient.getDesignation();
-        this.référence = produit.getRef_fourni();
-        this.unité = produit.getUnite();
-        this.stock_pui = stock_pui;
-        this.stock_destinataire = stock_destinataire;
-        this.conditionnement = (int) produit.getCond_distrib();
-        this.UID_Reference = dotation_patient.get_UID();
-
-        this.besoin = (int) dotation_patient.getQté();
-
-        this.a_preparer = this.besoin;
-
-        if (this.stock_destinataire >= this.a_preparer) {
-            this.a_preparer = 0;
-        } else {
-            this.a_preparer = (int) (this.a_preparer - this.stock_destinataire);
-        }
-
-        this.a_preparer = (int) Conditionnement_Calcul(this.a_preparer, this.conditionnement);
-
-    }
-
-    // Demande Protocole PAD
-    public Demande_PUI(Composants_patient composants_patient, Produit produit, double stock_pui, double stock_destinataire, int multiplicateur) {
-        this.code_produit = composants_patient.getCode_produit();
-        this.catégorie = composants_patient.getCatégorie();
-        this.désignation = composants_patient.getDésignation();
-        this.référence = produit.getRef_fourni();
-        this.unité = produit.getUnite();
-        this.stock_pui = stock_pui;
-        this.stock_destinataire = stock_destinataire;
-        this.conditionnement = (int) produit.getCond_distrib();
-        this.UID_Reference = composants_patient.get_UID();
-
-        this.besoin = (int) composants_patient.getQté() * multiplicateur;
-
-        this.a_preparer = this.besoin;
-
-        if (this.stock_destinataire >= this.a_preparer) {
-            this.a_preparer = 0;
-        } else {
-            this.a_preparer = (int) (this.a_preparer - this.stock_destinataire);
-        }
-
-        this.a_preparer = (int) Conditionnement_Calcul(this.a_preparer, this.conditionnement);
-
-    }
-
-
     public double Conditionnement_Calcul(Integer qté, Integer conditionnement) {
         double qte_conditionnee = 0;
 

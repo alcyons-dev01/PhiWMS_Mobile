@@ -114,7 +114,7 @@ public class UtilisateurOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_DEPOT_UID_UTILISATEUR, utilisateur.getDepot_UID());
         contentValues.put(Constantes.CLE_COL_ETABLISSEMENT_UTILISATEUR, utilisateur.getEtablissement());
         contentValues.put(Constantes.CLE_COL_ETABLISSEMENT_ID_UTILISATEUR, utilisateur.getEtablissementId());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, utilisateur.getphiwms_mobileUUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, utilisateur.getPhiMR4UUID());
         if (utilisateur.getServicesHabilites() != null) {
             String listeServices = "{ \"Services\": [";
             for (Service service : utilisateur.getServicesHabilites()
@@ -141,7 +141,7 @@ public class UtilisateurOpenHelper extends DBOpenHelper {
         }
 
 
-        long rowID = db.update(Constantes.TABLE_UTILISATEUR, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + utilisateur.getphiwms_mobileUUID(), null);
+        long rowID = db.update(Constantes.TABLE_UTILISATEUR, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + utilisateur.getPhiMR4UUID(), null);
 
         return rowID;
     }
@@ -165,7 +165,7 @@ public class UtilisateurOpenHelper extends DBOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put(Constantes.CLE_COL_TOKEN_UTILISATEUR, utilisateur.getToken());
 
-        long rowId = db.update(Constantes.TABLE_UTILISATEUR, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + utilisateur.getphiwms_mobileUUID(), null);
+        long rowId = db.update(Constantes.TABLE_UTILISATEUR, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + utilisateur.getPhiMR4UUID(), null);
 
         return rowId;
     }
@@ -174,7 +174,7 @@ public class UtilisateurOpenHelper extends DBOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put(Constantes.CLE_COL_ETABLISSEMENT_UTILISATEUR, utilisateur.getEtablissement());
 
-        long rowId = db.update(Constantes.TABLE_UTILISATEUR, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + utilisateur.getphiwms_mobileUUID(), null);
+        long rowId = db.update(Constantes.TABLE_UTILISATEUR, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + utilisateur.getPhiMR4UUID(), null);
 
         return rowId;
     }

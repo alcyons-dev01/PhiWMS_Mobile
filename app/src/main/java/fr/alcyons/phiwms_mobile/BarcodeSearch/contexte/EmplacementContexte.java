@@ -71,7 +71,7 @@ public class EmplacementContexte {
             long rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
             if(rowId != -1)
             {
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
             }
         }
         if (chaine.startsWith("PHITAGPLACE+")) {

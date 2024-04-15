@@ -69,7 +69,7 @@ public class Stock_Lot_Emplacement_Light implements Comparable {
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -180,7 +180,7 @@ public class Stock_Lot_Emplacement_Light implements Comparable {
     @Override
     public int compareTo(Object obj) {
 
-        if (this.getphiwms_mobileUUID() == ((Stock_Lot_Emplacement_Light) obj).getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == ((Stock_Lot_Emplacement_Light) obj).getPhiMR4UUID()) {
             return 0;
         } else {
             return this.get_UID() > ((Stock_Lot_Emplacement_Light) obj).get_UID() ? 1 : -1;

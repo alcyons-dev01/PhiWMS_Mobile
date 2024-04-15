@@ -785,13 +785,13 @@ public class RetourOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_PRENOM_CHAUFFEUR_RETOUR, retour.getPrenom_Chauffeur());
         contentValues.put(Constantes.CLE_COL_TRANSPORTEUR_RETOUR, retour.getTransporteur());
         contentValues.put(Constantes.CLE_COL_SIGNATURE_CHAUFFEUR, retour.getSignature_Chauffeur());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, retour.getphiwms_mobileUUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, retour.getPhiMR4UUID());
 
-        return db.update(Constantes.TABLE_RETOUR, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + String.valueOf(retour.getphiwms_mobileUUID()), null);
+        return db.update(Constantes.TABLE_RETOUR, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + String.valueOf(retour.getPhiMR4UUID()), null);
     }
 
     public static void supprimerUnRetour(SQLiteDatabase db, Retour retour) {
-        db.delete(Constantes.TABLE_RETOUR, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(retour.getphiwms_mobileUUID())});
+        db.delete(Constantes.TABLE_RETOUR, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(retour.getPhiMR4UUID())});
     }
 
     public static List<Retour> getRetoursByEnAttenteDe(SQLiteDatabase db, String critereEnAttenteDe) {

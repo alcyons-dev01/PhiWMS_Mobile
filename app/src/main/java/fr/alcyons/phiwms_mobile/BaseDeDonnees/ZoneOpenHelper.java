@@ -289,9 +289,9 @@ public class ZoneOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_CONSERVATION_DEPOT_ZONE, zone.getConservation());
         contentValues.put(Constantes.CLE_COL_DEPOT_REFERENCE_DEPOT_ZONE, zone.getDepot_Reference());
         contentValues.put(Constantes.CLE_COL_TYPE_EMPLACEMENT_DEPOT_ZONE, zone.getType_Emplacement());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, zone.getphiwms_mobileUUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, zone.getPhiMR4UUID());
 
-        return db.update(Constantes.TABLE_DEPOT_ZONE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + String.valueOf(zone.getphiwms_mobileUUID()), null);
+        return db.update(Constantes.TABLE_DEPOT_ZONE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + String.valueOf(zone.getPhiMR4UUID()), null);
     }
 
     public static class Constantes implements BaseColumns {

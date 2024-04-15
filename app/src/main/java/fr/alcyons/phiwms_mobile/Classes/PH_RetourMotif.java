@@ -52,7 +52,7 @@ public class PH_RetourMotif implements Serializable, Comparable {
         this.motifRetour = motifRetour;
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -76,17 +76,17 @@ public class PH_RetourMotif implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         PH_RetourMotif ph_retourMotif = (PH_RetourMotif) obj;
 
-        if (this.getphiwms_mobileUUID() == ph_retourMotif.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == ph_retourMotif.getPhiMR4UUID()) {
             return 0;
         } else {
-            return this.getphiwms_mobileUUID() > ph_retourMotif.getphiwms_mobileUUID() ? 1 : -1;
+            return this.getPhiMR4UUID() > ph_retourMotif.getPhiMR4UUID() ? 1 : -1;
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
-        if (((PH_RetourMotif) obj).getphiwms_mobileUUID() == this.getphiwms_mobileUUID()) {
+        if (((PH_RetourMotif) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
             valeurARetourner = true;
         }
 

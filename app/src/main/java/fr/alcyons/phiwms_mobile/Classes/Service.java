@@ -73,7 +73,7 @@ public class Service implements Serializable, Comparable {
         this.score = cursor.getInt(ServiceOpenHelper.Constantes.NUM_COL_SCORE);
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -190,7 +190,7 @@ public class Service implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Service service = (Service) obj;
 
-        if (this.getphiwms_mobileUUID() == ((Service) obj).getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == ((Service) obj).getPhiMR4UUID()) {
             return 0;
         } else {
             return this.getId() > ((Service) obj).getId() ? 1 : -1;

@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import fr.alcyons.phiwms_mobile.ListViewAdapters.FournisseurAdapter;
 import fr.alcyons.phiwms_mobile.MedicamentAuLivret.ServiceMedicamentAuLivretActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;

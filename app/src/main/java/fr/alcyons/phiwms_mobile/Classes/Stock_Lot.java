@@ -117,7 +117,7 @@ public class Stock_Lot implements Serializable, Comparable {
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -310,7 +310,7 @@ public class Stock_Lot implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Stock_Lot stock_lot = (Stock_Lot) obj;
 
-        if (this.getphiwms_mobileUUID() == stock_lot.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == stock_lot.getPhiMR4UUID()) {
             return 0;
         } else {
             return this.get_UID() > stock_lot.get_UID() ? 1 : -1;

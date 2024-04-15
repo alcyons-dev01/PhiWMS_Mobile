@@ -54,7 +54,7 @@ public class ZoneEtEmplacementContext {
             long rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
             if(rowId != -1)
             {
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
             }
         }
         code = gestionPrefixe(s.toString());
@@ -87,7 +87,7 @@ public class ZoneEtEmplacementContext {
             long rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
             if(rowId != -1)
             {
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
             }
         }
         code = gestionPrefixe(chaine);

@@ -103,7 +103,7 @@ public class Inventaire implements Serializable, Comparable {
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -264,7 +264,7 @@ public class Inventaire implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Inventaire inventaire = (Inventaire) obj;
 
-        if (this.getphiwms_mobileUUID() == inventaire.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == inventaire.getPhiMR4UUID()) {
             return 0;
         } else {
             return this.getInventaire_ID() > inventaire.getInventaire_ID() ? 1 : -1;

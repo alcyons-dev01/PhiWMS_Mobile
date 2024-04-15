@@ -81,8 +81,8 @@ public class ScannerEmplacementActivity  extends ServiceActivity {
         emplacementContexte = new EmplacementContexte(this, db, ADH, utilisateurConnecte);
 
         // Initialisation du CONTEXTE
-        switch (scannerContexteInt) {
-            case R.string.scannerContexteEmplacement:
+            if(scannerContexteInt == R.string.scannerContexteEmplacement)
+            {
                 bannerTexte = emplacementContexte.bannerTexte;
                 if(intent.getExtras().containsKey("designationProduit"))
                 {
@@ -90,8 +90,7 @@ public class ScannerEmplacementActivity  extends ServiceActivity {
                     designationProduit_Scan.setVisibility(View.VISIBLE);
                     designationProduit_Scan.setText(intent.getExtras().getString("designationProduit"));
                 }
-                break;
-        }
+            }
 
         ((TextView)findViewById(R.id.textManuelScan)).setText(intent.getExtras().getString("TextBannerManuel"));
         findViewById(R.id.linearScanManuel).setVisibility(View.VISIBLE);
@@ -131,19 +130,18 @@ public class ScannerEmplacementActivity  extends ServiceActivity {
                 if (s.toString().endsWith("\n")) {
 
                     code = "";
-                    switch (scannerContexteInt) {
-                        case R.string.scannerContexteEmplacement:
-                            if(modeTrace)
+                    if(scannerContexteInt == R.string.scannerContexteEmplacement)
+                    {
+                        if(modeTrace)
+                        {
+                            tableTrace = new TableTrace(id, date, "Context_Emplacement", "Récupération après scan", s.toString().substring(0, s.length() - 1), utilisateurConnecte.getIdentifiant(), utilisateurConnecte.getId());
+                            rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
+                            if(rowId != -1)
                             {
-                                tableTrace = new TableTrace(id, date, "Context_Emplacement", "Récupération après scan", s.toString().substring(0, s.length() - 1), utilisateurConnecte.getIdentifiant(), utilisateurConnecte.getId());
-                                rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
-                                if(rowId != -1)
-                                {
-                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
-                                }
+                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                             }
-                            code = s.toString().substring(0, s.length() - 1);
-                            break;
+                        }
+                        code = s.toString().substring(0, s.length() - 1);
                     }
 
 
@@ -164,6 +162,7 @@ public class ScannerEmplacementActivity  extends ServiceActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         findViewById(R.id.boutonFermetureManuel).performClick();
     }
 

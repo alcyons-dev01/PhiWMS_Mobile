@@ -81,7 +81,8 @@
                                               <map>
                                                 <entry key="color" value="000000" />
                                                 <entry key="imagePath" value="$PROJECT_DIR$/../PhiWMS/public/images/PhiWMS_Logo_2024.svg" />
-                                                <entry key="scalingPercent" value="59" />
+                                                <entry key="scalingPercent" value="92" />
+                                                <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -113,7 +114,12 @@
                                   </option>
                                   <option name="values">
                                     <map>
+                                      <entry key="backgroundAssetType" value="COLOR" />
+                                      <entry key="backgroundLayerName" value="logo_bg" />
+                                      <entry key="generateWebpIcons" value="false" />
+                                      <entry key="legacyIconShape" value="NONE" />
                                       <entry key="outputName" value="logo" />
+                                      <entry key="showSafeZone" value="false" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -131,6 +137,18 @@
                                               <map>
                                                 <entry key="color" value="000000" />
                                                 <entry key="imagePath" value="/private/var/folders/6z/sxmp_s2s3pzcdrbxkpbh29_c0000gp/T/ic_android_black_24dp.xml" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
+                                      <entry key="image">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="color" value="000000" />
+                                                <entry key="imagePath" value="$PROJECT_DIR$/../PhiWMS/public/images/PhiWMS_Logo_2024.svg" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -158,6 +176,14 @@
                                           </PersistentState>
                                         </value>
                                       </entry>
+                                    </map>
+                                  </option>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="assetType" value="IMAGE" />
+                                      <entry key="iconShape" value="NONE" />
+                                      <entry key="imageAsset" value="$PROJECT_DIR$/../PhiWMS/public/images/PhiWMS_Logo_2024.svg" />
+                                      <entry key="outputName" value="ic_logo_phiwms" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -279,9 +305,19 @@
                                       </entry>
                                     </map>
                                   </option>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="showSafeZone" value="false" />
+                                    </map>
+                                  </option>
                                 </PersistentState>
                               </value>
                             </entry>
+                          </map>
+                        </option>
+                        <option name="values">
+                          <map>
+                            <entry key="outputIconType" value="LAUNCHER_LEGACY" />
                           </map>
                         </option>
                       </PersistentState>
@@ -319,7 +355,7 @@
                           <map>
                             <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_phiwms_mobile_logo" />
+                            <entry key="outputName" value="phiwms_logo_2024" />
                             <entry key="sourceFile" value="$PROJECT_DIR$/../PhiWMS/public/images/PhiWMS_Logo_2024.svg" />
                           </map>
                         </option>

@@ -292,7 +292,7 @@ public class Retour_Ligne implements Serializable, Comparable {
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -616,7 +616,7 @@ public class Retour_Ligne implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Retour_Ligne retour_ligne = (Retour_Ligne) obj;
 
-        if (this.getphiwms_mobileUUID() == retour_ligne.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == retour_ligne.getPhiMR4UUID()) {
             return 0;
         } else {
             return this.get_UID() > retour_ligne.get_UID() ? 1 : -1;

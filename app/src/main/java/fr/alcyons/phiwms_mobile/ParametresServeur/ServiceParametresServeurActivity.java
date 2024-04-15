@@ -213,7 +213,7 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
 
         RequestQueue requestQueue = Volley.newRequestQueue(ServiceParametresServeurActivity.this);
 
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,null,
                 new Response.Listener<JSONObject>() {
 
                     @Override

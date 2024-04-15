@@ -128,7 +128,7 @@ public class ScannerDocumentActivity extends ServiceActivity {
                         rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                         if(rowId != -1)
                         {
-                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                         }
                     }
                     documentScannerContext.onTextWatcher(s);
@@ -151,9 +151,10 @@ public class ScannerDocumentActivity extends ServiceActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         Intent scannerSearchOnlyIntent = new Intent();
         Bundle scannerSearchOnlyBundle = new Bundle();
-        scannerSearchOnlyBundle.putString("code","");
+        scannerSearchOnlyBundle.putString("code", "");
         scannerSearchOnlyIntent.putExtras(scannerSearchOnlyBundle);
         ScannerDocumentActivity.this.setResult(RESULT_OK, scannerSearchOnlyIntent);
         ScannerDocumentActivity.this.finish();

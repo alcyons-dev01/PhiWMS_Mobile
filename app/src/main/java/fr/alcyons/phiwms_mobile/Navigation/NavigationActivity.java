@@ -38,9 +38,11 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.NotificationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ServiceOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.UtilisateurOpenHelper;
-import fr.alcyons.phiwms_mobile.BuildConfig;
+//import fr.alcyons.phiwms_mobile.BuildConfig;
 import fr.alcyons.phiwms_mobile.Classes.PerimetreFonctionnel;
 import fr.alcyons.phiwms_mobile.Classes.Service;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.ListPerimetreAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.NavigationAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
@@ -111,7 +113,8 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
 
         //affichage version
         versionApplication = (TextView) findViewById(R.id.versionApplication);
-        String phrase_version = Calendar.getInstance().get(Calendar.YEAR)+" - v"+BuildConfig.VERSION_NAME+"."+BuildConfig.VERSION_CODE;
+        //String phrase_version = Calendar.getInstance().get(Calendar.YEAR)+" - v"+BuildConfig.VERSION_NAME+"."+BuildConfig.VERSION_CODE;
+        String phrase_version = "";
         versionApplication.setText(phrase_version);
     }
 
@@ -195,7 +198,7 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                                 Service serviceBDD = ServiceOpenHelper.getServiceByID(db, idServiceCourant);
                                 if(serviceBDD != null)
                                 {
-                                    phiwms_mobileuuid = serviceBDD.getphiwms_mobileUUID();
+                                    phiwms_mobileuuid = serviceBDD.getPhiMR4UUID();
                                 }
 
                                 Service service = new Service(idServiceCourant, nomServiceCourant, ordreServiceCourant, idPerimetreFonctionnelServiceCourant, nomPerimetreFonctionnelServiceCourant, statutServiceCourant, indicateurServiceCourant, descriptionServiceCourant, videoServiceCourant, whitePaperServiceCourant, score, phiwms_mobileuuid);

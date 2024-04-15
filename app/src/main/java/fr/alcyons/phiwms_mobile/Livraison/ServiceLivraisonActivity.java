@@ -2,6 +2,7 @@ package fr.alcyons.phiwms_mobile.Livraison;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Dialog;
@@ -84,6 +85,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Preparation_LivraisonAdapter;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
@@ -92,9 +94,7 @@ import fr.alcyons.phiwms_mobile.Outils.Mail;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPDF;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotos;
-import fr.alcyons.phiwms_mobile.PAD.DetailPADActivity;
 import fr.alcyons.phiwms_mobile.R;
-import fr.alcyons.phiwms_mobile.ReceptionPAD.DetailReceptionPadActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
@@ -183,7 +183,7 @@ public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
 
             String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteServiceLivraison;
 
-            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,null,
                     new Response.Listener<JSONObject>() {
                         @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
                         @Override
@@ -587,7 +587,7 @@ public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
                 ph_preparation_Selectionne.setLivree(true);
                 PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, ph_preparation_Selectionne);
 
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation_Selectionne.getphiwms_mobileUUID(), ph_preparation_Selectionne.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation_Selectionne.getPhiMR4UUID(), ph_preparation_Selectionne.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
 
                 // Tentative de lancer la sychronisation
                 if (OutilsGestionConnexionReseau.isServerAccessible(ServiceLivraisonActivity.this)) {
@@ -610,7 +610,7 @@ public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
                 //mise à jour des PH_Preparations Ligne dans la BDD
                 for (PH_Preparation_Ligne preparation_ligne_courant : ph_preparation_ligne_List) {
                     PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, preparation_ligne_courant);
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, preparation_ligne_courant.getphiwms_mobileUUID(), preparation_ligne_courant.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, preparation_ligne_courant.getPhiMR4UUID(), preparation_ligne_courant.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
 
                     //gestion des actions lignes
                     Random randomactionligne = new Random();
@@ -749,8 +749,8 @@ public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
         PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, ph_preparation);
 
         // Ajout du PH_Preparation au ElementASynchroniser
-        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation.getphiwms_mobileUUID(), ph_preparation.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
-        gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getphiwms_mobileUUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation.getPhiMR4UUID(), ph_preparation.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+        gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
 
         // Tentative de lancer la sychronisation
         if (OutilsGestionConnexionReseau.isServerAccessible(ServiceLivraisonActivity.this)) {
@@ -837,9 +837,9 @@ public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
     public void afficherSnackBarLivraison() {
         Snackbar snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Document scanné inconnu</b>", 0), Snackbar.LENGTH_LONG);;
 
-        Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
+        @SuppressLint("RestrictedApi") Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
         layout.setBackgroundColor(getResources().getColor(R.color.rouge2, null));
-        TextView textView = (TextView) layout.findViewById(R.id.snackbar_text);
+        TextView textView = (TextView) layout.findViewById(com.google.android.material.R.id.snackbar_text);
         textView.setTextSize(TypedValue.TYPE_STRING, 8);
         snackbar.show();
     }

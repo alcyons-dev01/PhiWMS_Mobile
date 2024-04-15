@@ -98,9 +98,9 @@ public class PH_Lot_LigneOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_QUANTITE, ph_lot_ligne.getQuantite());
         contentValues.put(Constantes.CLE_COL_NUM_SERIE, ph_lot_ligne.getNumSerie());
         contentValues.put(Constantes.CLE_COL_NUM_VERROUILLER, ph_lot_ligne.isVerrouiller());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, ph_lot_ligne.getphiwms_mobileUUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, ph_lot_ligne.getPhiMR4UUID());
 
-        return db.update(Constantes.TABLE_PH_LOT_LIGNE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + String.valueOf(ph_lot_ligne.getphiwms_mobileUUID()), null);
+        return db.update(Constantes.TABLE_PH_LOT_LIGNE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + String.valueOf(ph_lot_ligne.getPhiMR4UUID()), null);
     }
 
     public static class Constantes implements BaseColumns {

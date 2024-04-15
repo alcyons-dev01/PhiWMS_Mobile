@@ -51,7 +51,7 @@ public class ObjetPreparationScannee implements Comparable{
         this.Serie = numSerie;
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -162,7 +162,7 @@ public class ObjetPreparationScannee implements Comparable{
     @Override
     public int compareTo(Object obj) {
 
-        if (this.getphiwms_mobileUUID() == ((ObjetPreparationScannee) obj).getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == ((ObjetPreparationScannee) obj).getPhiMR4UUID()) {
             return 0;
         } else {
             return this.get_UID() > ((ObjetPreparationScannee) obj).get_UID() ? 1 : -1;

@@ -153,7 +153,7 @@ public class EVENT implements Serializable, Comparable {
         TourneeID = tourneeID;
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -204,17 +204,17 @@ public class EVENT implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         EVENT event = (EVENT) obj;
 
-        if (this.getphiwms_mobileUUID() == event.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == event.getPhiMR4UUID()) {
             return 0;
         } else {
-            return this.getphiwms_mobileUUID() > event.getphiwms_mobileUUID() ? 1 : -1;
+            return this.getPhiMR4UUID() > event.getPhiMR4UUID() ? 1 : -1;
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
-        if (((EVENT) obj).getphiwms_mobileUUID() == this.getphiwms_mobileUUID()) {
+        if (((EVENT) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
             valeurARetourner = true;
         }
 

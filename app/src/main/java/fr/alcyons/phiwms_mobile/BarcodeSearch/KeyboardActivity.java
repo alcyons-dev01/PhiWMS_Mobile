@@ -100,6 +100,7 @@ public class KeyboardActivity extends ServiceActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         Intent scannerSearchOnlyIntent = new Intent();
         Bundle scannerSearchOnlyBundle = new Bundle();
         scannerSearchOnlyBundle.putStringArrayList("stringList", (ArrayList) pleinVideContexte.stringList);

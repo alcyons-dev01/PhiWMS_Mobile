@@ -123,7 +123,7 @@ public class ActionUtilisateur_Ligne implements Serializable, Comparable {
         NumChamps = numChamps;
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -200,7 +200,7 @@ public class ActionUtilisateur_Ligne implements Serializable, Comparable {
     public int compareTo(Object obj) {
         ActionUtilisateur_Ligne actionUtilisateur_ligne = (ActionUtilisateur_Ligne) obj;
 
-        if (this.getphiwms_mobileUUID() == actionUtilisateur_ligne.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == actionUtilisateur_ligne.getPhiMR4UUID()) {
             return 0;
         } else {
             return this.getId() > actionUtilisateur_ligne.getId() ? 1 : -1;

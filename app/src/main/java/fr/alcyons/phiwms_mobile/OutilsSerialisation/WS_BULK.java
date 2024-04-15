@@ -288,18 +288,6 @@ public class WS_BULK {
                                     String produitNumeroSerie = ph_serialisation.getNumeroSerie();
 
                                     SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
-
-                                    long rowUID_surveillance = SurveillanceReferenceOpenHelper.insererSurveillanceReferenceEnBDD(db, new_surveillance_reference);
-
-                                    if (rowUID_surveillance != -1) {
-                                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE, new_surveillance_reference.getSerialexpressUUID(), new_surveillance_reference.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
-                                        try {
-                                            EnvoyerMailSurveillance class_mail = new EnvoyerMailSurveillance();
-                                            class_mail.EnvoyerMailSerialisation(new_surveillance_reference.get_UID(), utilisateur.getMail(), db);
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
                                 }
 
                                 PH_Serialisation phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByMultiple(db, GTIN_Courant, Scheme_Courant, Batch_Id, Batch_ExpDate, Numero_de_serie);
@@ -594,18 +582,6 @@ public class WS_BULK {
                                             String produitNumeroSerie = phSerialisation.getNumeroSerie();
 
                                             SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
-
-                                            long rowUID_surveillance = SurveillanceReferenceOpenHelper.insererSurveillanceReferenceEnBDD(db, new_surveillance_reference);
-
-                                            if (rowUID_surveillance != -1) {
-                                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE, new_surveillance_reference.getSerialexpressUUID(), new_surveillance_reference.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
-                                                try {
-                                                    EnvoyerMailSurveillance class_mail = new EnvoyerMailSurveillance();
-                                                    class_mail.EnvoyerMailSerialisation(new_surveillance_reference.get_UID(), utilisateur.getMail(), db);
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
                                         }
 
                                         phSerialisation.setStatut("Executer");

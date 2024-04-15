@@ -1,12 +1,16 @@
 package fr.alcyons.phiwms_mobile.Outils;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -22,6 +26,7 @@ import java.io.IOException;
 
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
+import android.Manifest;
 import fr.alcyons.phiwms_mobile.OriginalActivity;
 
 /**
@@ -55,40 +60,53 @@ public class OutilsGestionConnexionReseau {
     }
 
     public static String getNetworkClass(Context context) {
-        TelephonyManager mTelephonyManager = (TelephonyManager)
-                context.getSystemService(Context.TELEPHONY_SERVICE);
-        int networkType = mTelephonyManager.getNetworkType();
-        switch (networkType) {
-            case TelephonyManager.NETWORK_TYPE_EDGE:
-                return "EDGE";
-            case TelephonyManager.NETWORK_TYPE_CDMA:
-                return "CDMA";
-            case TelephonyManager.NETWORK_TYPE_1xRTT:
-                return "TYPE_1xRTT";
-            case TelephonyManager.NETWORK_TYPE_IDEN:
-                return "IDEN";
-            case TelephonyManager.NETWORK_TYPE_EVDO_0:
-                return "EVDO_0";
-            case TelephonyManager.NETWORK_TYPE_EVDO_A:
-                return "EVDO_A";
-            case TelephonyManager.NETWORK_TYPE_HSDPA:
-                return "HSDPA";
-            case TelephonyManager.NETWORK_TYPE_HSUPA:
-                return "HSUPA";
-            case TelephonyManager.NETWORK_TYPE_HSPA:
-                return "HSPA";
-            case TelephonyManager.NETWORK_TYPE_EVDO_B:
-                return "EVDO_B";
-            case TelephonyManager.NETWORK_TYPE_EHRPD:
-                return "EHRPD";
-            case TelephonyManager.NETWORK_TYPE_UMTS:
-                return "Wifi";
-            case TelephonyManager.NETWORK_TYPE_HSPAP:
-                return "3G";
-            case TelephonyManager.NETWORK_TYPE_LTE:
-                return "4G";
-            default:
-                return "Unknown";
+        boolean permission = false;
+        int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE);
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            permission = true;
+        }
+
+        if(permission)
+        {
+            TelephonyManager mTelephonyManager = (TelephonyManager)
+                    context.getSystemService(Context.TELEPHONY_SERVICE);
+            int networkType = mTelephonyManager.getNetworkType();
+            switch (networkType) {
+                case TelephonyManager.NETWORK_TYPE_EDGE:
+                    return "EDGE";
+                case TelephonyManager.NETWORK_TYPE_CDMA:
+                    return "CDMA";
+                case TelephonyManager.NETWORK_TYPE_1xRTT:
+                    return "TYPE_1xRTT";
+                case TelephonyManager.NETWORK_TYPE_IDEN:
+                    return "IDEN";
+                case TelephonyManager.NETWORK_TYPE_EVDO_0:
+                    return "EVDO_0";
+                case TelephonyManager.NETWORK_TYPE_EVDO_A:
+                    return "EVDO_A";
+                case TelephonyManager.NETWORK_TYPE_HSDPA:
+                    return "HSDPA";
+                case TelephonyManager.NETWORK_TYPE_HSUPA:
+                    return "HSUPA";
+                case TelephonyManager.NETWORK_TYPE_HSPA:
+                    return "HSPA";
+                case TelephonyManager.NETWORK_TYPE_EVDO_B:
+                    return "EVDO_B";
+                case TelephonyManager.NETWORK_TYPE_EHRPD:
+                    return "EHRPD";
+                case TelephonyManager.NETWORK_TYPE_UMTS:
+                    return "Wifi";
+                case TelephonyManager.NETWORK_TYPE_HSPAP:
+                    return "3G";
+                case TelephonyManager.NETWORK_TYPE_LTE:
+                    return "4G";
+                default:
+                    return "Unknown";
+            }
+        }
+        else
+        {
+            return "Unknown";
         }
     }
 
@@ -117,7 +135,7 @@ public class OutilsGestionConnexionReseau {
 
             RequestQueue requestQueue = Volley.newRequestQueue(context);
 
-            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                     new Response.Listener<JSONObject>() {
 
                         @Override

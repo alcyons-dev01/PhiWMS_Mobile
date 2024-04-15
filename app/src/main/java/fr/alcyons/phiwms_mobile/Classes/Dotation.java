@@ -273,7 +273,7 @@ public class Dotation implements Serializable, Comparable {
         this.INSTALLATION = INSTALLATION;
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -371,17 +371,17 @@ public class Dotation implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         Dotation dotation = (Dotation) obj;
 
-        if (this.getphiwms_mobileUUID() == dotation.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == dotation.getPhiMR4UUID()) {
             return 0;
         } else {
-            return this.getphiwms_mobileUUID() > dotation.getphiwms_mobileUUID() ? 1 : -1;
+            return this.getPhiMR4UUID() > dotation.getPhiMR4UUID() ? 1 : -1;
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
-        if (((Dotation) obj).getphiwms_mobileUUID() == this.getphiwms_mobileUUID()) {
+        if (((Dotation) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
             valeurARetourner = true;
         }
 

@@ -10,6 +10,10 @@ import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
 
+import fr.alcyons.phiwms_mobile.ListViewAdapters.Depot_EmplacementAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.Depot_ZoneAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.Emplacement_RetourPUIAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.NotificationAdapter;
 import fr.alcyons.phiwms_mobile.R;
 
 /**
@@ -112,32 +116,31 @@ public class SimpleMultiChoiceModeListener implements AbsListView.MultiChoiceMod
 
     @Override
     public boolean onActionItemClicked(android.view.ActionMode mode, MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menuDelete:
-                if (notificationAdapter != null) {
-                    int nbNotificaionNonLuSupprimer = notificationAdapter.remove();
-                    int nbNotificationNonLu = Integer.parseInt(nbNotificationTextView.getText().toString());
-                    nbNotificationNonLu = nbNotificationNonLu - nbNotificaionNonLuSupprimer;
-                    nbNotificationTextView.setText(String.valueOf(nbNotificationNonLu));
-                    notificationAdapter.notifyDataSetChanged();
-                }
-                if (emplacementRetourPUIAdapter != null) {
-                    emplacementRetourPUIAdapter.remove();
-                    emplacementRetourPUIAdapter.notifyDataSetChanged();
-                }
-                if (depotZoneAdapter != null) {
-                    int nbZoneSupprimer = depotZoneAdapter.remove();
-                    int nbZone = Integer.parseInt(nbZoneTextView.getText().toString());
-                    nbZone = nbZone - nbZoneSupprimer;
-                    nbZoneTextView.setText(String.valueOf(nbZone));
-                }
-                if (depotEmplacementAdapter != null) {
-                    int nbEmplacementSupprimer = depotEmplacementAdapter.remove();
-                    int nbEmplacement = Integer.parseInt(nbEmplacementsTextView.getText().toString());
-                    nbEmplacement = nbEmplacement - nbEmplacementSupprimer;
-                    nbEmplacementsTextView.setText(String.valueOf(nbEmplacement));
-                }
-                break;
+        if(item.getItemId() == R.id.menuDelete)
+        {
+            if (notificationAdapter != null) {
+                int nbNotificaionNonLuSupprimer = notificationAdapter.remove();
+                int nbNotificationNonLu = Integer.parseInt(nbNotificationTextView.getText().toString());
+                nbNotificationNonLu = nbNotificationNonLu - nbNotificaionNonLuSupprimer;
+                nbNotificationTextView.setText(String.valueOf(nbNotificationNonLu));
+                notificationAdapter.notifyDataSetChanged();
+            }
+            if (emplacementRetourPUIAdapter != null) {
+                emplacementRetourPUIAdapter.remove();
+                emplacementRetourPUIAdapter.notifyDataSetChanged();
+            }
+            if (depotZoneAdapter != null) {
+                int nbZoneSupprimer = depotZoneAdapter.remove();
+                int nbZone = Integer.parseInt(nbZoneTextView.getText().toString());
+                nbZone = nbZone - nbZoneSupprimer;
+                nbZoneTextView.setText(String.valueOf(nbZone));
+            }
+            if (depotEmplacementAdapter != null) {
+                int nbEmplacementSupprimer = depotEmplacementAdapter.remove();
+                int nbEmplacement = Integer.parseInt(nbEmplacementsTextView.getText().toString());
+                nbEmplacement = nbEmplacement - nbEmplacementSupprimer;
+                nbEmplacementsTextView.setText(String.valueOf(nbEmplacement));
+            }
         }
         closeActionMode();
         return true;

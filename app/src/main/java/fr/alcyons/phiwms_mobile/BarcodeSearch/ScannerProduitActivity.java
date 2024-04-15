@@ -8,8 +8,6 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -20,10 +18,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
-import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_Preparation_Adapte;
-
-import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeEmplacementCreationActivity;
-import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeZoneCreationActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
@@ -34,29 +28,16 @@ public class ScannerProduitActivity extends ServiceActivity {
     int scannerContexteInt;
     int preparationID;
     List<String> listGTIN;
-    public PH_Preparation_Ligne_Preparation_Adapte.LotAdapte lotCourant;
     PH_Preparation preparation_courante;
-
 
     // CONTEXTE
     ProduitContexte produitContexte;
 
     // GRAPHIQUE
     EditText EditTextScanee;
-    LinearLayout layoutInformations;
-    TextView designationProduit;
-    TextView referenceProduit;
-    TextView quantiteDejaPreparer;
-    TextView quantiteProduit;
-    TextView EmplacementLotProduit;
-    TextView numeroLot;
-    TextView datePeremptionLot;
-    TextView qteSaisie;
     TextView numPreparation;
     TextView depot;
 
-    //Gestion reception PAD
-    ImageView imageValidation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,19 +54,9 @@ public class ScannerProduitActivity extends ServiceActivity {
 
         // GRAPHIQUE
         EditTextScanee = (EditText) findViewById(R.id.EditTextScanee);
-        layoutInformations = (LinearLayout) findViewById(R.id.layoutInformations);
-        designationProduit = (TextView) findViewById(R.id.designationProduit);
-        referenceProduit = (TextView) findViewById(R.id.referenceProduit);
-        quantiteDejaPreparer = (TextView) findViewById(R.id.quantiteDejaPreparer);
-        quantiteProduit = (TextView) findViewById(R.id.quantiteProduit);
-        EmplacementLotProduit = (TextView) findViewById(R.id.EmplacementLotProduit);
-        numeroLot = (TextView) findViewById(R.id.numeroLot);
-        datePeremptionLot = (TextView) findViewById(R.id.datePeremptionLot);
-        qteSaisie = (TextView) findViewById(R.id.qteSaisie);
         numPreparation = (TextView) findViewById(R.id.numPreparation);
         depot = (TextView) findViewById(R.id.depot);
         EditTextScanee.setBackground(getResources().getDrawable(R.drawable.background_scanner_preparation));
-        imageValidation = ((ImageView) findViewById(R.id.imageValidation));
 
         //Affichage des informations de la préparation
         preparation_courante = PH_PreparationOpenHelper.getPH_PreparationByID(db, preparationID);
@@ -145,7 +116,6 @@ public class ScannerProduitActivity extends ServiceActivity {
         findViewById(R.id.scannerMode).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //EditTextScanee.setText("01040462410085001721123110alcyons2\n");
             }
         });
 
@@ -194,8 +164,8 @@ public class ScannerProduitActivity extends ServiceActivity {
     }
 
     @Override
-    public void onBackPressed()
-    {
+    public void onBackPressed() {
+        super.onBackPressed();
         findViewById(R.id.boutonFermeture).performClick();
     }
 }

@@ -190,7 +190,7 @@ public class Detail_Dot implements Serializable, Comparable {
         Stock_minimum = stock_minimum;
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -235,17 +235,17 @@ public class Detail_Dot implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         Detail_Dot detail_dot = (Detail_Dot) obj;
 
-        if (this.getphiwms_mobileUUID() == detail_dot.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == detail_dot.getPhiMR4UUID()) {
             return 0;
         } else {
-            return this.getphiwms_mobileUUID() > detail_dot.getphiwms_mobileUUID() ? 1 : -1;
+            return this.getPhiMR4UUID() > detail_dot.getPhiMR4UUID() ? 1 : -1;
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
-        if (((Detail_Dot) obj).getphiwms_mobileUUID() == this.getphiwms_mobileUUID()) {
+        if (((Detail_Dot) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
             valeurARetourner = true;
         }
 

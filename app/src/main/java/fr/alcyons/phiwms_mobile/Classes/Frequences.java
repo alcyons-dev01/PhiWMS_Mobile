@@ -326,7 +326,7 @@ public class Frequences {
         this.SYS_USER_MAJ = SYS_USER_MAJ;
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 

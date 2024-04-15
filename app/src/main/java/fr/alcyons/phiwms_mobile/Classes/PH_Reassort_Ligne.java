@@ -174,7 +174,7 @@ public class PH_Reassort_Ligne implements Serializable, Comparable {
         this._UID = _UID;
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -209,17 +209,17 @@ public class PH_Reassort_Ligne implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         PH_Reassort_Ligne ph_reassort_ligne = (PH_Reassort_Ligne) obj;
 
-        if (this.getphiwms_mobileUUID() == ph_reassort_ligne.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == ph_reassort_ligne.getPhiMR4UUID()) {
             return 0;
         } else {
-            return this.getphiwms_mobileUUID() > ph_reassort_ligne.getphiwms_mobileUUID() ? 1 : -1;
+            return this.getPhiMR4UUID() > ph_reassort_ligne.getPhiMR4UUID() ? 1 : -1;
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
-        if (((PH_Reassort_Ligne) obj).getphiwms_mobileUUID() == this.getphiwms_mobileUUID()) {
+        if (((PH_Reassort_Ligne) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
             valeurARetourner = true;
         }
 

@@ -60,9 +60,6 @@ import fr.alcyons.phiwms_mobile.DispositifAuLivret.DetailDispositifAuLivretActiv
 import fr.alcyons.phiwms_mobile.IdentificationParScan.DetailProduitIdentificationParScanActivity;
 import fr.alcyons.phiwms_mobile.MedicamentAuLivret.DetailMedicamentAuLivretActivity;
 import fr.alcyons.phiwms_mobile.OriginalActivity;
-import fr.alcyons.phiwms_mobile.PAD.DetailPADActivity;
-import fr.alcyons.phiwms_mobile.PAD.DetailPADComposantPrescriptionActivity;
-import fr.alcyons.phiwms_mobile.PAD.DetailPADDotationActivity;
 
 /**
  * Created by jessica on 08/11/2017.
@@ -330,10 +327,8 @@ public class MedicalObjective {
             ((DetailDispositifAuLivretActivity) context).informationImportanteDispositif.photo.setImageBitmap(b);
             ((DetailDispositifAuLivretActivity) context).informationImportanteDispositif.photo.setVisibility(View.VISIBLE);
         } else if (serviceName.equals("PADComposantPrescription")) {
-            ((DetailPADComposantPrescriptionActivity) context).photoImageView.setImageBitmap(b);
         }
         else if (serviceName.equals("PADDotation")) {
-            ((DetailPADDotationActivity) context).photoImageView.setImageBitmap(b);
         }
     }
 
@@ -388,13 +383,10 @@ public class MedicalObjective {
                     ((DetailDispositifAuLivretActivity) context).informationImportanteDispositif.photo.setVisibility(View.VISIBLE);
                 }
                 if(activityName.contentEquals("DetailPADComposantPrescriptionActivity")){
-                    ((DetailPADComposantPrescriptionActivity) context).photoImageView.setImageBitmap(response);
                 }
                 if(activityName.contentEquals("DetailPADDotationActivity")){
-                    ((DetailPADDotationActivity) context).photoImageView.setImageBitmap(response);
                 }
                 if(activityName.contentEquals("DetailPADActivity")){
-                    ((DetailPADActivity) context).photoImageView.setImageBitmap(response);
                 }
                 if(activityName.contentEquals("DetailProduitIdentificationParScanActivity")){
                     ((DetailProduitIdentificationParScanActivity) context).photo.setImageBitmap(response);

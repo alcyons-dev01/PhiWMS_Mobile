@@ -614,7 +614,7 @@ public class Produit implements Serializable, Comparable {
 
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 

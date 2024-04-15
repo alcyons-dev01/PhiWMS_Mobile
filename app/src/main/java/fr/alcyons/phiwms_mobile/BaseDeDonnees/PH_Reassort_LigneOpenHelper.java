@@ -59,7 +59,7 @@ public class PH_Reassort_LigneOpenHelper extends DBOpenHelper {
     }
 
     public void supprimerUnPH_Reassort_Ligne(SQLiteDatabase db, PH_Reassort_Ligne ph_reassort_ligne) {
-        db.delete(Constantes.TABLE_PH_REASSORT_LIGNE, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(ph_reassort_ligne.getphiwms_mobileUUID())});
+        db.delete(Constantes.TABLE_PH_REASSORT_LIGNE, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(ph_reassort_ligne.getPhiMR4UUID())});
     }
 
     public static class Constantes implements BaseColumns {

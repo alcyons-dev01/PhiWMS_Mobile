@@ -327,7 +327,7 @@ public class SYS_User_Rules {
         SerialisationTermsEtConditions = serialisationTermsEtConditions;
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 

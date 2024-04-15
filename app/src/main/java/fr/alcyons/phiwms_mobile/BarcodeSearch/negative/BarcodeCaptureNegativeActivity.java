@@ -213,20 +213,26 @@ public class BarcodeCaptureNegativeActivity extends ServiceActivity {
         // Make sure to call the super method so that the states of our views are saved
         super.onSaveInstanceState(outState);
         // Save our own state now
-        switch (scannerContexteInt) {
-            case R.string.scannerContexteEmplacement:
-                break;
-            case R.string.scannerContextePleinVide:
-                stringList = pleinVideContexte.stringList;
-                break;
-            case R.string.scannerContextePleinVideLocalisation:
-                break;
-            case R.string.scannerContexteReceptionPAD:
-                stringList = receptionPADContexte.stringList;
-                break;
-            default:
-                stringList = produitContexte.stringList;
-                break;
+
+        if(scannerContexteInt == R.string.scannerContexteEmplacement)
+        {
+
+        }
+        else if(scannerContexteInt == R.string.scannerContextePleinVide)
+        {
+            stringList = pleinVideContexte.stringList;
+        }
+        else if(scannerContexteInt == R.string.scannerContextePleinVideLocalisation)
+        {
+
+        }
+        else if(scannerContexteInt == R.string.scannerContexteReceptionPAD)
+        {
+            stringList = receptionPADContexte.stringList;
+        }
+        else
+        {
+            stringList = produitContexte.stringList;
         }
         outState.putStringArrayList("stringList", (ArrayList<String>) stringList);
         outState.putString("messageText", message.getText().toString());
@@ -358,203 +364,196 @@ public class BarcodeCaptureNegativeActivity extends ServiceActivity {
         // Initialisation du CONTEXTE
         if (scannerContexte != null) {
             scannerContexteInt = Integer.parseInt(scannerContexte);
-            switch (scannerContexteInt) {
-                case R.string.scannerContexteEmplacement:
-                    bannerTexte = emplacementContexte.bannerTexte;
+            if(scannerContexteInt == R.string.scannerContexteEmplacement)
+            {
+                bannerTexte = emplacementContexte.bannerTexte;
+                compteurReliquat.setVisibility(View.GONE);
+                compteurScan.setVisibility(View.GONE);
+            }
+            else if(scannerContexteInt == R.string.scannerContexteEmplacementReceptionScannee)
+            {
+                bannerTexte = emplacementReceptionScanneeContexte.bannerTexte;
+                compteurReliquat.setVisibility(View.GONE);
+                compteurScan.setVisibility(View.GONE);
+                layoutlogoscan.setVisibility(View.GONE);
+                linearRayonnage.setVisibility(View.VISIBLE);
+                rayonnageSelect.setText(intent.getExtras().getString("ProduitSelect"));
+            }
+            else if(scannerContexteInt == R.string.scannerContextePleinVide)
+            {
+                bannerTexte = intent.getExtras().getString("dotationIntitule");
+                pleinVideContexte.stringList = stringList;
+                pleinVideContexte.detailDotPleinVide_AdressageList = intent.getExtras().getStringArrayList("detailDotPleinVide_AdressageList");
+                clavierMode.setVisibility(View.VISIBLE);
+            }
+            else if(scannerContexteInt == R.string.scannerContextePleinVideLocalisation)
+            {
+                bannerTexte = pleinVideLocalisationContexte.bannerTexte;
+            }
+            else if(scannerContexteInt == R.string.scannerContexteFranceMVO)
+            {
+                if(reliquat_uid == 0)
+                {
                     compteurReliquat.setVisibility(View.GONE);
-                    compteurScan.setVisibility(View.GONE);
-                    break;
-                case R.string.scannerContexteEmplacementReceptionScannee:
-                    bannerTexte = emplacementReceptionScanneeContexte.bannerTexte;
-                    compteurReliquat.setVisibility(View.GONE);
-                    compteurScan.setVisibility(View.GONE);
-                    layoutlogoscan.setVisibility(View.GONE);
-                    linearRayonnage.setVisibility(View.VISIBLE);
-                    rayonnageSelect.setText(intent.getExtras().getString("ProduitSelect"));
-                    break;
-                case R.string.scannerContextePleinVide:
-                    bannerTexte = intent.getExtras().getString("dotationIntitule");
-                    pleinVideContexte.stringList = stringList;
-                    pleinVideContexte.detailDotPleinVide_AdressageList = intent.getExtras().getStringArrayList("detailDotPleinVide_AdressageList");
-                    clavierMode.setVisibility(View.VISIBLE);
-                    break;
-                case R.string.scannerContextePleinVideLocalisation:
-                    bannerTexte = pleinVideLocalisationContexte.bannerTexte;
-                    break;
-                case R.string.scannerContexteFranceMVO:
-                    if(reliquat_uid == 0)
-                    {
-                        compteurReliquat.setVisibility(View.GONE);
-                    }
-                    scannerContexte = String.valueOf(R.string.scannerContexteFranceMVO);
-                    bannerTexte = franceMVOContexte.bannerTexte;
-                    franceMVOContexte.stringList = stringList;
-                    break;
-                case R.string.scannerContextePreparation:
-                    compteurReliquat.setVisibility(View.GONE);
-                    bannerTexte = preparationContexte.bannerTexte;
-                    scannerContexte = String.valueOf(R.string.scannerContextePreparation);
-                    preparationContexte.stringList = stringList;
-                    break;
-                case R.string.scannerContexteReceptionPAD :
-                    scannerContexte = String.valueOf(R.string.scannerContexteReceptionPAD);
-                    compteurReliquat.setVisibility(View.GONE);
-                    compteurScan.setVisibility(View.GONE);
-                    layout_emplacement_scannee.setVisibility(View.GONE);
-                    layoutlogoscan.setVisibility(View.GONE);
+                }
+                scannerContexte = String.valueOf(R.string.scannerContexteFranceMVO);
+                bannerTexte = franceMVOContexte.bannerTexte;
+                franceMVOContexte.stringList = stringList;
+            }
+            else if(scannerContexteInt == R.string.scannerContextePreparation)
+            {
+                compteurReliquat.setVisibility(View.GONE);
+                bannerTexte = preparationContexte.bannerTexte;
+                scannerContexte = String.valueOf(R.string.scannerContextePreparation);
+                preparationContexte.stringList = stringList;
+            }
+            else if(scannerContexteInt == R.string.scannerContexteReceptionPAD)
+            {
+                scannerContexte = String.valueOf(R.string.scannerContexteReceptionPAD);
+                compteurReliquat.setVisibility(View.GONE);
+                compteurScan.setVisibility(View.GONE);
+                layout_emplacement_scannee.setVisibility(View.GONE);
+                layoutlogoscan.setVisibility(View.GONE);
+                effacerEmplacement.setVisibility(View.GONE);
+                linearRayonnage.setVisibility(View.VISIBLE);
+                receptionPADContexte.stringList = intent.getExtras().getStringArrayList("Liste_GTIN_Scannee");
+                if(receptionPADContexte.stringList == null)
+                {
+                    receptionPADContexte.stringList = new ArrayList<>();
+                }
+                receptionPADContexte.list_result = (List<ObjetReceptionScannee>) intent.getExtras().getSerializable("ListeObjetScannee");
+                if(receptionPADContexte.list_result == null)
+                {
+                    receptionPADContexte.list_result = new ArrayList<>();
+                }
+                rayonnageSelect.setVisibility(View.GONE);
+                compteurScan.setVisibility(View.GONE);
+                bannerTexte = "Scannez une référence";
+            }
+            else if(scannerContexteInt == R.string.scannerContextePreparationADH)
+            {
+                preparationScanneeContexte.liste_resultat = (List<ObjetReceptionScannee>) intent.getExtras().getSerializable("Liste_Objet_Scanne");
+                if (preparationScanneeContexte.liste_resultat == null)
+                {
+                    preparationScanneeContexte.liste_resultat = new ArrayList<>();
+                }
+
+                preparationScanneeContexte.liste_code_scanne = intent.getExtras().getStringArrayList("ListString");
+                if(preparationScanneeContexte.liste_code_scanne == null)
+                {
+                    preparationScanneeContexte.liste_code_scanne = new ArrayList<>();
+                }
+
+                if(intent.hasExtra("EmplacementScanne"))
+                {
+                    preparationScanneeContexte.scanEmplacement = true;
+                    preparationScanneeContexte.emplacementProduitCourant = intent.getExtras().getString("EmplacementScanne");
+                    preparationScanneeContexte.zoneProduitCourant = intent.getExtras().getString("ZoneScanne");
+
+                    nomZoneProduitReceptionScannee.setText(preparationScanneeContexte.emplacementProduitCourant);
+                    nomEmplacementProduitReceptionScannee.setText(preparationScanneeContexte.zoneProduitCourant);
+                    bannerTexte = "Scanner un produit";
+                    effacerEmplacement.setVisibility(View.VISIBLE);
+                    boutonModifierEmplacementReceptionScanne.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    bannerTexte = "Scanner un emplacement";
+                    bannerTexte = preparationScanneeContexte.bannerTexte;
                     effacerEmplacement.setVisibility(View.GONE);
-                    linearRayonnage.setVisibility(View.VISIBLE);
-                    receptionPADContexte.stringList = intent.getExtras().getStringArrayList("Liste_GTIN_Scannee");
-                    if(receptionPADContexte.stringList == null)
-                    {
-                        receptionPADContexte.stringList = new ArrayList<>();
-                    }
-                    receptionPADContexte.list_result = (List<ObjetReceptionScannee>) intent.getExtras().getSerializable("ListeObjetScannee");
-                    if(receptionPADContexte.list_result == null)
-                    {
-                        receptionPADContexte.list_result = new ArrayList<>();
-                    }
-                    rayonnageSelect.setVisibility(View.GONE);
-                    compteurScan.setVisibility(View.GONE);
-                    bannerTexte = "Scannez une référence";
-                    break;
-                case R.string.scannerContextePreparationADH:
-                    preparationScanneeContexte.liste_resultat = (List<ObjetReceptionScannee>) intent.getExtras().getSerializable("Liste_Objet_Scanne");
-                    if (preparationScanneeContexte.liste_resultat == null)
-                    {
-                        preparationScanneeContexte.liste_resultat = new ArrayList<>();
-                    }
+                }
 
-                    preparationScanneeContexte.liste_code_scanne = intent.getExtras().getStringArrayList("ListString");
-                    if(preparationScanneeContexte.liste_code_scanne == null)
-                    {
-                        preparationScanneeContexte.liste_code_scanne = new ArrayList<>();
-                    }
-
-                    if(intent.hasExtra("EmplacementScanne"))
-                    {
-                        preparationScanneeContexte.scanEmplacement = true;
-                        preparationScanneeContexte.emplacementProduitCourant = intent.getExtras().getString("EmplacementScanne");
-                        preparationScanneeContexte.zoneProduitCourant = intent.getExtras().getString("ZoneScanne");
-
-                        nomZoneProduitReceptionScannee.setText(preparationScanneeContexte.emplacementProduitCourant);
-                        nomEmplacementProduitReceptionScannee.setText(preparationScanneeContexte.zoneProduitCourant);
-                        bannerTexte = "Scanner un produit";
-                        effacerEmplacement.setVisibility(View.VISIBLE);
-                        boutonModifierEmplacementReceptionScanne.setVisibility(View.VISIBLE);
-                    }
-                    else
-                    {
+                compteurReliquat.setVisibility(View.GONE);
+                compteurScan.setVisibility(View.GONE);
+                layout_emplacement_scannee.setVisibility(View.GONE);
+                layoutlogoscan.setVisibility(View.GONE);
+                scannerContexte = String.valueOf(R.string.scannerContextePreparationADH);
+                preparationScanneeContexte.stringList = stringList;
+                linearRayonnage.setVisibility(View.VISIBLE);
+                LinearZoneEmplacementProduitReceptionScanne.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
                         bannerTexte = "Scanner un emplacement";
-                        bannerTexte = preparationScanneeContexte.bannerTexte;
-                        effacerEmplacement.setVisibility(View.GONE);
+                        boutonValiderProduitReceptionScannee.setVisibility(View.GONE);
+                        nomZoneProduitReceptionScannee.setText("");
+                        nomEmplacementProduitReceptionScannee.setText("");
+                        preparationScanneeContexte.emplacementProduitCourant = "";
+                        preparationScanneeContexte.zoneProduitCourant = "";
+                        LinearZoneEmplacementProduitReceptionScanne.setBackgroundResource(android.R.color.transparent);
+                        ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
+                        boutonModifierEmplacementReceptionScanne.setVisibility(View.GONE);
+                        preparationScanneeContexte.scanEmplacement = true;
                     }
+                });
+                rayonnageSelect.setVisibility(View.GONE);
+                layout_emplacement_scannee.setVisibility(View.GONE);
+            }
+            else if(scannerContexteInt == R.string.scannerContexteDocument)
+            {
+                layout_image_codebarre.setVisibility(View.GONE);
+                layout_image_datamatrix.setVisibility(View.GONE);
+                layout_image_document.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
+                bannerTexte = documentContext.bannerTexte;
+            }
+            else if(scannerContexteInt == R.string.scannerContexteAuthentification)
+            {
+                ((ImageView)findViewById(R.id.changeMode)).setVisibility(View.GONE);
+                ((ImageView)findViewById(R.id.scannerMode)).setVisibility(View.GONE);
+                layout_image_codebarre.setVisibility(View.GONE);
+                layout_image_document.setVisibility(View.GONE);
+                layout_image_datamatrix.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
+                bannerTexte = authentificationContext.bannerTexte;
+            }
+            else if(scannerContexteInt == R.string.scannerContexteService)
+            {
+                layout_image_codebarre.setVisibility(View.GONE);
+                layout_image_document.setVisibility(View.GONE);
+                layout_image_datamatrix.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
+                bannerTexte = serviceContexte.bannerTexte;
+            }
+            else if(scannerContexteInt == R.string.scannerContexteProduitReceptionScannee)
+            {
+                scannerContexte = String.valueOf(R.string.scannerContexteProduitReceptionScannee);
+                compteurReliquat.setVisibility(View.GONE);
+                compteurScan.setVisibility(View.GONE);
+                layout_emplacement_scannee.setVisibility(View.GONE);
+                layoutlogoscan.setVisibility(View.GONE);
+                effacerEmplacement.setVisibility(View.GONE);
+                linearRayonnage.setVisibility(View.VISIBLE);
+                produitReceptionScanneeContexte.stringList = intent.getExtras().getStringArrayList("Liste_GTIN_Scannee");
+                int uidEmplacement = intent.getExtras().getInt("uidEmplacement");
+                if(uidEmplacement != 0)
+                {
+                    produitReceptionScanneeContexte.GestionEmplacement(uidEmplacement);
+                    nomEmplacementProduitReceptionScannee.setVisibility(View.VISIBLE);
+                    nomZoneProduitReceptionScannee.setVisibility(View.VISIBLE);
+                    nomEmplacementProduitReceptionScannee.setText(produitReceptionScanneeContexte.emplacementProduitCourant);
+                    nomZoneProduitReceptionScannee.setText(produitReceptionScanneeContexte.zoneProduitCourant);
+                    produitReceptionScanneeContexte.scanEmplacement = false;
+                    bannerTexte = "Scanner une référence";
 
-                    compteurReliquat.setVisibility(View.GONE);
-                    compteurScan.setVisibility(View.GONE);
-                    layout_emplacement_scannee.setVisibility(View.GONE);
-                    layoutlogoscan.setVisibility(View.GONE);
-                    scannerContexte = String.valueOf(R.string.scannerContextePreparationADH);
-                    preparationScanneeContexte.stringList = stringList;
-                    linearRayonnage.setVisibility(View.VISIBLE);
-                    LinearZoneEmplacementProduitReceptionScanne.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            bannerTexte = "Scanner un emplacement";
-                            boutonValiderProduitReceptionScannee.setVisibility(View.GONE);
-                            nomZoneProduitReceptionScannee.setText("");
-                            nomEmplacementProduitReceptionScannee.setText("");
-                            preparationScanneeContexte.emplacementProduitCourant = "";
-                            preparationScanneeContexte.zoneProduitCourant = "";
-                            LinearZoneEmplacementProduitReceptionScanne.setBackgroundResource(android.R.color.transparent);
-                            ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
-                            boutonModifierEmplacementReceptionScanne.setVisibility(View.GONE);
-                            preparationScanneeContexte.scanEmplacement = true;
-                        }
-                    });
-                    rayonnageSelect.setVisibility(View.GONE);
-                    layout_emplacement_scannee.setVisibility(View.GONE);
-                    //bannerTexte = produitReceptionScanneeContexte.bannerTexte;
-                    //rayonnageSelect.setText(intent.getExtras().getString("EmplacementSelect"));
-                    break;
-                case R.string.scannerContexteDocument:
-                    layout_image_codebarre.setVisibility(View.GONE);
-                    layout_image_datamatrix.setVisibility(View.GONE);
-                    layout_image_document.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
-                    bannerTexte = documentContext.bannerTexte;
-                    break;
-                case R.string.scannerContexteAuthentification:
-                    ((ImageView)findViewById(R.id.changeMode)).setVisibility(View.GONE);
-                    ((ImageView)findViewById(R.id.scannerMode)).setVisibility(View.GONE);
-                    layout_image_codebarre.setVisibility(View.GONE);
-                    layout_image_document.setVisibility(View.GONE);
-                    layout_image_datamatrix.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
-                    bannerTexte = authentificationContext.bannerTexte;
-                    break;
-                case R.string.scannerContexteService:
-                    layout_image_codebarre.setVisibility(View.GONE);
-                    layout_image_document.setVisibility(View.GONE);
-                    layout_image_datamatrix.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
-                    bannerTexte = serviceContexte.bannerTexte;
-                    break;
-                case R.string.scannerContexteProduitReceptionScannee:
-                    scannerContexte = String.valueOf(R.string.scannerContexteProduitReceptionScannee);
-                    compteurReliquat.setVisibility(View.GONE);
-                    compteurScan.setVisibility(View.GONE);
-                    layout_emplacement_scannee.setVisibility(View.GONE);
-                    layoutlogoscan.setVisibility(View.GONE);
-                    effacerEmplacement.setVisibility(View.GONE);
-                    linearRayonnage.setVisibility(View.VISIBLE);
-                    produitReceptionScanneeContexte.stringList = intent.getExtras().getStringArrayList("Liste_GTIN_Scannee");
-                    int uidEmplacement = intent.getExtras().getInt("uidEmplacement");
-                    if(uidEmplacement != 0)
-                    {
-                        produitReceptionScanneeContexte.GestionEmplacement(uidEmplacement);
-                        nomEmplacementProduitReceptionScannee.setVisibility(View.VISIBLE);
-                        nomZoneProduitReceptionScannee.setVisibility(View.VISIBLE);
-                        nomEmplacementProduitReceptionScannee.setText(produitReceptionScanneeContexte.emplacementProduitCourant);
-                        nomZoneProduitReceptionScannee.setText(produitReceptionScanneeContexte.zoneProduitCourant);
-                        produitReceptionScanneeContexte.scanEmplacement = false;
-                        bannerTexte = "Scanner une référence";
-
-                    }
-                    if(produitReceptionScanneeContexte.stringList == null)
-                    {
-                        produitReceptionScanneeContexte.stringList = new ArrayList<>();
-                    }
-                    produitReceptionScanneeContexte.list_result = (List<ObjetReceptionScannee>) intent.getExtras().getSerializable("ListeObjetScannee");
-                    if(produitReceptionScanneeContexte.list_result == null)
-                    {
-                        produitReceptionScanneeContexte.list_result = new ArrayList<>();
-                    }
-
-/*                    LinearZoneEmplacementProduitReceptionScanne.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            bannerTexte = "Scanner un emplacement";
-                            boutonValiderProduitReceptionScannee.setVisibility(View.GONE);
-                            nomZoneProduitReceptionScannee.setText("");
-                            nomEmplacementProduitReceptionScannee.setText("");
-                            produitReceptionScanneeContexte.emplacementProduitCourant = "";
-                            produitReceptionScanneeContexte.zoneProduitCourant = "";
-                            LinearZoneEmplacementProduitReceptionScanne.setBackgroundResource(android.R.color.transparent);
-                            ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
-                            boutonModifierEmplacementReceptionScanne.setVisibility(View.GONE);
-                            produitReceptionScanneeContexte.scanEmplacement = true;
-                        }
-                    });*/
-                    rayonnageSelect.setVisibility(View.GONE);
-                    compteurScan.setVisibility(View.GONE);
-                    break;
-                default:
-                    scannerContexte = String.valueOf(R.string.scannerContexteProduit);
-                    layout_image_codebarre.setVisibility(View.GONE);
-                    layout_image_document.setVisibility(View.GONE);
-                    produitContexte.stringList = stringList;
-                    compteurReliquat.setVisibility(View.GONE);
-                    layout_image_datamatrix.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
-                    bannerTexte = produitContexte.bannerTexte;
-                    break;
+                }
+                if(produitReceptionScanneeContexte.stringList == null)
+                {
+                    produitReceptionScanneeContexte.stringList = new ArrayList<>();
+                }
+                produitReceptionScanneeContexte.list_result = (List<ObjetReceptionScannee>) intent.getExtras().getSerializable("ListeObjetScannee");
+                if(produitReceptionScanneeContexte.list_result == null)
+                {
+                    produitReceptionScanneeContexte.list_result = new ArrayList<>();
+                }
+                rayonnageSelect.setVisibility(View.GONE);
+                compteurScan.setVisibility(View.GONE);
+            }
+            else
+            {
+                scannerContexte = String.valueOf(R.string.scannerContexteProduit);
+                layout_image_codebarre.setVisibility(View.GONE);
+                layout_image_document.setVisibility(View.GONE);
+                produitContexte.stringList = stringList;
+                compteurReliquat.setVisibility(View.GONE);
+                layout_image_datamatrix.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
+                bannerTexte = produitContexte.bannerTexte;
             }
         } else {
             scannerContexte = String.valueOf(R.string.scannerContexteProduit);
@@ -582,53 +581,65 @@ public class BarcodeCaptureNegativeActivity extends ServiceActivity {
                     Intent resultIntent = new Intent();
                     Bundle extras = new Bundle();
 
-                    switch (scannerContexteInt) {
-                        case R.string.scannerContexteEmplacement:
-                            break;
-                        case R.string.scannerContexteEmplacementReceptionScannee:
-                            break;
-                        case R.string.scannerContextePleinVide:
-                            stringList = pleinVideContexte.stringList;
-                            extras.putStringArrayList("listeString", (ArrayList) stringList);
-                            break;
-                        case R.string.scannerContextePleinVideLocalisation:
-                            break;
-                        case R.string.scannerContexteDocument:
-                            extras.putString("Code", "");
-                            break;
-                        case R.string.scannerContexteService:
-                            extras.putString("Code","");
-                            break;
-                        case R.string.scannerContexteAuthentification:
-                            extras.putString("username", "");
-                            extras.putString("password", "");
-                            break;
-                        case R.string.scannerContexteFranceMVO:
-                            extras.putSerializable("listeString", (Serializable) franceMVOContexte.tableau_renvoyer);
-                            break;
-                        case R.string.scannerContextePreparation:
-                            extras.putSerializable("listeString", (Serializable) preparationContexte.liste_preparation_liste_adapte);
-                            extras.putInt("nbProduitScanne", preparationContexte.nb_produit_scanne);
-                            break;
-                        case R.string.scannerContextePreparationADH:
-                            stringList = produitReceptionScanneeContexte.stringList;
-                            extras.putSerializable("listeObjet", (Serializable) preparationScanneeContexte.liste_resultat);
-                            extras.putStringArrayList("listecodescannee", (ArrayList<String>) preparationScanneeContexte.liste_code_scanne);
-                            /*                            extras.putSerializable("listeString", (Serializable) preparationScanneeContexte.liste_preparation_liste_adapte);
-                            extras.putInt("nbProduitScanne", preparationScanneeContexte.nb_produit_scanne);*/
-                            break;
-                        case R.string.scannerContexteProduitReceptionScannee:
-                            stringList = produitReceptionScanneeContexte.stringList;
-                            extras.putSerializable("listeString", (Serializable) produitReceptionScanneeContexte.list_result);
-                            break;
-                        case R.string.scannerContexteReceptionPAD:
-                            stringList = receptionPADContexte.stringList;
-                            extras.putSerializable("listeString", (Serializable) receptionPADContexte.list_result);
-                            break;
-                        default:
-                            stringList = produitContexte.stringList;
-                            extras.putStringArrayList("listeString", (ArrayList) stringList);
-                            break;
+                    if(scannerContexteInt == R.string.scannerContexteEmplacement)
+                    {
+
+                    }
+                    else if(scannerContexteInt == R.string.scannerContexteEmplacementReceptionScannee)
+                    {
+
+                    }
+                    else if(scannerContexteInt == R.string.scannerContextePleinVide)
+                    {
+                        stringList = pleinVideContexte.stringList;
+                        extras.putStringArrayList("listeString", (ArrayList) stringList);
+                    }
+                    else if(scannerContexteInt == R.string.scannerContextePleinVideLocalisation)
+                    {
+
+                    }
+                    else if(scannerContexteInt ==  R.string.scannerContexteDocument)
+                    {
+                        extras.putString("Code", "");
+                    }
+                    else if(scannerContexteInt == R.string.scannerContexteService)
+                    {
+                        extras.putString("Code","");
+                    }
+                    else if(scannerContexteInt == R.string.scannerContexteAuthentification)
+                    {
+                        extras.putString("username", "");
+                        extras.putString("password", "");
+                    }
+                    else if(scannerContexteInt == R.string.scannerContexteFranceMVO)
+                    {
+                        extras.putSerializable("listeString", (Serializable) franceMVOContexte.tableau_renvoyer);
+                    }
+                    else if(scannerContexteInt == R.string.scannerContextePreparation)
+                    {
+                        extras.putSerializable("listeString", (Serializable) preparationContexte.liste_preparation_liste_adapte);
+                        extras.putInt("nbProduitScanne", preparationContexte.nb_produit_scanne);
+                    }
+                    else if(scannerContexteInt == R.string.scannerContextePreparationADH)
+                    {
+                        stringList = produitReceptionScanneeContexte.stringList;
+                        extras.putSerializable("listeObjet", (Serializable) preparationScanneeContexte.liste_resultat);
+                        extras.putStringArrayList("listecodescannee", (ArrayList<String>) preparationScanneeContexte.liste_code_scanne);
+                    }
+                    else if(scannerContexteInt == R.string.scannerContexteProduitReceptionScannee)
+                    {
+                        stringList = produitReceptionScanneeContexte.stringList;
+                        extras.putSerializable("listeString", (Serializable) produitReceptionScanneeContexte.list_result);
+                    }
+                    else if(scannerContexteInt == R.string.scannerContexteReceptionPAD)
+                    {
+                        stringList = receptionPADContexte.stringList;
+                        extras.putSerializable("listeString", (Serializable) receptionPADContexte.list_result);
+                    }
+                    else
+                    {
+                        stringList = produitContexte.stringList;
+                        extras.putStringArrayList("listeString", (ArrayList) stringList);
                     }
 
                     resultIntent.putExtras(extras);
@@ -658,20 +669,25 @@ public class BarcodeCaptureNegativeActivity extends ServiceActivity {
                 Intent resultIntent = new Intent();
                 Bundle extras = new Bundle();
 
-                switch (scannerContexteInt) {
-                    case R.string.scannerContexteEmplacement:
-                        break;
-                    case R.string.scannerContextePleinVide:
-                        stringList = pleinVideContexte.stringList;
-                        break;
-                    case R.string.scannerContextePleinVideLocalisation:
-                        break;
-                    case R.string.scannerContextePreparationADH:
-                        stringList = preparationScanneeContexte.stringList;
-                        break;
-                    default:
-                        stringList = produitContexte.stringList;
-                        break;
+                if(scannerContexteInt == R.string.scannerContexteEmplacement)
+                {
+
+                }
+                else if(scannerContexteInt == R.string.scannerContextePleinVide)
+                {
+                    stringList = pleinVideContexte.stringList;
+                }
+                else if(scannerContexteInt == R.string.scannerContextePleinVideLocalisation)
+                {
+
+                }
+                else if(scannerContexteInt == R.string.scannerContextePreparationADH)
+                {
+                    stringList = preparationScanneeContexte.stringList;
+                }
+                else
+                {
+                    stringList = produitContexte.stringList;
                 }
 
                 if (modeRafale) {
@@ -704,36 +720,39 @@ public class BarcodeCaptureNegativeActivity extends ServiceActivity {
                     extras.putInt("scannerContexteInt",scannerContexteInt);
                     int codeEchangesActivites = 0;
                     if (modeRafale) {
-                        switch (scannerContexteInt) {
-                            case R.string.scannerContextePleinVide:
-                                stringList = pleinVideContexte.stringList;
-                                extras.putString("dotationIntitule", intent.getExtras().getString("dotationIntitule"));
-                                extras.putStringArrayList("detailDotPleinVide_AdressageList",intent.getExtras().getStringArrayList("detailDotPleinVide_AdressageList"));
-                                codeEchangesActivites = CodesEchangesActivites.RETOUR_LISTE_CODE_ADRESSAGE;
-                                break;
-                            case R.string.scannerContexteReceptionPAD:
-                                stringList = receptionPADContexte.stringList;
-                                int uidEmplacementScanne = receptionPADContexte.uidEmplacementCourant;
-                                extras.putInt("uidEmplacement", uidEmplacementScanne);
-                                codeEchangesActivites = CodesEchangesActivites.RETOUR_LISTE_CODE_GS1;
-                                break;
-                            default:
-                                stringList = produitContexte.stringList;
-                                codeEchangesActivites = CodesEchangesActivites.RETOUR_LISTE_CODE_GS1;
-                                break;
+                        if(scannerContexteInt == R.string.scannerContextePleinVide)
+                        {
+                            stringList = pleinVideContexte.stringList;
+                            extras.putString("dotationIntitule", intent.getExtras().getString("dotationIntitule"));
+                            extras.putStringArrayList("detailDotPleinVide_AdressageList",intent.getExtras().getStringArrayList("detailDotPleinVide_AdressageList"));
+                            codeEchangesActivites = CodesEchangesActivites.RETOUR_LISTE_CODE_ADRESSAGE;
                         }
+                        else if(scannerContexteInt == R.string.scannerContexteReceptionPAD)
+                        {
+                            stringList = receptionPADContexte.stringList;
+                            int uidEmplacementScanne = receptionPADContexte.uidEmplacementCourant;
+                            extras.putInt("uidEmplacement", uidEmplacementScanne);
+                            codeEchangesActivites = CodesEchangesActivites.RETOUR_LISTE_CODE_GS1;
+                        }
+                        else
+                        {
+                            stringList = produitContexte.stringList;
+                            codeEchangesActivites = CodesEchangesActivites.RETOUR_LISTE_CODE_GS1;
+                        }
+
                         extras.putStringArrayList("stringList", (ArrayList<String>) stringList);
                     } else {
-                        switch (scannerContexteInt) {
-                            case R.string.scannerContexteEmplacement:
-                                codeEchangesActivites = CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT;
-                                break;
-                            case R.string.scannerContextePleinVideLocalisation:
-                                codeEchangesActivites = CodesEchangesActivites.RESULT_PLEINVIDE_LOCALISATION;
-                                break;
-                            default:
-                                codeEchangesActivites = CodesEchangesActivites.RETOUR_CODE_GS1;
-                                break;
+                        if(scannerContexteInt == R.string.scannerContexteEmplacement)
+                        {
+                            codeEchangesActivites = CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT;
+                        }
+                        else if(scannerContexteInt == R.string.scannerContextePleinVideLocalisation)
+                        {
+                            codeEchangesActivites = CodesEchangesActivites.RESULT_PLEINVIDE_LOCALISATION;
+                        }
+                        else
+                        {
+                            codeEchangesActivites = CodesEchangesActivites.RETOUR_CODE_GS1;
                         }
                     }
                     newIntent.putExtras(extras);
@@ -779,94 +798,103 @@ public class BarcodeCaptureNegativeActivity extends ServiceActivity {
                 if (s.toString().endsWith("\n")) {
                     final Intent resultIntent = new Intent();
                     code = "";
-                    switch (scannerContexteInt) {
-                        case R.string.scannerContexteEmplacement:
-                            code = s.toString().substring(0, s.length() - 1);
-                            break;
-                        case R.string.scannerContexteEmplacementReceptionScannee:
-                            code = s.toString().substring(0, s.length()-1);
-                            break;
-                        case R.string.scannerContextePleinVide:
-                            pleinVideContexte.onTextWatcher(s);
-                            compteurScan.setText(String.valueOf(pleinVideContexte.stringList.size()) + " produit(s) scanné(s)");
-                            break;
-                        case R.string.scannerContextePleinVideLocalisation:
-                            pleinVideLocalisationContexte.onTextWatcher(s);
-                            code = pleinVideLocalisationContexte.code;
-                            break;
-                        case R.string.scannerContexteDocument:
-                            documentContext.onTextWatcher(s);
-                            code = documentContext.code;
-                            break;
-                        case R.string.scannerContexteService:
-                            serviceContexte.onTextWatcher(s);
-                            code = serviceContexte.code;
-                            break;
-                        case R.string.scannerContexteAuthentification:
-                            authentificationContext.onTextWatcher(s);
-                            String username = authentificationContext.username;
-                            String password = authentificationContext.password;
-                            if(username != null && password != null)
-                            {
-                                code = "ok";
-                            }
-                            else
-                                code = "";
 
-                            resultIntent.putExtra("username", username);
-                            resultIntent.putExtra("password", password);
-                            break;
-                        case R.string.scannerContexteFranceMVO:
-                            franceMVOContexte.onTextWatcher(s);
-                            compteurScan.setText(String.valueOf(franceMVOContexte.stringList.size())+" produit(s) scanné(s)");
-                            break;
-                        case R.string.scannerContextePreparation:
-                            preparationContexte.onTextWatcher(s);
-                            compteurScan.setText(String.valueOf(preparationContexte.nb_produit_scanne)+" produit(s) scanné(s)");
-                            break;
-                        case R.string.scannerContextePreparationADH:
-                            preparationScanneeContexte.onTextWatcher(s);
-                            //compteurScan.setText(String.valueOf(preparationScanneeContexte.nb_produit_scanne)+" produit(s) scanné(s)");
-                            //code = preparationScanneeContexte.code;
-                            layoutProduitPreparationADH.setVisibility(View.VISIBLE);
-                            DesignationProduitScannee.setText(preparationScanneeContexte.designationProduitScanne);
-                            quantiteProduitScannee.setVisibility(View.VISIBLE);
-                            quantiteProduitScannee.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                                @Override
-                                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                                    if(actionId == EditorInfo.IME_ACTION_DONE)
+                    if(scannerContexteInt == R.string.scannerContexteEmplacement)
+                    {
+                        code = s.toString().substring(0, s.length() - 1);
+                    }
+                    else if(scannerContexteInt == R.string.scannerContexteEmplacementReceptionScannee)
+                    {
+                        code = s.toString().substring(0, s.length()-1);
+                    }
+                    else if(scannerContexteInt == R.string.scannerContextePleinVide)
+                    {
+                        pleinVideContexte.onTextWatcher(s);
+                        compteurScan.setText(String.valueOf(pleinVideContexte.stringList.size()) + " produit(s) scanné(s)");
+                    }
+                    else if(scannerContexteInt == R.string.scannerContextePleinVideLocalisation)
+                    {
+                        pleinVideLocalisationContexte.onTextWatcher(s);
+                        code = pleinVideLocalisationContexte.code;
+                    }
+                    else if(scannerContexteInt == R.string.scannerContexteDocument)
+                    {
+                        documentContext.onTextWatcher(s);
+                        code = documentContext.code;
+                    }
+                    else if(scannerContexteInt == R.string.scannerContexteService)
+                    {
+                        serviceContexte.onTextWatcher(s);
+                        code = serviceContexte.code;
+                    }
+                    else if(scannerContexteInt == R.string.scannerContexteAuthentification)
+                    {
+                        authentificationContext.onTextWatcher(s);
+                        String username = authentificationContext.username;
+                        String password = authentificationContext.password;
+                        if(username != null && password != null)
+                        {
+                            code = "ok";
+                        }
+                        else
+                            code = "";
+
+                        resultIntent.putExtra("username", username);
+                        resultIntent.putExtra("password", password);
+                    }
+                    else if(scannerContexteInt == R.string.scannerContexteFranceMVO)
+                    {
+                        franceMVOContexte.onTextWatcher(s);
+                        compteurScan.setText(String.valueOf(franceMVOContexte.stringList.size())+" produit(s) scanné(s)");
+                    }
+                    else if(scannerContexteInt == R.string.scannerContextePreparation)
+                    {
+                        preparationContexte.onTextWatcher(s);
+                        compteurScan.setText(String.valueOf(preparationContexte.nb_produit_scanne)+" produit(s) scanné(s)");
+                    }
+                    else if(scannerContexteInt == R.string.scannerContextePreparationADH)
+                    {
+                        preparationScanneeContexte.onTextWatcher(s);
+                        layoutProduitPreparationADH.setVisibility(View.VISIBLE);
+                        DesignationProduitScannee.setText(preparationScanneeContexte.designationProduitScanne);
+                        quantiteProduitScannee.setVisibility(View.VISIBLE);
+                        quantiteProduitScannee.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                            @Override
+                            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                                if(actionId == EditorInfo.IME_ACTION_DONE)
+                                {
+                                    String text = quantiteProduitScannee.getText().toString();
+                                    if(!text.contentEquals(""))
                                     {
-                                        String text = quantiteProduitScannee.getText().toString();
-                                        if(!text.contentEquals(""))
-                                        {
-                                            int quantite_saisie = Integer.parseInt(text);
-                                            if(quantite_saisie > preparationScanneeContexte.nbMaxQuantite)
-                                                quantite_saisie = preparationScanneeContexte.nbMaxQuantite;
-                                            code = preparationScanneeContexte.uid_preparationLigneCourant+":"+quantite_saisie+":"+ preparationScanneeContexte.code;
-                                            resultIntent.putExtra("code", code);
-                                            setResult(BarcodeCaptureActivity.RESULT_OK, resultIntent);
-                                            finish();
-                                        }
+                                        int quantite_saisie = Integer.parseInt(text);
+                                        if(quantite_saisie > preparationScanneeContexte.nbMaxQuantite)
+                                            quantite_saisie = preparationScanneeContexte.nbMaxQuantite;
+                                        code = preparationScanneeContexte.uid_preparationLigneCourant+":"+quantite_saisie+":"+ preparationScanneeContexte.code;
+                                        resultIntent.putExtra("code", code);
+                                        setResult(BarcodeCaptureActivity.RESULT_OK, resultIntent);
+                                        finish();
                                     }
-                                    return false;
                                 }
-                            });
-                            break;
-                        case R.string.scannerContexteProduitReceptionScannee:
-                            produitReceptionScanneeContexte.onTextWatcher(s);
-                           // compteurScan.setText(String.valueOf(produitReceptionScanneeContexte.stringList.size()) + " produit(s) scanné(s)");
-                            code = produitReceptionScanneeContexte.code;
-                            break;
-                        case R.string.scannerContexteReceptionPAD:
-                            receptionPADContexte.onTextWatcher(s);
-                            compteurScan.setText(String.valueOf(receptionPADContexte.stringList.size()) + " produit(s) scanné(s)");
-                            code = receptionPADContexte.code;
-                            break;
-                        default:
-                            produitContexte.onTextWatcher(s);
-                            compteurScan.setText(String.valueOf(produitContexte.stringList.size()) + " produit(s) scanné(s)");
-                            code = produitContexte.code;
-                            break;
+                                return false;
+                            }
+                        });
+                    }
+                    else if(scannerContexteInt == R.string.scannerContexteProduitReceptionScannee)
+                    {
+                        produitReceptionScanneeContexte.onTextWatcher(s);
+                        code = produitReceptionScanneeContexte.code;
+                    }
+                    else if(scannerContexteInt == R.string.scannerContexteReceptionPAD)
+                    {
+                        receptionPADContexte.onTextWatcher(s);
+                        compteurScan.setText(String.valueOf(receptionPADContexte.stringList.size()) + " produit(s) scanné(s)");
+                        code = receptionPADContexte.code;
+                    }
+                    else
+                    {
+                        produitContexte.onTextWatcher(s);
+                        compteurScan.setText(String.valueOf(produitContexte.stringList.size()) + " produit(s) scanné(s)");
+                        code = produitContexte.code;
                     }
 
                     if(!code.isEmpty()){
@@ -900,75 +928,85 @@ public class BarcodeCaptureNegativeActivity extends ServiceActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data != null) {
-            switch (scannerContexteInt) {
-                case R.string.scannerContexteEmplacement:
-                    emplacementContexte.onActivityResult(requestCode, data);
-                    break;
-                case R.string.scannerContexteEmplacementReceptionScannee:
-                    emplacementReceptionScanneeContexte.onActivityResult(requestCode, data);
-                    break;
-                case R.string.scannerContextePleinVide:
-                    pleinVideContexte.onActivityResult(requestCode, data);
-                    pleinVideAjouter = false;
-                    break;
-                case R.string.scannerContextePleinVideLocalisation:
-                    pleinVideLocalisationContexte.onActivityResult(requestCode, data);
-                    if(!pleinVideLocalisationContexte.code.isEmpty()){
-                        ((EditText) findViewById(R.id.contenuCode)).setText(pleinVideLocalisationContexte.code + "\n");
-                    }
-                    break;
-                case R.string.scannerContexteDocument:
-                    documentContext.onActivityResult(requestCode, data);
-                    if(!documentContext.code.isEmpty()){
-                        ((EditText) findViewById(R.id.contenuCode)).setText(documentContext.code + "\n");
-                    }
-                    break;
-                case R.string.scannerContexteAuthentification:
-                    authentificationContext.onActivityResult(requestCode, data);
-                    if(!authentificationContext.username.isEmpty() && !authentificationContext.password.isEmpty())
-                    {
-                        ((EditText) findViewById(R.id.contenuCode)).setText("username:"+authentificationContext.username+":password:"+authentificationContext.password+"\n");
-                    }
-                    break;
-                case R.string.scannerContexteFranceMVO:
-                    franceMVOContexte.onActivityResult(requestCode, data);
-                    if(!franceMVOContexte.code.isEmpty()){
-                        ((EditText) findViewById(R.id.contenuCode)).setText(franceMVOContexte.code + "\n");
-                    }
-                    break;
-                case R.string.scannerContextePreparation:
-                    preparationContexte.onActivityResult(requestCode, data);
-                    if(!preparationContexte.code.isEmpty())
-                    {
-                        ((EditText) findViewById(R.id.contenuCode)).setText(preparationContexte.code+"\n");
-                    }
-                    break;
-                case R.string.scannerContextePreparationADH:
-                    preparationScanneeContexte.onActivityResult(requestCode, data);
-                    if(!preparationScanneeContexte.code.isEmpty())
-                    {
-                        ((EditText) findViewById(R.id.contenuCode)).setText(preparationScanneeContexte.code+"\n");
-                    }
-                    break;
-                case R.string.scannerContexteReceptionPAD:
-                    receptionPADContexte.onActivityResult(requestCode, data);
-                    boutonSuppression.callOnClick();
-                    break;
-                case R.string.scannerContexteService:
-                    serviceContexte.onActivityResult(requestCode, data);
-                    if(!serviceContexte.code.isEmpty())
-                        ((EditText) findViewById(R.id.contenuCode)).setText(serviceContexte.code+"\n");
-                    break;
-                case R.string.scannerContexteProduitReceptionScannee:
-                    produitReceptionScanneeContexte.onActivityResult(requestCode, data);
-                    boutonSuppression.callOnClick();
-                    break;
-                default:
-                    produitContexte.onActivityResult(requestCode, data);
-                    if(!produitContexte.code.isEmpty()){
-                        ((EditText) findViewById(R.id.contenuCode)).setText(produitContexte.code + "\n");
-                    }
-                    break;
+            if(scannerContexteInt == R.string.scannerContexteEmplacement)
+            {
+                emplacementContexte.onActivityResult(requestCode, data);
+            }
+            else if(scannerContexteInt == R.string.scannerContexteEmplacementReceptionScannee)
+            {
+                emplacementReceptionScanneeContexte.onActivityResult(requestCode, data);
+            }
+            else if(scannerContexteInt == R.string.scannerContextePleinVide)
+            {
+                pleinVideContexte.onActivityResult(requestCode, data);
+                pleinVideAjouter = false;
+            }
+            else if(scannerContexteInt == R.string.scannerContextePleinVideLocalisation)
+            {
+                pleinVideLocalisationContexte.onActivityResult(requestCode, data);
+                if(!pleinVideLocalisationContexte.code.isEmpty()){
+                    ((EditText) findViewById(R.id.contenuCode)).setText(pleinVideLocalisationContexte.code + "\n");
+                }
+            }
+            else if(scannerContexteInt == R.string.scannerContexteDocument)
+            {
+                documentContext.onActivityResult(requestCode, data);
+                if(!documentContext.code.isEmpty()){
+                    ((EditText) findViewById(R.id.contenuCode)).setText(documentContext.code + "\n");
+                }
+            }
+            else if(scannerContexteInt == R.string.scannerContexteAuthentification)
+            {
+                authentificationContext.onActivityResult(requestCode, data);
+                if(!authentificationContext.username.isEmpty() && !authentificationContext.password.isEmpty())
+                {
+                    ((EditText) findViewById(R.id.contenuCode)).setText("username:"+authentificationContext.username+":password:"+authentificationContext.password+"\n");
+                }
+            }
+            else if(scannerContexteInt == R.string.scannerContexteFranceMVO)
+            {
+                franceMVOContexte.onActivityResult(requestCode, data);
+                if(!franceMVOContexte.code.isEmpty()){
+                    ((EditText) findViewById(R.id.contenuCode)).setText(franceMVOContexte.code + "\n");
+                }
+            }
+            else if(scannerContexteInt == R.string.scannerContextePreparation)
+            {
+                preparationContexte.onActivityResult(requestCode, data);
+                if (!preparationContexte.code.isEmpty()) {
+                    ((EditText) findViewById(R.id.contenuCode)).setText(preparationContexte.code + "\n");
+                }
+            }
+            else if(scannerContexteInt == R.string.scannerContextePreparationADH)
+            {
+                preparationScanneeContexte.onActivityResult(requestCode, data);
+                if(!preparationScanneeContexte.code.isEmpty())
+                {
+                    ((EditText) findViewById(R.id.contenuCode)).setText(preparationScanneeContexte.code+"\n");
+                }
+            }
+            else if(scannerContexteInt == R.string.scannerContexteReceptionPAD)
+            {
+                receptionPADContexte.onActivityResult(requestCode, data);
+                boutonSuppression.callOnClick();
+            }
+            else if(scannerContexteInt == R.string.scannerContexteService)
+            {
+                serviceContexte.onActivityResult(requestCode, data);
+                if(!serviceContexte.code.isEmpty())
+                    ((EditText) findViewById(R.id.contenuCode)).setText(serviceContexte.code+"\n");
+            }
+            else if(scannerContexteInt == R.string.scannerContexteProduitReceptionScannee)
+            {
+                produitReceptionScanneeContexte.onActivityResult(requestCode, data);
+                boutonSuppression.callOnClick();
+            }
+            else
+            {
+                produitContexte.onActivityResult(requestCode, data);
+                if(!produitContexte.code.isEmpty()){
+                    ((EditText) findViewById(R.id.contenuCode)).setText(produitContexte.code + "\n");
+                }
             }
 
             boolean close = data.getBooleanExtra("close", false);
@@ -1647,9 +1685,9 @@ public class BarcodeCaptureNegativeActivity extends ServiceActivity {
 
     public void afficherSnackBar(String message) {
         Snackbar snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>" + message + "</b>", 0), Snackbar.LENGTH_LONG);
-        Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
+        @SuppressLint("RestrictedApi") Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
         layout.setBackgroundColor(getResources().getColor(R.color.rouge2, null));
-        TextView textView = (TextView) layout.findViewById(R.id.snackbar_text);
+        TextView textView = (TextView) layout.findViewById(com.google.android.material.R.id.snackbar_text);
         textView.setGravity(Gravity.CENTER_HORIZONTAL);
         textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);

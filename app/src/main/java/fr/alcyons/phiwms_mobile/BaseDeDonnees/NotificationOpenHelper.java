@@ -40,7 +40,7 @@ public class NotificationOpenHelper extends DBOpenHelper {
     }
 
     public static void supprimerUneNotification(SQLiteDatabase db, Notification notification) {
-        db.delete(Constantes.TABLE_NOTIFICATION, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(notification.getphiwms_mobileUUID())});
+        db.delete(Constantes.TABLE_NOTIFICATION, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(notification.getPhiMR4UUID())});
     }
 
     public static List<Notification> getAllNotifications(SQLiteDatabase db) {
@@ -106,10 +106,10 @@ public class NotificationOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_DATE_NOTIFICATION, notif.getDate());
         contentValues.put(Constantes.CLE_COL_AETEGEREE_NOTIFICATION, notif.isaEteGeree());
         contentValues.put(Constantes.CLE_COL_CHANNEL_NOTIFICATION, notif.getChannel());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, notif.getphiwms_mobileUUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, notif.getPhiMR4UUID());
 
         // Mise à jour
-        return db.update(Constantes.TABLE_NOTIFICATION, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(notif.getphiwms_mobileUUID())});
+        return db.update(Constantes.TABLE_NOTIFICATION, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(notif.getPhiMR4UUID())});
     }
 
     public static class Constantes implements BaseColumns {

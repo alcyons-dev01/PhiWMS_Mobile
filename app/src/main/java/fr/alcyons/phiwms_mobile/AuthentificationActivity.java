@@ -87,11 +87,7 @@ import fr.alcyons.phiwms_mobile.Outils.GPSTracker;
 import fr.alcyons.phiwms_mobile.Outils.OutilsEncodage;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.ParametresServeur.ServiceParametresServeurActivity;
-
-import fr.alcyons.phiwms_mobile.R;
-
 import fr.alcyons.phiwms_mobile.VerificationConnexion.VerificationConnexionActivity;
-//import com.github.aakira.expandablelayout.ExpandableRelativeLayout;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
@@ -107,6 +103,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 
@@ -173,7 +170,7 @@ public class AuthentificationActivity extends AppCompatActivity {
     PackageManager pm;
 
     public static boolean hasPermissions(Context context, String... permissions) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
+        if (context != null && permissions != null) {
             for (String permission : permissions) {
                 if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
                     return false;
@@ -216,7 +213,7 @@ public class AuthentificationActivity extends AppCompatActivity {
                 if (ShortcutBadger.isBadgeCounterSupported(AuthentificationActivity.this)) {
                     // Edit the saved preferences
                     editor.putInt("badgeCount", badgeCount);
-                    editor.commit();
+                    editor.apply();
                     Context context = AuthentificationActivity.this;
                     ShortcutBadger.applyCount(getApplicationContext(), badgeCount);
                 }
@@ -227,7 +224,7 @@ public class AuthentificationActivity extends AppCompatActivity {
         File dir = new File(getFilesDir().getAbsolutePath() + File.separator + "Documents");
         if (dir.isDirectory()) {
             String[] children = dir.list();
-            for (int i = 0; i < children.length; i++) {
+            for (int i = 0; i < Objects.requireNonNull(children).length; i++) {
                 new File(dir, children[i]).delete();
             }
         }
@@ -267,22 +264,10 @@ public class AuthentificationActivity extends AppCompatActivity {
         } else {
             //Nom de l'établissement
             etablissement = ParametresServeurOpenHelper.getEtablissementNom(db);
-            String port = ParametresServeurOpenHelper.getPortServeur(db);
-            if (port.contentEquals("81")) {
-                etablissement = "CALYDIAL";
-            } else if (port.contentEquals("82")) {
-                etablissement = "APAIR";
-            } else if (port.contentEquals("83")) {
-                etablissement = "APURAD";
-            } else if (port.contentEquals("84")) {
-                etablissement = "ADH";
-            } else if (port.contentEquals("85")) {
-                etablissement = "ATIR";
-            }
         }
 
         //lancer le lecteur de scan en cliquant sur le datamatrix
-        if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+        if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
             ((ImageView) findViewById(R.id.vers_identification_scan)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -307,7 +292,6 @@ public class AuthentificationActivity extends AppCompatActivity {
         } else {
             ((ImageView) findViewById(R.id.vers_identification_scan)).setVisibility(View.INVISIBLE);
         }
-
 
         // Récupération du bouton de connexion
         boutonConnexion = (Button) findViewById(R.id.boutonConnexion);
@@ -363,7 +347,7 @@ public class AuthentificationActivity extends AppCompatActivity {
                 String motDePasse = textViewMotDePasse.getText().toString();
 
                 // Vérification qu'un identifiant et un mot de passe ont bien été rentrés
-                if (!(motDePasse.equals("") || identifiant.equals(""))) {
+                if (!(motDePasse.isEmpty() || identifiant.isEmpty())) {
                     // Encodage du mot de passe
                     String motDePasseHache = "";
                     if (authentification_scan) {
@@ -383,27 +367,6 @@ public class AuthentificationActivity extends AppCompatActivity {
                 }
             }
         });
-
-        /*ImageView imageView = (ImageView) findViewById(R.id.alcyonsLogo);
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Récupération des objets contenant l'identifiant et du mot de passe de l'utilisateur
-                TextView textViewIdentifiant = (TextView) findViewById(R.id.identifiant);
-                TextView textViewMotDePasse = (TextView) findViewById(R.id.motDePasse);
-
-                // Récupération de l'identifiant et du mot de passe de l'utilisateur
-                final String identifiant = textViewIdentifiant.getText().toString();
-                String motDePasse = textViewMotDePasse.getText().toString();
-
-                if (identifiant.toUpperCase().equals("ALCYONS")) {
-                    if (motDePasse.equals("helpdesk") || motDePasse.equals("65ken64btz")) {
-                        Intent authentificationIntent = new Intent(AuthentificationActivity.this, ServiceParametresServeurActivity.class);
-                        AuthentificationActivity.this.startActivity(authentificationIntent);
-                    }
-                }
-            }
-        });*/
 
         // Affichage du nombre d'élément à synchroniser si nécessaire
         int nbElement = gestionnaireElementASynchroniser.compterElementsASynchroniser(db);
@@ -438,13 +401,6 @@ public class AuthentificationActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
                     if (ActivityCompat.checkSelfPermission(AuthentificationActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
                         return;
                     }
                     String device_id = "";
@@ -554,7 +510,7 @@ public class AuthentificationActivity extends AppCompatActivity {
 
     public void identificationUtilisateur(final String motDePasseHache, final String identifiant) {
         String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteUtilisateur;
-        if (OutilsGestionConnexionReseau.isServerAccessible(AuthentificationActivity.this) == false) {
+        if (!OutilsGestionConnexionReseau.isServerAccessible(AuthentificationActivity.this)) {
             utilisateurConnecte = gestionnaireUtilisateur.identifierUtilisateurLocalement(identifiant, motDePasseHache, db);
 
             if (utilisateurConnecte != null) {

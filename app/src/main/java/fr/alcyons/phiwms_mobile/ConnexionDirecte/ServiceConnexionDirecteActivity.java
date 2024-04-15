@@ -1,5 +1,6 @@
 package fr.alcyons.phiwms_mobile.ConnexionDirecte;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
@@ -58,6 +59,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ServiceOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.PerimetreFonctionnel;
 import fr.alcyons.phiwms_mobile.Classes.Service;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.ConnexionDirecteExpandableAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionListeServices;
@@ -154,7 +156,7 @@ public class ServiceConnexionDirecteActivity extends ServiceAvecConnexionActivit
 
                 String urlCompletRequetePlanHabilitation = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequetePlanHabilitation + String.valueOf(utilisateurConnecte.getPlanHabilitation())/* + DBOpenHelper.Urls.parametreToken + utilisateurConnecte.getToken()*/;
 
-                JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlCompletRequetePlanHabilitation, new Response.Listener<JSONObject>() {
+                JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlCompletRequetePlanHabilitation, null, new Response.Listener<JSONObject>() {
                     // Takes the response from the JSON request
                     @Override
                     public void onResponse(JSONObject response) {
@@ -663,9 +665,9 @@ public class ServiceConnexionDirecteActivity extends ServiceAvecConnexionActivit
         String erreur = OutilsGestionPhraseSnackbar.obtenirPhraseSnackbar(nomService);
         Snackbar snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>"+erreur+"</b>", 0), Snackbar.LENGTH_LONG);
 
-        Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
+        @SuppressLint("RestrictedApi") Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
         layout.setBackgroundColor(getResources().getColor(R.color.rouge2, null));
-        TextView textView = (TextView) layout.findViewById(R.id.snackbar_text);
+        TextView textView = (TextView) layout.findViewById(com.google.android.material.R.id.snackbar_text);
         textView.setGravity(Gravity.CENTER_HORIZONTAL);
         textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);

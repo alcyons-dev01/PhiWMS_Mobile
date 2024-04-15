@@ -869,7 +869,7 @@ public class PH_Patient implements Serializable, Comparable {
         this.discipline_Medicale = discipline_Medicale;
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -1050,17 +1050,17 @@ public class PH_Patient implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         PH_Patient ph_patient = (PH_Patient) obj;
 
-        if (this.getphiwms_mobileUUID() == ph_patient.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == ph_patient.getPhiMR4UUID()) {
             return 0;
         } else {
-            return this.getphiwms_mobileUUID() > ph_patient.getphiwms_mobileUUID() ? 1 : -1;
+            return this.getPhiMR4UUID() > ph_patient.getPhiMR4UUID() ? 1 : -1;
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
-        if (((PH_Patient) obj).getphiwms_mobileUUID() == this.getphiwms_mobileUUID()) {
+        if (((PH_Patient) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
             valeurARetourner = true;
         }
 

@@ -39,7 +39,7 @@ public class ElementASynchroniser {
         this.idOrigine4D = idOrigine4D;
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 

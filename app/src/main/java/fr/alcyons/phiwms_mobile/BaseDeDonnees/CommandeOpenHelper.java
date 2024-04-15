@@ -190,9 +190,9 @@ public class CommandeOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_TRANSITAIRE_METROPOLE_COMMANDE, commande.getTransitaire_Metropole());
         contentValues.put(Constantes.CLE_COL_TRANSITAIRE_LOCAL_COMMANDE, commande.getTransitaire_Local());
         contentValues.put(Constantes.CLE_COL_TRANSPORT_TYPE_COMMANDE, commande.getTransport_Type());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, commande.getphiwms_mobileUUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, commande.getPhiMR4UUID());
 
-        return db.update(Constantes.TABLE_COMMANDE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + commande.getphiwms_mobileUUID(), null);
+        return db.update(Constantes.TABLE_COMMANDE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + commande.getPhiMR4UUID(), null);
 
     }
 

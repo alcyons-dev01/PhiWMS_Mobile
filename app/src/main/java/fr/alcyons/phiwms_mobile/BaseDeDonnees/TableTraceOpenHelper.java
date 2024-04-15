@@ -33,7 +33,7 @@ public class TableTraceOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_CODE_RETOURNE, objet.getCodeRetourne());
         contentValues.put(Constantes.CLE_COL_USER, objet.getUser());
         contentValues.put(Constantes.CLE_COL_USERID, objet.getUserID());
-     //   contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, objet.getphiwms_mobileUUID());
+     //   contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, objet.getPhiMR4UUID());
 
         long rowID = db.insert(Constantes.TABLE_TABLE_TRACE, null, contentValues);
         objet.setphiwms_mobileUUID((int) rowID);

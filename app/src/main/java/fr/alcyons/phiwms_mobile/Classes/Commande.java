@@ -307,7 +307,7 @@ public class Commande implements Serializable, Comparable {
         this.phiwms_mobileUUID = commandeCursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -752,7 +752,7 @@ public class Commande implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Commande commande = (Commande) obj;
 
-        if (this.getphiwms_mobileUUID() == commande.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == commande.getPhiMR4UUID()) {
             return 0;
         } else {
             return this.getID_commande() > commande.getID_commande() ? 1 : -1;

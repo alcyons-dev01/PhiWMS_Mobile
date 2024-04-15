@@ -129,7 +129,7 @@ public class Utilisateur implements Serializable {
         this.channels = channels;
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 

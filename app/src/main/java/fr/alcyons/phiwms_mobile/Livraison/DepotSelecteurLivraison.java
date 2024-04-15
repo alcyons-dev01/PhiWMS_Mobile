@@ -38,6 +38,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.Depot_Livraison_Adapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
@@ -94,7 +95,7 @@ public class DepotSelecteurLivraison extends ServiceAvecConnexionActivity {
 
             String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteServiceDepotLivraison;
 
-            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                     new Response.Listener<JSONObject>() {
                         @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
                         @Override

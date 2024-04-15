@@ -52,10 +52,10 @@ public class ActionUtilisateur_LigneOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_EMPLACEMENT_ID, objet.getEmplacementId());
         contentValues.put(Constantes.CLE_COL_QUANTITE, objet.getQuantite());
         contentValues.put(Constantes.CLE_COL_NOM_PRODUIT, objet.getNom_Produit());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, objet.getphiwms_mobileUUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, objet.getPhiMR4UUID());
 
 
-        long rowId = db.update(Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + objet.getphiwms_mobileUUID(), null);
+        long rowId = db.update(Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + objet.getPhiMR4UUID(), null);
 
         return rowId;
     }

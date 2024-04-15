@@ -39,6 +39,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Preparation_LivraisonAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
@@ -99,7 +100,7 @@ public class NewServiceLivraison  extends ServiceAvecConnexionActivity {
 
             String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteServiceLivraisonByDepot + "/" + depot_uid;
 
-            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                     new Response.Listener<JSONObject>() {
                         @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
                         @Override

@@ -267,22 +267,6 @@ public class PreparationSimpleContext
                                         String produitNumeroSerie = serialisation_courante.getNumeroSerie();
 
                                         SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
-
-                                        long rowUID_surveillance = SurveillanceReferenceOpenHelper.insererSurveillanceReferenceEnBDD(db, new_surveillance_reference);
-
-                                        if (rowUID_surveillance != -1) {
-                                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE, new_surveillance_reference.getSerialexpressUUID(), new_surveillance_reference.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
-
-                                            try {
-                                                EnvoyerMailSurveillance class_mail = new EnvoyerMailSurveillance();
-                                                class_mail.EnvoyerMailSerialisation(new_surveillance_reference.get_UID(), utilisateurConnecte.getMail(), db);
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-
-                                        //((BarcodeCaptureActivity) context).afficherAlerteFranceMVO(produit.getDesignation_interne(), resultat, serie, motif);
-
                                     } else {
                                         String messageTexteFranceMVO = "";
                                     }
@@ -324,7 +308,7 @@ public class PreparationSimpleContext
                                 Depot_Zone zone_courante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
                                 Stock_Lot_Emplacement_Light newStockLotEmplacement = new Stock_Lot_Emplacement_Light(qte_restante, lot, date_peremption_courant, emplacement_courant.getAdressage(), preparation.getDepotOrigineReference(), zone_courante.getZoneName(), produit.getID_produit(), 0, serie);
                                 Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, newStockLotEmplacement);
-                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, newStockLotEmplacement.getphiwms_mobileUUID(), newStockLotEmplacement.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, newStockLotEmplacement.getPhiMR4UUID(), newStockLotEmplacement.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
                                 lot_courant = phPreparationLignePreparationAdapte.new LotAdapte(newStockLotEmplacement);
                                 liste_preparation_liste_adapte.add(lot_courant);
                             }
@@ -392,7 +376,7 @@ public class PreparationSimpleContext
                             Depot_Zone zone_courante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
                             Stock_Lot_Emplacement_Light newStockLotEmplacement = new Stock_Lot_Emplacement_Light(qte_restante, lot, date_peremption_courant, emplacement_courant.getAdressage(), preparation.getDepotOrigineReference(), zone_courante.getZoneName(), produit.getID_produit(), 0, serie);
                             Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, newStockLotEmplacement);
-                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, newStockLotEmplacement.getphiwms_mobileUUID(), newStockLotEmplacement.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, newStockLotEmplacement.getPhiMR4UUID(), newStockLotEmplacement.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
                             lot_courant = phPreparationLignePreparationAdapte.new LotAdapte(newStockLotEmplacement);
                             liste_preparation_liste_adapte.add(lot_courant);
                         }
@@ -597,19 +581,6 @@ public class PreparationSimpleContext
 
                                     SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
 
-                                    long rowUID_surveillance = SurveillanceReferenceOpenHelper.insererSurveillanceReferenceEnBDD(db, new_surveillance_reference);
-
-                                    if (rowUID_surveillance != -1) {
-                                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE, new_surveillance_reference.getSerialexpressUUID(), new_surveillance_reference.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
-
-                                        try {
-                                            EnvoyerMailSurveillance class_mail = new EnvoyerMailSurveillance();
-                                            class_mail.EnvoyerMailSerialisation(new_surveillance_reference.get_UID(), utilisateurConnecte.getMail(), db);
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-
                                     //((BarcodeCaptureActivity) context).afficherAlerteFranceMVO(produit.getDesignation_interne(), resultat, serie, motif);
 
                                 } else {
@@ -654,7 +625,7 @@ public class PreparationSimpleContext
                             Depot_Zone zone_courante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
                             Stock_Lot_Emplacement_Light newStockLotEmplacement = new Stock_Lot_Emplacement_Light(qte_restante, lot, date_peremption_courant, emplacement_courant.getAdressage(), preparation.getDepotOrigineReference(), zone_courante.getZoneName(), produit.getID_produit(), 0, serie);
                             Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, newStockLotEmplacement);
-                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, newStockLotEmplacement.getphiwms_mobileUUID(), newStockLotEmplacement.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, newStockLotEmplacement.getPhiMR4UUID(), newStockLotEmplacement.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
                             lot_courant = phPreparationLignePreparationAdapte.new LotAdapte(newStockLotEmplacement);
                             liste_preparation_liste_adapte.add(lot_courant);
                         }
@@ -721,7 +692,7 @@ public class PreparationSimpleContext
                             Depot_Zone zone_courante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
                             Stock_Lot_Emplacement_Light newStockLotEmplacement = new Stock_Lot_Emplacement_Light(qte_restante, lot, date_peremption_courant, emplacement_courant.getAdressage(), preparation.getDepotOrigineReference(), zone_courante.getZoneName(), produit.getID_produit(), 0, serie);
                             Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, newStockLotEmplacement);
-                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, newStockLotEmplacement.getphiwms_mobileUUID(), newStockLotEmplacement.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, newStockLotEmplacement.getPhiMR4UUID(), newStockLotEmplacement.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
                             lot_courant = phPreparationLignePreparationAdapte.new LotAdapte(newStockLotEmplacement);
                             liste_preparation_liste_adapte.add(lot_courant);
                         }

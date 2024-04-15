@@ -160,7 +160,7 @@ public class NewReceptionPADContext {
                     rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                     if(rowId != -1)
                     {
-                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                     }
                 }
 
@@ -274,34 +274,7 @@ public class NewReceptionPADContext {
 
                                             SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
                                             String surveillanceHeure = mdformat.format(calendar.getTime());
-
-                                            int produit_id = serialisation_courante.getProduitUID();
-                                            int serialisationID = serialisation_courante.get_UID();
-                                            String motif = GestionCodeErreurNMVO.getMessage(code);
-                                            String actionAMener = "";
-                                            String statut = "NON LU";
-                                            String traitePar = utilisateurConnecte.getIdentifiant();
-                                            String traiteDate = surveillanceDate;
-                                            String traiteHeure = surveillanceHeure;
-                                            String produitLot = serialisation_courante.getNumeroLot();
-                                            String produitDatePéremption = serialisation_courante.getDatePeremptionAAMMJJ();
-                                            String produitNumeroSerie = serialisation_courante.getNumeroSerie();
-
-                                            SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
-
-                                            long rowUID_surveillance = SurveillanceReferenceOpenHelper.insererSurveillanceReferenceEnBDD(db, new_surveillance_reference);
-
-                                            if (rowUID_surveillance != -1) {
-                                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE, new_surveillance_reference.getSerialexpressUUID(), new_surveillance_reference.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
-
-                                                try {
-                                                    EnvoyerMailSurveillance class_mail = new EnvoyerMailSurveillance();
-                                                    class_mail.EnvoyerMailSerialisation(new_surveillance_reference.get_UID(), utilisateurConnecte.getMail(), db);
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
-
+                                            String motif = "";
                                             ((BarcodeCaptureActivity) context).afficherAlerteFranceMVO(produit.getDesignation_interne(), resultat, serie, motif);
 
                                         } else {
@@ -498,7 +471,7 @@ public class NewReceptionPADContext {
                 rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
                 if(rowId != -1)
                 {
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getphiwms_mobileUUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                 }
             }
 
@@ -624,19 +597,6 @@ public class NewReceptionPADContext {
                                     String produitNumeroSerie = serialisation_courante.getNumeroSerie();
 
                                     SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
-
-                                    long rowUID_surveillance = SurveillanceReferenceOpenHelper.insererSurveillanceReferenceEnBDD(db, new_surveillance_reference);
-
-                                    if (rowUID_surveillance != -1) {
-                                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE, new_surveillance_reference.getSerialexpressUUID(), new_surveillance_reference.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
-
-                                        try {
-                                            EnvoyerMailSurveillance class_mail = new EnvoyerMailSurveillance();
-                                            class_mail.EnvoyerMailSerialisation(new_surveillance_reference.get_UID(), utilisateurConnecte.getMail(), db);
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
 
                                     ((BarcodeCaptureActivity) context).afficherAlerteFranceMVO(produit.getDesignation_interne(), resultat, serie, motif);
 

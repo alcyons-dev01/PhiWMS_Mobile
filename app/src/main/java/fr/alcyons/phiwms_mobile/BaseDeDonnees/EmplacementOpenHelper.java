@@ -200,7 +200,7 @@ public class EmplacementOpenHelper extends DBOpenHelper {
     }
 
     public static long supprimerUnEmplacementEnBDD(SQLiteDatabase db, Depot_Emplacement emplacement) {
-        return db.delete(Constantes.TABLE_DEPOT_EMPLACEMENT, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(emplacement.getphiwms_mobileUUID())});
+        return db.delete(Constantes.TABLE_DEPOT_EMPLACEMENT, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(emplacement.getPhiMR4UUID())});
     }
 
     public static Depot_Emplacement getUnEmplacementZoneEtNom(SQLiteDatabase db, Depot_Zone depotZone, String depotEmplacementAdressage) {
@@ -284,10 +284,10 @@ public class EmplacementOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_DEPOT_REFERENCE_DEPOT_EMPLACEMENT, emplacement.getDepot_Reference());
         contentValues.put(Constantes.CLE_COL_CODE_GLN_DEPOT_EMPLACEMENT, emplacement.getCode_GLN());
 
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, emplacement.getphiwms_mobileUUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, emplacement.getPhiMR4UUID());
 
         // Insertion du dépot en BDD
-        return db.update(Constantes.TABLE_DEPOT_EMPLACEMENT, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + String.valueOf(emplacement.getphiwms_mobileUUID()), null);
+        return db.update(Constantes.TABLE_DEPOT_EMPLACEMENT, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + String.valueOf(emplacement.getPhiMR4UUID()), null);
     }
 
     public static class Constantes implements BaseColumns {

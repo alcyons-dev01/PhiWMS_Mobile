@@ -154,9 +154,9 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_SERIALISATION_RECEPTION, ph_Reliquat.isSerialiserReception());
         contentValues.put(Constantes.CLE_COL_SERIE, ph_Reliquat.getSerie());
         contentValues.put(Constantes.CLE_COL_BL_Numero, ph_Reliquat.getBL_Numero());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, ph_Reliquat.getphiwms_mobileUUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, ph_Reliquat.getPhiMR4UUID());
 
-        return db.update(Constantes.TABLE_PH_RELIQUAT, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + ph_Reliquat.getphiwms_mobileUUID(), null);
+        return db.update(Constantes.TABLE_PH_RELIQUAT, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + ph_Reliquat.getPhiMR4UUID(), null);
     }
 
     public static PH_Reliquat getPH_ReliquatByphiwms_mobileUUID(SQLiteDatabase db, int id) {
@@ -233,7 +233,7 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
     }
 
     public void supprimerUnPhReliquat(SQLiteDatabase db, PH_Reliquat ph_reliquat) {
-        db.delete(Constantes.TABLE_PH_RELIQUAT, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(ph_reliquat.getphiwms_mobileUUID())});
+        db.delete(Constantes.TABLE_PH_RELIQUAT, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(ph_reliquat.getPhiMR4UUID())});
     }
 
     public static class Constantes implements BaseColumns {

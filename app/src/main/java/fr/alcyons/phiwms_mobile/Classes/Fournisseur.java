@@ -368,7 +368,7 @@ public class Fournisseur implements Serializable, Comparable {
         this.phiwms_mobileUUID = cursorFournisseur.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -1049,7 +1049,7 @@ public class Fournisseur implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Fournisseur fournisseur = (Fournisseur) obj;
 
-        if (this.getphiwms_mobileUUID() == fournisseur.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == fournisseur.getPhiMR4UUID()) {
             return 0;
         } else {
             return this.get_UID() > fournisseur.get_UID() ? 1 : -1;

@@ -69,7 +69,7 @@ public class PH_ReassortOpenHelper extends DBOpenHelper {
 
 
     public void supprimerUnePH_Reassort(SQLiteDatabase db, PH_Reassort ph_reassort) {
-        db.delete(Constantes.TABLE_PH_REASSORT, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(ph_reassort.getphiwms_mobileUUID())});
+        db.delete(Constantes.TABLE_PH_REASSORT, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(ph_reassort.getPhiMR4UUID())});
     }
 
     public static class Constantes implements BaseColumns {

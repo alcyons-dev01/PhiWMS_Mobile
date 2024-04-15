@@ -11,6 +11,7 @@ import android.view.View;
 
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
+import fr.alcyons.phiwms_mobile.R;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 
@@ -93,8 +94,7 @@ public class ServiceAvecConnexionActivity extends ServiceActivity {
     @Override
     public void setContentView(int layoutRef) {
         super.setContentView(layoutRef);
-        //swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout = null;
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
 
         if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

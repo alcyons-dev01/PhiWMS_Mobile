@@ -291,17 +291,6 @@ public class WS_MIXED_BULK {
                                                 String produitNumeroSerie = phSerialisation.getNumeroSerie();
 
                                                 SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
-
-                                                long rowUID_surveillance = SurveillanceReferenceOpenHelper.insererSurveillanceReferenceEnBDD(db, new_surveillance_reference);
-
-                                                if (rowUID_surveillance != -1) {
-                                                    try {
-                                                        EnvoyerMailSurveillance class_mail = new EnvoyerMailSurveillance();
-                                                        class_mail.EnvoyerMailSerialisation(new_surveillance_reference.get_UID(), utilisateur.getMail(), db);
-                                                    } catch (Exception e) {
-                                                        e.printStackTrace();
-                                                    }
-                                                }
                                             }
 
                                             phSerialisation.setStatut("Executer");
@@ -382,17 +371,6 @@ public class WS_MIXED_BULK {
                                             String produitNumeroSerie = phSerialisation.getNumeroSerie();
 
                                             SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
-
-                                            long rowUID_surveillance = SurveillanceReferenceOpenHelper.insererSurveillanceReferenceEnBDD(db, new_surveillance_reference);
-
-                                            if (rowUID_surveillance != -1) {
-                                                try {
-                                                    EnvoyerMailSurveillance class_mail = new EnvoyerMailSurveillance();
-                                                    class_mail.EnvoyerMailSerialisation(new_surveillance_reference.get_UID(), utilisateur.getMail(), db);
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
                                         }
 
                                         phSerialisation.setStatut("Executer");

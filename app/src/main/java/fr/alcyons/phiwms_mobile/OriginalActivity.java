@@ -17,6 +17,8 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.Objects;
+
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Commande_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
@@ -155,21 +157,21 @@ public class OriginalActivity extends AppCompatActivity {
         // Récupération de l'utilisateur connecté
         if(intent.hasExtra("ServiceCourant"))
         {
-            service = intent.getExtras().getString("ServiceCourant");
+            service = Objects.requireNonNull(intent.getExtras()).getString("ServiceCourant");
         }
-        utilisateurConnecte = gestionnaireUtilisateur.getUtilisateurByID(db, intent.getExtras().getInt("utilisateurConnecteID"));
-        if (utilisateurConnecte == null && !service.contentEquals("Authentification")) {
-            Alerte.afficherAlerte(OriginalActivity.this, "Alerte", "L'utilisateur connecté a été perdu, veuillez vous reconnecter", "alerte");
-            Intent newIntent = new Intent(OriginalActivity.this, AuthentificationActivity.class);
-            OriginalActivity.this.startActivity(newIntent);
-            OriginalActivity.this.finish();
-            return;
+        utilisateurConnecte = UtilisateurOpenHelper.getUtilisateurByID(db, Objects.requireNonNull(intent.getExtras()).getInt("utilisateurConnecteID"));
+        if (utilisateurConnecte == null) {
+            assert service != null;
+            if (!service.contentEquals("Authentification")) {
+                Alerte.afficherAlerte(OriginalActivity.this, "Alerte", "L'utilisateur connecté a été perdu, veuillez vous reconnecter", "alerte");
+                Intent newIntent = new Intent(OriginalActivity.this, AuthentificationActivity.class);
+                OriginalActivity.this.startActivity(newIntent);
+                OriginalActivity.this.finish();
+                return;
+            }
         }
 
-        //if (OutilsGestionConnexionReseau.isServerAccessible(OriginalActivity.this)) {
-        //    gestionnaireElementASynchroniser.toutSynchroniser(OriginalActivity.this, db, utilisateurConnecte);
-        //}
-
+        assert service != null;
         if(!service.contentEquals("Authentification"))
         {
             // Récupération de la géolocalisation de l'utilisateur
@@ -197,6 +199,7 @@ public class OriginalActivity extends AppCompatActivity {
                 // for ActivityCompat#requestPermissions for more details.
                 return;
             }
+            assert bestProvider != null;
             location = locationManager.getLastKnownLocation(bestProvider);
             if (location != null) {
                 utilisateurConnecte.setLocalisation(location);

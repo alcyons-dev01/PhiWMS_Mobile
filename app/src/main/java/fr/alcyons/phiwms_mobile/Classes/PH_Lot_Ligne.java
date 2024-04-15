@@ -59,7 +59,7 @@ public class PH_Lot_Ligne implements Serializable, Comparable {
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -148,7 +148,7 @@ public class PH_Lot_Ligne implements Serializable, Comparable {
     public int compareTo(Object obj) {
         PH_Lot_Ligne ph_lot_ligne = (PH_Lot_Ligne) obj;
 
-        if (this.getphiwms_mobileUUID() == ph_lot_ligne.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == ph_lot_ligne.getPhiMR4UUID()) {
             return 0;
         } else {
             return this.getUID() > ph_lot_ligne.getUID() ? 1 : -1;

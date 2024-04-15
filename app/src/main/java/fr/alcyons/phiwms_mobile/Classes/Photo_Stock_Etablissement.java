@@ -148,51 +148,7 @@ public class Photo_Stock_Etablissement implements Serializable, Comparable {
         }
     }
 
-    public Photo_Stock_Etablissement(Cursor cursor) {
-        Code_Produit = cursor.getInt(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_CODE_PRODUIT_PHOTO_STOCK_ETABLISSEMENT);
-        Annee = cursor.getInt(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_ANNEE_PHOTO_STOCK_ETABLISSEMENT);
-        Mois = cursor.getInt(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_MOIS_PHOTO_STOCK_ETABLISSEMENT);
-        Ref_Cycle = cursor.getString(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_REF_CYCLE_PHOTO_STOCK_ETABLISSEMENT);
-        STOCK_DEBUT = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_STOCK_DEBUT_PHOTO_STOCK_ETABLISSEMENT);
-        QTE_ENTREE_CDE = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_QTE_ENTREE_CDE_PHOTO_STOCK_ETABLISSEMENT);
-        QTE_SORTIE_DELIV = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_QTE_SORTIE_DELIV_PHOTO_STOCK_ETABLISSEMENT);
-        QTE_ENTREE_DELIV = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_QTE_ENTREE_DELIV_PHOTO_STOCK_ETABLISSEMENT);
-        QTE_SORTIE_RETOUR = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_QTE_SORTIE_RETOUR_PHOTO_STOCK_ETABLISSEMENT);
-        QTE_ENTREE_RETOUR = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_QTE_ENTREE_RETOUR_PHOTO_STOCK_ETABLISSEMENT);
-        QTE_SORTIE_REGUL = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_QTE_SORTIE_REGUL_PHOTO_STOCK_ETABLISSEMENT);
-        QTE_ENTREE_REGUL = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_QTE_ENTREE_REGUL_PHOTO_STOCK_ETABLISSEMENT);
-        QTE_SORTIE_ECART = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_QTE_SORTIE_ECART_PHOTO_STOCK_ETABLISSEMENT);
-        QTE_ENTREE_ECART = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_QTE_ENTREE_ECART_PHOTO_STOCK_ETABLISSEMENT);
-        STOCK_FIN = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_STOCK_FIN_PHOTO_STOCK_ETABLISSEMENT);
-        VALEUR_STOCK_FIN = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_VALEUR_STOCK_FIN_PHOTO_STOCK_ETABLISSEMENT);
-        VALEUR_STOCK_DEBUT = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_VALEUR_STOCK_DEBUT_PHOTO_STOCK_ETABLISSEMENT);
-        CATEGORIE = cursor.getString(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_CATEGORIE_PHOTO_STOCK_ETABLISSEMENT);
-        REFERENCE = cursor.getString(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_REFERENCE_PHOTO_STOCK_ETABLISSEMENT);
-        DESIGNATION = cursor.getString(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_DESIGNATION_PHOTO_STOCK_ETABLISSEMENT);
-        PRIX_UNIT_HT = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_PRIX_UNIT_HT_PHOTO_STOCK_ETABLISSEMENT);
-        Consommation_mensuelle = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_CONSOMMATION_MENSUELLE_PHOTO_STOCK_ETABLISSEMENT);
-        Qte_Entree = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_QTE_ENTREE_PHOTO_STOCK_ETABLISSEMENT);
-        Qte_Sortie = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_QTE_SORTIE_PHOTO_STOCK_ETABLISSEMENT);
-        Consommation_Trimestrielle = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_CONSOMMATION_TRIMESTRIELLE_PHOTO_STOCK_ETABLISSEMENT);
-        Conso_Journaliere = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_CONSO_JOURNALIERE_PHOTO_STOCK_ETABLISSEMENT);
-        Conso_Q1 = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_CONSO_Q1_PHOTO_STOCK_ETABLISSEMENT);
-        Conso_Q2 = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_CONSO_Q2_PHOTO_STOCK_ETABLISSEMENT);
-        Conso_Q3 = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_CONSO_Q3_PHOTO_STOCK_ETABLISSEMENT);
-        Conso_Q4 = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_CONSO_Q4_PHOTO_STOCK_ETABLISSEMENT);
-        Conso_S1 = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_CONSO_S1_PHOTO_STOCK_ETABLISSEMENT);
-        Conso_S2 = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_CONSO_S2_PHOTO_STOCK_ETABLISSEMENT);
-        Conso_S3 = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_CONSO_S3_PHOTO_STOCK_ETABLISSEMENT);
-        Conso_S4 = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_CONSO_S4_PHOTO_STOCK_ETABLISSEMENT);
-        Conso_S5 = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_CONSO_S5_PHOTO_STOCK_ETABLISSEMENT);
-        Rien = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_RIEN_PHOTO_STOCK_ETABLISSEMENT);
-        PMP_TTC = cursor.getDouble(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_PMP_TTC_PHOTO_STOCK_ETABLISSEMENT);
-        _UID = cursor.getInt(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL__UID_PHOTO_STOCK_ETABLISSEMENT);
-        QTE_COMMANDE = cursor.getInt(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_QTE_COMMANDE_PHOTO_STOCK_ETABLISSEMENT);
-        QTE_RAF = cursor.getInt(Photo_Stock_EtablissementOpenHelper.Constantes.NUM_COL_QTE_RAF_PHOTO_STOCK_ETABLISSEMENT);
-        phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
-    }
-
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -589,7 +545,7 @@ public class Photo_Stock_Etablissement implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Photo_Stock_Etablissement photo_stock_etablissement = (Photo_Stock_Etablissement) obj;
 
-        if (this.getphiwms_mobileUUID() == photo_stock_etablissement.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == photo_stock_etablissement.getPhiMR4UUID()) {
             return 0;
         } else {
             return this.get_UID() > photo_stock_etablissement.get_UID() ? 1 : -1;

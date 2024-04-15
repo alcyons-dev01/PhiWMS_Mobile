@@ -742,9 +742,9 @@ public class ProduitOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_CODE_INCONNU, produit.getCodeInconnue());
         contentValues.put(Constantes.CLE_COL_SUIVI_SERIALISATION, produit.isSuivi_Serialisation());
         contentValues.put(Constantes.CLE_COL_SERIALISER_RECEPTION_DELIVRANCE, produit.isSerialiser_Reception_Delivrance());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, produit.getphiwms_mobileUUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, produit.getPhiMR4UUID());
 
-        long rowId = db.update(Constantes.TABLE_PRODUIT, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + produit.getphiwms_mobileUUID(), null);
+        long rowId = db.update(Constantes.TABLE_PRODUIT, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + produit.getPhiMR4UUID(), null);
         return rowId;
     }
 

@@ -87,7 +87,7 @@ public class Depot_Zone implements Serializable, Comparable {
         this.phiwms_mobileUUID = cursorZones.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -201,7 +201,7 @@ public class Depot_Zone implements Serializable, Comparable {
     public int compareTo(Object obj) {
         Depot_Zone depot_zone = (Depot_Zone) obj;
 
-        if (this.getphiwms_mobileUUID() == depot_zone.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == depot_zone.getPhiMR4UUID()) {
             return 0;
         } else {
             return this.getZoneID() > depot_zone.getZoneID() ? 1 : -1;

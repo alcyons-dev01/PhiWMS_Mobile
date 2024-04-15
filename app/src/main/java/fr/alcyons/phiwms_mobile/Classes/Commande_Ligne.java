@@ -183,7 +183,7 @@ public class Commande_Ligne implements Serializable, Comparable {
         this.phiwms_mobileUUID = cursorCommande_ligne.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 

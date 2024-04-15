@@ -53,6 +53,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Lot_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.ListePointDeLivraisonAdapter;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
@@ -70,7 +71,7 @@ public class ListePointDeLivraison extends ServiceAvecConnexionActivity {
     List<PH_Preparation> ph_preparation_List;
     List<PH_Preparation> ph_preparation_List_base;
     ListView ph_preparation_ListView;
-    ListePointDeLivraisonAdapter ListePointDeLivraisonAdapter;
+    ListePointDeLivraisonAdapter listePointDeLivraisonAdapter;
     List<String> listeDate;
     List<String> listePointLivraison;
 
@@ -98,8 +99,8 @@ public class ListePointDeLivraison extends ServiceAvecConnexionActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                if (ListePointDeLivraisonAdapter.sectionHeader.contains(position) == false) {
-                    PH_Preparation ph_preparation_Selectionne = ListePointDeLivraisonAdapter.getItem(position);
+                if (listePointDeLivraisonAdapter.sectionHeader.contains(position) == false) {
+                    PH_Preparation ph_preparation_Selectionne = listePointDeLivraisonAdapter.getItem(position);
                     Intent serviceLivraison_Intent = new Intent(ListePointDeLivraison.this, ListeLivraisonDepot.class);
                     Bundle serviceLivraison_Bundle = ListePointDeLivraison.super.getBundle();
                     serviceLivraison_Bundle.putString("depotRef", ph_preparation_Selectionne.getDepotDestinataireReference());
@@ -133,7 +134,7 @@ public class ListePointDeLivraison extends ServiceAvecConnexionActivity {
 
             String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteServiceLivraison;
 
-            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,
+            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                     new Response.Listener<JSONObject>() {
                         @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
                         @Override
@@ -271,26 +272,26 @@ public class ListePointDeLivraison extends ServiceAvecConnexionActivity {
         });
 
 
-        ListePointDeLivraisonAdapter = new ListePointDeLivraisonAdapter(ListePointDeLivraison.this, db, utilisateurConnecte);
+        listePointDeLivraisonAdapter = new ListePointDeLivraisonAdapter(ListePointDeLivraison.this, db, utilisateurConnecte);
 
        for (PH_Preparation ph_courant : ph_preparation_List) {
             if (!listeDate.contains(ph_courant.getLivraisonPrevueDate())) {
                 listeDate.add(ph_courant.getLivraisonPrevueDate());
-                ListePointDeLivraisonAdapter.addSectionHeaderItem(ph_courant);
+                listePointDeLivraisonAdapter.addSectionHeaderItem(ph_courant);
                 listePointLivraison.add(ph_courant.getDepotDestinataireReference());
-                ListePointDeLivraisonAdapter.addItem(ph_courant);
+                listePointDeLivraisonAdapter.addItem(ph_courant);
             }
 
             if(!listePointLivraison.contains(ph_courant.getDepotDestinataireReference()))
             {
                 listePointLivraison.add(ph_courant.getDepotDestinataireReference());
-                ListePointDeLivraisonAdapter.addItem(ph_courant);
+                listePointDeLivraisonAdapter.addItem(ph_courant);
             }
         }
 
 
         ph_preparation_ListView.setDivider(footer);
-        ph_preparation_ListView.setAdapter(ListePointDeLivraisonAdapter);
+        ph_preparation_ListView.setAdapter(listePointDeLivraisonAdapter);
 
 
         int taille_liste = ph_preparation_List.size();
@@ -352,25 +353,25 @@ public class ListePointDeLivraison extends ServiceAvecConnexionActivity {
                     });
 
 
-                    ListePointDeLivraisonAdapter = new ListePointDeLivraisonAdapter(ListePointDeLivraison.this, db, utilisateurConnecte);
+                    listePointDeLivraisonAdapter = new ListePointDeLivraisonAdapter(ListePointDeLivraison.this, db, utilisateurConnecte);
 
                     for (PH_Preparation ph_courant : ph_preparation_List) {
                         if (listeDate.indexOf(ph_courant.getLivraisonPrevueDate()) == -1) {
                             listeDate.add(ph_courant.getLivraisonPrevueDate());
-                            ListePointDeLivraisonAdapter.addSectionHeaderItem(ph_courant);
+                            listePointDeLivraisonAdapter.addSectionHeaderItem(ph_courant);
                             listePointLivraison.add(ph_courant.getDepotDestinataireReference());
-                            ListePointDeLivraisonAdapter.addItem(ph_courant);
+                            listePointDeLivraisonAdapter.addItem(ph_courant);
                         }
 
                         if(!listePointLivraison.contains(ph_courant.getDepotDestinataireReference()))
                         {
                             listePointLivraison.add(ph_courant.getDepotDestinataireReference());
-                            ListePointDeLivraisonAdapter.addItem(ph_courant);
+                            listePointDeLivraisonAdapter.addItem(ph_courant);
                         }
                     }
 
                     ph_preparation_ListView.setDivider(footer);
-                    ph_preparation_ListView.setAdapter(ListePointDeLivraisonAdapter);
+                    ph_preparation_ListView.setAdapter(listePointDeLivraisonAdapter);
 
                     int taille_liste = ph_preparation_List.size();
                     String titre = "Livraisons";
@@ -460,15 +461,5 @@ public class ListePointDeLivraison extends ServiceAvecConnexionActivity {
 
         scanDocumentIntent.putExtras(scanDocumentBundle);
         ListePointDeLivraison.this.startActivityForResult(scanDocumentIntent, CodesEchangesActivites.RETOUR_DOCUMENT);
-    }
-
-    public void afficherSnackBarLivraison() {
-        Snackbar snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Document scanné inconnu</b>", 0), Snackbar.LENGTH_LONG);;
-
-        Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
-        layout.setBackgroundColor(getResources().getColor(R.color.rouge2, null));
-        TextView textView = (TextView) layout.findViewById(R.id.snackbar_text);
-        textView.setTextSize(TypedValue.TYPE_STRING, 8);
-        snackbar.show();
     }
 }

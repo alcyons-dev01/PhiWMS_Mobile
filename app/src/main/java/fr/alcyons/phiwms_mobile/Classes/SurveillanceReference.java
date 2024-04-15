@@ -68,25 +68,6 @@ public class SurveillanceReference {
             e.printStackTrace();
         }
     }
-
-    public SurveillanceReference(Cursor cursor) {
-        this._UID = cursor.getInt(SurveillanceReferenceOpenHelper.Constantes.NUM_COL__UID_SURVEILLANCEREFERENCE);
-        this.surveillanceDate = cursor.getString(SurveillanceReferenceOpenHelper.Constantes.NUM_COL_SURVEILLANCEDATE_SURVEILLANCEREFERENCE);
-        this.surveillanceHeure = cursor.getString(SurveillanceReferenceOpenHelper.Constantes.NUM_COL_SURVEILLANCEHEURE_SURVEILLANCEREFERENCE);
-        this.produitID = cursor.getInt(SurveillanceReferenceOpenHelper.Constantes.NUM_COL_PRODUITID_SURVEILLANCEREFERENCE);
-        this.serialisationID = cursor.getInt(SurveillanceReferenceOpenHelper.Constantes.NUM_COL_SERIALISATIONID_SURVEILLANCEREFERENCE);
-        this.motif = cursor.getString(SurveillanceReferenceOpenHelper.Constantes.NUM_COL_MOTIF_SURVEILLANCEREFERENCE);
-        this.actionAMener = cursor.getString(SurveillanceReferenceOpenHelper.Constantes.NUM_COL_ACTIONAMENER_SURVEILLANCEREFERENCE);
-        this.statut = cursor.getString(SurveillanceReferenceOpenHelper.Constantes.NUM_COL_STATUT_SURVEILLANCEREFERENCE);
-        this.traitePar = cursor.getString(SurveillanceReferenceOpenHelper.Constantes.NUM_COL_TRAITEPAR_SURVEILLANCEREFERENCE);
-        this.traiteDate = cursor.getString(SurveillanceReferenceOpenHelper.Constantes.NUM_COL_TRAITEDATE_SURVEILLANCEREFERENCE);
-        this.traiteHeure = cursor.getString(SurveillanceReferenceOpenHelper.Constantes.NUM_COL_TRAITEHEURE_SURVEILLANCEREFERENCE);
-        this.produitLot = cursor.getString(SurveillanceReferenceOpenHelper.Constantes.NUM_COL_PRODUITLOT_SURVEILLANCEREFERENCE);
-        this.produitDatePéremption = cursor.getString(SurveillanceReferenceOpenHelper.Constantes.NUM_COL_PRODUITDATEPEREMPTION_SURVEILLANCEREFERENCE);
-        this.produitNumeroSerie = cursor.getString(SurveillanceReferenceOpenHelper.Constantes.NUM_COL_PRODUITNUMEROSERIE_SURVEILLANCEREFERENCE);
-        this.serialexpressUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
-    }
-
     public JSONObject toJson() {
         JSONObject jsonObject = new JSONObject();
         try {

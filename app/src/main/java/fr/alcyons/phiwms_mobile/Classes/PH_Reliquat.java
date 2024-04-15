@@ -259,7 +259,7 @@ public class PH_Reliquat implements Serializable, Comparable {
         Reliquat_UID = reliquat_UID;
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -774,7 +774,7 @@ public class PH_Reliquat implements Serializable, Comparable {
     public int compareTo(@NonNull Object obj) {
         PH_Reliquat ph_reliquat = (PH_Reliquat) obj;
 
-        if (this.getphiwms_mobileUUID() == ph_reliquat.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == ph_reliquat.getPhiMR4UUID()) {
             return 0;
         } else {
             return this.getReliquat_UID() > ph_reliquat.getReliquat_UID() ? 1 : -1;

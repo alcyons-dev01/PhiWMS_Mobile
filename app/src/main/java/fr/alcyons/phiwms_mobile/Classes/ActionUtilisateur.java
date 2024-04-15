@@ -94,7 +94,7 @@ public class ActionUtilisateur implements Serializable, Comparable {
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -212,7 +212,7 @@ public class ActionUtilisateur implements Serializable, Comparable {
     public int compareTo(Object obj) {
         ActionUtilisateur actionUtilisateur = (ActionUtilisateur) obj;
 
-        if (this.getphiwms_mobileUUID() == actionUtilisateur.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == actionUtilisateur.getPhiMR4UUID()) {
             return 0;
         } else {
             return this.getId() > actionUtilisateur.getId() ? 1 : -1;

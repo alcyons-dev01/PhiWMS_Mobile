@@ -213,7 +213,7 @@ public class Inventaire_Ligne_Temp implements Serializable, Comparable {
         return new_gs1;
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 

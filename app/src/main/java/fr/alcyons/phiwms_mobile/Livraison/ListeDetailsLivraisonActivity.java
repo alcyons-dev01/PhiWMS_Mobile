@@ -46,6 +46,7 @@ import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Preparation_Ligne_LivraisonAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.Dialogue;
@@ -106,7 +107,7 @@ public class ListeDetailsLivraisonActivity extends ServiceActivity {
                 }
 
                 PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, preparation_ligne_courant);
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, preparation_ligne_courant.getphiwms_mobileUUID(), preparation_ligne_courant.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, preparation_ligne_courant.getPhiMR4UUID(), preparation_ligne_courant.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
 
                 //gestion des actions lignes
                 Random randomactionligne = new Random();
@@ -329,6 +330,7 @@ public class ListeDetailsLivraisonActivity extends ServiceActivity {
 
     @Override
     public void onSaveInstanceState(Bundle outstate) {
+        super.onSaveInstanceState(outstate);
         PH_Preparation ph_preparation = ph_preparation_Selectionne;
         outstate.putInt("ph_preparationUID_Selectionne", ph_preparation.getUID());
     }
@@ -350,8 +352,8 @@ public class ListeDetailsLivraisonActivity extends ServiceActivity {
         PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, ph_preparation);
 
         // Ajout du PH_Preparation au ElementASynchroniser
-        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation.getphiwms_mobileUUID(), ph_preparation.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
-        gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getphiwms_mobileUUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation.getPhiMR4UUID(), ph_preparation.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+        gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
 
         // Tentative de lancer la sychronisation
         if (OutilsGestionConnexionReseau.isServerAccessible(ListeDetailsLivraisonActivity.this)) {
@@ -405,6 +407,7 @@ public class ListeDetailsLivraisonActivity extends ServiceActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         ListeDetailsLivraisonActivity.this.finish();
     }
 }

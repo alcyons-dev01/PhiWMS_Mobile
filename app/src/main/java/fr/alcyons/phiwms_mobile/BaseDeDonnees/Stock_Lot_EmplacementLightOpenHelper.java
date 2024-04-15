@@ -64,9 +64,9 @@ public class Stock_Lot_EmplacementLightOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_PEREMPTIONDATE_STOCK_LOT_EMPLACEMENT, stock_lot_emplacement.getPeremptionDate());
         contentValues.put(Constantes.CLE_COL_QTE_PREPARER_STOCK_LOT_EMPLACEMENT, stock_lot_emplacement.getQte_Preparer());
         contentValues.put(Constantes.CLE_COL_SERIE, stock_lot_emplacement.getSerie());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, stock_lot_emplacement.getphiwms_mobileUUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, stock_lot_emplacement.getPhiMR4UUID());
 
-        return db.update(Constantes.TABLE_STOCK_LOT_EMPLACEMENT, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + stock_lot_emplacement.getphiwms_mobileUUID(), null);
+        return db.update(Constantes.TABLE_STOCK_LOT_EMPLACEMENT, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + stock_lot_emplacement.getPhiMR4UUID(), null);
     }
 
     public static List<Stock_Lot_Emplacement_Light> getStockLotEmplacementByStock(SQLiteDatabase db, Stock stock) {
@@ -85,7 +85,7 @@ public class Stock_Lot_EmplacementLightOpenHelper extends DBOpenHelper {
     }
 
     public static void supprimerUnStockLotEmplacement(SQLiteDatabase db, Stock_Lot_Emplacement_Light stockLotEmplacement) {
-        db.delete(Constantes.TABLE_STOCK_LOT_EMPLACEMENT, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(stockLotEmplacement.getphiwms_mobileUUID())});
+        db.delete(Constantes.TABLE_STOCK_LOT_EMPLACEMENT, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(stockLotEmplacement.getPhiMR4UUID())});
     }
 
     public static List<Stock_Lot_Emplacement_Light> getAllStock_Lot_EmplacementsByProduitIDEtCommandeNumero(SQLiteDatabase db, Produit produit, String critereCommandeNumero) {

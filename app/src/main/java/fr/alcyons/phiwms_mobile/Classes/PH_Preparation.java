@@ -340,7 +340,7 @@ public class PH_Preparation implements Serializable, Comparable {
         this.TempsPreparation = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_TEMPS_PREPARATION);
     }
 
-    public int getphiwms_mobileUUID() {
+    public int getPhiMR4UUID() {
         return phiwms_mobileUUID;
     }
 
@@ -810,7 +810,7 @@ public class PH_Preparation implements Serializable, Comparable {
     public int compareTo(Object obj) {
         PH_Preparation ph_preparation = (PH_Preparation) obj;
 
-        if (this.getphiwms_mobileUUID() == ph_preparation.getphiwms_mobileUUID()) {
+        if (this.getPhiMR4UUID() == ph_preparation.getPhiMR4UUID()) {
             return 0;
         } else {
             return this.getUID() > ph_preparation.getUID() ? 1 : -1;
