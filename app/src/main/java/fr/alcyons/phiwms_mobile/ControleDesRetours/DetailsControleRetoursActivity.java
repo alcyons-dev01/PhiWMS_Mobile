@@ -101,7 +101,7 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
         serialisation = new Serialisation(DetailsControleRetoursActivity.this, db, utilisateurConnecte);
 
         // Affichage des informations de base
-        ((TextView) findViewById(R.id.intitule)).setText(retourSelectionne.getIntitulé());
+        ((TextView) findViewById(R.id.intitule)).setText(retourSelectionne.getIntitule());
         ((TextView) findViewById(R.id.numero)).setText(retourSelectionne.getNumero());
 
         // Récupération et initialisation de la listView

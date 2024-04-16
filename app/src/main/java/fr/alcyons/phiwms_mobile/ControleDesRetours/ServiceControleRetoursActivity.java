@@ -347,7 +347,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
     // Permet de supprimer en base de donnée les données afin d'éviter les duplicats
     public void viderTablesConcernees() {
         for (Retour retour : gestionnaireRetour.getRetoursByEnAttenteDe(db, getString(R.string.RepriseDemandee))) {
-            if(!retour.getIntitulé().contentEquals("Retour_ALCYONS"))
+            if(!retour.getIntitule().contentEquals("Retour_ALCYONS"))
             {
                 for (Retour_Ligne retourLigne : gestionnaireRetour_Ligne.getAllRetourLignesByRetour(db, retour)) {
                     gestionnaireRetour_Ligne.supprimerUnRetourLigne(db, retourLigne);
