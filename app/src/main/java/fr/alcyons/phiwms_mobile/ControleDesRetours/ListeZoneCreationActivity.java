@@ -29,9 +29,8 @@ import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RESULT_ZONE
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT;
 
 /**
- * Created by olivier on 27/12/2017.
+ * Created by olivier on 16/04/2024.
  */
-
 public class ListeZoneCreationActivity extends ServiceActivity {
     Depot depotSelectionne;
 

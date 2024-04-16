@@ -69,9 +69,8 @@ import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 /**
- * Created by olivier on 26/06/2019.
+ * Created by olivier on 16/04/2024.
  */
-
 public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity {
 
     Retour retourSelectionne;

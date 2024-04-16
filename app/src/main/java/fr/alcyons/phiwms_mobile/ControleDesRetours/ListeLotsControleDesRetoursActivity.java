@@ -43,7 +43,9 @@ import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_CODE_GS1;
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LISTE_LOTS;
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LOT;
-
+/**
+ * Created by olivier on 16/04/2024.
+ */
 public class ListeLotsControleDesRetoursActivity extends ServiceActivity {
 
     public List<Retour_Ligne_ControleRetour_Adapte.LotAdapte> lotAdaptesList;
