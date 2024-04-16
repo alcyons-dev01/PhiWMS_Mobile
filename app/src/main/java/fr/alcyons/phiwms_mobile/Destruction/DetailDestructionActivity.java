@@ -159,8 +159,8 @@ public class DetailDestructionActivity extends ServiceActivity {
 
                 // Si tous les retoursLignes ont bien été mis à jour, on met à jour le retour
                 if (compteurReussite == adapter.retour_Lignes.size()) {
-                    String intitulé = retourSelectionne.getIntitulé();
-                    retourSelectionne.setIntitulé(intitulé.replace(getString(R.string.DestructionDemandée), getString(R.string.DestructionEffectuée)));
+                    String intitulé = retourSelectionne.getIntitule();
+                    retourSelectionne.setIntitule(intitulé.replace(getString(R.string.DestructionDemandée), getString(R.string.DestructionEffectuée)));
                     retourSelectionne.setEn_Attente_de(getString(R.string.DestructionEffectuée));
                     retourSelectionne.setCommentaire(commentaire.getText().toString().trim());
                     Date date = new Date();
@@ -242,7 +242,7 @@ public class DetailDestructionActivity extends ServiceActivity {
         commentaire = (EditText) findViewById(R.id.commentaire);
 
         // Affichage des constantes
-        ((TextView) findViewById(R.id.intitule)).setText(retourSelectionne.getIntitulé().trim());
+        ((TextView) findViewById(R.id.intitule)).setText(retourSelectionne.getIntitule().trim());
         ((TextView) findViewById(R.id.numero)).setText(retourSelectionne.getNumero().trim());
 
         // Récupération du bouton d'enregistrement
