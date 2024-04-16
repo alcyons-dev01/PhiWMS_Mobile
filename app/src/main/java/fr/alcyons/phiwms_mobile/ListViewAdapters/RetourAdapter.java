@@ -98,7 +98,7 @@ public class RetourAdapter extends ArrayAdapter implements Filterable {
             }
 
 
-            String[] intitule_tab = retour.getIntitulé().split(":");
+            String[] intitule_tab = retour.getIntitule().split(":");
             String intitule_split = intitule_tab[intitule_tab.length-1];
             String depot_origine = intitule_tab[0];
 
@@ -133,7 +133,7 @@ public class RetourAdapter extends ArrayAdapter implements Filterable {
                     String valueText = retour.getChaineFiltreQuarantaine(db).toLowerCase();
                     if (valueText.startsWith(String.valueOf(constraint))) {
                         founded.add(retour);
-                    } else if (retour.getIntitulé().toLowerCase().contains(constraint)) {
+                    } else if (retour.getIntitule().toLowerCase().contains(constraint)) {
                         founded.add(retour);
                     } else {
                         /* Vérifie le début de chaque mot */
