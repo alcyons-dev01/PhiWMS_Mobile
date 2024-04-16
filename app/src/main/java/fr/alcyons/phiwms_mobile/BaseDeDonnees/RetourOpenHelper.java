@@ -517,7 +517,7 @@ public class RetourOpenHelper extends DBOpenHelper {
                                 }
                             } else {
                                 JSONArray retoursJson = response.getJSONArray("PH_Retours");
-                                for (Retour retour : getAllRetoursByStatutEtEnAttenteDe(db, context.getString(R.string.statutEncours), context.getString(R.string.RetourFRSDemandé))
+                                for (Retour retour : getAllRetoursByStatutEtEnAttenteDe(db, context.getString(R.string.statutEncours), context.getString(R.string.RetourFRSDemande))
                                         ) {
                                     List<Retour_Ligne> retourLignes = Retour_LigneOpenHelper.getAllRetourLignesByRetour(db, retour);
                                     for (Retour_Ligne retourLigne : retourLignes
@@ -530,7 +530,7 @@ public class RetourOpenHelper extends DBOpenHelper {
                                     JSONObject retourJson = retoursJson.getJSONObject(i);
                                     Retour retour = new Retour(retourJson);
 
-                                    if (retour.getEn_Attente_de().equals(context.getString(R.string.RetourFRSDemandé)) && retour.getStatut().equals(context.getString(R.string.statutEncours))) {
+                                    if (retour.getEn_Attente_de().equals(context.getString(R.string.RetourFRSDemande)) && retour.getStatut().equals(context.getString(R.string.statutEncours))) {
                                         long rowID = insererUnRetourEnBDD(db, retour);
                                         if (rowID != -1) {
                                             JSONArray retourLignesJson = retourJson.getJSONArray("ph_retour_ligne");
