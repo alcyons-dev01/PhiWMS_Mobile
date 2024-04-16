@@ -2271,20 +2271,17 @@ public class BarcodeCaptureActivity extends ServiceActivity {
 /*        if (floatingActionMenu.isOpened()) {
             floatingActionMenu.close(true);
         } else*/
-        if(scannerContexte.contentEquals(scannerContexteAuthentification))
-        {
+        super.onBackPressed();
+        if (scannerContexte.contentEquals(scannerContexteAuthentification)) {
             BarcodeCaptureActivity.this.finish();
-        }
-        else if(scannerContexte.contentEquals(scannerContextePleinVideLocalisation))
-        {
+        } else if (scannerContexte.contentEquals(scannerContextePleinVideLocalisation)) {
             Intent resultIntent = new Intent();
             Bundle extras = new Bundle();
             extras.putString("code", "");
             resultIntent.putExtras(extras);
             setResult(CodesEchangesActivites.RESULT_PLEINVIDE_LOCALISATION, resultIntent);
             finish();
-        }
-        else if (modeRafale) {
+        } else if (modeRafale) {
             // Dans le cas du mode rafale on subodore que le fait de backPresser est équivalent à cliquer sur bouton suppression
             boutonSuppression.callOnClick();
         } else {
