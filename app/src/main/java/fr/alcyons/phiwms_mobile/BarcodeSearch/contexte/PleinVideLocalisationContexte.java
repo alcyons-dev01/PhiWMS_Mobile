@@ -54,7 +54,7 @@ public class PleinVideLocalisationContexte {
             messageColor = Color.RED;
         }
         else{
-            boolean confirmation = Alerte.afficherAlerte(context, "Confirmation", "Vous allez réaliser une Demande PleinVide pour "+ dotation.getIntitulé() +" \n\nContinuer ?", "OuiNon");
+            boolean confirmation = Alerte.afficherAlerte(context, "Confirmation", "Vous allez réaliser une Demande PleinVide pour "+ dotation.getIntitule() +" \n\nContinuer ?", "OuiNon");
             if(confirmation){
                 messageTexte = "Localisation trouvée";
                 messageColor = Color.GREEN;
