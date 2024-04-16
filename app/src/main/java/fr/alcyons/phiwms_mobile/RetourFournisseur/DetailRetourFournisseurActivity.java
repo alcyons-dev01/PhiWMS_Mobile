@@ -119,8 +119,8 @@ public class DetailRetourFournisseurActivity extends ServiceActivity {
             // Si tout est ok mise à jour du Retour
             if (compteurReussite == adapter.retour_Lignes.size()) {
                 retourSelectionne.setCommentaire(commentaire.getText().toString().trim());
-                String intitulé = retourSelectionne.getIntitulé().replace(getString(R.string.RetourFRSDemandé), getString(R.string.RetourFRSEffectué));
-                retourSelectionne.setIntitulé(intitulé);
+                String intitulé = retourSelectionne.getIntitule().replace(getString(R.string.RetourFRSDemandé), getString(R.string.RetourFRSEffectué));
+                retourSelectionne.setIntitule(intitulé);
                 retourSelectionne.setEn_Attente_de(getString(R.string.RetourFRSEffectué));
                 retourSelectionne.setRef_Depot_Dest("Retour Fournisseur");
                 retourSelectionne.setStatut(getString(R.string.statutEncours));
@@ -178,7 +178,7 @@ public class DetailRetourFournisseurActivity extends ServiceActivity {
         commentaire = (EditText) findViewById(R.id.commentaire);
 
         // Affichage des informations de base
-        String[] provenance_tab = retourSelectionne.getIntitulé().split(":");
+        String[] provenance_tab = retourSelectionne.getIntitule().split(":");
         String origine_retour = provenance_tab[0];
         ((TextView) findViewById(R.id.depotOrigine)).setText(origine_retour);
         ((TextView) findViewById(R.id.fournisseurDestinataire)).setText(retourSelectionne.getRef_Depot_Dest());
