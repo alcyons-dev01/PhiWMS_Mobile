@@ -263,7 +263,7 @@ public class DetailQuarantaineActivity extends ServiceActivity {
         // Affichage des informations de base
         commentaireEditText = (EditText) findViewById(R.id.commentaire);
 
-        ((TextView) findViewById(R.id.intitule)).setText(retourSelectionne.getIntitulé());
+        ((TextView) findViewById(R.id.intitule)).setText(retourSelectionne.getIntitule());
         ((TextView) findViewById(R.id.numero)).setText(retourSelectionne.getNumero());
         ((TextView) findViewById(R.id.motif)).setText(retourSelectionne.getMotif());
         commentaireEditText.setText(retourSelectionne.getCommentaire());

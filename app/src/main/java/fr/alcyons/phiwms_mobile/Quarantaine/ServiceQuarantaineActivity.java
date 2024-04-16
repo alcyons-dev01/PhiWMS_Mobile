@@ -292,7 +292,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
 
         for (Retour retour : retourList)
         {
-            if(!retour.getIntitulé().contentEquals("Quarantaine_ALCYONS"))
+            if(!retour.getIntitule().contentEquals("Quarantaine_ALCYONS"))
             {
                 List<Retour_Ligne> retourLigneList = gestionnaireRetour_Ligne.getAllRetourLignesByRetour(db, retour);
                 for (Retour_Ligne retourLigne : retourLigneList)
