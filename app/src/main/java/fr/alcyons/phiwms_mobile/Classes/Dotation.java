@@ -113,11 +113,11 @@ public class Dotation implements Serializable, Comparable {
         this._UID = _UID;
     }
 
-    public String getIntitulé() {
+    public String getIntitule() {
         return Intitulé;
     }
 
-    public void setIntitulé(String intitulé) {
+    public void setIntitule(String intitulé) {
         Intitulé = intitulé;
     }
 

@@ -224,11 +224,11 @@ public class Retour implements Serializable, Comparable {
         Code_Patient = code_Patient;
     }
 
-    public String getIntitulé() {
+    public String getIntitule() {
         return Intitulé;
     }
 
-    public void setIntitulé(String intitulé) {
+    public void setIntitule(String intitulé) {
         Intitulé = intitulé;
     }
 
@@ -391,7 +391,7 @@ public class Retour implements Serializable, Comparable {
             jsonObject.put("Numero", this.getNumero());
             jsonObject.put("Ref_Depot_Origine", this.getRef_Depot_Origine());
             jsonObject.put("Code_Patient", this.getCode_Patient());
-            jsonObject.put("Intitulé", this.getIntitulé());
+            jsonObject.put("Intitulé", this.getIntitule());
             jsonObject.put("Ref_Depot_Dest", this.getRef_Depot_Dest());
             jsonObject.put("Statut", this.getStatut());
             jsonObject.put("Date_retour", this.getDate_retour());
