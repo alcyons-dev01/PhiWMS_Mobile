@@ -85,7 +85,57 @@
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
 
-    <!-- Retour PUI -->
+    <!-- Contrôle des retours -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.ControleDesRetours.ServiceControleRetoursActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.ControleDesRetours.DetailsControleRetoursActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.ControleDesRetours.ListeLotsControleDesRetoursActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.ControleDesRetours.ListeZoneCreationActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.ControleDesRetours.ListeEmplacementCreationActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="fr.alcyons.phiwms_mobile.ControleDesRetours.CreationLotControleDesRetoursActivity"
+            android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation|screenSize"/>
+
+    <!-- Quarantaine -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.Quarantaine.ServiceQuarantaineActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.Quarantaine.DetailQuarantaineActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+        <!-- Retour PUI -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
@@ -113,6 +163,19 @@
 
     <activity
         android:name="fr.alcyons.phiwms_mobile.RetourFournisseur.DetailRetourFournisseurActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <!-- Destruction -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.Destruction.ServiceDestructionActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.Destruction.DetailDestructionActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>

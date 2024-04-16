@@ -28,6 +28,7 @@ import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity
 //import fr.alcyons.phiwms_mobile.DemandeProtocolePAD.ServiceDemandeProtocolePADActivity;
 //import fr.alcyons.phiwms_mobile.DemandeReassort.ServiceDemandeReassortActivity;
 //import fr.alcyons.phiwms_mobile.Destruction.ServiceDestructionActivity;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.ServiceControleRetoursActivity;
 import fr.alcyons.phiwms_mobile.Destruction.ServiceDestructionActivity;
 import fr.alcyons.phiwms_mobile.DispositifAuLivret.ServiceDispositifAuLivretActivity;
 //import fr.alcyons.phiwms_mobile.DotationService.ServiceDotationServiceActivity;
@@ -152,8 +153,7 @@ public class OutilsGestionListeServices {
             case "Réception PAD":
                 return ServiceReceptionPadActivity.class;
             case "Contrôle des retours":
-                //return ServiceControleRetoursActivity.class;
-               // return ServiceControleRetoursScanneeActivity.class;
+                return ServiceControleRetoursActivity.class;
             case "Contrôle des retours Scan":
               //  return ServiceControleRetoursScanneeActivity.class;
             case "Retour PUI":
