@@ -31,7 +31,9 @@ import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
@@ -241,7 +243,7 @@ public class ListeLotReceptionPuiActivity extends ServiceActivity {
 
                     if(android.os.Build.MANUFACTURER.contains("Zebra Technologies")  || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") )
                     {
-                        listeLotReceptionPui_Intent = new Intent(ListeLotReceptionPuiActivity.this, ScannerPreparationActivity.class);
+                        listeLotReceptionPui_Intent = new Intent(ListeLotReceptionPuiActivity.this, ScannerReceptionActivity.class);
                         listeLotReceptionPui_Bundle.putString("contexte", String.valueOf(R.string.scannerContextUniqueNewReceptionPUI));
                         listeLotReceptionPui_Bundle.putInt("ReceptionID", commandeSelectionne.getID_commande());
                         listeLotReceptionPui_Bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
@@ -250,7 +252,7 @@ public class ListeLotReceptionPuiActivity extends ServiceActivity {
                     }
                     else
                     {
-                        listeLotReceptionPui_Intent = new Intent(ListeLotReceptionPuiActivity.this, BarcodePreparationActivity.class);
+                        listeLotReceptionPui_Intent = new Intent(ListeLotReceptionPuiActivity.this, BarcodeReceptionActivity.class);
                         listeLotReceptionPui_Bundle.putString("contexte", String.valueOf(R.string.scannerContextUniqueNewReceptionPUI));
                         listeLotReceptionPui_Bundle.putInt("ReceptionID", commandeSelectionne.getID_commande());
                         listeLotReceptionPui_Bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
@@ -777,8 +779,8 @@ public class ListeLotReceptionPuiActivity extends ServiceActivity {
     }
 
     @Override
-    public void onBackPressed()
-    {
+    public void onBackPressed() {
+        super.onBackPressed();
         onMenuSaveClick();
     }
 

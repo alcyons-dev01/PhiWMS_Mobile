@@ -1,5 +1,7 @@
 package fr.alcyons.phiwms_mobile.ReceptionPUI;
 
+import static com.google.android.gms.vision.L.TAG;
+
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -15,25 +17,18 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -92,7 +87,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
     private void initObjetGraphique()
     {
         //optionTri = (Spinner) findViewById(R.id.optionTri);
-        commandeListView = (ListView) findViewById(R.id.listeView);
+        commandeListView = findViewById(R.id.listeView);
         ((TextView) findViewById(R.id.titre)).setText("Réceptions");
         pm = ServiceReceptionPuiActivity.this.getPackageManager();
     }
@@ -115,19 +110,16 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
 
         depotPUI = DepotOpenHelper.getDepotPUI(db);
 
-        commandeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Commande commandeSelectionne = (Commande) commandeReceptionPUIAdapter.getItem(position);
+        commandeListView.setOnItemClickListener((parent, view, position, id) -> {
+            Commande commandeSelectionne = (Commande) commandeReceptionPUIAdapter.getItem(position);
 
-                if (commandeSelectionne != null) {
-                    Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPuiActivity.this, DetailReceptionPuiActivity.class);
-                    Bundle serviceReceptionPui_Bundle = ServiceReceptionPuiActivity.super.getBundle();
-                    serviceReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
-                    serviceReceptionPui_Intent.putExtras(serviceReceptionPui_Bundle);
-                    ServiceReceptionPuiActivity.this.startActivity(serviceReceptionPui_Intent);
-                    ServiceReceptionPuiActivity.this.finish();
-                }
+            if (commandeSelectionne != null) {
+                Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPuiActivity.this, DetailReceptionPuiActivity.class);
+                Bundle serviceReceptionPui_Bundle = ServiceReceptionPuiActivity.super.getBundle();
+                serviceReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
+                serviceReceptionPui_Intent.putExtras(serviceReceptionPui_Bundle);
+                ServiceReceptionPuiActivity.this.startActivity(serviceReceptionPui_Intent);
+                ServiceReceptionPuiActivity.this.finish();
             }
         });
 
@@ -151,7 +143,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                                         commandeListView.setDivider(footer);
                                         commandeListView.setAdapter(commandeReceptionPUIAdapter);
 
-                                        if (commandeList.size() == 0) {
+                                        if (commandeList.isEmpty()) {
                                             vide = true;
                                             nomServiceVide = "Réception PUI";
                                             ServiceReceptionPuiActivity.this.finish();
@@ -174,7 +166,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                                     commandeListView.setDivider(footer);
                                     commandeListView.setAdapter(commandeReceptionPUIAdapter);
 
-                                    if (commandeList.size() == 0) {
+                                    if (commandeList.isEmpty()) {
                                         vide = true;
                                         nomServiceVide = "Réception PUI";
                                         ServiceReceptionPuiActivity.this.finish();
@@ -190,7 +182,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                                 commandeListView.setDivider(footer);
                                 commandeListView.setAdapter(commandeReceptionPUIAdapter);
 
-                                if (commandeList.size() == 0) {
+                                if (commandeList.isEmpty()) {
                                     vide = true;
                                     nomServiceVide = "Réception PUI";
                                     ServiceReceptionPuiActivity.this.finish();
@@ -220,86 +212,80 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
             String urlRequete = null;
             try {
                 urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteCommandes + "depotreference/" + URLEncoder.encode(depotPUI.getDepot_Reference(), "utf-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                Log.e(TAG, "Error UnsupportedEncodingException :", e);
             }
 
             JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                int resultCount = response.getInt("resultCount");
-                                if (resultCount == 0) {
-                                    String erreur = response.getString("erreur");
-                                    if (erreur.equals(getString(R.string.tokenInvalide))) {
-                                        Alerte.afficherAlerte(ServiceReceptionPuiActivity.this, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter", "alerte");
-                                        DBOpenHelper.viderBasesDeDonnees(db);
-                                        ServiceReceptionPuiActivity.this.finishAffinity();
-                                        Intent intent = new Intent(ServiceReceptionPuiActivity.this, AuthentificationActivity.class);
-                                        ServiceReceptionPuiActivity.this.startActivity(intent);
-                                    } else if (erreur.equals(getString(R.string.tokenExpire))) {
-                                        Alerte.afficherAlerte(ServiceReceptionPuiActivity.this, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter", "alerte");
-                                        ServiceReceptionPuiActivity.this.finishAffinity();
-                                        Intent intent = new Intent(ServiceReceptionPuiActivity.this, AuthentificationActivity.class);
-                                        ServiceReceptionPuiActivity.this.startActivity(intent);
-                                    } else if (erreur.contentEquals("Aucun PH_Commande trouvé")) {
-                                        Toast toast = Toast.makeText(ServiceReceptionPuiActivity.this, "Aucune Commande trouvé", Toast.LENGTH_SHORT);
-                                        toast.setGravity(Gravity.CENTER, 0, 0);
-                                        toast.show();
-                                    } else {
-                                        Alerte.afficherAlerte(ServiceReceptionPuiActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Reception PUI", "alerte");
-                                    }
+                    response -> {
+                        try {
+                            int resultCount = response.getInt("resultCount");
+                            if (resultCount == 0) {
+                                String erreur = response.getString("erreur");
+                                if (erreur.equals(getString(R.string.tokenInvalide))) {
+                                    Alerte.afficherAlerte(ServiceReceptionPuiActivity.this, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter", "alerte");
+                                    DBOpenHelper.viderBasesDeDonnees(db);
+                                    ServiceReceptionPuiActivity.this.finishAffinity();
+                                    Intent intent = new Intent(ServiceReceptionPuiActivity.this, AuthentificationActivity.class);
+                                    ServiceReceptionPuiActivity.this.startActivity(intent);
+                                } else if (erreur.equals(getString(R.string.tokenExpire))) {
+                                    Alerte.afficherAlerte(ServiceReceptionPuiActivity.this, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter", "alerte");
+                                    ServiceReceptionPuiActivity.this.finishAffinity();
+                                    Intent intent = new Intent(ServiceReceptionPuiActivity.this, AuthentificationActivity.class);
+                                    ServiceReceptionPuiActivity.this.startActivity(intent);
+                                } else if (erreur.contentEquals("Aucun PH_Commande trouvé")) {
+                                    Toast toast = Toast.makeText(ServiceReceptionPuiActivity.this, "Aucune Commande trouvé", Toast.LENGTH_SHORT);
+                                    toast.setGravity(Gravity.CENTER, 0, 0);
+                                    toast.show();
                                 } else {
-                                    commandeJSONArray = response.getJSONArray("PH_Commandes");
-                                    viderTableCommandes(db);
-                                    viderTablePH_Reliquat(db);
+                                    Alerte.afficherAlerte(ServiceReceptionPuiActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Reception PUI", "alerte");
+                                }
+                            } else {
+                                commandeJSONArray = response.getJSONArray("PH_Commandes");
+                                viderTableCommandes(db);
+                                viderTablePH_Reliquat(db);
 
-                                    for (int i = 0; i < commandeJSONArray.length(); i++) {
-                                        JSONObject commandeJSONObject = commandeJSONArray.getJSONObject(i);
+                                for (int i = 0; i < commandeJSONArray.length(); i++) {
+                                    JSONObject commandeJSONObject = commandeJSONArray.getJSONObject(i);
 
-                                        Commande commandeCourant = new Commande(commandeJSONObject);
+                                    Commande commandeCourant = new Commande(commandeJSONObject);
 
-                                        phReliquatJSONArray = commandeJSONObject.getJSONArray("ph_reliquat");
+                                    phReliquatJSONArray = commandeJSONObject.getJSONArray("ph_reliquat");
 
-                                        boolean phReliquatPresent = false;
+                                    boolean phReliquatPresent = false;
 
-                                        for (int j = 0; j < phReliquatJSONArray.length(); j++) {
+                                    for (int j = 0; j < phReliquatJSONArray.length(); j++) {
 
-                                            PH_Reliquat reliquatCourant = new PH_Reliquat((phReliquatJSONArray.getJSONObject(j)));
+                                        PH_Reliquat reliquatCourant = new PH_Reliquat((phReliquatJSONArray.getJSONObject(j)));
 
 
-                                            long phReliquatPHiMR4ID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, reliquatCourant);
-                                            if (phReliquatPHiMR4ID != -1) {
-                                                phReliquatPresent = true;
-                                            }
+                                        long phReliquatPHiMR4ID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, reliquatCourant);
+                                        if (phReliquatPHiMR4ID != -1) {
+                                            phReliquatPresent = true;
                                         }
+                                    }
 
-                                        if (phReliquatPresent) {
-                                            long rowID = CommandeOpenHelper.insererUneCommandeEnBDD(db, commandeCourant);
-                                            if (rowID != -1) {
-                                                commandeList.add(commandeCourant);
-                                            }
+                                    if (phReliquatPresent) {
+                                        long rowID = CommandeOpenHelper.insererUneCommandeEnBDD(db, commandeCourant);
+                                        if (rowID != -1) {
+                                            commandeList.add(commandeCourant);
                                         }
                                     }
                                 }
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
                             }
-                            handler.sendMessage(handler.obtainMessage());
+
+                        } catch (Throwable e) {
+                            Log.e(TAG, "Error JSON :", e);
                         }
+                        handler.sendMessage(handler.obtainMessage());
                     },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e("Volley", "Error");
-                            Alerte.afficherAlerte(ServiceReceptionPuiActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP Service Reception PUI", "alerte");
-                        }
+                    error -> {
+                        Log.e("Volley", "Error");
+                        Alerte.afficherAlerte(ServiceReceptionPuiActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP Service Reception PUI", "alerte");
                     }
             ) {
                 @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     HashMap<String, String> headers = new HashMap<>();
                     headers.put("Authorization", utilisateurConnecte.getToken());
                     return headers;
@@ -310,23 +296,17 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
             try {
                 Looper.loop();
             } catch (RuntimeException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Error loop :", e);
             }
             invalidateOptionsMenu();
 
             passageParOnCreate = false;
         } else {
             commandeList = CommandeOpenHelper.getAllCommandesPUI(db, depotPUI.getDepot_Reference());
-            if (commandeList.size() == 0) {
+            if (commandeList.isEmpty()) {
                 if(connexionDirecte)
                 {
-                    Intent retourVersServiceConnexionDirectIntent = new Intent(ServiceReceptionPuiActivity.this, ServiceConnexionDirecteActivity.class);
-                    Bundle retourVersServiceConnexionDirectBundle = new Bundle();
-                    retourVersServiceConnexionDirectBundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                    retourVersServiceConnexionDirectBundle.putBoolean("snackBar", true);
-                    retourVersServiceConnexionDirectBundle.putString("nomService", "Commande");
-
-                    retourVersServiceConnexionDirectIntent.putExtras(retourVersServiceConnexionDirectBundle);
+                    Intent retourVersServiceConnexionDirectIntent = getRetourVersServiceConnexionDirectIntent();
                     ServiceReceptionPuiActivity.this.startActivity(retourVersServiceConnexionDirectIntent);
                     ServiceReceptionPuiActivity.this.finish();
                 }
@@ -369,6 +349,18 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
         }
     }
 
+    @NonNull
+    private Intent getRetourVersServiceConnexionDirectIntent() {
+        Intent retourVersServiceConnexionDirectIntent = new Intent(ServiceReceptionPuiActivity.this, ServiceConnexionDirecteActivity.class);
+        Bundle retourVersServiceConnexionDirectBundle = new Bundle();
+        retourVersServiceConnexionDirectBundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+        retourVersServiceConnexionDirectBundle.putBoolean("snackBar", true);
+        retourVersServiceConnexionDirectBundle.putString("nomService", "Commande");
+
+        retourVersServiceConnexionDirectIntent.putExtras(retourVersServiceConnexionDirectBundle);
+        return retourVersServiceConnexionDirectIntent;
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -384,25 +376,19 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.prepareOptionsMenu(menu, commandeReceptionPUIAdapter, null, "Produit, Numéro, Fournisseur");
         MenuItem item = menu.findItem(R.id.menuDatamatrix);
-        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-
-            @Override
-            public boolean onMenuItemClick(@NonNull MenuItem item) {
-                lancerScan();
-                return true;
-            }
+        item.setOnMenuItemClickListener(item1 -> {
+            lancerScan();
+            return true;
         });
         return true;
     }
-
-
     public void lancerScan()
     {
         Bundle scanDocumentBundle = ServiceReceptionPuiActivity.super.getBundle();
         scanDocumentBundle.putString("contexte", String.valueOf(R.string.scannerContexteDocument));
         scanDocumentBundle.putBoolean("isBoutonSuppressionExistant", true);
 
-        Intent scanDocumentIntent = null;
+        Intent scanDocumentIntent;
         if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
         {
             scanDocumentIntent = new Intent(ServiceReceptionPuiActivity.this, ScannerDocumentActivity.class);
@@ -429,11 +415,11 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
     }
 
     public void afficherSnackBarPreparationReceptionPUI() {
-        Snackbar snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Document scanné inconnu</b>", 0), Snackbar.LENGTH_LONG);;
+        Snackbar snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Document scanné inconnu</b>", 0), Snackbar.LENGTH_LONG);
 
         @SuppressLint("RestrictedApi") Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
         layout.setBackgroundColor(getResources().getColor(R.color.rouge2, null));
-        TextView textView = (TextView) layout.findViewById(com.google.android.material.R.id.snackbar_text);
+        TextView textView = layout.findViewById(com.google.android.material.R.id.snackbar_text);
         textView.setTextSize(TypedValue.TYPE_STRING, 8);
         snackbar.show();
     }
@@ -441,12 +427,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
     public void onClickTriNumero()
     {
         tri_choisi = "Numéro de commande";
-        commandeReceptionPUIAdapter.commandeList.sort(new Comparator<Commande>() {
-            @Override
-            public int compare(Commande o1, Commande o2) {
-                return o1.getNumero().compareTo(o2.getNumero());
-            }
-        });
+        commandeReceptionPUIAdapter.commandeList.sort(Comparator.comparing(Commande::getNumero));
 
         commandeReceptionPUIAdapter.notifyDataSetChanged();
     }
@@ -454,12 +435,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
     public void onClickTriDate()
     {
         tri_choisi = "Date de livraison";
-        commandeReceptionPUIAdapter.commandeList.sort(new Comparator<Commande>() {
-            @Override
-            public int compare(Commande o1, Commande o2) {
-                return o2.getDate_Liv().compareTo(o1.getDate_Liv());
-            }
-        });
+        commandeReceptionPUIAdapter.commandeList.sort((o1, o2) -> o2.getDate_Liv().compareTo(o1.getDate_Liv()));
 
         commandeReceptionPUIAdapter.notifyDataSetChanged();
     }
@@ -467,12 +443,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
     public void onClickTriFournisseur()
     {
         tri_choisi = "Fournisseur";
-        commandeReceptionPUIAdapter.commandeList.sort(new Comparator<Commande>() {
-            @Override
-            public int compare(Commande o1, Commande o2) {
-                return o1.getFournisseur().compareTo(o2.getFournisseur());
-            }
-        });
+        commandeReceptionPUIAdapter.commandeList.sort(Comparator.comparing(Commande::getFournisseur));
 
         commandeReceptionPUIAdapter.notifyDataSetChanged();
     }

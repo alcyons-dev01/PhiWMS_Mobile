@@ -188,6 +188,21 @@
         android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation|keyboardHidden"/>
 
+    <!-- Barcode Réception Activity -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
     <!-- Plan de placement -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.PlanDePlacement.ListeZonesActivity"
