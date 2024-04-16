@@ -50,38 +50,77 @@
     <!-- Navigation Activity -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.Navigation.NavigationActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
 
     <!-- Service Réception PUI -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
 
     <activity
         android:name="fr.alcyons.phiwms_mobile.ReceptionPUI.ListeLotReceptionPuiActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
 
     <activity
         android:name="fr.alcyons.phiwms_mobile.ReceptionPUI.DetailReceptionPuiActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
 
     <activity
         android:name="fr.alcyons.phiwms_mobile.ReceptionPUI.CreationLotManuelReceptionPUIActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
 
     <activity
         android:name="fr.alcyons.phiwms_mobile.ReceptionPUI.ZoneEtEmplacementSelecteurMultipleActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <!-- Retour PUI -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.RetourPUI.DetailRetourPUIActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.RetourPUI.ListeEmplacementRetourPUIActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
 
     <!-- Barcode Activity -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <!-- Plan de placement -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.PlanDePlacement.ListeZonesActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.PlanDePlacement.ListeEmplacementActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
