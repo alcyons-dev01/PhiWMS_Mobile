@@ -1,7 +1,6 @@
 package fr.alcyons.phiwms_mobile.RetourPUI;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -16,18 +15,18 @@ import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import androidx.annotation.RequiresApi;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
+
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -39,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
@@ -47,6 +47,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
@@ -58,47 +59,138 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
-public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
+/**
+ * Created by olivier on 16/04/2024.
+ */
 
+public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
     List<Retour> retourList;
     ListView retourListView;
     RetourAdapter adapter;
     PackageManager pm;
     JSONArray retourJSONArray;
     NavigationActivity navigationActivity;
-
     Context context;
-
     boolean connexionDirecte;
+    ActivityResultLauncher<Intent> resultScanDocument;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_liste_retours);
+        setContentView(R.layout.activity_liste_refresh);
 
         // Modification du titre
         ((TextView) findViewById(R.id.titre)).setText("Retours PUI demandés");
         pm = ServiceRetourPUIActivity.this.getPackageManager();
         // Gestion de la listView
         retourListView = (ListView) findViewById(R.id.listeView);
-        retourListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Retour retourSelectionne = (Retour) adapter.getItem(position);
+        retourListView.setOnItemClickListener((parent, view, position, id) -> {
+            Retour retourSelectionne = (Retour) adapter.getItem(position);
 
-                Intent serviceRetourPuiIntent = new Intent(ServiceRetourPUIActivity.this, DetailRetourPUIActivity.class);
-                Bundle serviceRetourPuiBundle = ServiceRetourPUIActivity.super.getBundle();
-                serviceRetourPuiBundle.putInt("retourSelectionneID", retourSelectionne.get_UID());
+            Intent serviceRetourPuiIntent = new Intent(ServiceRetourPUIActivity.this, DetailRetourPUIActivity.class);
+            Bundle serviceRetourPuiBundle = ServiceRetourPUIActivity.super.getBundle();
+            assert retourSelectionne != null;
+            serviceRetourPuiBundle.putInt("retourSelectionneID", retourSelectionne.get_UID());
 
-                serviceRetourPuiIntent.putExtras(serviceRetourPuiBundle);
-                ServiceRetourPUIActivity.this.startActivity(serviceRetourPuiIntent);
-                ServiceRetourPUIActivity.this.finish();
-            }
+            serviceRetourPuiIntent.putExtras(serviceRetourPuiBundle);
+            ServiceRetourPUIActivity.this.startActivity(serviceRetourPuiIntent);
+            ServiceRetourPUIActivity.this.finish();
         });
         navigationActivity = new NavigationActivity();
         context = navigationActivity;
 
         connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(db);
+
+        resultScanDocument = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    Intent data = result.getData();
+                    if (result.getResultCode() == CodesEchangesActivites.RETOUR_DOCUMENT) {
+                        if (data != null) {
+                            String code = Objects.requireNonNull(data.getExtras()).getString("code");
+                            if (code != null) {
+                                Retour retourSelectionne = RetourOpenHelper.getRetourByNumero(db, code);
+                                if (retourSelectionne == null) {
+                                    if (!code.contentEquals("")) {
+                                        afficherSnackBarRetourPUI();
+                                    }
+                                    /* Code nécessaire à l'affichage de la liste */
+                                    int size_liste = retourList.size();
+                                    String titre = "Retours PUI demandés";
+                                    if (size_liste < 2)
+                                        titre = "Retour PUI demandé";
+
+                                    ((TextView) findViewById(R.id.titre)).setText(titre);
+                                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
+                                    adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList);
+                                    retourListView.setDivider(footer);
+                                    retourListView.setAdapter(adapter);
+
+                                    if (retourList.isEmpty()) {
+
+                                        vide = true;
+                                        nomServiceVide = "Retour PUI";
+                                        ServiceRetourPUIActivity.this.finish();
+                                    }
+
+                                    invalidateOptionsMenu();
+                                } else {
+                                    Intent serviceRetourPuiIntent = new Intent(ServiceRetourPUIActivity.this, DetailRetourPUIActivity.class);
+                                    Bundle serviceRetourPuiBundle = ServiceRetourPUIActivity.super.getBundle();
+                                    serviceRetourPuiBundle.putInt("retourSelectionneID", retourSelectionne.get_UID());
+
+                                    serviceRetourPuiIntent.putExtras(serviceRetourPuiBundle);
+                                    ServiceRetourPUIActivity.this.startActivity(serviceRetourPuiIntent);
+                                    ServiceRetourPUIActivity.this.finish();
+                                }
+                            } else {
+                                /* Code nécessaire à l'affichage de la liste */
+                                int size_liste = retourList.size();
+                                String titre = "Retours PUI demandés";
+                                if (size_liste < 2)
+                                    titre = "Retour PUI demandé";
+
+                                ((TextView) findViewById(R.id.titre)).setText(titre);
+                                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
+                                adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList);
+                                retourListView.setDivider(footer);
+                                retourListView.setAdapter(adapter);
+
+                                if (retourList.isEmpty()) {
+
+                                    vide = true;
+                                    nomServiceVide = "Retour PUI";
+                                    ServiceRetourPUIActivity.this.finish();
+                                }
+
+                                invalidateOptionsMenu();
+                            }
+                        } else {
+                            /* Code nécessaire à l'affichage de la liste */
+                            int size_liste = retourList.size();
+                            String titre = "Retours PUI demandés";
+                            if (size_liste < 2)
+                                titre = "Retour PUI demandé";
+
+                            ((TextView) findViewById(R.id.titre)).setText(titre);
+                            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
+                            adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList);
+                            retourListView.setDivider(footer);
+                            retourListView.setAdapter(adapter);
+
+                            if (retourList.isEmpty()) {
+
+                                vide = true;
+                                nomServiceVide = "Retour PUI";
+                                ServiceRetourPUIActivity.this.finish();
+                            }
+
+                            invalidateOptionsMenu();
+                        }
+                    }
+                });
+
     }
 
     @Override
@@ -119,7 +211,6 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
 
             JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,null,
                     new Response.Listener<JSONObject>() {
-                        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
                         @Override
                         public void onResponse(JSONObject response) {
                             try {
@@ -151,13 +242,13 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
 
                                         if (retour.getEn_Attente_de().equals(getString(R.string.RetourPUIDemande)) && retour.getStatut().equals(getString(R.string.statutEncours))) {
                                             retourList.add(retour);
-                                            long rowID = gestionnaireRetour.insererUnRetourEnBDD(db, retour);
+                                            long rowID = RetourOpenHelper.insererUnRetourEnBDD(db, retour);
                                             if (rowID != -1) {
                                                 JSONArray retourLigneJSONArray = retourJSONObject.getJSONArray("ph_retour_ligne");
                                                 for (int k = 0; k < retourLigneJSONArray.length(); k++) {
                                                     JSONObject retourLigneJSONObject = retourLigneJSONArray.getJSONObject(k);
                                                     Retour_Ligne retourLigne = new Retour_Ligne(retourLigneJSONObject);
-                                                    gestionnaireRetour_Ligne.insererUnRetour_LigneEnBDD(db, retourLigne);
+                                                    Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(db, retourLigne);
                                                 }
                                             }
                                         }
@@ -169,12 +260,9 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                             handler.sendMessage(handler.obtainMessage());
                         }
                     },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e("Volley", "Error");
-                            Alerte.afficherAlerte(ServiceRetourPUIActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP service retour pui", "alerte");
-                        }
+                    error -> {
+                        Log.e("Volley", "Error");
+                        Alerte.afficherAlerte(ServiceRetourPUIActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP service retour pui", "alerte");
                     }
             ) {
                 @Override
@@ -192,7 +280,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                 e.printStackTrace();
             }
 
-            if (retourList.size() == 0) {
+            if (retourList.isEmpty()) {
 
                 vide = true;
                 nomServiceVide = "Retour PUI";
@@ -220,8 +308,8 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                 passageParOnCreate = false;
             }
         } else {
-            retourList = gestionnaireRetour.getAllRetoursByStatutEtEnAttenteDe(db, getString(R.string.statutEncours), getString(R.string.RetourPUIDemande));
-            if (retourList.size() == 0) {
+            retourList = RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(db, getString(R.string.statutEncours), getString(R.string.RetourPUIDemande));
+            if (retourList.isEmpty()) {
                 if(connexionDirecte)
                 {
                     Intent retourVersServiceConnexionDirectIntent = new Intent(ServiceRetourPUIActivity.this, ServiceConnexionDirecteActivity.class);
@@ -257,7 +345,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                     retourListView.setDivider(footer);
                     retourListView.setAdapter(adapter);
 
-                    if (retourList.size() == 0) {
+                    if (retourList.isEmpty()) {
 
                         vide = true;
                         nomServiceVide = "Retour PUI";
@@ -273,14 +361,14 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
     }
 
     public void viderTablesConcernees() {
-        for (Retour retour : gestionnaireRetour.getAllRetoursByStatutEtEnAttenteDe(db, getString(R.string.statutEncours), getString(R.string.RetourPUIDemande))
+        for (Retour retour : RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(db, getString(R.string.statutEncours), getString(R.string.RetourPUIDemande))
                 ) {
-            List<Retour_Ligne> retourLigneList = gestionnaireRetour_Ligne.getAllRetourLignesByRetour(db, retour);
+            List<Retour_Ligne> retourLigneList = Retour_LigneOpenHelper.getAllRetourLignesByRetour(db, retour);
             for (Retour_Ligne retourLigne : retourLigneList
                     ) {
-                gestionnaireRetour_Ligne.supprimerUnRetourLigne(db, retourLigne);
+                Retour_LigneOpenHelper.supprimerUnRetourLigne(db, retourLigne);
             }
-            gestionnaireRetour.supprimerUnRetour(db, retour);
+            RetourOpenHelper.supprimerUnRetour(db, retour);
         }
     }
 
@@ -292,7 +380,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
         item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
             @Override
-            public boolean onMenuItemClick(MenuItem item) {
+            public boolean onMenuItemClick(@NonNull MenuItem item) {
                 return true;
             }
         });
@@ -323,7 +411,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
         }
         else
         {
-            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
+            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
             {
                 scanDocumentIntent = new Intent(ServiceRetourPUIActivity.this, BarcodeCaptureActivity.class);
                 scanDocumentBundle.putBoolean("modeRafale", false);
@@ -337,113 +425,12 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
         }
 
         scanDocumentIntent.putExtras(scanDocumentBundle);
-        ServiceRetourPUIActivity.this.startActivityForResult(scanDocumentIntent, CodesEchangesActivites.RETOUR_DOCUMENT);
+        resultScanDocument.launch(scanDocumentIntent);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case CodesEchangesActivites.RETOUR_DOCUMENT: {
-                if (data != null) {
-                    String code = data.getExtras().getString("code");
-                    if (code != null) {
-                        Retour retourSelectionne = RetourOpenHelper.getRetourByNumero(db, code);
-                        if(retourSelectionne == null)
-                        {
-                            if(!code.contentEquals(""))
-                            {
-                                afficherSnackBarRetourPUI();
-                            }
-                            /* Code nécessaire à l'affichage de la liste */
-                            int size_liste = retourList.size();
-                            String titre = "Retours PUI demandés";
-                            if(size_liste < 2)
-                                titre = "Retour PUI demandé";
-
-                            ((TextView) findViewById(R.id.titre)).setText(titre);
-                            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                            adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList);
-                            retourListView.setDivider(footer);
-                            retourListView.setAdapter(adapter);
-
-                            if (retourList.size() == 0) {
-
-                                vide = true;
-                                nomServiceVide = "Retour PUI";
-                                ServiceRetourPUIActivity.this.finish();
-                            }
-
-                            invalidateOptionsMenu();
-                        }
-                        else
-                        {
-                            Intent serviceRetourPuiIntent = new Intent(ServiceRetourPUIActivity.this, DetailRetourPUIActivity.class);
-                            Bundle serviceRetourPuiBundle = ServiceRetourPUIActivity.super.getBundle();
-                            serviceRetourPuiBundle.putInt("retourSelectionneID", retourSelectionne.get_UID());
-
-                            serviceRetourPuiIntent.putExtras(serviceRetourPuiBundle);
-                            ServiceRetourPUIActivity.this.startActivity(serviceRetourPuiIntent);
-                            ServiceRetourPUIActivity.this.finish();
-                        }
-                    } else {
-                        /* Code nécessaire à l'affichage de la liste */
-                        int size_liste = retourList.size();
-                        String titre = "Retours PUI demandés";
-                        if(size_liste < 2)
-                            titre = "Retour PUI demandé";
-
-                        ((TextView) findViewById(R.id.titre)).setText(titre);
-                        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                        adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList);
-                        retourListView.setDivider(footer);
-                        retourListView.setAdapter(adapter);
-
-                        if (retourList.size() == 0) {
-
-                            vide = true;
-                            nomServiceVide = "Retour PUI";
-                            ServiceRetourPUIActivity.this.finish();
-                        }
-
-                        invalidateOptionsMenu();
-                    }
-                }
-                else
-                {
-                    /* Code nécessaire à l'affichage de la liste */
-                    int size_liste = retourList.size();
-                    String titre = "Retours PUI demandés";
-                    if(size_liste < 2)
-                        titre = "Retour PUI demandé";
-
-                    ((TextView) findViewById(R.id.titre)).setText(titre);
-                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                    adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList);
-                    retourListView.setDivider(footer);
-                    retourListView.setAdapter(adapter);
-
-                    if (retourList.size() == 0) {
-
-                        vide = true;
-                        nomServiceVide = "Retour PUI";
-                        ServiceRetourPUIActivity.this.finish();
-                    }
-
-                    invalidateOptionsMenu();
-                }
-                break;
-            }
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public void afficherSnackBarRetourPUI() {
         Snackbar snackbar = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Document scanné inconnu</b>", 0), Snackbar.LENGTH_LONG);
-        }
-        ;
+        snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Document scanné inconnu</b>", 0), Snackbar.LENGTH_LONG);
 
         @SuppressLint("RestrictedApi") Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
         layout.setBackgroundColor(getResources().getColor(R.color.rouge2, null));
