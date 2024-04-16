@@ -206,7 +206,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                 mProgressDialog = ProgressDialog.show(ServiceRetourPUIActivity.this, "Veuillez patienter", "Synchronisation des retours en cours");
             }
 
-            RequestQueue requestQueueDestructionUtilisateur = Volley.newRequestQueue(ServiceRetourPUIActivity.this);
+            RequestQueue requestQueueRetourPUI = Volley.newRequestQueue(ServiceRetourPUIActivity.this);
             String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteRetourPUI;
 
             JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,null,
@@ -273,7 +273,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                 }
             };
             obreq.setRetryPolicy(retryPolicy);
-            requestQueueDestructionUtilisateur.add(obreq);
+            requestQueueRetourPUI.add(obreq);
             try {
                 Looper.loop();
             } catch (RuntimeException e) {
