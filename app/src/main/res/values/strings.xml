@@ -49,10 +49,10 @@
     <string name="RepriseDemandee">Reprise demandée</string>
     <string name="RepriseEffectuee">Reprise effectuée</string>
     <string name="RetourPUIDemande">Retour PUI demandé</string>
-    <string name="RetourFRSDemandé">Retour Frs demandé</string>
+    <string name="RetourFRSDemande">Retour Frs demandé</string>
     <string name="DestructionDemandée">Destruction demandée</string>
     <string name="RetourPUIEffectue">Retour PUI effectué</string>
-    <string name="RetourFRSEffectué">Retour Frs effectué</string>
+    <string name="RetourFRSEffectue">Retour Frs effectué</string>
     <string name="DestructionEffectuée">Destruction effectuée</string>
     <string name="PreparationEffectuée">Preparation effectuée</string>
 
