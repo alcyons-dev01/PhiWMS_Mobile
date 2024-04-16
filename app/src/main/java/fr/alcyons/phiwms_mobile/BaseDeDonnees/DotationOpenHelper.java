@@ -49,7 +49,7 @@ public class DotationOpenHelper extends DBOpenHelper {
     public static long insererDotationEnBDD(SQLiteDatabase db, Dotation objet) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(Constantes.CLE_COL__UID_DOTATION, objet.get_UID());
-        contentValues.put(Constantes.CLE_COL_INTITULE_DOTATION, objet.getIntitulé());
+        contentValues.put(Constantes.CLE_COL_INTITULE_DOTATION, objet.getIntitule());
         contentValues.put(Constantes.CLE_COL_REF_DEPOT_DOTATION, objet.getRef_Depot());
         contentValues.put(Constantes.CLE_COL_DEBUT_DOTATION, objet.getDébut());
         contentValues.put(Constantes.CLE_COL_FIN_DOTATION, objet.getFin());

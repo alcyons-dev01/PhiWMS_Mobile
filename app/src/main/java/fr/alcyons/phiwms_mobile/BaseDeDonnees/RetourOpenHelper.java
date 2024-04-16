@@ -92,7 +92,7 @@ public class RetourOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_NUMERO_RETOUR, retour.getNumero());
         contentValues.put(Constantes.CLE_COL_REF_DEPOT_ORIGINE_RETOUR, retour.getRef_Depot_Origine());
         contentValues.put(Constantes.CLE_COL_CODE_PATIENT_RETOUR, retour.getCode_Patient());
-        contentValues.put(Constantes.CLE_COL_INTITULE_RETOUR, retour.getIntitulé());
+        contentValues.put(Constantes.CLE_COL_INTITULE_RETOUR, retour.getIntitule());
         contentValues.put(Constantes.CLE_COL_REF_DEPOT_DEST_RETOUR, retour.getRef_Depot_Dest());
         contentValues.put(Constantes.CLE_COL_STATUT_RETOUR, retour.getStatut());
         contentValues.put(Constantes.CLE_COL_DATE_RETOUR_RETOUR, retour.getDate_retour());
@@ -765,7 +765,7 @@ public class RetourOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_NUMERO_RETOUR, retour.getNumero());
         contentValues.put(Constantes.CLE_COL_REF_DEPOT_ORIGINE_RETOUR, retour.getRef_Depot_Origine());
         contentValues.put(Constantes.CLE_COL_CODE_PATIENT_RETOUR, retour.getCode_Patient());
-        contentValues.put(Constantes.CLE_COL_INTITULE_RETOUR, retour.getIntitulé());
+        contentValues.put(Constantes.CLE_COL_INTITULE_RETOUR, retour.getIntitule());
         contentValues.put(Constantes.CLE_COL_REF_DEPOT_DEST_RETOUR, retour.getRef_Depot_Dest());
         contentValues.put(Constantes.CLE_COL_STATUT_RETOUR, retour.getStatut());
         contentValues.put(Constantes.CLE_COL_DATE_RETOUR_RETOUR, retour.getDate_retour());
