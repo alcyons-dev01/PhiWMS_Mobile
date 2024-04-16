@@ -118,7 +118,7 @@ public class ListeZonesActivity extends ServiceActivity {
                     listeZonesBundle.putInt("zoneSelectionneeID", zoneSelectionnee.getZoneID());
                     listeZonesBundle.putInt("depotSelectionneID", depotSelectionne.getDepot_UID());
                     listeZonesIntent.putExtras(listeZonesBundle);
-                    setResult(Activity.RESULT_OK, listeZonesIntent);
+                    setResult(CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT, listeZonesIntent);
                     finish();
                     break;
             }
