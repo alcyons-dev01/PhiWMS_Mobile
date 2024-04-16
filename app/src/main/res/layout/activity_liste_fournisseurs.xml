@@ -4,7 +4,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@android:color/white"
-    tools:context="fr.alcyons.phimr4.MedicamentAuLivret">
+    tools:context="fr.alcyons.phiwms_mobile.MedicamentAuLivret">
 
     <LinearLayout
         android:id="@+id/barreDeTitre"

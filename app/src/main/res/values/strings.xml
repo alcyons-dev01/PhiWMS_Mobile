@@ -51,7 +51,7 @@
     <string name="RetourPUIDemande">Retour PUI demandé</string>
     <string name="RetourFRSDemandé">Retour Frs demandé</string>
     <string name="DestructionDemandée">Destruction demandée</string>
-    <string name="RetourPUIEffectué">Retour PUI effectué</string>
+    <string name="RetourPUIEffectue">Retour PUI effectué</string>
     <string name="RetourFRSEffectué">Retour Frs effectué</string>
     <string name="DestructionEffectuée">Destruction effectuée</string>
     <string name="PreparationEffectuée">Preparation effectuée</string>
@@ -266,5 +266,6 @@
     <string name="identifiant">Identifiant</string>
     <string name="bouton_scan">bouton scan</string>
     <string name="logophiwms">logoPhiWMS</string>
+    <string name="imagedatamatrix">imageDatamatrix</string>
 
 </resources>

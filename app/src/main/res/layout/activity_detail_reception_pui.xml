@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context="fr.alcyons.phimr4.ReceptionPUI.DetailReceptionPuiActivity">
+    tools:context="fr.alcyons.phiwms_mobile.ReceptionPUI.DetailReceptionPuiActivity">
 
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -78,12 +78,14 @@
                 android:orientation="horizontal"
                 android:gravity="center"
                 android:layout_gravity="right"
-                android:background="@color/bleu_clair_alcyons">
+                android:background="@color/bleu_clair_alcyons"
+                tools:ignore="RtlHardcoded">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/ic_datamatrix"/>
+                    android:background="@drawable/ic_datamatrix"
+                    android:contentDescription="@string/imagedatamatrix" />
 
             </LinearLayout>
 
@@ -107,8 +109,5 @@
             android:descendantFocusability="afterDescendants">
 
         </ListView>
-
-
-
     </RelativeLayout>
 </RelativeLayout>

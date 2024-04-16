@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:background="@android:color/white"
         android:orientation="vertical"
-        tools:context="fr.alcyons.phimr4.PlanDePlacement.DetailProduitPlanDePlacementActivity">
+        tools:context="fr.alcyons.phiwms_mobile.PlanDePlacement.DetailProduitPlanDePlacementActivity">
 
         <LinearLayout
             android:id="@+id/barreDeTitre"

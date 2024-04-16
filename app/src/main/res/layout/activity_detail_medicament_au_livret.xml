@@ -7,7 +7,7 @@
     android:layout_height="fill_parent"
     android:background="@android:color/white"
     android:fitsSystemWindows="true"
-    tools:context="fr.alcyons.phimr4.MedicamentAuLivret.DetailMedicamentAuLivretActivity">
+    tools:context="fr.alcyons.phiwms_mobile.MedicamentAuLivret.DetailMedicamentAuLivretActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
