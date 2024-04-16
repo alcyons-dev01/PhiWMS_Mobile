@@ -20,11 +20,14 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -35,17 +38,18 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerDocumentActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
@@ -53,7 +57,7 @@ import fr.alcyons.phiwms_mobile.Classes.Commande;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.CommandeReceptionPUIAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.ReceptionAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
@@ -61,14 +65,14 @@ import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 /**
- * Created by olivier on 11/06/2019.
+ * Created by olivier on 16/04/2024.
  */
 
 public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
 
     Depot depotPUIPAD;
     ListView commandeListView;
-    CommandeReceptionPUIAdapter commandeReceptionPUIAdapter;
+    ReceptionAdapter commandeReceptionPUIAdapter;
     JSONArray commandeJSONArray;
     JSONArray phReliquatJSONArray;
     List<Commande> commandeList;
@@ -76,13 +80,16 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
 
     String tri_choisi;
 
+    ActivityResultLauncher<Intent> resultScanDocument;
     boolean connexionDirecte;
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_service_reception_pui);
+        setContentView(R.layout.activity_liste_refresh);
         pm = ServiceReceptionPadActivity.this.getPackageManager();
-        depotPUIPAD = gestionnaireDepot.getDepotPUIPAD(db);
+        depotPUIPAD = DepotOpenHelper.getDepotPUIPAD(db);
+        ((TextView) findViewById(R.id.titre)).setText("Réceptions");
         tri_choisi =  ParametreUtilisateurOpenHelper.getChoixTriReception(db);
 
         if(tri_choisi == null)
@@ -112,6 +119,88 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
         });
 
         connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(db);
+
+        resultScanDocument = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    Intent data = result.getData();
+                    if (result.getResultCode() == CodesEchangesActivites.RETOUR_DOCUMENT) {
+                        if (data != null)
+                        {
+                            String code = Objects.requireNonNull(data.getExtras()).getString("code");
+                            if (code != null) {
+
+                                Commande commandeSelectionne = CommandeOpenHelper.getCommandeByNumero(db, code);
+                                if (commandeSelectionne == null) {
+                                    if (!code.contentEquals("")) {
+                                        afficherSnackBarPreparationReceptionPAD();
+                                    }
+
+                                    Commande commande_essai = CommandeOpenHelper.getCommandeTestAlcyons(db);
+                                    if (commande_essai != null) {
+                                        commandeList.add(commande_essai);
+                                    }
+                                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
+
+                                    commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPadActivity.this, db, commandeList);
+                                    commandeListView.setDivider(footer);
+                                    commandeListView.setAdapter(commandeReceptionPUIAdapter);
+
+                                    if (commandeList.isEmpty()) {
+                                        vide = true;
+                                        nomServiceVide = "Réception PAD";
+                                        ServiceReceptionPadActivity.this.finish();
+                                    }
+
+                                    invalidateOptionsMenu();
+                                } else {
+                                    Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPadActivity.this, DetailReceptionPadActivity.class);
+                                    Bundle serviceReceptionPui_Bundle = ServiceReceptionPadActivity.super.getBundle();
+                                    serviceReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
+                                    serviceReceptionPui_Intent.putExtras(serviceReceptionPui_Bundle);
+                                    ServiceReceptionPadActivity.this.startActivity(serviceReceptionPui_Intent);
+                                    ServiceReceptionPadActivity.this.finish();
+                                }
+                            } else {
+                                Commande commande_essai = CommandeOpenHelper.getCommandeTestAlcyons(db);
+                                if (commande_essai != null) {
+                                    commandeList.add(commande_essai);
+                                }
+                                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
+
+                                commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPadActivity.this, db, commandeList);
+                                commandeListView.setDivider(footer);
+                                commandeListView.setAdapter(commandeReceptionPUIAdapter);
+
+                                if (commandeList.isEmpty()) {
+                                    vide = true;
+                                    nomServiceVide = "Réception PAD";
+                                    ServiceReceptionPadActivity.this.finish();
+                                }
+
+                                invalidateOptionsMenu();
+                            }
+                        }
+                        else
+                        {
+                            /* Code nécessaire à l'affichage de la liste */
+                            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
+
+                            commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPadActivity.this, db, commandeList);
+                            commandeListView.setDivider(footer);
+                            commandeListView.setAdapter(commandeReceptionPUIAdapter);
+
+                            if (commandeList.isEmpty()) {
+                                vide = true;
+                                nomServiceVide = "Réception PAD";
+                                ServiceReceptionPadActivity.this.finish();
+                            }
+
+                            invalidateOptionsMenu();
+                        }
+                    }
+                });
+
     }
 
     @Override
@@ -155,9 +244,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                                         ServiceReceptionPadActivity.this.finishAffinity();
                                         Intent intent = new Intent(ServiceReceptionPadActivity.this, AuthentificationActivity.class);
                                         ServiceReceptionPadActivity.this.startActivity(intent);
-                                    } else if (erreur.contentEquals("Aucun PH_Commande trouvé")) {
-
-                                    } else {
+                                    }  else {
                                         Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Reception PUI", "alerte");
                                     }
                                 } else {
@@ -179,14 +266,14 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                                             PH_Reliquat reliquatCourant = new PH_Reliquat((phReliquatJSONArray.getJSONObject(j)));
 
 
-                                            long phReliquatPHiMR4ID = gestionnairePH_Reliquat.insererPH_ReliquatEnBDD(db, reliquatCourant);
+                                            long phReliquatPHiMR4ID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, reliquatCourant);
                                             if (phReliquatPHiMR4ID != -1) {
                                                 phReliquatPresent = true;
                                             }
                                         }
 
                                         if (phReliquatPresent) {
-                                            long rowID = gestionnaireCommande.insererUneCommandeEnBDD(db, commandeCourant);
+                                            long rowID = CommandeOpenHelper.insererUneCommandeEnBDD(db, commandeCourant);
                                             if (rowID != -1) {
                                                 if(commandeCourant.getRef_Depot_Dest().contains("-PUI-PAD"))
                                                 {
@@ -203,12 +290,9 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                             handler.sendMessage(handler.obtainMessage());
                         }
                     },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e("Volley", "Error");
-                            Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP Service Reception PUI", "alerte");
-                        }
+                    error -> {
+                        Log.e("Volley", "Error");
+                        Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP Service Reception PUI", "alerte");
                     }
             ) {
                 @Override
@@ -225,15 +309,15 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
             } catch (RuntimeException e) {
                 e.printStackTrace();
             }
-            if(passageParOnCreate && commandeList.size() > 0)
+            if(passageParOnCreate && !commandeList.isEmpty())
             {
                 //lancerScan();
                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
-                commandeReceptionPUIAdapter = new CommandeReceptionPUIAdapter(ServiceReceptionPadActivity.this, db, commandeList);
+                commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPadActivity.this, db, commandeList);
                 commandeListView.setDivider(footer);
                 commandeListView.setAdapter(commandeReceptionPUIAdapter);
             }
-            else if(commandeList.size() == 0)
+            else if(commandeList.isEmpty())
             {
                 vide = true;
                 nomServiceVide = "Réception PAD";
@@ -242,8 +326,8 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
 
             passageParOnCreate = false;
         } else {
-            commandeList = gestionnaireCommande.getAllCommandesPUI(db, depotPUIPAD.getDepot_Reference());
-            if (commandeList.size() == 0) {
+            commandeList = CommandeOpenHelper.getAllCommandesPUI(db, depotPUIPAD.getDepot_Reference());
+            if (commandeList.isEmpty()) {
                 if(connexionDirecte)
                 {
                     Intent retourVersServiceConnexionDirectIntent = new Intent(ServiceReceptionPadActivity.this, ServiceConnexionDirecteActivity.class);
@@ -314,7 +398,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
         item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
             @Override
-            public boolean onMenuItemClick(MenuItem item) {
+            public boolean onMenuItemClick(@NonNull MenuItem item) {
                 lancerScan();
                 return true;
             }
@@ -348,7 +432,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
         }
         else
         {
-            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
+            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
             {
                 scanDocumentIntent = new Intent(ServiceReceptionPadActivity.this, BarcodeCaptureActivity.class);
                 scanDocumentBundle.putBoolean("modeRafale", false);
@@ -363,98 +447,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
         }
 
         scanDocumentIntent.putExtras(scanDocumentBundle);
-        ServiceReceptionPadActivity.this.startActivityForResult(scanDocumentIntent, CodesEchangesActivites.RETOUR_DOCUMENT);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case CodesEchangesActivites.RETOUR_DOCUMENT: {
-                if (data != null) {
-                    String code = data.getExtras().getString("code");
-                    if (code != null) {
-
-                        Commande commandeSelectionne = CommandeOpenHelper.getCommandeByNumero(db, code);
-                        if(commandeSelectionne == null)
-                        {
-                            if(!code.contentEquals(""))
-                            {
-                                afficherSnackBarPreparationReceptionPAD() ;
-                            }
-                            /* Code nécessaire à l'affichage de la liste */
-                            //on recupere la commande test si elle existe
-                            Commande commande_essai = CommandeOpenHelper.getCommandeTestAlcyons(db);
-                            if(commande_essai != null)
-                            {
-                                commandeList.add(commande_essai);
-                            }
-                            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
-
-                            commandeReceptionPUIAdapter = new CommandeReceptionPUIAdapter(ServiceReceptionPadActivity.this, db, commandeList);
-                            commandeListView.setDivider(footer);
-                            commandeListView.setAdapter(commandeReceptionPUIAdapter);
-
-                            if (commandeList.size() == 0) {
-                                vide = true;
-                                nomServiceVide = "Réception PAD";
-                                ServiceReceptionPadActivity.this.finish();
-                            }
-
-                            invalidateOptionsMenu();
-                        }
-                        else
-                        {
-                            Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPadActivity.this, DetailReceptionPadActivity.class);
-                            Bundle serviceReceptionPui_Bundle = ServiceReceptionPadActivity.super.getBundle();
-                            serviceReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
-                            serviceReceptionPui_Intent.putExtras(serviceReceptionPui_Bundle);
-                            ServiceReceptionPadActivity.this.startActivity(serviceReceptionPui_Intent);
-                            ServiceReceptionPadActivity.this.finish();
-                        }
-                    } else {
-                               /* Code nécessaire à l'affichage de la liste */
-                        //on recupere la commande test si elle existe
-                        Commande commande_essai = CommandeOpenHelper.getCommandeTestAlcyons(db);
-                        if(commande_essai != null)
-                        {
-                            commandeList.add(commande_essai);
-                        }
-                        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
-
-                        commandeReceptionPUIAdapter = new CommandeReceptionPUIAdapter(ServiceReceptionPadActivity.this, db, commandeList);
-                        commandeListView.setDivider(footer);
-                        commandeListView.setAdapter(commandeReceptionPUIAdapter);
-
-                        if (commandeList.size() == 0) {
-                            vide = true;
-                            nomServiceVide = "Réception PAD";
-                            ServiceReceptionPadActivity.this.finish();
-                        }
-
-                        invalidateOptionsMenu();
-                    }
-                }
-                else
-                {
-                    /* Code nécessaire à l'affichage de la liste */
-                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
-
-                    commandeReceptionPUIAdapter = new CommandeReceptionPUIAdapter(ServiceReceptionPadActivity.this, db, commandeList);
-                    commandeListView.setDivider(footer);
-                    commandeListView.setAdapter(commandeReceptionPUIAdapter);
-
-                    if (commandeList.size() == 0) {
-                        vide = true;
-                        nomServiceVide = "Réception PAD";
-                        ServiceReceptionPadActivity.this.finish();
-                    }
-
-                    invalidateOptionsMenu();
-                }
-                break;
-            }
-        }
+        resultScanDocument.launch(scanDocumentIntent);
     }
 
     public void afficherSnackBarPreparationReceptionPAD() {
@@ -470,7 +463,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
     public void onClickTriNumero()
     {
         tri_choisi = "Numéro de commande";
-        Collections.sort(commandeReceptionPUIAdapter.commandeList, new Comparator<Commande>() {
+        commandeReceptionPUIAdapter.commandeList.sort(new Comparator<Commande>() {
             @Override
             public int compare(Commande o1, Commande o2) {
                 return o1.getNumero().compareTo(o2.getNumero());
@@ -484,7 +477,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
     public void onClickTriDate()
     {
         tri_choisi = "Date de livraison";
-        Collections.sort(commandeReceptionPUIAdapter.commandeList, new Comparator<Commande>() {
+        commandeReceptionPUIAdapter.commandeList.sort(new Comparator<Commande>() {
             @Override
             public int compare(Commande o1, Commande o2) {
                 return o2.getDate_Liv().compareTo(o1.getDate_Liv());
@@ -497,7 +490,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
     public void onClickTriFournisseur()
     {
         tri_choisi = "Fournisseur";
-        Collections.sort(commandeReceptionPUIAdapter.commandeList, new Comparator<Commande>() {
+        commandeReceptionPUIAdapter.commandeList.sort(new Comparator<Commande>() {
             @Override
             public int compare(Commande o1, Commande o2) {
                 return o1.getFournisseur().compareTo(o2.getFournisseur());
