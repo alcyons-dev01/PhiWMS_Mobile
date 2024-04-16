@@ -58,7 +58,7 @@
 
     <string name="statutTraité">Traité</string>
     <string name="statutEncours">Encours</string>
-    <string name="statutValidé">Validé</string>
+    <string name="statutValide">Validé</string>
     <string name="statutVerrouillée">Verrouillée</string>
     <string name="statutDéverrouillée">Déverrouillée</string>
     <string name="statutDélivrer">Délivrée</string>
