@@ -104,6 +104,19 @@
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
 
+    <!-- Retour Fournisseur -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.RetourFournisseur.ServiceRetourFournisseurActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.RetourFournisseur.DetailRetourFournisseurActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
     <!-- Barcode Activity -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity"
