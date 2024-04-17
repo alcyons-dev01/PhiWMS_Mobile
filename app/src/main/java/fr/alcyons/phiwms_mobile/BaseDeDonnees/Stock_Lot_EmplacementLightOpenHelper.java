@@ -163,7 +163,7 @@ public class Stock_Lot_EmplacementLightOpenHelper extends DBOpenHelper {
         return stockLotEmplacementLight;
     }
 
-    public static Stock_Lot_Emplacement_Light getStock_Lot_EmplacementByphiwms_mobileUUID(SQLiteDatabase db, int id) {
+    public static Stock_Lot_Emplacement_Light getStock_Lot_EmplacementByPhiMR4UUID(SQLiteDatabase db, int id) {
         Stock_Lot_Emplacement_Light stockLotEmplacementLight = null;
         Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_STOCK_LOT_EMPLACEMENT + " WHERE  " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(id)});
 

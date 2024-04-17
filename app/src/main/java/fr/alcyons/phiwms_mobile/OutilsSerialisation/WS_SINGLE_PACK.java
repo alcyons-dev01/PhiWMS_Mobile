@@ -77,7 +77,7 @@ public class WS_SINGLE_PACK {
         if (!utilisateur.getToken().contentEquals("")) {
             PH_Serialisation phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, serialisationUID);
             if(phSerialisation == null)
-                phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByphiwms_mobileUUID(db, serialisationUID);
+                phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, serialisationUID);
 
             // Tentative de lancer la sychronisation
             if (OutilsGestionConnexionReseau.isServerAccessible(context)) {
@@ -214,7 +214,7 @@ public class WS_SINGLE_PACK {
         if (!utilisateur.getToken().contentEquals("")) {
             PH_Serialisation phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, serialisationUID);
             if(phSerialisation == null)
-                phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByphiwms_mobileUUID(db, serialisationUID);
+                phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, serialisationUID);
 
             // Tentative de lancer la sychronisation
             if (haveNetworkConnection(context)) {
@@ -348,7 +348,7 @@ public class WS_SINGLE_PACK {
         if (!utilisateur.getToken().contentEquals("")) {
             PH_Serialisation phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, serialisationUID);
             if(phSerialisation == null)
-                phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByphiwms_mobileUUID(db, serialisationUID);
+                phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, serialisationUID);
 
             // Tentative de lancer la sychronisation
             if (haveNetworkConnection(context)) {
@@ -484,7 +484,7 @@ public class WS_SINGLE_PACK {
         if (!utilisateur.getToken().contentEquals("")) {
             PH_Serialisation phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, serialisationUID);
             if(phSerialisation == null)
-                phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByphiwms_mobileUUID(db, serialisationUID);
+                phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, serialisationUID);
 
             // Tentative de lancer la sychronisation
             if (haveNetworkConnection(context)) {
@@ -621,7 +621,7 @@ public class WS_SINGLE_PACK {
         if (!utilisateur.getToken().contentEquals("")) {
             PH_Serialisation phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, serialisationUID);
             if(phSerialisation == null)
-                phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByphiwms_mobileUUID(db, serialisationUID);
+                phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, serialisationUID);
 
             // Tentative de lancer la sychronisation
             if (haveNetworkConnection(context)) {
@@ -756,7 +756,7 @@ public class WS_SINGLE_PACK {
         if (!utilisateur.getToken().contentEquals("")) {
             PH_Serialisation phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, serialisationUID);
             if(phSerialisation == null)
-                phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByphiwms_mobileUUID(db, serialisationUID);
+                phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, serialisationUID);
 
             // Tentative de lancer la sychronisation
             if (haveNetworkConnection(context)) {

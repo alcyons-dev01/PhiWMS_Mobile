@@ -274,7 +274,7 @@ public class PreparationContexte {
                         PH_Serialisation serialisation = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, (int)ph_serialisation_uid);
                         if(serialisation == null)
                         {
-                            serialisation = PH_SerialisationOpenHelper.getPH_SerialisationByphiwms_mobileUUID(db, (int)ph_serialisation_uid);
+                            serialisation = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int)ph_serialisation_uid);
                         }
 
                         resultat = serialisation.getResultat();

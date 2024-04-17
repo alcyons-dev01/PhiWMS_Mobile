@@ -271,7 +271,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                     }
                     break;
                 case Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT:
-                    Stock_Lot_Emplacement_Light stockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
+                    Stock_Lot_Emplacement_Light stockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByPhiMR4UUID(db, element.getIdDansTableConcernee());
                     if (stockLotEmplacement == null) {
                         // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
                         return;
@@ -340,7 +340,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                     }
                     break;
                 case PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION:
-                    PH_Serialisation serialisation = PH_SerialisationOpenHelper.getPH_SerialisationByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
+                    PH_Serialisation serialisation = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, element.getIdDansTableConcernee());
                     if (serialisation == null) {
                         // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
                         return;

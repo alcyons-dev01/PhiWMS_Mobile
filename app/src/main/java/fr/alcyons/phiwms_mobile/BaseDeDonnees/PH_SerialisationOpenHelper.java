@@ -24,7 +24,7 @@ public class PH_SerialisationOpenHelper extends DBOpenHelper {
         super(context, name, factory, version);
     }
 
-    public static PH_Serialisation getPH_SerialisationByphiwms_mobileUUID(SQLiteDatabase db, int id) {
+    public static PH_Serialisation getPH_SerialisationByPhiMR4UUID(SQLiteDatabase db, int id) {
         PH_Serialisation objet = null;
         Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_SERIALISATION + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=? ", new String[]{String.valueOf(id)});
         if (cursor.getCount() == 1) {

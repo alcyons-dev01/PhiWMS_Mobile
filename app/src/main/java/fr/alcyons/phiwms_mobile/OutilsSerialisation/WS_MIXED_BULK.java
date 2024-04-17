@@ -80,7 +80,7 @@ public class WS_MIXED_BULK {
                     PH_Serialisation phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, UID_Courant);
                     if(phSerialisation == null)
                     {
-                        phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByphiwms_mobileUUID(db, UID_Courant);
+                        phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, UID_Courant);
                     }
                     JSONArray trxItem = new JSONArray();
                     trxItem.put(phSerialisation.getProduitCodeValue());

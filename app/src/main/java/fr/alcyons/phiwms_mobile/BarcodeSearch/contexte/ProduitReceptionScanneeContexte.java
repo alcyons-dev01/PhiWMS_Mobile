@@ -257,7 +257,7 @@ public class ProduitReceptionScanneeContexte {
 
                                         serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, (int) ph_serialisation_uid);
                                         if (serialisation_courante == null) {
-                                            serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByphiwms_mobileUUID(db, (int) ph_serialisation_uid);
+                                            serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int) ph_serialisation_uid);
                                         }
 
                                         resultat = serialisation_courante.getResultat();
