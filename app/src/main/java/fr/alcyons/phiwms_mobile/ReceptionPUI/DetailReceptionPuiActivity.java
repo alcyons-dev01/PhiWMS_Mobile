@@ -1,5 +1,6 @@
 package fr.alcyons.phiwms_mobile.ReceptionPUI;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -9,11 +10,9 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.net.ConnectivityManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,20 +28,18 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.view.ViewCompat;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
@@ -53,18 +50,15 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Commande;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
-import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_ReceptionPUI_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
@@ -80,28 +74,20 @@ import fr.alcyons.phiwms_mobile.ServiceActivity;
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotos.verifyStoragePermissions;
 
 /**
- * Created by olivier on 27/11/2017.
+ * Created by olivier on 17/04/2024.
  */
 
 public class DetailReceptionPuiActivity extends ServiceActivity {
     Commande commandeSelectionne;
     List<PH_Reliquat> phReliquatList;
     List<PH_Reliquat_ReceptionPUI_Adapte> phReliquatReceptionPUIAdapteList;
-
     ListView phReliquatListView;
-    //TextView bonLivraisonTextView;
-
     Depot depotPUI;
-
-    //TextView nbLotsLivresTotal;
     PH_Reliquat_ReceptionPuiAdapter phReliquatReceptionPuiAdapter;
-
     PH_Reliquat_ReceptionPuiAdapter.PH_Reliquat_ReceptionPuiViewHolder phReliquatReceptionPuiViewHolder;
-
     String bonLivraison = "";
     String subject = "";
     String body = "";
-    String filename = "";
     String bonLivraisonPhotoName = "";
     Boolean orientation = false;
     boolean check_lot_present;
@@ -112,21 +98,13 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
     boolean second_passage_photo;
     PH_Reliquat_ReceptionPUI_Adapte phReliquatReceptionPUIAdapteSelectionne;
     List<String> listeProduitRAL = new ArrayList<>();
-
     PackageManager pm;
-
     String tri_choisi;
-    int selectedItem = -1;
-
     LinearLayout lancerScan;
-
     Depot_Emplacement emplacement_precedent;
     Produit produitPrecedent;
 
-    /**
-     * TODO : pour prendre plusieurs photo d'un bon de livraison (recto-verso)
-     */
-
+    @SuppressLint("SimpleDateFormat")
     public void valider_reception()
     {
         //on check la connexion à internet pour l'envoie du mail
@@ -138,7 +116,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
         else
         {
             //Construction mail
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
             Date dateDuJour = new Date();
             String date = dateFormat.format(dateDuJour);
             Depot depotdest = DepotOpenHelper.getDepotParReference(db, commandeSelectionne.getRef_Depot_Dest());
@@ -174,12 +152,11 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
 
             //Sauvegarde de la signature dans une image
             if (bonLivraisonBitmap != null) {
-
                 dateFormat = new SimpleDateFormat("yyyyMMdd");
                 dateDuJour = new Date();
                 date = dateFormat.format(dateDuJour);
 
-                bonLivraisonPhotoName = String.valueOf(commandeSelectionne.getNumero()) + "_" + date + "_ReceptionPuiBonLivraison";
+                bonLivraisonPhotoName = commandeSelectionne.getNumero() + "_" + date + "_ReceptionPuiBonLivraison";
 
                 verifyStoragePermissions(DetailReceptionPuiActivity.this);
             }
@@ -194,9 +171,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
             {
                 email = "dev01@alcyons.fr";
             }
-            // Demande à l'utilisateur si envoi de copie
             afficherAlerteConfirmationMail(DetailReceptionPuiActivity.this, LayoutInflater.from(DetailReceptionPuiActivity.this), email);
-
         }
 
 
@@ -237,7 +212,6 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
         Toast toast = Toast.makeText(DetailReceptionPuiActivity.this, "Réception effectuée", Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
-        //DetailReceptionPuiActivity.this.finish();
         retourService(super.getBundle());
     }
 
@@ -247,17 +221,15 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
     }
 
     private Boolean receptionner(Commande commande, List<PH_Reliquat_ReceptionPUI_Adapte> phReliquatReceptionPUIAdapteList) {
-        //Création de l'action utilisateur
         Random random = new Random();
         int actionId = random.nextInt();
         if(actionId > 0)
             actionId= actionId*-1;
-        SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date =new Date();
         String date_string = parseFormat.format(date);
         ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), Integer.parseInt(ParametresServeurOpenHelper.getPortServeur(db)), "En attente", commande.getID_commande(), "", "Réception PUI");
         ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
-        //fin de la création de l'action utilisateur
 
         for (PH_Reliquat_ReceptionPUI_Adapte phReliquatReceptionPUIAdapte : phReliquatReceptionPUIAdapteList) {
 
@@ -280,15 +252,15 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
                         if(quantite == 0)
                         {
                             erreur = "Quantité";
-                            listeProduitRAL.add(phReliquatCourant.getDesignationCourte()+" - "+String.valueOf(phReliquatCourant.getQteCommande()));
+                            listeProduitRAL.add(phReliquatCourant.getDesignationCourte()+" - "+ phReliquatCourant.getQteCommande());
                         }
 
                         if(numeroLot.contentEquals(""))
                         {
                             erreur = "Lot";
-                            int index = listeProduitRAL.indexOf(phReliquatCourant.getDesignationCourte()+" - "+String.valueOf(phReliquatCourant.getQteCommande()));
+                            int index = listeProduitRAL.indexOf(phReliquatCourant.getDesignationCourte()+" - "+ phReliquatCourant.getQteCommande());
                             if(index == - 1)
-                                listeProduitRAL.add(phReliquatCourant.getDesignationCourte()+" - "+String.valueOf(phReliquatCourant.getQteCommande()));
+                                listeProduitRAL.add(phReliquatCourant.getDesignationCourte()+" - "+ phReliquatCourant.getQteCommande());
                         }
 
                         phReliquatCourant.setLot(numeroLot.trim());
@@ -343,6 +315,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -355,7 +328,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
         //gestion du package manager
         pm = DetailReceptionPuiActivity.this.getPackageManager();
 
-        commandeSelectionne = CommandeOpenHelper.getCommandeByID(db, intent.getExtras().getInt("commandeID_Selectionne"));
+        commandeSelectionne = CommandeOpenHelper.getCommandeByID(db, Objects.requireNonNull(intent.getExtras()).getInt("commandeID_Selectionne"));
 
         orientation = false;
         check_lot_present = false;
@@ -370,10 +343,6 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
             phReliquatListView = (ListView) findViewById(R.id.liste_view);
             onResume();
         }
-
-        if (!orientation) {
-        }
-
 
         phReliquatListView = (ListView) findViewById(R.id.liste_view);
         phReliquatListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -401,7 +370,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
                             Bundle detailReceptionPui_Bundle = DetailReceptionPuiActivity.super.getBundle();
                             detailReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
                             detailReceptionPui_Bundle.putSerializable("phReliquatReceptionPUIAdapte", phReliquatReceptionPUIAdapteSelectionne);
-                            detailReceptionPui_Bundle.putInt("serviceSelectionneID", intent.getExtras().getInt("serviceSelectionneID"));
+                            detailReceptionPui_Bundle.putInt("serviceSelectionneID", Objects.requireNonNull(intent.getExtras()).getInt("serviceSelectionneID"));
                             detailReceptionPui_Bundle.putSerializable("EmplacementPrecedent", emplacement_precedent);
                             detailReceptionPui_Bundle.putSerializable("ProduitPrecedent", produitPrecedent);
 
@@ -411,7 +380,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
                         }
                         else
                         {
-                            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
+                            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
                             {
                                 PH_Reliquat courant = PH_ReliquatOpenHelper.getPH_ReliquatById(db, phReliquatReceptionPUIAdapteSelectionne.getPhReliquatUID());
                                 int quantiteReliquat = courant.getQteCommande() - courant.getQteLivraison();
@@ -425,7 +394,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
                                 detailReceptionPUIBundle.putInt("reliquat_uid", courant.getReliquat_UID());
                                 detailReceptionPUIBundle.putBoolean("modeRafale", true);
                                 detailReceptionPUIBundle.putString("GTIN_courant", produit_selectionne.getGTIN());
-                                detailReceptionPUIBundle.putInt("serviceSelectionneID", intent.getExtras().getInt("serviceSelectionneID"));
+                                detailReceptionPUIBundle.putInt("serviceSelectionneID", Objects.requireNonNull(intent.getExtras()).getInt("serviceSelectionneID"));
 
                                 detailReceptionPUIIntent.putExtras(detailReceptionPUIBundle);
 
@@ -439,7 +408,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
                                 detailReceptionPui_Bundle.putSerializable("phReliquatReceptionPUIAdapte", phReliquatReceptionPUIAdapteSelectionne);
                                 detailReceptionPui_Bundle.putSerializable("EmplacementPrecedent", emplacement_precedent);
                                 detailReceptionPui_Bundle.putSerializable("ProduitPrecedent", produitPrecedent);
-                                detailReceptionPui_Bundle.putInt("serviceSelectionneID", intent.getExtras().getInt("serviceSelectionneID"));
+                                detailReceptionPui_Bundle.putInt("serviceSelectionneID", Objects.requireNonNull(intent.getExtras()).getInt("serviceSelectionneID"));
 
                                 detailReceptionPui_Intent.putExtras(detailReceptionPui_Bundle);
 
@@ -456,7 +425,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
                         detailReceptionPui_Bundle.putSerializable("phReliquatReceptionPUIAdapte", phReliquatReceptionPUIAdapteSelectionne);
                         detailReceptionPui_Bundle.putSerializable("EmplacementPrecedent", emplacement_precedent);
                         detailReceptionPui_Bundle.putSerializable("ProduitPrecedent", produitPrecedent);
-                        detailReceptionPui_Bundle.putInt("serviceSelectionneID", intent.getExtras().getInt("serviceSelectionneID"));
+                        detailReceptionPui_Bundle.putInt("serviceSelectionneID", Objects.requireNonNull(intent.getExtras()).getInt("serviceSelectionneID"));
 
                         detailReceptionPui_Intent.putExtras(detailReceptionPui_Bundle);
 
@@ -470,74 +439,21 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
         if (commandeSelectionne != null) {
             // Entete
             ((TextView) findViewById(R.id.nomFournisseur)).setText(commandeSelectionne.getFournisseur());
-            ((TextView) findViewById(R.id.numCommande)).setText("#" + String.valueOf(commandeSelectionne.getNumero()));
-            //((TextView) findViewById(R.id.bonLivraison)).setText(bonLivraison);
+            ((TextView) findViewById(R.id.numCommande)).setText("#" + commandeSelectionne.getNumero());
 
             phReliquatList = PH_ReliquatOpenHelper.getPH_ReliquatByCommandeNumero(db, commandeSelectionne.getNumero());
 
-            Collections.sort(phReliquatList, new Comparator<PH_Reliquat>() {
-                @Override
-                public int compare(PH_Reliquat o1, PH_Reliquat o2) {
-                    return o1.getdesignationCourte().compareTo(o2.getdesignationCourte());
-                }
-            });
+            phReliquatList.sort(Comparator.comparing(PH_Reliquat::getdesignationCourte));
 
             depotPUI = DepotOpenHelper.getDepotPUI(db);
 
             phReliquatReceptionPUIAdapteList = new ArrayList<>();
 
             for (PH_Reliquat phReliquatCourant : phReliquatList) {
-                // Récupération Zone et Emplacement par défaut du produit en reliquat
-                Produit produit = ProduitOpenHelper.getProduitByID(db, phReliquatCourant.getProduitID());
-                // Nombre de reliquat
-                int zoneId = 0;
-                String zoneName = "";
-                int emplacementId = 0;
-                String emplacementName = "";
-
-                int quantiteReliquat = phReliquatCourant.getQteCommande() - phReliquatCourant.getQteLivraison();
-
-                // Création d'un ph_reliquat adpaté pour la reception PUI
                 PH_Reliquat_ReceptionPUI_Adapte phReliquatReceptionPUIAdapte = new PH_Reliquat_ReceptionPUI_Adapte(phReliquatCourant.getReliquat_UID(), phReliquatCourant.getSerie(), phReliquatCourant.isSuiviParSerieActif(), phReliquatCourant.isSerialiserReception());
-                // Création d'un numéro de lot à blanc, en attante de saisie
-                PH_Reliquat_ReceptionPUI_Adapte.Lot lot = null;
-                if(produit.isSuivi_Lot())
-                {
-                    lot = phReliquatReceptionPUIAdapte.new Lot("", "00/00/0000", "", "");
-                }
-                else
-                {
-                    DateFormat dateFormat = new SimpleDateFormat("yyMMdd");
-                    Date date = new Date();
-                    String new_date = dateFormat.format(date);
-                    String numLot = "Phi"+new_date;
-                    lot = phReliquatReceptionPUIAdapte.new Lot(numLot, "00/00/0000", "", "");
-                }
-
-
-                if (produit != null) {
-                    Depot_Zone depotZone = ZoneOpenHelper.getZoneByDepotEtNom(db, depotPUI, produit.getZone_PUI_Defaut());
-
-                    if (depotZone != null) {
-                        zoneId = depotZone.getZoneID();
-                        zoneName = depotZone.getZoneName();
-
-                        Depot_Emplacement depotEmplacement = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, depotZone, produit.getEmplacement_PUI_Defaut());
-                        if (depotEmplacement != null) {
-                            emplacementId = depotEmplacement.get_UID();
-                            emplacementName = depotEmplacement.getAdressage();
-                        } else {
-                            quantiteReliquat = 0;
-                        }
-                    }
-                }
-
-
 
                 phReliquatReceptionPUIAdapteList.add(phReliquatReceptionPUIAdapte);
             }
-
-
 
             //initi du tri
             tri_choisi = ParametreUtilisateurOpenHelper.getChoixTriReliquat(db);
@@ -571,40 +487,32 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
         super.onResume();
         lancerScan = (LinearLayout) findViewById(R.id.lancerScan);
         tri_choisi = "Categorie";
-        int nbLotslivres = 0;
-        for (PH_Reliquat_ReceptionPUI_Adapte phReliquatReceptionPUIAdapte : phReliquatReceptionPUIAdapteList) {
-            nbLotslivres += phReliquatReceptionPUIAdapte.getlotList().size();
-        }
 
         //gestion du bouton qui lance le scan
-        lancerScan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent listeLotReceptionPui_Intent = null;
-                Bundle listeLotReceptionPui_Bundle = new Bundle();
-                if(android.os.Build.MANUFACTURER.contains("Zebra Technologies")  || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
-                {
-                    listeLotReceptionPui_Intent = new Intent(DetailReceptionPuiActivity.this, ScannerReceptionActivity.class);
-                }
-                else
-                {
-                    listeLotReceptionPui_Intent = new Intent(DetailReceptionPuiActivity.this, BarcodeReceptionActivity.class);
-                }
-
-                listeLotReceptionPui_Bundle.putString("contexte", String.valueOf(R.string.scannerContextNewReceptionPUI));
-                listeLotReceptionPui_Bundle.putInt("ReceptionID", commandeSelectionne.getID_commande());
-                listeLotReceptionPui_Bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                listeLotReceptionPui_Bundle.putString("ordreTri", tri_choisi);
-                listeLotReceptionPui_Bundle.putInt("serviceSelectionneID", intent.getExtras().getInt("serviceSelectionneID"));
-                listeLotReceptionPui_Bundle.putSerializable("ReceptionPUIAdapte", (Serializable) phReliquatReceptionPUIAdapteList);
-                listeLotReceptionPui_Bundle.putSerializable("EmplacementPrecedent", (Serializable) emplacement_precedent);
-                listeLotReceptionPui_Bundle.putSerializable("ProduitPrecedent", (Serializable) produitPrecedent);
-                listeLotReceptionPui_Intent.putExtras(listeLotReceptionPui_Bundle);
-                DetailReceptionPuiActivity.this.startActivityForResult(listeLotReceptionPui_Intent, CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH);
+        lancerScan.setOnClickListener(view -> {
+            Intent listeLotReceptionPui_Intent;
+            Bundle listeLotReceptionPui_Bundle = new Bundle();
+            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies")  || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+            {
+                listeLotReceptionPui_Intent = new Intent(DetailReceptionPuiActivity.this, ScannerReceptionActivity.class);
             }
+            else
+            {
+                listeLotReceptionPui_Intent = new Intent(DetailReceptionPuiActivity.this, BarcodeReceptionActivity.class);
+            }
+
+            listeLotReceptionPui_Bundle.putString("contexte", String.valueOf(R.string.scannerContextNewReceptionPUI));
+            listeLotReceptionPui_Bundle.putInt("ReceptionID", commandeSelectionne.getID_commande());
+            listeLotReceptionPui_Bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+            listeLotReceptionPui_Bundle.putString("ordreTri", tri_choisi);
+            listeLotReceptionPui_Bundle.putInt("serviceSelectionneID", Objects.requireNonNull(intent.getExtras()).getInt("serviceSelectionneID"));
+            listeLotReceptionPui_Bundle.putSerializable("ReceptionPUIAdapte", (Serializable) phReliquatReceptionPUIAdapteList);
+            listeLotReceptionPui_Bundle.putSerializable("EmplacementPrecedent", (Serializable) emplacement_precedent);
+            listeLotReceptionPui_Bundle.putSerializable("ProduitPrecedent", (Serializable) produitPrecedent);
+            listeLotReceptionPui_Intent.putExtras(listeLotReceptionPui_Bundle);
+            DetailReceptionPuiActivity.this.startActivityForResult(listeLotReceptionPui_Intent, CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH);
         });
 
-        //gestion du tri
         switch (tri_choisi)
         {
             case "Categorie":
@@ -623,7 +531,6 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
         invalidateOptionsMenu();
     }
 
-    // Lorsqu'on lance une nouvelle activity avec " startActivityForResult ", action à réaliser à la fin de l'activity lancé suivant le " CodesEchangesActivites " passé
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -637,7 +544,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
                     onResume();
                     break;
                 case CodesEchangesActivites.RETOUR_PRISE_PHOTO:
-                    String photoProduits = data.getExtras().getString("photoProduit");
+                    String photoProduits = Objects.requireNonNull(data.getExtras()).getString("photoProduit");
                     if (photoProduits == null || photoProduits.contentEquals("")) {
                         // Récupération du bon de livraison
 
@@ -653,14 +560,14 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
                                 onMenuSaveClick();
                             }
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            Log.e("IOException", Objects.requireNonNull(e.getMessage()));
                         }
                     }
                     break;
                 case CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH:
                     //récupération de la liste d'adapte
                     phReliquatReceptionPUIAdapteList = new ArrayList<>();
-                    emplacement_precedent = (Depot_Emplacement) data.getExtras().getSerializable("EmplacementPrecedent");
+                    emplacement_precedent = (Depot_Emplacement) Objects.requireNonNull(data.getExtras()).getSerializable("EmplacementPrecedent");
                     produitPrecedent = (Produit) data.getExtras().getSerializable("ProduitPrecedent");
                     phReliquatReceptionPUIAdapteList = (List<PH_Reliquat_ReceptionPUI_Adapte>) data.getExtras().getSerializable("reliquatAdapteList");
                     onResume();
@@ -683,28 +590,21 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem item = menu.findItem(R.id.menuSave);
-        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                onMenuSaveClick();
-                return true;
-            }
+        item.setOnMenuItemClickListener(item1 -> {
+            onMenuSaveClick();
+            return true;
         });
 
         MenuItem itemPhoto = menu.findItem(R.id.menuPhoto);
-        itemPhoto.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                prendrePhotoBL();
-                return true;
-            }
+        itemPhoto.setOnMenuItemClickListener(item12 -> {
+            prendrePhotoBL();
+            return true;
         });
         return true;
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outstate) {
+    public void onSaveInstanceState(@NonNull Bundle outstate) {
         //gestion du commentaire pour ne pas effacer l'édit text pendant la rotation
         if (bonLivraison != null) {
             outstate.putString("NomBonLivraison", bonLivraison);
@@ -722,7 +622,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
 
     private Object envoyerMail(String email)
     {
-        Mail sender = null;
+        Mail sender;
         if(!envoyerCopie)
         {
             sender = new Mail(DetailReceptionPuiActivity.this, email, true, db);
@@ -750,7 +650,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("Exception", Objects.requireNonNull(e.getMessage()));
         }
 
         return "executed";
@@ -759,13 +659,9 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
     private boolean checkInternetConnection() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         // test for connection
-        if (cm.getActiveNetworkInfo() != null
+        return cm.getActiveNetworkInfo() != null
                 && cm.getActiveNetworkInfo().isAvailable()
-                && cm.getActiveNetworkInfo().isConnected()) {
-            return true;
-        } else {
-            return false;
-        }
+                && cm.getActiveNetworkInfo().isConnected();
     }
 
     @Override
@@ -793,15 +689,12 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
     private void onClickTriDesignation()
     {
         tri_choisi = "Designation";
-        Collections.sort(phReliquatReceptionPUIAdapteList, new Comparator<PH_Reliquat_ReceptionPUI_Adapte>() {
-            @Override
-            public int compare(PH_Reliquat_ReceptionPUI_Adapte o1, PH_Reliquat_ReceptionPUI_Adapte o2) {
+        phReliquatReceptionPUIAdapteList.sort((o1, o2) -> {
 
-                PH_Reliquat oo1 = PH_ReliquatOpenHelper.getPH_ReliquatById(db, o1.getPhReliquatUID());
-                PH_Reliquat oo2 = PH_ReliquatOpenHelper.getPH_ReliquatById(db, o2.getPhReliquatUID());
+            PH_Reliquat oo1 = PH_ReliquatOpenHelper.getPH_ReliquatById(db, o1.getPhReliquatUID());
+            PH_Reliquat oo2 = PH_ReliquatOpenHelper.getPH_ReliquatById(db, o2.getPhReliquatUID());
 
-                return oo1.getDesignationCourte().toLowerCase().compareTo(oo2.getDesignationCourte().toLowerCase());
-            }
+            return oo1.getDesignationCourte().toLowerCase().compareTo(oo2.getDesignationCourte().toLowerCase());
         });
         phReliquatReceptionPuiAdapter = new PH_Reliquat_ReceptionPuiAdapter(DetailReceptionPuiActivity.this, db, phReliquatReceptionPUIAdapteList);
         phReliquatListView.setDivider(footer);
@@ -811,18 +704,15 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
     private void onClickTriCategorie()
     {
         tri_choisi = "Categorie";
-        Collections.sort(phReliquatReceptionPUIAdapteList, new Comparator<PH_Reliquat_ReceptionPUI_Adapte>() {
-            @Override
-            public int compare(PH_Reliquat_ReceptionPUI_Adapte o1, PH_Reliquat_ReceptionPUI_Adapte o2) {
+        phReliquatReceptionPUIAdapteList.sort((o1, o2) -> {
 
-                PH_Reliquat oo1 = PH_ReliquatOpenHelper.getPH_ReliquatById(db, o1.getPhReliquatUID());
-                PH_Reliquat oo2 = PH_ReliquatOpenHelper.getPH_ReliquatById(db, o2.getPhReliquatUID());
+            PH_Reliquat oo1 = PH_ReliquatOpenHelper.getPH_ReliquatById(db, o1.getPhReliquatUID());
+            PH_Reliquat oo2 = PH_ReliquatOpenHelper.getPH_ReliquatById(db, o2.getPhReliquatUID());
 
-                Produit produit1 = ProduitOpenHelper.getProduitByID(db, oo1.getProduitID());
-                Produit produit2 = ProduitOpenHelper.getProduitByID(db, oo2.getProduitID());
+            Produit produit1 = ProduitOpenHelper.getProduitByID(db, oo1.getProduitID());
+            Produit produit2 = ProduitOpenHelper.getProduitByID(db, oo2.getProduitID());
 
-                return produit1.getCategorie().toLowerCase().compareTo(produit2.getCategorie().toLowerCase());
-            }
+            return produit1.getCategorie().toLowerCase().compareTo(produit2.getCategorie().toLowerCase());
         });
         phReliquatReceptionPuiAdapter = new PH_Reliquat_ReceptionPuiAdapter(DetailReceptionPuiActivity.this, db, phReliquatReceptionPUIAdapteList);
         phReliquatListView.setDivider(footer);
@@ -832,27 +722,24 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
     private void onTriParPlace()
     {
         tri_choisi = "Place";
-        Collections.sort(phReliquatReceptionPUIAdapteList, new Comparator<PH_Reliquat_ReceptionPUI_Adapte>() {
-            @Override
-            public int compare(PH_Reliquat_ReceptionPUI_Adapte o1, PH_Reliquat_ReceptionPUI_Adapte o2) {
+        phReliquatReceptionPUIAdapteList.sort((o1, o2) -> {
 
-                PH_Reliquat oo1 = PH_ReliquatOpenHelper.getPH_ReliquatById(db, o1.getPhReliquatUID());
-                PH_Reliquat oo2 = PH_ReliquatOpenHelper.getPH_ReliquatById(db, o2.getPhReliquatUID());
-                String oo1EmplacementParDefaut = oo1.getEmplacement();
-                String oo2EmplacementParDefaut = oo2.getEmplacement();
+            PH_Reliquat oo1 = PH_ReliquatOpenHelper.getPH_ReliquatById(db, o1.getPhReliquatUID());
+            PH_Reliquat oo2 = PH_ReliquatOpenHelper.getPH_ReliquatById(db, o2.getPhReliquatUID());
+            String oo1EmplacementParDefaut = oo1.getEmplacement();
+            String oo2EmplacementParDefaut = oo2.getEmplacement();
 
-                if(oo1EmplacementParDefaut == null || oo1EmplacementParDefaut.contentEquals("")){
-                    Produit produit = ProduitOpenHelper.getProduitByID(db, oo1.getProduitID());
-                    oo1EmplacementParDefaut = produit.getEmplacement_PUI_Defaut();
+            if (oo1EmplacementParDefaut == null || oo1EmplacementParDefaut.contentEquals("")) {
+                Produit produit = ProduitOpenHelper.getProduitByID(db, oo1.getProduitID());
+                oo1EmplacementParDefaut = produit.getEmplacement_PUI_Defaut();
 
-                }
-                if(oo2EmplacementParDefaut == null || oo2EmplacementParDefaut.contentEquals("")){
-                    Produit produit = ProduitOpenHelper.getProduitByID(db, oo2.getProduitID());
-                    oo2EmplacementParDefaut = produit.getEmplacement_PUI_Defaut();
-                }
-
-                return oo1EmplacementParDefaut.compareTo(oo2EmplacementParDefaut);
             }
+            if (oo2EmplacementParDefaut == null || oo2EmplacementParDefaut.contentEquals("")) {
+                Produit produit = ProduitOpenHelper.getProduitByID(db, oo2.getProduitID());
+                oo2EmplacementParDefaut = produit.getEmplacement_PUI_Defaut();
+            }
+
+            return oo1EmplacementParDefaut.compareTo(oo2EmplacementParDefaut);
         });
         phReliquatReceptionPuiAdapter = new PH_Reliquat_ReceptionPuiAdapter(DetailReceptionPuiActivity.this, db, phReliquatReceptionPUIAdapteList);
         phReliquatListView.setDivider(footer);
@@ -876,81 +763,75 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
         layout.setMinimumHeight((int)(displayRectangle.height() * 0.6f));
         builder.setView(layout);
         final AlertDialog alertDialog = builder.create();
-        alertDialog.getWindow().setGravity(Gravity.CENTER);
+        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
         alertDialog.show();
 
-        buttonOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                buttonOk.setBackgroundColor(getResources().getColor(R.color.vert));
-                ViewCompat.setBackgroundTintList(iconValidation, ColorStateList.valueOf(getResources().getColor(R.color.blanc, null)));
-                String numeroBL = numeroBLEdit.getText().toString();
-                commandeSelectionne.setBLNumero(numeroBL);
-                bonLivraison = numeroBL;
-                alertDialog.dismiss();
-                //on vérifie qu'une saisie a été effectué avant d'enregistrer
-                boolean saisie_effectuer = false;
-                for (PH_Reliquat_ReceptionPUI_Adapte phReliquatReceptionPUIAdapte : phReliquatReceptionPUIAdapteList)
-                {
-                    for (PH_Reliquat_ReceptionPUI_Adapte.Lot lot : phReliquatReceptionPUIAdapte.getlotList()) {
-                        for (PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement zoneEtEmplacement : lot.getZoneEtEmplacementList())
+        buttonOk.setOnClickListener(v -> {
+            buttonOk.setBackgroundColor(getResources().getColor(R.color.vert, null));
+            ViewCompat.setBackgroundTintList(iconValidation, ColorStateList.valueOf(getResources().getColor(R.color.blanc, null)));
+            String numeroBL = numeroBLEdit.getText().toString();
+            commandeSelectionne.setBLNumero(numeroBL);
+            bonLivraison = numeroBL;
+            alertDialog.dismiss();
+            //on vérifie qu'une saisie a été effectué avant d'enregistrer
+            boolean saisie_effectuer = false;
+            for (PH_Reliquat_ReceptionPUI_Adapte phReliquatReceptionPUIAdapte : phReliquatReceptionPUIAdapteList)
+            {
+                for (PH_Reliquat_ReceptionPUI_Adapte.Lot lot : phReliquatReceptionPUIAdapte.getlotList()) {
+                    for (PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement zoneEtEmplacement : lot.getZoneEtEmplacementList())
+                    {
+                        if(zoneEtEmplacement.getQuantite() != 0)
                         {
-                            if(zoneEtEmplacement.getQuantite() != 0)
-                            {
-                                saisie_effectuer = true;
-                                break;
-                            }
-                        }
-
-                        if(saisie_effectuer)
+                            saisie_effectuer = true;
                             break;
+                        }
                     }
+
+                    if(saisie_effectuer)
+                        break;
                 }
+            }
 
-                if(saisie_effectuer)
-                {
-                    second_passage_photo = false;
-                    Boolean receptionEffectuee = receptionner(commandeSelectionne, phReliquatReceptionPUIAdapteList);
-                    if (!receptionEffectuee) {
-                        boolean continuer = false;
-                        // Si une erreur est survenue, on annule les modifications en vidant la table ElementASynchroniser
-                        if(erreur.contentEquals("Quantité"))
-                        {
-                            continuer = Alerte.afficherAlerteList(DetailReceptionPuiActivity.this, "Attention", "Les produits suivant n'ont pas été réceptionnés, continuer ? ", listeProduitRAL, "OuiNon");
-                        }
-                        else if(erreur.contentEquals("Lot"))
-                        {
-                            continuer = Alerte.afficherAlerteList(DetailReceptionPuiActivity.this, "Attention", "Les produits suivant n'ont pas été réceptionnés, continuer ?", listeProduitRAL, "OuiNon");
-                        }
-                        else
-                        {
-                            Alerte.afficherAlerte(DetailReceptionPuiActivity.this, "Alerte", "Une erreur est survenue, aucun traitement ne sera effectué.", "alerte");
-                            ElementASynchroniserOpenHelper.viderTableElementASynchroniser(db);
-                            DetailReceptionPuiActivity.this.finish();
-                        }
+            if(saisie_effectuer)
+            {
+                second_passage_photo = false;
+                Boolean receptionEffectuee = receptionner(commandeSelectionne, phReliquatReceptionPUIAdapteList);
+                if (!receptionEffectuee) {
+                    boolean continuer = false;
+                    // Si une erreur est survenue, on annule les modifications en vidant la table ElementASynchroniser
+                    if(erreur.contentEquals("Quantité"))
+                    {
+                        continuer = Alerte.afficherAlerteList(DetailReceptionPuiActivity.this, "Attention", "Les produits suivant n'ont pas été réceptionnés, continuer ? ", listeProduitRAL, "OuiNon");
+                    }
+                    else if(erreur.contentEquals("Lot"))
+                    {
+                        continuer = Alerte.afficherAlerteList(DetailReceptionPuiActivity.this, "Attention", "Les produits suivant n'ont pas été réceptionnés, continuer ?", listeProduitRAL, "OuiNon");
+                    }
+                    else
+                    {
+                        Alerte.afficherAlerte(DetailReceptionPuiActivity.this, "Alerte", "Une erreur est survenue, aucun traitement ne sera effectué.", "alerte");
+                        ElementASynchroniserOpenHelper.viderTableElementASynchroniser(db);
+                        DetailReceptionPuiActivity.this.finish();
+                    }
 
-                        if(continuer)
-                            valider_reception();
-
-                    } else {
-
+                    if(continuer)
                         valider_reception();
-                    }
+
+                } else {
+
+                    valider_reception();
                 }
-                else
-                {
-                    onBackPressed();
-                }
+            }
+            else
+            {
+                onBackPressed();
             }
         });
 
-        btn_photo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boutonPhoto.setBackgroundColor(getResources().getColor(R.color.bleu_clair_alcyons));
-                ViewCompat.setBackgroundTintList(btn_photo, ColorStateList.valueOf(getResources().getColor(R.color.blanc, null)));
-                prendrePhotoBL();
-            }
+        btn_photo.setOnClickListener(v -> {
+            boutonPhoto.setBackgroundColor(getResources().getColor(R.color.bleu_clair_alcyons, null));
+            ViewCompat.setBackgroundTintList(btn_photo, ColorStateList.valueOf(getResources().getColor(R.color.blanc, null)));
+            prendrePhotoBL();
         });
     }
 
@@ -963,26 +844,21 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
         builder.setView(layout);
 
         final androidx.appcompat.app.AlertDialog alertDialog = builder.create();
-        alertDialog.getWindow().setGravity(Gravity.CENTER);
+        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
         alertDialog.show();
 
-        zoneok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-                envoyerMail(true, email);
-            }
+        zoneok.setOnClickListener(v -> {
+            alertDialog.dismiss();
+            envoyerMail(true, email);
         });
 
-        buttonAnnuler.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-                envoyerMail(false, email);
-            }
+        buttonAnnuler.setOnClickListener(v -> {
+            alertDialog.dismiss();
+            envoyerMail(false, email);
         });
     }
 
+    @SuppressLint("SetTextI18n")
     public void afficherAlerteConfirmationRetour(Context context, LayoutInflater inflater, final Bundle bundle) {
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
         View layout = inflater.inflate(R.layout.alerte_confirmation_mail, null);
@@ -994,23 +870,15 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
         builder.setView(layout);
 
         final androidx.appcompat.app.AlertDialog alertDialog = builder.create();
-        alertDialog.getWindow().setGravity(Gravity.CENTER);
+        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
         alertDialog.show();
 
-        zoneok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-                retourService(bundle);
-            }
+        zoneok.setOnClickListener(v -> {
+            alertDialog.dismiss();
+            retourService(bundle);
         });
 
-        buttonAnnuler.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
+        buttonAnnuler.setOnClickListener(v -> alertDialog.dismiss());
     }
 
     private void retourService(final Bundle bundle)

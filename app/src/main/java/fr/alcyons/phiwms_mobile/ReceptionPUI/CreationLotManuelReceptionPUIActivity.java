@@ -1,7 +1,6 @@
 package fr.alcyons.phiwms_mobile.ReceptionPUI;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -12,9 +11,11 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
 import android.text.Html;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.View;
@@ -36,14 +37,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerEmplacementActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerProduitActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Commande;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
@@ -64,8 +69,11 @@ import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RESULT_ZONE
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT;
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LOT;
 
-public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
+/**
+ * Created by olivier on 17/04/2024.
+ */
 
+public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
     Produit produitSelectionne;
     Depot depotSelectionne;
     Depot_Zone zoneSelectionner;
@@ -87,13 +95,12 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
     LinearLayout validationScan;
     ImageView imageValidation;
     RelativeLayout relativeQte;
-    TextView emplacementParDefaut;
-
     Commande commandecourante;
     PH_Reliquat reliquat_courant;
     PH_Reliquat_ReceptionPUI_Adapte phReliquatReceptionPUIAdapte;
 
     PackageManager pm;
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,8 +110,8 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
         pm = CreationLotManuelReceptionPUIActivity.this.getPackageManager();
 
         // Récupération des variables globales
-        produitSelectionne = gestionnaireProduit.getProduitByID(db, intent.getExtras().getInt("produitID"));
-        depotSelectionne = gestionnaireDepot.getDepotParID(db, intent.getExtras().getInt("depotID"));
+        produitSelectionne = ProduitOpenHelper.getProduitByID(db, Objects.requireNonNull(intent.getExtras()).getInt("produitID"));
+        depotSelectionne = DepotOpenHelper.getDepotParID(db, intent.getExtras().getInt("depotID"));
         reliquat_courant = PH_ReliquatOpenHelper.getPH_ReliquatById(db, intent.getExtras().getInt("ReliquatID"));
         phReliquatReceptionPUIAdapte = (PH_Reliquat_ReceptionPUI_Adapte) intent.getExtras().getSerializable("phReliquatReceptionPUIAdapte");
         commandecourante = CommandeOpenHelper.getCommandeByNumero(db, reliquat_courant.getCommandeNumero());
@@ -150,104 +157,103 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
         fournisseurTextView.setText(commandecourante.getFournisseur());
 
         // Définition des actions sur Click
-        datePeremptionTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatePickerFragmentReception newFragment = new DatePickerFragmentReception();
-                newFragment.setTextView(datePeremptionTextView);
-                newFragment.show((CreationLotManuelReceptionPUIActivity.this).getSupportFragmentManager(), "timePicker");
-            }
+        datePeremptionTextView.setOnClickListener(v -> {
+            DatePickerFragmentReception newFragment = new DatePickerFragmentReception();
+            newFragment.setTextView(datePeremptionTextView);
+            newFragment.show((CreationLotManuelReceptionPUIActivity.this).getSupportFragmentManager(), "timePicker");
         });
 
 
         //affichage de la liste des zones
-        zoneTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                depotZoneList = new ArrayList<Depot_Zone>();
-                depotZoneList = gestionnaireZone.getZonesEtEmplacementsParDepot(db, depotSelectionne);
+        zoneTextView.setOnClickListener(view -> {
+            depotZoneList = new ArrayList<>();
+            depotZoneList = ZoneOpenHelper.getZonesEtEmplacementsParDepot(db, depotSelectionne);
 
-                if (depotZoneList.size() != 0) {
-                    Intent newIntent = new Intent(CreationLotManuelReceptionPUIActivity.this, ListeZoneCreationActivity.class);
-                    Bundle extras = CreationLotManuelReceptionPUIActivity.super.getBundle();
-                    extras.putInt("depotID", depotSelectionne.getDepot_UID());
-                    newIntent.putExtras(extras);
-                    CreationLotManuelReceptionPUIActivity.this.startActivityForResult(newIntent, RESULT_ZONE);
-                }
-
+            if (!depotZoneList.isEmpty()) {
+                Intent newIntent = new Intent(CreationLotManuelReceptionPUIActivity.this, ListeZoneCreationActivity.class);
+                Bundle extras = CreationLotManuelReceptionPUIActivity.super.getBundle();
+                extras.putInt("depotID", depotSelectionne.getDepot_UID());
+                newIntent.putExtras(extras);
+                CreationLotManuelReceptionPUIActivity.this.startActivityForResult(newIntent, RESULT_ZONE);
             }
+
         });
 
         //affichage des emplacements
-        emplacementTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                emplacementList = new ArrayList<>();
-                if (zoneSelectionner != null) {
-                    emplacementList = gestionnaireEmplacement.getEmplacementsParZone(db, zoneSelectionner);
-                }
-
-
-                if (emplacementList.size() != 0) {
-                    Intent newIntent = new Intent(CreationLotManuelReceptionPUIActivity.this, ListeEmplacementCreationActivity.class);
-                    Bundle extras = CreationLotManuelReceptionPUIActivity.super.getBundle();
-                    extras.putInt("zoneid", zoneSelectionner.getZoneID());
-                    newIntent.putExtras(extras);
-                    CreationLotManuelReceptionPUIActivity.this.startActivityForResult(newIntent, RETOUR_CODE_EMPLACEMENT);
-                }
-
+        emplacementTextView.setOnClickListener(view -> {
+            emplacementList = new ArrayList<>();
+            if (zoneSelectionner != null) {
+                emplacementList = EmplacementOpenHelper.getEmplacementsParZone(db, zoneSelectionner);
             }
+            if (!emplacementList.isEmpty()) {
+                Intent newIntent = new Intent(CreationLotManuelReceptionPUIActivity.this, ListeEmplacementCreationActivity.class);
+                Bundle extras = CreationLotManuelReceptionPUIActivity.super.getBundle();
+                extras.putInt("zoneid", zoneSelectionner.getZoneID());
+                newIntent.putExtras(extras);
+                CreationLotManuelReceptionPUIActivity.this.startActivityForResult(newIntent, RETOUR_CODE_EMPLACEMENT);
+            }
+
         });
 
         //clic sur le datamatrix de la zone et de l'emplacement
-        datamatrix1ImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+        datamatrix1ImageView.setOnClickListener(view -> {
+            if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+            {
+                Intent detailProduitPlanDePlacementIntent = getDetailProduitPlanDePlacementIntent();
+                CreationLotManuelReceptionPUIActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT);
+            }
+            else
+            {
+                if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
                 {
                     Bundle detailProduitPlanDePlacementBundle = CreationLotManuelReceptionPUIActivity.super.getBundle();
                     detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un emplacement");
-                    detailProduitPlanDePlacementBundle.putInt("scannerContexteInt", R.string.scannerContexteEmplacement);
+                    detailProduitPlanDePlacementBundle.putString("contexte", String.valueOf(R.string.scannerContexteEmplacement));
                     detailProduitPlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
-                    Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotManuelReceptionPUIActivity.this, ScannerEmplacementActivity.class);
+                    Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotManuelReceptionPUIActivity.this, BarcodeCaptureActivity.class);
                     detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
                     CreationLotManuelReceptionPUIActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT);
                 }
                 else
                 {
-                    if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
-                    {
-                        Bundle detailProduitPlanDePlacementBundle = CreationLotManuelReceptionPUIActivity.super.getBundle();
-                        detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un emplacement");
-                        detailProduitPlanDePlacementBundle.putString("contexte", String.valueOf(R.string.scannerContexteEmplacement));
-                        detailProduitPlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
-                        Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotManuelReceptionPUIActivity.this, BarcodeCaptureActivity.class);
-                        detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
-                        CreationLotManuelReceptionPUIActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT);
-                    }
-                    else
-                    {
-                        Bundle detailProduitPlanDePlacementBundle = CreationLotManuelReceptionPUIActivity.super.getBundle();
-                        detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un emplacement");
-                        detailProduitPlanDePlacementBundle.putInt("scannerContexteInt", R.string.scannerContexteEmplacement);
-                        detailProduitPlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
-                        Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotManuelReceptionPUIActivity.this, ScannerEmplacementActivity.class);
-                        detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
-                        CreationLotManuelReceptionPUIActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT);
-                    }
+                    Intent detailProduitPlanDePlacementIntent = getProduitPlanDePlacementIntent();
+                    CreationLotManuelReceptionPUIActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT);
                 }
             }
         });
 
         //clic sur le datamtrix permettant de récupérer le numéro de lot et la date de péremption
-        datamatrix2ImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+        datamatrix2ImageView.setOnClickListener(view -> {
+            if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+            {
+                Bundle detailProduitPlanDePlacementBundle = CreationLotManuelReceptionPUIActivity.super.getBundle();
+                detailProduitPlanDePlacementBundle.putBoolean("doitEtreIdentique", false);
+                detailProduitPlanDePlacementBundle.putString("Designation", produitSelectionne.getDesignation_interne());
+                detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un numéro de lot");
+                detailProduitPlanDePlacementBundle.putString("contexte", String.valueOf(R.string.scannerContexteProduit));
+                detailProduitPlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
+                Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotManuelReceptionPUIActivity.this, ScannerProduitActivity.class);
+                detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
+                CreationLotManuelReceptionPUIActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_LOT);
+            }
+            else
+            {
+                if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
                 {
                     Bundle detailProduitPlanDePlacementBundle = CreationLotManuelReceptionPUIActivity.super.getBundle();
-                    detailProduitPlanDePlacementBundle.putBoolean("doitEtreIdentique", false);
+                    detailProduitPlanDePlacementBundle.putBoolean("doitEtreIdentique", true);
+                    detailProduitPlanDePlacementBundle.putString("Designation", produitSelectionne.getDesignation_interne());
+                    detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un numéro de lot");
+                    detailProduitPlanDePlacementBundle.putString("contexte", String.valueOf(R.string.scannerContexteProduit));
+                    detailProduitPlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
+                    Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotManuelReceptionPUIActivity.this, BarcodeCaptureActivity.class);
+                    detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
+                    CreationLotManuelReceptionPUIActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_LOT);
+                }
+                else
+                {
+                    Bundle detailProduitPlanDePlacementBundle = CreationLotManuelReceptionPUIActivity.super.getBundle();
+                    detailProduitPlanDePlacementBundle.putBoolean("doitEtreIdentique", true);
                     detailProduitPlanDePlacementBundle.putString("Designation", produitSelectionne.getDesignation_interne());
                     detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un numéro de lot");
                     detailProduitPlanDePlacementBundle.putString("contexte", String.valueOf(R.string.scannerContexteProduit));
@@ -256,38 +262,11 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
                     detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
                     CreationLotManuelReceptionPUIActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_LOT);
                 }
-                else
-                {
-                    if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
-                    {
-                        Bundle detailProduitPlanDePlacementBundle = CreationLotManuelReceptionPUIActivity.super.getBundle();
-                        detailProduitPlanDePlacementBundle.putBoolean("doitEtreIdentique", true);
-                        detailProduitPlanDePlacementBundle.putString("Designation", produitSelectionne.getDesignation_interne());
-                        detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un numéro de lot");
-                        detailProduitPlanDePlacementBundle.putString("contexte", String.valueOf(R.string.scannerContexteProduit));
-                        detailProduitPlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
-                        Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotManuelReceptionPUIActivity.this, BarcodeCaptureActivity.class);
-                        detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
-                        CreationLotManuelReceptionPUIActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_LOT);
-                    }
-                    else
-                    {
-                        Bundle detailProduitPlanDePlacementBundle = CreationLotManuelReceptionPUIActivity.super.getBundle();
-                        detailProduitPlanDePlacementBundle.putBoolean("doitEtreIdentique", true);
-                        detailProduitPlanDePlacementBundle.putString("Designation", produitSelectionne.getDesignation_interne());
-                        detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un numéro de lot");
-                        detailProduitPlanDePlacementBundle.putString("contexte", String.valueOf(R.string.scannerContexteProduit));
-                        detailProduitPlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
-                        Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotManuelReceptionPUIActivity.this, ScannerProduitActivity.class);
-                        detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
-                        CreationLotManuelReceptionPUIActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_LOT);
-                    }
-                }
-
             }
+
         });
 
-        if(!pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
+        if(!pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
         {
             datamatrix2ImageView.setVisibility(View.GONE);
         }
@@ -298,15 +277,15 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
         if (depotSelectionne.getStructure().contains("PAD")) {
             zoneTextView.setText(produitSelectionne.getZone_PAD_Defaut());
             emplacementTextView.setText(produitSelectionne.getEmplacement_PAD_Defaut());
-            zoneSelectionner = gestionnaireZone.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_PAD_Defaut());
+            zoneSelectionner = ZoneOpenHelper.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_PAD_Defaut());
         } else if (depotSelectionne.getStructure().contains("PUF")) {
             zoneTextView.setText(produitSelectionne.getZone_UF_Defaut());
             emplacementTextView.setText(produitSelectionne.getEmplacement_UF_Defaut());
-            zoneSelectionner = gestionnaireZone.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_UF_Defaut());
+            zoneSelectionner = ZoneOpenHelper.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_UF_Defaut());
         } else {
             zoneTextView.setText(produitSelectionne.getZone_PUI_Defaut());
             emplacementTextView.setText(produitSelectionne.getEmplacement_PUI_Defaut());
-            zoneSelectionner = gestionnaireZone.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_PUI_Defaut());
+            zoneSelectionner = ZoneOpenHelper.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_PUI_Defaut());
         }
 
         String numLot = intent.getExtras().getString("numLot");
@@ -326,17 +305,18 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
         // Transformation d'une date au format yyyy-MM-dd à dd/MM/yyyyy
         String dateDePeremption = intent.getExtras().getString("datePeremption");
         if (dateDePeremption != null) {
-            DateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
-            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            @SuppressLint("SimpleDateFormat") DateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
+            @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
             String dateAAfficher = "";
-            Date date = new Date();
+            Date date;
 
             try {
                 date = dateDecodeur.parse(dateDePeremption);
+                assert date != null;
                 dateAAfficher = dateFormat.format(date);
             } catch (ParseException e) {
-                e.printStackTrace();
+                Log.e("Parse Exception", Objects.requireNonNull(e.getMessage()));
             }
             datePeremptionTextView.setText(dateAAfficher);
         }
@@ -347,13 +327,10 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
             labelSerie.setVisibility(View.GONE);
         }
 
-        lotEditText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String lotnumero = Alerte.afficherAlerteEditText(CreationLotManuelReceptionPUIActivity.this, "Numéro de lot", "Saisir le numéro de lot");
-                lotEditText.setText(lotnumero);
-                apparitionValider();
-            }
+        lotEditText.setOnClickListener(view -> {
+            String lotnumero = Alerte.afficherAlerteEditText(CreationLotManuelReceptionPUIActivity.this, "Numéro de lot", "Saisir le numéro de lot");
+            lotEditText.setText(lotnumero);
+            apparitionValider();
         });
 
         //affichage de la quantité de base
@@ -370,26 +347,21 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
             qteActuelleEditText.setText(String.valueOf((int)reliquat_courant.getQteReliquat_X()));
         }
 
-        relativeQte.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String title = produitSelectionne.getDesignation_interne();
-                String message = "Choisir une quantité: ";
-                int maxValue = reliquat_courant.getQteReliquat_X();
-                int value = reliquat_courant.getQteReliquat_X();
+        relativeQte.setOnClickListener(view -> {
+            String title = produitSelectionne.getDesignation_interne();
+            String message = "Choisir une quantité: ";
+            int maxValue = reliquat_courant.getQteReliquat_X();
+            int value = reliquat_courant.getQteReliquat_X();
 
-                DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+            DialogInterface.OnClickListener onClickListener = (dialog, id) -> {
 
-                        int qteAprès = aNumberPicker.getValue()*reliquat_courant.getConditionnementAchat();
-                        qteActuelleEditText.setText(String.valueOf(qteAprès).trim());
-                        dialog.dismiss();
-                        apparitionValider();
-                    }
-                };
+                int qteApres = aNumberPicker.getValue()*reliquat_courant.getConditionnementAchat();
+                qteActuelleEditText.setText(String.valueOf(qteApres).trim());
+                dialog.dismiss();
+                apparitionValider();
+            };
 
-                Alerte.afficherAlerteNumberPickerAvecPas(CreationLotManuelReceptionPUIActivity.this, title, message, value, maxValue, onClickListener, reliquat_courant.getConditionnementAchat());
-            }
+            Alerte.afficherAlerteNumberPickerAvecPas(CreationLotManuelReceptionPUIActivity.this, title, message, value, maxValue, onClickListener, reliquat_courant.getConditionnementAchat());
         });
 
         //on affiche des valeurs fictive si c'est alcyons qui est connecté
@@ -408,12 +380,29 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
         }
 
         apparitionValider();
-        imageValidation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onMenuSaveClick();
-            }
-        });
+        imageValidation.setOnClickListener(view -> onMenuSaveClick());
+    }
+
+    @NonNull
+    private Intent getProduitPlanDePlacementIntent() {
+        Bundle detailProduitPlanDePlacementBundle = CreationLotManuelReceptionPUIActivity.super.getBundle();
+        detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un emplacement");
+        detailProduitPlanDePlacementBundle.putInt("scannerContexteInt", R.string.scannerContexteEmplacement);
+        detailProduitPlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
+        Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotManuelReceptionPUIActivity.this, ScannerEmplacementActivity.class);
+        detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
+        return detailProduitPlanDePlacementIntent;
+    }
+
+    @NonNull
+    private Intent getDetailProduitPlanDePlacementIntent() {
+        Bundle detailProduitPlanDePlacementBundle = CreationLotManuelReceptionPUIActivity.super.getBundle();
+        detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un emplacement");
+        detailProduitPlanDePlacementBundle.putInt("scannerContexteInt", R.string.scannerContexteEmplacement);
+        detailProduitPlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
+        Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotManuelReceptionPUIActivity.this, ScannerEmplacementActivity.class);
+        detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
+        return detailProduitPlanDePlacementIntent;
     }
 
     @Override
@@ -430,7 +419,7 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
     }
 
     private void onMenuSaveClick() {
-        if (zoneTextView.getText().toString().trim().equals("") || emplacementTextView.getText().toString().trim().equals("") || lotEditText.getText().toString().trim().equals("") || datePeremptionTextView.getText().toString().trim().equals("")) {
+        if (zoneTextView.getText().toString().trim().isEmpty() || emplacementTextView.getText().toString().trim().isEmpty() || lotEditText.getText().toString().trim().isEmpty() || datePeremptionTextView.getText().toString().trim().isEmpty()) {
             Toast.makeText(CreationLotManuelReceptionPUIActivity.this, "Tous les éléments n'ont pas été saisis.", Toast.LENGTH_SHORT).show();
         } else {
             Bundle onMenuSaveClick_Bundle = CreationLotManuelReceptionPUIActivity.super.getBundle();
@@ -438,21 +427,22 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
             onMenuSaveClick_Bundle.putString("nomEmplacement", emplacementTextView.getText().toString());
             onMenuSaveClick_Bundle.putString("numLot", lotEditText.getText().toString());
             onMenuSaveClick_Bundle.putString("numSerie", numSerieEditText.getText().toString());
-            if(qteActuelleEditText.getText().toString().trim().length()!=0){
+            if(!qteActuelleEditText.getText().toString().trim().isEmpty()){
                 onMenuSaveClick_Bundle.putInt("qteActuelle", Integer.parseInt(qteActuelleEditText.getText().toString().trim()));
             }
 
-            DateFormat dateDecodeur = new SimpleDateFormat("dd/MM/yyyy");
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            @SuppressLint("SimpleDateFormat") DateFormat dateDecodeur = new SimpleDateFormat("dd/MM/yyyy");
+            @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-            Date date = new Date();
+            Date date;
             String dateARetourner = "";
 
             try {
                 date = dateDecodeur.parse(datePeremptionTextView.getText().toString().trim());
+                assert date != null;
                 dateARetourner = dateFormat.format(date);
             } catch (ParseException e) {
-                e.printStackTrace();
+                Log.e("ParseException", Objects.requireNonNull(e.getMessage()));
             }
 
             onMenuSaveClick_Bundle.putString("datePeremption", dateARetourner);
@@ -465,32 +455,31 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
         }
     }
 
-    // Lorsqu'on lance une nouvelle activity avec " startActivityForResult ", action à réaliser à la fin de l'activity lancé suivant le " CodesEchangesActivites " passé
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data != null) {
             switch (requestCode) {
                 case RESULT_ZONE:
-                    int zoneid = data.getExtras().getInt("zoneid");
+                    int zoneid = Objects.requireNonNull(data.getExtras()).getInt("zoneid");
                     if(zoneid != -1)
                     {
-                        zoneSelectionner = gestionnaireZone.getUneZoneByID(db, zoneid);
+                        zoneSelectionner = ZoneOpenHelper.getUneZoneByID(db, zoneid);
                         zoneTextView.setText(zoneSelectionner.getZoneName().trim());
                         emplacementTextView.performClick();
                     }
                     break;
                 case RETOUR_CODE_EMPLACEMENT:
-                    int emplacementid = data.getExtras().getInt("emplacementId");
+                    int emplacementid = Objects.requireNonNull(data.getExtras()).getInt("emplacementId");
                     if(emplacementid != -1)
                     {
-                        emplacementSelectionner = gestionnaireEmplacement.getUnEmplacementByID(db, emplacementid);
+                        emplacementSelectionner = EmplacementOpenHelper.getUnEmplacementByID(db, emplacementid);
                         emplacementTextView.setText(emplacementSelectionner.getAdressage().trim());
                     }
                     break;
 
                 case CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT:
-                    Depot_Emplacement depotEmplacement = gestionnaireEmplacement.getUnEmplacementByID(db, data.getExtras().getInt("emplacementSelectionneID"));
+                    Depot_Emplacement depotEmplacement = EmplacementOpenHelper.getUnEmplacementByID(db, Objects.requireNonNull(data.getExtras()).getInt("emplacementSelectionneID"));
                     String code_emplacement = data.getStringExtra("code");
                     if(code_emplacement != null && !code_emplacement.contentEquals(""))
                     {
@@ -499,12 +488,12 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
                             if (code_emplacement.startsWith("PHITAGPLACE+")) {
                                 String[] tabchaine = code_emplacement.split(":");
                                 code_emplacement = tabchaine[1];
-                                depotEmplacement = gestionnaireEmplacement.getUnEmplacementByID(db, Integer.parseInt(code_emplacement));
+                                depotEmplacement = EmplacementOpenHelper.getUnEmplacementByID(db, Integer.parseInt(code_emplacement));
                             }
                         }
                         if(depotEmplacement != null)
                         {
-                            Depot_Zone depotZone = gestionnaireZone.getUneZoneByID(db, depotEmplacement.getZoneID());
+                            Depot_Zone depotZone = ZoneOpenHelper.getUneZoneByID(db, depotEmplacement.getZoneID());
                             if(depotZone != null){
                                 zoneTextView.setText(depotZone.getZoneName().trim());
                                 emplacementTextView.setText(depotEmplacement.getAdressage().trim());
@@ -522,7 +511,7 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
                     break;
 
                 case RETOUR_LOT:
-                    String code = data.getExtras().getString("code");
+                    String code = Objects.requireNonNull(data.getExtras()).getString("code");
                     String numLot = data.getExtras().getString("numLot");
                     String datePeremptionScanner = data.getExtras().getString("datePeremption");
                     if(code != null)
@@ -579,8 +568,6 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
 
     public void apparitionValider()
     {
-        String qte = qteActuelleEditText.getText().toString();
-
         if(!lotEditText.getText().toString().contentEquals("") && !datePeremptionTextView.getText().toString().contentEquals("") && !qteActuelleEditText.getText().toString().contentEquals("0"))
         {
             validationScan.setVisibility(View.VISIBLE);
@@ -616,7 +603,7 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
 
         TextView datePeremption;
 
-        @TargetApi(Build.VERSION_CODES.N)
+        @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // Use the current date as the default date in the picker
@@ -629,35 +616,28 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
             int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
 
             // Create a new instance of DatePickerDialog and return it
-            return new DatePickerDialog(getActivity(), this, year, month, day);
+            return new DatePickerDialog(requireActivity(), this, year, month, day);
         }
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
-
-            Date dateFournie = null;
             month++;
-
             String mois = "";
             if (month < 10) {
                 mois += "0";
             }
-
             mois += String.valueOf(month);
-
-            String date = String.valueOf(day) + "/" + mois + "/" + String.valueOf(year);
+            String date = day + "/" + mois + "/" + year;
             Date datedate = null;
-            String dateAAfficher = "";
-            DateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
             try {
-                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 datedate = dateFormat.parse(date);
 
             } catch (ParseException e) {
-                e.printStackTrace();
+                Log.e("Parse Exception", Objects.requireNonNull(e.getMessage()));
             }
             datePeremption.setText(date);
             setDatePeremptionColor(datedate);
-            ((CreationLotManuelReceptionPUIActivity) getActivity()).apparitionValider();
+            ((CreationLotManuelReceptionPUIActivity) requireActivity()).apparitionValider();
 
         }
 
@@ -673,11 +653,11 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
                 int delai60jours = -60;
 
                 if (delai >= delai30jours) {
-                    datePeremption.setTextColor(getContext().getResources().getColor(R.color.rouge2));
+                    datePeremption.setTextColor(requireContext().getResources().getColor(R.color.rouge2, null));
                 } else if (delai >= delai60jours) {
-                    datePeremption.setTextColor(getContext().getResources().getColor(R.color.orange2));
+                    datePeremption.setTextColor(requireContext().getResources().getColor(R.color.orange2, null));
                 } else {
-                    datePeremption.setTextColor(getContext().getResources().getColor(R.color.vert));
+                    datePeremption.setTextColor(requireContext().getResources().getColor(R.color.vert, null));
                 }
             } else {
                 datePeremption.setTextColor(Color.BLACK);
@@ -690,11 +670,8 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
     }
 
     public void afficherSnackBar() {
-        Snackbar snackbar = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Mauvais produit scanné</b>", 0), Snackbar.LENGTH_LONG);
-        }
-        ;
+        Snackbar snackbar;
+        snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Mauvais produit scanné</b>", 0), Snackbar.LENGTH_LONG);
 
         @SuppressLint("RestrictedApi") Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
         layout.setBackgroundColor(getResources().getColor(R.color.rouge2, null));

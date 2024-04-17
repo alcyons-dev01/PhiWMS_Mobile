@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.core.view.MenuItemCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,7 +23,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
@@ -36,9 +42,8 @@ import fr.alcyons.phiwms_mobile.ServiceActivity;
 import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 
 /**
- * Created by olivier on 07/12/2017.
+ * Created by olivier on 17/04/2024.
  */
-
 public class ZoneEtEmplacementSelecteurMultipleActivity extends ServiceActivity {
 
     Map<Depot_Zone, List<PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement>> ParentListItems;
@@ -91,7 +96,7 @@ public class ZoneEtEmplacementSelecteurMultipleActivity extends ServiceActivity 
                         }
                     }
 
-                    if (zoneEtEmplacement.getQuantite() > 0 && present == false) {
+                    if (zoneEtEmplacement.getQuantite() > 0 && !present) {
                         lotZoneEtEmplacementList.add(zoneEtEmplacement);
                     }
                 }
@@ -121,13 +126,14 @@ public class ZoneEtEmplacementSelecteurMultipleActivity extends ServiceActivity 
         setContentView(R.layout.activity_zoneetemplacement_selecteur_multiple);
 
 
-        phReliquatReceptionPUIAdapte = (PH_Reliquat_ReceptionPUI_Adapte) intent.getExtras().getSerializable("phReliquatReceptionPUIAdapte");
+        phReliquatReceptionPUIAdapte = (PH_Reliquat_ReceptionPUI_Adapte) Objects.requireNonNull(intent.getExtras()).getSerializable("phReliquatReceptionPUIAdapte");
         lot = (PH_Reliquat_ReceptionPUI_Adapte.Lot) intent.getExtras().getSerializable("lot");
+        assert lot != null;
         lotZoneEtEmplacementList = lot.getZoneEtEmplacementList();
 
 
         //Entete et bas de page
-        phReliquat = gestionnairePH_Reliquat.getPH_ReliquatById(db, intent.getExtras().getInt("phReliquatUIDSelectionne"));
+        phReliquat = PH_ReliquatOpenHelper.getPH_ReliquatById(db, intent.getExtras().getInt("phReliquatUIDSelectionne"));
         ((TextView) findViewById(R.id.designationProduit)).setText(phReliquat.getdesignationCourte());
 
         quantiteReliquat = intent.getExtras().getInt("quantiteReliquat");
@@ -143,7 +149,7 @@ public class ZoneEtEmplacementSelecteurMultipleActivity extends ServiceActivity 
         //on note le nombre d'emplacement disponnible
         Depot depot = gestionnaireDepot.getPUICourant(db);
         depotZoneList = new ArrayList<>();
-        depotZoneList = gestionnaireZone.getZonesEtEmplacementsParDepot(db, depot);
+        depotZoneList = ZoneOpenHelper.getZonesEtEmplacementsParDepot(db, depot);
 
         ParentList = new ArrayList<>();
         ParentListItems = new LinkedHashMap<>();
@@ -154,19 +160,13 @@ public class ZoneEtEmplacementSelecteurMultipleActivity extends ServiceActivity 
         for (Depot_Zone zoneCourant : depotZoneList) {
             ParentList.add(zoneCourant);
 
-            depotEmplacementList = gestionnaireEmplacement.getEmplacementsParZoneID(db, zoneCourant.getZoneID());
+            depotEmplacementList = EmplacementOpenHelper.getEmplacementsParZoneID(db, zoneCourant.getZoneID());
 
             zoneEtEmplacementList = new ArrayList<>();
 
             for (Depot_Emplacement emplacementCourant : depotEmplacementList) {
 
-                PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement zoneEtEmplacementCourant = phReliquatReceptionPUIAdapte.new ZoneEtEmplacement(zoneCourant.getZoneID(), zoneCourant.getZoneName(), emplacementCourant.get_UID(), emplacementCourant.getAdressage(), 0);
-
-                for (PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement zoneEtEmplacement : lotZoneEtEmplacementList) {
-                    if (zoneCourant.getZoneID() == zoneEtEmplacement.getZoneId() && emplacementCourant.get_UID() == zoneEtEmplacement.getEmplacementId()) {
-                        zoneEtEmplacementCourant.setQuantite(zoneEtEmplacement.getQuantite());
-                    }
-                }
+                PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement zoneEtEmplacementCourant = getZoneEtEmplacement(zoneCourant, emplacementCourant);
                 zoneEtEmplacementList.add(zoneEtEmplacementCourant);
             }
 
@@ -178,65 +178,56 @@ public class ZoneEtEmplacementSelecteurMultipleActivity extends ServiceActivity 
         //on note le nombre d'emplacement disponnible
         ((TextView) findViewById(R.id.nbZone)).setText(String.valueOf(nbEmplacement));
 
-
         expandablelistView = (ExpandableListView) findViewById(R.id.expandableListView_Zone);
 
         expListAdapter = new ZonetEtEmplacementExpandableAdapter(this, ParentList, ParentListItems, quantiteLivree, quantiteReliquat);
 
         expandablelistView.setAdapter(expListAdapter);
 
-        expandablelistView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+        expandablelistView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
 
-                final PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement zoneEtEmplacement = (PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement) expListAdapter.getChild(groupPosition, childPosition);
+            final PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement zoneEtEmplacement = (PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement) expListAdapter.getChild(groupPosition, childPosition);
 
-                // Ouvre une boite de dialogue avec un NumberPicker
-                Context context = ZoneEtEmplacementSelecteurMultipleActivity.this;
-                String title = zoneEtEmplacement.getZoneName() + " - " + zoneEtEmplacement.getEmplacementName();
-                String message = "Quantité placée : ";
-                int maxValue = quantiteReliquat;
-                int value = quantiteRestant;
-                if (zoneEtEmplacement.getQuantite() > 0) {
-                    value = zoneEtEmplacement.getQuantite();
-                }
-                DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        int qteAvant = zoneEtEmplacement.getQuantite();
-                        int qteAprès = aNumberPicker.getValue();
-                        int difference = 0;
-
-
-                        if(qteAprès == 0)
-                        {
-                            //quantiteLivree = quantiteLivree - qteAvant;
-                            quantiteRestant = quantiteReliquat + qteAvant;
-                            quantiteReliquat = quantiteReliquat + qteAvant;
-                        }
-                        else
-                        {
-                            quantiteLivree = quantiteLivree + qteAprès;
-                            quantiteRestant = phReliquat.getQteCommande() - quantiteLivree;
-                        }
-
-                        ((TextView) findViewById(R.id.qteReliquat)).setText(String.valueOf(quantiteRestant));
-                        zoneEtEmplacement.setQuantite(qteAprès);
-                        expListAdapter.notifyDataSetChanged();
-                        InputMethodManager imm = (InputMethodManager) ZoneEtEmplacementSelecteurMultipleActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                        dialog.dismiss();
-
-                    }
-                };
-
-                Alerte.afficherAlerteNumberPicker(context, title, message, value, maxValue, onClickListener);
-
-                return false;
+            // Ouvre une boite de dialogue avec un NumberPicker
+            Context context = ZoneEtEmplacementSelecteurMultipleActivity.this;
+            String title = zoneEtEmplacement.getZoneName() + " - " + zoneEtEmplacement.getEmplacementName();
+            String message = "Quantité placée : ";
+            int maxValue = quantiteReliquat;
+            int value = quantiteRestant;
+            if (zoneEtEmplacement.getQuantite() > 0) {
+                value = zoneEtEmplacement.getQuantite();
             }
+            DialogInterface.OnClickListener onClickListener = (dialog, id1) -> {
+                int qteAvant = zoneEtEmplacement.getQuantite();
+                int qteApres = aNumberPicker.getValue();
+
+                if(qteApres == 0)
+                {
+                    quantiteRestant = quantiteReliquat + qteAvant;
+                    quantiteReliquat = quantiteReliquat + qteAvant;
+                }
+                else
+                {
+                    quantiteLivree = quantiteLivree + qteApres;
+                    quantiteRestant = phReliquat.getQteCommande() - quantiteLivree;
+                }
+
+                ((TextView) findViewById(R.id.qteReliquat)).setText(String.valueOf(quantiteRestant));
+                zoneEtEmplacement.setQuantite(qteApres);
+                expListAdapter.notifyDataSetChanged();
+                InputMethodManager imm = (InputMethodManager) ZoneEtEmplacementSelecteurMultipleActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                dialog.dismiss();
+
+            };
+
+            Alerte.afficherAlerteNumberPicker(context, title, message, value, maxValue, onClickListener);
+
+            return false;
         });
 
         // Ouvre les zones sélectionnées précèdent
-        if (ParentList.size() > 0) {
+        if (!ParentList.isEmpty()) {
             for (int i = 0; i < lotZoneEtEmplacementList.size(); i++) {
                 for (int j = 0; j < ParentList.size(); j++) {
                     if (ParentList.get(j).getZoneName().equals(lotZoneEtEmplacementList.get(i).getZoneName())) {
@@ -246,6 +237,18 @@ public class ZoneEtEmplacementSelecteurMultipleActivity extends ServiceActivity 
             }
         }
 
+    }
+
+    @NonNull
+    private PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement getZoneEtEmplacement(Depot_Zone zoneCourant, Depot_Emplacement emplacementCourant) {
+        PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement zoneEtEmplacementCourant = phReliquatReceptionPUIAdapte.new ZoneEtEmplacement(zoneCourant.getZoneID(), zoneCourant.getZoneName(), emplacementCourant.get_UID(), emplacementCourant.getAdressage(), 0);
+
+        for (PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement zoneEtEmplacement : lotZoneEtEmplacementList) {
+            if (zoneCourant.getZoneID() == zoneEtEmplacement.getZoneId() && emplacementCourant.get_UID() == zoneEtEmplacement.getEmplacementId()) {
+                zoneEtEmplacementCourant.setQuantite(zoneEtEmplacement.getQuantite());
+            }
+        }
+        return zoneEtEmplacementCourant;
     }
 
     @Override
@@ -285,16 +288,13 @@ public class ZoneEtEmplacementSelecteurMultipleActivity extends ServiceActivity 
 
             @Override
             public boolean onQueryTextChange(final String newText) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        expListAdapter.filter(newText);
+                runOnUiThread(() -> {
+                    expListAdapter.filter(newText);
 
-                        //display the list
-                        expandablelistView.setAdapter(expListAdapter);
-                        //expand all Groups
-                        expandAll();
-                    }
+                    //display the list
+                    expandablelistView.setAdapter(expListAdapter);
+                    //expand all Groups
+                    expandAll();
                 });
                 return false;
             }
