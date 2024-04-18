@@ -1,6 +1,8 @@
 package fr.alcyons.phiwms_mobile.PreparationPUFetPAD;
 
 
+import static com.google.android.gms.vision.L.TAG;
+
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -65,9 +67,8 @@ import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 /**
- * Created by jessica on 26/09/2017.
+ * Created by olivier on 18/04/2024.
  */
-
 public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity {
     Context context;
     List<PH_Preparation> ph_preparation_List;
@@ -83,7 +84,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_service_preparation);
+        setContentView(R.layout.activity_liste_refresh);
         pm = ServicePreparationPadActivity.this.getPackageManager();
         context = ServicePreparationPadActivity.this;
 
@@ -126,10 +127,9 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
             requestQueue.add(obreq);
             try {
                 Looper.loop();
-            } catch (RuntimeException e) {
-                Log.e("Runtime Exception", Objects.requireNonNull(e.getMessage()));
+            } catch (Throwable e) {
+                Log.e(TAG, "Error Looper :", e);
             }
-
             if(passageParOnCreate)
             {
                 //on récupère la preparation du jeu d'essai si elle existe

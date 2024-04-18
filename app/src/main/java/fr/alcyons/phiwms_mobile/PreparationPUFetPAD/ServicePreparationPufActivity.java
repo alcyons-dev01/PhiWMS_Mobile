@@ -1,5 +1,7 @@
 package fr.alcyons.phiwms_mobile.PreparationPUFetPAD;
 
+import static com.google.android.gms.vision.L.TAG;
+
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -64,7 +66,7 @@ import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 /**
- * Created by jessica on 29/09/2017.
+ * Created by olivier on 18/04/2024.
  */
 
 public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity {
@@ -75,7 +77,6 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
     ListView ph_preparation_ListView;
     PH_Preparation_PreparationAdapter ph_preparation_preparationAdapter;
     boolean connexionDirecte;
-
     List<String> listeDepotLivraison;
     ArrayAdapter<String> spinnerArrayAdapter;
     Spinner spinner;
@@ -125,10 +126,9 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
             requestQueue.add(obreq);
             try {
                 Looper.loop();
-            } catch (RuntimeException e) {
-                Log.e("RuntimeException Looper", Objects.requireNonNull(e.getMessage()));
+            } catch (Throwable e) {
+                Log.e(TAG, "Error Looper :", e);
             }
-            
             if(passageParOnCreate)
             {
                 //on récupère la preparation du jeu d'essai si elle existe
@@ -156,8 +156,9 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
             }
 
             passageParOnCreate = false;
-
-        } else {
+        }
+        else
+        {
             ph_preparation_List = PH_PreparationOpenHelper.getAllPHPreparationPreparationPUF(db);
             ph_preparation_List_base = PH_PreparationOpenHelper.getAllPHPreparationPreparationPUF(db);
 

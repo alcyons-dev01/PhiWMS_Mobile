@@ -202,7 +202,8 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
         commandeList = new ArrayList<>();
 
         //* Code nécessaire afin de réaliser une requête à l' API *//*
-        if (OutilsGestionConnexionReseau.isServerAccessible(ServiceReceptionPuiActivity.this) && passageParOnCreate && !connexionDirecte) {
+        if (OutilsGestionConnexionReseau.isServerAccessible(ServiceReceptionPuiActivity.this) && passageParOnCreate && !connexionDirecte)
+        {
 
             if (!swipeRefreshLayout.isRefreshing()) {
                 mProgressDialog = ProgressDialog.show(ServiceReceptionPuiActivity.this, "Veuillez patienter", "Synchronisation des commandes en cours");
@@ -215,7 +216,6 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
             } catch (Throwable e) {
                 Log.e(TAG, "Error UnsupportedEncodingException :", e);
             }
-
             JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
                     response -> {
                         try {
@@ -301,7 +301,9 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
             invalidateOptionsMenu();
 
             passageParOnCreate = false;
-        } else {
+        }
+        else
+        {
             commandeList = CommandeOpenHelper.getAllCommandesPUI(db, depotPUI.getDepot_Reference());
             if (commandeList.isEmpty()) {
                 if(connexionDirecte)

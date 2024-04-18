@@ -50,6 +50,8 @@ import fr.alcyons.phiwms_mobile.ParametresUtilisateur.ServiceParametreUtilisateu
 //import fr.alcyons.phiwms_mobile.PreparationPUFetPADScannee.ServicePreparationPadScanneeActivity;
 //import fr.alcyons.phiwms_mobile.PreparationPUFetPADScannee.ServicePreparationPufScanneeActivity;
 //import fr.alcyons.phiwms_mobile.Quarantaine.ServiceQuarantaineActivity;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ServicePreparationPadActivity;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ServicePreparationPufActivity;
 import fr.alcyons.phiwms_mobile.Quarantaine.ServiceQuarantaineActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ReceptionPAD.ServiceReceptionPadActivity;
@@ -215,11 +217,11 @@ public class OutilsGestionListeServices {
             case "Commander":
                // return ServicePADActivity.class;
             case "Préparation PAD":
-              //  return ServicePreparationPadActivity.class;
+                return ServicePreparationPadActivity.class;
             case "Préparation PAD Scan":
               //  return ServicePreparationPadScanneeActivity.class;
             case "Préparation UF":
-              //  return ServicePreparationPufActivity.class;
+                return ServicePreparationPufActivity.class;
             case "Préparation UF Scan":
               //  return ServicePreparationPufScanneeActivity.class;
             case "Demande PleinVide":

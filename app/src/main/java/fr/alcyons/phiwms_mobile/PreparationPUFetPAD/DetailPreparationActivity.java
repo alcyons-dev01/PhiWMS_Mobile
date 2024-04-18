@@ -88,7 +88,7 @@ import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 
 /**
- * Created by olivier on 27/06/2019.
+ * Created by olivier on 18/04/2024.
  */
 
 public class DetailPreparationActivity extends ServiceAvecConnexionActivity {

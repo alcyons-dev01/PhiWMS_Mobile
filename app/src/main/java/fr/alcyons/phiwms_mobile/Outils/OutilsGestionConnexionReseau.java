@@ -1,5 +1,6 @@
 package fr.alcyons.phiwms_mobile.Outils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
@@ -126,7 +127,7 @@ public class OutilsGestionConnexionReseau {
 
             String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + "serveur";
 
-            final Handler handler = new Handler() {
+            @SuppressLint("HandlerLeak") final Handler handler = new Handler() {
                 @Override
                 public void handleMessage(Message mesg) {
                     throw new RuntimeException();

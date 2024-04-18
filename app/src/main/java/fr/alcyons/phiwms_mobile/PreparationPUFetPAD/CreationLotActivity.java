@@ -66,6 +66,9 @@ import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RESULT_ZONE
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT;
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LOT;
 
+/**
+ * Created by olivier on 18/04/2024.
+ */
 public class CreationLotActivity extends ServiceActivity {
     Produit produitSelectionne;
     Depot depotSelectionne;
