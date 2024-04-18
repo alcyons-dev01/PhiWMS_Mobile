@@ -82,6 +82,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
     Spinner spinner;
     List<PH_Preparation> ph_preparation_List_base;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +91,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
         context = ServicePreparationPufActivity.this;
 
         // Gestion de la listView
+        ((TextView) findViewById(R.id.titre)).setText("Préparations");
         ph_preparation_ListView = (ListView) findViewById(R.id.listeView);
         ph_preparation_ListView.setOnItemClickListener((parent, view, position, id) -> {
             PH_Preparation ph_preparation_Selectionne = (PH_Preparation) ph_preparation_preparationAdapter.getItem(position);
