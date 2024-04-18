@@ -1,10 +1,8 @@
 package fr.alcyons.phiwms_mobile.Outils;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -35,9 +33,7 @@ import fr.alcyons.phiwms_mobile.DispositifAuLivret.ServiceDispositifAuLivretActi
 import fr.alcyons.phiwms_mobile.IdentificationParScan.ListeProduitsIdentificationParScanActivity;
 //import fr.alcyons.phiwms_mobile.InventaireScanner.ServiceInventaireScannerActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.ServiceAdapter;
-//import fr.alcyons.phiwms_mobile.Livraison.DepotSelecteurLivraison;
 import fr.alcyons.phiwms_mobile.Livraison.ListePointDeLivraison;
-import fr.alcyons.phiwms_mobile.Livraison.ServiceLivraisonActivity;
 import fr.alcyons.phiwms_mobile.MedicamentAuLivret.ServiceMedicamentAuLivretActivity;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 //import fr.alcyons.phiwms_mobile.Notifications.ServiceNotificationsActivity;
@@ -143,7 +139,6 @@ public class OutilsGestionListeServices {
             case "Quarantaine":
                 return ServiceQuarantaineActivity.class;
             case "Verrou Pharmacie Préparation externe":
-                return ServiceVerrouPharmacieActivity.class;
             case "Verrou Pharmacie Préparation Externe":
                 return ServiceVerrouPharmacieActivity.class;
             case "Verrou Pharmacie Préparation interne":
@@ -175,8 +170,6 @@ public class OutilsGestionListeServices {
             case "Réception Scannée":
                 //return ServiceReceptionScanneeActivity.class;
             case "Livraison":
-                //return DepotSelecteurLivraison.class;
-                //return ServiceLivraisonActivity.class;
                 return ListePointDeLivraison.class;
             case "Utiliser":
                // return ServiceUtiliserActivity.class;

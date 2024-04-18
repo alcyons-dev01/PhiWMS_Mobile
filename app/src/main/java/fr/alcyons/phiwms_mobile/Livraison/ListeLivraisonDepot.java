@@ -1,5 +1,7 @@
 package fr.alcyons.phiwms_mobile.Livraison;
 
+import static com.google.android.gms.vision.L.TAG;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -12,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Base64;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -20,12 +23,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
@@ -40,6 +43,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
@@ -71,6 +75,9 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotos;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
+/**
+ * Created by olivier on 18/04/2024.
+ */
 public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static final String[] PERMISSIONS_STORAGE = {
@@ -125,7 +132,7 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
                 {
                     ph_preparation_ligne.setAccepter(false);
                     ph_preparation_ligne.setQte_livrer(0);
-                    gestionnairePH_Preparation_Ligne.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
+                    PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
                 }
             }
             AfficherSignature();
@@ -133,6 +140,7 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
     };
 
     public View.OnClickListener clicboutonPatientAbsent = new View.OnClickListener() {
+        @SuppressLint("SimpleDateFormat")
         @Override
         public void onClick(View v) {
             floatingMenu.close(true);
@@ -158,15 +166,16 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
                         ElementASynchroniserOpenHelper.toutSynchroniser(ListeLivraisonDepot.this, db, utilisateurConnecte, true);
                     }
 
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+                    @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
                     Date dateDuJour = new Date();
-                    String date = dateFormat.format(dateDuJour);
+                    dateFormat.format(dateDuJour);
+                    String date;
                     dateFormat = new SimpleDateFormat("yyyyMMdd");
                     dateDuJour = new Date();
                     date = dateFormat.format(dateDuJour);
 
                     subject = "phiwms_mobile - " + depot.getNom() + " - Livraisons N°" + ph_preparation_Selectionne.getUID() + " Refusé - " + date;
-                    /**TODO : envoyer un mail*/
+
                     body = "Madame, Monsieur, \n \n" +
                             "La livraison N°" + ph_preparation_Selectionne.getUID() + " à destination de " + depot.getNom() + " a été refusé car le patient est absent. \n" +
                             "Ceci est un message automatique merci de ne pas répondre\n\n";
@@ -194,10 +203,10 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_service_livraison_v2);
         context = ListeLivraisonDepot.this;
-        floatingMenu = (FloatingActionMenu) findViewById(R.id.floatingMenu);
-        boutonSignatureLivreur = (FloatingActionButton) findViewById(R.id.boutonSignatureLivreur);
-        boutonPatientAbsent = (FloatingActionButton) findViewById(R.id.boutonPatientAbsent);
-        boutonToutRefuser = (FloatingActionButton) findViewById(R.id.boutonToutRefuser);
+        floatingMenu = findViewById(R.id.floatingMenu);
+        boutonSignatureLivreur = findViewById(R.id.boutonSignatureLivreur);
+        boutonPatientAbsent = findViewById(R.id.boutonPatientAbsent);
+        boutonToutRefuser = findViewById(R.id.boutonToutRefuser);
 
         boutonSignatureLivreur.setOnClickListener(clicboutonSignerLivreur);
 
@@ -214,17 +223,15 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
         listeDepotLivraison = new ArrayList<>();
         listeDepotLivraison.add("Tous");
         //Gestion de la listView
-        ph_preparation_ListView = (ListView) findViewById(R.id.listeView);
-        ph_preparation_ListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                PH_Preparation ph_preparation_Selectionne = (PH_Preparation) ph_preparation_livraisonAdapter.getItem(position);
-                Intent serviceLivraison_Intent = new Intent(ListeLivraisonDepot.this, InformationLivraisonActivity.class);
-                Bundle serviceLivraison_Bundle = ListeLivraisonDepot.super.getBundle();
-                serviceLivraison_Bundle.putInt("ph_preparationUID_Selectionne", ph_preparation_Selectionne.getUID());
-                serviceLivraison_Intent.putExtras(serviceLivraison_Bundle);
-                ListeLivraisonDepot.this.startActivity(serviceLivraison_Intent);
-            }
+        ph_preparation_ListView = findViewById(R.id.listeView);
+        ph_preparation_ListView.setOnItemClickListener((parent, view, position, id) -> {
+            PH_Preparation ph_preparation_Selectionne = (PH_Preparation) ph_preparation_livraisonAdapter.getItem(position);
+            Intent serviceLivraison_Intent = new Intent(ListeLivraisonDepot.this, InformationLivraisonActivity.class);
+            Bundle serviceLivraison_Bundle = ListeLivraisonDepot.super.getBundle();
+            assert ph_preparation_Selectionne != null;
+            serviceLivraison_Bundle.putInt("ph_preparationUID_Selectionne", ph_preparation_Selectionne.getUID());
+            serviceLivraison_Intent.putExtras(serviceLivraison_Bundle);
+            ListeLivraisonDepot.this.startActivity(serviceLivraison_Intent);
         });
 
         connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(db);
@@ -247,19 +254,14 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
             ((TextView) findViewById(R.id.titre)).setText(depot.getNom());
         else
             ((TextView) findViewById(R.id.titre)).setText("");
-
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem item = menu.findItem(R.id.menuDatamatrix);
-        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                lancerScan();
-                return true;
-            }
+        item.setOnMenuItemClickListener(item1 -> {
+            lancerScan();
+            return true;
         });
 
         return true;
@@ -275,40 +277,28 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
         return true;
     }
 
-    public void toutValider()
-    {
-        afficherAlerteValidationAllLivraison(ListeLivraisonDepot.this, ListeLivraisonDepot.this.getLayoutInflater());
-    }
-
+    @SuppressLint("SetTextI18n")
     public void afficherAlerteValidationAllLivraison(Context context, LayoutInflater inflater)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         View layout = inflater.inflate(R.layout.alerte_confirmation_validation, null);
 
-        LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
-        LinearLayout buttonAnnuler = (LinearLayout) layout.findViewById(R.id.buttonAnnuler);
-        TextView textDialog = (TextView) layout.findViewById(R.id.messageFin);
+        LinearLayout zoneok = layout.findViewById(R.id.buttonOk);
+        LinearLayout buttonAnnuler = layout.findViewById(R.id.buttonAnnuler);
+        TextView textDialog = layout.findViewById(R.id.messageFin);
         textDialog.setText("Souhaitez-validez toutes les livraisons ?");
         builder.setView(layout);
 
         final AlertDialog alertDialog = builder.create();
-        alertDialog.getWindow().setGravity(Gravity.CENTER);
+        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
         alertDialog.show();
 
-        zoneok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AfficherSignature();
-                alertDialog.dismiss();
-            }
+        zoneok.setOnClickListener(v -> {
+            AfficherSignature();
+            alertDialog.dismiss();
         });
 
-        buttonAnnuler.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
+        buttonAnnuler.setOnClickListener(v -> alertDialog.dismiss());
     }
 
     public void AfficherSignature()
@@ -318,25 +308,26 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
     }
 
     public View.OnClickListener clicValidationSignatureAllLivraison = new View.OnClickListener() {
+        @SuppressLint("SimpleDateFormat")
         @Override
         public void onClick(View v) {
 
             // Création du pdf
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
             Date dateDuJour = new Date();
-            String date = dateFormat.format(dateDuJour);
+            dateFormat.format(dateDuJour);
+            String date;
             dateFormat = new SimpleDateFormat("yyyyMMdd");
             dateDuJour = new Date();
             date = dateFormat.format(dateDuJour);
 
             for(PH_Preparation ph_preparation_courant : ph_preparation_List)
             {
-                filename = String.valueOf(ph_preparation_courant.getUID()) + "_" + date + "_Livraison.pdf";
-                signatureNameChauffeur = String.valueOf(ph_preparation_courant.getUID()) + "_" + date + "_LivraisonSignature";
+                filename = ph_preparation_courant.getUID() + "_" + date + "_Livraison.pdf";
+                signatureNameChauffeur = ph_preparation_courant.getUID() + "_" + date + "_LivraisonSignature";
 
                 //Sauvegarde de la signature dans une image
                 verifyStoragePermissions(ListeLivraisonDepot.this);
-                String content = "";
                 Bitmap bitmap = dialogue.signaturePad.getSignatureBitmap();
                 OutilsGestionPhotos.saveExternalStorageImageJPEG(ListeLivraisonDepot.this, bitmap, signatureNameChauffeur);
 
@@ -358,12 +349,13 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
     };
 
     View.OnClickListener onClickListenerValiderAllLivraison = new View.OnClickListener() {
+        @SuppressLint("SimpleDateFormat")
         @Override
         public void onClick(View v) {
             alertePatientezDialog = new Dialog(ListeLivraisonDepot.this);
             alertePatientezDialog.setContentView(R.layout.alerte_patientez);
             alertePatientezDialog.setCancelable(false);
-            WindowManager.LayoutParams layoutParams = alertePatientezDialog.getWindow().getAttributes();
+            WindowManager.LayoutParams layoutParams = Objects.requireNonNull(alertePatientezDialog.getWindow()).getAttributes();
             layoutParams.gravity = Gravity.CENTER;
             if (!alertePatientezDialog.isShowing()) {
                 alertePatientezDialog.show();
@@ -374,7 +366,7 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
                 if (!commentaireSaisie.contentEquals("")) {
                     ph_preparation_Selectionne.setCommentaires(commentaireSaisie);
                 }
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date dateDuJour = new Date();
                 String date = dateFormat.format(dateDuJour);
                 ph_preparation_Selectionne.setLivraisonDate(date);
@@ -393,7 +385,7 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
                 int actionId = random.nextInt();
                 if (actionId > 0)
                     actionId = actionId * -1;
-                SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 Date dateDestruction = new Date();
                 String date_string = parseFormat.format(dateDestruction);
                 new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), Integer.parseInt(ParametresServeurOpenHelper.getPortServeur(db)), "En attente", ph_preparation_Selectionne.getUID(), "", "Livraison");
@@ -405,22 +397,10 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
                 for (PH_Preparation_Ligne preparation_ligne_courant : ph_preparation_ligne_List) {
                     PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, preparation_ligne_courant);
                     ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, preparation_ligne_courant.getPhiMR4UUID(), preparation_ligne_courant.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
-
-                    //gestion des actions lignes
-                    Random randomactionligne = new Random();
-                    int actionligneId = randomactionligne.nextInt();
-                    if (actionligneId > 0)
-                        actionligneId = actionligneId * -1;
-
-                    ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.getId(), "Ph_Preparation_Ligne", preparation_ligne_courant.get_UID(), "", 0, (int) preparation_ligne_courant.getQte_livrer(), preparation_ligne_courant.getProduitDesignation());
+                    ActionUtilisateur_Ligne actionUtilisateur_ligne = getActionUtilisateurLigne(preparation_ligne_courant);
                     ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne);
                 }
 
-                /**
-                 * TODO : une boucle PDF
-                 * Répertoire partage sur le serveur, envoyer le PDF dessus
-                 * Envoyer le mail depuis le serveur
-                 */
                 //Construction mail
                 Depot depot = DepotOpenHelper.getDepotParID(db, ph_preparation_Selectionne.getDepotDestinataireID());
                 String commentaire = ph_preparation_Selectionne.getCommentaires();
@@ -442,7 +422,7 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
                     dateDuJour = new Date();
                     date = dateFormat.format(dateDuJour);
 
-                    photoLivraisonPhotoName = String.valueOf(ph_preparation_Selectionne.getUID()) + "_" + date + "_LivraisonPhoto";
+                    photoLivraisonPhotoName = ph_preparation_Selectionne.getUID() + "_" + date + "_LivraisonPhoto";
 
                     verifyStoragePermissions(ListeLivraisonDepot.this);
                 }
@@ -475,9 +455,9 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
                     OutilsGestionPDF outilsGestionPDF = new OutilsGestionPDF(true);
                     outilsGestionPDF.createLivraisonV2(ListeLivraisonDepot.this, filename, signatureNameChauffeur, db, ph_preparation_Selectionne);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "IOException :", e);
                 } catch (DocumentException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "DocumentException :", e);
                 }
 
                 // Récupération Mail Pharmacie
@@ -504,6 +484,17 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
         }
     };
 
+    @NonNull
+    private ActionUtilisateur_Ligne getActionUtilisateurLigne(PH_Preparation_Ligne preparation_ligne_courant) {
+        Random randomactionligne = new Random();
+        int actionligneId = randomactionligne.nextInt();
+        if (actionligneId > 0)
+            actionligneId = actionligneId * -1;
+
+        return new ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.getId(), "Ph_Preparation_Ligne", preparation_ligne_courant.get_UID(), "", 0, preparation_ligne_courant.getQte_livrer(), preparation_ligne_courant.getProduitDesignation());
+    }
+
+    @SuppressLint("StaticFieldLeak")
     private class SendEmailTask extends AsyncTask<String, Object, Object> {
 
         @Override
@@ -524,7 +515,7 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
                     sender.sendMailPDFAndPhoto(subject, body, "Documents/"+filename, "Documents/"+photoLivraisonPhotoName + ".jpeg");
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "Exception :", e);
             }
             return "executed";
         }
@@ -532,7 +523,7 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
 
     public void mettreAJourPhPreparation(PH_Preparation ph_preparation) {
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date dateDuJour = new Date();
         String date = dateFormat.format(dateDuJour);
 
@@ -548,7 +539,7 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
 
         // Ajout du PH_Preparation au ElementASynchroniser
         ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation.getPhiMR4UUID(), ph_preparation.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
-        gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
 
         // Tentative de lancer la sychronisation
         if (OutilsGestionConnexionReseau.isServerAccessible(ListeLivraisonDepot.this)) {
@@ -561,7 +552,7 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
         Bundle scanDocumentBundle = ListeLivraisonDepot.super.getBundle();
         scanDocumentBundle.putString("contexte", String.valueOf(R.string.scannerContexteDocument));
         scanDocumentBundle.putBoolean("isBoutonSuppressionExistant", true);
-        Intent scanDocumentIntent = null;
+        Intent scanDocumentIntent;
         if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
         {
             scanDocumentIntent = new Intent(ListeLivraisonDepot.this, ScannerDocumentActivity.class);
@@ -570,7 +561,7 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
         }
         else
         {
-            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
+            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
             {
                 scanDocumentIntent = new Intent(ListeLivraisonDepot.this, BarcodeCaptureActivity.class);
                 scanDocumentBundle.putBoolean("modeRafale", false);
@@ -590,54 +581,45 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case CodesEchangesActivites.RETOUR_DOCUMENT: {
-                if (data != null) {
-                    String code_recu = data.getExtras().getString("code");
-                    if (code_recu != null) {
-                        String code ="";
-                        if(code_recu.startsWith("DDS"))
-                        {
-                            code = code_recu.substring(3);
-                        }
-                        int idPreparation = 0;
-                        try {
-                            idPreparation = Integer.parseInt(code);
-                        } catch (NumberFormatException e) {
-                            idPreparation = 0;
-                        }
-                        PH_Preparation ph_preparation_Selectionne = PH_PreparationOpenHelper.getPH_PreparationByID(db, idPreparation);
-                        if(ph_preparation_Selectionne != null)
-                        {
-                            Intent serviceLivraison_Intent = new Intent(ListeLivraisonDepot.this, ListeLivraisonDepot.class);
-                            Bundle serviceLivraison_Bundle = ListeLivraisonDepot.super.getBundle();
-                            serviceLivraison_Bundle.putInt("ph_preparationUID_Selectionne", ph_preparation_Selectionne.getUID());
-                            serviceLivraison_Intent.putExtras(serviceLivraison_Bundle);
-                            ListeLivraisonDepot.this.startActivity(serviceLivraison_Intent);
-                            ListeLivraisonDepot.this.finish();
+        if (requestCode == CodesEchangesActivites.RETOUR_DOCUMENT) {
+            if (data != null) {
+                String code_recu = Objects.requireNonNull(data.getExtras()).getString("code");
+                if (code_recu != null) {
+                    String code = "";
+                    if (code_recu.startsWith("DDS")) {
+                        code = code_recu.substring(3);
+                    }
+                    int idPreparation = 0;
+                    try {
+                        idPreparation = Integer.parseInt(code);
+                    } catch (NumberFormatException ignored) {
+                    }
+                    PH_Preparation ph_preparation_Selectionne = PH_PreparationOpenHelper.getPH_PreparationByID(db, idPreparation);
+                    if (ph_preparation_Selectionne != null) {
+                        Intent serviceLivraison_Intent = new Intent(ListeLivraisonDepot.this, ListeLivraisonDepot.class);
+                        Bundle serviceLivraison_Bundle = ListeLivraisonDepot.super.getBundle();
+                        serviceLivraison_Bundle.putInt("ph_preparationUID_Selectionne", ph_preparation_Selectionne.getUID());
+                        serviceLivraison_Intent.putExtras(serviceLivraison_Bundle);
+                        ListeLivraisonDepot.this.startActivity(serviceLivraison_Intent);
+                        ListeLivraisonDepot.this.finish();
 
-                            invalidateOptionsMenu();
-                        }
-                        else
-                        {
-                            if(code_recu.startsWith("DDS"))
-                            {
-                                afficherSnackBarLivraison();
-                            }
+                        invalidateOptionsMenu();
+                    } else {
+                        if (code_recu.startsWith("DDS")) {
+                            afficherSnackBarLivraison();
                         }
                     }
                 }
-                break;
             }
         }
     }
 
     public void afficherSnackBarLivraison() {
-        Snackbar snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Document scanné inconnu</b>", 0), Snackbar.LENGTH_LONG);;
+        Snackbar snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Document scanné inconnu</b>", 0), Snackbar.LENGTH_LONG);
 
         @SuppressLint("RestrictedApi") Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
         layout.setBackgroundColor(getResources().getColor(R.color.rouge2, null));
-        TextView textView = (TextView) layout.findViewById(com.google.android.material.R.id.snackbar_text);
+        TextView textView = layout.findViewById(com.google.android.material.R.id.snackbar_text);
         textView.setTextSize(TypedValue.TYPE_STRING, 8);
         snackbar.show();
     }

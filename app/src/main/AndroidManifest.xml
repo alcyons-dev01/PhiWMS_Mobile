@@ -211,6 +211,25 @@
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
 
+    <!-- Livraison -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.Livraison.ListePointDeLivraison"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.Livraison.ListeLivraisonDepot"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.Livraison.InformationLivraisonActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
     <!-- Barcode Activity -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity"
