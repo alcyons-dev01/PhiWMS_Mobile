@@ -1,6 +1,7 @@
 package fr.alcyons.phiwms_mobile.PreparationPUFetPAD;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,8 +12,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
 import android.util.Log;
@@ -23,16 +22,22 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.github.clans.fab.FloatingActionButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,6 +48,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -60,7 +66,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
@@ -71,7 +76,6 @@ import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_Preparation_Adapte;
-import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.AlertePreparationAdapter;
@@ -88,11 +92,10 @@ import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 
 /**
- * Created by olivier on 18/04/2024.
+ * Created by olivier on 27/06/2019.
  */
 
 public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
-
     public PH_Preparation ph_preparation_Selectionne;
     Serialisation serialisation;
     PH_Preparation_Ligne_Preparation_Adapte ph_preparationLigneAdapteRetourListeLot;
@@ -124,6 +127,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         int nbLigneSansValeur = 0;
         List<String> produitNonRenseigne = new ArrayList<>();
 
+        // On vérifie que toutes les ph_preparations_lignes ont une quantité pour au moins un lot
         for (PH_Preparation_Ligne_Preparation_Adapte ph_preparationLigneAdapte : ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes) {
             int nbLignesAvecValeur = 0;
 
@@ -156,9 +160,13 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_preparation_modifiable);
 
+        //gestion du package manager
         pm = DetailPreparationActivity.this.getPackageManager();
+
         //gestion date début
         Chronometer.LancementChrono();
+        //Gestion spinner
+        //initi du tri
         tri_choisi = ParametreUtilisateurOpenHelper.getChoixTriPreparation(db);
         if(tri_choisi == null)
         {
@@ -175,9 +183,10 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         utilisation_scan = false;
         serialisation = new Serialisation(DetailPreparationActivity.this, db, utilisateurConnecte);
         listeGTIN = new ArrayList<>();
+        // Affichage des informations de base
         Depot depot = DepotOpenHelper.getDepotParReference(db, ph_preparation_Selectionne.getDepotDestinataireReference());
 
-        String intitule = "#" + ph_preparation_Selectionne.getUID();
+        String intitule = "#" + String.valueOf(ph_preparation_Selectionne.getUID());
         ((TextView) findViewById(R.id.intitule)).setText(intitule);
 
         String textDepot = depot.getNom();
@@ -198,7 +207,6 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         phPreparationLignePreparationAdapte_List = new ArrayList<>();
 
         nbLotPreparer = 0;
-
         phPreparationLignes.sort((o1, o2) -> Double.compare(o2.getProduitPoids(), o1.getProduitPoids()));
 
         phPreparationLigne_ListView.setOnItemClickListener((parent, view, position, id) -> {
@@ -220,12 +228,14 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
 
             DetailPreparationActivity.this.startActivityForResult(detailPreparation_Intent, CodesEchangesActivites.RETOUR_LISTE_LOTS);
         });
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
+        /* Code nécessaire afin de réaliser une requête à l' API */
         if(!ph_preparation_Selectionne.getListe().contentEquals("ALCYONS_LISTE"))
         {
             if (OutilsGestionConnexionReseau.isServerAccessible(DetailPreparationActivity.this) && passageParOnCreate)
@@ -238,18 +248,81 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                 RequestQueue requestQueue = Volley.newRequestQueue(DetailPreparationActivity.this);
                 String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequetePreparationDetail+ph_preparation_Selectionne.getUID();
 
-                JsonObjectRequest obreq = getJsonObjectRequest(urlRequete);
+                JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,null,
+                        new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                try {
+                                    int nbResultat = response.getInt("resultCount");
+                                    if (nbResultat == 0) {
+                                        String erreur = response.getString("erreur");
+                                        if (erreur.equals(context.getString(R.string.tokenInvalide))) {
+                                            Alerte.afficherAlerte(context, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter.", "alerte");
+                                        } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
+                                            Alerte.afficherAlerte(context, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", "alerte");;
+                                        } else if (!erreur.contentEquals("Aucun PH_Preparation trouvé")) {
+                                            Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Aucune ligne trouvée", "alerte");
+                                        }
+                                    } else {
+                                        JSONArray ph_preparationLigne_JSONArray = response.getJSONArray("PH_Preparation_Ligne");
+                                        for (int k = 0; k < ph_preparationLigne_JSONArray.length(); k++) {
+                                            JSONObject ph_preparationLigne_JSONObject = ph_preparationLigne_JSONArray.getJSONObject(k);
+                                            JSONArray phStockLotEmplacement_JSONArray = ph_preparationLigne_JSONObject.getJSONArray("ph_stock_lot_emplacements");
+
+                                            for (int y = 0; y < phStockLotEmplacement_JSONArray.length(); y++) {
+                                                Stock_Lot_Emplacement_Light stock_lot_emplacement_light = new Stock_Lot_Emplacement_Light(phStockLotEmplacement_JSONArray.getJSONObject(y));
+                                                Stock_Lot_Emplacement_Light stock_lot_emplacement_bdd = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, stock_lot_emplacement_light.get_UID());
+
+                                                if (stock_lot_emplacement_bdd == null) {
+                                                    if (stock_lot_emplacement_light.getQte() > 0) {
+                                                        Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, stock_lot_emplacement_light);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if(stock_lot_emplacement_bdd.getQte() != stock_lot_emplacement_light.getQte())
+                                                    {
+                                                        Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_lot_emplacement_light);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                handler.sendMessage(handler.obtainMessage());
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Log.e("Volley", "Error");
+                                Alerte.afficherAlerte(DetailPreparationActivity.this, "Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Préparation PAD)", "alerte");
+                            }
+                        }
+                ) {
+                    @Override
+                    public Map<String, String> getHeaders() {
+                        HashMap<String, String> headers = new HashMap<>();
+                        headers.put("Authorization", utilisateurConnecte.getToken());
+                        return headers;
+                    }
+                };
+                obreq.setRetryPolicy(retryPolicy);
                 requestQueue.add(obreq);
                 try {
                     Looper.loop();
                 } catch (RuntimeException e) {
-                    Log.e("Runtime Exception", Objects.requireNonNull(e.getMessage()));
+                    e.printStackTrace();
                 }
 
                 phPreparationLignePreparationAdapte_List = new ArrayList<>();
                 for (PH_Preparation_Ligne phPrepLigne : phPreparationLignes) {
 
                     if ((phPrepLigne.getQte_APreparer() > 0 || phPrepLigne.getQte_Demander() == phPrepLigne.getQte_preparer()) && phPrepLigne.getQte_APreparer() != 0) {
+                        List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte> lotAdaptes = null;
+
                         PH_Preparation_Ligne_Preparation_Adapte ph_preparationLigneAdapte = new PH_Preparation_Ligne_Preparation_Adapte(phPrepLigne.get_UID());
                         Produit produit = ProduitOpenHelper.getProduitByID(db, phPrepLigne.getProduitID());
                         if(produit != null)
@@ -286,6 +359,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                         }
                     }
                 }
+
                 passageParOnCreate = false;
             }
         }
@@ -304,67 +378,6 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                 onTriParPoids();
                 break;
         }
-    }
-
-    @NonNull
-    private JsonObjectRequest getJsonObjectRequest(String urlRequete) {
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
-                response -> {
-                    try {
-                        int nbResultat = response.getInt("resultCount");
-                        if (nbResultat == 0) {
-                            String erreur = response.getString("erreur");
-                            if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerte(context, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter.", "alerte");
-                            } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
-                                Alerte.afficherAlerte(context, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", "alerte");
-                            } else if (!erreur.contentEquals("Aucun PH_Preparation trouvé")) {
-                                Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Aucune ligne trouvée", "alerte");
-                            }
-                        } else {
-                            JSONArray ph_preparationLigne_JSONArray = response.getJSONArray("PH_Preparation_Ligne");
-                            for (int k = 0; k < ph_preparationLigne_JSONArray.length(); k++) {
-                                JSONObject ph_preparationLigne_JSONObject = ph_preparationLigne_JSONArray.getJSONObject(k);
-                                JSONArray phStockLotEmplacement_JSONArray = ph_preparationLigne_JSONObject.getJSONArray("ph_stock_lot_emplacements");
-
-                                for (int y = 0; y < phStockLotEmplacement_JSONArray.length(); y++) {
-                                    Stock_Lot_Emplacement_Light stock_lot_emplacement_light = new Stock_Lot_Emplacement_Light(phStockLotEmplacement_JSONArray.getJSONObject(y));
-                                    Stock_Lot_Emplacement_Light stock_lot_emplacement_bdd = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, stock_lot_emplacement_light.get_UID());
-
-                                    if (stock_lot_emplacement_bdd == null) {
-                                        if (stock_lot_emplacement_light.getQte() > 0) {
-                                            Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, stock_lot_emplacement_light);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if(stock_lot_emplacement_bdd.getQte() != stock_lot_emplacement_light.getQte())
-                                        {
-                                            Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_lot_emplacement_light);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } catch (JSONException e) {
-                        Log.e("JSON Exception", Objects.requireNonNull(e.getMessage()));
-                    }
-                    handler.sendMessage(handler.obtainMessage());
-                },
-                error -> {
-                    Log.e("Volley", "Error");
-                    Alerte.afficherAlerte(DetailPreparationActivity.this, "Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Préparation PAD)", "alerte");
-                }
-        ) {
-            @Override
-            public Map<String, String> getHeaders() {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", utilisateurConnecte.getToken());
-                return headers;
-            }
-        };
-        obreq.setRetryPolicy(retryPolicy);
-        return obreq;
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -388,7 +401,21 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
 
                     if(ph_preparationLigneAdapteRetourListeLot != null)
                     {
+                        int quantiteAvant = 0;
+                        for (PH_Preparation_Ligne_Preparation_Adapte.LotAdapte lotAdapte : ph_preparationLigneAdapteRetourListeLot.getLotAdaptes()) {
+                            if (lotAdapte.getQteSaisie() > 0) {
+                                quantiteAvant++;
+                            }
+                        }
+
                         ph_preparationLigneAdapteRetourListeLot.setLotAdaptes((List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte>) data.getExtras().getSerializable("lotAdaptes"));
+
+                        int quantiteApres = 0;
+                        for (PH_Preparation_Ligne_Preparation_Adapte.LotAdapte lotAdapte : ph_preparationLigneAdapteRetourListeLot.getLotAdaptes()) {
+                            if (lotAdapte.getQteSaisie() > 0) {
+                                quantiteApres++;
+                            }
+                        }
                     }
 
                     if(ph_preparation_ligne_preparationLotAdapter != null)
@@ -400,9 +427,8 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                 case CodesEchangesActivites.RETOUR_CODE_GS1: {
                     if (resultCode == DetailPreparationActivity.RESULT_OK) {
                         String code = data.getStringExtra("code");
-                        assert code != null;
                         Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(code);
-                        List<Produit> produit_List;
+                        List<Produit> produit_List = new ArrayList<>();
 
                         if (!gs1Decoupe.isEmpty()) {
                             String codeGtin = gs1Decoupe.get(OutilsDecodage.codeGtin);
@@ -431,7 +457,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                                 gtin = gtin.substring(2);
                             }
                             String peremption = "";
-                            Date peremption_temp;
+                            Date peremption_temp = null;
                             @SuppressLint("SimpleDateFormat") SimpleDateFormat input = new SimpleDateFormat("yyyy-MM-dd");
                             @SuppressLint("SimpleDateFormat") SimpleDateFormat output = new SimpleDateFormat("yyMMdd");
                             try {
@@ -440,18 +466,10 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                                 assert peremption_temp != null;
                                 peremption = output.format(peremption_temp);    // format output
                             } catch (ParseException e) {
-                                Log.e("Parse Exception", Objects.requireNonNull(e.getMessage()));
+                                e.printStackTrace();
                             }
                             long uid = Serialisation.Serialisation_Verifier(utilisateurConnecte.getId(), false, false, gtin, "GTIN", numeroLot, peremption, numeroSerie, "Vérification", gtin, "", "");
-                            PH_Serialisation ph_serialisation = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int) uid);
-                            if(ph_serialisation != null)
-                            {
-                                if(ph_serialisation.getResultat().contentEquals("ERREUR") || ph_serialisation.getResultat().contentEquals("INACTIVE"))
-                                {
-                                    Alerte.afficherAlerte(DetailPreparationActivity.this, "Erreur", "Le produit scanné est déjà inactif", "alerte" );
-                                    break;
-                                }
-                            }
+
 
                             produit_List = ProduitOpenHelper.getMedicamentsParGTIN(db, codeGtin);
                             if (produit_List.size() == 1) {
@@ -662,7 +680,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         else
         {
             //gestion du zebra
-            if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
             {
                 detailPreparation_Intent = new Intent(DetailPreparationActivity.this, ScannerPreparationActivity.class);
             }
@@ -679,51 +697,58 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
             else
             {
                 //boolean plan_De_Cueillette = gestionnaireParametresServeur.getPlanDeCueilletteActif(db);
-                nbLotPreparer = 0;
-                List<PH_Preparation_Ligne_Preparation_Adapte>listemp = phPreparationLignePreparationAdapte_List;
-                phPreparationLignePreparationAdapte_List = new ArrayList<>();
-                for(PH_Preparation_Ligne_Preparation_Adapte ph_preparationLigneAdapte : listemp)
+                boolean plan_De_Cueillette = true;
+                if(plan_De_Cueillette)
                 {
-                    PH_Preparation_Ligne phPrepLigne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, ph_preparationLigneAdapte.getPh_preparationLigneID());
-                    Produit produit = ProduitOpenHelper.getProduitByID(db, phPrepLigne.getProduitID());
-
-                    listeGTIN.add(produit.getGTIN());
-                    Depot depotOrigine = DepotOpenHelper.getDepotParReference(db, ph_preparation_Selectionne.getDepotOrigineReference());
-                    List<Stock_Lot_Emplacement_Light> stock_lot_emplacement_lightList = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depotOrigine);
-
-                    stock_lot_emplacement_lightList.sort(Comparator.comparing(Stock_Lot_Emplacement_Light::getLot));
-                    stock_lot_emplacement_lightList.sort(Comparator.comparing(Stock_Lot_Emplacement_Light::getPeremptionDate));
-
-                    double qteDemander = phPrepLigne.getQte_Demander();
-                    double qtePreparer;
-                    boolean lotAssigne = false;
-                    List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte> nouvelleListe = new ArrayList<>();
-                    ph_preparationLigneAdapte.setLotAdaptes(nouvelleListe);
-                    if(!phPrepLigne.isSuivi_Par_Serie())
+                    nbLotPreparer = 0;
+                    List<PH_Preparation_Ligne_Preparation_Adapte>listemp = phPreparationLignePreparationAdapte_List;
+                    phPreparationLignePreparationAdapte_List = new ArrayList<>();
+                    for(PH_Preparation_Ligne_Preparation_Adapte ph_preparationLigneAdapte : listemp)
                     {
-                        for (Stock_Lot_Emplacement_Light stockLotEmplacement : stock_lot_emplacement_lightList) {
-                            if (stockLotEmplacement.getQte() > 0) {
-                                if (!lotAssigne) {
-                                    if (qteDemander > 0) {
-                                        nbLotPreparer++;
+                        List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte> lotAdaptes = null;
+
+                        PH_Preparation_Ligne phPrepLigne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, ph_preparationLigneAdapte.getPh_preparationLigneID());
+                        Produit produit = ProduitOpenHelper.getProduitByID(db, phPrepLigne.getProduitID());
+
+                        listeGTIN.add(produit.getGTIN());
+                        Depot depotOrigine = DepotOpenHelper.getDepotParReference(db, ph_preparation_Selectionne.getDepotOrigineReference());
+                        List<Stock_Lot_Emplacement_Light> stock_lot_emplacement_lightList = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depotOrigine);
+
+                        stock_lot_emplacement_lightList.sort(Comparator.comparing(Stock_Lot_Emplacement_Light::getLot));
+                        stock_lot_emplacement_lightList.sort(Comparator.comparing(Stock_Lot_Emplacement_Light::getPeremptionDate));
+
+                        double qteDemander = phPrepLigne.getQte_Demander();
+                        double qtePreparer;
+                        boolean lotAssigne = false;
+                        List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte> nouvelleListe = new ArrayList<>();
+                        ph_preparationLigneAdapte.setLotAdaptes(nouvelleListe);
+                        if(!phPrepLigne.isSuivi_Par_Serie())
+                        {
+
+                            for (Stock_Lot_Emplacement_Light stockLotEmplacement : stock_lot_emplacement_lightList) {
+                                if (stockLotEmplacement.getQte() > 0) {
+                                    if (!lotAssigne) {
+                                        if (qteDemander > 0) {
+                                            nbLotPreparer++;
+                                        }
+                                        if (stockLotEmplacement.getQte() < qteDemander) {
+                                            qteDemander = qteDemander - stockLotEmplacement.getQte();
+                                            qtePreparer = stockLotEmplacement.getQte();
+                                        } else {
+                                            lotAssigne = true;
+                                            qtePreparer = qteDemander;
+                                        }
+                                        stockLotEmplacement.setQte_Preparer((int) qtePreparer);
                                     }
-                                    if (stockLotEmplacement.getQte() < qteDemander) {
-                                        qteDemander = qteDemander - stockLotEmplacement.getQte();
-                                        qtePreparer = stockLotEmplacement.getQte();
-                                    } else {
-                                        lotAssigne = true;
-                                        qtePreparer = qteDemander;
-                                    }
-                                    stockLotEmplacement.setQte_Preparer((int) qtePreparer);
+                                    ph_preparationLigneAdapte.getLotAdaptes().add(ph_preparationLigneAdapte.new LotAdapte(stockLotEmplacement));
                                 }
-                                ph_preparationLigneAdapte.getLotAdaptes().add(ph_preparationLigneAdapte.new LotAdapte(stockLotEmplacement));
                             }
                         }
+                        phPreparationLignePreparationAdapte_List.add(ph_preparationLigneAdapte);
                     }
-                    phPreparationLignePreparationAdapte_List.add(ph_preparationLigneAdapte);
-                }
 
-                detailPreparation_Bundle.putSerializable("listedejascanne", (Serializable) phPreparationLignePreparationAdapte_List);
+                    detailPreparation_Bundle.putSerializable("listedejascanne", (Serializable) phPreparationLignePreparationAdapte_List);
+                }
             }
             detailPreparation_Bundle.putSerializable("lotAdapteList", (Serializable) phPreparationLignePreparationAdapte_List);
             detailPreparation_Bundle.putString("Designation", ph_preparation_Selectionne.getListe());
@@ -743,17 +768,19 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
     public void onBackPressed() {
         super.onBackPressed();
         if (!ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.isEmpty()) {
-            afficherAlerteConfirmationRetour(DetailPreparationActivity.this, LayoutInflater.from(DetailPreparationActivity.this));
+            afficherAlerteConfirmationRetour(DetailPreparationActivity.this, LayoutInflater.from(DetailPreparationActivity.this), super.getBundle());
         } else {
-            retourService();
+            retourService(super.getBundle());
         }
     }
 
     public void onClick_ActionContenant() {
+        final HashMap<Integer, Integer> resultat = new HashMap<>();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = this.getLayoutInflater().inflate(R.layout.alerte_preparation, null);
 
         LinearLayout LinearPalette = (LinearLayout) view.findViewById(R.id.LinearPalette);
+        LinearLayout LinearColis = (LinearLayout) view.findViewById(R.id.LinearColis);
         LinearLayout LinearContainer = (LinearLayout) view.findViewById(R.id.LinearContainer);
         LinearLayout LinearScelle = (LinearLayout) view.findViewById(R.id.LinearScelle);
         textViewNBPalette = (TextView) view.findViewById(R.id.nbPaletteSelectionne);
@@ -879,7 +906,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         builder.setView(view);
         final AlertDialog alertDialog = builder.create();
         alertDialog.setCancelable(false);
-        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
+        alertDialog.getWindow().setGravity(Gravity.CENTER);
         alertDialog.show();
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
@@ -896,7 +923,8 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
             if(!textViewNBContainer.getText().toString().contentEquals(""))
                 Conteneur_NB = Integer.parseInt(textViewNBContainer.getText().toString());
 
-            String numero_scelle;
+            String numero_scelle = "";
+            textViewNBScelle.getText().toString();
             numero_scelle = textViewNBScelle.getText().toString();
 
             ph_preparation_Selectionne.setColisNB(nbCaisse);
@@ -955,7 +983,8 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
     public void EnregistrerPreparation(int nbTotalLotsAvecValeurSaisie)
     {
         List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte> lotsSaisis;
-        PH_Preparation_Ligne ph_preparationLigneCorrespondant;
+        PH_Preparation_Ligne ph_preparationLigneCorrespondant = null;
+        List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte> listeLot = new ArrayList<>();
         int compteurReussiteGlobale = 0;
         int compteurReussiteParLotAvecValeur = 0;
         //Création de l'action utilisateur
@@ -1030,6 +1059,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                     if (rowID != -1) {
                         compteurReussiteParLotAvecValeur++;
                         ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparationLigneCourant.getPhiMR4UUID(), ph_preparationLigneCourant.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                        //gestion des actions lignes
                         Random randomactionligne = new Random();
                         int actionligneId = randomactionligne.nextInt();
                         if(actionligneId > 0)
@@ -1097,6 +1127,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
             return;
         }
 
+
         //véfication de la totalité de la préparation
         List<PH_Preparation_Ligne> listePhPreparationRALListe;
         listePhPreparationRALListe = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesRAL(db, ph_preparation_Selectionne);
@@ -1110,13 +1141,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         if (OutilsGestionConnexionReseau.isServerAccessible(DetailPreparationActivity.this)) {
             ElementASynchroniserOpenHelper.toutSynchroniser(DetailPreparationActivity.this, db, utilisateurConnecte, true);
         }
-        Intent retourListeIntent = getRetourListeIntent();
-        DetailPreparationActivity.this.startActivity(retourListeIntent);
-        DetailPreparationActivity.this.finish();
-    }
-
-    @NonNull
-    private Intent getRetourListeIntent() {
+        //NewDetailPreparationActivity.this.setResult(CodesEchangesActivites.RETOUR_LISTE_LOTS);
         Intent retourListeIntent = new Intent(DetailPreparationActivity.this, ServicePreparationPufActivity.class);
         if(ph_preparation_Selectionne.getDepotDestinataireReference().contains("-PAD-"))
             retourListeIntent = new Intent(DetailPreparationActivity.this, ServicePreparationPadActivity.class);
@@ -1125,12 +1150,14 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
         extras.putInt("serviceSelectionneID", serviceActuel.getId());
         retourListeIntent.putExtras(extras);
-        return retourListeIntent;
+        DetailPreparationActivity.this.startActivity(retourListeIntent);
+        DetailPreparationActivity.this.finish();
+        return;
     }
 
     @SuppressLint("SetTextI18n")
-    public void afficherAlerteConfirmationRetour(Context context, LayoutInflater inflater) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+    public void afficherAlerteConfirmationRetour(Context context, LayoutInflater inflater, final Bundle bundle) {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
         View layout = inflater.inflate(R.layout.alerte_confirmation_mail, null);
 
         LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
@@ -1139,21 +1166,21 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         messageTextView.setText("Vous allez quitter la préparation, confirmez vous ?");
         builder.setView(layout);
 
-        final AlertDialog alertDialog = builder.create();
+        final androidx.appcompat.app.AlertDialog alertDialog = builder.create();
         Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
         alertDialog.show();
 
         zoneok.setOnClickListener(v -> {
             alertDialog.dismiss();
-            retourService();
+            retourService(bundle);
         });
 
         buttonAnnuler.setOnClickListener(v -> alertDialog.dismiss());
     }
 
-    private void retourService()
+    private void retourService(final Bundle bundle)
     {
-        Intent detailPreparationIntent;
+        Intent detailPreparationIntent = null;
         if(genre_preparation.contentEquals("PUF"))
         {
             detailPreparationIntent = new Intent(DetailPreparationActivity.this, ServicePreparationPufActivity.class);
