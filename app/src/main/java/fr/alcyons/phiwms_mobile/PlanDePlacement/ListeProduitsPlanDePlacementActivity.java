@@ -31,7 +31,7 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_liste_produits_plan_de_placement);
+        setContentView(R.layout.activity_liste);
 
         // Récupération de la liste_view à remplir
         produitListView = (ListView) findViewById(R.id.listeView);

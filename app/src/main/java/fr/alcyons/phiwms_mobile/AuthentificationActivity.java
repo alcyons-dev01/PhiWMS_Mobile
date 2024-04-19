@@ -1,4 +1,6 @@
 package fr.alcyons.phiwms_mobile;
+import static com.google.android.gms.vision.L.TAG;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -109,30 +111,12 @@ import me.leolin.shortcutbadger.ShortcutBadger;
 
 
 public class AuthentificationActivity extends AppCompatActivity {
-
     public static int nbTableAInserer = 8;
     public static int nbTableinserees = 0;
     public boolean pretAPasserActiviteSuivante = false;
     // base de donnée
     public SQLiteDatabase db;
     public String etablissement;
-    // Le gestionnaire de BDD
-    protected DBOpenHelper gestionnaireBDD;
-    protected UtilisateurOpenHelper gestionnaireUtilisateur;
-    protected DepotOpenHelper gestionnaireDepot;
-    protected ElementASynchroniserOpenHelper gestionnaireElementASynchroniser;
-    protected EmplacementOpenHelper gestionnaireEmplacement;
-    protected PerimetreFonctionnelOpenHelper gestionnairePerimetreFonctionnel;
-    protected ProduitOpenHelper gestionnaireProduit;
-    protected ServiceOpenHelper gestionnaireService;
-    protected ZoneOpenHelper gestionnaireZone;
-    protected NotificationOpenHelper gestionnaireNotification;
-    protected ParametresServeurOpenHelper gestionnaireParametresServeur;
-    protected PH_RetourMotifOpenHelper gestionnairePH_RetourMotif;
-    protected DotationOpenHelper gestionnaireDotation;
-    protected Detail_DotOpenHelper gestionnaireDetailDotation;
-    protected FrequencesOpenHelper gestionnaireFrequence;
-    protected Parametres_SerialisationOpenHelper parametres_serialisationOpenHelper;
     private boolean authentification_scan;
     Boolean activerAuthentificationForte;
     Boolean connexionDirecte;
@@ -140,15 +124,9 @@ public class AuthentificationActivity extends AppCompatActivity {
     // Elément à synchroniser
     TextView nbElementsTextView;
     TextView textElementTextView;
-    // Création de l'utilisateur connecté
     Utilisateur utilisateurConnecte = null;
-    // Liste des channels auxquels l'utilisateur est connecté
     List<String> channels = new ArrayList<>();
-    // Boite de dialogue
-    ProgressDialog mProgressDialog;
-    // Defining the Volley request queue that handles the URL request concurrently
     RequestQueue requestQueueUtilisateur;
-    RequestQueue requestQueuePlanHabilitationUtilisateur;
     //Liste pour gérer l'alerte
     List<TextView> textViewList = new ArrayList<>();
     List<ImageView> imageViewList = new ArrayList<>();
@@ -156,18 +134,16 @@ public class AuthentificationActivity extends AppCompatActivity {
     AlertDialog alertDialog;
     List<String> tabErreur = new ArrayList<>();
     int i = 0;
-    //ExpandableRelativeLayout expandableLayout1;
     LinearLayout gestionExpandable;
     TextView TextSynchronisation;
-
-    //pour gérer le code de verification
     String channelTelephone;
     JSONObject utilisateurJson;
     String token;
     Button boutonConnexion;
     ProgressBar progressBar;
-
     PackageManager pm;
+
+    DBOpenHelper gestionnaireBaseDeDonnee;
 
     public static boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
@@ -180,6 +156,7 @@ public class AuthentificationActivity extends AppCompatActivity {
         return true;
     }
 
+    @SuppressLint("HardwareIds")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -187,12 +164,9 @@ public class AuthentificationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_authentification);
 
         //ouverture CGU
-        ((TextView) findViewById(R.id.versCGU)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent versCGU = new Intent(AuthentificationActivity.this, CguActivity.class);
-                AuthentificationActivity.this.startActivity(versCGU);
-            }
+        findViewById(R.id.versCGU).setOnClickListener(v -> {
+            Intent versCGU = new Intent(AuthentificationActivity.this, CguActivity.class);
+            AuthentificationActivity.this.startActivity(versCGU);
         });
 
         //gestion du package manager
@@ -214,7 +188,6 @@ public class AuthentificationActivity extends AppCompatActivity {
                     // Edit the saved preferences
                     editor.putInt("badgeCount", badgeCount);
                     editor.apply();
-                    Context context = AuthentificationActivity.this;
                     ShortcutBadger.applyCount(getApplicationContext(), badgeCount);
                 }
             }
@@ -233,32 +206,13 @@ public class AuthentificationActivity extends AppCompatActivity {
         Intent newIntent = new Intent(AuthentificationActivity.this, MyFirebaseInstanceIdService.class);
         startService(newIntent);
 
-        // Création ou récupération de la BDD si elle existe déjà
-        gestionnaireBDD = new DBOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireUtilisateur = new UtilisateurOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireDepot = new DepotOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireElementASynchroniser = new ElementASynchroniserOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireEmplacement = new EmplacementOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnairePerimetreFonctionnel = new PerimetreFonctionnelOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireProduit = new ProduitOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireService = new ServiceOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireZone = new ZoneOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireNotification = new NotificationOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireParametresServeur = new ParametresServeurOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnairePH_RetourMotif = new PH_RetourMotifOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireDotation = new DotationOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireDetailDotation = new Detail_DotOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireFrequence = new FrequencesOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        parametres_serialisationOpenHelper = new Parametres_SerialisationOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-
-
         // Ouverture de la BDD
-        db = gestionnaireBDD.openDB();
-        gestionnaireBDD.onUpgrade(db, 0, 0);
-        //ParametresServeurOpenHelper.updateParametresServeurEnBDD(db, "192.168.20.13", "81", "v1", "", "", "", "Calydial", 84, "", false, false, false, false, "", "", 0, "", 0);
+        gestionnaireBaseDeDonnee = new DBOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
+        db = gestionnaireBaseDeDonnee.openDB();
+        gestionnaireBaseDeDonnee.onUpgrade(db, 0, 0);
 
         // Vérification que les paramètres serveur ont été enregistrés
-        if (gestionnaireParametresServeur.getNbParametresServeur(db) != 1) {
+        if (ParametresServeurOpenHelper.getNbParametresServeur(db) != 1) {
             newIntent = new Intent(AuthentificationActivity.this, ServiceParametresServeurActivity.class);
             AuthentificationActivity.this.startActivity(newIntent);
         } else {
@@ -290,12 +244,11 @@ public class AuthentificationActivity extends AppCompatActivity {
                 }
             });
         } else {
-            ((ImageView) findViewById(R.id.vers_identification_scan)).setVisibility(View.INVISIBLE);
+            findViewById(R.id.vers_identification_scan).setVisibility(View.INVISIBLE);
         }
 
-        // Récupération du bouton de connexion
-        boutonConnexion = (Button) findViewById(R.id.boutonConnexion);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        boutonConnexion = findViewById(R.id.boutonConnexion);
+        progressBar = findViewById(R.id.progressBar);
 
         ((EditText) findViewById(R.id.motDePasse)).addTextChangedListener(new TextWatcher() {
             @Override
@@ -314,65 +267,58 @@ public class AuthentificationActivity extends AppCompatActivity {
             }
         });
 
-        ((EditText) findViewById(R.id.motDePasse)).setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    boutonConnexion.setVisibility(View.INVISIBLE);
-                    boutonConnexion.performClick();
-                }
-                return false;
+        ((EditText) findViewById(R.id.motDePasse)).setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                boutonConnexion.setVisibility(View.INVISIBLE);
+                boutonConnexion.performClick();
             }
+            return false;
         });
 
 
         // Définition de la fonction à appliquer en cas de clic sur le bouton de connexion
-        boutonConnexion.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                InputMethodManager imm = (InputMethodManager) AuthentificationActivity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(getWindow().getDecorView().getRootView().getWindowToken(), 0);
+        boutonConnexion.setOnClickListener(v -> {
+            InputMethodManager imm = (InputMethodManager) AuthentificationActivity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getWindow().getDecorView().getRootView().getWindowToken(), 0);
 
-                //on supprime les potentiels données de test créé pour alcyons
-                supprimerDonneesTest();
+            supprimerDonneesTest();
 
-                boutonConnexion.setVisibility(View.GONE);
-                progressBar.setVisibility(View.VISIBLE);
-                // Récupération des objets contenant l'identifiant et du mot de passe de l'utilisateur
-                TextView textViewIdentifiant = (TextView) findViewById(R.id.identifiant);
-                TextView textViewMotDePasse = (TextView) findViewById(R.id.motDePasse);
+            boutonConnexion.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+            // Récupération des objets contenant l'identifiant et du mot de passe de l'utilisateur
+            TextView textViewIdentifiant = findViewById(R.id.identifiant);
+            TextView textViewMotDePasse = findViewById(R.id.motDePasse);
 
-                // Récupération de l'identifiant et du mot de passe de l'utilisateur
-                final String identifiant = textViewIdentifiant.getText().toString();
-                String motDePasse = textViewMotDePasse.getText().toString();
+            // Récupération de l'identifiant et du mot de passe de l'utilisateur
+            final String identifiant = textViewIdentifiant.getText().toString();
+            String motDePasse = textViewMotDePasse.getText().toString();
 
-                // Vérification qu'un identifiant et un mot de passe ont bien été rentrés
-                if (!(motDePasse.isEmpty() || identifiant.isEmpty())) {
-                    // Encodage du mot de passe
-                    String motDePasseHache = "";
-                    if (authentification_scan) {
-                        motDePasseHache = motDePasse;
-                        authentification_scan = false;
-                    } else
-                        motDePasseHache = OutilsEncodage.recupererHashageMD5(motDePasse);
+            // Vérification qu'un identifiant et un mot de passe ont bien été rentrés
+            if (!(motDePasse.isEmpty() || identifiant.isEmpty())) {
+                // Encodage du mot de passe
+                String motDePasseHache = "";
+                if (authentification_scan) {
+                    motDePasseHache = motDePasse;
+                    authentification_scan = false;
+                } else
+                    motDePasseHache = OutilsEncodage.recupererHashageMD5(motDePasse);
 
-                    // Appel de la fonction de connexion
-                    identificationUtilisateur(motDePasseHache, identifiant);
-                } else {
-                    Toast toast = Toast.makeText(AuthentificationActivity.this, "Veuillez saisir les informations de connexion", Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.CENTER, 0, 0);
-                    toast.show();
-                    boutonConnexion.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.GONE);
-                }
+                // Appel de la fonction de connexion
+                identificationUtilisateur(motDePasseHache, identifiant);
+            } else {
+                Toast toast = Toast.makeText(AuthentificationActivity.this, "Veuillez saisir les informations de connexion", Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+                boutonConnexion.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
             }
         });
 
         // Affichage du nombre d'élément à synchroniser si nécessaire
-        int nbElement = gestionnaireElementASynchroniser.compterElementsASynchroniser(db);
+        int nbElement = ElementASynchroniserOpenHelper.compterElementsASynchroniser(db);
         if (nbElement > 0) {
-            nbElementsTextView = (TextView) findViewById(R.id.nbElements);
-            textElementTextView = (TextView) findViewById(R.id.textElement);
+            nbElementsTextView = findViewById(R.id.nbElements);
+            textElementTextView = findViewById(R.id.textElement);
             nbElementsTextView.setVisibility(View.VISIBLE);
             textElementTextView.setVisibility(View.VISIBLE);
             nbElementsTextView.setText(String.valueOf(nbElement));
@@ -396,45 +342,41 @@ public class AuthentificationActivity extends AppCompatActivity {
         //récupération IMEI telephone
         if(!Build.MANUFACTURER.toLowerCase().contains("honeywell") && !Build.MANUFACTURER.toLowerCase().contains("google"))
         {
-            ((ImageView) findViewById(R.id.imageLogo)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-                    if (ActivityCompat.checkSelfPermission(AuthentificationActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                        return;
-                    }
-                    String device_id = "";
-
-                    if(tm != null && !Build.MANUFACTURER.toLowerCase().contains("crosscall") && !Build.MANUFACTURER.toLowerCase().contains("huawei") && !Build.MANUFACTURER.toLowerCase().contains("zebra") && !Build.MANUFACTURER.toLowerCase().contains("samsung"))
-                    {
-                        device_id = tm.getDeviceId();
-                    }
-                    else
-                    {
-                        String androidId = Settings.Secure.getString(AuthentificationActivity.this.getContentResolver(), Settings.Secure.ANDROID_ID);
-                        device_id= androidId;
-                    }
-
-
-                    if(device_id != null)
-                    {
-                        if(device_id.contentEquals("6b3405cfd1cf57fd") || device_id.contentEquals("359467074856616") || device_id.contentEquals("42b3cc2997eab48e")|| device_id.contentEquals("283fd36870b99d52") || device_id.contentEquals("865545031537572") || device_id.contentEquals("358439079740070") || device_id.contentEquals("e76b2dc0dc33f6b2") ||device_id.contentEquals("baad6c7f647267d2")||device_id.contentEquals("66e4d0b5f734a6e7") || device_id.contentEquals("356672848915688") || device_id.contentEquals("351921588915688") || device_id.contentEquals("7db4057f77ad69c0"))
-                        {
-                            TextView textViewIdentifiant = (TextView) findViewById(R.id.identifiant);
-                            TextView textViewMotDePasse = (TextView) findViewById(R.id.motDePasse);
-
-                            textViewIdentifiant.setText("alcyons");
-                            textViewMotDePasse.setText("65ken64btz");
-                        }
-                    }
-
+            findViewById(R.id.imageLogo).setOnClickListener(v -> {
+                TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+                if (ActivityCompat.checkSelfPermission(AuthentificationActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                    return;
                 }
+                String device_id = "";
+
+                if(tm != null && !Build.MANUFACTURER.toLowerCase().contains("crosscall") && !Build.MANUFACTURER.toLowerCase().contains("huawei") && !Build.MANUFACTURER.toLowerCase().contains("zebra") && !Build.MANUFACTURER.toLowerCase().contains("samsung"))
+                {
+                    device_id = tm.getSubscriberId();
+                }
+                else
+                {
+                    device_id= Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+                }
+
+
+                if(device_id != null)
+                {
+                    if(device_id.contentEquals("6b3405cfd1cf57fd") || device_id.contentEquals("359467074856616") || device_id.contentEquals("42b3cc2997eab48e")|| device_id.contentEquals("283fd36870b99d52") || device_id.contentEquals("865545031537572") || device_id.contentEquals("358439079740070") || device_id.contentEquals("e76b2dc0dc33f6b2") ||device_id.contentEquals("baad6c7f647267d2")||device_id.contentEquals("66e4d0b5f734a6e7") || device_id.contentEquals("356672848915688") || device_id.contentEquals("351921588915688") || device_id.contentEquals("7db4057f77ad69c0"))
+                    {
+                        TextView textViewIdentifiant = findViewById(R.id.identifiant);
+                        TextView textViewMotDePasse = findViewById(R.id.motDePasse);
+
+                        textViewIdentifiant.setText("alcyons");
+                        textViewMotDePasse.setText("65ken64btz");
+                    }
+                }
+
             });
         }
         else if(Build.MANUFACTURER.toLowerCase().contains("google"))
         {
-            TextView textViewIdentifiant = (TextView) findViewById(R.id.identifiant);
-            TextView textViewMotDePasse = (TextView) findViewById(R.id.motDePasse);
+            TextView textViewIdentifiant = findViewById(R.id.identifiant);
+            TextView textViewMotDePasse = findViewById(R.id.motDePasse);
 
             textViewIdentifiant.setText("alcyons");
             textViewMotDePasse.setText("65ken64btz");
@@ -473,18 +415,18 @@ public class AuthentificationActivity extends AppCompatActivity {
         if (data != null) {
             switch (requestCode) {
                 case CodesEchangesActivites.RESULT_VERIFICATION_UTILISATEUR:
-                    if (data.getExtras().getBoolean("verifier") == true) {
+                    if (Objects.requireNonNull(data.getExtras()).getBoolean("verifier")) {
                         // Si l'identification s'est bien passé, on récupère le plan d'habilitation de l'utilisateur connecté
                         // Activer les notifications pour l'utilisateur
                         if(connexionDirecte)
                         {
-                            gestionnaireUtilisateur.mettreAJourUtilisateur(db, utilisateurConnecte);
+                            UtilisateurOpenHelper.mettreAJourUtilisateur(db, utilisateurConnecte);
                             versConnexionDirecte();
                         }
                         else
                         {
                             afficherAlerteConnexion();
-                            gestionnaireUtilisateur.mettreAJourUtilisateur(db, utilisateurConnecte);
+                            UtilisateurOpenHelper.mettreAJourUtilisateur(db, utilisateurConnecte);
 
                             mettreAJourBDD();
                         }
@@ -511,7 +453,7 @@ public class AuthentificationActivity extends AppCompatActivity {
     public void identificationUtilisateur(final String motDePasseHache, final String identifiant) {
         String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteUtilisateur;
         if (!OutilsGestionConnexionReseau.isServerAccessible(AuthentificationActivity.this)) {
-            utilisateurConnecte = gestionnaireUtilisateur.identifierUtilisateurLocalement(identifiant, motDePasseHache, db);
+            utilisateurConnecte = UtilisateurOpenHelper.identifierUtilisateurLocalement(identifiant, motDePasseHache, db);
 
             if (utilisateurConnecte != null) {
                 Toast toast = Toast.makeText(AuthentificationActivity.this, "Vous êtes en mode hors connexion !", Toast.LENGTH_SHORT);
@@ -535,98 +477,92 @@ public class AuthentificationActivity extends AppCompatActivity {
                 body.put("identifiant", identifiant);
                 body.put("mdp", motDePasseHache);
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e(TAG, "JSONException :", e);
             }
 
-            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.POST, urlRequete, body, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    try {
-                        int nbResultats = response.getInt("resultCount");
-                        if (nbResultats != 1) {
-                            if (nbResultats > 1) {
-                                Alerte.afficherAlerte(AuthentificationActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete identificationUtilisateur", "alerte");
-                                boutonConnexion.setVisibility(View.VISIBLE);
-                                progressBar.setVisibility(View.GONE);
-                            }
-                            if (nbResultats == 0) {
-                                Toast toast = Toast.makeText(AuthentificationActivity.this, "Identifiant ou mot de passe incorrect !", Toast.LENGTH_SHORT);
-                                toast.setGravity(Gravity.CENTER, 0, 0);
-                                toast.show();
-                                boutonConnexion.setVisibility(View.VISIBLE);
-                                progressBar.setVisibility(View.GONE);
-                            }
-                        } else {
-                            // Récupération de l'utilisateur en BDD distante
-                            JSONArray utilisateurJsonArray = response.getJSONArray("utilisateur");
-                            JSONArray parametresJsonArray = response.getJSONArray("parametres");
-                            if (parametresJsonArray.length() == 1) {
-                                JSONObject paramatres = parametresJsonArray.getJSONObject(0);
-                                String ip = gestionnaireParametresServeur.getIPServeur(db);
-                                String port = gestionnaireParametresServeur.getPortServeur(db);
-                                String apiVersion = gestionnaireParametresServeur.getAPIVersion(db);
-                                Boolean Reliquats_pour_prevision = gestionnaireParametresServeur.getReliquats_pour_prevision(db);
-                                Boolean Liv_indirecte_egal_Cond_achat = gestionnaireParametresServeur.getLiv_indirecte_egal_Cond_achat(db);
-                                String mailPharmacie = paramatres.getString("etablissementMailPharmacie");
-                                String pubnubPublishKey = paramatres.getString("pubnubPublishKey");
-                                String pubnubSubscribeKey = paramatres.getString("pubnubSubscribeKey");
-                                String etablissementNom = paramatres.getString("etablissementNom");
-                                int etablissementNumero = paramatres.getInt("etablissementNumero");
-                                String etablissementLogoNom = paramatres.getString("etablissementLogoNom");
-                                String mailEmetteur = paramatres.getString("Mail_Emetteur");
-                                String mdpEmetteur = paramatres.getString("MDP_Emetteur");
-                                int smtpPort = paramatres.getInt("SMTP_Port");
-                                String smtpServeur = paramatres.getString("SMTP_Serveur");
-                                int smtpSession = paramatres.getInt("SMTP_Session");
-
-                                /**
-                                 * ADH
-                                 * mailEmetteur : pharmadh@adh-asso.net
-                                 * mdpEmetteur :
-                                 * psswordEmetteur = "gbx55df1";
-                                 * loginEmetteur = "pharmaadh@adh-asso.local";
-                                 * smtpPort : 465
-                                 * smtpServeur : mail.adh-asso.net
-                                 * smtpSession : 1
-                                 * emeteurID : adh-asso\pharmaadh
-                                 */
-                                String loginEmetteur = "";
-
-                                if(etablissementNom.contentEquals("ADH"))
-                                {
-                                    smtpPort = 25;
-                                    mailEmetteur = "pharmadh@adh-asso.net";
-                                    mdpEmetteur = "gbx55df1";
-                                    smtpServeur = "mail.adh-asso.net";
-                                    smtpSession = 1;
-                                    loginEmetteur = "pharmaadh@adh-asso.local";
-                                }
-
-                                Boolean plan_de_cueillette = false;
-                                Boolean module_transport = paramatres.getInt("Module_Transport")==1;
-                                gestionnaireParametresServeur.updateParametresServeurEnBDD(db, ip, port, apiVersion, mailPharmacie, pubnubPublishKey, pubnubSubscribeKey, etablissementNom, etablissementNumero, etablissementLogoNom, Reliquats_pour_prevision, Liv_indirecte_egal_Cond_achat, plan_de_cueillette,module_transport, mailEmetteur, mdpEmetteur, smtpPort, smtpServeur, smtpSession, loginEmetteur);
-                            }
-
-                            token = response.getString("token");
-                            utilisateurJson = utilisateurJsonArray.getJSONObject(0);
-
-                            // Connexion de l'utilisateur
-                            connexionUtilisateur(utilisateurJson, token);
-
+            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.POST, urlRequete, body, response -> {
+                try {
+                    int nbResultats = response.getInt("resultCount");
+                    if (nbResultats != 1) {
+                        if (nbResultats > 1) {
+                            Alerte.afficherAlerte(AuthentificationActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete identificationUtilisateur", "alerte");
+                            boutonConnexion.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.GONE);
                         }
-                    } catch (JSONException exception) {
-                        exception.printStackTrace();
-                        effacerAlerte(alertDialog);
+                        if (nbResultats == 0) {
+                            Toast toast = Toast.makeText(AuthentificationActivity.this, "Identifiant ou mot de passe incorrect !", Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+                            boutonConnexion.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    } else {
+                        // Récupération de l'utilisateur en BDD distante
+                        JSONArray utilisateurJsonArray = response.getJSONArray("utilisateur");
+                        JSONArray parametresJsonArray = response.getJSONArray("parametres");
+                        if (parametresJsonArray.length() == 1) {
+                            JSONObject paramatres = parametresJsonArray.getJSONObject(0);
+                            String ip = ParametresServeurOpenHelper.getIPServeur(db);
+                            String port = ParametresServeurOpenHelper.getPortServeur(db);
+                            String apiVersion = ParametresServeurOpenHelper.getAPIVersion(db);
+                            Boolean Reliquats_pour_prevision = ParametresServeurOpenHelper.getReliquats_pour_prevision(db);
+                            Boolean Liv_indirecte_egal_Cond_achat = ParametresServeurOpenHelper.getLiv_indirecte_egal_Cond_achat(db);
+                            String mailPharmacie = paramatres.getString("etablissementMailPharmacie");
+                            String pubnubPublishKey = paramatres.getString("pubnubPublishKey");
+                            String pubnubSubscribeKey = paramatres.getString("pubnubSubscribeKey");
+                            String etablissementNom = paramatres.getString("etablissementNom");
+                            int etablissementNumero = paramatres.getInt("etablissementNumero");
+                            String etablissementLogoNom = paramatres.getString("etablissementLogoNom");
+                            String mailEmetteur = paramatres.getString("Mail_Emetteur");
+                            String mdpEmetteur = paramatres.getString("MDP_Emetteur");
+                            int smtpPort = paramatres.getInt("SMTP_Port");
+                            String smtpServeur = paramatres.getString("SMTP_Serveur");
+                            int smtpSession = paramatres.getInt("SMTP_Session");
+
+                            /**
+                             * ADH
+                             * mailEmetteur : pharmadh@adh-asso.net
+                             * mdpEmetteur :
+                             * psswordEmetteur = "gbx55df1";
+                             * loginEmetteur = "pharmaadh@adh-asso.local";
+                             * smtpPort : 465
+                             * smtpServeur : mail.adh-asso.net
+                             * smtpSession : 1
+                             * emeteurID : adh-asso\pharmaadh
+                             */
+                            String loginEmetteur = "";
+
+                            if(etablissementNom.contentEquals("ADH"))
+                            {
+                                smtpPort = 25;
+                                mailEmetteur = "pharmadh@adh-asso.net";
+                                mdpEmetteur = "gbx55df1";
+                                smtpServeur = "mail.adh-asso.net";
+                                smtpSession = 1;
+                                loginEmetteur = "pharmaadh@adh-asso.local";
+                            }
+
+                            Boolean plan_de_cueillette = false;
+                            Boolean module_transport = paramatres.getInt("Module_Transport")==1;
+                            ParametresServeurOpenHelper.updateParametresServeurEnBDD(db, ip, port, apiVersion, mailPharmacie, pubnubPublishKey, pubnubSubscribeKey, etablissementNom, etablissementNumero, etablissementLogoNom, Reliquats_pour_prevision, Liv_indirecte_egal_Cond_achat, plan_de_cueillette,module_transport, mailEmetteur, mdpEmetteur, smtpPort, smtpServeur, smtpSession, loginEmetteur);
+                        }
+
+                        token = response.getString("token");
+                        utilisateurJson = utilisateurJsonArray.getJSONObject(0);
+
+                        // Connexion de l'utilisateur
+                        connexionUtilisateur(utilisateurJson, token);
+
                     }
+                } catch (JSONException exception) {
+                    Log.e(TAG, "JSONException :", exception);
+                    effacerAlerte(alertDialog);
                 }
             },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e("Idenitifcation Volley", error.toString());
-                            Alerte.afficherAlerte(AuthentificationActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP identificationUtilisateur", "alerte");
-                            effacerAlerte(alertDialog);
-                        }
+                    error -> {
+                        Log.e("Idenitifcation Volley", error.toString());
+                        Alerte.afficherAlerte(AuthentificationActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP identificationUtilisateur", "alerte");
+                        effacerAlerte(alertDialog);
                     }
             ) {
                 @Override
@@ -656,7 +592,6 @@ public class AuthentificationActivity extends AppCompatActivity {
         if(gps != null)
         {
             Location location = gps.getLocation();
-
             if (location != null) {
                 utilisateurConnecte.setLocalisation(location);
             }
@@ -667,16 +602,16 @@ public class AuthentificationActivity extends AppCompatActivity {
         boolean recuperationUtilisateur = false;
 
         try {
-            utilisateurConnecte = gestionnaireUtilisateur.getUtilisateurByID(db, utilisateurJson.getInt("id"));
+            utilisateurConnecte = UtilisateurOpenHelper.getUtilisateurByID(db, utilisateurJson.getInt("id"));
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(TAG, "JSONException :", e);
         }
         if (utilisateurConnecte == null) {
             // Création de l'utilisateur
             utilisateurConnecte = new Utilisateur(utilisateurJson);
             utilisateurConnecte.setToken(token);
             utilisateurConnecte.setLastPerimetre(0);
-            long rowID = gestionnaireUtilisateur.insererUnUtilisateurEnBD(db, utilisateurConnecte);
+            long rowID = UtilisateurOpenHelper.insererUnUtilisateurEnBD(db, utilisateurConnecte);
             if (rowID != -1) {
                 // Si l'utilisateur n'existe pas, on l'insère en BDD
                 recuperationUtilisateur = true;
@@ -685,19 +620,19 @@ public class AuthentificationActivity extends AppCompatActivity {
             utilisateurConnecte.setToken(token);
             try {
                 utilisateurConnecte.setEtablissement(utilisateurJson.getString("etablissement"));
-                gestionnaireUtilisateur.mettreAJourEtablissement(db, utilisateurConnecte);
+                UtilisateurOpenHelper.mettreAJourEtablissement(db, utilisateurConnecte);
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e(TAG, "JSONException :", e);
             }
             // Si l'utilisateur existe, on met à jour son token
-            long rowId = gestionnaireUtilisateur.mettreAJourToken(db, utilisateurConnecte);
+            long rowId = UtilisateurOpenHelper.mettreAJourToken(db, utilisateurConnecte);
             if (rowId != -1) {
                 recuperationUtilisateur = true;
             }
         }
 
 
-        if (recuperationUtilisateur != true) {
+        if (!recuperationUtilisateur) {
             Alerte.afficherAlerte(AuthentificationActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete connexionUtilisateur", "alerte");
         } else {
             //on checked l'authentification forte pour savoir si on le fait ou si on synchronise directement
@@ -709,7 +644,7 @@ public class AuthentificationActivity extends AppCompatActivity {
             }
             else if(connexionDirecte)
             {
-                gestionnaireUtilisateur.mettreAJourUtilisateur(db, utilisateurConnecte);
+                UtilisateurOpenHelper.mettreAJourUtilisateur(db, utilisateurConnecte);
                 versConnexionDirecte();
             }
             else {
@@ -722,7 +657,7 @@ public class AuthentificationActivity extends AppCompatActivity {
                         afficherAlerteConnexion();
                         // Si l'identification s'est bien passé, on récupère le plan d'habilitation de l'utilisateur connecté
                         // Activer les notifications pour l'utilisateur
-                        gestionnaireUtilisateur.mettreAJourUtilisateur(db, utilisateurConnecte);
+                        UtilisateurOpenHelper.mettreAJourUtilisateur(db, utilisateurConnecte);
 
                         mettreAJourBDD();
                     }
@@ -736,7 +671,7 @@ public class AuthentificationActivity extends AppCompatActivity {
                     afficherAlerteConnexion();
                     // Si l'identification s'est bien passé, on récupère le plan d'habilitation de l'utilisateur connecté
                     // Activer les notifications pour l'utilisateur
-                    gestionnaireUtilisateur.mettreAJourUtilisateur(db, utilisateurConnecte);
+                    UtilisateurOpenHelper.mettreAJourUtilisateur(db, utilisateurConnecte);
 
                     mettreAJourBDD();
                 }
@@ -751,7 +686,7 @@ public class AuthentificationActivity extends AppCompatActivity {
         BufferedInputStream buf;
         try {
             File[] tabFichier = dir.listFiles();
-            for (int i = 0; i < tabFichier.length; i++) {
+            for (int i = 0; i < Objects.requireNonNull(tabFichier).length; i++) {
                 in = new FileInputStream(tabFichier[i]);
                 buf = new BufferedInputStream(in);
                 byte[] bMapArray = new byte[buf.available()];
@@ -788,7 +723,7 @@ public class AuthentificationActivity extends AppCompatActivity {
 
     private void recuperationSysUserRules()  {
         String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteSysUserRules+utilisateurConnecte.getId();
-        if (OutilsGestionConnexionReseau.isServerAccessible(AuthentificationActivity.this) == false) {
+        if (!OutilsGestionConnexionReseau.isServerAccessible(AuthentificationActivity.this)) {
             Toast toast = Toast.makeText(AuthentificationActivity.this, "Impossible de vous connecter !", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
@@ -796,44 +731,38 @@ public class AuthentificationActivity extends AppCompatActivity {
 
             requestQueueUtilisateur = Volley.newRequestQueue(this);
 
-            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    try {
-                        int nbResultats = response.getInt("resultCount");
-                        if (nbResultats != 1) {
-                            if (nbResultats > 1) {
-                                Alerte.afficherAlerte(AuthentificationActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete identificationUtilisateur", "alerte");
-                            }
-                            if (nbResultats == 0) {
-                                Toast toast = Toast.makeText(AuthentificationActivity.this, "Identifiant ou mot de passe incorrect !", Toast.LENGTH_SHORT);
-                                toast.setGravity(Gravity.CENTER, 0, 0);
-                                toast.show();
-                            }
-                        } else {
-                            SYS_User_RulesOpenHelper.viderTableSYS_User_Rules(db);
-                            // Récupération de l'utilisateur en BDD distante
-                            JSONArray userRulesJsonArray = response.getJSONArray("SYS_User_Rules");
-                            JSONObject userRulesJsonObject = userRulesJsonArray.getJSONObject(0);
-                            if(userRulesJsonObject != null)
-                            {
-                                SYS_User_Rules userRules = new SYS_User_Rules(userRulesJsonObject);
-                                SYS_User_RulesOpenHelper.insererSYS_User_RulesEnBDD(db, userRules);
-                            }
+            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null, response -> {
+                try {
+                    int nbResultats = response.getInt("resultCount");
+                    if (nbResultats != 1) {
+                        if (nbResultats > 1) {
+                            Alerte.afficherAlerte(AuthentificationActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete identificationUtilisateur", "alerte");
                         }
-                    } catch (JSONException exception) {
-                        exception.printStackTrace();
-                        effacerAlerte(alertDialog);
+                        if (nbResultats == 0) {
+                            Toast toast = Toast.makeText(AuthentificationActivity.this, "Identifiant ou mot de passe incorrect !", Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+                        }
+                    } else {
+                        SYS_User_RulesOpenHelper.viderTableSYS_User_Rules(db);
+                        // Récupération de l'utilisateur en BDD distante
+                        JSONArray userRulesJsonArray = response.getJSONArray("SYS_User_Rules");
+                        JSONObject userRulesJsonObject = userRulesJsonArray.getJSONObject(0);
+                        if(userRulesJsonObject != null)
+                        {
+                            SYS_User_Rules userRules = new SYS_User_Rules(userRulesJsonObject);
+                            SYS_User_RulesOpenHelper.insererSYS_User_RulesEnBDD(db, userRules);
+                        }
                     }
+                } catch (JSONException exception) {
+                    Log.e(TAG, "JSONException :", exception);
+                    effacerAlerte(alertDialog);
                 }
             },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e("Volley", "Error");
-                            Alerte.afficherAlerte(AuthentificationActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP récupération userRules", "alerte");
-                            effacerAlerte(alertDialog);
-                        }
+                    error -> {
+                        Log.e("Volley", "Error");
+                        Alerte.afficherAlerte(AuthentificationActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP récupération userRules", "alerte");
+                        effacerAlerte(alertDialog);
                     }
             ) {
                 @Override
@@ -853,20 +782,20 @@ public class AuthentificationActivity extends AppCompatActivity {
 
     public void mettreAJourBDD() {
         String token = utilisateurConnecte.getToken();
-        gestionnaireElementASynchroniser.toutSynchroniser(AuthentificationActivity.this, db, utilisateurConnecte, true);
-        gestionnaireService.insererBDDLocaleServicesEtPerimetresFonctionnelsphiwms_mobile(AuthentificationActivity.this, db, token, utilisateurConnecte);
-        gestionnaireZone.insererBDDLocaleDepotsZones(AuthentificationActivity.this, db, token, utilisateurConnecte);
-        gestionnaireDepot.insererBDDLocaleDepots(AuthentificationActivity.this, db, token, utilisateurConnecte);
-        gestionnaireEmplacement.insererBDDLocaleDepotsEmplacements(AuthentificationActivity.this, db, token, utilisateurConnecte);
-        gestionnaireProduit.insererBDDLocaleProduits(AuthentificationActivity.this, db, token, utilisateurConnecte);
-        gestionnairePH_RetourMotif.insererBDDLocalePH_RetourMotif(AuthentificationActivity.this, db, token, utilisateurConnecte);
-        gestionnaireDotation.insererBDDLocaleDotation(AuthentificationActivity.this, db, token, utilisateurConnecte);
+        ElementASynchroniserOpenHelper.toutSynchroniser(AuthentificationActivity.this, db, utilisateurConnecte, true);
+        ServiceOpenHelper.insererBDDLocaleServicesEtPerimetresFonctionnelsphiwms_mobile(AuthentificationActivity.this, db, token, utilisateurConnecte);
+        ZoneOpenHelper.insererBDDLocaleDepotsZones(AuthentificationActivity.this, db, token, utilisateurConnecte);
+        DepotOpenHelper.insererBDDLocaleDepots(AuthentificationActivity.this, db, token, utilisateurConnecte);
+        EmplacementOpenHelper.insererBDDLocaleDepotsEmplacements(AuthentificationActivity.this, db, token, utilisateurConnecte);
+        ProduitOpenHelper.insererBDDLocaleProduits(AuthentificationActivity.this, db, token, utilisateurConnecte);
+        PH_RetourMotifOpenHelper.insererBDDLocalePH_RetourMotif(AuthentificationActivity.this, db, token, utilisateurConnecte);
+        DotationOpenHelper.insererBDDLocaleDotation(AuthentificationActivity.this, db, token, utilisateurConnecte);
         ActionUtilisateurOpenHelper.insererBDDLocaleActionUtilisatuer(AuthentificationActivity.this, db, token, utilisateurConnecte);
     }
 
     public void insertionDeTableEffectuee(String tableNom, boolean etat, String erreur) {
 
-        if (etat == false) {
+        if (!etat) {
             tabErreur.add(erreur);
         }
 
@@ -874,7 +803,7 @@ public class AuthentificationActivity extends AppCompatActivity {
 
         updateAlerte(tableNom, nbTableinserees, etat);
         if (nbTableinserees == nbTableAInserer) {
-            if (tabErreur.size() != 0) {
+            if (!tabErreur.isEmpty()) {
                 RapportErreur();
             } else {
                 passerActiviteSuivante();
@@ -885,14 +814,13 @@ public class AuthentificationActivity extends AppCompatActivity {
     public void afficherAlerteConnexion() {
         AlertDialog.Builder builder = new AlertDialog.Builder(AuthentificationActivity.this);
         LayoutInflater inflater = AuthentificationActivity.this.getLayoutInflater();
-        View layout = inflater.inflate(R.layout.alert_connexion, null);
+        @SuppressLint("InflateParams") View layout = inflater.inflate(R.layout.alert_connexion, null);
 
 
         initialisationAlerte(layout, builder);
     }
 
-    @SuppressLint("NewApi")
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @SuppressLint({"NewApi", "UseCompatLoadingForDrawables"})
     private void updateAlerte(String tableNom, int nbTableinserees, boolean etat) {
         i = nbTableinserees - 1;
 
@@ -920,64 +848,56 @@ public class AuthentificationActivity extends AppCompatActivity {
 
     private void initialisationAlerte(View layout, AlertDialog.Builder builder) {
 
-        TextView service = (TextView) layout.findViewById(R.id.Service);
+        TextView service = layout.findViewById(R.id.Service);
         textViewList.add(service);
-        TextView depot = (TextView) layout.findViewById(R.id.depot);
+        TextView depot = layout.findViewById(R.id.depot);
         textViewList.add(depot);
-        TextView Zone = (TextView) layout.findViewById(R.id.Zone);
+        TextView Zone = layout.findViewById(R.id.Zone);
         textViewList.add(Zone);
-        TextView Emplacement = (TextView) layout.findViewById(R.id.Emplacement);
+        TextView Emplacement = layout.findViewById(R.id.Emplacement);
         textViewList.add(Emplacement);
-        TextView produit = (TextView) layout.findViewById(R.id.Produit);
+        TextView produit = layout.findViewById(R.id.Produit);
         textViewList.add(produit);
-        TextView Motif = (TextView) layout.findViewById(R.id.Motif);
+        TextView Motif = layout.findViewById(R.id.Motif);
         textViewList.add(Motif);
-        TextView Dotation = (TextView) layout.findViewById(R.id.Dotation);
+        TextView Dotation = layout.findViewById(R.id.Dotation);
         textViewList.add(Dotation);
-        TextView Action = (TextView) layout.findViewById(R.id.Action);
+        TextView Action = layout.findViewById(R.id.Action);
         textViewList.add(Action);
 
 
-        zoneok = (SeekBar) layout.findViewById(R.id.barDeProgression);
-        zoneok.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
-            }
-        });
+        zoneok = layout.findViewById(R.id.barDeProgression);
+        zoneok.setOnTouchListener((v, event) -> true);
 
-        //expandableLayout1 = (ExpandableRelativeLayout) layout.findViewById(R.id.expandableLayout1);
+        TextSynchronisation = layout.findViewById(R.id.TextSynchronisation);
 
-        TextSynchronisation = (TextView) layout.findViewById(R.id.TextSynchronisation);
-
-        ImageView checkService = (ImageView) layout.findViewById(R.id.checkService);
+        ImageView checkService = layout.findViewById(R.id.checkService);
         imageViewList.add(checkService);
-        ImageView checkDepot = (ImageView) layout.findViewById(R.id.checkDepot);
+        ImageView checkDepot = layout.findViewById(R.id.checkDepot);
         imageViewList.add(checkDepot);
-        ImageView checkZone = (ImageView) layout.findViewById(R.id.checkZone);
+        ImageView checkZone = layout.findViewById(R.id.checkZone);
         imageViewList.add(checkZone);
-        ImageView checkEmplacement = (ImageView) layout.findViewById(R.id.checkEmplacement);
+        ImageView checkEmplacement = layout.findViewById(R.id.checkEmplacement);
         imageViewList.add(checkEmplacement);
-        ImageView checkProduit = (ImageView) layout.findViewById(R.id.checkProduit);
+        ImageView checkProduit = layout.findViewById(R.id.checkProduit);
         imageViewList.add(checkProduit);
-        ImageView checkMotif = (ImageView) layout.findViewById(R.id.checkMotif);
+        ImageView checkMotif = layout.findViewById(R.id.checkMotif);
         imageViewList.add(checkMotif);
-        ImageView checkDotation = (ImageView) layout.findViewById(R.id.checkDotation);
+        ImageView checkDotation = layout.findViewById(R.id.checkDotation);
         imageViewList.add(checkDotation);
 
-        ImageView checkAction = (ImageView) layout.findViewById(R.id.checkAction);
+        ImageView checkAction = layout.findViewById(R.id.checkAction);
         imageViewList.add(checkAction);
 
-        gestionExpandable = (LinearLayout) layout.findViewById(R.id.gestionExpandable);
+        gestionExpandable = layout.findViewById(R.id.gestionExpandable);
 
         builder.setView(layout);
         alertDialog = builder.create();
-        alertDialog.getWindow().setGravity(Gravity.CENTER);
+        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
         alertDialog.setCancelable(false);
-        if (alertDialog.isShowing() == false) {
+        if (!alertDialog.isShowing()) {
             alertDialog.show();
         }
-
     }
 
     private void effacerAlerte(AlertDialog alertDialog) {

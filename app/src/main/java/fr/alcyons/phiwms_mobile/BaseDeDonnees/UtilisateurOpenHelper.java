@@ -55,7 +55,7 @@ public class UtilisateurOpenHelper extends DBOpenHelper {
         return booleen;
     }
 
-    public long insererUnUtilisateurEnBD(SQLiteDatabase db, Utilisateur utilisateur) {
+    public static long insererUnUtilisateurEnBD(SQLiteDatabase db, Utilisateur utilisateur) {
         // Récupération des valeurs de l'utilisateur à insérer
         ContentValues contentValues = new ContentValues();
         contentValues.put(Constantes.CLE_COL_ID_UTILISATEUR, utilisateur.getId());
@@ -146,7 +146,7 @@ public class UtilisateurOpenHelper extends DBOpenHelper {
         return rowID;
     }
 
-    public Utilisateur identifierUtilisateurLocalement(String identifiant, String mdp, SQLiteDatabase db) {
+    public static Utilisateur identifierUtilisateurLocalement(String identifiant, String mdp, SQLiteDatabase db) {
         Utilisateur utilisateur = null;
 
         Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_UTILISATEUR + " WHERE " + Constantes.CLE_COL_IDENTIFIANT_UTILISATEUR + "=? and " + Constantes.CLE_COL_MDP_UTILISATEUR + "=?", new String[]{identifiant, mdp});
@@ -161,7 +161,7 @@ public class UtilisateurOpenHelper extends DBOpenHelper {
         return utilisateur;
     }
 
-    public long mettreAJourToken(SQLiteDatabase db, Utilisateur utilisateur) {
+    public static long mettreAJourToken(SQLiteDatabase db, Utilisateur utilisateur) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(Constantes.CLE_COL_TOKEN_UTILISATEUR, utilisateur.getToken());
 
@@ -170,7 +170,7 @@ public class UtilisateurOpenHelper extends DBOpenHelper {
         return rowId;
     }
 
-    public long mettreAJourEtablissement(SQLiteDatabase db, Utilisateur utilisateur) {
+    public static long mettreAJourEtablissement(SQLiteDatabase db, Utilisateur utilisateur) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(Constantes.CLE_COL_ETABLISSEMENT_UTILISATEUR, utilisateur.getEtablissement());
 

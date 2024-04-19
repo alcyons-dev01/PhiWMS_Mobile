@@ -201,7 +201,7 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_service_livraison_v2);
+        setContentView(R.layout.activity_liste_livraison_depot);
         context = ListeLivraisonDepot.this;
         floatingMenu = findViewById(R.id.floatingMenu);
         boutonSignatureLivreur = findViewById(R.id.boutonSignatureLivreur);

@@ -30,7 +30,7 @@ public class ListeCategorieActivity extends ServiceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_liste_categories);
+        setContentView(R.layout.activity_liste);
 
         // Récupération des fournisseurs par rapport à la classeNumeroProduit ( Médicament ou Dispositif)
         List<String> categories = gestionnaireProduit.getAllCategories(db, intent.getExtras().getString("produitClasse_numero"));

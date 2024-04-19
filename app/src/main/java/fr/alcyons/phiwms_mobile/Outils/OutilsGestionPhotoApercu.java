@@ -66,7 +66,7 @@ public class OutilsGestionPhotoApercu extends ServiceActivity implements View.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.acitivity_apercu_photo);
+        setContentView(R.layout.activity_apercu_photo);
 
         //init de la méthode pour le zoom
         imageView = (ImageView) findViewById(R.id.photo);

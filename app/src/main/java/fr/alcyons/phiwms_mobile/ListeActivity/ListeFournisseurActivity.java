@@ -30,7 +30,7 @@ public class ListeFournisseurActivity extends ServiceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_liste_fournisseurs);
+        setContentView(R.layout.activity_liste);
 
         // Récupération des fournisseurs par rapport à la classeNumeroProduit ( Médicament ou Dispositif)
         List<String> fournisseur_List = gestionnaireProduit.getAllFournisseurs(db, intent.getExtras().getString("produitClasse_numero"));

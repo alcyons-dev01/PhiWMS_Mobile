@@ -153,7 +153,7 @@ public class ServiceOpenHelper extends DBOpenHelper {
         return service;
     }
 
-    public long insererUnServiceEnBD(SQLiteDatabase db, Service service) {
+    public static long insererUnServiceEnBD(SQLiteDatabase db, Service service) {
         // Récupération des valeurs du service à insérer
         ContentValues contentValues = new ContentValues();
         contentValues.put(Constantes.CLE_COL_ID_SERVICE, service.getId());
@@ -196,11 +196,11 @@ public class ServiceOpenHelper extends DBOpenHelper {
 
     }
 
-    public void viderTableService(SQLiteDatabase db) {
+    public static void viderTableService(SQLiteDatabase db) {
         db.delete(Constantes.TABLE_SERVICE, null, null);
     }
 
-    public void insererBDDLocaleServicesEtPerimetresFonctionnelsphiwms_mobile(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
+    public static void insererBDDLocaleServicesEtPerimetresFonctionnelsphiwms_mobile(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
         final String tableNom = "Service";
         final String erreurSynchronisationLibelle = "Services non synchronisés";
 

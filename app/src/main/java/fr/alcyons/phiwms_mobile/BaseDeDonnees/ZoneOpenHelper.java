@@ -160,7 +160,7 @@ public class ZoneOpenHelper extends DBOpenHelper {
         return valeurARetourner;
     }
 
-    public int getNbDepotsZones(SQLiteDatabase db) {
+    public static int getNbDepotsZones(SQLiteDatabase db) {
         Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_DEPOT_ZONE, null);
         int nbDepotsZones = cursor.getCount();
         cursor.close();
@@ -168,7 +168,7 @@ public class ZoneOpenHelper extends DBOpenHelper {
         return nbDepotsZones;
     }
 
-    public void viderTableDepotZones(SQLiteDatabase db) {
+    public static void viderTableDepotZones(SQLiteDatabase db) {
         db.delete(Constantes.TABLE_DEPOT_ZONE, null, null);
     }
 
@@ -193,7 +193,7 @@ public class ZoneOpenHelper extends DBOpenHelper {
         return rowId;
     }
 
-    public void insererBDDLocaleDepotsZones(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
+    public static void insererBDDLocaleDepotsZones(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
         final String tableNom = "Zones";
         final String erreurSynchronisationLibelle = "Zones non synchronisées";
 

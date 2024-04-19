@@ -102,7 +102,7 @@ public class EmplacementOpenHelper extends DBOpenHelper {
         return rowId;
     }
 
-    public void insererBDDLocaleDepotsEmplacements(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
+    public static void insererBDDLocaleDepotsEmplacements(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
         final String tableNom = "Emplacements";
         final String erreurSynchronisationLibelle = "Emplacements non synchronisées";
         if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {

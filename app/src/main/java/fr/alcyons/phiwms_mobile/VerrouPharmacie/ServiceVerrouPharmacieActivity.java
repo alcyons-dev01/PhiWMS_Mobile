@@ -80,7 +80,7 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_service_verrou_pharmacie);
+        setContentView(R.layout.activity_liste_refresh);
 
         context = ServiceVerrouPharmacieActivity.this;
         pm = ServiceVerrouPharmacieActivity.this.getPackageManager();

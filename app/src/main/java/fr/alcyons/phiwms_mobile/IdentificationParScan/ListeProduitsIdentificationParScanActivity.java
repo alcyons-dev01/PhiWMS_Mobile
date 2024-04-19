@@ -1,5 +1,6 @@
 package fr.alcyons.phiwms_mobile.IdentificationParScan;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -33,13 +34,14 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
     InputMethodManager imm;
     ListView listViewProduits;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_liste_produits_identification_scan);
+        setContentView(R.layout.activity_liste);
         imm = (InputMethodManager) ListeProduitsIdentificationParScanActivity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
         // Récupération de la liste_view à remplir
-        listViewProduits = (ListView) findViewById(R.id.listeView);
+        listViewProduits = findViewById(R.id.listeView);
         codeInconnue = intent.getExtras().getString("codeInconnue");
         if(codeInconnue == null)
         {

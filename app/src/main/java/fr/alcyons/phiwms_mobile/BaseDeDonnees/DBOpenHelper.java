@@ -113,7 +113,6 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         db.execSQL(EVENTOpenHelper.Constantes.CREATION_TABLE_EVENT);
     }
 
-    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w("DBOpenHelper", "Mise à jour de la version " + oldVersion + " vers la version " + newVersion + ", les anciennes données seront détruites");
     }

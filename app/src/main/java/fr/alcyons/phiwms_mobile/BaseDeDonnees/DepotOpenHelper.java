@@ -129,7 +129,7 @@ public class DepotOpenHelper extends DBOpenHelper {
         return db.delete(Constantes.TABLE_DEPOT, Constantes.CLE_COL_DEPOT_REFERENCE_DEPOT + "=?", new String[]{"DEPOT_PUI_ALCYONS_ESSAI"});
     }
 
-    public void viderTableDepot(SQLiteDatabase db) {
+    public static void viderTableDepot(SQLiteDatabase db) {
         db.delete(Constantes.TABLE_DEPOT, null, null);
     }
 
@@ -233,7 +233,7 @@ public class DepotOpenHelper extends DBOpenHelper {
         return rowId;
     }
 
-    public void insererBDDLocaleDepots(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
+    public static void insererBDDLocaleDepots(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
         final String tableNom = "Dépôt";
         final String erreurSynchronisationLibelle = "Dépots non synchronisés";
 

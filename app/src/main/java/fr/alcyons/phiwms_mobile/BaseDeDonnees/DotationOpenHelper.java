@@ -168,7 +168,7 @@ public class DotationOpenHelper extends DBOpenHelper {
         return listeDepot;
     }
 
-    public void insererBDDLocaleDotation(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
+    public static void insererBDDLocaleDotation(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
         final String tableNom = "Dotations";
         final String erreurSynchronisationLibelle = "Dotations non synchronisées";
 

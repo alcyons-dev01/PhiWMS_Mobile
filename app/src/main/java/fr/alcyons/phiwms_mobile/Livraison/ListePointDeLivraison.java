@@ -2,6 +2,7 @@ package fr.alcyons.phiwms_mobile.Livraison;
 
 import static com.google.android.gms.vision.L.TAG;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -76,16 +77,18 @@ public class ListePointDeLivraison extends ServiceAvecConnexionActivity {
     ArrayAdapter<String> spinnerArrayAdapter;
     Spinner spinner;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_service_livraison);
+        setContentView(R.layout.activity_liste_refresh);
         context = ListePointDeLivraison.this;
 
         pm = ListePointDeLivraison.this.getPackageManager();
         listeDepotLivraison = new ArrayList<>();
         listeDepotLivraison.add("Tous");
         //Gestion de la listView
+        ((TextView) findViewById(R.id.titre)).setText("Livraisons");
         ph_preparation_ListView = findViewById(R.id.listeView);
         ph_preparation_ListView.setOnItemClickListener((parent, view, position, id) -> {
 

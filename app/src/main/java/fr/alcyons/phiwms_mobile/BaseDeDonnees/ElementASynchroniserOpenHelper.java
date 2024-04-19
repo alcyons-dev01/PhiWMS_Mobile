@@ -704,7 +704,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
         requestQueue.add(obreq);
     }
 
-    public int compterElementsASynchroniser(SQLiteDatabase db) {
+    public static int compterElementsASynchroniser(SQLiteDatabase db) {
         Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_ELEMENT_A_SYNCHRONISER, null);
         int nombre = cursor.getCount();
         cursor.close();

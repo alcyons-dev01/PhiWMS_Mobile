@@ -267,5 +267,6 @@
     <string name="bouton_scan">bouton scan</string>
     <string name="logophiwms">logoPhiWMS</string>
     <string name="imagedatamatrix">imageDatamatrix</string>
+    <string name="produits">Produits</string>
 
 </resources>

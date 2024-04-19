@@ -333,7 +333,7 @@ public class ProduitOpenHelper extends DBOpenHelper {
         return db.delete(Constantes.TABLE_PRODUIT, Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT + "=?", new String[]{"Traceur_Medicament_ALCYONS"});
     }
 
-    public void viderTableProduit(SQLiteDatabase db) {
+    public static void viderTableProduit(SQLiteDatabase db) {
         db.delete(Constantes.TABLE_PRODUIT, null, null);
     }
 
@@ -486,7 +486,7 @@ public class ProduitOpenHelper extends DBOpenHelper {
         return rowId;
     }
 
-    public void insererBDDLocaleProduits(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
+    public static void insererBDDLocaleProduits(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
         final String tableNom = "Produit";
         final String erreurSynchronisationLibelle = "Produits non synchronisés";
 
