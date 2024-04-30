@@ -11,6 +11,7 @@ import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -166,7 +167,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
         if (OutilsGestionConnexionReseau.isServerAccessible(ServiceDestructionActivity.this) && passageParOnCreate && !connexionDirecte) {
 
             if (!swipeRefreshLayout.isRefreshing()) {
-                mProgressDialog = ProgressDialog.show(ServiceDestructionActivity.this, "Veuillez patienter", "Synchronisation des retours en cours");
+                afficherSpinner(ServiceDestructionActivity.this, LayoutInflater.from(ServiceDestructionActivity.this));
             }
       
             RequestQueue requestQueueDestructionUtilisateur = Volley.newRequestQueue(ServiceDestructionActivity.this);
@@ -201,6 +202,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
 
                 passageParOnCreate = false;
             }
+            arreterSpinner();
         } else {
             listeRetours = RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(db, getString(R.string.statutEncours), getString(R.string.DestructionDemandee));
             if (listeRetours.isEmpty()) {

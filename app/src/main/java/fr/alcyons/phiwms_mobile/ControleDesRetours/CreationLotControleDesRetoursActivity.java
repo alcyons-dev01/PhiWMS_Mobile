@@ -29,6 +29,10 @@ import java.util.List;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
@@ -71,8 +75,8 @@ public class CreationLotControleDesRetoursActivity extends ServiceActivity {
         pm = CreationLotControleDesRetoursActivity.this.getPackageManager();
 
         // Récupération des variables globales
-        produitSelectionne = gestionnaireProduit.getProduitByID(db, intent.getExtras().getInt("produitID"));
-        depotSelectionne = gestionnaireDepot.getDepotParID(db, intent.getExtras().getInt("depotID"));
+        produitSelectionne = ProduitOpenHelper.getProduitByID(db, intent.getExtras().getInt("produitID"));
+        depotSelectionne = DepotOpenHelper.getDepotParID(db, intent.getExtras().getInt("depotID"));
 
 
         // Récupération des objets graphiques
@@ -102,7 +106,7 @@ public class CreationLotControleDesRetoursActivity extends ServiceActivity {
             @Override
             public void onClick(View view) {
                 depotZoneList = new ArrayList<Depot_Zone>();
-                depotZoneList = gestionnaireZone.getZonesEtEmplacementsParDepot(db, depotSelectionne);
+                depotZoneList = ZoneOpenHelper.getZonesEtEmplacementsParDepot(db, depotSelectionne);
 
                 if (depotZoneList.size() != 0) {
                     Intent newIntent = new Intent(CreationLotControleDesRetoursActivity.this, ListeZoneCreationActivity.class);
@@ -122,7 +126,7 @@ public class CreationLotControleDesRetoursActivity extends ServiceActivity {
 
                 emplacementList = new ArrayList<>();
                 if (zoneSelectionner != null) {
-                    emplacementList = gestionnaireEmplacement.getEmplacementsParZone(db, zoneSelectionner);
+                    emplacementList = EmplacementOpenHelper.getEmplacementsParZone(db, zoneSelectionner);
                 }
 
 
@@ -234,15 +238,15 @@ public class CreationLotControleDesRetoursActivity extends ServiceActivity {
         if (depotSelectionne.getStructure().contains("PAD")) {
             zoneTextView.setText(produitSelectionne.getZone_PAD_Defaut());
             emplacementTextView.setText(produitSelectionne.getEmplacement_PAD_Defaut());
-            zoneSelectionner = gestionnaireZone.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_PAD_Defaut());
+            zoneSelectionner = ZoneOpenHelper.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_PAD_Defaut());
         } else if (depotSelectionne.getStructure().contains("PUF")) {
             zoneTextView.setText(produitSelectionne.getZone_UF_Defaut());
             emplacementTextView.setText(produitSelectionne.getEmplacement_UF_Defaut());
-            zoneSelectionner = gestionnaireZone.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_UF_Defaut());
+            zoneSelectionner = ZoneOpenHelper.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_UF_Defaut());
         } else {
             zoneTextView.setText(produitSelectionne.getZone_PUI_Defaut());
             emplacementTextView.setText(produitSelectionne.getEmplacement_PUI_Defaut());
-            zoneSelectionner = gestionnaireZone.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_PUI_Defaut());
+            zoneSelectionner = ZoneOpenHelper.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_PUI_Defaut());
         }
 
         String numLot = intent.getExtras().getString("numLot");
@@ -353,18 +357,18 @@ public class CreationLotControleDesRetoursActivity extends ServiceActivity {
             switch (requestCode) {
                 case RESULT_ZONE:
                     int zoneid = data.getExtras().getInt("zoneid");
-                    zoneSelectionner = gestionnaireZone.getUneZoneByID(db, zoneid);
+                    zoneSelectionner = ZoneOpenHelper.getUneZoneByID(db, zoneid);
                     zoneTextView.setText(zoneSelectionner.getZoneName().trim());
 
                     break;
                 case RETOUR_CODE_EMPLACEMENT:
                     int emplacementid = data.getExtras().getInt("emplacementId");
-                    emplacementSelectionner = gestionnaireEmplacement.getUnEmplacementByID(db, emplacementid);
+                    emplacementSelectionner = EmplacementOpenHelper.getUnEmplacementByID(db, emplacementid);
                     emplacementTextView.setText(emplacementSelectionner.getAdressage().trim());
                     break;
 
                 case CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT:
-                    Depot_Emplacement depotEmplacement = gestionnaireEmplacement.getUnEmplacementByID(db, data.getExtras().getInt("emplacementSelectionneID"));
+                    Depot_Emplacement depotEmplacement = EmplacementOpenHelper.getUnEmplacementByID(db, data.getExtras().getInt("emplacementSelectionneID"));
                     if(depotEmplacement == null)
                     {
                         String code = data.getStringExtra("code");
@@ -372,9 +376,9 @@ public class CreationLotControleDesRetoursActivity extends ServiceActivity {
                             String[] tabchaine = code.split(":");
                             code = tabchaine[1];
                         }
-                        depotEmplacement = gestionnaireEmplacement.getUnEmplacementByID(db, Integer.parseInt(code));
+                        depotEmplacement = EmplacementOpenHelper.getUnEmplacementByID(db, Integer.parseInt(code));
                     }
-                    Depot_Zone depotZone = gestionnaireZone.getUneZoneByID(db, depotEmplacement.getZoneID());
+                    Depot_Zone depotZone = ZoneOpenHelper.getUneZoneByID(db, depotEmplacement.getZoneID());
                     if(depotEmplacement!= null && depotZone != null){
                         zoneTextView.setText(depotZone.getZoneName().trim());
                         emplacementTextView.setText(depotEmplacement.getAdressage().trim());

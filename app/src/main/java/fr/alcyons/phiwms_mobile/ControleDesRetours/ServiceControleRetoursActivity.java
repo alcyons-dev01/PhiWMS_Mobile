@@ -3,10 +3,12 @@ package fr.alcyons.phiwms_mobile.ControleDesRetours;
 import static com.google.android.gms.vision.L.TAG;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
@@ -14,12 +16,17 @@ import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -66,6 +73,8 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.ReceptionPUI.DetailReceptionPuiActivity;
+import fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 /**
@@ -170,18 +179,14 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                                     retourListView.setAdapter(retourAdapter);
 
                                     if (retourList.isEmpty()) {
-                                        Bundle serviceControleRetours_Bundle = new Bundle();
-                                        serviceControleRetours_Bundle.putBoolean("vide", true);
-                                        serviceControleRetours_Bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                                        serviceControleRetours_Bundle.putString("nomservice", "Contrôle des retours");
-
-                                        Intent serviceControleRetours_Intent = new Intent(ServiceControleRetoursActivity.this, NavigationActivity.class);
-                                        serviceControleRetours_Intent.putExtras(serviceControleRetours_Bundle);
-                                        ServiceControleRetoursActivity.this.startActivity(intent);
+                                        vide = true;
+                                        nomServiceVide = "Contrôle des retours";
                                         ServiceControleRetoursActivity.this.finish();
                                     }
-
-                                    invalidateOptionsMenu();
+                                    else
+                                    {
+                                        invalidateOptionsMenu();
+                                    }
                                 } else {
                                     Bundle serviceControleRetours_Bundle = ServiceControleRetoursActivity.super.getBundle();
                                     serviceControleRetours_Bundle.putInt("retourSelectionneID", retourSelectionne.get_UID());
@@ -189,6 +194,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                                     Intent serviceControleRetours_Intent = new Intent(ServiceControleRetoursActivity.this, DetailsControleRetoursActivity.class);
                                     serviceControleRetours_Intent.putExtras(serviceControleRetours_Bundle);
                                     ServiceControleRetoursActivity.this.startActivity(serviceControleRetours_Intent);
+                                    ServiceControleRetoursActivity.this.finish();
                                 }
                             } else {
                                 /* Code nécessaire à l'affichage de la liste */
@@ -199,18 +205,14 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                                 retourListView.setAdapter(retourAdapter);
 
                                 if (retourList.isEmpty()) {
-                                    Bundle serviceControleRetours_Bundle = new Bundle();
-                                    serviceControleRetours_Bundle.putBoolean("vide", true);
-                                    serviceControleRetours_Bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                                    serviceControleRetours_Bundle.putString("nomservice", "Contrôle des retours");
-
-                                    Intent serviceControleRetours_Intent = new Intent(ServiceControleRetoursActivity.this, NavigationActivity.class);
-                                    serviceControleRetours_Intent.putExtras(serviceControleRetours_Bundle);
-                                    ServiceControleRetoursActivity.this.startActivity(intent);
+                                    vide = true;
+                                    nomServiceVide = "Contrôle des retours";
                                     ServiceControleRetoursActivity.this.finish();
                                 }
-
-                                invalidateOptionsMenu();
+                                else
+                                {
+                                    invalidateOptionsMenu();
+                                }
                             }
                         } else {
                             /* Code nécessaire à l'affichage de la liste */
@@ -221,18 +223,14 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                             retourListView.setAdapter(retourAdapter);
 
                             if (retourList.isEmpty()) {
-                                Bundle serviceControleRetours_Bundle = new Bundle();
-                                serviceControleRetours_Bundle.putBoolean("vide", true);
-                                serviceControleRetours_Bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                                serviceControleRetours_Bundle.putString("nomservice", "Contrôle des retours");
-
-                                Intent serviceControleRetours_Intent = new Intent(ServiceControleRetoursActivity.this, NavigationActivity.class);
-                                serviceControleRetours_Intent.putExtras(serviceControleRetours_Bundle);
-                                ServiceControleRetoursActivity.this.startActivity(intent);
+                                vide = true;
+                                nomServiceVide = "Contrôle des retours";
                                 ServiceControleRetoursActivity.this.finish();
                             }
-
-                            invalidateOptionsMenu();
+                            else
+                            {
+                                invalidateOptionsMenu();
+                            }
                         }
                     }
                 });
@@ -246,7 +244,8 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         if (OutilsGestionConnexionReseau.isServerAccessible(ServiceControleRetoursActivity.this) && passageParOnCreate && !connexionDirecte) {
 
             if (!swipeRefreshLayout.isRefreshing()) {
-                mProgressDialog = ProgressDialog.show(ServiceControleRetoursActivity.this, "Veuillez patienter", "Synchronisation des retours en cours");
+                //mProgressDialog = AlertDialog..show(ServiceControleRetoursActivity.this, "Veuillez patienter", "Synchronisation des retours en cours");
+                afficherSpinner(ServiceControleRetoursActivity.this, LayoutInflater.from(ServiceControleRetoursActivity.this));
             }
 
             RequestQueue requestQueue = Volley.newRequestQueue(ServiceControleRetoursActivity.this);
@@ -277,20 +276,17 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                 retourListView.setAdapter(retourAdapter);
 
                 if (retourList.isEmpty()) {
-                    Bundle serviceControleRetours_Bundle = new Bundle();
-                    serviceControleRetours_Bundle.putBoolean("vide", true);
-                    serviceControleRetours_Bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                    serviceControleRetours_Bundle.putString("nomservice", "Contrôle des retours");
-
-                    Intent serviceControleRetours_Intent = new Intent(ServiceControleRetoursActivity.this, NavigationActivity.class);
-                    serviceControleRetours_Intent.putExtras(serviceControleRetours_Bundle);
-                    ServiceControleRetoursActivity.this.startActivity(intent);
+                    vide = true;
+                    nomServiceVide = "Contrôle des retours";
                     ServiceControleRetoursActivity.this.finish();
                 }
-
-                invalidateOptionsMenu();
+                else
+                {
+                    invalidateOptionsMenu();
+                }
             }
             passageParOnCreate = false;
+            arreterSpinner();
         } else {
             retourList = RetourOpenHelper.getRetoursByEnAttenteDe(db, getString(R.string.RepriseDemandee));
             if (retourList.isEmpty()) {
@@ -319,19 +315,15 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                     retourListView.setAdapter(retourAdapter);
 
                     if (retourList.isEmpty()) {
-                        Bundle serviceControleRetours_Bundle = new Bundle();
-                        serviceControleRetours_Bundle.putBoolean("vide", true);
-                        serviceControleRetours_Bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                        serviceControleRetours_Bundle.putString("nomservice", "Contrôle des retours");
-
-                        Intent serviceControleRetours_Intent = new Intent(ServiceControleRetoursActivity.this, NavigationActivity.class);
-                        serviceControleRetours_Intent.putExtras(serviceControleRetours_Bundle);
-                        ServiceControleRetoursActivity.this.startActivity(intent);
+                        vide = true;
+                        nomServiceVide = "Contrôle des retours";
                         ServiceControleRetoursActivity.this.finish();
                     }
-
-                    invalidateOptionsMenu();
-                    connexionDirecte = !connexionDirecte;
+                    else
+                    {
+                        invalidateOptionsMenu();
+                        connexionDirecte = !connexionDirecte;
+                    }
                 }
             }
         }

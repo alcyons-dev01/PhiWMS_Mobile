@@ -51,7 +51,7 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
 
         messageAlerte = "";
         // Récupération des variables globales et du produit selectionné
-        produitSelectionne = gestionnaireProduit.getProduitByID(db, intent.getExtras().getInt("produitSelectionneID"));
+        produitSelectionne = ProduitOpenHelper.getProduitByID(db, intent.getExtras().getInt("produitSelectionneID"));
         if (intent.getExtras().getString("codeGS1") != null) {
             codeComplet = intent.getExtras().getString("codeGS1");
             estCodeGS1 = true;
@@ -113,9 +113,9 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
                         produitSelectionne.setCodeInconnue("");
                     }
 
-                    long rowId = gestionnaireProduit.mettreAJourProduit(db, produitSelectionne);
+                    long rowId = ProduitOpenHelper.mettreAJourProduit(db, produitSelectionne);
                     if (rowId != -1) {
-                        gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitSelectionne.getPhiMR4UUID(), produitSelectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitSelectionne.getPhiMR4UUID(), produitSelectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
                     }
                     codeComplet = "";
                     messageAlerte = "";
@@ -146,9 +146,9 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
                 if (!produitSelectionne.getGTIN().equals(gs1Decoupe.get(OutilsDecodage.codeGtin))) {
                     produitSelectionne.setGTIN(gs1Decoupe.get(OutilsDecodage.codeGtin).trim());
 
-                    long rowId = gestionnaireProduit.mettreAJourProduit(db, produitSelectionne);
+                    long rowId = ProduitOpenHelper.mettreAJourProduit(db, produitSelectionne);
                     if (rowId != -1) {
-                        gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitSelectionne.getPhiMR4UUID(), produitSelectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitSelectionne.getPhiMR4UUID(), produitSelectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
                     }
                 }
             }
@@ -165,9 +165,9 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
             if (produitAModifier) {
                 produitSelectionne.setCodeInconnue(codeComplet.trim());
 
-                long rowId = gestionnaireProduit.mettreAJourProduit(db, produitSelectionne);
+                long rowId = ProduitOpenHelper.mettreAJourProduit(db, produitSelectionne);
                 if (rowId != -1) {
-                    gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitSelectionne.getPhiMR4UUID(), produitSelectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitSelectionne.getPhiMR4UUID(), produitSelectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
                 }
             }
         }
@@ -227,7 +227,7 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
 
                 produitSelectionne.setSuivi_Serialisation(true);
 
-                gestionnaireProduit.mettreAJourProduit(db, produitSelectionne);
+                ProduitOpenHelper.mettreAJourProduit(db, produitSelectionne);
                 ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitSelectionne.getPhiMR4UUID(), produitSelectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
             }
         }*/

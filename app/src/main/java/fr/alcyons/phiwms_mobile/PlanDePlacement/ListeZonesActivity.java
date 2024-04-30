@@ -12,6 +12,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
@@ -36,7 +39,7 @@ public class ListeZonesActivity extends ServiceActivity {
         setContentView(R.layout.activity_liste_zones);
 
         // Récupération du dépot avec la variable globale
-        depotSelectionne = gestionnaireDepot.getDepotParID(db, intent.getExtras().getInt("depotSelectionneID"));
+        depotSelectionne = DepotOpenHelper.getDepotParID(db, intent.getExtras().getInt("depotSelectionneID"));
 
         //gestion du produit designation
         designationProduit = (TextView) findViewById(R.id.designationProduit);
@@ -60,7 +63,7 @@ public class ListeZonesActivity extends ServiceActivity {
         depotZoneListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 
         // Récupération de la liste des zones à afficher
-        List<Depot_Zone> zonesAAfficher = gestionnaireZone.getZonesEtEmplacementsParDepot(db, depotSelectionne);
+        List<Depot_Zone> zonesAAfficher = ZoneOpenHelper.getZonesEtEmplacementsParDepot(db, depotSelectionne);
         if(zonesAAfficher.size() != 0)
         {
             // Creation de l'adapter qui va gérer la liste des zones
@@ -111,7 +114,7 @@ public class ListeZonesActivity extends ServiceActivity {
         if (data != null) {
             switch (requestCode) {
                 case CodesEchangesActivites.RETOUR_EMPLACEMENT:
-                    Depot_Emplacement emplacementSelectionne = gestionnaireEmplacement.getUnEmplacementByID(db, data.getExtras().getInt("emplacementSelectionneID"));
+                    Depot_Emplacement emplacementSelectionne = EmplacementOpenHelper.getUnEmplacementByID(db, data.getExtras().getInt("emplacementSelectionneID"));
                     Intent listeZonesIntent = new Intent();
                     Bundle listeZonesBundle = super.getBundle();
                     listeZonesBundle.putInt("emplacementSelectionneID", emplacementSelectionne.get_UID());

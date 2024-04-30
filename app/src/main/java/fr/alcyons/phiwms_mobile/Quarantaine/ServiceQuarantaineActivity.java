@@ -14,6 +14,7 @@ import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -55,6 +56,7 @@ import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.SYS_User_Rules;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.ServiceControleRetoursActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourAdapter;
 
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
@@ -192,7 +194,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
         if (OutilsGestionConnexionReseau.isServerAccessible(ServiceQuarantaineActivity.this) && passageParOnCreate && !connexionDirecte) {
 
             if (!swipeRefreshLayout.isRefreshing()) {
-                mProgressDialog = ProgressDialog.show(ServiceQuarantaineActivity.this, "Veuillez patienter", "Synchronisation des retours en cours");
+                afficherSpinner(ServiceQuarantaineActivity.this, LayoutInflater.from(ServiceQuarantaineActivity.this));
             }
 
             RequestQueue requestQueueQuarantaineUtilisateur = Volley.newRequestQueue(ServiceQuarantaineActivity.this);
@@ -229,6 +231,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
 
                 passageParOnCreate = false;
             }
+            arreterSpinner();
         } else {
             retourList = RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(db, getString(R.string.statutEncours), getString(R.string.MiseEnQuarantaine));
 

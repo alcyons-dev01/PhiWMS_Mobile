@@ -43,6 +43,8 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
@@ -138,10 +140,10 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
         pm = DetailVerrouPharmacieActivity.this.getPackageManager();
 
         // Récupération da la préparation selectionné
-        phPreparationSelectionne = gestionnairePH_Preparation.getPH_PreparationByID(db, intent.getExtras().getInt("phPreparationSelectionneID"));
+        phPreparationSelectionne = PH_PreparationOpenHelper.getPH_PreparationByID(db, intent.getExtras().getInt("phPreparationSelectionneID"));
 
         // Entete
-        Depot depot = gestionnaireDepot.getDepotParID(db, phPreparationSelectionne.getDepotDestinataireID());
+        Depot depot = DepotOpenHelper.getDepotParID(db, phPreparationSelectionne.getDepotDestinataireID());
         ((TextView) findViewById(R.id.depotNom)).setText(depot.getNom());
         String preparationNumero = "N° " + String.valueOf(phPreparationSelectionne.getUID());
         ((TextView) findViewById(R.id.preparationNumero)).setText(preparationNumero);
@@ -170,9 +172,9 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
         // Génération de la liste de PH_Preparation_Ligne_VerrouPharmacieAdapter
         phPreparationLigneVerrouPharmacieAdaptes = new ArrayList<>();
 
-        List<PH_Preparation_Ligne> phPreparationLignes = gestionnairePH_Preparation_Ligne.getAllPHPreparationLignesParPHPreparation(db, phPreparationSelectionne);
+        List<PH_Preparation_Ligne> phPreparationLignes = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, phPreparationSelectionne);
         for (PH_Preparation_Ligne phPreparationLigne : phPreparationLignes) {
-            Produit produit = gestionnaireProduit.getProduitByID(db, phPreparationLigne.getProduitID());
+            Produit produit = ProduitOpenHelper.getProduitByID(db, phPreparationLigne.getProduitID());
             stockLotEmplacementLightList = Stock_Lot_EmplacementLightOpenHelper.getAllStock_Lot_EmplacementsByProduitIDEtCommandeNumero(db, produit, numeroCommande);
             if (stockLotEmplacementLightList.size() > 0) {
                 for (Stock_Lot_Emplacement_Light stockLotEmplacement : stockLotEmplacementLightList) {
@@ -360,7 +362,7 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
         int quantite = (int) qte;
 
         if (produitID != 0) {
-            Produit produitCorrespondant = gestionnaireProduit.getProduitByID(db, produitID);
+            Produit produitCorrespondant = ProduitOpenHelper.getProduitByID(db, produitID);
             conditionnementAchat = produitCorrespondant.getCond_achat();
             if (conditionnementAchat == 0) {
                 conditionnementAchat = (int) produitCorrespondant.getCond_distrib();
@@ -462,7 +464,7 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
             String only_heure = parseHeureFormat.format(date);
             ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), Integer.parseInt(ParametresServeurOpenHelper.getPortServeur(db)), "En attente", phPreparationSelectionne.getUID(), "", "Verrou Pharmacie");
             ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
-            gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
             //fin de la création de l'action utilisateur
 
             int compteurReussite = 0;
@@ -484,8 +486,8 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
 
                     phPreparationLigne.set_UID(phPreparationLigneUID);
                     phPreparationLigne.setPhiMR4UUID(phPreparationLigneUID);
-                    gestionnairePH_Preparation_Ligne.insererUnPH_Preparation_LigneEnBDD(db, phPreparationLigne);
-                    gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, phPreparationLigne.getPhiMR4UUID(), phPreparationLigne.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                    PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, phPreparationLigne);
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, phPreparationLigne.getPhiMR4UUID(), phPreparationLigne.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
                 }
 
                 stockLotEmplacementLight.setLot(viewHolder.valeurLot);
@@ -518,10 +520,10 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
                 phPreparationLigne.setQte_APreparer(stockLotEmplacementLight.getQte_Preparer());
                 phPreparationLigne.setQte_RAL(stockLotEmplacementLight.getQte_Preparer());
                 phPreparationLigne.setEmplacementParDefaut(stockLotEmplacementLight.getEmplacement());
-                long rowID = gestionnairePH_Preparation_Ligne.mettreAJourUnPHPreparationLigne(db, phPreparationLigne);
+                long rowID = PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, phPreparationLigne);
                 if (rowID != -1) {
                     compteurReussite++;
-                    gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, phPreparationLigne.getPhiMR4UUID(), phPreparationLigne.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, phPreparationLigne.getPhiMR4UUID(), phPreparationLigne.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
                 } else {
                     compteurReussite = 0;
                 }
@@ -543,9 +545,9 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
                 phPreparationSelectionne.setDelivranceValider_Le(only_date);
                 phPreparationSelectionne.setDelivranceValider_A(only_heure);
 
-                long rowID = gestionnairePH_Preparation.mettreAJourUnPHPreparation(db, phPreparationSelectionne);
+                long rowID = PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, phPreparationSelectionne);
                 if (rowID != -1) {
-                    gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, phPreparationSelectionne.getPhiMR4UUID(), phPreparationSelectionne.getUID(), DBOpenHelper.ActionsEAS.MAJ);
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, phPreparationSelectionne.getPhiMR4UUID(), phPreparationSelectionne.getUID(), DBOpenHelper.ActionsEAS.MAJ);
                 } else {
                     compteurReussite = 0;
                 }
@@ -553,7 +555,7 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
 
             if (compteurReussite != phPreparationLigneVerrouPharmacieAdapter.phPreparationLigneVerrouPharmacieAdapteList.size()) {
                 Alerte.afficherAlerte(DetailVerrouPharmacieActivity.this, "Alerte", "Une erreur est survenue, aucun traitement ne sera effectué.", "alerte");
-                gestionnaireElementASynchroniser.viderTableElementASynchroniser(db);
+                ElementASynchroniserOpenHelper.viderTableElementASynchroniser(db);
                 DetailVerrouPharmacieActivity.this.finish();
                 return;
             }
@@ -561,7 +563,7 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
             Toast.makeText(DetailVerrouPharmacieActivity.this, "Préparation déverrouillée", Toast.LENGTH_SHORT).show();
 
             if (OutilsGestionConnexionReseau.isServerAccessible(DetailVerrouPharmacieActivity.this)) {
-                gestionnaireElementASynchroniser.toutSynchroniser(DetailVerrouPharmacieActivity.this, db, utilisateurConnecte, true);
+                ElementASynchroniserOpenHelper.toutSynchroniser(DetailVerrouPharmacieActivity.this, db, utilisateurConnecte, true);
             }
             onBackPressed();
         }

@@ -23,6 +23,7 @@ import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.MedicamentAdapter;
 import fr.alcyons.phiwms_mobile.ListeActivity.ListeCategorieActivity;
@@ -55,7 +56,7 @@ public class ServiceMedicamentAuLivretActivity extends ServiceActivity {
 
         // Récupération de la liste des médicaments
         if (medicamentList == null) {
-            medicamentList = gestionnaireProduit.getAllMedicaments(db);
+            medicamentList = ProduitOpenHelper.getAllMedicaments(db);
             medicamentAdapter.notifyDataSetChanged();
         } else {
             medicamentAdapter = new MedicamentAdapter(ServiceMedicamentAuLivretActivity.this, medicamentList);
@@ -78,7 +79,7 @@ public class ServiceMedicamentAuLivretActivity extends ServiceActivity {
 
         // Récupération de la liste des médicaments
         if (medicamentList == null) {
-            medicamentList = gestionnaireProduit.getAllMedicaments(db);
+            medicamentList = ProduitOpenHelper.getAllMedicaments(db);
         }
 
         // Afficher le nombre de médicaments
@@ -191,7 +192,7 @@ public class ServiceMedicamentAuLivretActivity extends ServiceActivity {
                         List<Produit> produit_List = new ArrayList<>();
 
                         if (gs1Decoupe.size() != 1) {
-                            produit_List = gestionnaireProduit.getMedicamentsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+                            produit_List = ProduitOpenHelper.getMedicamentsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
                             if (produit_List.size() == 1) {
                                 appelerDetailMedicament(produit_List.get(0));
                             } else if (produit_List.size() > 1) {
@@ -204,7 +205,7 @@ public class ServiceMedicamentAuLivretActivity extends ServiceActivity {
                                 toast.show();
                             }
                         } else {
-                            produit_List = gestionnaireProduit.getProduitsParCodeInconnue(db, code);
+                            produit_List = ProduitOpenHelper.getProduitsParCodeInconnue(db, code);
                             if (produit_List.size() == 1) {
                                 appelerDetailMedicament(produit_List.get(0));
                             } else if (produit_List.size() > 1) {
@@ -225,7 +226,7 @@ public class ServiceMedicamentAuLivretActivity extends ServiceActivity {
                 if (resultCode == ServiceMedicamentAuLivretActivity.RESULT_OK) {
                     String fournisseur_Selectionne = data.getStringExtra("fournisseur_Selectionne");
                     List<Produit> produit_List = new ArrayList<>();
-                    produit_List = gestionnaireProduit.getMedicamentsParFournisseur(db, fournisseur_Selectionne);
+                    produit_List = ProduitOpenHelper.getMedicamentsParFournisseur(db, fournisseur_Selectionne);
                     if (produit_List.size() >= 1) {
                         medicamentList = produit_List;
                         Collections.sort(medicamentList, new Comparator<Produit>() {
@@ -247,7 +248,7 @@ public class ServiceMedicamentAuLivretActivity extends ServiceActivity {
                 if (resultCode == ServiceMedicamentAuLivretActivity.RESULT_OK) {
                     String categorie_Selectionne = data.getStringExtra("categorie_Selectionne");
                     List<Produit> produit_List = new ArrayList<>();
-                    produit_List = gestionnaireProduit.getMedicamentsParCategorie(db, categorie_Selectionne);
+                    produit_List = ProduitOpenHelper.getMedicamentsParCategorie(db, categorie_Selectionne);
                     if (produit_List.size() >= 1) {
                         medicamentList = produit_List;
                         Collections.sort(medicamentList, new Comparator<Produit>() {
@@ -301,7 +302,7 @@ public class ServiceMedicamentAuLivretActivity extends ServiceActivity {
             floatingActionMenu.close(true);
             return;
         }
-        List<Produit> medicamentsEnBDD_List = gestionnaireProduit.getAllMedicaments(db);
+        List<Produit> medicamentsEnBDD_List = ProduitOpenHelper.getAllMedicaments(db);
         if (medicamentList.size() != medicamentsEnBDD_List.size()) {
             medicamentList = medicamentsEnBDD_List;
             onResume();

@@ -15,6 +15,7 @@ import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -119,7 +120,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
         if (OutilsGestionConnexionReseau.isServerAccessible(ServicePreparationPadActivity.this) && passageParOnCreate && !connexionDirecte) {
 
             if (!swipeRefreshLayout.isRefreshing()) {
-                mProgressDialog = ProgressDialog.show(ServicePreparationPadActivity.this, "Veuillez patienter", "Synchronisation des Préparations PAD en cours");
+                afficherSpinner(ServicePreparationPadActivity.this, LayoutInflater.from(ServicePreparationPadActivity.this));
             }
 
             RequestQueue requestQueue = Volley.newRequestQueue(ServicePreparationPadActivity.this);
@@ -157,7 +158,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
             }
 
             passageParOnCreate = false;
-
+            arreterSpinner();
         } else {
             ph_preparation_List = PH_PreparationOpenHelper.getAllPHPreparationPreparationPAD(db);
             ph_preparation_List_base = PH_PreparationOpenHelper.getAllPHPreparationPreparationPAD(db);

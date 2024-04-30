@@ -24,6 +24,7 @@ import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.DispositifAdapter;
 import fr.alcyons.phiwms_mobile.ListeActivity.ListeCategorieActivity;
@@ -54,7 +55,7 @@ public class ServiceDispositifAuLivretActivity extends ServiceActivity {
         invalidateOptionsMenu();
         // Récupération de la liste des dispositifs
         if (dispositifList == null) {
-            dispositifList = gestionnaireProduit.getAllDispositifs(db);
+            dispositifList = ProduitOpenHelper.getAllDispositifs(db);
             dispositifAdapter.notifyDataSetChanged();
         } else {
             dispositifAdapter = new DispositifAdapter(ServiceDispositifAuLivretActivity.this, dispositifList);
@@ -76,7 +77,7 @@ public class ServiceDispositifAuLivretActivity extends ServiceActivity {
 
         // Récupération de la liste des dispositifs
         if (dispositifList == null) {
-            dispositifList = gestionnaireProduit.getAllDispositifs(db);
+            dispositifList = ProduitOpenHelper.getAllDispositifs(db);
         }
 
         // Afficher le nombre de dispositifs
@@ -189,7 +190,7 @@ public class ServiceDispositifAuLivretActivity extends ServiceActivity {
                         List<Produit> produit_List = new ArrayList<>();
                         if (gs1Decoupe.size() != 0) {
                             // Si le code est valide, on récupère les éléments correspondants en BDD
-                            produit_List = gestionnaireProduit.getDispositifsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+                            produit_List = ProduitOpenHelper.getDispositifsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
                             if (produit_List.size() == 1) {
                                 appelerDetailDispositif(produit_List.get(0));
                             } else if (produit_List.size() > 1) {
@@ -215,7 +216,7 @@ public class ServiceDispositifAuLivretActivity extends ServiceActivity {
                 if (resultCode == ServiceDispositifAuLivretActivity.RESULT_OK) {
                     String fournisseur_Selectionne = data.getStringExtra("fournisseur_Selectionne");
                     List<Produit> produit_List = new ArrayList<>();
-                    produit_List = gestionnaireProduit.getDispositifsParFournisseur(db, fournisseur_Selectionne);
+                    produit_List = ProduitOpenHelper.getDispositifsParFournisseur(db, fournisseur_Selectionne);
                     if (produit_List.size() >= 1) {
                         dispositifList = produit_List;
                         Collections.sort(dispositifList, new Comparator<Produit>() {
@@ -238,7 +239,7 @@ public class ServiceDispositifAuLivretActivity extends ServiceActivity {
                 if (resultCode == ServiceDispositifAuLivretActivity.RESULT_OK) {
                     String categorie_Selectionne = data.getStringExtra("categorie_Selectionne");
                     List<Produit> produit_List = new ArrayList<>();
-                    produit_List = gestionnaireProduit.getDispositifsParCategorie(db, categorie_Selectionne);
+                    produit_List = ProduitOpenHelper.getDispositifsParCategorie(db, categorie_Selectionne);
                     if (produit_List.size() >= 1) {
                         dispositifList = produit_List;
                         Collections.sort(dispositifList, new Comparator<Produit>() {
@@ -294,7 +295,7 @@ public class ServiceDispositifAuLivretActivity extends ServiceActivity {
             floatingActionMenu.close(true);
             return;
         }
-        List<Produit> dispositifsEnBDD = gestionnaireProduit.getAllDispositifs(db);
+        List<Produit> dispositifsEnBDD = ProduitOpenHelper.getAllDispositifs(db);
         if (dispositifList.size() != dispositifsEnBDD.size()) {
             dispositifList = dispositifsEnBDD;
             onResume();

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Produit_IdentificationParScanAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
@@ -56,15 +57,15 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
             // Récupération et gestion de la liste des produits correspondants en fonction de la longueur de cette liste
             if(gs1Decoupe.size() > 1)
             {
-                listeAAfficher = gestionnaireProduit.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+                listeAAfficher = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
             }
             else
             {
-                listeAAfficher = gestionnaireProduit.getProduitsParCodeInconnue(db, codeGS1);
+                listeAAfficher = ProduitOpenHelper.getProduitsParCodeInconnue(db, codeGS1);
             }
         } else if(codeInconnue != null && !codeInconnue.contentEquals("")){
             // Récupération et gestion de la liste des produits correspondants en fonction de la longueur de cette liste
-            listeAAfficher = gestionnaireProduit.getProduitsParCodeInconnue(db, codeInconnue);
+            listeAAfficher = ProduitOpenHelper.getProduitsParCodeInconnue(db, codeInconnue);
         }
 
         //gestion de la liste
@@ -73,7 +74,7 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
         } else if (listeAAfficher.size() > 1) {
             Alerte.afficherAlerte(ListeProduitsIdentificationParScanActivity.this, "Attention", "Plusieurs produits correspondent à ce code.", "alerte");
         } else {
-            listeAAfficher = gestionnaireProduit.getAllProduits(db);
+            listeAAfficher = ProduitOpenHelper.getAllProduits(db);
             if(codeInconnue != null && !codeInconnue.contentEquals(""))
             {
                 Toast toast = Toast.makeText(ListeProduitsIdentificationParScanActivity.this, "Aucun produit ne correspond au code fourni", Toast.LENGTH_SHORT);
@@ -88,7 +89,7 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
         super.onResume();
         invalidateOptionsMenu();
         listeAAfficher = new ArrayList<>();
-        listeAAfficher = gestionnaireProduit.getAllProduits(db);
+        listeAAfficher = ProduitOpenHelper.getAllProduits(db);
 
         // Affichage de la liste
         adapter = new Produit_IdentificationParScanAdapter(ListeProduitsIdentificationParScanActivity.this, listeAAfficher, db);

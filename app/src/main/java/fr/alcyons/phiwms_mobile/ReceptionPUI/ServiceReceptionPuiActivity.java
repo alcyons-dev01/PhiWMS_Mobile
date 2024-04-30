@@ -14,6 +14,7 @@ import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -204,9 +205,8 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
         //* Code nécessaire afin de réaliser une requête à l' API *//*
         if (OutilsGestionConnexionReseau.isServerAccessible(ServiceReceptionPuiActivity.this) && passageParOnCreate && !connexionDirecte)
         {
-
             if (!swipeRefreshLayout.isRefreshing()) {
-                mProgressDialog = ProgressDialog.show(ServiceReceptionPuiActivity.this, "Veuillez patienter", "Synchronisation des commandes en cours");
+                afficherSpinner(ServiceReceptionPuiActivity.this, LayoutInflater.from(ServiceReceptionPuiActivity.this));
             }
 
             RequestQueue requestQueueDestructionUtilisateur = Volley.newRequestQueue(ServiceReceptionPuiActivity.this);
@@ -349,6 +349,8 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                 onClickTriFournisseur();
                 break;
         }
+
+        arreterSpinner();
     }
 
     @NonNull

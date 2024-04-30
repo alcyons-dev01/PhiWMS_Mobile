@@ -11,6 +11,7 @@ import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -49,6 +50,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.ServiceControleRetoursActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
@@ -166,7 +168,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
         /* Code nécessaire afin de réaliser une requête à l' API */
         if (OutilsGestionConnexionReseau.isServerAccessible(ServiceRetourFournisseurActivity.this) && passageParOnCreate && !connexionDirecte) {
             if (!swipeRefreshLayout.isRefreshing()) {
-                mProgressDialog = ProgressDialog.show(ServiceRetourFournisseurActivity.this, "Veuillez patienter", "Synchronisation des retours en cours");
+                afficherSpinner(ServiceRetourFournisseurActivity.this,  LayoutInflater.from(ServiceRetourFournisseurActivity.this));;
             }
      
             RequestQueue requestQueueRetourFournisseur = Volley.newRequestQueue(ServiceRetourFournisseurActivity.this);
@@ -202,6 +204,8 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
 
                 passageParOnCreate = false;
             }
+
+            arreterSpinner();
         } else {
             listeRetours = RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(db, getString(R.string.statutEncours), getString(R.string.RetourFRSDemande));
             if (listeRetours.isEmpty()) {

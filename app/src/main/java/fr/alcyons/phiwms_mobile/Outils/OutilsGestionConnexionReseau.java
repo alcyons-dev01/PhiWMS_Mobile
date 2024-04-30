@@ -127,47 +127,104 @@ public class OutilsGestionConnexionReseau {
 
             String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + "serveur";
 
-            @SuppressLint("HandlerLeak") final Handler handler = new Handler() {
+            /*final Handler handler = new Handler() {
                 @Override
                 public void handleMessage(Message mesg) {
                     throw new RuntimeException();
                 }
-            };
+            };*/
 
             RequestQueue requestQueue = Volley.newRequestQueue(context);
 
             JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
-                    new Response.Listener<JSONObject>() {
-
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                int nbProduitsEnBDDistante = response.getInt("resultCount");
-                                if (nbProduitsEnBDDistante == 1) {
-                                    reponseRecue = true;
-                                }
-                                handler.sendMessage(handler.obtainMessage());
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                handler.sendMessage(handler.obtainMessage());
+                    response -> {
+                        try {
+                            int connexionOuverte = response.getInt("resultCount");
+                            if (connexionOuverte == 1) {
+                                reponseRecue = true;
                             }
+                            returnServerAccessible(context);
+                            //handler.sendMessage(handler.obtainMessage());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            //handler.sendMessage(handler.obtainMessage());
                         }
                     },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e("Volley", "Error");
-                            handler.sendMessage(handler.obtainMessage());
-                        }
+                    error -> {
+                        Log.e("Volley", "Error");
+                        //handler.sendMessage(handler.obtainMessage());
                     }
             );
             requestQueue.add(obreq);
-            try {
+            /*try {
                 Looper.loop();
             } catch (RuntimeException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
+    return reponseRecue;
+    }
+
+    public static void isServerAccessiblev2(Context context) {
+
+        reponseRecue = false;
+
+        if (!getNetworkClass(context).contentEquals("")) {
+
+            SQLiteDatabase db = null;
+            try {
+                db = ((OriginalActivity) context).db;
+            } catch (ClassCastException e) {
+                e.printStackTrace();
+                db = ((AuthentificationActivity) context).db;
+            }
+
+            String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + "serveur";
+
+            /*final Handler handler = new Handler() {
+                @Override
+                public void handleMessage(Message mesg) {
+                    throw new RuntimeException();
+                }
+            };*/
+
+            RequestQueue requestQueue = Volley.newRequestQueue(context);
+
+            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
+                    response -> {
+                        try {
+                            int connexionOuverte = response.getInt("resultCount");
+                            if (connexionOuverte == 1) {
+                                reponseRecue = true;
+                            }
+                            returnServerAccessible(context);
+                            //handler.sendMessage(handler.obtainMessage());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            //handler.sendMessage(handler.obtainMessage());
+                        }
+                    },
+                    error -> {
+                        Log.e("Volley", "Error");
+                        //handler.sendMessage(handler.obtainMessage());
+                    }
+            );
+            requestQueue.add(obreq);
+            /*try {
+                Looper.loop();
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            }*/
+        }
+
+    }
+
+    public static boolean returnServerAccessible(Context context)
+    {
+
+        isServerAccessiblev2(context);
+
+
         return reponseRecue;
     }
 }

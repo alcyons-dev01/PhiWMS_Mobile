@@ -13,6 +13,7 @@ import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -45,10 +46,14 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerDocumentActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
@@ -56,6 +61,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.ServiceControleRetoursActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_PreparationAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
@@ -114,9 +120,8 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
         /* Code nécessaire afin de réaliser une requête à l' API */
         if (OutilsGestionConnexionReseau.isServerAccessible(ServiceVerrouPharmacieActivity.this) && passageParOnCreate && !connexionDirect) {
 
-            mProgressDialog = null;
             if (!swipeRefreshLayout.isRefreshing()) {
-                mProgressDialog = ProgressDialog.show(ServiceVerrouPharmacieActivity.this, "Veuillez patienter", "Synchronisation des préparations en cours");
+                afficherSpinner(ServiceVerrouPharmacieActivity.this, LayoutInflater.from(ServiceVerrouPharmacieActivity.this));;
             }
             CommandeOpenHelper.insererBDDLocaleCommandeReceptionPAD(ServiceVerrouPharmacieActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
 
@@ -164,13 +169,13 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
                                         JSONObject phPreparationJSONObject = phPreparationJSONArray.getJSONObject(i);
                                         PH_Preparation phPreparation = new PH_Preparation(phPreparationJSONObject);
 
-                                        Depot depot = gestionnaireDepot.getDepotParID(db, phPreparation.getDepotDestinataireID());
+                                        Depot depot = DepotOpenHelper.getDepotParID(db, phPreparation.getDepotDestinataireID());
 
                                         if (depot != null) {
 
                                             if (depot.getStructure().contains("PAD")) {
                                                 if (phPreparation.getStatut().equals(getString(R.string.statutVerrouillée))) {
-                                                    rowID = gestionnairePH_Preparation.insererUnPH_PreparationEnBDD(db, phPreparation);
+                                                    rowID = PH_PreparationOpenHelper.insererUnPH_PreparationEnBDD(db, phPreparation);
                                                     if (rowID != -1) {
                                                         phPreparationList.add(phPreparation);
                                                         remplirTablesPHPreparationLigneEtStockLotEmplacement(phPreparationJSONObject);
@@ -179,7 +184,7 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
                                             } else if (depot.getStructure().contains("PUF")) {
                                                 if (!phPreparation.getListe().contains("nominative")) {
                                                     if (!phPreparation.getValidee()) {
-                                                        rowID = gestionnairePH_Preparation.insererUnPH_PreparationEnBDD(db, phPreparation);
+                                                        rowID = PH_PreparationOpenHelper.insererUnPH_PreparationEnBDD(db, phPreparation);
                                                         if (rowID != -1) {
                                                             phPreparationList.add(phPreparation);
                                                             remplirTablesPHPreparationLigneEtStockLotEmplacement(phPreparationJSONObject);
@@ -252,8 +257,10 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
                 passageParOnCreate = false;
 
             }
+
+            arreterSpinner();
         } else {
-            phPreparationList = gestionnairePH_Preparation.getAllPHPreparationVerrouPharmacie(db);
+            phPreparationList = PH_PreparationOpenHelper.getAllPHPreparationVerrouPharmacie(db);
             if (phPreparationList.size() == 0) {
                 if(connexionDirect)
                 {
@@ -339,24 +346,24 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
 
     public void viderTablesConcernees() {
 
-        for (PH_Preparation ph_preparation : gestionnairePH_Preparation.getAllPHPreparationVerrouPharmacie(db))
+        for (PH_Preparation ph_preparation : PH_PreparationOpenHelper.getAllPHPreparationVerrouPharmacie(db))
         {
             if(!ph_preparation.getListe().contentEquals("ALCYONS_VERROU"))
             {
-                for (PH_Preparation_Ligne ph_preparation_ligne : gestionnairePH_Preparation_Ligne.getAllPHPreparationLignesParPHPreparation(db, ph_preparation))
+                for (PH_Preparation_Ligne ph_preparation_ligne : PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, ph_preparation))
                 {
-                    gestionnairePH_Preparation_Ligne.supprimerUnPhPreparationLigne(db, ph_preparation_ligne);
-                    Produit produit = gestionnaireProduit.getProduitByID(db, ph_preparation_ligne.getProduitID());
-                    Depot depot = gestionnaireDepot.getDepotParID(db, ph_preparation.getDepotOrigineID());
+                    PH_Preparation_LigneOpenHelper.supprimerUnPhPreparationLigne(db, ph_preparation_ligne);
+                    Produit produit = ProduitOpenHelper.getProduitByID(db, ph_preparation_ligne.getProduitID());
+                    Depot depot = DepotOpenHelper.getDepotParID(db, ph_preparation.getDepotOrigineID());
 
                     if (depot != null && produit != null) {
-                        for (Stock_Lot_Emplacement_Light stockLotEmplacement : gestionnaireStock_Lot_Emplacement.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot)
+                        for (Stock_Lot_Emplacement_Light stockLotEmplacement : Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot)
                         ) {
-                            gestionnaireStock_Lot_Emplacement.supprimerUnStockLotEmplacement(db, stockLotEmplacement);
+                            Stock_Lot_EmplacementLightOpenHelper.supprimerUnStockLotEmplacement(db, stockLotEmplacement);
                         }
                     }
                 }
-                gestionnairePH_Preparation.supprimerUnPhPreparation(db, ph_preparation);
+                PH_PreparationOpenHelper.supprimerUnPhPreparation(db, ph_preparation);
             }
         }
     }
@@ -368,12 +375,12 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
             for (int i = 0; i < phPreparationLignesJSONArray.length(); i++) {
                 JSONObject phPreparationLignesJSONObject = phPreparationLignesJSONArray.getJSONObject(i);
                 PH_Preparation_Ligne phPreparationLigne = new PH_Preparation_Ligne(phPreparationLignesJSONObject);
-                long rowID = gestionnairePH_Preparation_Ligne.insererUnPH_Preparation_LigneEnBDD(db, phPreparationLigne);
+                long rowID = PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, phPreparationLigne);
                 JSONArray phStockLotEmplacementJSONArray = phPreparationLignesJSONObject.getJSONArray("ph_stock_lot_emplacements");
                 for (int k = 0; k < phStockLotEmplacementJSONArray.length(); k++) {
                     JSONObject phStockLotEmplacementJSONObject = phStockLotEmplacementJSONArray.getJSONObject(k);
                     Stock_Lot_Emplacement_Light stockLotEmplacementLight = new Stock_Lot_Emplacement_Light(phStockLotEmplacementJSONObject);
-                    gestionnaireStock_Lot_Emplacement.insererUnStock_Lot_EmplacementEnBDD(db, stockLotEmplacementLight);
+                    Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, stockLotEmplacementLight);
                 }
 
             }

@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
@@ -81,7 +83,7 @@ public class DetailMedicamentAuLivretActivity extends ServiceActivity {
 
         /* Code nécessaire à l'exécution du service */
         produitID_List = intent.getExtras().getIntegerArrayList("produitID_List");
-        medicament_Selectionne = gestionnaireProduit.getProduitByID(db, intent.getExtras().getInt("produitID_Selectionne"));
+        medicament_Selectionne = ProduitOpenHelper.getProduitByID(db, intent.getExtras().getInt("produitID_Selectionne"));
 
         invalidateOptionsMenu();
     }
@@ -147,9 +149,9 @@ public class DetailMedicamentAuLivretActivity extends ServiceActivity {
                             compteurErreur++;
                         }
 
-                        long rowId = gestionnaireProduit.mettreAJourProduit(db, medicament_Selectionne);
+                        long rowId = ProduitOpenHelper.mettreAJourProduit(db, medicament_Selectionne);
                         if (rowId != -1) {
-                            gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, medicament_Selectionne.getPhiMR4UUID(), medicament_Selectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, medicament_Selectionne.getPhiMR4UUID(), medicament_Selectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
                         }
 
 
@@ -181,7 +183,7 @@ public class DetailMedicamentAuLivretActivity extends ServiceActivity {
                                     e.printStackTrace();
                                 }
                                 informationImportanteMedicament.photo.setImageBitmap(medicamentPhoto_Bitmap);
-                                Depot depot = gestionnaireDepot.getDepotPUI(db);
+                                Depot depot = DepotOpenHelper.getDepotPUI(db);
                                 if (OutilsGestionConnexionReseau.isServerAccessible(DetailMedicamentAuLivretActivity.this)) {
                                     MedicalObjective medicalObjective = new MedicalObjective(this, utilisateurConnecte, depot, depot, medicament_Selectionne, true);
                                     medicalObjective.savePicture(medicamentPhoto_Bitmap, String.valueOf(n), "MedicamentAuLivret", false);

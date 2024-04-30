@@ -1,16 +1,25 @@
 package fr.alcyons.phiwms_mobile;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
+
+import java.util.Objects;
+
 import fr.alcyons.phiwms_mobile.R;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
@@ -24,7 +33,7 @@ public class ServiceAvecConnexionActivity extends ServiceActivity {
     public boolean passageParOnCreate = false;
     public SwipeRefreshLayout swipeRefreshLayout;
 
-    public ProgressDialog mProgressDialog;
+    public AlertDialog alertDialog;
     public Handler handler;
     public RetryPolicy retryPolicy;
 
@@ -39,6 +48,7 @@ public class ServiceAvecConnexionActivity extends ServiceActivity {
         }
     };
 
+    @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,9 +74,6 @@ public class ServiceAvecConnexionActivity extends ServiceActivity {
         handler = new Handler() {
             @Override
             public void handleMessage(Message mesg) {
-                if (mProgressDialog != null) {
-                    mProgressDialog.dismiss();
-                }
                 throw new RuntimeException();
             }
         };
@@ -75,9 +82,21 @@ public class ServiceAvecConnexionActivity extends ServiceActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-        }
+    }
+
+    protected void afficherSpinner(Context context, LayoutInflater inflater)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View layout = inflater.inflate(R.layout.progress_bar, null);
+        builder.setView(layout);
+        alertDialog = builder.create();
+        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
+        alertDialog.show();
+    }
+
+    protected void arreterSpinner()
+    {
+        alertDialog.dismiss();
     }
 
     public void connexionNecessaire() {

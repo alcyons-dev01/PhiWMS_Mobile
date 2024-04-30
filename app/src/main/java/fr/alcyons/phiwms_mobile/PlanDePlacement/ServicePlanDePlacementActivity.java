@@ -13,6 +13,7 @@ import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
@@ -86,7 +87,7 @@ public class ServicePlanDePlacementActivity extends ServiceActivity {
                         {
                             Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeComplet);
                             if (gs1Decoupe.size() != 0) {
-                                List<Produit> produitsConcernes = gestionnaireProduit.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+                                List<Produit> produitsConcernes = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
                                 List<Integer> produitIDs = new ArrayList<>();
                                 for (Produit produit : produitsConcernes
                                 ) {

@@ -123,7 +123,7 @@ public class DetailRetourFournisseurActivity extends ServiceActivity {
                 @SuppressLint("SimpleDateFormat") DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
                 retourSelectionne.setDate_retour(format.format(date));
 
-                long rowID = gestionnaireRetour.mettreAJourRetour(db, retourSelectionne);
+                long rowID = RetourOpenHelper.mettreAJourRetour(db, retourSelectionne);
                 if (rowID != -1) {
                     ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, RetourOpenHelper.Constantes.TABLE_RETOUR, retourSelectionne.getPhiMR4UUID(), retourSelectionne.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
                 } else {
@@ -145,7 +145,7 @@ public class DetailRetourFournisseurActivity extends ServiceActivity {
                 ElementASynchroniserOpenHelper.toutSynchroniser(DetailRetourFournisseurActivity.this, db, utilisateurConnecte, true);
             }
 
-            DetailRetourFournisseurActivity.this.finish();
+            onBackPressed();
         }
     };
 

@@ -237,7 +237,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
 
             if (phReliquatCourant != null) {
                 ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, phReliquatCourant.getPhiMR4UUID(), phReliquatCourant.getReliquat_UID(), DBOpenHelper.ActionsEAS.SUPPR);
-                gestionnairePH_Reliquat.supprimerUnPhReliquat(db, phReliquatCourant);
+                PH_ReliquatOpenHelper.supprimerUnPhReliquat(db, phReliquatCourant);
 
                 for (PH_Reliquat_ReceptionPUI_Adapte.Lot lot : phReliquatReceptionPUIAdapte.getlotList()) {
                     for (PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement zoneEtEmplacement : lot.getZoneEtEmplacementList()) {

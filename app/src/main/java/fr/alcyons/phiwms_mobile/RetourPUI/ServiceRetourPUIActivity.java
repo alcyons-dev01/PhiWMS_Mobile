@@ -12,6 +12,7 @@ import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -39,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.zip.Inflater;
 
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
@@ -51,6 +53,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.ServiceControleRetoursActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourAdapter;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
@@ -203,7 +206,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
         if (OutilsGestionConnexionReseau.isServerAccessible(ServiceRetourPUIActivity.this) && passageParOnCreate && !connexionDirecte) {
 
             if (!swipeRefreshLayout.isRefreshing()) {
-                mProgressDialog = ProgressDialog.show(ServiceRetourPUIActivity.this, "Veuillez patienter", "Synchronisation des retours en cours");
+                afficherSpinner(ServiceRetourPUIActivity.this, LayoutInflater.from(ServiceRetourPUIActivity.this));
             }
 
             RequestQueue requestQueueRetourPUI = Volley.newRequestQueue(ServiceRetourPUIActivity.this);
@@ -281,7 +284,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
             }
 
             if (retourList.isEmpty()) {
-
+                arreterSpinner();
                 vide = true;
                 nomServiceVide = "Retour PUI";
                 ServiceRetourPUIActivity.this.finish();
@@ -346,7 +349,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                     retourListView.setAdapter(adapter);
 
                     if (retourList.isEmpty()) {
-
+                        arreterSpinner();
                         vide = true;
                         nomServiceVide = "Retour PUI";
                         ServiceRetourPUIActivity.this.finish();
@@ -358,6 +361,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
             }
         }
         invalidateOptionsMenu();
+        arreterSpinner();
     }
 
     public void viderTablesConcernees() {

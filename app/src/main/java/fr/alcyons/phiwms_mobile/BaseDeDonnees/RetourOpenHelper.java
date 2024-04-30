@@ -758,7 +758,7 @@ public class RetourOpenHelper extends DBOpenHelper {
         return retour;
     }
 
-    public long mettreAJourRetour(SQLiteDatabase db, Retour retour) {
+    public static long mettreAJourRetour(SQLiteDatabase db, Retour retour) {
         // Récupération des éléments du dépot
         ContentValues contentValues = new ContentValues();
         contentValues.put(Constantes.CLE_COL__UID_RETOUR, retour.get_UID());

@@ -232,7 +232,7 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
         return phReliquat;
     }
 
-    public void supprimerUnPhReliquat(SQLiteDatabase db, PH_Reliquat ph_reliquat) {
+    public static void supprimerUnPhReliquat(SQLiteDatabase db, PH_Reliquat ph_reliquat) {
         db.delete(Constantes.TABLE_PH_RELIQUAT, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(ph_reliquat.getPhiMR4UUID())});
     }
 

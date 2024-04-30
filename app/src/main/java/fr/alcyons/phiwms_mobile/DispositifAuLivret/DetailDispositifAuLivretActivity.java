@@ -23,6 +23,8 @@ import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
@@ -80,7 +82,7 @@ public class DetailDispositifAuLivretActivity extends ServiceActivity {
 
         /* Code nécessaire à l'exécution du service */
         produitID_List = intent.getExtras().getIntegerArrayList("produitID_List");
-        dispositif_Selectionne = gestionnaireProduit.getProduitByID(db, intent.getExtras().getInt("produitID_Selectionne"));
+        dispositif_Selectionne = ProduitOpenHelper.getProduitByID(db, intent.getExtras().getInt("produitID_Selectionne"));
 
         invalidateOptionsMenu();
     }
@@ -106,9 +108,9 @@ public class DetailDispositifAuLivretActivity extends ServiceActivity {
                             compteurErreur++;
                         }
 
-                        long rowId = gestionnaireProduit.mettreAJourProduit(db, dispositif_Selectionne);
+                        long rowId = ProduitOpenHelper.mettreAJourProduit(db, dispositif_Selectionne);
                         if (rowId != -1) {
-                            gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, dispositif_Selectionne.getPhiMR4UUID(), dispositif_Selectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, dispositif_Selectionne.getPhiMR4UUID(), dispositif_Selectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
                         }
 
                         if (compteurErreur == 0) {
@@ -136,7 +138,7 @@ public class DetailDispositifAuLivretActivity extends ServiceActivity {
                                 e.printStackTrace();
                             }
                             informationImportanteDispositif.photo.setImageBitmap(dispositifPhoto_Bitmap);
-                            Depot depot = gestionnaireDepot.getDepotPUI(db);
+                            Depot depot = DepotOpenHelper.getDepotPUI(db);
                             if (OutilsGestionConnexionReseau.isServerAccessible(DetailDispositifAuLivretActivity.this)) {
                                 MedicalObjective medicalObjective = new MedicalObjective(this, utilisateurConnecte, depot, depot, dispositif_Selectionne, true);
                                 if(dispositifPhoto_Bitmap != null)

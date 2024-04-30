@@ -601,7 +601,7 @@ public class ProduitOpenHelper extends DBOpenHelper {
         }
     }
 
-    public long mettreAJourProduit(SQLiteDatabase db, Produit produit) {
+    public static long mettreAJourProduit(SQLiteDatabase db, Produit produit) {
         // Récupération des éléments du produit
         ContentValues contentValues = new ContentValues();
         contentValues.put(Constantes.CLE_COL_ID_PRODUIT, produit.getID_produit());

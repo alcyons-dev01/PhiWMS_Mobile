@@ -1,5 +1,8 @@
 package fr.alcyons.phiwms_mobile.Navigation;
 
+import static com.google.android.gms.vision.L.TAG;
+
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -9,24 +12,20 @@ import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
@@ -38,7 +37,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.NotificationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ServiceOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.UtilisateurOpenHelper;
-//import fr.alcyons.phiwms_mobile.BuildConfig;
 import fr.alcyons.phiwms_mobile.Classes.PerimetreFonctionnel;
 import fr.alcyons.phiwms_mobile.Classes.Service;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.ListPerimetreAdapter;
@@ -48,26 +46,21 @@ import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionListeServices;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotoApercu;
-import fr.alcyons.phiwms_mobile.PrisePhoto.PrisePhoto;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
-import com.github.clans.fab.FloatingActionButton;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class NavigationActivity extends ServiceAvecConnexionActivity {
-
-    public ProgressDialog mProgressDialog;
     //public Handler handler;
     RequestQueue requestQueuePlanHabilitationUtilisateur;
     RequestQueue requestQueueIndicateur;
@@ -76,13 +69,9 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
     ListView actionListView;
     NavigationAdapter navigationAdapter;
     ListPerimetreAdapter listPerimetreAdapter;
-    FloatingActionButton versPhoto;
-    List<String> listeDate;
     Map<String, Integer> mapServiceIndicateur;
     PackageManager pm;
     List<Service> liste_service;
-    Button VersActionUtilisateur;
-
     LinearLayout layoutRecherche;
     ImageView closeRecherche;
     ImageView lancerScanService;
@@ -95,7 +84,7 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
         setContentView(R.layout.activity_navigation);
         pm = NavigationActivity.this.getPackageManager();
 
-        etablissement = intent.getExtras().getString("etablissement");
+        etablissement = Objects.requireNonNull(intent.getExtras()).getString("etablissement");
         if (etablissement == null) {
             etablissement = ParametresServeurOpenHelper.getEtablissementNom(db);
         }
@@ -114,19 +103,19 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
         //affichage version
         versionApplication = (TextView) findViewById(R.id.versionApplication);
         //String phrase_version = Calendar.getInstance().get(Calendar.YEAR)+" - v"+BuildConfig.VERSION_NAME+"."+BuildConfig.VERSION_CODE;
+
         String phrase_version = "";
         versionApplication.setText(phrase_version);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onResume() {
         super.onResume();
         if (OutilsGestionConnexionReseau.isServerAccessible(NavigationActivity.this)) {
             ElementASynchroniserOpenHelper.toutSynchroniser(NavigationActivity.this, db, utilisateurConnecte, true);
         }
-
         NotificationOpenHelper.supprimerNotificationVerification(db);
-
         if (vide != null) {
             if (vide) {
                 afficherSnackBar(nomServiceVide);
@@ -136,102 +125,95 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
 
         /* Code nécessaire afin de réaliser une requête à l' API */
         if (OutilsGestionConnexionReseau.isServerAccessible(NavigationActivity.this) && passageParOnCreate) {
-            mProgressDialog = ProgressDialog.show(NavigationActivity.this, "Veuillez patienter", "Synchronisation du plan d'habilitation en cours");
+            afficherSpinner(NavigationActivity.this, LayoutInflater.from(NavigationActivity.this));
             requestQueuePlanHabilitationUtilisateur = new Volley().newRequestQueue(NavigationActivity.this);
 
-            final String urlCompletRequetePlanHabilitation = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequetePlanHabilitation + String.valueOf(utilisateurConnecte.getPlanHabilitation())/* + DBOpenHelper.Urls.parametreToken + utilisateurConnecte.getToken()*/;
+            final String urlCompletRequetePlanHabilitation = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequetePlanHabilitation + utilisateurConnecte.getPlanHabilitation()/* + DBOpenHelper.Urls.parametreToken + utilisateurConnecte.getToken()*/;
             try {
                 if (Looper.myLooper() == null)
                     Looper.prepare();
             } catch (RuntimeException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Error Looper :", e);
             }
-            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlCompletRequetePlanHabilitation, null, new Response.Listener<JSONObject>() {
-                // Takes the response from the JSON request
-                @Override
-                public void onResponse(JSONObject response) {
-                    try {
-                        int resultCount = response.getInt("resultCount");
-                        if (resultCount == 0) {
-                            String erreur = response.getString("erreur");
-                            if (erreur.equals(NavigationActivity.this.getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerte(NavigationActivity.this, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter.", "alerte");
-                                DBOpenHelper.viderBasesDeDonnees(db);
-                                NavigationActivity.this.finishAffinity();
-                                Intent intent = new Intent(NavigationActivity.this, AuthentificationActivity.class);
-                                NavigationActivity.this.startActivity(intent);
-                            } else if (erreur.equals(NavigationActivity.this.getString(R.string.tokenExpire))) {
-                                Alerte.afficherAlerte(NavigationActivity.this, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", "alerte");
-                                NavigationActivity.this.finishAffinity();
-                                Intent intent = new Intent(NavigationActivity.this, AuthentificationActivity.class);
-                                NavigationActivity.this.startActivity(intent);
-                            } else if (!erreur.contentEquals("Aucun plan_habilitation trouvé")) {
-                                Alerte.afficherAlerte(NavigationActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete recupererPlanHabilitationUtilisateur", "alerte");
-                            } else {
-                                utilisateurConnecte.setServicesHabilites(null);
-                                gestionnaireUtilisateur.mettreAJourUtilisateur(db, utilisateurConnecte);
-                            }
+
+            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlCompletRequetePlanHabilitation, null, response -> {
+                try {
+                    int resultCount = response.getInt("resultCount");
+                    if (resultCount == 0) {
+                        String erreur = response.getString("erreur");
+                        if (erreur.equals(NavigationActivity.this.getString(R.string.tokenInvalide))) {
+                            Alerte.afficherAlerte(NavigationActivity.this, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter.", "alerte");
+                            DBOpenHelper.viderBasesDeDonnees(db);
+                            NavigationActivity.this.finishAffinity();
+                            Intent intent = new Intent(NavigationActivity.this, AuthentificationActivity.class);
+                            NavigationActivity.this.startActivity(intent);
+                        } else if (erreur.equals(NavigationActivity.this.getString(R.string.tokenExpire))) {
+                            Alerte.afficherAlerte(NavigationActivity.this, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", "alerte");
+                            NavigationActivity.this.finishAffinity();
+                            Intent intent = new Intent(NavigationActivity.this, AuthentificationActivity.class);
+                            NavigationActivity.this.startActivity(intent);
+                        } else if (!erreur.contentEquals("Aucun plan_habilitation trouvé")) {
+                            Alerte.afficherAlerte(NavigationActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete recupererPlanHabilitationUtilisateur", "alerte");
                         } else {
-                            // récupération des services auquels l'utilisateur connecté a accès
-                            JSONArray planHabilitationJSONArray = response.getJSONArray("plan_habilitation");
-
-                            // Creation de la liste des services auquels l'utilisateur connecté a accès
-                            List<Service> serviceList = new ArrayList<>();
-
-                            for (int i = 0; i < planHabilitationJSONArray.length(); i++) {
-                                // Récupération du service courant
-                                JSONObject planHabilitationJSONObject = planHabilitationJSONArray.getJSONObject(i);
-
-                                // Récupération des attributs du service courant
-                                int idServiceCourant = planHabilitationJSONObject.getInt("id");
-                                String nomServiceCourant = planHabilitationJSONObject.getString("name");
-                                int ordreServiceCourant = planHabilitationJSONObject.getInt("ordre");
-                                int idPerimetreFonctionnelServiceCourant = planHabilitationJSONObject.getInt("perimetre_fonctionnel_id");
-                                String nomPerimetreFonctionnelServiceCourant = planHabilitationJSONObject.getString("perimetre_fonctionnel");
-                                String statutServiceCourant = planHabilitationJSONObject.getString("statut");
-                                int indicateurServiceCourant = 0;
-                                String descriptionServiceCourant = planHabilitationJSONObject.getString("description");
-                                String videoServiceCourant = planHabilitationJSONObject.getString("video");
-                                String whitePaperServiceCourant= planHabilitationJSONObject.getString("whitepaper");
-                                int score = planHabilitationJSONObject.getInt("score");
-                                int phiwms_mobileuuid = 0;
-                                Service serviceBDD = ServiceOpenHelper.getServiceByID(db, idServiceCourant);
-                                if(serviceBDD != null)
-                                {
-                                    phiwms_mobileuuid = serviceBDD.getPhiMR4UUID();
-                                }
-
-                                Service service = new Service(idServiceCourant, nomServiceCourant, ordreServiceCourant, idPerimetreFonctionnelServiceCourant, nomPerimetreFonctionnelServiceCourant, statutServiceCourant, indicateurServiceCourant, descriptionServiceCourant, videoServiceCourant, whitePaperServiceCourant, score, phiwms_mobileuuid);
-                                serviceList.add(service);
-                            }
-                            utilisateurConnecte.setServicesHabilites(serviceList);
-                            gestionnaireUtilisateur.mettreAJourUtilisateur(db, utilisateurConnecte);
-                            if (utilisateurConnecte.getServicesHabilites().size() > 0) {
-                                // Activer les indicateurs pour l'utilisateur
-                                recupererIndicateurs();
-                                mProgressDialog.dismiss();
-                            }
-
+                            utilisateurConnecte.setServicesHabilites(null);
+                            UtilisateurOpenHelper.mettreAJourUtilisateur(db, utilisateurConnecte);
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        Alerte.afficherAlerte(NavigationActivity.this, "Erreur synchronisation", String.valueOf(e.getMessage()), "alerte");
+                    } else {
+                        // récupération des services auquels l'utilisateur connecté a accès
+                        JSONArray planHabilitationJSONArray = response.getJSONArray("plan_habilitation");
+
+                        // Creation de la liste des services auquels l'utilisateur connecté a accès
+                        List<Service> serviceList = new ArrayList<>();
+
+                        for (int i = 0; i < planHabilitationJSONArray.length(); i++) {
+                            // Récupération du service courant
+                            JSONObject planHabilitationJSONObject = planHabilitationJSONArray.getJSONObject(i);
+
+                            // Récupération des attributs du service courant
+                            int idServiceCourant = planHabilitationJSONObject.getInt("id");
+                            String nomServiceCourant = planHabilitationJSONObject.getString("name");
+                            int ordreServiceCourant = planHabilitationJSONObject.getInt("ordre");
+                            int idPerimetreFonctionnelServiceCourant = planHabilitationJSONObject.getInt("perimetre_fonctionnel_id");
+                            String nomPerimetreFonctionnelServiceCourant = planHabilitationJSONObject.getString("perimetre_fonctionnel");
+                            String statutServiceCourant = planHabilitationJSONObject.getString("statut");
+                            int indicateurServiceCourant = 0;
+                            String descriptionServiceCourant = planHabilitationJSONObject.getString("description");
+                            String videoServiceCourant = planHabilitationJSONObject.getString("video");
+                            String whitePaperServiceCourant= planHabilitationJSONObject.getString("whitepaper");
+                            int score = planHabilitationJSONObject.getInt("score");
+                            int phiwms_mobileuuid = 0;
+                            Service serviceBDD = ServiceOpenHelper.getServiceByID(db, idServiceCourant);
+                            if(serviceBDD != null)
+                            {
+                                phiwms_mobileuuid = serviceBDD.getPhiMR4UUID();
+                            }
+
+                            Service service = new Service(idServiceCourant, nomServiceCourant, ordreServiceCourant, idPerimetreFonctionnelServiceCourant, nomPerimetreFonctionnelServiceCourant, statutServiceCourant, indicateurServiceCourant, descriptionServiceCourant, videoServiceCourant, whitePaperServiceCourant, score, phiwms_mobileuuid);
+                            serviceList.add(service);
+                        }
+                        utilisateurConnecte.setServicesHabilites(serviceList);
+                        UtilisateurOpenHelper.mettreAJourUtilisateur(db, utilisateurConnecte);
+                        if (!utilisateurConnecte.getServicesHabilites().isEmpty()) {
+                            // Activer les indicateurs pour l'utilisateur
+                            recupererIndicateurs();
+                        }
 
                     }
+                } catch (JSONException e) {
+                    Log.e(TAG, "Error Looper :", e);
+                    Alerte.afficherAlerte(NavigationActivity.this, "Erreur synchronisation", String.valueOf(e.getMessage()), "alerte");
 
-                    handler.sendMessage(handler.obtainMessage());
                 }
+
+                handler.sendMessage(handler.obtainMessage());
             },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e("Volley", "Error");
-                            Alerte.afficherAlerte(NavigationActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons !\n Impossible d'atteindre le serveur", "alerte");
-                        }
+                    error -> {
+                        Log.e("Volley", "Error");
+                        Alerte.afficherAlerte(NavigationActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons !\n Impossible d'atteindre le serveur", "alerte");
                     }
             ) {
                 @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     HashMap<String, String> headers = new HashMap<>();
                     headers.put("Content-Type", "application/json;charset=utf-8");
                     headers.put("Authorization", utilisateurConnecte.getToken());
@@ -244,7 +226,7 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
             try {
                 Looper.loop();
             } catch (RuntimeException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Error Looper :", e);
             }
             passageParOnCreate = false;
         } else {
@@ -257,35 +239,29 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
         //gestion du clic sur la toolbar
         if(toolbar != null)
         {
-            toolbar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    perimetreCourantTextView.setText("Périmètres");
-                    final List<PerimetreFonctionnel> list_perimetre = utilisateurConnecte.getAllPerimetres();
-                    listPerimetreAdapter = new ListPerimetreAdapter(NavigationActivity.this, list_perimetre, utilisateurConnecte);
-                    actionListView = (ListView) findViewById(R.id.listeView);
-                    actionListView.setAdapter(listPerimetreAdapter);
-                    actionListView.setDivider(footer);
+            toolbar.setOnClickListener(v -> {
+                perimetreCourantTextView.setText("Périmètres");
+                final List<PerimetreFonctionnel> list_perimetre = utilisateurConnecte.getAllPerimetres();
+                listPerimetreAdapter = new ListPerimetreAdapter(NavigationActivity.this, list_perimetre, utilisateurConnecte);
+                actionListView = (ListView) findViewById(R.id.listeView);
+                actionListView.setAdapter(listPerimetreAdapter);
+                actionListView.setDivider(footer);
 
-                    actionListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            perimetreFonctionnelCourant = list_perimetre.get(position);
-                            utilisateurConnecte.setLastPerimetre(perimetreFonctionnelCourant.getId());
-                            UtilisateurOpenHelper.mettreAJourUtilisateur(db, utilisateurConnecte);
-                            perimetreCourantTextView.setText(perimetreFonctionnelCourant.getNom());
-                            if(perimetreFonctionnelCourant != null)
-                            {
-                                intent.getExtras().putSerializable("PerimetreFonctionnelCourant", perimetreFonctionnelCourant);
-                                liste_service = new ArrayList();
-                                List<Service> serviceList = utilisateurConnecte.getServicesUtilisateurParPerimetreFonctionnel(perimetreFonctionnelCourant);
-                                liste_service.addAll(serviceList);
-                                gestionIndicateur();
-                                gestionAdapter();
-                            }
-                        }
-                    });
-                }
+                actionListView.setOnItemClickListener((parent, view, position, id) -> {
+                    perimetreFonctionnelCourant = list_perimetre.get(position);
+                    utilisateurConnecte.setLastPerimetre(perimetreFonctionnelCourant.getId());
+                    UtilisateurOpenHelper.mettreAJourUtilisateur(db, utilisateurConnecte);
+                    perimetreCourantTextView.setText(perimetreFonctionnelCourant.getNom());
+                    if(perimetreFonctionnelCourant != null)
+                    {
+                        Objects.requireNonNull(intent.getExtras()).putSerializable("PerimetreFonctionnelCourant", perimetreFonctionnelCourant);
+                        liste_service = new ArrayList<>();
+                        List<Service> serviceList = utilisateurConnecte.getServicesUtilisateurParPerimetreFonctionnel(perimetreFonctionnelCourant);
+                        liste_service.addAll(serviceList);
+                        gestionIndicateur();
+                        gestionAdapter();
+                    }
+                });
             });
         }
 
@@ -313,7 +289,7 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
             navigationAdapter.clear();
         }
 
-        liste_service = new ArrayList();
+        liste_service = new ArrayList<>();
 
         if(perimetreFonctionnelCourant != null)
         {
@@ -325,8 +301,8 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
         else
         {
             toolbar.performClick();
+            arreterSpinner();
         }
-
     }
 
     @Override
@@ -343,52 +319,41 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+        if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
             MenuItem item = menu.findItem(R.id.menuDatamatrix);
-            item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    lancerScan();
-                    return true;
-                }
+            item.setOnMenuItemClickListener(item1 -> {
+                lancerScan();
+                return true;
             });
         }
 
         MenuItem itemRecherche = menu.findItem(R.id.menuRecherche);
-        itemRecherche.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                rechercherService();
-                return true;
-            }
+        itemRecherche.setOnMenuItemClickListener(item -> {
+            rechercherService();
+            return true;
         });
 
         MenuItem itemInformation = menu.findItem(R.id.menuInformation);
-        itemInformation.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                actionListView = (ListView) findViewById(R.id.listeView);
-                if(!navigationAdapter.afficherInfo)
-                {
-                    navigationAdapter = new NavigationAdapter(NavigationActivity.this, utilisateurConnecte, db, liste_service, mapServiceIndicateur, perimetreFonctionnelCourant.getNom(), true);
-                }
-                else
-                {
-                    navigationAdapter = new NavigationAdapter(NavigationActivity.this, utilisateurConnecte, db, liste_service, mapServiceIndicateur, perimetreFonctionnelCourant.getNom(), false);
-                }
-                actionListView.setAdapter(navigationAdapter);
-                actionListView.setDivider(footer);
-                return true;
+        itemInformation.setOnMenuItemClickListener(item -> {
+            actionListView = (ListView) findViewById(R.id.listeView);
+            if(!navigationAdapter.afficherInfo)
+            {
+                navigationAdapter = new NavigationAdapter(NavigationActivity.this, utilisateurConnecte, db, liste_service, mapServiceIndicateur, perimetreFonctionnelCourant.getNom(), true);
             }
+            else
+            {
+                navigationAdapter = new NavigationAdapter(NavigationActivity.this, utilisateurConnecte, db, liste_service, mapServiceIndicateur, perimetreFonctionnelCourant.getNom(), false);
+            }
+            actionListView.setAdapter(navigationAdapter);
+            actionListView.setDivider(footer);
+            return true;
         });
 
         return true;
     }
 
     public void lancerScan() {
-        Intent scanDocumentIntent = null;
+        Intent scanDocumentIntent;
         Bundle scanDocumentBundle = NavigationActivity.super.getBundle();
         scanDocumentBundle.putBoolean("isBoutonSuppressionExistant", true);
         scanDocumentBundle.putBoolean("modeRafale", false);
@@ -401,7 +366,7 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
         }
         else
         {
-            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
+            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
             {
                 scanDocumentIntent = new Intent(NavigationActivity.this, BarcodeCaptureActivity.class);
                 scanDocumentBundle.putString("contexte", String.valueOf(R.string.scannerContexteService));
@@ -448,7 +413,7 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
             }
             case CodesEchangesActivites.RETOUR_PRISE_PHOTO:
                 if (data != null) {
-                    String photoProduits = data.getExtras().getString("photoProduit");
+                    String photoProduits = Objects.requireNonNull(data.getExtras()).getString("photoProduit");
 
                     Intent anotherIntent = new Intent(NavigationActivity.this, OutilsGestionPhotoApercu.class);
                     Bundle extras = new Bundle();
@@ -457,8 +422,6 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                     anotherIntent.putExtras(extras);
                     NavigationActivity.this.startActivity(anotherIntent);
                 }
-
-                //afficherMenu();
                 break;
         }
     }
@@ -471,68 +434,48 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
         actionListView.setDivider(footer);
 
 
-        actionListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                InputMethodManager imm = (InputMethodManager) NavigationActivity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(getWindow().getDecorView().getRootView().getWindowToken(), 0);
+        actionListView.setOnItemClickListener((adapterView, view, i, l) -> {
+            InputMethodManager imm = (InputMethodManager) NavigationActivity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getWindow().getDecorView().getRootView().getWindowToken(), 0);
 
-                Service serviceSelectionne = navigationAdapter.getItem(i);
-                TextView text_indicateur = view.findViewById(R.id.indicateurService);
-                String indicateur = text_indicateur.getText().toString();
-                if(indicateur != null && !indicateur.contentEquals("0"))
-                {
-                    if (serviceSelectionne != null) {
+            Service serviceSelectionne = navigationAdapter.getItem(i);
+            TextView text_indicateur = view.findViewById(R.id.indicateurService);
+            String indicateur = text_indicateur.getText().toString();
+            if(!indicateur.contentEquals("0"))
+            {
+                if (serviceSelectionne != null) {
 
-                        Class classe_demande = OutilsGestionListeServices.recupererActiviteCorrespondanteAUnService(serviceSelectionne);
-                        if (classe_demande.getName().contentEquals("fr.alcyons.phiwms_mobile.ServiceEnCreationActivity")) {
-                            afficherSnackBar("EnCoursDeDeveloppement");
-                        } else {
-                            serviceSelectionne.setScore(serviceSelectionne.getScore()+1);
-                            long rowid = ServiceOpenHelper.mettreAJourUnServiceEnBD(db, serviceSelectionne);
-                            gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ServiceOpenHelper.Constantes.TABLE_SERVICE, serviceSelectionne.getId(), serviceSelectionne.getId(), DBOpenHelper.ActionsEAS.MAJ);
+                    Class classe_demande = OutilsGestionListeServices.recupererActiviteCorrespondanteAUnService(serviceSelectionne);
+                    if (classe_demande.getName().contentEquals("fr.alcyons.phiwms_mobile.ServiceEnCreationActivity")) {
+                        afficherSnackBar("EnCoursDeDeveloppement");
+                    } else {
+                        serviceSelectionne.setScore(serviceSelectionne.getScore()+1);
+                        ServiceOpenHelper.mettreAJourUnServiceEnBD(db, serviceSelectionne);
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ServiceOpenHelper.Constantes.TABLE_SERVICE, serviceSelectionne.getId(), serviceSelectionne.getId(), DBOpenHelper.ActionsEAS.MAJ);
+                        Intent intentVersService = new Intent(NavigationActivity.this, classe_demande);
 
-                            // Appeler l'activité correspondante au service sélectionné
-                            Intent intentVersService = new Intent(NavigationActivity.this, classe_demande);
+                        // Récupération des éléments à transmettre à la prochaine activité
+                        Bundle extras = new Bundle();
 
-                            // Récupération des éléments à transmettre à la prochaine activité
-                            Bundle extras = new Bundle();
-
-                            if (serviceActuel != null) {
-                                intentVersService.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                intentVersService.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                intentVersService.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                intentVersService.putExtra("EXIT", true);
-                            }
-
-                            extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                            extras.putInt("serviceSelectionneID", serviceSelectionne.getId()); //!\ Il est nécessaire de transmettre cet élément pour gérer les services non disponible avec une seule activité
-                            intentVersService.putExtras(extras);
-
-                            // Appel de la prochaine activité
-                            NavigationActivity.this.startActivity(intentVersService);
+                        if (serviceActuel != null) {
+                            intentVersService.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intentVersService.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            intentVersService.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intentVersService.putExtra("EXIT", true);
                         }
+
+                        extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                        extras.putInt("serviceSelectionneID", serviceSelectionne.getId()); //!\ Il est nécessaire de transmettre cet élément pour gérer les services non disponible avec une seule activité
+                        intentVersService.putExtras(extras);
+
+                        // Appel de la prochaine activité
+                        NavigationActivity.this.startActivity(intentVersService);
                     }
                 }
             }
         });
-    }
 
-    public void prendrePhoto() {
-        Intent detailReceptionPui_Intent = new Intent(NavigationActivity.this, PrisePhoto.class);
-        Bundle detailReceptionPui_Bundle = NavigationActivity.super.getBundle();
-        // Nécessaire pour éviter le message " L'utilisateur connecté a été perdu "
-        detailReceptionPui_Bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-        detailReceptionPui_Bundle.putString("contexte", "photoAction");
-        detailReceptionPui_Intent.putExtras(detailReceptionPui_Bundle);
-        NavigationActivity.this.startActivityForResult(detailReceptionPui_Intent, CodesEchangesActivites.RETOUR_PRISE_PHOTO);
-    }
-
-    public int GetDipsFromPixel(float pixels) {
-        // Get the screen's density scale
-        final float scale = getResources().getDisplayMetrics().density;
-        // Convert the dps to pixels, based on density scale
-        return (int) (pixels * scale + 0.5f);
+        arreterSpinner();
     }
 
     public void recupererIndicateurs() {
@@ -542,119 +485,114 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
         }
 
         String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteIndicateur + "bureau";
-        requestQueueIndicateur = new Volley().newRequestQueue(NavigationActivity.this);
+        new Volley();
+        requestQueueIndicateur = Volley.newRequestQueue(NavigationActivity.this);
 
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    int resultCount = response.getInt("resultCount");
-                    if (resultCount == 0) {
-                        String erreur = response.getString("erreur");
-                        if (erreur.equals(NavigationActivity.this.getString(R.string.tokenInvalide))) {
-                            DBOpenHelper.viderBasesDeDonnees(db);
-                            NavigationActivity.this.finish();
-                            Intent intent = new Intent(NavigationActivity.this, AuthentificationActivity.class);
-                            NavigationActivity.this.startActivity(intent);
-                        } else if (erreur.equals(NavigationActivity.this.getString(R.string.tokenExpire))) {
-                            Alerte.afficherAlerte(NavigationActivity.this, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", "alerte");
-                            NavigationActivity.this.finish();
-                            Intent intent = new Intent(NavigationActivity.this, AuthentificationActivity.class);
-                            NavigationActivity.this.startActivity(intent);
-                        } else {
-                            Alerte.afficherAlerte(NavigationActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete recupererIndicateurs", "alerte");
-                        }
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null, response -> {
+            try {
+                int resultCount = response.getInt("resultCount");
+                if (resultCount == 0) {
+                    String erreur = response.getString("erreur");
+                    if (erreur.equals(NavigationActivity.this.getString(R.string.tokenInvalide))) {
+                        DBOpenHelper.viderBasesDeDonnees(db);
+                        NavigationActivity.this.finish();
+                        Intent intent = new Intent(NavigationActivity.this, AuthentificationActivity.class);
+                        NavigationActivity.this.startActivity(intent);
+                    } else if (erreur.equals(NavigationActivity.this.getString(R.string.tokenExpire))) {
+                        Alerte.afficherAlerte(NavigationActivity.this, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", "alerte");
+                        NavigationActivity.this.finish();
+                        Intent intent = new Intent(NavigationActivity.this, AuthentificationActivity.class);
+                        NavigationActivity.this.startActivity(intent);
                     } else {
-                        JSONObject indicateurJSONObject = response.getJSONObject("Indicateurs");
-
-                        int indicateurVerrouPharmacie = indicateurJSONObject.getInt("VerrouPharmacie");
-                        serviceIndicateurNom.add("Verrou Pharmacie Préparation externe");
-                        serviceIndicateurValeur.add(indicateurVerrouPharmacie);
-                        mapServiceIndicateur.put("Verrou Pharmacie Préparation externe", indicateurVerrouPharmacie);
-
-                        int indicateurQuarantaine = indicateurJSONObject.getInt("Quarantaine");
-                        serviceIndicateurNom.add("Quarantaine");
-                        serviceIndicateurValeur.add(indicateurQuarantaine);
-                        mapServiceIndicateur.put("Quarantaine", indicateurQuarantaine);
-
-                        int indicateurControleDesRetours = indicateurJSONObject.getInt("ControleDesRetours");
-                        serviceIndicateurNom.add("Contrôle des retours");
-                        serviceIndicateurValeur.add(indicateurControleDesRetours);
-                        mapServiceIndicateur.put("Contrôle des retours", indicateurControleDesRetours);
-
-                        int indicateurRetourPUI = indicateurJSONObject.getInt("RetourPUI");
-                        serviceIndicateurNom.add("Retour PUI");
-                        serviceIndicateurValeur.add(indicateurRetourPUI);
-                        mapServiceIndicateur.put("Retour PUI", indicateurRetourPUI);
-
-                        int indicateurRetourFrs = indicateurJSONObject.getInt("RetourFrs");
-                        serviceIndicateurNom.add("Retour Frs");
-                        serviceIndicateurValeur.add(indicateurRetourFrs);
-                        mapServiceIndicateur.put("Retour Frs", indicateurRetourFrs);
-
-                        int indicateurDestruction = indicateurJSONObject.getInt("Destruction");
-                        serviceIndicateurNom.add("Destruction");
-                        serviceIndicateurValeur.add(indicateurDestruction);
-                        mapServiceIndicateur.put("Destruction", indicateurDestruction);
-
-                        int indicateurPreparationUF = indicateurJSONObject.getInt("PreparationUF");
-                        serviceIndicateurNom.add("Préparation UF");
-                        serviceIndicateurValeur.add(indicateurPreparationUF);
-                        mapServiceIndicateur.put("Préparation UF", indicateurPreparationUF);
-
-                        int indicateurPreparationPAD = indicateurJSONObject.getInt("PreparationPAD");
-                        serviceIndicateurNom.add("Préparation PAD");
-                        serviceIndicateurValeur.add(indicateurPreparationPAD);
-                        mapServiceIndicateur.put("Préparation PAD", indicateurPreparationPAD);
-
-                        int indicateurLivraison = indicateurJSONObject.getInt("Livraison");
-                        serviceIndicateurNom.add("Livraison");
-                        serviceIndicateurValeur.add(indicateurLivraison);
-                        mapServiceIndicateur.put("Livraison", indicateurLivraison);
-
-                        int indicateurReceptionPUI = indicateurJSONObject.getInt("ReceptionPUI");
-                        serviceIndicateurNom.add("Réception PUI");
-                        serviceIndicateurValeur.add(indicateurReceptionPUI);
-                        mapServiceIndicateur.put("Réception PUI", indicateurReceptionPUI);
-
-                        int indicateurReceptionPAD = indicateurJSONObject.getInt("ReceptionPAD");
-                        serviceIndicateurNom.add("Réception PAD");
-                        serviceIndicateurValeur.add(indicateurReceptionPAD);
-                        mapServiceIndicateur.put("Réception PAD", indicateurReceptionPAD);
-
-                        int indicateurPharmacieInterne = indicateurJSONObject.getInt("VerrouPharmacieInterne");
-                        serviceIndicateurNom.add("Verrou Pharmacie Préparation interne");
-                        serviceIndicateurValeur.add(indicateurPharmacieInterne);
-                        mapServiceIndicateur.put("Verrou Pharmacie Préparation interne", indicateurPharmacieInterne);
-
-                        int indicateurDemandePleinVide = indicateurJSONObject.getInt("DemandePleinVide");
-                        serviceIndicateurNom.add("Demande PleinVide");
-                        serviceIndicateurValeur.add(indicateurDemandePleinVide);
-                        mapServiceIndicateur.put("Demande PleinVide", indicateurDemandePleinVide);
-
-                        for (String serviceCourant : serviceIndicateurNom) {
-                            Service service = ServiceOpenHelper.getServiceByName(db, serviceCourant);
-                            serviceList.add(service);
-                        }
-                        afficherMenu();
-                        //activerNotifications();
+                        Alerte.afficherAlerte(NavigationActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete recupererIndicateurs", "alerte");
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                } else {
+                    JSONObject indicateurJSONObject = response.getJSONObject("Indicateurs");
+
+                    int indicateurVerrouPharmacie = indicateurJSONObject.getInt("VerrouPharmacie");
+                    serviceIndicateurNom.add("Verrou Pharmacie Préparation externe");
+                    serviceIndicateurValeur.add(indicateurVerrouPharmacie);
+                    mapServiceIndicateur.put("Verrou Pharmacie Préparation externe", indicateurVerrouPharmacie);
+
+                    int indicateurQuarantaine = indicateurJSONObject.getInt("Quarantaine");
+                    serviceIndicateurNom.add("Quarantaine");
+                    serviceIndicateurValeur.add(indicateurQuarantaine);
+                    mapServiceIndicateur.put("Quarantaine", indicateurQuarantaine);
+
+                    int indicateurControleDesRetours = indicateurJSONObject.getInt("ControleDesRetours");
+                    serviceIndicateurNom.add("Contrôle des retours");
+                    serviceIndicateurValeur.add(indicateurControleDesRetours);
+                    mapServiceIndicateur.put("Contrôle des retours", indicateurControleDesRetours);
+
+                    int indicateurRetourPUI = indicateurJSONObject.getInt("RetourPUI");
+                    serviceIndicateurNom.add("Retour PUI");
+                    serviceIndicateurValeur.add(indicateurRetourPUI);
+                    mapServiceIndicateur.put("Retour PUI", indicateurRetourPUI);
+
+                    int indicateurRetourFrs = indicateurJSONObject.getInt("RetourFrs");
+                    serviceIndicateurNom.add("Retour Frs");
+                    serviceIndicateurValeur.add(indicateurRetourFrs);
+                    mapServiceIndicateur.put("Retour Frs", indicateurRetourFrs);
+
+                    int indicateurDestruction = indicateurJSONObject.getInt("Destruction");
+                    serviceIndicateurNom.add("Destruction");
+                    serviceIndicateurValeur.add(indicateurDestruction);
+                    mapServiceIndicateur.put("Destruction", indicateurDestruction);
+
+                    int indicateurPreparationUF = indicateurJSONObject.getInt("PreparationUF");
+                    serviceIndicateurNom.add("Préparation UF");
+                    serviceIndicateurValeur.add(indicateurPreparationUF);
+                    mapServiceIndicateur.put("Préparation UF", indicateurPreparationUF);
+
+                    int indicateurPreparationPAD = indicateurJSONObject.getInt("PreparationPAD");
+                    serviceIndicateurNom.add("Préparation PAD");
+                    serviceIndicateurValeur.add(indicateurPreparationPAD);
+                    mapServiceIndicateur.put("Préparation PAD", indicateurPreparationPAD);
+
+                    int indicateurLivraison = indicateurJSONObject.getInt("Livraison");
+                    serviceIndicateurNom.add("Livraison");
+                    serviceIndicateurValeur.add(indicateurLivraison);
+                    mapServiceIndicateur.put("Livraison", indicateurLivraison);
+
+                    int indicateurReceptionPUI = indicateurJSONObject.getInt("ReceptionPUI");
+                    serviceIndicateurNom.add("Réception PUI");
+                    serviceIndicateurValeur.add(indicateurReceptionPUI);
+                    mapServiceIndicateur.put("Réception PUI", indicateurReceptionPUI);
+
+                    int indicateurReceptionPAD = indicateurJSONObject.getInt("ReceptionPAD");
+                    serviceIndicateurNom.add("Réception PAD");
+                    serviceIndicateurValeur.add(indicateurReceptionPAD);
+                    mapServiceIndicateur.put("Réception PAD", indicateurReceptionPAD);
+
+                    int indicateurPharmacieInterne = indicateurJSONObject.getInt("VerrouPharmacieInterne");
+                    serviceIndicateurNom.add("Verrou Pharmacie Préparation interne");
+                    serviceIndicateurValeur.add(indicateurPharmacieInterne);
+                    mapServiceIndicateur.put("Verrou Pharmacie Préparation interne", indicateurPharmacieInterne);
+
+                    int indicateurDemandePleinVide = indicateurJSONObject.getInt("DemandePleinVide");
+                    serviceIndicateurNom.add("Demande PleinVide");
+                    serviceIndicateurValeur.add(indicateurDemandePleinVide);
+                    mapServiceIndicateur.put("Demande PleinVide", indicateurDemandePleinVide);
+
+                    for (String serviceCourant : serviceIndicateurNom) {
+                        Service service = ServiceOpenHelper.getServiceByName(db, serviceCourant);
+                        serviceList.add(service);
+                    }
+                    afficherMenu();
+                    //activerNotifications();
                 }
-
+            } catch (JSONException e) {
+                Log.e(TAG, "Error Looper :", e);
             }
+
         },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("Volley", "Error");
-                        Alerte.afficherAlerte(NavigationActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP recupererIndicateurs", "alerte");
-                    }
+                error -> {
+                    Log.e("Volley", "Error");
+                    Alerte.afficherAlerte(NavigationActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP recupererIndicateurs", "alerte");
                 }
         ) {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 HashMap<String, String> headers = new HashMap<>();
                 headers.put("Authorization", utilisateurConnecte.getToken());
                 headers.put("UserId", String.valueOf(utilisateurConnecte.getId()));
@@ -706,20 +644,9 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                     }
                 });*/
     }
-
-    @Override
-    public void setContentView(int layoutRef) {
-        super.setContentView(layoutRef);
-    }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-    }
-
-    @Override
-    public void onPause(){
-        super.onPause();
     }
 
     protected void rechercherService()
@@ -742,7 +669,7 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.toString().length() > 0)
+                if(!s.toString().isEmpty())
                 {
                     List<String> serviceNomSelectionne = new ArrayList<>();
                     liste_service = new ArrayList<>();
@@ -787,27 +714,21 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
             }
         });
 
-        closeRecherche.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                rechercheService.setText("");
-                imm.hideSoftInputFromWindow(getWindow().getDecorView().getRootView().getWindowToken(), 0);
-                layoutRecherche.setVisibility(View.GONE);
-                liste_service = new ArrayList();
-                List<Service> serviceList = utilisateurConnecte.getServicesUtilisateurParPerimetreFonctionnel(perimetreFonctionnelCourant);
-                liste_service.addAll(serviceList);
-                gestionIndicateur();
-                gestionAdapter();
+        closeRecherche.setOnClickListener(v -> {
+            rechercheService.setText("");
+            imm.hideSoftInputFromWindow(getWindow().getDecorView().getRootView().getWindowToken(), 0);
+            layoutRecherche.setVisibility(View.GONE);
+            liste_service = new ArrayList<>();
+            List<Service> serviceList = utilisateurConnecte.getServicesUtilisateurParPerimetreFonctionnel(perimetreFonctionnelCourant);
+            liste_service.addAll(serviceList);
+            gestionIndicateur();
+            gestionAdapter();
 
-            }
         });
 
-        lancerScanService.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                imm.hideSoftInputFromWindow(getWindow().getDecorView().getRootView().getWindowToken(), 0);
-                lancerScan();
-            }
+        lancerScanService.setOnClickListener(v -> {
+            imm.hideSoftInputFromWindow(getWindow().getDecorView().getRootView().getWindowToken(), 0);
+            lancerScan();
         });
 
     }

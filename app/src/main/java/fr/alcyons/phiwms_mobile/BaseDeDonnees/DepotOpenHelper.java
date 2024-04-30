@@ -363,7 +363,7 @@ public class DepotOpenHelper extends DBOpenHelper {
 
     }
 
-    public List<Depot> getDepotsParType(SQLiteDatabase db, String depotStructure) {
+    public static List<Depot> getDepotsParType(SQLiteDatabase db, String depotStructure) {
         String critereRecherche = depotStructure;
         Cursor cursor = db.query(true, Constantes.TABLE_DEPOT, new String[]{"*"}, Constantes.CLE_COL_STRUCTURE_DEPOT + " LIKE ?", new String[]{critereRecherche}, Constantes.CLE_COL_NOM_DEPOT, null, null, null);
 
@@ -379,7 +379,7 @@ public class DepotOpenHelper extends DBOpenHelper {
         return depotList;
     }
 
-    public Depot getPUICourant(SQLiteDatabase db) {
+    public static Depot getPUICourant(SQLiteDatabase db) {
         Depot depot = null;
 
         Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_DEPOT + " WHERE " + Constantes.CLE_COL_STRUCTURE_DEPOT + " LIKE ?", new String[]{"%PUI"});

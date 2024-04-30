@@ -4,16 +4,19 @@ import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -46,11 +49,15 @@ import java.util.Random;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
@@ -79,23 +86,25 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
     ListView retourLigneControleRetourAdapteListView;
     Retour_Ligne_ControleRetoursAdapter retourLigneControleRetoursAdapter;
     Retour_Ligne_ControleRetoursAdapter.Retour_LigneViewHolder viewHolderAModifier;
-
+    PackageManager pm;
     Serialisation serialisation;
-
+    List<Integer> liste_id_retour_ligne;
+    boolean premierPassage;
+    //List<ObjetReceptionScannee> liste_resultat_scan;
+    List<Retour_Ligne> liste_retour_ligne;
     Context context;
-    Spinner optionTri;
     String tri_choisi;
+    LinearLayout lancerScan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_controle_retours);
 
-        //initialisation du context
         context = DetailsControleRetoursActivity.this;
 
         // Récupération des variables globales
-        retourSelectionne = gestionnaireRetour.getRetourByID(db, intent.getExtras().getInt("retourSelectionneID"));
+        retourSelectionne = RetourOpenHelper.getRetourByID(db, intent.getExtras().getInt("retourSelectionneID"));
 
         serialisation = new Serialisation(DetailsControleRetoursActivity.this, db, utilisateurConnecte);
 
@@ -111,13 +120,14 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Retour_Ligne_ControleRetour_Adapte retourLigneAdapte = retourLigneControleRetoursAdapter.retour_Lignes.get(position);
-                Retour_Ligne retourLigne = gestionnaireRetour_Ligne.getRetourLigneByID(db, retourLigneAdapte.getRetourLigneID());
-                Depot depot = gestionnaireDepot.getDepotParReference(db, retourSelectionne.getRef_Depot_Origine());
+                Retour_Ligne retourLigne = Retour_LigneOpenHelper.getRetourLigneByID(db, retourLigneAdapte.getRetourLigneID());
+                Depot depot = DepotOpenHelper.getDepotParReference(db, retourSelectionne.getRef_Depot_Origine());
 
                 viewHolderAModifier = retourLigneControleRetoursAdapter.retourLigneViewHolderList.get(position);
 
                 Bundle DetailControleRetours_Bundle = DetailsControleRetoursActivity.super.getBundle();
-                DetailControleRetours_Bundle.putInt("produitID", retourLigne.getCode_produit());
+                if(retourLigne != null)
+                    DetailControleRetours_Bundle.putInt("produitID", retourLigne.getCode_produit());
                 DetailControleRetours_Bundle.putSerializable("retourLigneAdapte", retourLigneAdapte);
                 DetailControleRetours_Bundle.putInt("depotID", depot.getDepot_UID());
 
@@ -127,26 +137,45 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
             }
         });
 
-        // Initialisation de la liste contenant les Retour_Lignes
+        //Initialisation des variables
+        premierPassage = true;
+        liste_id_retour_ligne = new ArrayList<>();
         retourLigneControleRetourAdapteList = new ArrayList<>();
+        //liste_resultat_scan = new ArrayList<>();
+        liste_retour_ligne = new ArrayList<>();
+        pm = DetailsControleRetoursActivity.this.getPackageManager();
+        liste_retour_ligne =  Retour_LigneOpenHelper.getAllRetourLignesByRetour(db, retourSelectionne);
+
+        tri_choisi = ParametreUtilisateurOpenHelper.getChoixTriRetourLigne(db);
+        if(tri_choisi == null)
+        {
+            ParametreUtilisateurOpenHelper.mettreAJourTriRetourLigne(db, 0, "Designation");
+            tri_choisi= ParametreUtilisateurOpenHelper.getChoixTriRetourLigne(db);
+        }
+
+        //gestion du bouton de scan
+        lancerScan = (LinearLayout) findViewById(R.id.lancerScan);
+        lancerScan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                lancerScanner();
+            }
+        });
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
-
-        /* Code nécessaire afin de réaliser une requête à l' API */
         if (OutilsGestionConnexionReseau.isServerAccessible(DetailsControleRetoursActivity.this) && passageParOnCreate) {
 
             if (!swipeRefreshLayout.isRefreshing()) {
-                mProgressDialog = ProgressDialog.show(DetailsControleRetoursActivity.this, "Veuillez patienter", "Synchronisation des stocks en cours");
+                afficherSpinner(DetailsControleRetoursActivity.this, LayoutInflater.from(DetailsControleRetoursActivity.this));
             }
 
             RequestQueue requestQueue = Volley.newRequestQueue(DetailsControleRetoursActivity.this);
             String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteControleRetours+"/"+retourSelectionne.get_UID();
 
-            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
+            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,null,
                     new Response.Listener<JSONObject>() {
 
                         // Takes the response from the JSON request
@@ -172,7 +201,7 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
 
                                         for (int y = 0; y < stockLotEmplacementsJSONArray.length(); y++) {
                                             Stock_Lot_Emplacement_Light stockLotEmplacementLight = new Stock_Lot_Emplacement_Light(stockLotEmplacementsJSONArray.getJSONObject(y));
-                                            gestionnaireStock_Lot_Emplacement.insererUnStock_Lot_EmplacementEnBDD(db, stockLotEmplacementLight);
+                                            Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, stockLotEmplacementLight);
                                         }
                                     }
                                 }
@@ -209,77 +238,105 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
             } catch (RuntimeException e) {
                 e.printStackTrace();
             }
-
+            arreterSpinner();
         }
-
         // Récupération des retours_lignes du Retour présélectionné
         if (retourLigneControleRetourAdapteList.size() == 0) {
-            for (Retour_Ligne retourLigne : gestionnaireRetour_Ligne.getAllRetourLignesByRetour(db, retourSelectionne)) {
+            for (Retour_Ligne retourLigne : liste_retour_ligne) {
                 Retour_Ligne_ControleRetour_Adapte retourLigneAdapte = new Retour_Ligne_ControleRetour_Adapte(retourLigne.get_UID());
-                Produit produit = gestionnaireProduit.getProduitByID(db, retourLigne.getCode_produit());
-                Depot depot = gestionnaireDepot.getDepotParReference(db, retourSelectionne.getRef_Depot_Origine());
-                if(produit != null)
+                Produit produit = ProduitOpenHelper.getProduitByID(db, retourLigne.getCode_produit());
+                Depot depot = DepotOpenHelper.getDepotParReference(db, retourSelectionne.getRef_Depot_Origine());
+                if(produit != null && depot !=null)
                 {
-                    for (Stock_Lot_Emplacement_Light stockLotEmplacement : gestionnaireStock_Lot_Emplacement.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot)) {
+                    for (Stock_Lot_Emplacement_Light stockLotEmplacement : Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot)) {
                         retourLigneAdapte.getLotAdaptes().add(retourLigneAdapte.new LotAdapte(stockLotEmplacement));
                     }
                 }
                 retourLigneControleRetourAdapteList.add(retourLigneAdapte);
+                liste_id_retour_ligne.add(retourLigne.get_UID());
             }
         }
 
-        tri_choisi = "Designation";
-        optionTri = (Spinner) findViewById(R.id.optionTri);
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.option_tri_retour_ligne, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(R.layout.spinner_item);
-        optionTri.setAdapter(adapter);
-        if (tri_choisi != null) {
-            int spinnerPosition = adapter.getPosition(tri_choisi);
-            optionTri.setSelection(spinnerPosition);
-        }
-        optionTri.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        switch (tri_choisi)
         {
-            @Override
-            public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
-                // TODO Auto-generated method stub
-                ((TextView) arg0.getChildAt(0)).setVisibility(View.INVISIBLE);
-                String optionSelect = arg0.getItemAtPosition(position).toString();
-                switch (optionSelect)
-                {
-                    case "Designation":
-                        onClickTriDesignation();
-                        break;
-                    case "Place":
-                        onClickTriParPlace();
-                        break;
+            case "Designation":
+                onClickTriDesignation();
+                break;
+            case "Place":
+                onClickTriParPlace();
+                break;
 
-                    case "Catégorie":
-                        onClickTriCategorie();
-                        break;
+            case "Catégorie":
+                onClickTriCategorie();
+                break;
 
-                    case "Poids":
-                        onClickTriParPoids();
-                        break;
-                }
-            }
+            case "Poids":
+                onClickTriParPoids();
+                break;
+        }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-                // TODO Auto-generated method stub
-            }
-        });
+        if(premierPassage)
+        {
+            //lancerScanner();
+        }
         invalidateOptionsMenu();
     }
 
     // Lorsqu'on lance une nouvelle activity avec " startActivityForResult ", action à réaliser à la fin de l'activity lancé suivant le " CodesEchangesActivites " passé
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (data != null) {
             switch (requestCode) {
                 case CodesEchangesActivites.RETOUR_LISTE_LOTS:
                     Retour_Ligne_ControleRetour_Adapte retourLigneAdapte = retourLigneControleRetoursAdapter.retour_Lignes.get(retourLigneControleRetoursAdapter.retourLigneViewHolderList.indexOf(viewHolderAModifier));
                     retourLigneAdapte.setLotAdaptes((List<Retour_Ligne_ControleRetour_Adapte.LotAdapte>) data.getExtras().getSerializable("lotAdaptesList"));
+                    break;
+                case CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH:
+                    if(data != null)
+                    {
+                        /*int retourLigneId = data.getExtras().getInt("retourLigneId");
+                        String numLot = data.getExtras().getString("numLot");
+                        String numSerie = data.getExtras().getString("numSerie");
+                        String datePeremption = data.getExtras().getString("datePeremption");
+                        int qteActuelle = data.getExtras().getInt("qteActuelle");
+
+                        Retour_Ligne retour_ligne_courant = Retour_LigneOpenHelper.getRetourLigneByID(db, retourLigneId);
+
+                        if(retour_ligne_courant != null)
+                        {
+                            Produit produit_courant = ProduitOpenHelper.getProduitByID(db, retour_ligne_courant.getCode_produit());
+
+                            //MAJ du retour ligne
+                            retour_ligne_courant.setQte_Retourner(retour_ligne_courant.getQte_Retourner()+qteActuelle);
+                            Retour_LigneOpenHelper.mettreAJourUnRetourLigne(db, retour_ligne_courant);
+
+                            ObjetPreparationScannee objetPreparationScannee = new ObjetPreparationScannee(qteActuelle, numLot, datePeremption, "", "", "", produit_courant.getID_produit(), qteActuelle, numSerie);
+                            Retour_Ligne_ControleRetour_Adapte retourLigneAdapteCourant = new Retour_Ligne_ControleRetour_Adapte(retourLigneId);
+                            int index_a_supprimer = -1;
+                            boolean aSupprimer = false;
+                            for(Retour_Ligne_ControleRetour_Adapte retour_adapte_temp : retourLigneControleRetourAdapteList)
+                            {
+                                index_a_supprimer ++;
+                                if(retour_adapte_temp.getRetourLigneID() == retourLigneAdapteCourant.getRetourLigneID())
+                                {
+                                    retourLigneAdapteCourant = retour_adapte_temp;
+                                    aSupprimer = true;
+                                    break;
+                                }
+                            }
+
+                            if(aSupprimer)
+                            {
+                                retourLigneControleRetourAdapteList.remove(index_a_supprimer);
+                            }
+
+                            retourLigneAdapteCourant.getLotAdaptes().add(retourLigneAdapteCourant.new LotAdapte(objetPreparationScannee));
+                            retourLigneControleRetourAdapteList.add(retourLigneAdapteCourant);
+                        }*/
+
+                    }
                     break;
             }
             invalidateOptionsMenu();
@@ -312,7 +369,6 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
 
     // Définition de l'action sur Click du bouton Save
     public void onMenuSaveClick() {
-
         int compteurReussiteGlobale = 0;
         int nbTotalLotsAvecValeurSaisie = 0;
         int compteurReussiteParLotAvecValeur = 0;
@@ -324,10 +380,6 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
                     nbLignesAvecValeur++;
                     nbTotalLotsAvecValeurSaisie++;
                 }
-            }
-            if (nbLignesAvecValeur == 0) {
-                Alerte.afficherAlerte(DetailsControleRetoursActivity.this, "Alerte", "Tous les éléments n'ont pas été renseignés.", "alerte");
-                return;
             }
         }
 
@@ -341,12 +393,11 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
         String date_string = parseFormat.format(date);
         ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), Integer.parseInt(ParametresServeurOpenHelper.getPortServeur(db)), "En attente", retourSelectionne.get_UID(), "", "Controle des retours");
         ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
-        gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
         //fin de la création de l'action utilisateur
 
-
         for (Retour_Ligne_ControleRetour_Adapte retourLigneAdapte : retourLigneControleRetoursAdapter.retour_Lignes) {
-            Retour_Ligne retourLigneCorrespondant = gestionnaireRetour_Ligne.getRetourLigneByID(db, retourLigneAdapte.getRetourLigneID());
+            Retour_Ligne retourLigneCorrespondant = Retour_LigneOpenHelper.getRetourLigneByID(db, retourLigneAdapte.getRetourLigneID());
 
             List<Retour_Ligne_ControleRetour_Adapte.LotAdapte> lotsSaisis = new ArrayList<>();
             for (Retour_Ligne_ControleRetour_Adapte.LotAdapte lot : retourLigneAdapte.getLotAdaptes()) {
@@ -358,20 +409,32 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
             int compteurLotsDunSeulRetourLigne = 0;
 
             for (Retour_Ligne_ControleRetour_Adapte.LotAdapte lot : lotsSaisis) {
-                Stock_Lot_Emplacement_Light stockLotEmplacementCourant = gestionnaireStock_Lot_Emplacement.getStock_Lot_EmplacementByID(db, lot.getStockLotEmplacementID());
+                Stock_Lot_Emplacement_Light stockLotEmplacementCourant = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, lot.getStockLotEmplacementID());
                 Retour_Ligne retourLigneCourant = new Retour_Ligne(retourLigneCorrespondant);
-
-                retourLigneCourant.set_UID(retourLigneCorrespondant.get_UID()*-1);
+                Random randomactionPhRetourLigne = new Random();
+                int phRetourLigneUID = randomactionPhRetourLigne.nextInt();
+                if(phRetourLigneUID > 0)
+                    phRetourLigneUID = phRetourLigneUID*-1;
+                retourLigneCourant.set_UID(phRetourLigneUID);
                 retourLigneCourant.setQte_Retourner(lot.getQteSaisie());
                 retourLigneCourant.setLot_Retourner(lot.getNumLot());
                 retourLigneCourant.setSerie_Retourner(lot.getNumSerie());
                 retourLigneCourant.setPeremptionDate(lot.getDatePeremption());
 
-                long rowID = gestionnaireRetour_Ligne.insererUnRetour_LigneEnBDD(db, retourLigneCourant);
+                long rowID = Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(db, retourLigneCourant);
                 if (rowID != -1) {
                     compteurReussiteParLotAvecValeur++;
                     compteurLotsDunSeulRetourLigne++;
-                    gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE, retourLigneCourant.getPhiMR4UUID(), retourLigneCourant.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE, retourLigneCourant.getPhiMR4UUID(), retourLigneCourant.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                    //gestion des actions lignes
+                    Random randomactionligne = new Random();
+                    int actionligneId = randomactionligne.nextInt();
+                    if(actionligneId > 0)
+                        actionligneId= actionligneId*-1;
+
+                    ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.getId(), "Retour Ligne", retourLigneCourant.get_UID(), "", 0, (int)retourLigneCourant.getQte_Retourner(), retourLigneCourant.getProduit_Designation());
+                    ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne);
+                    Retour_LigneOpenHelper.supprimerUnRetourLigne(db, retourLigneCorrespondant);
                 }
 
                 if(!retourLigneCourant.getSerie_Retourner().contentEquals(""))
@@ -387,7 +450,7 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
                     SimpleDateFormat input = new SimpleDateFormat("yyyy-MM-dd");
                     SimpleDateFormat output = new SimpleDateFormat("yyMMdd");
                     try {
-                        peremption_temp = input.parse(retourLigneCourant.getPeremptionDate());                 // parse input
+                        peremption_temp = input.parse(retourLigneCourant.getPeremptionDate());// parse input
                         peremption = output.format(peremption_temp);    // format output
                     } catch (ParseException e) {
                         e.printStackTrace();
@@ -397,23 +460,14 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
                     PH_Serialisation serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, (int)uid_serialisation);
                     if(serialisation_courante != null)
                     {
-                        gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisation_courante.getSerialexpressUUID(), serialisation_courante.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisation_courante.getSerialexpressUUID(), serialisation_courante.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
                     }
                 }
 
             }
 
             if (compteurLotsDunSeulRetourLigne == lotsSaisis.size()) {
-                gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE, retourLigneCorrespondant.getPhiMR4UUID(), retourLigneCorrespondant.get_UID(), DBOpenHelper.ActionsEAS.SUPPR);
-                //gestion des actions lignes
-                Random randomactionligne = new Random();
-                int actionligneId = randomactionligne.nextInt();
-                if(actionligneId > 0)
-                    actionligneId= actionligneId*-1;
-
-                ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.getId(), "Retour Ligne", retourLigneCorrespondant.get_UID(), "", 0, (int)retourLigneCorrespondant.getQte_Retourner(), retourLigneCorrespondant.getProduit_Designation());
-                ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne);
-                gestionnaireRetour_Ligne.supprimerUnRetourLigne(db, retourLigneCorrespondant);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE, retourLigneCorrespondant.getPhiMR4UUID(), retourLigneCorrespondant.get_UID(), DBOpenHelper.ActionsEAS.SUPPR);
                 compteurReussiteGlobale++;
             } else {
                 compteurReussiteGlobale = 0;
@@ -429,9 +483,9 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
             retourSelectionne.setDate_retour(format.format(dateJour));
             retourSelectionne.setDate_Validation(format.format(dateJour));
 
-            long rowID = gestionnaireRetour.mettreAJourRetour(db, retourSelectionne);
+            long rowID = RetourOpenHelper.mettreAJourRetour(db, retourSelectionne);
             if (rowID != -1) {
-                gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, RetourOpenHelper.Constantes.TABLE_RETOUR, retourSelectionne.getPhiMR4UUID(), retourSelectionne.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, RetourOpenHelper.Constantes.TABLE_RETOUR, retourSelectionne.getPhiMR4UUID(), retourSelectionne.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
             } else {
                 // Si le retour n'est pas mis à jour, on remet le compteur à 0
                 compteurReussiteGlobale = 0;
@@ -443,7 +497,7 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
         if (compteurReussiteGlobale != retourLigneControleRetoursAdapter.retour_Lignes.size()) {
             // Si une erreur est survenue, on annule les modifications en vidant la table ElementASynchroniser
             Alerte.afficherAlerte(DetailsControleRetoursActivity.this, "Alerte", "Une erreur est survenue, aucun traitement ne sera effectué.", "alerte");
-            gestionnaireElementASynchroniser.viderTableElementASynchroniser(db);
+            ElementASynchroniserOpenHelper.viderTableElementASynchroniser(db);
             DetailsControleRetoursActivity.this.finish();
             return;
         }
@@ -452,8 +506,14 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
 
         // Si possible, on essaie de mettre à jour les éléments
         if (OutilsGestionConnexionReseau.isServerAccessible(DetailsControleRetoursActivity.this)) {
-            gestionnaireElementASynchroniser.toutSynchroniser(DetailsControleRetoursActivity.this, db, utilisateurConnecte, true);
+            ElementASynchroniserOpenHelper.toutSynchroniser(DetailsControleRetoursActivity.this, db, utilisateurConnecte, true);
         }
+
+
+        Intent validationRetour_Intent = new Intent(DetailsControleRetoursActivity.this, ServiceControleRetoursActivity.class);
+        Bundle validationRetours_Bundle = DetailsControleRetoursActivity.super.getBundle();
+        validationRetour_Intent.putExtras(validationRetours_Bundle);
+        DetailsControleRetoursActivity.this.startActivity(validationRetour_Intent);
         DetailsControleRetoursActivity.this.finish();
         return;
     }
@@ -463,6 +523,55 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
         if (commentaireRetourner != null) {
             retourSelectionne.setCommentaire(commentaireRetourner.trim());
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent detailControleIntent = new Intent(DetailsControleRetoursActivity.this, ServiceControleRetoursActivity.class);
+        Bundle detailControleBundle = super.getBundle();
+        detailControleBundle.putString("Etat", "Retour");
+        detailControleIntent.putExtras(detailControleBundle);
+        DetailsControleRetoursActivity.this.startActivity(detailControleIntent);
+        DetailsControleRetoursActivity.this.finish();
+    }
+
+    public void lancerScanner()
+    {
+        /*premierPassage = false;
+        Intent controleDesRetour_Intent = null;
+        Bundle controleDesRetour_Bundle = super.getBundle();
+        controleDesRetour_Bundle.putString("contexte", String.valueOf(R.string.scannerContextMultipleNewControleRetour));
+
+        if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+        {
+            controleDesRetour_Intent = new Intent(DetailsControleRetoursActivity.this, ScannerPreparationActivity.class);
+        }
+        else
+        {
+            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
+            {
+                controleDesRetour_Intent = new Intent(DetailsControleRetoursActivity.this, BarcodePreparationActivity.class);
+
+            }
+            else
+            {
+                controleDesRetour_Intent = new Intent(DetailsControleRetoursActivity.this, ScannerPreparationActivity.class);
+            }
+        }
+
+
+        controleDesRetour_Bundle.putBoolean("doitEtreIdentique", false);
+        controleDesRetour_Bundle.putBoolean("isBoutonSuppressionExistant", true);
+        controleDesRetour_Bundle.putBoolean("modeCumule", true);
+        controleDesRetour_Bundle.putInt("UserId", utilisateurConnecte.getId());
+        controleDesRetour_Bundle.putInt("RetourId", retourSelectionne.get_UID());
+        controleDesRetour_Bundle.putBoolean("modeRafale", true);
+
+        controleDesRetour_Bundle.putIntegerArrayList("liste_id_retour_ligne", (ArrayList<Integer>) liste_id_retour_ligne);
+
+        controleDesRetour_Intent.putExtras(controleDesRetour_Bundle);
+        DetailsControleRetoursActivity.this.startActivityForResult(controleDesRetour_Intent, CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH);*/
     }
 
     private void onClickTriDesignation()
@@ -557,16 +666,5 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
         retourLigneControleRetoursAdapter = new Retour_Ligne_ControleRetoursAdapter(DetailsControleRetoursActivity.this, retourLigneControleRetourAdapteList, db);
         retourLigneControleRetourAdapteListView.setDivider(footer);
         retourLigneControleRetourAdapteListView.setAdapter(retourLigneControleRetoursAdapter);
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent detailControleIntent = new Intent(DetailsControleRetoursActivity.this, ServiceControleRetoursActivity.class);
-        Bundle detailControleBundle = super.getBundle();
-        detailControleBundle.putString("Etat", "Retour");
-        detailControleIntent.putExtras(detailControleBundle);
-        DetailsControleRetoursActivity.this.startActivity(detailControleIntent);
-        DetailsControleRetoursActivity.this.finish();
     }
 }

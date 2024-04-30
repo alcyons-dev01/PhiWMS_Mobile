@@ -189,7 +189,7 @@ public class DetailQuarantaineActivity extends ServiceActivity {
                     retourSelectionne.setEn_Attente_de(getString(R.string.Quarantaine));
                     retourSelectionne.setCommentaire(commentaireEditText.getText().toString().trim());
 
-                    long rowID = gestionnaireRetour.mettreAJourRetour(db, retourSelectionne);
+                    long rowID = RetourOpenHelper.mettreAJourRetour(db, retourSelectionne);
 
                     if (rowID != -1) {
                         ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, RetourOpenHelper.Constantes.TABLE_RETOUR, retourSelectionne.getPhiMR4UUID(), retourSelectionne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);

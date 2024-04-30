@@ -242,7 +242,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
             {
 
                 if (!swipeRefreshLayout.isRefreshing()) {
-                    mProgressDialog = ProgressDialog.show(DetailPreparationActivity.this, "Veuillez patienter", "Synchronisation des stocks en cours");
+                    afficherSpinner(DetailPreparationActivity.this, LayoutInflater.from(DetailPreparationActivity.this));
                 }
 
                 RequestQueue requestQueue = Volley.newRequestQueue(DetailPreparationActivity.this);
@@ -361,6 +361,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                 }
 
                 passageParOnCreate = false;
+                arreterSpinner();
             }
         }
 

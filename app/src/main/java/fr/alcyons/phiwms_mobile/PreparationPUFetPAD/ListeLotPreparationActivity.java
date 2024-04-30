@@ -1,5 +1,7 @@
 package fr.alcyons.phiwms_mobile.PreparationPUFetPAD;
 
+import static com.google.android.gms.vision.L.TAG;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -859,7 +861,7 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
                     try {
                         Looper.loop();
                     } catch (RuntimeException e) {
-                        Log.e("Runtime Exception", Objects.requireNonNull(e.getMessage()));
+                        Log.e(TAG, "Error Looper :", e);
                     }
                 }
             }

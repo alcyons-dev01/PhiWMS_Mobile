@@ -14,7 +14,10 @@ import java.util.List;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
@@ -65,14 +68,14 @@ public class ListeEmplacementActivity extends ServiceActivity {
         }
 
         // Récupération de la zone et du dépôt sélectionnés
-        zoneSelectionnee = gestionnaireZone.getUneZoneByID(db, intent.getExtras().getInt("zoneSelectionneeID"));
-        depotSelectionne = gestionnaireDepot.getDepotParID(db, intent.getExtras().getInt("depotSelectionneID"));
-        depotEmplacementList = gestionnaireEmplacement.getEmplacementsParZone(db, zoneSelectionnee);
+        zoneSelectionnee = ZoneOpenHelper.getUneZoneByID(db, intent.getExtras().getInt("zoneSelectionneeID"));
+        depotSelectionne = DepotOpenHelper.getDepotParID(db, intent.getExtras().getInt("depotSelectionneID"));
+        depotEmplacementList = EmplacementOpenHelper.getEmplacementsParZone(db, zoneSelectionnee);
         if (depotEmplacementList.size() == 0) {
             Depot_Emplacement depotEmplacement = new Depot_Emplacement("emplacement", "", "", "", "", zoneSelectionnee.getZoneID(), zoneSelectionnee.getDepotID(), zoneSelectionnee.getDepot_Reference(), "");
-            long rowID = gestionnaireEmplacement.insererUnDepotEmplacementEnBDD(db, depotEmplacement);
+            long rowID = EmplacementOpenHelper.insererUnDepotEmplacementEnBDD(db, depotEmplacement);
             if (rowID != -1) {
-                gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, EmplacementOpenHelper.Constantes.TABLE_DEPOT_EMPLACEMENT, depotEmplacement.getPhiMR4UUID(), depotEmplacement.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, EmplacementOpenHelper.Constantes.TABLE_DEPOT_EMPLACEMENT, depotEmplacement.getPhiMR4UUID(), depotEmplacement.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
                 emplacementSelectionne = depotEmplacement;
                 if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
                 {

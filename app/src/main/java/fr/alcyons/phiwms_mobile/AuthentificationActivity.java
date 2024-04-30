@@ -156,7 +156,7 @@ public class AuthentificationActivity extends AppCompatActivity {
         return true;
     }
 
-    @SuppressLint("HardwareIds")
+    @SuppressLint({"HardwareIds", "SetTextI18n"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -436,7 +436,7 @@ public class AuthentificationActivity extends AppCompatActivity {
 
                     break;
                 case CodesEchangesActivites.RETOUR_AUTHENTIFICATION:
-                    String nom_utilisateur = data.getExtras().getString("username");
+                    String nom_utilisateur = Objects.requireNonNull(data.getExtras()).getString("username");
                     String mot_de_passe = data.getExtras().getString("password");
                     ((EditText) findViewById(R.id.identifiant)).setText(nom_utilisateur);
                     ((EditText) findViewById(R.id.motDePasse)).setText(mot_de_passe);
@@ -452,7 +452,7 @@ public class AuthentificationActivity extends AppCompatActivity {
 
     public void identificationUtilisateur(final String motDePasseHache, final String identifiant) {
         String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteUtilisateur;
-        if (!OutilsGestionConnexionReseau.isServerAccessible(AuthentificationActivity.this)) {
+        if (!OutilsGestionConnexionReseau.returnServerAccessible(AuthentificationActivity.this)) {
             utilisateurConnecte = UtilisateurOpenHelper.identifierUtilisateurLocalement(identifiant, motDePasseHache, db);
 
             if (utilisateurConnecte != null) {
@@ -519,7 +519,7 @@ public class AuthentificationActivity extends AppCompatActivity {
                             String smtpServeur = paramatres.getString("SMTP_Serveur");
                             int smtpSession = paramatres.getInt("SMTP_Session");
 
-                            /**
+                            /*
                              * ADH
                              * mailEmetteur : pharmadh@adh-asso.net
                              * mdpEmetteur :
@@ -706,12 +706,8 @@ public class AuthentificationActivity extends AppCompatActivity {
                 out.close();
                 tabFichier[i].delete();
 
-                if (in != null) {
-                    in.close();
-                }
-                if (buf != null) {
-                    buf.close();
-                }
+                in.close();
+                buf.close();
             }
         } catch (Exception e) {
             Log.e("Error reading file", e.toString());
@@ -846,6 +842,7 @@ public class AuthentificationActivity extends AppCompatActivity {
         zoneok.setProgress(nbTableinserees);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void initialisationAlerte(View layout, AlertDialog.Builder builder) {
 
         TextView service = layout.findViewById(R.id.Service);

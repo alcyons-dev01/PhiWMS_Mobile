@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PerimetreFonctionnelOpenHelper;
@@ -100,7 +101,7 @@ public class ServiceActivity extends MenuActivity {
     {
         super.onResume();
         // Récupération du service sélectionné
-        serviceActuel = gestionnaireService.getServiceByID(db, intent.getExtras().getInt("serviceSelectionneID"));
+        serviceActuel = ServiceOpenHelper.getServiceByID(db, intent.getExtras().getInt("serviceSelectionneID"));
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
         if(utilisateurConnecte != null)
@@ -112,7 +113,7 @@ public class ServiceActivity extends MenuActivity {
             // boutonRetourListePerimetresFonctionnelsLinearLayout = (LinearLayout) findViewById(R.id.boutonRetourListePerimetresFonctionnels);
             if(serviceActuel != null)
             {
-                perimetreFonctionnelConcerne = gestionnairePerimetreFonctionnel.getUnPerimetreFonctionnelParNom(serviceActuel.getNomPerimetrefonctionnel(), db);
+                perimetreFonctionnelConcerne = PerimetreFonctionnelOpenHelper.getUnPerimetreFonctionnelParNom(serviceActuel.getNomPerimetrefonctionnel(), db);
 
             }
 
@@ -194,7 +195,7 @@ public class ServiceActivity extends MenuActivity {
                             //on gere le score du service
                             serviceSelectionne.setScore(serviceSelectionne.getScore()+1);
                             ServiceOpenHelper.mettreAJourUnServiceEnBD(db, serviceSelectionne);
-                            gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ServiceOpenHelper.Constantes.TABLE_SERVICE, serviceSelectionne.getPhiMR4UUID(), serviceSelectionne.getId(), DBOpenHelper.ActionsEAS.MAJ);
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ServiceOpenHelper.Constantes.TABLE_SERVICE, serviceSelectionne.getPhiMR4UUID(), serviceSelectionne.getId(), DBOpenHelper.ActionsEAS.MAJ);
 
                             // Appeler l'activité correspondante au service sélectionné
                             Intent intentVersService = new Intent(context, classe_demande);

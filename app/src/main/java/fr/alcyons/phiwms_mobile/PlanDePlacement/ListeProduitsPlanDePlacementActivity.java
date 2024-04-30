@@ -15,6 +15,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Produit_PlanDePlacementAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
@@ -44,7 +45,7 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
         produitList = new ArrayList<>();
         for (int id : produitIDs
                 ) {
-            produitList.add(gestionnaireProduit.getProduitByID(db, id));
+            produitList.add(ProduitOpenHelper.getProduitByID(db, id));
         }
 
         passageParOnCreate = true;
@@ -52,9 +53,9 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
         if (produitList.size() == 1) {
             passerAuDetailProduit(produitList.get(0));
         } else if (produitList.size() == 0) {
-            produitList = gestionnaireProduit.getAllProduits(db);
+            produitList = ProduitOpenHelper.getAllProduits(db);
         } else {
-            List<Produit> listeProduitsBd = gestionnaireProduit.getAllProduits(db);
+            List<Produit> listeProduitsBd = ProduitOpenHelper.getAllProduits(db);
             if (!listeProduitsBd.equals(produitList)) {
                 Alerte.afficherAlerte(ListeProduitsPlanDePlacementActivity.this, "Attention", "Plusieurs produits correspondent à ce code.", "alerte");
             } else {
@@ -87,7 +88,7 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
             List<Produit> tempProduitList = new ArrayList<>();
             for (Produit produitCourant : produitList
                     ) {
-                tempProduitList.add(gestionnaireProduit.getProduitByID(db, produitCourant.getID_produit()));
+                tempProduitList.add(ProduitOpenHelper.getProduitByID(db, produitCourant.getID_produit()));
             }
             produitList = tempProduitList;
             adapter = new Produit_PlanDePlacementAdapter(ListeProduitsPlanDePlacementActivity.this, produitList);

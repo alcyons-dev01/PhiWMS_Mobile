@@ -118,7 +118,7 @@ public class DetailDestructionActivity extends ServiceActivity {
                     retourSelectionne.setDate_retour(dateFormat.format(date));
 
 
-                    long rowID = gestionnaireRetour.mettreAJourRetour(db, retourSelectionne);
+                    long rowID = RetourOpenHelper.mettreAJourRetour(db, retourSelectionne);
                     if (rowID != -1) {
                         ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, RetourOpenHelper.Constantes.TABLE_RETOUR, retourSelectionne.getPhiMR4UUID(), retourSelectionne.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
                     } else {
@@ -140,7 +140,7 @@ public class DetailDestructionActivity extends ServiceActivity {
                     ElementASynchroniserOpenHelper.toutSynchroniser(DetailDestructionActivity.this, db, utilisateurConnecte, true);
                 }
 
-                DetailDestructionActivity.this.finish();
+                onBackPressed();
             }
         }
     };

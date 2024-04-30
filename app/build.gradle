@@ -3,6 +3,9 @@ plugins {
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
 }
+def getVersionCode = {
+    return 1;
+}
 android {
     namespace 'fr.alcyons.phiwms_mobile'
     compileSdk 34
@@ -11,7 +14,7 @@ android {
         applicationId "fr.alcyons.phiwms_mobile"
         minSdk 30
         targetSdk 34
-        versionCode 1
+        versionCode getVersionCode()
         versionName "1.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         multiDexEnabled true

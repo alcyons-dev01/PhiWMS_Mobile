@@ -880,7 +880,7 @@ public class DetailReceptionPadActivity extends ServiceActivity {
                                 if(ph_reliquat_courant.getZone() == null && ph_reliquat_courant.getEmplacement() == null && ph_reliquat_courant.getReliquat_UID() >0)
                                 {
                                     ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, ph_reliquat_courant.getPhiMR4UUID(), ph_reliquat_courant.getReliquat_UID(), DBOpenHelper.ActionsEAS.SUPPR);
-                                    gestionnairePH_Reliquat.supprimerUnPhReliquat(db, ph_reliquat_courant);
+                                    PH_ReliquatOpenHelper.supprimerUnPhReliquat(db, ph_reliquat_courant);
                                 }
 
                                 Random randomactionReliquat = new Random();
@@ -918,7 +918,7 @@ public class DetailReceptionPadActivity extends ServiceActivity {
                                 if(actionligneId > 0)
                                     actionligneId= actionligneId*-1;
 
-                                gestionnairePH_Reliquat.insererPH_ReliquatEnBDD(db, ph_reliquat_courant);
+                                PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, ph_reliquat_courant);
                                 ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, ph_reliquat_courant.getPhiMR4UUID(), ph_reliquat_courant.getReliquat_UID(), DBOpenHelper.ActionsEAS.AJOUT);
 
                                 ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(actionligneId, action.getId(), "PH_Reliquat", ph_reliquat_courant.getReliquat_UID(), GS1, objet_courant.getEmplacement_uid(), objet_courant.getQuantiteScannee(), produit_courant.getDesignation_interne());

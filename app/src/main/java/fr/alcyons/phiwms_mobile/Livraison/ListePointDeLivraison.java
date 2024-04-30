@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -118,7 +119,7 @@ public class ListePointDeLivraison extends ServiceAvecConnexionActivity {
         /* Code nécessaire afin de réaliser une requête à l' API */
         if (OutilsGestionConnexionReseau.isServerAccessible(ListePointDeLivraison.this) && passageParOnCreate && !connexionDirecte) {
             if (!swipeRefreshLayout.isRefreshing()) {
-                mProgressDialog = ProgressDialog.show(ListePointDeLivraison.this, "Veuillez patienter", "Synchronisation des livraisons en cours");
+                afficherSpinner(ListePointDeLivraison.this, LayoutInflater.from(ListePointDeLivraison.this));
             }
 
             RequestQueue requestQueue = Volley.newRequestQueue(ListePointDeLivraison.this);

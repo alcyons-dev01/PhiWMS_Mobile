@@ -783,7 +783,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
                         int emplacementid = data.getExtras().getInt("emplacementId");
                         if(emplacementid != -1)
                         {
-                            Depot_Emplacement emplacementSelectionner = gestionnaireEmplacement.getUnEmplacementByID(db, emplacementid);
+                            Depot_Emplacement emplacementSelectionner = EmplacementOpenHelper.getUnEmplacementByID(db, emplacementid);
                             ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacementSelectionner.getAdressage().trim());
                             preparationSimpleContext.emplacement_courant = emplacementSelectionner;
 
@@ -844,7 +844,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
                         int emplacementid = data.getExtras().getInt("emplacementId");
                         if(emplacementid != -1)
                         {
-                            Depot_Emplacement emplacementSelectionner = gestionnaireEmplacement.getUnEmplacementByID(db, emplacementid);
+                            Depot_Emplacement emplacementSelectionner = EmplacementOpenHelper.getUnEmplacementByID(db, emplacementid);
                             ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacementSelectionner.getAdressage().trim());
                             preparationMultipleContext.emplacement_courant = emplacementSelectionner;
                             if(preparationMultipleContext.lot_courant != null)
@@ -904,7 +904,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
                         int emplacementid = data.getExtras().getInt("emplacementId");
                         if(emplacementid != -1)
                         {
-                            Depot_Emplacement emplacementSelectionner = gestionnaireEmplacement.getUnEmplacementByID(db, emplacementid);
+                            Depot_Emplacement emplacementSelectionner = EmplacementOpenHelper.getUnEmplacementByID(db, emplacementid);
                             ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacementSelectionner.getAdressage().trim());
                             newUniqueReceptionPUIContext.emplacement_courant = emplacementSelectionner;
                             ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
@@ -935,7 +935,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
                         int emplacementid = data.getExtras().getInt("emplacementId");
                         if(emplacementid != -1)
                         {
-                            Depot_Emplacement emplacementSelectionner = gestionnaireEmplacement.getUnEmplacementByID(db, emplacementid);
+                            Depot_Emplacement emplacementSelectionner = EmplacementOpenHelper.getUnEmplacementByID(db, emplacementid);
                             ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacementSelectionner.getAdressage().trim());
                             newReceptionPUIContext.emplacement_courant = emplacementSelectionner;
                             ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");

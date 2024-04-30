@@ -53,10 +53,14 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ServiceOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.UtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.PerimetreFonctionnel;
 import fr.alcyons.phiwms_mobile.Classes.Service;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.ConnexionDirecteExpandableAdapter;
@@ -150,7 +154,7 @@ public class ServiceConnexionDirecteActivity extends ServiceAvecConnexionActivit
         {
             /* Code nécessaire afin de réaliser une requête à l' API */
             if (haveNetworkConnection(ServiceConnexionDirecteActivity.this) && premierPassage) {
-                mProgressDialog = ProgressDialog.show(ServiceConnexionDirecteActivity.this, "Veuillez patienter", "Synchronisation du plan d'habilitation en cours");
+                afficherSpinner(ServiceConnexionDirecteActivity.this, LayoutInflater.from(ServiceConnexionDirecteActivity.this));
 
                 RequestQueue requestQueuePlanHabilitationUtilisateur = Volley.newRequestQueue(ServiceConnexionDirecteActivity.this);
 
@@ -181,7 +185,7 @@ public class ServiceConnexionDirecteActivity extends ServiceAvecConnexionActivit
                                 else
                                 {
                                     utilisateurConnecte.setServicesHabilites(null);
-                                    gestionnaireUtilisateur.mettreAJourUtilisateur(db, utilisateurConnecte);
+                                    UtilisateurOpenHelper.mettreAJourUtilisateur(db, utilisateurConnecte);
                                 }
                             } else {
                                 // récupération des services auquels l'utilisateur connecté a accès
@@ -211,13 +215,12 @@ public class ServiceConnexionDirecteActivity extends ServiceAvecConnexionActivit
                                     serviceList.add(service);
                                 }
                                 utilisateurConnecte.setServicesHabilites(serviceList);
-                                gestionnaireUtilisateur.mettreAJourUtilisateur(db, utilisateurConnecte);
+                                UtilisateurOpenHelper.mettreAJourUtilisateur(db, utilisateurConnecte);
 
 
                                 if (utilisateurConnecte.getServicesHabilites().size() > 0) {
                                     // Activer les indicateurs pour l'utilisateur
                                     recupererIndicateurs();
-                                    mProgressDialog.dismiss();
                                 }
                             }
                         } catch (JSONException e) {
@@ -580,10 +583,10 @@ public class ServiceConnexionDirecteActivity extends ServiceAvecConnexionActivit
         if(!enCoursDeDeveloppement)
         {
             //synchronisation des éléments communs
-            gestionnaireElementASynchroniser.toutSynchroniser(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte, true);
-            gestionnaireService.insererBDDLocaleServicesEtPerimetresFonctionnelsphiwms_mobile(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
-            gestionnaireDepot.insererBDDLocaleDepots(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
-            gestionnaireProduit.insererBDDLocaleProduits(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
+            ElementASynchroniserOpenHelper.toutSynchroniser(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte, true);
+            ServiceOpenHelper.insererBDDLocaleServicesEtPerimetresFonctionnelsphiwms_mobile(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
+            DepotOpenHelper.insererBDDLocaleDepots(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
+            ProduitOpenHelper.insererBDDLocaleProduits(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
         }
         else
         {

@@ -17,6 +17,8 @@ import java.util.List;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
@@ -112,7 +114,7 @@ public class ListeZoneCreationActivity extends ServiceActivity {
         invalidateOptionsMenu();
 
         // Récupération de la liste des zones à afficher
-        depotZoneList = gestionnaireZone.getZonesEtEmplacementsParDepot(db, depotSelectionne);
+        depotZoneList = ZoneOpenHelper.getZonesEtEmplacementsParDepot(db, depotSelectionne);
 
         // Modifier le nombre de zones trouvées
         nbElementInAdapter.setText(String.valueOf(depotZoneList.size()));
@@ -163,10 +165,10 @@ public class ListeZoneCreationActivity extends ServiceActivity {
                     {
                         String[] tab_code = code.split(":");
                         int id_emplacement = Integer.parseInt(tab_code[tab_code.length-1]);
-                        Depot_Emplacement depotEmplacement = gestionnaireEmplacement.getUnEmplacementByID(db, id_emplacement);
+                        Depot_Emplacement depotEmplacement = EmplacementOpenHelper.getUnEmplacementByID(db, id_emplacement);
                         if(depotEmplacement != null)
                         {
-                            Depot_Zone depotZone = gestionnaireZone.getUneZoneByID(db, depotEmplacement.getZoneID());
+                            Depot_Zone depotZone = ZoneOpenHelper.getUneZoneByID(db, depotEmplacement.getZoneID());
                             if(depotEmplacement!= null && depotZone != null){
                                 Intent resultIntent = new Intent();
 

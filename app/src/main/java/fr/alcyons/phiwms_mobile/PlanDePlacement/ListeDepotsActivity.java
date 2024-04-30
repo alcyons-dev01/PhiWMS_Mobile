@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.DepotAdapter;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
@@ -31,7 +32,7 @@ public class ListeDepotsActivity extends ServiceActivity {
         String typeDepotChoisi = intent.getExtras().getString("typeDepotChoisi");
 
         // Gestion de l'adapter et de la listView
-        depotList = gestionnaireDepot.getDepotsParType(db, typeDepotChoisi);
+        depotList = DepotOpenHelper.getDepotsParType(db, typeDepotChoisi);
         depotListView = (ListView) findViewById(R.id.listeView);
 
         adapter = new DepotAdapter(ListeDepotsActivity.this, depotList, utilisateurConnecte);

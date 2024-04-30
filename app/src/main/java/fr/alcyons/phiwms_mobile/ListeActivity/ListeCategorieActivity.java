@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.CategorieAdapter;
 import fr.alcyons.phiwms_mobile.MedicamentAuLivret.ServiceMedicamentAuLivretActivity;
 import fr.alcyons.phiwms_mobile.R;
@@ -33,7 +34,7 @@ public class ListeCategorieActivity extends ServiceActivity {
         setContentView(R.layout.activity_liste);
 
         // Récupération des fournisseurs par rapport à la classeNumeroProduit ( Médicament ou Dispositif)
-        List<String> categories = gestionnaireProduit.getAllCategories(db, intent.getExtras().getString("produitClasse_numero"));
+        List<String> categories = ProduitOpenHelper.getAllCategories(db, intent.getExtras().getString("produitClasse_numero"));
 
         // Récupération de la listeView des zones
         categorie_ListView = (ListView) findViewById(R.id.listeView);

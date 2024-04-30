@@ -68,42 +68,6 @@ public class OriginalActivity extends AppCompatActivity {
 
     // Les gestionnaires de BDD
     protected DBOpenHelper gestionnaireBDD;
-    protected UtilisateurOpenHelper gestionnaireUtilisateur;
-    protected DepotOpenHelper gestionnaireDepot;
-    protected ElementASynchroniserOpenHelper gestionnaireElementASynchroniser;
-    protected EmplacementOpenHelper gestionnaireEmplacement;
-    protected PerimetreFonctionnelOpenHelper gestionnairePerimetreFonctionnel;
-    protected ProduitOpenHelper gestionnaireProduit;
-    protected ServiceOpenHelper gestionnaireService;
-    protected ZoneOpenHelper gestionnaireZone;
-    protected CommandeOpenHelper gestionnaireCommande;
-    protected InventaireOpenHelper gestionnaireInventaire;
-    protected Inventaire_LigneOpenHelper gestionnaireInventaire_Ligne;
-    protected FournisseurOpenHelper gestionnaireFournisseur;
-    protected Commande_LigneOpenHelper gestionnaireCommande_Ligne;
-    protected PH_PreparationOpenHelper gestionnairePH_Preparation;
-    protected PH_Preparation_LigneOpenHelper gestionnairePH_Preparation_Ligne;
-    protected Inventaire_Ligne_TempOpenHelper gestionnaireInventaire_Ligne_Temp;
-    protected RetourOpenHelper gestionnaireRetour;
-    protected Retour_LigneOpenHelper gestionnaireRetour_Ligne;
-    protected StockOpenHelper gestionnaireStock;
-    protected Stock_LotOpenHelper gestionnaireStock_Lot;
-    protected Stock_Lot_EmplacementLightOpenHelper gestionnaireStock_Lot_Emplacement;
-    protected SYS_Document_TypeOpenHelper gestionnaireSYS_Document_Type;
-    protected SYS_Mvt_Stock_TypeOpenHelper gestionnaireSYS_Mvt_Stock_Type;
-    protected NotificationOpenHelper gestionnaireNotification;
-    protected ParametresServeurOpenHelper gestionnaireParametresServeur;
-    protected Detail_DotOpenHelper gestionnaireDetail_Dot;
-    protected DotationOpenHelper gestionnaireDotation;
-    protected PH_PatientOpenHelper gestionnairePH_Patient;
-    protected PH_ReassortOpenHelper gestionnairePH_Reassort;
-    protected PH_Reassort_LigneOpenHelper gestionnairePH_Reassort_Ligne;
-    protected PH_ReliquatOpenHelper gestionnairePH_Reliquat;
-    protected PH_RetourMotifOpenHelper gestionnairePH_RetourMotif;
-    protected PH_UtiliserOpenHelper gestionnairePH_Utiliser;
-    protected PH_SerialisationOpenHelper gestionnaireSerialisation;
-    protected PH_Lot_LigneOpenHelper gestionnairePH_Lot_Ligne;
-
     // Récupération de ce qui a été transmis
     protected Intent intent;
 
@@ -113,40 +77,6 @@ public class OriginalActivity extends AppCompatActivity {
         // Récupération de la BDD
         // Création ou récupération de la BDD si elle existe déjà
         gestionnaireBDD = new DBOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireUtilisateur = new UtilisateurOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireDepot = new DepotOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireElementASynchroniser = new ElementASynchroniserOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireEmplacement = new EmplacementOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnairePerimetreFonctionnel = new PerimetreFonctionnelOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireProduit = new ProduitOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireService = new ServiceOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireZone = new ZoneOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireCommande = new CommandeOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireInventaire = new InventaireOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireInventaire_Ligne = new Inventaire_LigneOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireInventaire_Ligne_Temp = new Inventaire_Ligne_TempOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireFournisseur = new FournisseurOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireCommande_Ligne = new Commande_LigneOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnairePH_Preparation = new PH_PreparationOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnairePH_Preparation_Ligne = new PH_Preparation_LigneOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireRetour = new RetourOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireRetour_Ligne = new Retour_LigneOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireStock = new StockOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireStock_Lot = new Stock_LotOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-         gestionnaireStock_Lot_Emplacement = new Stock_Lot_EmplacementLightOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireSYS_Document_Type = new SYS_Document_TypeOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireSYS_Mvt_Stock_Type = new SYS_Mvt_Stock_TypeOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireNotification = new NotificationOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireParametresServeur = new ParametresServeurOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireDetail_Dot = new Detail_DotOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireDotation = new DotationOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnairePH_Patient = new PH_PatientOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnairePH_Reassort = new PH_ReassortOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnairePH_Reassort_Ligne = new PH_Reassort_LigneOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnairePH_Reliquat = new PH_ReliquatOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnairePH_RetourMotif = new PH_RetourMotifOpenHelper(OriginalActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnairePH_Utiliser = new PH_UtiliserOpenHelper(OriginalActivity.this,DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        gestionnaireSerialisation = new PH_SerialisationOpenHelper(OriginalActivity.this,DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
         db = gestionnaireBDD.openDB();
 
         gestionnaireBDD.onUpgrade(db, 0, 0);

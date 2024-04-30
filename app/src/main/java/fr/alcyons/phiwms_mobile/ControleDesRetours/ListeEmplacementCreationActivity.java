@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Depot_EmplacementAdapter;
@@ -44,8 +45,8 @@ public class ListeEmplacementCreationActivity extends ServiceActivity {
         // Récupération de la zone et du dépôt sélectionnés
         if(intent.hasExtra("zoneid"))
         {
-            zoneSelectionnee = gestionnaireZone.getUneZoneByID(db, intent.getExtras().getInt("zoneid"));
-            zoneSelectionnee.setEmplacements(gestionnaireEmplacement.getEmplacementsParZone(db, zoneSelectionnee));
+            zoneSelectionnee = ZoneOpenHelper.getUneZoneByID(db, intent.getExtras().getInt("zoneid"));
+            zoneSelectionnee.setEmplacements(EmplacementOpenHelper.getEmplacementsParZone(db, zoneSelectionnee));
             // Modification des indicateurs
             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(zoneSelectionnee.getEmplacements().size()));
             ((TextView) findViewById(R.id.nomZone)).setText(String.valueOf(zoneSelectionnee.getZoneName()));
@@ -64,7 +65,7 @@ public class ListeEmplacementCreationActivity extends ServiceActivity {
         listViewEmplacements.setTextFilterEnabled(false);
         listeDepotsEmplacements = (List<Depot_Emplacement>) intent.getExtras().getSerializable("listeEmplacements");
         if (listeDepotsEmplacements == null && listeEmplacementCourant == null) {
-            listeDepotsEmplacements = gestionnaireEmplacement.getEmplacementsParZone(db, zoneSelectionnee);
+            listeDepotsEmplacements = EmplacementOpenHelper.getEmplacementsParZone(db, zoneSelectionnee);
         }
         else
         {

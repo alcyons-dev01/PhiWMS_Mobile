@@ -18,6 +18,8 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
@@ -47,7 +49,7 @@ public class DetailProduitPlanDePlacementActivity extends ServiceActivity {
         pm = DetailProduitPlanDePlacementActivity.this.getPackageManager();
 
         // Récupération du produit sélectionné par rapport à la variable globale
-        produitSelectionne = gestionnaireProduit.getProduitByID(db, intent.getExtras().getInt("produitSelectionneID"));
+        produitSelectionne = ProduitOpenHelper.getProduitByID(db, intent.getExtras().getInt("produitSelectionneID"));
 
         // Récupération du depot PUI
         depotPUI = DepotOpenHelper.getDepotPUI(db);
@@ -110,8 +112,8 @@ public class DetailProduitPlanDePlacementActivity extends ServiceActivity {
         if (data != null) {
             switch (requestCode) {
                 case CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT:
-                    Depot_Emplacement depotEmplacement = gestionnaireEmplacement.getUnEmplacementByID(db, data.getExtras().getInt("emplacementSelectionneID"));
-                    Depot_Zone depotZone = gestionnaireZone.getUneZoneByID(db, data.getExtras().getInt("zoneSelectionneeID"));
+                    Depot_Emplacement depotEmplacement = EmplacementOpenHelper.getUnEmplacementByID(db, data.getExtras().getInt("emplacementSelectionneID"));
+                    Depot_Zone depotZone = ZoneOpenHelper.getUneZoneByID(db, data.getExtras().getInt("zoneSelectionneeID"));
 
                     int idTextViewZone = -1;
                     int idTextViewEmplacement = -1;
@@ -135,8 +137,8 @@ public class DetailProduitPlanDePlacementActivity extends ServiceActivity {
                     if (code != null && !code.contentEquals("") ) {
                         String[] tab_code = code.split(":");
                         int emplacement_id = Integer.parseInt(tab_code[tab_code.length-1]);
-                        Depot_Emplacement emplacementRetourne = gestionnaireEmplacement.getUnEmplacementByID(db, emplacement_id);
-                        Depot_Zone zoneEmplacementRetourne = gestionnaireZone.getUneZoneByID(db, emplacementRetourne.getZoneID());
+                        Depot_Emplacement emplacementRetourne = EmplacementOpenHelper.getUnEmplacementByID(db, emplacement_id);
+                        Depot_Zone zoneEmplacementRetourne = ZoneOpenHelper.getUneZoneByID(db, emplacementRetourne.getZoneID());
 
                         int textViewZoneID = -1;
                         int TextViewEmplacementID = -1;
@@ -199,6 +201,7 @@ public class DetailProduitPlanDePlacementActivity extends ServiceActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         DetailProduitPlanDePlacementActivity.this.finish();
     }
 
@@ -231,8 +234,8 @@ public class DetailProduitPlanDePlacementActivity extends ServiceActivity {
                         break;
                 }
 
-                gestionnaireProduit.mettreAJourProduit(db, produitSelectionne);
-                gestionnaireElementASynchroniser.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitSelectionne.getPhiMR4UUID(), produitSelectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
+                ProduitOpenHelper.mettreAJourProduit(db, produitSelectionne);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitSelectionne.getPhiMR4UUID(), produitSelectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
                 ((TextView) findViewById(TextViewEmplacementID)).setText(emplacementRetourne.getAdressage().trim());
                 ((TextView) findViewById(textViewZoneID)).setText(zoneEmplacementRetourne.getZoneName().trim());
                 alertDialog.dismiss();
@@ -259,7 +262,7 @@ public class DetailProduitPlanDePlacementActivity extends ServiceActivity {
     public void clicBoutonModificationListener() {
         Intent detailProduitPlanDePlacementIntent = new Intent(DetailProduitPlanDePlacementActivity.this, ListeDepotsActivity.class);
         Bundle detailProduitPlanDePlacementBundle = DetailProduitPlanDePlacementActivity.super.getBundle();
-        Depot depotSelectionne = gestionnaireDepot.getPUICourant(db);
+        Depot depotSelectionne = DepotOpenHelper.getPUICourant(db);
         if (depotSelectionne != null) {
             Intent newIntent = new Intent(DetailProduitPlanDePlacementActivity.this, ListeZonesActivity.class);
             Bundle extras = DetailProduitPlanDePlacementActivity.super.getBundle();

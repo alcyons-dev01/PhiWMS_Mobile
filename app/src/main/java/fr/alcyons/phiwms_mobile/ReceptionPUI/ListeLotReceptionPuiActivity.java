@@ -117,7 +117,7 @@ public class ListeLotReceptionPuiActivity extends ServiceActivity {
         //gestion du package manager
         pm = ListeLotReceptionPuiActivity.this.getPackageManager();
 
-        depot = gestionnaireDepot.getPUICourant(db);
+        depot = DepotOpenHelper.getPUICourant(db);
         scanProduit = false;
 
         //gestion du booleen d'ajout manuel d'un lot

@@ -14,6 +14,7 @@ import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -119,7 +120,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
         /* Code nécessaire afin de réaliser une requête à l' API */
         if (OutilsGestionConnexionReseau.isServerAccessible(ServicePreparationPufActivity.this) && passageParOnCreate && !connexionDirecte) {
             if (!swipeRefreshLayout.isRefreshing()) {
-                mProgressDialog = ProgressDialog.show(ServicePreparationPufActivity.this, "Veuillez patienter", "Synchronisation des Préparations PUF en cours");
+                afficherSpinner(ServicePreparationPufActivity.this, LayoutInflater.from(ServicePreparationPufActivity.this));
             }
             RequestQueue requestQueue = Volley.newRequestQueue(ServicePreparationPufActivity.this);
             String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequetePreparationPUF;
@@ -158,6 +159,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
             }
 
             passageParOnCreate = false;
+            arreterSpinner();
         }
         else
         {

@@ -12,6 +12,7 @@ import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -213,7 +214,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
         if (OutilsGestionConnexionReseau.isServerAccessible(ServiceReceptionPadActivity.this) && passageParOnCreate && !connexionDirecte) {
 
             if (!swipeRefreshLayout.isRefreshing()) {
-                mProgressDialog = ProgressDialog.show(ServiceReceptionPadActivity.this, "Veuillez patienter", "Synchronisation des commandes en cours");
+                afficherSpinner(ServiceReceptionPadActivity.this, LayoutInflater.from(ServiceReceptionPadActivity.this));
             }
 
             RequestQueue requestQueueDestructionUtilisateur = Volley.newRequestQueue(ServiceReceptionPadActivity.this);
@@ -325,6 +326,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
             }
 
             passageParOnCreate = false;
+            arreterSpinner();
         } else {
             commandeList = CommandeOpenHelper.getAllCommandesPUI(db, depotPUIPAD.getDepot_Reference());
             if (commandeList.isEmpty()) {

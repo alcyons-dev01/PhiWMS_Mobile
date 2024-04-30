@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
@@ -147,7 +148,7 @@ public class ZoneEtEmplacementSelecteurMultipleActivity extends ServiceActivity 
         boutonValider.setOnClickListener(clicBoutonValider);
 
         //on note le nombre d'emplacement disponnible
-        Depot depot = gestionnaireDepot.getPUICourant(db);
+        Depot depot = DepotOpenHelper.getPUICourant(db);
         depotZoneList = new ArrayList<>();
         depotZoneList = ZoneOpenHelper.getZonesEtEmplacementsParDepot(db, depot);
 
