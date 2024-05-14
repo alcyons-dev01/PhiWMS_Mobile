@@ -11,10 +11,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.SYS_Document_TypeOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by quentinlanusse on 28/06/2017.
- */
-
 public class SYS_Document_Type implements Serializable, Comparable {
 
     private int TYD_ID;

@@ -8,10 +8,6 @@ import java.util.List;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PerimetreFonctionnelOpenHelper;
 
-/**
- * Created by quentinlanusse on 13/04/2017.
- */
-
 public class PerimetreFonctionnel implements Serializable {
     private int id;
     private String nom;

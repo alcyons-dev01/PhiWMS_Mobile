@@ -33,6 +33,7 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.Classes.SurveillanceReference;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
+import fr.alcyons.phiwms_mobile.MainActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.GestionCodeErreurNMVO;
@@ -47,7 +48,7 @@ import fr.alcyons.phiwms_mobile.R;
  * Created by olivier on 28/03/2019.
  */
 
-public class PreparationContexte {
+public class PreparationContexte extends MainActivity {
 
 
     private Context context;
@@ -230,7 +231,7 @@ public class PreparationContexte {
                     boolean differe = false;
                     if(!serie.contentEquals(""))
                     {
-                        if (!OutilsGestionConnexionReseau.isServerAccessible(context))
+                        if (!statutConnexion)
                             differe = true;
 
                         if(conditionnement.contentEquals(""))

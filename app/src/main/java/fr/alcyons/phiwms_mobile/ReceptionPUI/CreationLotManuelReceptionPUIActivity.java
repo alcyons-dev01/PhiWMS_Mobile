@@ -11,6 +11,7 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
@@ -151,7 +152,6 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
             datePeremptionTextView.setText(dateNextYear);
         }
 
-
         //affichage des informations en barre de titre
         numPreparation.setText("#"+commandecourante.getNumero());
         fournisseurTextView.setText(commandecourante.getFournisseur());
@@ -162,7 +162,6 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
             newFragment.setTextView(datePeremptionTextView);
             newFragment.show((CreationLotManuelReceptionPUIActivity.this).getSupportFragmentManager(), "timePicker");
         });
-
 
         //affichage de la liste des zones
         zoneTextView.setOnClickListener(view -> {
@@ -379,6 +378,13 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
             datePeremptionTextView.setText(dateNextYear);
         }
 
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                CreationLotManuelReceptionPUIActivity.this.finish();
+            }
+        });
+
         apparitionValider();
         imageValidation.setOnClickListener(view -> onMenuSaveClick());
     }
@@ -588,13 +594,6 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
 
         // Start the animation (looped playback by default).
         frameAnimation.start();
-    }
-
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        CreationLotManuelReceptionPUIActivity.this.finish();
     }
 
     // Class static permettant de faire apparaitre le DatePicker du téléphone

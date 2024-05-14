@@ -13,11 +13,6 @@ import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.OriginalActivity;
 import fr.alcyons.phiwms_mobile.Outils.MedicalObjective;
 import fr.alcyons.phiwms_mobile.R;
-
-/**
- * Created by quentinlanusse on 09/05/2017.
- */
-
 public class InformationImportanteDispositif extends InformationDispositif {
 
     public ImageView photo;

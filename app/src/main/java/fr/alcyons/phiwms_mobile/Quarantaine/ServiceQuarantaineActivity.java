@@ -3,14 +3,15 @@ package fr.alcyons.phiwms_mobile.Quarantaine;
 import static com.google.android.gms.vision.L.TAG;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
 import com.google.android.material.snackbar.Snackbar;
+
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
@@ -21,6 +22,7 @@ import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -56,13 +58,13 @@ import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.SYS_User_Rules;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
-import fr.alcyons.phiwms_mobile.ControleDesRetours.ServiceControleRetoursActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourAdapter;
 
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
-import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 /**
@@ -79,13 +81,13 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
     Context context;
     boolean connexionDirecte;
     ActivityResultLauncher<Intent> resultScanDocument;
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_liste_refresh);
         context = ServiceQuarantaineActivity.this;
-        ((TextView) findViewById(R.id.titre)).setText("Demandes de quarantaine");
         pm = ServiceQuarantaineActivity.this.getPackageManager();
         SYS_User_Rules sys_user_rules = SYS_User_RulesOpenHelper.getSYS_User_RulesByUser(db, utilisateurConnecte.getId());
 
@@ -184,6 +186,18 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                         }
                     }
                 });
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent(ServiceQuarantaineActivity.this, NavigationActivity.class);
+                Bundle extras = new Bundle();
+                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                intent.putExtras(extras);
+                ServiceQuarantaineActivity.this.startActivity(intent);
+                ServiceQuarantaineActivity.this.finish();
+            }
+        });
     }
 
     @Override
@@ -191,48 +205,20 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
         super.onResume();
         retourList = new ArrayList<>();
 
-        if (OutilsGestionConnexionReseau.isServerAccessible(ServiceQuarantaineActivity.this) && passageParOnCreate && !connexionDirecte) {
+        if (statutConnexion && passageParOnCreate && !connexionDirecte) {
 
             if (!swipeRefreshLayout.isRefreshing()) {
                 afficherSpinner(ServiceQuarantaineActivity.this, LayoutInflater.from(ServiceQuarantaineActivity.this));
             }
 
+            //test();
             RequestQueue requestQueueQuarantaineUtilisateur = Volley.newRequestQueue(ServiceQuarantaineActivity.this);
             String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteQuarantaine;
-
             JsonObjectRequest obreq = getObjectRequest(urlRequete);
             requestQueueQuarantaineUtilisateur.add(obreq);
-            try {
-                Looper.loop();
-            } catch (Throwable e) {
-                Log.e(TAG, "Error looper :", e);
-            }
-
-            if (retourList.isEmpty()) {
-                vide = true;
-                nomServiceVide = "Quarantaine";
-                ServiceQuarantaineActivity.this.finish();
-            }
-            else
-            {
-                if(passageParOnCreate)
-                {
-                    Retour retour_alcyons = RetourOpenHelper.getQuarantaineEssai(db);
-                    if(retour_alcyons != null)
-                        retourList.add(retour_alcyons);
-
-                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                    retourList.sort(Comparator.comparing(Retour::getDate_retour));
-                    retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList);
-                    retourListView.setDivider(footer);
-
-                    retourListView.setAdapter(retourAdapter);
-                }
-
-                passageParOnCreate = false;
-            }
-            arreterSpinner();
-        } else {
+        }
+        else
+        {
             retourList = RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(db, getString(R.string.statutEncours), getString(R.string.MiseEnQuarantaine));
 
             if (retourList.isEmpty()) {
@@ -244,7 +230,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                 }
                 else
                 {
-                    connexionNecessaire();
+                    //connexionNecessaire();
                     return;
                 }
             }
@@ -279,10 +265,12 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
         return retourVersServiceConnexionDirectIntent;
     }
 
+    @SuppressLint("SetTextI18n")
     @NonNull
     private JsonObjectRequest getObjectRequest(String urlRequete) {
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
-                response -> {
+
+        return new JsonObjectRequest
+                (Request.Method.GET, urlRequete, null, response -> {
                     try {
                         int resultCount = response.getInt("resultCount");
                         if (resultCount == 0) {
@@ -291,31 +279,28 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                                 Alerte.afficherAlerte(context, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter.", "alerte");
                                 DBOpenHelper.viderBasesDeDonnees(db);
                                 ServiceQuarantaineActivity.this.finishAffinity();
-                                Intent intent = new Intent(context, AuthentificationActivity.class);
-                                context.startActivity(intent);
+                                Intent intent1 = new Intent(context, AuthentificationActivity.class);
+                                context.startActivity(intent1);
                             } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                 Alerte.afficherAlerte(context, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", "alerte");
                                 ServiceQuarantaineActivity.this.finishAffinity();
-                                Intent intent = new Intent(context, AuthentificationActivity.class);
-                                context.startActivity(intent);
+                                Intent intent1 = new Intent(context, AuthentificationActivity.class);
+                                context.startActivity(intent1);
                             } else if (!erreur.contentEquals("Aucun PH_Retour trouvé")) {
                                 Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Quarantaine", "alerte");
                             }
                         } else {
                             retourJSONArray = response.getJSONArray("PH_Retours");
                             viderTablesConcernees();
-                            for (int i = 0; i < retourJSONArray.length(); i++)
-                            {
+                            for (int i = 0; i < retourJSONArray.length(); i++) {
                                 JSONObject retourJSONObject = retourJSONArray.getJSONObject(i);
 
-                                if (retourJSONObject.getString("En_Attente_de").equals("Mise en quarantaine"))
-                                {
+                                if (retourJSONObject.getString("En_Attente_de").equals("Mise en quarantaine")) {
                                     Retour retour = new Retour(retourJSONObject);
 
                                     //check quarantaine existe
                                     Retour quarantaine_existe = RetourOpenHelper.getRetourByID(db, retour.get_UID());
-                                    if(quarantaine_existe != null)
-                                    {
+                                    if (quarantaine_existe != null) {
                                         RetourOpenHelper.supprimerUnRetour(db, quarantaine_existe);
                                     }
 
@@ -323,32 +308,47 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                                     RetourOpenHelper.insererUnRetourEnBDD(db, retour);
                                     JSONArray retourLigneJSONArray = retourJSONObject.getJSONArray("ph_retour_ligne");
 
-                                    for (int k = 0; k < retourLigneJSONArray.length(); k++)
-                                    {
+                                    for (int k = 0; k < retourLigneJSONArray.length(); k++) {
                                         Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(db, new Retour_Ligne(retourLigneJSONArray.getJSONObject(k)));
                                     }
                                 }
                             }
 
                             JSONArray serialisationJSONArray = response.getJSONArray("PH_Serialisation");
-                            for(int j = 0; j < serialisationJSONArray.length(); j++)
-                            {
+                            for (int j = 0; j < serialisationJSONArray.length(); j++) {
                                 JSONObject serialisationObject = serialisationJSONArray.getJSONObject(j);
                                 PH_Serialisation serialisation = new PH_Serialisation(serialisationObject);
                                 PH_SerialisationOpenHelper.insererPH_SerialisationEnBDD(db, serialisation);
                             }
 
+                            if (retourList.isEmpty()) {
+                                vide = true;
+                                nomServiceVide = "Quarantaine";
+                                ServiceQuarantaineActivity.this.finish();
+                            } else {
+                                if (passageParOnCreate) {
+                                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
+                                    ((TextView) findViewById(R.id.titre)).setText("Demandes de quarantaine");
+                                    retourList.sort(Comparator.comparing(Retour::getDate_retour));
+                                    retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList);
+                                    retourListView.setDivider(footer);
+
+                                    retourListView.setAdapter(retourAdapter);
+                                    new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
+                                }
+                                passageParOnCreate = false;
+                            }
                         }
-                    } catch (Throwable t) {
+                    }
+                    catch (Throwable t)
+                    {
                         Log.e(TAG, "Error JSON", t);
                     }
-                    handler.sendMessage(handler.obtainMessage());
-                },
-                error -> {
+                }, error -> {
+                    // TODO: Handle error
                     Log.e("Volley", "Error");
-                    Alerte.afficherAlerte(context, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP Service Quarantaine", "alerte");
-                }
-        ) {
+                    Alerte.afficherAlerte(context, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP Service Récupération Quarantaine", "alerte");
+                }) {
             @Override
             public Map<String, String> getHeaders() {
                 HashMap<String, String> headers = new HashMap<>();
@@ -356,8 +356,6 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                 return headers;
             }
         };
-        obreq.setRetryPolicy(retryPolicy);
-        return obreq;
     }
 
     public void viderTablesConcernees() {

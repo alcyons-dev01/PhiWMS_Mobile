@@ -204,11 +204,11 @@ public class ActionUtilisateurOpenHelper extends DBOpenHelper {
         return compteur;
     }
 
-    public static void insererBDDLocaleActionUtilisatuer(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
+    public static void insererBDDLocaleActionUtilisatuer(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion) {
         final String tableNom = "ActionUtilisateur";
         final String erreurSynchronisationLibelle = "Actions utilisateurs non synchronisés";
 
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+        if (!statutConnexion) {
             ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, false, erreurSynchronisationLibelle);
         }
         else{

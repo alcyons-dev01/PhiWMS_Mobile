@@ -22,10 +22,6 @@ import fr.alcyons.phiwms_mobile.R;
 
 import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 
-/**
- * Created by quentinlanusse on 16/08/2017.
- */
-
 public class PH_Preparation_Ligne_LivraisonAdapter extends ArrayAdapter {
 
     public List<PH_Preparation_Ligne> ph_preparation_lignes;

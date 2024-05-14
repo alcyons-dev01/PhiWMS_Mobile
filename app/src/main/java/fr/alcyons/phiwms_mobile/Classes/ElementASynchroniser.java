@@ -5,10 +5,6 @@ import android.database.Cursor;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 
-/**
- * Created by quentinlanusse on 27/04/2017.
- */
-
 public class ElementASynchroniser {
     private int phiwms_mobileUUID;
     private String tableConcernee;

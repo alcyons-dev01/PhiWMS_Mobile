@@ -12,6 +12,9 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
 import android.util.Log;
@@ -80,6 +83,7 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.AlertePreparationAdapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Preparation_Ligne_PreparationLotAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.Chronometer;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
@@ -229,6 +233,16 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
             DetailPreparationActivity.this.startActivityForResult(detailPreparation_Intent, CodesEchangesActivites.RETOUR_LISTE_LOTS);
         });
 
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.isEmpty()) {
+                    afficherAlerteConfirmationRetour(DetailPreparationActivity.this, LayoutInflater.from(DetailPreparationActivity.this), DetailPreparationActivity.super.getBundle());
+                } else {
+                    retourService(DetailPreparationActivity.super.getBundle());
+                }
+            }
+        });
     }
 
     @Override
@@ -238,7 +252,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         /* Code nécessaire afin de réaliser une requête à l' API */
         if(!ph_preparation_Selectionne.getListe().contentEquals("ALCYONS_LISTE"))
         {
-            if (OutilsGestionConnexionReseau.isServerAccessible(DetailPreparationActivity.this) && passageParOnCreate)
+            if (statutConnexion && passageParOnCreate)
             {
 
                 if (!swipeRefreshLayout.isRefreshing()) {
@@ -248,138 +262,154 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                 RequestQueue requestQueue = Volley.newRequestQueue(DetailPreparationActivity.this);
                 String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequetePreparationDetail+ph_preparation_Selectionne.getUID();
 
-                JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,null,
-                        new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                try {
-                                    int nbResultat = response.getInt("resultCount");
-                                    if (nbResultat == 0) {
-                                        String erreur = response.getString("erreur");
-                                        if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                            Alerte.afficherAlerte(context, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter.", "alerte");
-                                        } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
-                                            Alerte.afficherAlerte(context, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", "alerte");;
-                                        } else if (!erreur.contentEquals("Aucun PH_Preparation trouvé")) {
-                                            Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Aucune ligne trouvée", "alerte");
-                                        }
-                                    } else {
-                                        JSONArray ph_preparationLigne_JSONArray = response.getJSONArray("PH_Preparation_Ligne");
-                                        for (int k = 0; k < ph_preparationLigne_JSONArray.length(); k++) {
-                                            JSONObject ph_preparationLigne_JSONObject = ph_preparationLigne_JSONArray.getJSONObject(k);
-                                            JSONArray phStockLotEmplacement_JSONArray = ph_preparationLigne_JSONObject.getJSONArray("ph_stock_lot_emplacements");
-
-                                            for (int y = 0; y < phStockLotEmplacement_JSONArray.length(); y++) {
-                                                Stock_Lot_Emplacement_Light stock_lot_emplacement_light = new Stock_Lot_Emplacement_Light(phStockLotEmplacement_JSONArray.getJSONObject(y));
-                                                Stock_Lot_Emplacement_Light stock_lot_emplacement_bdd = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, stock_lot_emplacement_light.get_UID());
-
-                                                if (stock_lot_emplacement_bdd == null) {
-                                                    if (stock_lot_emplacement_light.getQte() > 0) {
-                                                        Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, stock_lot_emplacement_light);
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    if(stock_lot_emplacement_bdd.getQte() != stock_lot_emplacement_light.getQte())
-                                                    {
-                                                        Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_lot_emplacement_light);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                handler.sendMessage(handler.obtainMessage());
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Log.e("Volley", "Error");
-                                Alerte.afficherAlerte(DetailPreparationActivity.this, "Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Préparation PAD)", "alerte");
-                            }
-                        }
-                ) {
-                    @Override
-                    public Map<String, String> getHeaders() {
-                        HashMap<String, String> headers = new HashMap<>();
-                        headers.put("Authorization", utilisateurConnecte.getToken());
-                        return headers;
-                    }
-                };
-                obreq.setRetryPolicy(retryPolicy);
+                JsonObjectRequest obreq = getJsonObjectRequest(urlRequete);
                 requestQueue.add(obreq);
-                try {
-                    Looper.loop();
-                } catch (RuntimeException e) {
-                    e.printStackTrace();
-                }
+            }
+        }
+        else
+        {
+            invalidateOptionsMenu();
+            switch(tri_choisi)
+            {
+                case "Designation":
+                    onClickTriDesignation();
+                    break;
+                case "Place":
+                    onTriParPlace();
+                    break;
+                case "Poids":
+                    onTriParPoids();
+                    break;
+            }
+        }
+    }
 
-                phPreparationLignePreparationAdapte_List = new ArrayList<>();
-                for (PH_Preparation_Ligne phPrepLigne : phPreparationLignes) {
+    @NonNull
+    private JsonObjectRequest getJsonObjectRequest(String urlRequete) {
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            int nbResultat = response.getInt("resultCount");
+                            if (nbResultat == 0) {
+                                String erreur = response.getString("erreur");
+                                if (erreur.equals(context.getString(R.string.tokenInvalide))) {
+                                    Alerte.afficherAlerte(context, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter.", "alerte");
+                                } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
+                                    Alerte.afficherAlerte(context, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", "alerte");;
+                                } else if (!erreur.contentEquals("Aucun PH_Preparation trouvé")) {
+                                    Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Aucune ligne trouvée", "alerte");
+                                }
+                            } else {
+                                JSONArray ph_preparationLigne_JSONArray = response.getJSONArray("PH_Preparation_Ligne");
+                                for (int k = 0; k < ph_preparationLigne_JSONArray.length(); k++) {
+                                    JSONObject ph_preparationLigne_JSONObject = ph_preparationLigne_JSONArray.getJSONObject(k);
+                                    JSONArray phStockLotEmplacement_JSONArray = ph_preparationLigne_JSONObject.getJSONArray("ph_stock_lot_emplacements");
 
-                    if ((phPrepLigne.getQte_APreparer() > 0 || phPrepLigne.getQte_Demander() == phPrepLigne.getQte_preparer()) && phPrepLigne.getQte_APreparer() != 0) {
-                        List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte> lotAdaptes = null;
+                                    for (int y = 0; y < phStockLotEmplacement_JSONArray.length(); y++) {
+                                        Stock_Lot_Emplacement_Light stock_lot_emplacement_light = new Stock_Lot_Emplacement_Light(phStockLotEmplacement_JSONArray.getJSONObject(y));
+                                        Stock_Lot_Emplacement_Light stock_lot_emplacement_bdd = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, stock_lot_emplacement_light.get_UID());
 
-                        PH_Preparation_Ligne_Preparation_Adapte ph_preparationLigneAdapte = new PH_Preparation_Ligne_Preparation_Adapte(phPrepLigne.get_UID());
-                        Produit produit = ProduitOpenHelper.getProduitByID(db, phPrepLigne.getProduitID());
-                        if(produit != null)
-                        {
-                            listeGTIN.add(produit.getGTIN());
-                            Depot depotOrigine = DepotOpenHelper.getDepotParReference(db, ph_preparation_Selectionne.getDepotOrigineReference());
-                            List<Stock_Lot_Emplacement_Light> stock_lot_emplacement_lightList = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depotOrigine);
-
-                            stock_lot_emplacement_lightList.sort(Comparator.comparing(Stock_Lot_Emplacement_Light::getLot));
-                            stock_lot_emplacement_lightList.sort(Comparator.comparing(Stock_Lot_Emplacement_Light::getPeremptionDate));
-
-                            for (Stock_Lot_Emplacement_Light stockLotEmplacement : stock_lot_emplacement_lightList) {
-                                if (stockLotEmplacement.getQte() > 0) {
-                                    if(phPrepLigne.getQte_preparer() == 0)
-                                    {
-                                        stockLotEmplacement.setQte_Preparer(0);
-                                    }
-                                    else
-                                    {
-                                        if(stockLotEmplacement.getQte() < phPrepLigne.getQte_preparer())
-                                        {
-                                            stockLotEmplacement.setQte_Preparer((int)stockLotEmplacement.getQte());
+                                        if (stock_lot_emplacement_bdd == null) {
+                                            if (stock_lot_emplacement_light.getQte() > 0) {
+                                                Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, stock_lot_emplacement_light);
+                                            }
                                         }
                                         else
                                         {
-                                            stockLotEmplacement.setQte_Preparer((int)phPrepLigne.getQte_preparer());
+                                            if(stock_lot_emplacement_bdd.getQte() != stock_lot_emplacement_light.getQte())
+                                            {
+                                                Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_lot_emplacement_light);
+                                            }
                                         }
                                     }
-                                    Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockLotEmplacement);
-                                    ph_preparationLigneAdapte.getLotAdaptes().add(ph_preparationLigneAdapte.new LotAdapte(stockLotEmplacement));
                                 }
+
+                                phPreparationLignePreparationAdapte_List = new ArrayList<>();
+                                for (PH_Preparation_Ligne phPrepLigne : phPreparationLignes) {
+
+                                    if ((phPrepLigne.getQte_APreparer() > 0 || phPrepLigne.getQte_Demander() == phPrepLigne.getQte_preparer()) && phPrepLigne.getQte_APreparer() != 0) {
+                                        List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte> lotAdaptes = null;
+
+                                        PH_Preparation_Ligne_Preparation_Adapte ph_preparationLigneAdapte = new PH_Preparation_Ligne_Preparation_Adapte(phPrepLigne.get_UID());
+                                        Produit produit = ProduitOpenHelper.getProduitByID(db, phPrepLigne.getProduitID());
+                                        if(produit != null)
+                                        {
+                                            listeGTIN.add(produit.getGTIN());
+                                            Depot depotOrigine = DepotOpenHelper.getDepotParReference(db, ph_preparation_Selectionne.getDepotOrigineReference());
+                                            List<Stock_Lot_Emplacement_Light> stock_lot_emplacement_lightList = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depotOrigine);
+
+                                            stock_lot_emplacement_lightList.sort(Comparator.comparing(Stock_Lot_Emplacement_Light::getLot));
+                                            stock_lot_emplacement_lightList.sort(Comparator.comparing(Stock_Lot_Emplacement_Light::getPeremptionDate));
+
+                                            for (Stock_Lot_Emplacement_Light stockLotEmplacement : stock_lot_emplacement_lightList) {
+                                                if (stockLotEmplacement.getQte() > 0) {
+                                                    if(phPrepLigne.getQte_preparer() == 0)
+                                                    {
+                                                        stockLotEmplacement.setQte_Preparer(0);
+                                                    }
+                                                    else
+                                                    {
+                                                        if(stockLotEmplacement.getQte() < phPrepLigne.getQte_preparer())
+                                                        {
+                                                            stockLotEmplacement.setQte_Preparer((int)stockLotEmplacement.getQte());
+                                                        }
+                                                        else
+                                                        {
+                                                            stockLotEmplacement.setQte_Preparer((int)phPrepLigne.getQte_preparer());
+                                                        }
+                                                    }
+                                                    Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockLotEmplacement);
+                                                    ph_preparationLigneAdapte.getLotAdaptes().add(ph_preparationLigneAdapte.new LotAdapte(stockLotEmplacement));
+                                                }
+                                            }
+                                            phPreparationLignePreparationAdapte_List.add(ph_preparationLigneAdapte);
+                                        }
+                                    }
+                                }
+
+                                invalidateOptionsMenu();
+                                switch(tri_choisi)
+                                {
+                                    case "Designation":
+                                        onClickTriDesignation();
+                                        break;
+                                    case "Place":
+                                        onTriParPlace();
+                                        break;
+                                    case "Poids":
+                                        onTriParPoids();
+                                        break;
+                                }
+
+                                passageParOnCreate = false;
+                                arreterSpinner();
                             }
-                            phPreparationLignePreparationAdapte_List.add(ph_preparationLigneAdapte);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
                     }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("Volley", "Error");
+                        Alerte.afficherAlerte(DetailPreparationActivity.this, "Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Préparation PAD)", "alerte");
+                    }
                 }
-
-                passageParOnCreate = false;
-                arreterSpinner();
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Authorization", utilisateurConnecte.getToken());
+                return headers;
             }
-        }
-
-        // Initialisation de l'adapter puis transfere de l'adapter à la listeView pour l'affichage
-        invalidateOptionsMenu();
-        switch(tri_choisi)
-        {
-            case "Designation":
-                onClickTriDesignation();
-                break;
-            case "Place":
-                onTriParPlace();
-                break;
-            case "Poids":
-                onTriParPoids();
-                break;
-        }
+        };
+        obreq.setRetryPolicy(retryPolicy);
+        return obreq;
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -765,16 +795,6 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        if (!ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.isEmpty()) {
-            afficherAlerteConfirmationRetour(DetailPreparationActivity.this, LayoutInflater.from(DetailPreparationActivity.this), super.getBundle());
-        } else {
-            retourService(super.getBundle());
-        }
-    }
-
     public void onClick_ActionContenant() {
         final HashMap<Integer, Integer> resultat = new HashMap<>();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -1139,7 +1159,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         }
 
         // Si possible, on essaie de mettre à jour les éléments
-        if (OutilsGestionConnexionReseau.isServerAccessible(DetailPreparationActivity.this)) {
+        if (statutConnexion) {
             ElementASynchroniserOpenHelper.toutSynchroniser(DetailPreparationActivity.this, db, utilisateurConnecte, true);
         }
         //NewDetailPreparationActivity.this.setResult(CodesEchangesActivites.RETOUR_LISTE_LOTS);

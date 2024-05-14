@@ -23,12 +23,15 @@ import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Depot_ZoneAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RESULT_ZONE;
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT;
+
+import androidx.activity.OnBackPressedCallback;
 
 /**
  * Created by olivier on 16/04/2024.
@@ -106,6 +109,20 @@ public class ListeZoneCreationActivity extends ServiceActivity {
 
         // Récupération de la listeView des zones
         zoneListView = (ListView) findViewById(R.id.listeView);
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent resultIntent = new Intent();
+
+                Bundle extras = ListeZoneCreationActivity.super.getBundle();
+                extras.putInt("zoneid", -1);
+                resultIntent.putExtras(extras);
+
+                ListeZoneCreationActivity.this.setResult(RESULT_ZONE, resultIntent);
+                ListeZoneCreationActivity.this.finish();
+            }
+        });
     }
 
     @Override
@@ -197,20 +214,5 @@ public class ListeZoneCreationActivity extends ServiceActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.prepareOptionsMenu(menu, adapter, null, "Nom zone...");
         return true;
-    }
-
-    //surcharge du onBackPressed
-    @Override
-    public void onBackPressed() {
-        // Récupérer les éléments nécessaires à la prochaine activité
-        super.onBackPressed();
-        Intent resultIntent = new Intent();
-
-        Bundle extras = ListeZoneCreationActivity.super.getBundle();
-        extras.putInt("zoneid", -1);
-        resultIntent.putExtras(extras);
-
-        ListeZoneCreationActivity.this.setResult(RESULT_ZONE, resultIntent);
-        ListeZoneCreationActivity.this.finish();
     }
 }

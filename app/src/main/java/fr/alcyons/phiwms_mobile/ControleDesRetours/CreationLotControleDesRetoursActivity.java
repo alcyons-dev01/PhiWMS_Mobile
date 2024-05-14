@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+
+import androidx.activity.OnBackPressedCallback;
 import androidx.fragment.app.DialogFragment;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,6 +40,7 @@ import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.CreationLotActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
@@ -286,6 +289,13 @@ public class CreationLotControleDesRetoursActivity extends ServiceActivity {
             numSerieEditText.setVisibility(View.GONE);
             labelSerie.setVisibility(View.GONE);
         }
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                CreationLotControleDesRetoursActivity.this.finish();
+            }
+        });
     }
 
     @Override
@@ -394,12 +404,6 @@ public class CreationLotControleDesRetoursActivity extends ServiceActivity {
             }
             invalidateOptionsMenu();
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        CreationLotControleDesRetoursActivity.this.finish();
     }
 
     // Class static permettant de faire apparaitre le DatePicker du téléphone

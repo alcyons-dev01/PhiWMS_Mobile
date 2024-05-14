@@ -12,11 +12,6 @@ import java.util.List;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
-
-/**
- * Created by quentinlanusse on 24/04/2017.
- */
-
 public class Depot_Zone implements Serializable, Comparable {
     private int ZoneID;
     private String ZoneName;

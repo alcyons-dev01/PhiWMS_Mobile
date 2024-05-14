@@ -12,10 +12,6 @@ import java.util.List;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 
-/**
- * Created by quentinlanusse on 20/06/2017.
- */
-
 public class Retour_LigneOpenHelper extends DBOpenHelper {
 
     public Retour_LigneOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

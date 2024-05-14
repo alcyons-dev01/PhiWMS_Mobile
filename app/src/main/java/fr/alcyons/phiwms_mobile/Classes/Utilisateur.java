@@ -17,10 +17,6 @@ import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBool
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by quentinlanusse on 12/04/2017.
- */
-
 public class Utilisateur implements Serializable {
 
     private int id;

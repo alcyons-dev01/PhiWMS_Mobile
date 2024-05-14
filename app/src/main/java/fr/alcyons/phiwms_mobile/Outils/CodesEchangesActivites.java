@@ -1,9 +1,5 @@
 package fr.alcyons.phiwms_mobile.Outils;
 
-/**
- * Created by quentinlanusse on 23/05/2017.
- */
-
 public class CodesEchangesActivites {
     public static final int RETOUR_CODE_GS1 = 0;
     public static final int RETOUR_ZONE_ET_EMPLACEMENT = 1;

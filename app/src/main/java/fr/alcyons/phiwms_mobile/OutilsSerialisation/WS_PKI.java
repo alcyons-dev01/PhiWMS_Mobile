@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
+import fr.alcyons.phiwms_mobile.MainActivity;
+import fr.alcyons.phiwms_mobile.OriginalActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 
@@ -32,7 +34,7 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
  * Created by olivier on 26/02/2019.
  */
 
-public class WS_PKI {
+public class WS_PKI extends MainActivity {
 
     public static Handler handler = new Handler() {
         @Override
@@ -71,7 +73,7 @@ public class WS_PKI {
                 String ClientTrxId = "";
 
                 // Tentative de lancer la sychronisation
-                if (OutilsGestionConnexionReseau.isServerAccessible(context)) {
+                if (statutConnexion) {
                     String urlRequete = url + "G615";
                     RequestQueue requestQueue = Volley.newRequestQueue(context);
 

@@ -48,10 +48,6 @@ import fr.alcyons.phiwms_mobile.R;
 
 import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 
-/**
- * Created by quentinlanusse on 22/06/2017.
- */
-
 public class Retour_Ligne_QuarantaineAdapter extends ArrayAdapter {
 
     public List<Retour_Ligne> retourLigneList;

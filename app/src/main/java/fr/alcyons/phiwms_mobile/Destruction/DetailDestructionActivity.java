@@ -9,6 +9,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
+
 import com.github.clans.fab.FloatingActionButton;
 
 import java.text.DateFormat;
@@ -33,6 +35,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_RetourMotif;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Retour_Ligne_DestructionAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
@@ -136,12 +139,15 @@ public class DetailDestructionActivity extends ServiceActivity {
                 // Si possible, on tente de tout mettre à jour en BDD distante directement
                 ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                 Toast.makeText(DetailDestructionActivity.this, "Destruction effectuée", Toast.LENGTH_SHORT).show();
-                if (OutilsGestionConnexionReseau.isServerAccessible(DetailDestructionActivity.this)) {
+                if (statutConnexion) {
                     ElementASynchroniserOpenHelper.toutSynchroniser(DetailDestructionActivity.this, db, utilisateurConnecte, true);
                 }
 
-                onBackPressed();
-            }
+                Intent detailDestructionIntent = new Intent(DetailDestructionActivity.this, ServiceDestructionActivity.class);
+                Bundle detailDestructionBundle = DetailDestructionActivity.super.getBundle();
+                detailDestructionIntent.putExtras(detailDestructionBundle);
+                DetailDestructionActivity.this.startActivity(detailDestructionIntent);
+                DetailDestructionActivity.this.finish();            }
         }
     };
     FloatingActionButton boutonSave;
@@ -170,6 +176,17 @@ public class DetailDestructionActivity extends ServiceActivity {
         listViewRetourLignes = findViewById(R.id.listeView);
         listViewRetourLignes.setDivider(footer);
         listViewRetourLignes.setItemsCanFocus(true);
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent detailDestructionIntent = new Intent(DetailDestructionActivity.this, ServiceDestructionActivity.class);
+                Bundle detailDestructionBundle = DetailDestructionActivity.super.getBundle();
+                detailDestructionIntent.putExtras(detailDestructionBundle);
+                DetailDestructionActivity.this.startActivity(detailDestructionIntent);
+                DetailDestructionActivity.this.finish();
+            }
+        });
     }
 
     @Override
@@ -180,15 +197,5 @@ public class DetailDestructionActivity extends ServiceActivity {
         listeRetourLignes = Retour_LigneOpenHelper.getAllRetourLignesByRetour(db, retourSelectionne);
         adapter = new Retour_Ligne_DestructionAdapter(DetailDestructionActivity.this, listeRetourLignes);
         listViewRetourLignes.setAdapter(adapter);
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent detailDestructionIntent = new Intent(DetailDestructionActivity.this, ServiceDestructionActivity.class);
-        Bundle detailDestructionBundle = super.getBundle();
-        detailDestructionIntent.putExtras(detailDestructionBundle);
-        DetailDestructionActivity.this.startActivity(detailDestructionIntent);
-        DetailDestructionActivity.this.finish();
     }
 }

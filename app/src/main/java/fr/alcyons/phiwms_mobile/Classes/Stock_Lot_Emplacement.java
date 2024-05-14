@@ -12,10 +12,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelp
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by quentinlanusse on 28/06/2017.
- */
-
 public class Stock_Lot_Emplacement implements Serializable, Comparable {
 
     private String SYS;

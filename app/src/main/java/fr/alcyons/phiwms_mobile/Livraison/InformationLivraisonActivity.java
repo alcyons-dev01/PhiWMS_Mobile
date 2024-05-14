@@ -168,7 +168,7 @@ public class InformationLivraisonActivity extends ServiceActivity {
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation_Selectionne.getPhiMR4UUID(), ph_preparation_Selectionne.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
 
             // Tentative de lancer la sychronisation
-            if (OutilsGestionConnexionReseau.isServerAccessible(InformationLivraisonActivity.this)) {
+            if (statutConnexion) {
                 ElementASynchroniserOpenHelper.toutSynchroniser(InformationLivraisonActivity.this, db, utilisateurConnecte, true);
             }
 
@@ -365,7 +365,7 @@ public class InformationLivraisonActivity extends ServiceActivity {
                 ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
 
                 // Tentative de lancer la sychronisation
-                if (OutilsGestionConnexionReseau.isServerAccessible(InformationLivraisonActivity.this)) {
+                if (statutConnexion) {
                     ElementASynchroniserOpenHelper.toutSynchroniser(InformationLivraisonActivity.this, db, utilisateurConnecte, true);
                 }
 
@@ -701,7 +701,7 @@ public class InformationLivraisonActivity extends ServiceActivity {
         ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation.getPhiMR4UUID(), ph_preparation.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
 
         // Tentative de lancer la sychronisation
-        if (OutilsGestionConnexionReseau.isServerAccessible(InformationLivraisonActivity.this)) {
+        if (statutConnexion) {
             ElementASynchroniserOpenHelper.toutSynchroniser(InformationLivraisonActivity.this, db, utilisateurConnecte, true);
         }
     }

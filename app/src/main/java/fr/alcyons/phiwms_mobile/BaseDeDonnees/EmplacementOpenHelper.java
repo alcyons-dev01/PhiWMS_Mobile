@@ -32,10 +32,6 @@ import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by quentinlanusse on 01/06/2017.
- */
-
 public class EmplacementOpenHelper extends DBOpenHelper {
 
     public EmplacementOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -102,10 +98,10 @@ public class EmplacementOpenHelper extends DBOpenHelper {
         return rowId;
     }
 
-    public static void insererBDDLocaleDepotsEmplacements(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
+    public static void insererBDDLocaleDepotsEmplacements(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion) {
         final String tableNom = "Emplacements";
         final String erreurSynchronisationLibelle = "Emplacements non synchronisées";
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+        if (!statutConnexion) {
             ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, false, erreurSynchronisationLibelle);
         }
         else{

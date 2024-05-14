@@ -50,10 +50,6 @@ import fr.alcyons.phiwms_mobile.VerrouPharmacie.DetailVerrouPharmacieActivity;
 
 import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 
-/**
- * Created by quentinlanusse on 06/07/2017.
- */
-
 public class PH_Preparation_Ligne_VerrouPharmacieAdapter extends ArrayAdapter {
 
     public List<PH_Preparation_Ligne_VerrouPharmacie_Adapte> phPreparationLigneVerrouPharmacieAdapteList;

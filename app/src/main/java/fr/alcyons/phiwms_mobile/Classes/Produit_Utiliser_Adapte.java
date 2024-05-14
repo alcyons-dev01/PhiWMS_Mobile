@@ -11,10 +11,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 
-/**
- * Created by quentinlanusse on 09/08/2017.
- */
-
 public class Produit_Utiliser_Adapte implements Serializable, Comparable {
 
     private int id;

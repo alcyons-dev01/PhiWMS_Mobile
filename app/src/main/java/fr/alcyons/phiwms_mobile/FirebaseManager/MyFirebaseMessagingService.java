@@ -22,10 +22,6 @@ import me.leolin.shortcutbadger.ShortcutBadger;
 
 import static android.content.ContentValues.TAG;
 
-/**
- * Created by quentinlanusse on 27/07/2017.
- */
-
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public MyFirebaseMessagingService() {
     }

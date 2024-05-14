@@ -6,10 +6,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
-/**
- * Created by quentinlanusse on 20/06/2017.
- */
-
 public class Inventaire_LigneOpenHelper extends DBOpenHelper {
 
     public Inventaire_LigneOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

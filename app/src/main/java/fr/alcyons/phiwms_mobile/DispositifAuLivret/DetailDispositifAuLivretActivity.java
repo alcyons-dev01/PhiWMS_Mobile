@@ -139,7 +139,7 @@ public class DetailDispositifAuLivretActivity extends ServiceActivity {
                             }
                             informationImportanteDispositif.photo.setImageBitmap(dispositifPhoto_Bitmap);
                             Depot depot = DepotOpenHelper.getDepotPUI(db);
-                            if (OutilsGestionConnexionReseau.isServerAccessible(DetailDispositifAuLivretActivity.this)) {
+                            if (statutConnexion) {
                                 MedicalObjective medicalObjective = new MedicalObjective(this, utilisateurConnecte, depot, depot, dispositif_Selectionne, true);
                                 if(dispositifPhoto_Bitmap != null)
                                 {

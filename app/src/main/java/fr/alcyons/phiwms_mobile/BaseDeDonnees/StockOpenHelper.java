@@ -13,10 +13,6 @@ import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Stock;
 
-/**
- * Created by quentinlanusse on 20/06/2017.
- */
-
 public class StockOpenHelper extends DBOpenHelper {
 
     public StockOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

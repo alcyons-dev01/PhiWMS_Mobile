@@ -12,11 +12,6 @@ import java.util.List;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp;
 
-/*
-  Created by quentinlanusse on 20/06/2017.
-*/
-
-
 public class Inventaire_Ligne_TempOpenHelper extends DBOpenHelper {
 
     public Inventaire_Ligne_TempOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

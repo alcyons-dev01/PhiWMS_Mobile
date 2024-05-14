@@ -1,5 +1,6 @@
 package fr.alcyons.phiwms_mobile.ListViewAdapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
@@ -10,18 +11,15 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.R;
-
-/**
- * Created by quentinlanusse on 21/06/2017.
- */
 
 public class RetourAdapter extends ArrayAdapter implements Filterable {
 
@@ -30,9 +28,6 @@ public class RetourAdapter extends ArrayAdapter implements Filterable {
     public List<Retour_Ligne> retourLigneList;
     Context context;
     SQLiteDatabase db;
-    Retour retourSelectionne;
-    int nombreProduit = 0;
-
     RetourFilter filter;
 
     public RetourAdapter(Context context, SQLiteDatabase database, List<Retour> retourList) {
@@ -48,6 +43,7 @@ public class RetourAdapter extends ArrayAdapter implements Filterable {
     }
 
 
+    @NonNull
     @Override
     public Filter getFilter() {
         if (filter == null)
@@ -56,8 +52,10 @@ public class RetourAdapter extends ArrayAdapter implements Filterable {
         return filter;
     }
 
+    @NonNull
+    @SuppressLint("SetTextI18n")
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_retour, parent, false);
         }
@@ -76,27 +74,10 @@ public class RetourAdapter extends ArrayAdapter implements Filterable {
         Retour retour = (Retour) getItem(position);
 
         if (retour != null) {
-            retourSelectionne = RetourOpenHelper.getRetourByID(db, retour.get_UID());
+            retourLigneList = Retour_LigneOpenHelper.getAllRetourLignesByRetour(db, retour);
 
-            if(retourSelectionne != null)
-            {
-                retourLigneList = Retour_LigneOpenHelper.getAllRetourLignesByRetour(db, retourSelectionne);
-
-                for (Retour_Ligne item : retourLigneList) {
-                    if (context.getClass().getName().contains("ServiceControleRetoursActivity") || context.getClass().getName().contains("ServiceControleRetoursScanneeActivity")) {
-                        nombreProduit = nombreProduit + (int) item.getQte_Demander();
-                    } else {
-                        nombreProduit = nombreProduit + (int) item.getQte_Retourner();
-                    }
-                }
-            }
 
             int size = retourLigneList.size();
-            if(retourLigneList == null)
-            {
-                size = 0;
-            }
-
 
             String[] intitule_tab = retour.getIntitule().split(":");
             String intitule_split = intitule_tab[intitule_tab.length-1];
@@ -107,9 +88,7 @@ public class RetourAdapter extends ArrayAdapter implements Filterable {
             viewHolder.motif.setText(retour.getMotif());
             viewHolder.numero.setText("#"+retour.getNumero());
             viewHolder.depotOrigine.setText(depot_origine);
-            nombreProduit = 0;
         }
-
 
         return convertView;
     }
@@ -119,14 +98,11 @@ public class RetourAdapter extends ArrayAdapter implements Filterable {
         protected FilterResults performFiltering(CharSequence constraint) {
 
             retourList.clear();
-            for (Retour retour : retourDeBaseList
-                    ) {
-                retourList.add(retour);
-            }
+            retourList.addAll(retourDeBaseList);
             constraint = constraint.toString().toLowerCase();
             FilterResults result = new FilterResults();
 
-            if (constraint != null && constraint.toString().length() > 0) {
+            if (!constraint.toString().isEmpty()) {
                 List<Retour> founded = new ArrayList<>();
                 for (Retour retour : retourList) {
                     // Vérifie le début du premier mot
@@ -169,13 +145,10 @@ public class RetourAdapter extends ArrayAdapter implements Filterable {
         }
 
     }
-
-
-    private class RetourViewHolder {
+    private static class RetourViewHolder {
         public TextView intitule;
         public TextView motif;
         public TextView numero;
-        public TextView date;
         public TextView sommeProduit;
         public TextView depotOrigine;
     }

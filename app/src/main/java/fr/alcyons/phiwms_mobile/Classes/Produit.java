@@ -11,10 +11,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by quentinlanusse on 18/04/2017.
- */
-
 public class Produit implements Serializable, Comparable {
     public boolean selected;
     public boolean URGENCE;

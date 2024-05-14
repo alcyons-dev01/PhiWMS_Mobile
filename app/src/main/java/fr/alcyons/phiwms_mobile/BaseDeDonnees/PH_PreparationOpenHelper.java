@@ -41,10 +41,6 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by quentinlanusse on 20/06/2017.
- */
-
 public class PH_PreparationOpenHelper extends DBOpenHelper {
 
     public PH_PreparationOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -522,8 +518,8 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
         return db.delete(Constantes.TABLE_PH_PREPARATION, Constantes.CLE_COL_LISTE_PH_PREPARATION + "=?", new String[]{"ALCYONS_LISTE"});
     }
 
-    public static void synchronisationPH_PreparationVerrouPharmacie(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+    public static void synchronisationPH_PreparationVerrouPharmacie(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion) {
+        if (!statutConnexion) {
             Alerte.afficherAlerte(context, "Alerte", "Veuillez contacter la société Alcyons ! \n Impossible de se connecter à la base de données.", "alerte");
             return;
         }
@@ -642,8 +638,8 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
         requestQueue.add(obreq);
     }
 
-    public static void synchronisationPH_PreparationUF(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+    public static void synchronisationPH_PreparationUF(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion) {
+        if (!statutConnexion) {
             Alerte.afficherAlerte(context, "Alerte", "Veuillez contacter la société Alcyons ! \n Impossible de se connecter à la base de données.", "alerte");
             return;
         }
@@ -774,8 +770,8 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
         requestQueue.add(obreq);
     }
 
-    public static void synchronisationPH_PreparationPAD(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+    public static void synchronisationPH_PreparationPAD(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion) {
+        if (!statutConnexion) {
             Alerte.afficherAlerte(context, "Alerte", "Veuillez contacter la société Alcyons ! \n Impossible de se connecter à la base de données.", "alerte");
             return;
         }
@@ -900,9 +896,9 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
         requestQueue.add(obreq);
     }
 
-    public static void synchronisationPH_PreparationLivraison(final Context context, final SQLiteDatabase db, final String token, final int utilisateurConnecteID, final Utilisateur utilisateur)
+    public static void synchronisationPH_PreparationLivraison(final Context context, final SQLiteDatabase db, final String token, final int utilisateurConnecteID, final Utilisateur utilisateur, final boolean statutConnexion)
     {
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+        if (!statutConnexion) {
             Alerte.afficherAlerte(context, "Alerte", "Veuillez contacter la société Alcyons ! \n Impossible de se connecter à la base de données.", "alerte");
             return;
         }

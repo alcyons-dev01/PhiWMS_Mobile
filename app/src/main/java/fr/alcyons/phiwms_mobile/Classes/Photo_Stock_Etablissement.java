@@ -10,10 +10,6 @@ import java.io.Serializable;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by quentinlanusse on 28/06/2017.
- */
-
 public class Photo_Stock_Etablissement implements Serializable, Comparable {
 
     int Code_Produit;

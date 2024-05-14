@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -56,6 +57,8 @@ import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LOT;
+
+import androidx.activity.OnBackPressedCallback;
 
 /**
  * Created by olivier on 17/04/2024.
@@ -253,8 +256,13 @@ public class ListeLotReceptionPuiActivity extends ServiceActivity {
         } else {
             ListeLotReceptionPuiActivity.this.finish();
         }
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                onMenuSaveClick();
+            }
+        });
     }
-
 
     @SuppressLint("UseCompatLoadingForDrawables")
     @Override
@@ -718,11 +726,6 @@ public class ListeLotReceptionPuiActivity extends ServiceActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        onMenuSaveClick();
-    }
 
     public void ClickNumberPicker(final int position)
     {

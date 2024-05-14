@@ -22,10 +22,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by quentinlanusse on 26/04/2017.
- */
-
 public class Depot_ZoneAdapter extends ArrayAdapter implements Filterable {
 
     public List<Depot_Zone> depotZoneList;

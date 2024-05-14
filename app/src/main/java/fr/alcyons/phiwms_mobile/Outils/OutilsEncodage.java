@@ -6,10 +6,6 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-/**
- * Created by quentinlanusse on 12/04/2017.
- */
-
 public class OutilsEncodage {
 
     public static String recupererHashageMD5(String input) {

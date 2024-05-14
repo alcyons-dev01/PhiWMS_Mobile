@@ -239,7 +239,7 @@ public class PrisePhoto extends OriginalActivity {
 
                                     File dir = null;
 
-                                    if (OutilsGestionConnexionReseau.isServerAccessible(PrisePhoto.this)) {
+                                    if (statutConnexion) {
                                         dir = new File(root + "Photos/MedicalObjective/");
                                     } else {
                                         dir = new File(root + "Photos/PhotoASynchroniser");
@@ -356,7 +356,7 @@ public class PrisePhoto extends OriginalActivity {
                                 }
                                 else
                                 {
-                                    if (OutilsGestionConnexionReseau.isServerAccessible(PrisePhoto.this)) {
+                                    if (statutConnexion) {
                                         dir = new File(root + "Photos/MedicalObjective/");
                                     } else {
                                         dir = new File(root + "Photos/PhotoASynchroniser");

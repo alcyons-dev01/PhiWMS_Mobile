@@ -13,10 +13,6 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
 
-/**
- * Created by quentinlanusse on 20/06/2017.
- */
-
 public class Inventaire_Ligne implements Serializable, Comparable {
 
     private int ProduitID;

@@ -24,7 +24,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="/private/var/folders/6z/sxmp_s2s3pzcdrbxkpbh29_c0000gp/T/ic_android_black_24dp.xml" />
+                                                <entry key="imagePath" value="/private/var/folders/g1/q1xll98x07n9_dbkxr8d55s80000gp/T/ic_android_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -62,13 +62,24 @@
                                 <PersistentState>
                                   <option name="children">
                                     <map>
+                                      <entry key="backgroundImage">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="trimmed" value="true" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
                                       <entry key="foregroundClipArt">
                                         <value>
                                           <PersistentState>
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="/private/var/folders/6z/sxmp_s2s3pzcdrbxkpbh29_c0000gp/T/ic_android_black_24dp.xml" />
+                                                <entry key="imagePath" value="/private/var/folders/g1/q1xll98x07n9_dbkxr8d55s80000gp/T/ic_android_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -114,9 +125,6 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="backgroundLayerName" value="logo_bg" />
-                                      <entry key="generateWebpIcons" value="false" />
                                       <entry key="legacyIconShape" value="NONE" />
                                       <entry key="outputName" value="logo" />
                                       <entry key="showSafeZone" value="false" />
@@ -136,7 +144,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="/private/var/folders/6z/sxmp_s2s3pzcdrbxkpbh29_c0000gp/T/ic_android_black_24dp.xml" />
+                                                <entry key="imagePath" value="/private/var/folders/g1/q1xll98x07n9_dbkxr8d55s80000gp/T/ic_android_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -148,7 +156,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="$PROJECT_DIR$/../PhiWMS/public/images/PhiWMS_Logo_2024.svg" />
+                                                <entry key="imagePath" value="$USER_HOME$/Downloads/PhiWMS_Logo_2024.png" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -182,8 +190,8 @@
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
                                       <entry key="iconShape" value="NONE" />
-                                      <entry key="imageAsset" value="$PROJECT_DIR$/../PhiWMS/public/images/PhiWMS_Logo_2024.svg" />
-                                      <entry key="outputName" value="ic_logo_phiwms" />
+                                      <entry key="imageAsset" value="$USER_HOME$/Downloads/PhiWMS_Logo_2024.png" />
+                                      <entry key="outputName" value="ic_logo_phiwms_new" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -200,7 +208,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="/private/var/folders/6z/sxmp_s2s3pzcdrbxkpbh29_c0000gp/T/ic_android_black_24dp.xml" />
+                                                <entry key="imagePath" value="/private/var/folders/g1/q1xll98x07n9_dbkxr8d55s80000gp/T/ic_android_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -264,7 +272,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="imagePath" value="/private/var/folders/6z/sxmp_s2s3pzcdrbxkpbh29_c0000gp/T/ic_android_black_24dp.xml" />
+                                                <entry key="imagePath" value="/private/var/folders/g1/q1xll98x07n9_dbkxr8d55s80000gp/T/ic_android_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>

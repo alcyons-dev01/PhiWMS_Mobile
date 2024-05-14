@@ -383,7 +383,7 @@ public class PrisePhotoV2  extends ServiceActivity {
 
                     File dir = null;
 
-                    if (OutilsGestionConnexionReseau.isServerAccessible(PrisePhotoV2.this)) {
+                    if (statutConnexion) {
                         dir = new File(root + "Photos/MedicalObjective/");
                     } else {
                         dir = new File(root + "Photos/PhotoASynchroniser");

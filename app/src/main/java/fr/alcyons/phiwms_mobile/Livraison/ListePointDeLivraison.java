@@ -117,7 +117,7 @@ public class ListePointDeLivraison extends ServiceAvecConnexionActivity {
         listeDate = new ArrayList<>();
         listePointLivraison = new ArrayList<>();
         /* Code nécessaire afin de réaliser une requête à l' API */
-        if (OutilsGestionConnexionReseau.isServerAccessible(ListePointDeLivraison.this) && passageParOnCreate && !connexionDirecte) {
+        if (statutConnexion && passageParOnCreate && !connexionDirecte) {
             if (!swipeRefreshLayout.isRefreshing()) {
                 afficherSpinner(ListePointDeLivraison.this, LayoutInflater.from(ListePointDeLivraison.this));
             }

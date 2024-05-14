@@ -11,6 +11,7 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
@@ -354,6 +355,13 @@ public class CreationLotActivity extends ServiceActivity {
 
         apparitionValider();
         imageValidation.setOnClickListener(view -> onMenuSaveClick());
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                CreationLotActivity.this.finish();
+            }
+        });
     }
 
     @NonNull
@@ -536,13 +544,6 @@ public class CreationLotActivity extends ServiceActivity {
             invalidateOptionsMenu();
         }
     }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        CreationLotActivity.this.finish();
-    }
-
     public void apparitionValider()
     {
         if(!lotEditText.getText().toString().contentEquals("") && !datePeremptionTextView.getText().toString().contentEquals("") && !qteActuelleEditText.getText().toString().contentEquals("0"))

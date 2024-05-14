@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+
+import androidx.annotation.NonNull;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.Gravity;
@@ -40,7 +42,7 @@ public class ServiceAvecConnexionActivity extends ServiceActivity {
     View.OnClickListener clicRefreshListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (OutilsGestionConnexionReseau.isServerAccessible(ServiceAvecConnexionActivity.this)) {
+            if (statutConnexion) {
                 Intent serviceAvecConnexionIntent = ServiceAvecConnexionActivity.this.getIntent();
                 ServiceAvecConnexionActivity.this.finish();
                 ServiceAvecConnexionActivity.this.startActivity(serviceAvecConnexionIntent);
@@ -73,7 +75,7 @@ public class ServiceAvecConnexionActivity extends ServiceActivity {
 
         handler = new Handler() {
             @Override
-            public void handleMessage(Message mesg) {
+            public void handleMessage(@NonNull Message mesg) {
                 throw new RuntimeException();
             }
         };
@@ -94,9 +96,10 @@ public class ServiceAvecConnexionActivity extends ServiceActivity {
         alertDialog.show();
     }
 
-    protected void arreterSpinner()
+    public void arreterSpinner()
     {
-        alertDialog.dismiss();
+        if(alertDialog != null)
+            alertDialog.dismiss();
     }
 
     public void connexionNecessaire() {

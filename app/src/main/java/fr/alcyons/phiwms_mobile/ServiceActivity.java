@@ -294,14 +294,14 @@ public class ServiceActivity extends MenuActivity {
         viewGroup.addView(View.inflate(this, layoutDirection, null));
     }
 
-    @Override
+    /*@Override
     public void onBackPressed() {
         super.onBackPressed();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            if (doubleBackToExitPressedOnce) {
+           /*if (doubleBackToExitPressedOnce) {
                 doubleBackToExitPressedOnce = false;
                 Intent intent = new Intent(Intent.ACTION_MAIN);
                 intent.addCategory(Intent.CATEGORY_HOME);
@@ -313,23 +313,24 @@ public class ServiceActivity extends MenuActivity {
             this.doubleBackToExitPressedOnce = true;
             Toast.makeText(this, "Cliquez à nouveau pour quitter l'application", Toast.LENGTH_SHORT).show();
 
-            new Handler().postDelayed(new Runnable() {
-
-                @Override
-                public void run() {
-                    if(doubleBackToExitPressedOnce)
-                    {
-                        Intent intent = new Intent(context, NavigationActivity.class);
-                        Bundle extras = new Bundle();
-                        extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                        intent.putExtras(extras);
-                        context.startActivity(intent);
-
-                    }
+            new Handler().postDelayed(() -> {
+                if(doubleBackToExitPressedOnce)
+                {
+                    Intent intent = new Intent(context, NavigationActivity.class);
+                    Bundle extras = new Bundle();
+                    extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                    intent.putExtras(extras);
+                    context.startActivity(intent);
                 }
             }, 250);
+            Intent intent = new Intent(context, NavigationActivity.class);
+            Bundle extras = new Bundle();
+            extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+            intent.putExtras(extras);
+            context.startActivity(intent);
+
         }
-    }
+    }*/
 
 
     public Bundle getBundle() {
@@ -351,7 +352,7 @@ public class ServiceActivity extends MenuActivity {
     public void recupererIndicateurs() {
 
 
-        if (!OutilsGestionConnexionReseau.isServerAccessible(ServiceActivity.this)) {
+        if (!statutConnexion) {
             Alerte.afficherAlerte(ServiceActivity.this, "Alerte", "Veuillez contacter la société Alcyons ! \n Impossible de se connecter à la base de données.", "alerte");
             return;
         }

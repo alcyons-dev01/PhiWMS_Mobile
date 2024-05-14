@@ -33,6 +33,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.SurveillanceReference;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
+import fr.alcyons.phiwms_mobile.MainActivity;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.GestionCodeErreurNMVO;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
@@ -40,7 +41,7 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.EnvoyerMailSurveillance;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
 
-public class NewReceptionPUIContext {
+public class NewReceptionPUIContext extends MainActivity {
     private Context context;
     private SQLiteDatabase db;
 
@@ -334,7 +335,7 @@ public class NewReceptionPUIContext {
                                 listeSerie.add(serie);
                                 String resultat = "";
                                 boolean differe = false;
-                                if (!OutilsGestionConnexionReseau.isServerAccessible(context))
+                                if (!statutConnexion)
                                     differe = true;
 
                                 if (conditionnementString.contentEquals("")) {
@@ -742,7 +743,7 @@ public class NewReceptionPUIContext {
                             listeSerie.add(serie);
                             String resultat = "";
                             boolean differe = false;
-                            if (!OutilsGestionConnexionReseau.isServerAccessible(context))
+                            if (!statutConnexion)
                                 differe = true;
 
                             if (conditionnementString.contentEquals("")) {

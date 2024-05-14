@@ -31,12 +31,6 @@ import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
-
-
-/**
- * Created by quentinlanusse on 01/06/2017.
- */
-
 public class ProduitOpenHelper extends DBOpenHelper {
 
     private static final int MY_SOCKET_TIMEOUT_MS = 100;
@@ -486,11 +480,11 @@ public class ProduitOpenHelper extends DBOpenHelper {
         return rowId;
     }
 
-    public static void insererBDDLocaleProduits(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
+    public static void insererBDDLocaleProduits(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion) {
         final String tableNom = "Produit";
         final String erreurSynchronisationLibelle = "Produits non synchronisés";
 
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+        if (!statutConnexion) {
             String activityName = context.getClass().getSimpleName();
             if(activityName.contentEquals("AuthentificationActivity"))
             {

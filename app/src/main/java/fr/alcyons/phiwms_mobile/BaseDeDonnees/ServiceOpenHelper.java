@@ -32,11 +32,6 @@ import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
-
-/**
- * Created by quentinlanusse on 01/06/2017.
- */
-
 public class ServiceOpenHelper extends DBOpenHelper {
 
     public ServiceOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -200,11 +195,11 @@ public class ServiceOpenHelper extends DBOpenHelper {
         db.delete(Constantes.TABLE_SERVICE, null, null);
     }
 
-    public static void insererBDDLocaleServicesEtPerimetresFonctionnelsphiwms_mobile(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
+    public static void insererBDDLocaleServicesEtPerimetresFonctionnelsphiwms_mobile(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion) {
         final String tableNom = "Service";
         final String erreurSynchronisationLibelle = "Services non synchronisés";
 
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+        if (!statutConnexion) {
             String activityName = context.getClass().getSimpleName();
             if(activityName.contentEquals("AuthentificationActivity"))
             {

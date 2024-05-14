@@ -17,10 +17,6 @@ import java.util.List;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by quentinlanusse on 09/05/2017.
- */
-
 public class DispositifAdapter extends ArrayAdapter {
 
     public List<Produit> dispositifList = new ArrayList<>();

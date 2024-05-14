@@ -28,6 +28,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.core.view.ViewCompat;
 
@@ -63,6 +64,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_ReceptionPUI_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Reliquat_ReceptionPuiAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.Mail;
@@ -301,7 +303,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
 
             // Si possible, on essaie de mettre à jour les éléments
-            if (OutilsGestionConnexionReseau.isServerAccessible(DetailReceptionPuiActivity.this)) {
+            if (statutConnexion) {
                 ElementASynchroniserOpenHelper.toutSynchroniser(DetailReceptionPuiActivity.this, db, utilisateurConnecte, true);
             }
             else
@@ -480,6 +482,16 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
         } else {
             DetailReceptionPuiActivity.this.finish();
         }
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!phReliquatReceptionPUIAdapteList.get(0).getlotList().isEmpty()) {
+                    afficherAlerteConfirmationRetour(DetailReceptionPuiActivity.this, LayoutInflater.from(DetailReceptionPuiActivity.this), DetailReceptionPuiActivity.super.getBundle());
+                } else {
+                    retourService(DetailReceptionPuiActivity.super.getBundle());
+                }
+            }
+        });
     }
 
     @Override
@@ -664,15 +676,6 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
                 && cm.getActiveNetworkInfo().isConnected();
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        if (!phReliquatReceptionPUIAdapteList.get(0).getlotList().isEmpty()) {
-            afficherAlerteConfirmationRetour(DetailReceptionPuiActivity.this, LayoutInflater.from(DetailReceptionPuiActivity.this), super.getBundle());
-        } else {
-            retourService(super.getBundle());
-        }
-    }
 
     public void prendrePhotoBL()
     {
@@ -824,7 +827,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
             }
             else
             {
-                onBackPressed();
+                //onBackPressed();
             }
         });
 

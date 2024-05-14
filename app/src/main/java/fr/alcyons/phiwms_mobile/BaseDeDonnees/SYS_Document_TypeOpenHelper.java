@@ -4,10 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
-/**
- * Created by quentinlanusse on 28/06/2017.
- */
-
 public class SYS_Document_TypeOpenHelper extends DBOpenHelper {
 
     public SYS_Document_TypeOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

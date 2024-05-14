@@ -11,10 +11,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.InventaireOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by quentinlanusse on 20/06/2017.
- */
-
 public class Inventaire implements Serializable, Comparable {
 
 

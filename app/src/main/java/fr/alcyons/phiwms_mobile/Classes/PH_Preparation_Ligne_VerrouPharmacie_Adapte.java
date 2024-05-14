@@ -3,11 +3,6 @@ package fr.alcyons.phiwms_mobile.Classes;
 import android.database.sqlite.SQLiteDatabase;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
-
-/**
- * Created by quentinlanusse on 06/07/2017.
- */
-
 public class PH_Preparation_Ligne_VerrouPharmacie_Adapte {
 
     private String designation;

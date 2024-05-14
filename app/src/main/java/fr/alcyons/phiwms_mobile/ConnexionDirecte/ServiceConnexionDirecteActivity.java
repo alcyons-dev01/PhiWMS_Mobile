@@ -435,11 +435,11 @@ public class ServiceConnexionDirecteActivity extends ServiceAvecConnexionActivit
             //Périmètre pharmacien :
             case "Verrou Pharmacie":
                 initialisationAlerte(4);
-                PH_PreparationOpenHelper.synchronisationPH_PreparationVerrouPharmacie(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
+                PH_PreparationOpenHelper.synchronisationPH_PreparationVerrouPharmacie(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte, statutConnexion);
                 break;
             case "Quarantaine":
                 initialisationAlerte(4);
-                RetourOpenHelper.insererRetourQuarantaine(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
+                RetourOpenHelper.insererRetourQuarantaine(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte, statutConnexion);
                 break;
 
             //Périmètre Magasinier :
@@ -448,23 +448,23 @@ public class ServiceConnexionDirecteActivity extends ServiceAvecConnexionActivit
                 break;
             case "Réception PUI":
                 initialisationAlerte(4);
-                CommandeOpenHelper.insererBDDLocaleCommandeReceptionPUI(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
+                CommandeOpenHelper.insererBDDLocaleCommandeReceptionPUI(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte, statutConnexion);
                 break;
             case "Contrôle des retours":
                 initialisationAlerte(4);
-                RetourOpenHelper.insererRetourControleDesRetour(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
+                RetourOpenHelper.insererRetourControleDesRetour(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte, statutConnexion);
                 break;
             case "Retour PUI":
                 initialisationAlerte(4);
-                RetourOpenHelper.insererRetourRetourPUI(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
+                RetourOpenHelper.insererRetourRetourPUI(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte, statutConnexion);
                 break;
             case "Retour Frs":
                 initialisationAlerte(4);
-                RetourOpenHelper.insererRetourRetourFournisseur(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
+                RetourOpenHelper.insererRetourRetourFournisseur(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte, statutConnexion);
                 break;
             case "Destruction":
                 initialisationAlerte(4);
-                RetourOpenHelper.insererRetourDestruction(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
+                RetourOpenHelper.insererRetourDestruction(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte, statutConnexion);
                 break;
             case "Plan de Placements":
                 initialisationAlerte(3);
@@ -477,17 +477,17 @@ public class ServiceConnexionDirecteActivity extends ServiceAvecConnexionActivit
                 break;
             case "Préparation UF":
                 initialisationAlerte(4);
-                PH_PreparationOpenHelper.synchronisationPH_PreparationUF(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
+                PH_PreparationOpenHelper.synchronisationPH_PreparationUF(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte, statutConnexion);
                 break;
             case "Préparation PAD":
                 initialisationAlerte(4);
-                PH_PreparationOpenHelper.synchronisationPH_PreparationPAD(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
+                PH_PreparationOpenHelper.synchronisationPH_PreparationPAD(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte, statutConnexion);
                 break;
 
             //Périmètre Chauffeurs :
             case "Livraison":
                 initialisationAlerte(4);
-                PH_PreparationOpenHelper.synchronisationPH_PreparationLivraison(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte.getId(), utilisateurConnecte);
+                PH_PreparationOpenHelper.synchronisationPH_PreparationLivraison(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte.getId(), utilisateurConnecte, statutConnexion);
                 break;
             case "Tournée journalière":
                 enCoursDeDeveloppement = true;
@@ -569,11 +569,11 @@ public class ServiceConnexionDirecteActivity extends ServiceAvecConnexionActivit
             //Spécifique ADH (Préparation UF&PAD défini en amont, ainsi que contrôle des retours scannés)
             case "Réception Scannée":
                 initialisationAlerte(4);
-                CommandeOpenHelper.insererBDDLocaleCommandeReceptionScannee(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
+                CommandeOpenHelper.insererBDDLocaleCommandeReceptionScannee(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte, statutConnexion);
                 break;
             case "Réception PAD":
                 initialisationAlerte(4);
-                CommandeOpenHelper.insererBDDLocaleCommandeReceptionPAD(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
+                CommandeOpenHelper.insererBDDLocaleCommandeReceptionPAD(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte, statutConnexion);
                 break;
             default:
                 initialisationAlerte(3);
@@ -584,9 +584,9 @@ public class ServiceConnexionDirecteActivity extends ServiceAvecConnexionActivit
         {
             //synchronisation des éléments communs
             ElementASynchroniserOpenHelper.toutSynchroniser(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte, true);
-            ServiceOpenHelper.insererBDDLocaleServicesEtPerimetresFonctionnelsphiwms_mobile(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
-            DepotOpenHelper.insererBDDLocaleDepots(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
-            ProduitOpenHelper.insererBDDLocaleProduits(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
+            ServiceOpenHelper.insererBDDLocaleServicesEtPerimetresFonctionnelsphiwms_mobile(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte, statutConnexion);
+            DepotOpenHelper.insererBDDLocaleDepots(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte, statutConnexion);
+            ProduitOpenHelper.insererBDDLocaleProduits(ServiceConnexionDirecteActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte, statutConnexion);
         }
         else
         {

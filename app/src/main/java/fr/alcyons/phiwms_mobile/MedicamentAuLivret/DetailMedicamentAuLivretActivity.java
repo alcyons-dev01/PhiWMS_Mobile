@@ -184,7 +184,7 @@ public class DetailMedicamentAuLivretActivity extends ServiceActivity {
                                 }
                                 informationImportanteMedicament.photo.setImageBitmap(medicamentPhoto_Bitmap);
                                 Depot depot = DepotOpenHelper.getDepotPUI(db);
-                                if (OutilsGestionConnexionReseau.isServerAccessible(DetailMedicamentAuLivretActivity.this)) {
+                                if (statutConnexion) {
                                     MedicalObjective medicalObjective = new MedicalObjective(this, utilisateurConnecte, depot, depot, medicament_Selectionne, true);
                                     medicalObjective.savePicture(medicamentPhoto_Bitmap, String.valueOf(n), "MedicamentAuLivret", false);
 

@@ -13,10 +13,6 @@ import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by quentinlanusse on 25/04/2017.
- */
-
 public class DepotAdapter extends ArrayAdapter {
 
     public List<Depot> depots;

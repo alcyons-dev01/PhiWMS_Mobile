@@ -30,12 +30,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import android.Manifest;
 import fr.alcyons.phiwms_mobile.OriginalActivity;
 
-/**
- * Created by quentinlanusse on 20/04/2017.
- */
-
-
-public class OutilsGestionConnexionReseau {
+public class OutilsGestionConnexionReseau extends OriginalActivity {
 
     public static boolean reponseRecue = false;
     public static boolean requeteTerminee = false;
@@ -111,7 +106,7 @@ public class OutilsGestionConnexionReseau {
         }
     }
 
-    public static boolean isServerAccessible(Context context) {
+    public static boolean isServerAccessibleasda(Context context) {
 
         reponseRecue = false;
 
@@ -143,7 +138,6 @@ public class OutilsGestionConnexionReseau {
                             if (connexionOuverte == 1) {
                                 reponseRecue = true;
                             }
-                            returnServerAccessible(context);
                             //handler.sendMessage(handler.obtainMessage());
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -165,9 +159,9 @@ public class OutilsGestionConnexionReseau {
     return reponseRecue;
     }
 
-    public static void isServerAccessiblev2(Context context) {
+    public static void isServerAccessibleV2(Context context) {
 
-        reponseRecue = false;
+        statutConnexion = false;
 
         if (!getNetworkClass(context).contentEquals("")) {
 
@@ -180,14 +174,6 @@ public class OutilsGestionConnexionReseau {
             }
 
             String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + "serveur";
-
-            /*final Handler handler = new Handler() {
-                @Override
-                public void handleMessage(Message mesg) {
-                    throw new RuntimeException();
-                }
-            };*/
-
             RequestQueue requestQueue = Volley.newRequestQueue(context);
 
             JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
@@ -195,36 +181,17 @@ public class OutilsGestionConnexionReseau {
                         try {
                             int connexionOuverte = response.getInt("resultCount");
                             if (connexionOuverte == 1) {
-                                reponseRecue = true;
+                                statutConnexion = true;
                             }
-                            returnServerAccessible(context);
-                            //handler.sendMessage(handler.obtainMessage());
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            //handler.sendMessage(handler.obtainMessage());
                         }
                     },
                     error -> {
                         Log.e("Volley", "Error");
-                        //handler.sendMessage(handler.obtainMessage());
                     }
             );
             requestQueue.add(obreq);
-            /*try {
-                Looper.loop();
-            } catch (RuntimeException e) {
-                e.printStackTrace();
-            }*/
         }
-
-    }
-
-    public static boolean returnServerAccessible(Context context)
-    {
-
-        isServerAccessiblev2(context);
-
-
-        return reponseRecue;
     }
 }

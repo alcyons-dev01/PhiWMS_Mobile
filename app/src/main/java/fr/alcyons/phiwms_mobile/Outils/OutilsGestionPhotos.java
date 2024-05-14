@@ -15,10 +15,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-/**
- * Created by quentinlanusse on 10/08/2017.
- */
-
 public class OutilsGestionPhotos {
 
     /*

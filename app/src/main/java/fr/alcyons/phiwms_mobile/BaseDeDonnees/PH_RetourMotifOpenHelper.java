@@ -68,11 +68,11 @@ public class PH_RetourMotifOpenHelper extends DBOpenHelper {
         return phRetourMotifList;
     }
 
-    public static void insererBDDLocalePH_RetourMotif(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
+    public static void insererBDDLocalePH_RetourMotif(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion) {
         final String tableNom = "Motifs de retour";
         final String erreurSynchronisationLibelle = "Motifs de retour non synchronisés";
 
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+        if (!statutConnexion) {
             ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, false, erreurSynchronisationLibelle);
         }
         else{

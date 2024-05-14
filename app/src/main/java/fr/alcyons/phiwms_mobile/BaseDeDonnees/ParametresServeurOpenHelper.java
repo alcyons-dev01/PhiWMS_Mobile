@@ -8,10 +8,6 @@ import android.provider.BaseColumns;
 
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
 
-/**
- * Created by quentinlanusse on 01/08/2017.
- */
-
 public class ParametresServeurOpenHelper extends DBOpenHelper {
 
     public ParametresServeurOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

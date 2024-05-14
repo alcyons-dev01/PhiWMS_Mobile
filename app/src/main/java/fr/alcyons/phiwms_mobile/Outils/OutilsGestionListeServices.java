@@ -155,6 +155,7 @@ public class OutilsGestionListeServices {
               //  return ServiceControleRetoursScanneeActivity.class;
             case "Retour PUI":
                 return ServiceRetourPUIActivity.class;
+                //return NewRetourPUIActivity.class;
             case "Retour Frs":
                 return ServiceRetourFournisseurActivity.class;
             case "Destruction":

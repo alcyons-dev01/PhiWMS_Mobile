@@ -38,10 +38,6 @@ import fr.alcyons.phiwms_mobile.R;
 import static fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper.viderTablePH_Reliquat;
 import static fr.alcyons.phiwms_mobile.OutilsSerialisation.WS_MIXED_BULK.handler;
 
-/**
- * Created by quentinlanusse on 19/06/2017.
- */
-
 public class CommandeOpenHelper extends DBOpenHelper {
 
     public CommandeOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -196,8 +192,8 @@ public class CommandeOpenHelper extends DBOpenHelper {
 
     }
 
-    public static void insererBDDLocaleCommandeReceptionPUI(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+    public static void insererBDDLocaleCommandeReceptionPUI(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion) {
+        if (!statutConnexion) {
             Alerte.afficherAlerte(context, "Alerte", "Veuillez contacter la société Alcyons ! \n Impossible de se connecter à la base de données.", "alerte");
             return;
         }
@@ -297,8 +293,8 @@ public class CommandeOpenHelper extends DBOpenHelper {
         requestQueue.add(obreq);
     }
 
-    public static void insererBDDLocaleCommandeReceptionScannee(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+    public static void insererBDDLocaleCommandeReceptionScannee(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion) {
+        if (!statutConnexion) {
             Alerte.afficherAlerte(context, "Alerte", "Veuillez contacter la société Alcyons ! \n Impossible de se connecter à la base de données.", "alerte");
             return;
         }
@@ -397,9 +393,9 @@ public class CommandeOpenHelper extends DBOpenHelper {
         requestQueue.add(obreq);
     }
 
-    public static void insererBDDLocaleCommandeReceptionPAD(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur)
+    public static void insererBDDLocaleCommandeReceptionPAD(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion)
     {
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+        if (!statutConnexion) {
             Alerte.afficherAlerte(context, "Alerte", "Veuillez contacter la société Alcyons ! \n Impossible de se connecter à la base de données.", "alerte");
             return;
         }

@@ -30,10 +30,6 @@ import fr.alcyons.phiwms_mobile.R;
 
 import static android.view.View.GONE;
 
-/**
- * Created by quentinlanusse on 04/07/2017.
- */
-
 public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
 
     public List<Retour_Ligne_RetourPUI_Adapte> retourLigneRetourPUIAdapteList;

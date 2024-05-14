@@ -36,6 +36,7 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.SurveillanceReference;
 import fr.alcyons.phiwms_mobile.Classes.TableTrace;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
+import fr.alcyons.phiwms_mobile.MainActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.GestionCodeErreurNMVO;
@@ -49,7 +50,7 @@ import fr.alcyons.phiwms_mobile.R;
  * Created by olivier on 12/06/2019.
  */
 
-public class ReceptionPADScannerContexte {
+public class ReceptionPADScannerContexte extends MainActivity {
 
     private Context context;
     private SQLiteDatabase db;
@@ -278,7 +279,7 @@ public class ReceptionPADScannerContexte {
                                     serieListe.add(serie);
                                     String resultat = "";
                                     boolean differe = false;
-                                    if (!OutilsGestionConnexionReseau.isServerAccessible(context))
+                                    if (!statutConnexion)
                                         differe = true;
 
                                     if (conditionnementString.contentEquals("")) {

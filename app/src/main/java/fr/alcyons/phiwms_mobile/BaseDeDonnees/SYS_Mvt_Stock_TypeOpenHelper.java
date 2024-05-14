@@ -3,10 +3,6 @@ package fr.alcyons.phiwms_mobile.BaseDeDonnees;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-/**
- * Created by quentinlanusse on 28/06/2017.
- */
-
 public class SYS_Mvt_Stock_TypeOpenHelper extends DBOpenHelper {
 
     public SYS_Mvt_Stock_TypeOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

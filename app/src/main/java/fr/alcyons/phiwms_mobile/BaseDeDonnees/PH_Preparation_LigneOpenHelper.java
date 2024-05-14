@@ -11,11 +11,6 @@ import java.util.List;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 
-
-/**
- * Created by quentinlanusse on 20/06/2017.
- */
-
 public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
 
     public PH_Preparation_LigneOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

@@ -20,6 +20,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
@@ -49,6 +50,7 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Retour_Ligne_QuarantaineAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
@@ -194,7 +196,7 @@ public class DetailQuarantaineActivity extends ServiceActivity {
                     if (rowID != -1) {
                         ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, RetourOpenHelper.Constantes.TABLE_RETOUR, retourSelectionne.getPhiMR4UUID(), retourSelectionne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
                     }
-                    if (OutilsGestionConnexionReseau.isServerAccessible(DetailQuarantaineActivity.this)) {
+                    if (statutConnexion) {
                         ElementASynchroniserOpenHelper.toutSynchroniser(DetailQuarantaineActivity.this, db, utilisateurConnecte, true);
                     }
                     Toast.makeText(DetailQuarantaineActivity.this, "Demande d'enregistrement effectuée", Toast.LENGTH_SHORT).show();
@@ -332,6 +334,13 @@ public class DetailQuarantaineActivity extends ServiceActivity {
                     invalidateOptionsMenu();
 
                 });
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                afficherAlerteConfirmationRetour(DetailQuarantaineActivity.this, LayoutInflater.from(DetailQuarantaineActivity.this));
+            }
+        });
     }
     @Override
     public void onResume() {
@@ -343,12 +352,6 @@ public class DetailQuarantaineActivity extends ServiceActivity {
         // Initialisation de l'adapter puis transfere de l'adapter à la listeView pour l'affichage
         retourLigneQuarantaineAdapter = new Retour_Ligne_QuarantaineAdapter(DetailQuarantaineActivity.this, db, retourLigneList);
         retourLigneListView.setAdapter(retourLigneQuarantaineAdapter);
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        afficherAlerteConfirmationRetour(DetailQuarantaineActivity.this, LayoutInflater.from(DetailQuarantaineActivity.this));
     }
 
     public void mettreAJourUnRetourLigne(Retour_Ligne retourLigne, Retour_Ligne_QuarantaineAdapter.Retour_LigneViewHolder viewHolder) {

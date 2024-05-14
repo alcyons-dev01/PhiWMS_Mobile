@@ -13,10 +13,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.StockOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by quentinlanusse on 20/06/2017.
- */
-
 public class Stock implements Serializable, Comparable {
 
     private int Produit_UID;

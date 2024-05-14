@@ -35,10 +35,6 @@ import fr.alcyons.phiwms_mobile.R;
 import static fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper.getEmplacementsParZone;
 import static fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper.supprimerUnEmplacementEnBDD;
 
-/**
- * Created by quentinlanusse on 01/06/2017.
- */
-
 public class ZoneOpenHelper extends DBOpenHelper {
 
     public ZoneOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -193,11 +189,11 @@ public class ZoneOpenHelper extends DBOpenHelper {
         return rowId;
     }
 
-    public static void insererBDDLocaleDepotsZones(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
+    public static void insererBDDLocaleDepotsZones(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion) {
         final String tableNom = "Zones";
         final String erreurSynchronisationLibelle = "Zones non synchronisées";
 
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+        if (!statutConnexion) {
             ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, false, erreurSynchronisationLibelle);
         }
         else{

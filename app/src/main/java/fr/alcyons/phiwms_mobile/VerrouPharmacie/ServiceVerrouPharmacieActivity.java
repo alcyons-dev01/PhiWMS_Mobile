@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
@@ -21,6 +22,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -63,10 +67,12 @@ import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.ControleDesRetours.ServiceControleRetoursActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_PreparationAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity {
@@ -110,6 +116,18 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
         });
 
         connexionDirect = ParametreUtilisateurOpenHelper.getConnexionDirecte(db);
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent(ServiceVerrouPharmacieActivity.this, NavigationActivity.class);
+                Bundle extras = new Bundle();
+                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                intent.putExtras(extras);
+                ServiceVerrouPharmacieActivity.this.startActivity(intent);
+                ServiceVerrouPharmacieActivity.this.finish();
+            }
+        });
     }
 
     @Override
@@ -118,150 +136,21 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
         phPreparationList = new ArrayList<>();
 
         /* Code nécessaire afin de réaliser une requête à l' API */
-        if (OutilsGestionConnexionReseau.isServerAccessible(ServiceVerrouPharmacieActivity.this) && passageParOnCreate && !connexionDirect) {
+        if (statutConnexion && passageParOnCreate && !connexionDirect) {
 
             if (!swipeRefreshLayout.isRefreshing()) {
                 afficherSpinner(ServiceVerrouPharmacieActivity.this, LayoutInflater.from(ServiceVerrouPharmacieActivity.this));;
             }
-            CommandeOpenHelper.insererBDDLocaleCommandeReceptionPAD(ServiceVerrouPharmacieActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte);
+            CommandeOpenHelper.insererBDDLocaleCommandeReceptionPAD(ServiceVerrouPharmacieActivity.this, db, utilisateurConnecte.getToken(), utilisateurConnecte, statutConnexion);
 
             RequestQueue requestQueueVerrouPharmacieUtilisateur = Volley.newRequestQueue(ServiceVerrouPharmacieActivity.this);
             String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteVerrouPharmacie;
 
-            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
-                    new Response.Listener<JSONObject>() {
-
-                        // Takes the response from the JSON request
-                        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                int resultCount = response.getInt("resultCount");
-                                if (resultCount == 0) {
-                                    String erreur = response.getString("erreur");
-                                    if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                        Alerte.afficherAlerte(context, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter.", "alerte");
-                                        DBOpenHelper.viderBasesDeDonnees(db);
-                                        ServiceVerrouPharmacieActivity.this.finishAffinity();
-                                        Intent intent = new Intent(context, AuthentificationActivity.class);
-                                        context.startActivity(intent);
-                                    } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
-                                        Alerte.afficherAlerte(context, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", "alerte");
-                                        ServiceVerrouPharmacieActivity.this.finishAffinity();
-                                        Intent intent = new Intent(context, AuthentificationActivity.class);
-                                        context.startActivity(intent);
-                                    } else if (!erreur.contentEquals("Aucun PH_Preparation trouvé")) {
-                                        Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Verrou Pharmacie", "alerte");
-                                        ServiceVerrouPharmacieActivity.this.finishAffinity();
-                                    }
-                                } else {
-                                    PH_SerialisationOpenHelper.viderTablePH_Serialisation(db);
-                                    JSONArray SerialisationJSONArray = response.getJSONArray("Ph_Serialisation");
-                                    for (int s = 0; s < SerialisationJSONArray.length(); s++) {
-                                        JSONObject serialisationJSONObject = SerialisationJSONArray.getJSONObject(s);
-                                        PH_Serialisation serialisation = new PH_Serialisation(serialisationJSONObject);
-                                        PH_SerialisationOpenHelper.insererPH_SerialisationEnBDD(db, serialisation);
-                                    }
-
-                                    phPreparationJSONArray = response.getJSONArray("PH_Preparations");
-                                    viderTablesConcernees();
-                                    for (int i = 0; i < phPreparationJSONArray.length(); i++) {
-                                        JSONObject phPreparationJSONObject = phPreparationJSONArray.getJSONObject(i);
-                                        PH_Preparation phPreparation = new PH_Preparation(phPreparationJSONObject);
-
-                                        Depot depot = DepotOpenHelper.getDepotParID(db, phPreparation.getDepotDestinataireID());
-
-                                        if (depot != null) {
-
-                                            if (depot.getStructure().contains("PAD")) {
-                                                if (phPreparation.getStatut().equals(getString(R.string.statutVerrouillée))) {
-                                                    rowID = PH_PreparationOpenHelper.insererUnPH_PreparationEnBDD(db, phPreparation);
-                                                    if (rowID != -1) {
-                                                        phPreparationList.add(phPreparation);
-                                                        remplirTablesPHPreparationLigneEtStockLotEmplacement(phPreparationJSONObject);
-                                                    }
-                                                }
-                                            } else if (depot.getStructure().contains("PUF")) {
-                                                if (!phPreparation.getListe().contains("nominative")) {
-                                                    if (!phPreparation.getValidee()) {
-                                                        rowID = PH_PreparationOpenHelper.insererUnPH_PreparationEnBDD(db, phPreparation);
-                                                        if (rowID != -1) {
-                                                            phPreparationList.add(phPreparation);
-                                                            remplirTablesPHPreparationLigneEtStockLotEmplacement(phPreparationJSONObject);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            handler.sendMessage(handler.obtainMessage());
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e("Volley", "Error");
-                            Alerte.afficherAlerte(context, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP Service Verrou Pharmacie", "alerte");
-                        }
-                    }
-            ) {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    HashMap<String, String> headers = new HashMap<>();
-                    headers.put("Authorization", utilisateurConnecte.getToken());
-                    return headers;
-                }
-            };
-
-            obreq.setRetryPolicy(retryPolicy);
+            JsonObjectRequest obreq = getObjectRequest(urlRequete);
             requestQueueVerrouPharmacieUtilisateur.add(obreq);
-            try {
-                Looper.loop();
-            } catch (RuntimeException e) {
-                e.printStackTrace();
-            }
-
-            if (phPreparationList.size() == 0) {
-                vide = true;
-                nomServiceVide = "Verrou Pharmacie";
-                onBackPressed();
-            }
-            else
-            {
-                if(passageParOnCreate)
-                {
-                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(phPreparationList.size()));
-                    Collections.sort(phPreparationList, new Comparator<PH_Preparation>() {
-                        @Override
-                        public int compare(PH_Preparation o1, PH_Preparation o2) {
-                            return o1.getLivraisonPrevueDate().compareTo(o2.getLivraisonPrevueDate());
-                        }
-                    });
-
-                    phPreparationAdapter = new PH_PreparationAdapter(ServiceVerrouPharmacieActivity.this, db, phPreparationList, utilisateurConnecte);
-                    phPreparationListView.setDivider(footer);
-                    phPreparationListView.setAdapter(phPreparationAdapter);
-
-                    if (phPreparationList.size() == 0) {
-                        vide = true;
-                        nomServiceVide = "Verrou Pharmacie";
-                        ServiceVerrouPharmacieActivity.this.finish();
-                    }
-                }
-
-                passageParOnCreate = false;
-
-            }
-
-            arreterSpinner();
         } else {
             phPreparationList = PH_PreparationOpenHelper.getAllPHPreparationVerrouPharmacie(db);
-            if (phPreparationList.size() == 0) {
+            if (phPreparationList.isEmpty()) {
                 if(connexionDirect)
                 {
                     Intent retourVersServiceConnexionDirectIntent = new Intent(ServiceVerrouPharmacieActivity.this, ServiceConnexionDirecteActivity.class);
@@ -277,24 +166,18 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
                 else
                 {
                     connexionNecessaire();
-                    return;
                 }
             }
             else
             {
                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(phPreparationList.size()));
-                Collections.sort(phPreparationList, new Comparator<PH_Preparation>() {
-                    @Override
-                    public int compare(PH_Preparation o1, PH_Preparation o2) {
-                        return o1.getLivraisonPrevueDate().compareTo(o2.getLivraisonPrevueDate());
-                    }
-                });
+                phPreparationList.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
 
                 phPreparationAdapter = new PH_PreparationAdapter(ServiceVerrouPharmacieActivity.this, db, phPreparationList, utilisateurConnecte);
                 phPreparationListView.setDivider(footer);
                 phPreparationListView.setAdapter(phPreparationAdapter);
 
-                if (phPreparationList.size() == 0) {
+                if (phPreparationList.isEmpty()) {
                     vide = true;
                     nomServiceVide = "Verrou Pharmacie";
                     ServiceVerrouPharmacieActivity.this.finish();
@@ -303,12 +186,131 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
                 passageParOnCreate = false;
                 if(connexionDirect)
                 {
-                    connexionDirect = !connexionDirect;
+                    connexionDirect = false;
                 }
 
                 invalidateOptionsMenu();
             }
         }
+    }
+
+    @NonNull
+    private JsonObjectRequest getObjectRequest(String urlRequete) {
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
+                response -> {
+                    try {
+                        int resultCount = response.getInt("resultCount");
+                        if (resultCount == 0) {
+                            String erreur = response.getString("erreur");
+                            if (erreur.equals(context.getString(R.string.tokenInvalide))) {
+                                Alerte.afficherAlerte(context, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter.", "alerte");
+                                DBOpenHelper.viderBasesDeDonnees(db);
+                                ServiceVerrouPharmacieActivity.this.finishAffinity();
+                                Intent intent = new Intent(context, AuthentificationActivity.class);
+                                context.startActivity(intent);
+                            } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
+                                Alerte.afficherAlerte(context, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", "alerte");
+                                ServiceVerrouPharmacieActivity.this.finishAffinity();
+                                Intent intent = new Intent(context, AuthentificationActivity.class);
+                                context.startActivity(intent);
+                            } else if (!erreur.contentEquals("Aucun PH_Preparation trouvé")) {
+                                Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Verrou Pharmacie", "alerte");
+                                ServiceVerrouPharmacieActivity.this.finishAffinity();
+                            }
+                        } else {
+                            PH_SerialisationOpenHelper.viderTablePH_Serialisation(db);
+                            JSONArray SerialisationJSONArray = response.getJSONArray("Ph_Serialisation");
+                            for (int s = 0; s < SerialisationJSONArray.length(); s++) {
+                                JSONObject serialisationJSONObject = SerialisationJSONArray.getJSONObject(s);
+                                PH_Serialisation serialisation = new PH_Serialisation(serialisationJSONObject);
+                                PH_SerialisationOpenHelper.insererPH_SerialisationEnBDD(db, serialisation);
+                            }
+
+                            phPreparationJSONArray = response.getJSONArray("PH_Preparations");
+                            viderTablesConcernees();
+                            for (int i = 0; i < phPreparationJSONArray.length(); i++) {
+                                JSONObject phPreparationJSONObject = phPreparationJSONArray.getJSONObject(i);
+                                PH_Preparation phPreparation = new PH_Preparation(phPreparationJSONObject);
+
+                                Depot depot = DepotOpenHelper.getDepotParID(db, phPreparation.getDepotDestinataireID());
+
+                                if (depot != null) {
+
+                                    if (depot.getStructure().contains("PAD")) {
+                                        if (phPreparation.getStatut().equals(getString(R.string.statutVerrouillée))) {
+                                            rowID = PH_PreparationOpenHelper.insererUnPH_PreparationEnBDD(db, phPreparation);
+                                            if (rowID != -1) {
+                                                phPreparationList.add(phPreparation);
+                                                remplirTablesPHPreparationLigneEtStockLotEmplacement(phPreparationJSONObject);
+                                            }
+                                        }
+                                    } else if (depot.getStructure().contains("PUF")) {
+                                        if (!phPreparation.getListe().contains("nominative")) {
+                                            if (!phPreparation.getValidee()) {
+                                                rowID = PH_PreparationOpenHelper.insererUnPH_PreparationEnBDD(db, phPreparation);
+                                                if (rowID != -1) {
+                                                    phPreparationList.add(phPreparation);
+                                                    remplirTablesPHPreparationLigneEtStockLotEmplacement(phPreparationJSONObject);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (phPreparationList.isEmpty()) {
+                                vide = true;
+                                nomServiceVide = "Verrou Pharmacie";
+                                Intent intent = new Intent(ServiceVerrouPharmacieActivity.this, NavigationActivity.class);
+                                Bundle extras = new Bundle();
+                                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                                intent.putExtras(extras);
+                                ServiceVerrouPharmacieActivity.this.startActivity(intent);
+                                ServiceVerrouPharmacieActivity.this.finish();
+                            }
+                            else
+                            {
+                                if(passageParOnCreate)
+                                {
+                                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(phPreparationList.size()));
+                                    ((TextView) findViewById(R.id.titre)).setText("Verrous");
+                                    phPreparationList.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
+
+                                    phPreparationAdapter = new PH_PreparationAdapter(ServiceVerrouPharmacieActivity.this, db, phPreparationList, utilisateurConnecte);
+                                    phPreparationListView.setDivider(footer);
+                                    phPreparationListView.setAdapter(phPreparationAdapter);
+
+                                    if (phPreparationList.isEmpty()) {
+                                        vide = true;
+                                        nomServiceVide = "Verrou Pharmacie";
+                                        ServiceVerrouPharmacieActivity.this.finish();
+                                    }
+                                }
+
+                                passageParOnCreate = false;
+                            }
+                            new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> {
+                    Log.e("Volley", "Error");
+                    Alerte.afficherAlerte(context, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP Service Verrou Pharmacie", "alerte");
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Authorization", utilisateurConnecte.getToken());
+                return headers;
+            }
+        };
+
+        obreq.setRetryPolicy(retryPolicy);
+        return obreq;
     }
 
     public void lancerScan()

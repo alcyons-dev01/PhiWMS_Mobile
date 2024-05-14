@@ -12,6 +12,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.view.ViewCompat;
@@ -65,12 +67,14 @@ import fr.alcyons.phiwms_mobile.Classes.ObjetReceptionScannee;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.ReceptionPADExpandableAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.Mail;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.PrisePhoto.PrisePhoto;
 import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotos.verifyStoragePermissions;
@@ -161,26 +165,11 @@ public class DetailReceptionPadActivity extends ServiceActivity {
         lancerScan = (LinearLayout) findViewById(R.id.lancerScan);
 
         //gestion des objets graphiques
-        boutonAddByScan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                lancerScanProduit();
-            }
-        });
+        boutonAddByScan.setOnClickListener(view -> lancerScanProduit());
 
-        boutonAddByManuel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onMenuAddClick();
-            }
-        });
+        boutonAddByManuel.setOnClickListener(view -> onMenuAddClick());
 
-        lancerScan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                lancerScanProduit();
-            }
-        });
+        lancerScan.setOnClickListener(v -> lancerScanProduit());
 
         nomReceptionPAD.setText(commandeCourante.getFournisseur());
         numeroCommande.setText(commandeCourante.getNumero());
@@ -196,6 +185,12 @@ public class DetailReceptionPadActivity extends ServiceActivity {
         pm = DetailReceptionPadActivity.this.getPackageManager();
         premierPassage = true;
 
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                afficherAlerteConfirmation(DetailReceptionPadActivity.this, DetailReceptionPadActivity.this.getLayoutInflater());
+            }
+        });
     }
 
     @Override
@@ -206,7 +201,7 @@ public class DetailReceptionPadActivity extends ServiceActivity {
         {
             commandeSelectNumero = commandeCourante.getNumero();
             listeReliquat = PH_ReliquatOpenHelper.getPH_ReliquatByCommandeNumero(db, commandeCourante.getNumero());
-            if(listeReliquat.size() != 0)
+            if(!listeReliquat.isEmpty())
             {
                 for(PH_Reliquat reliquat : listeReliquat)
                 {
@@ -215,30 +210,34 @@ public class DetailReceptionPadActivity extends ServiceActivity {
             }
         }
 
-        if(mapAdapter.size() == 0 && premierPassage)
+        if(mapAdapter.isEmpty() && premierPassage)
         {
             linearBouton.setVisibility(View.VISIBLE);
             liste_viewProduitReceptionPAD.setVisibility(View.GONE);
             boutonAddByManuel.performClick();
             premierPassage = false;
         }
-        else if(mapAdapter.size() == 0  && !premierPassage)
-        {
-            onBackPressed();
-        }
         else
         {
-            linearBouton.setVisibility(View.GONE);
-            liste_viewProduitReceptionPAD.setVisibility(View.VISIBLE);
-            receptionPADExpandableAdapter = new ReceptionPADExpandableAdapter(DetailReceptionPadActivity.this, db, liste_objetReception, mapAdapter, utilisateurConnecte);
-            liste_viewProduitReceptionPAD.setAdapter(receptionPADExpandableAdapter);
-            liste_viewProduitReceptionPAD.setDivider(footer);
-            expandAll();
-        }
-
-        if(premierPassage)
-        {
-
+            if(liste_objetReception.isEmpty())
+            {
+                Intent intent = new Intent(DetailReceptionPadActivity.this, ServiceReceptionPadActivity.class);
+                Bundle extras = new Bundle();
+                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                extras.putInt("serviceSelectionneID", serviceActuel.getId());
+                intent.putExtras(extras);
+                DetailReceptionPadActivity.this.startActivity(intent);
+                DetailReceptionPadActivity.this.finish();
+            }
+            else
+            {
+                linearBouton.setVisibility(View.GONE);
+                liste_viewProduitReceptionPAD.setVisibility(View.VISIBLE);
+                receptionPADExpandableAdapter = new ReceptionPADExpandableAdapter(DetailReceptionPadActivity.this, db, liste_objetReception, mapAdapter, utilisateurConnecte);
+                liste_viewProduitReceptionPAD.setAdapter(receptionPADExpandableAdapter);
+                liste_viewProduitReceptionPAD.setDivider(footer);
+                expandAll();
+            }
         }
     }
 
@@ -963,19 +962,6 @@ public class DetailReceptionPadActivity extends ServiceActivity {
         DetailReceptionPadActivity.this.startActivityForResult(detailReceptionPui_Intent, CodesEchangesActivites.RETOUR_PRISE_PHOTO);
     }
 
-    @Override
-    public void onBackPressed()
-    {
-        if(enregistrer)
-        {
-            super.onBackPressed();
-        }
-        else
-        {
-            afficherAlerteConfirmation(DetailReceptionPadActivity.this, DetailReceptionPadActivity.this.getLayoutInflater());
-        }
-    }
-
     private static ObjetReceptionPAD getKeyMap(Map Map, int index)
     {
 
@@ -1048,26 +1034,18 @@ public class DetailReceptionPadActivity extends ServiceActivity {
         alertDialog.getWindow().setGravity(Gravity.CENTER);
         alertDialog.show();
 
-        zoneok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-                Intent intent = new Intent(DetailReceptionPadActivity.this, ServiceReceptionPadActivity.class);
-                Bundle extras = new Bundle();
-                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                extras.putInt("serviceSelectionneID", serviceActuel.getId());
-                intent.putExtras(extras);
-                DetailReceptionPadActivity.this.startActivity(intent);
-                DetailReceptionPadActivity.this.finish();
-            }
+        zoneok.setOnClickListener(v -> {
+            alertDialog.dismiss();
+            Intent intent = new Intent(DetailReceptionPadActivity.this, ServiceReceptionPadActivity.class);
+            Bundle extras = new Bundle();
+            extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+            extras.putInt("serviceSelectionneID", serviceActuel.getId());
+            intent.putExtras(extras);
+            DetailReceptionPadActivity.this.startActivity(intent);
+            DetailReceptionPadActivity.this.finish();
         });
 
-        buttonAnnuler.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
+        buttonAnnuler.setOnClickListener(v -> alertDialog.dismiss());
     }
 
     public void afficherAlerteValidationReception(Context context, LayoutInflater inflater)
@@ -1083,20 +1061,12 @@ public class DetailReceptionPadActivity extends ServiceActivity {
         alertDialog.getWindow().setGravity(Gravity.CENTER);
         alertDialog.show();
 
-        zoneok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SauvegarderReception();
-                alertDialog.dismiss();
-            }
+        zoneok.setOnClickListener(v -> {
+            SauvegarderReception();
+            alertDialog.dismiss();
         });
 
-        buttonAnnuler.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
+        buttonAnnuler.setOnClickListener(v -> alertDialog.dismiss());
     }
 
     private void EnvoiMailReception()

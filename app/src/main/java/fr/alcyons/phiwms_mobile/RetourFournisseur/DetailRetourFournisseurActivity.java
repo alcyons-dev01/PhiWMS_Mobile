@@ -13,6 +13,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
+
 import com.github.clans.fab.FloatingActionButton;
 
 import java.io.ByteArrayOutputStream;
@@ -35,10 +37,12 @@ import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Retour_Ligne_RetourFournisseurAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.Dialogue;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 /**
@@ -141,11 +145,15 @@ public class DetailRetourFournisseurActivity extends ServiceActivity {
             Toast.makeText(DetailRetourFournisseurActivity.this, "Retour fournisseur effectué", Toast.LENGTH_SHORT).show();
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
 
-            if (OutilsGestionConnexionReseau.isServerAccessible(DetailRetourFournisseurActivity.this)) {
+            if (statutConnexion) {
                 ElementASynchroniserOpenHelper.toutSynchroniser(DetailRetourFournisseurActivity.this, db, utilisateurConnecte, true);
             }
 
-            onBackPressed();
+            Intent detailRetourFournisseurIntent = new Intent(DetailRetourFournisseurActivity.this, ServiceRetourFournisseurActivity.class);
+            Bundle detailRetourFournisseurBundle = DetailRetourFournisseurActivity.super.getBundle();
+            detailRetourFournisseurIntent.putExtras(detailRetourFournisseurBundle);
+            DetailRetourFournisseurActivity.this.startActivity(detailRetourFournisseurIntent);
+            DetailRetourFournisseurActivity.this.finish();
         }
     };
 
@@ -180,6 +188,17 @@ public class DetailRetourFournisseurActivity extends ServiceActivity {
         listViewRetourLignes = findViewById(R.id.listeView);
         listViewRetourLignes.setDivider(footer);
         listViewRetourLignes.setItemsCanFocus(true);
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent detailRetourFournisseurIntent = new Intent(DetailRetourFournisseurActivity.this, ServiceRetourFournisseurActivity.class);
+                Bundle detailRetourFournisseurBundle = DetailRetourFournisseurActivity.super.getBundle();
+                detailRetourFournisseurIntent.putExtras(detailRetourFournisseurBundle);
+                DetailRetourFournisseurActivity.this.startActivity(detailRetourFournisseurIntent);
+                DetailRetourFournisseurActivity.this.finish();
+            }
+        });
     }
     @Override
     public void onResume() {
@@ -188,15 +207,5 @@ public class DetailRetourFournisseurActivity extends ServiceActivity {
         listeRetourLignes = Retour_LigneOpenHelper.getAllRetourLignesByRetour(db, retourSelectionne);
         adapter = new Retour_Ligne_RetourFournisseurAdapter(DetailRetourFournisseurActivity.this, listeRetourLignes);
         listViewRetourLignes.setAdapter(adapter);
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent detailRetourFournisseurIntent = new Intent(DetailRetourFournisseurActivity.this, ServiceRetourFournisseurActivity.class);
-        Bundle detailRetourFournisseurBundle = super.getBundle();
-        detailRetourFournisseurIntent.putExtras(detailRetourFournisseurBundle);
-        DetailRetourFournisseurActivity.this.startActivity(detailRetourFournisseurIntent);
-        DetailRetourFournisseurActivity.this.finish();
     }
 }

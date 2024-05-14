@@ -50,10 +50,6 @@ import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.MedicalObjective;
 
-/**
- * Created by quentinlanusse on 01/06/2017.
- */
-
 public class ElementASynchroniserOpenHelper extends DBOpenHelper {
 
     public ElementASynchroniserOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

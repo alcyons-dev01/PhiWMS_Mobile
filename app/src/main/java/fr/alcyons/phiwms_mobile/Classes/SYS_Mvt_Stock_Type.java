@@ -12,10 +12,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.SYS_Mvt_Stock_TypeOpenHelper;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by quentinlanusse on 28/06/2017.
- */
-
 public class SYS_Mvt_Stock_Type implements Serializable, Comparable {
 
     int TYM_ID;

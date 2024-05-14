@@ -30,6 +30,12 @@
 
     <!-- Authentification -->
     <activity
+        android:name="fr.alcyons.phiwms_mobile.MainActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"
+        android:exported="true"/>
+
+    <activity
         android:name="fr.alcyons.phiwms_mobile.AuthentificationActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"
@@ -81,6 +87,38 @@
 
     <activity
         android:name="fr.alcyons.phiwms_mobile.ReceptionPUI.ZoneEtEmplacementSelecteurMultipleActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <!-- Service Réception PAD -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.ReceptionPAD.ServiceReceptionPadActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.ReceptionPAD.DetailReceptionPadActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.ReceptionPAD.AjoutManuelProduitReceptionPADActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <!-- Service Verrou Pharmacie -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.VerrouPharmacie.ServiceVerrouPharmacieActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.VerrouPharmacie.DetailVerrouPharmacieActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
@@ -138,6 +176,12 @@
         <!-- Retour PUI -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+        <activity
+        android:name="fr.alcyons.phiwms_mobile.RetourPUI.NewRetourPUIActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>

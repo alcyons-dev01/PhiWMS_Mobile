@@ -14,10 +14,6 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Stock;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 
-/**
- * Created by quentinlanusse on 28/06/2017.
- */
-
 public class Stock_Lot_EmplacementLightOpenHelper extends DBOpenHelper {
 
     public Stock_Lot_EmplacementLightOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

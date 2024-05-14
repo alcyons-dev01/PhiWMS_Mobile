@@ -11,10 +11,6 @@ import java.util.List;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 
-/**
- * Created by quentinlanusse on 09/05/2017.
- */
-
 public class InformationDispositif extends Fragment {
 
     Produit dispositif_Selectionne;

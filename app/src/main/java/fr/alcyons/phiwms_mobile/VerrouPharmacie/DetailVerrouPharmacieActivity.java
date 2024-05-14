@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 
 
@@ -60,11 +61,13 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_VerrouPharmacie_Ada
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Preparation_Ligne_VerrouPharmacieAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
@@ -105,7 +108,7 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
         detailVerrouPharmacieBundle.putString("Designation", designation);
         detailVerrouPharmacieBundle.putBoolean("isBoutonSuppressionExistant", true);
         Intent detailVerrouPharmacieIntent = null;
-        if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA) && !android.os.Build.MANUFACTURER.contains("Zebra Technologies") && !android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+        if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY) && !android.os.Build.MANUFACTURER.contains("Zebra Technologies") && !android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
         {
 
         }
@@ -217,6 +220,13 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
         }
 
         ((TextView) findViewById(R.id.nbColisTotal)).setText(String.valueOf(nbColisTotal));
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                afficherAlerteConfirmationRetour(DetailVerrouPharmacieActivity.this, LayoutInflater.from(DetailVerrouPharmacieActivity.this), DetailVerrouPharmacieActivity.super.getBundle());
+            }
+        });
     }
 
     @Override
@@ -411,12 +421,6 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        afficherAlerteConfirmationRetour(DetailVerrouPharmacieActivity.this, LayoutInflater.from(DetailVerrouPharmacieActivity.this), super.getBundle());
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         //Récupération du menu
@@ -562,7 +566,7 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
 
             Toast.makeText(DetailVerrouPharmacieActivity.this, "Préparation déverrouillée", Toast.LENGTH_SHORT).show();
 
-            if (OutilsGestionConnexionReseau.isServerAccessible(DetailVerrouPharmacieActivity.this)) {
+            if (statutConnexion) {
                 ElementASynchroniserOpenHelper.toutSynchroniser(DetailVerrouPharmacieActivity.this, db, utilisateurConnecte, true);
             }
             onBackPressed();

@@ -21,10 +21,6 @@ import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.MenuActivity;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by quentinlanusse on 03/05/2017.
- */
-
 public class Depot_EmplacementAdapter extends ArrayAdapter implements Filterable {
 
     public List<Depot_Emplacement> depotEmplacementList;

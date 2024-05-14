@@ -8,10 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 import fr.alcyons.phiwms_mobile.Classes.Inventaire;
 
-/**
- * Created by quentinlanusse on 20/06/2017.
- */
-
 public class InventaireOpenHelper extends DBOpenHelper {
 
     public InventaireOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

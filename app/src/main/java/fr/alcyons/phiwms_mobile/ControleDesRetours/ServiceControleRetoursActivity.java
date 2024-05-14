@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
@@ -32,6 +33,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -55,6 +57,7 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerDocumentActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
@@ -62,6 +65,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
+import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
@@ -72,8 +76,10 @@ import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
+import fr.alcyons.phiwms_mobile.Quarantaine.ServiceQuarantaineActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ReceptionPUI.DetailReceptionPuiActivity;
+import fr.alcyons.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity;
 import fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
@@ -102,9 +108,6 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         optionTri = findViewById(R.id.optionTri);
         triListe = findViewById(R.id.triListe);
         triListe.setVisibility(View.VISIBLE);
-
-        // Affichage des informations de base
-        ((TextView) findViewById(R.id.titre)).setText("Demandes de retour");
 
         // Initialisation de la liste et de l'action sur l'un de ses items
         retourListView = findViewById(R.id.listeView);
@@ -234,17 +237,26 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                         }
                     }
                 });
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent(ServiceControleRetoursActivity.this, NavigationActivity.class);
+                Bundle extras = new Bundle();
+                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                intent.putExtras(extras);
+                ServiceControleRetoursActivity.this.startActivity(intent);
+                ServiceControleRetoursActivity.this.finish();
+            }
+        });
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
-        /* Code nécessaire afin de réaliser une requête à l' API */
-        if (OutilsGestionConnexionReseau.isServerAccessible(ServiceControleRetoursActivity.this) && passageParOnCreate && !connexionDirecte) {
+        if (statutConnexion && passageParOnCreate && !connexionDirecte) {
 
             if (!swipeRefreshLayout.isRefreshing()) {
-                //mProgressDialog = AlertDialog..show(ServiceControleRetoursActivity.this, "Veuillez patienter", "Synchronisation des retours en cours");
                 afficherSpinner(ServiceControleRetoursActivity.this, LayoutInflater.from(ServiceControleRetoursActivity.this));
             }
 
@@ -253,40 +265,6 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
 
             JsonObjectRequest obreq = getJsonObjectRequest(urlRequete);
             requestQueue.add(obreq);
-
-            try {
-                Looper.loop();
-            } catch (Throwable e) {
-                Log.e(TAG, "Error Looper :", e);
-            }
-            if(passageParOnCreate)
-            {
-                Retour retour_alcyons = RetourOpenHelper.getRetourEssaiAlcyons(db);
-                if(retour_alcyons != null)
-                {
-                    retourList.add(retour_alcyons);
-                }
-
-                //lancerScan();
-                /* Code nécessaire à l'affichage de la liste */
-                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList);
-                // Permet d'enlever le séparateur entre deux éléments d'une listeView
-                retourListView.setDivider(footer);
-                retourListView.setAdapter(retourAdapter);
-
-                if (retourList.isEmpty()) {
-                    vide = true;
-                    nomServiceVide = "Contrôle des retours";
-                    ServiceControleRetoursActivity.this.finish();
-                }
-                else
-                {
-                    invalidateOptionsMenu();
-                }
-            }
-            passageParOnCreate = false;
-            arreterSpinner();
         } else {
             retourList = RetourOpenHelper.getRetoursByEnAttenteDe(db, getString(R.string.RepriseDemandee));
             if (retourList.isEmpty()) {
@@ -345,12 +323,11 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
 
     @NonNull
     private JsonObjectRequest getJsonObjectRequest(String urlRequete) {
-        // Takes the response from the JSON request
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
-                response -> {
+        return new JsonObjectRequest
+                (Request.Method.GET, urlRequete, null, response -> {
                     try {
-                        int nbResultat = response.getInt("resultCount");
-                        if (nbResultat == 0) {
+                        int resultCount = response.getInt("resultCount");
+                        if (resultCount == 0) {
                             String erreur = response.getString("erreur");
                             if (erreur.equals(context.getString(R.string.tokenInvalide))) {
                                 Alerte.afficherAlerte(context, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter.", "alerte");
@@ -387,21 +364,44 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                                     }
                                 }
                             }
-                        }
-                    } catch (Throwable e) {
-                        Log.e(TAG, "Error JSON :", e);
-                    }
-                    handler.sendMessage(handler.obtainMessage());
-                },
-                error -> {
-                    Log.e("Volley CdR", error.toString());
-                    Alerte.afficherAlerte(ServiceControleRetoursActivity.this, "Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Contrôle des retours)", "alerte");
-                }
-        ) {
 
-            /**
-             * Passing some request headers
-             */
+                            Retour retour_alcyons = RetourOpenHelper.getRetourEssaiAlcyons(db);
+                            if(retour_alcyons != null)
+                            {
+                                retourList.add(retour_alcyons);
+                            }
+
+                            //lancerScan();
+                            /* Code nécessaire à l'affichage de la liste */
+                            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
+                            ((TextView) findViewById(R.id.titre)).setText("Demandes de retour");
+                            retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList);
+                            // Permet d'enlever le séparateur entre deux éléments d'une listeView
+                            retourListView.setDivider(footer);
+                            retourListView.setAdapter(retourAdapter);
+
+                            if (retourList.isEmpty()) {
+                                vide = true;
+                                nomServiceVide = "Contrôle des retours";
+                                ServiceControleRetoursActivity.this.finish();
+                            }
+                            else
+                            {
+                                invalidateOptionsMenu();
+                            }
+                            passageParOnCreate = false;
+                            new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
+                        }
+                    }
+                    catch (Throwable t)
+                    {
+                        Log.e(TAG, "Error JSON", t);
+                    }
+                }, error -> {
+                    // TODO: Handle error
+                    Log.e("Volley", "Error");
+                    Alerte.afficherAlerte(context, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP Service Récupération Quarantaine", "alerte");
+                }) {
             @Override
             public Map<String, String> getHeaders() {
                 HashMap<String, String> headers = new HashMap<>();
@@ -409,8 +409,6 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                 return headers;
             }
         };
-        obreq.setRetryPolicy(retryPolicy);
-        return obreq;
     }
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {

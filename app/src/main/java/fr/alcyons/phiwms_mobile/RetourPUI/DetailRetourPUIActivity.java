@@ -43,11 +43,14 @@ import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne_RetourPUI_Adapte;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Retour_Ligne_RetourPUIAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
+
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
@@ -123,6 +126,12 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
                     }
                 });
 
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                afficherAlerteConfirmationRetour(DetailRetourPUIActivity.this, LayoutInflater.from(DetailRetourPUIActivity.this));
+            }
+        });
     }
     @Override
     public void onResume() {
@@ -252,7 +261,7 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
 
             Toast.makeText(DetailRetourPUIActivity.this, "Retour PUI effectué", Toast.LENGTH_SHORT).show();
-            if (OutilsGestionConnexionReseau.isServerAccessible(DetailRetourPUIActivity.this)) {
+            if (statutConnexion) {
                 ElementASynchroniserOpenHelper.toutSynchroniser(DetailRetourPUIActivity.this, db, utilisateurConnecte, true);
             }
             retourService();
@@ -279,11 +288,6 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
         });
 
         buttonAnnuler.setOnClickListener(v -> alertDialog.dismiss());
-    }
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        afficherAlerteConfirmationRetour(DetailRetourPUIActivity.this, LayoutInflater.from(DetailRetourPUIActivity.this));
     }
     private void retourService()
     {

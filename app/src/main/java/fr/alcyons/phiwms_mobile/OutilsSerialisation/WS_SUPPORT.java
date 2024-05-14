@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
+import fr.alcyons.phiwms_mobile.MainActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 
@@ -32,7 +33,7 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
  * Created by olivier on 26/02/2019.
  */
 
-public class WS_SUPPORT {
+public class WS_SUPPORT extends MainActivity {
 
     public static Handler handler = new Handler() {
         @Override
@@ -71,7 +72,7 @@ public class WS_SUPPORT {
                 String ClientTrxId = "";
 
                 // Tentative de lancer la sychronisation
-                if (OutilsGestionConnexionReseau.isServerAccessible(context)) {
+                if (statutConnexion) {
                     String urlRequete = url + "G445";
                     RequestQueue requestQueue = Volley.newRequestQueue(context);
 
@@ -155,7 +156,7 @@ public class WS_SUPPORT {
             String ClientTrxId = "";
 
             // Tentative de lancer la sychronisation
-            if (OutilsGestionConnexionReseau.isServerAccessible(context)) {
+            if (statutConnexion) {
                 String urlRequete = url + "G482";
                 RequestQueue requestQueue = Volley.newRequestQueue(context);
 
@@ -234,7 +235,7 @@ public class WS_SUPPORT {
             String ClientTrxId = "";
 
             // Tentative de lancer la sychronisation
-            if (OutilsGestionConnexionReseau.isServerAccessible(context)) {
+            if (statutConnexion) {
                 String urlRequete = url + "G483";
                 RequestQueue requestQueue = Volley.newRequestQueue(context);
 

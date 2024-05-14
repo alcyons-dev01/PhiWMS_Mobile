@@ -30,6 +30,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.SurveillanceReference;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
+import fr.alcyons.phiwms_mobile.MainActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.GestionCodeErreurNMVO;
@@ -44,7 +45,7 @@ import fr.alcyons.phiwms_mobile.R;
  * Created by olivier on 05/03/2019.
  */
 
-public class FranceMVOContexte  {
+public class FranceMVOContexte  extends MainActivity {
 
     private Context context;
     private SQLiteDatabase db;
@@ -160,7 +161,7 @@ public class FranceMVOContexte  {
                     boolean differe = false;
                     if(!serie.contentEquals(""))
                     {
-                        if (!OutilsGestionConnexionReseau.isServerAccessible(context))
+                        if (!statutConnexion)
                             differe = true;
 
                         if(conditionnement.contentEquals(""))

@@ -20,10 +20,6 @@ import fr.alcyons.phiwms_mobile.OriginalActivity;
 import fr.alcyons.phiwms_mobile.Outils.MedicalObjective;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by quentinlanusse on 18/05/2017.
- */
-
 public class Produit_IdentificationParScanAdapter extends ArrayAdapter {
 
     public List<Produit> produits;

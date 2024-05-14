@@ -35,6 +35,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.SurveillanceReference;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
+import fr.alcyons.phiwms_mobile.MainActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.GestionCodeErreurNMVO;
 import fr.alcyons.phiwms_mobile.Outils.OutilsEncodage;
@@ -44,7 +45,7 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
  * Created by olivier on 26/02/2019.
  */
 
-public class WS_SINGLE_PACK {
+public class WS_SINGLE_PACK extends MainActivity {
 
     public static Handler handler = new Handler() {
         @Override
@@ -80,7 +81,7 @@ public class WS_SINGLE_PACK {
                 phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, serialisationUID);
 
             // Tentative de lancer la sychronisation
-            if (OutilsGestionConnexionReseau.isServerAccessible(context)) {
+            if (statutConnexion) {
                 String urlRequete = url + "G110";
                 RequestQueue requestQueue = Volley.newRequestQueue(context);
 

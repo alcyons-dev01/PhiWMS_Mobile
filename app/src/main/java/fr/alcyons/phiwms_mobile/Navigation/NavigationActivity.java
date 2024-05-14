@@ -4,10 +4,10 @@ import static com.google.android.gms.vision.L.TAG;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,6 +23,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.activity.OnBackPressedCallback;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -43,7 +45,6 @@ import fr.alcyons.phiwms_mobile.ListViewAdapters.ListPerimetreAdapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.NavigationAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
-import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionListeServices;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotoApercu;
 import fr.alcyons.phiwms_mobile.R;
@@ -61,7 +62,6 @@ import java.util.Map;
 import java.util.Objects;
 
 public class NavigationActivity extends ServiceAvecConnexionActivity {
-    //public Handler handler;
     RequestQueue requestQueuePlanHabilitationUtilisateur;
     RequestQueue requestQueueIndicateur;
     String etablissement;
@@ -106,13 +106,25 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
 
         String phrase_version = "";
         versionApplication.setText(phrase_version);
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent(NavigationActivity.this, NavigationActivity.class);
+                Bundle extras = new Bundle();
+                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                intent.putExtras(extras);
+                NavigationActivity.this.startActivity(intent);
+                NavigationActivity.this.finish();
+            }
+        });
     }
 
     @SuppressLint("SetTextI18n")
     @Override
     public void onResume() {
         super.onResume();
-        if (OutilsGestionConnexionReseau.isServerAccessible(NavigationActivity.this)) {
+        if (statutConnexion) {
             ElementASynchroniserOpenHelper.toutSynchroniser(NavigationActivity.this, db, utilisateurConnecte, true);
         }
         NotificationOpenHelper.supprimerNotificationVerification(db);
@@ -124,17 +136,11 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
         }
 
         /* Code nécessaire afin de réaliser une requête à l' API */
-        if (OutilsGestionConnexionReseau.isServerAccessible(NavigationActivity.this) && passageParOnCreate) {
+        if (statutConnexion && passageParOnCreate) {
             afficherSpinner(NavigationActivity.this, LayoutInflater.from(NavigationActivity.this));
             requestQueuePlanHabilitationUtilisateur = new Volley().newRequestQueue(NavigationActivity.this);
 
             final String urlCompletRequetePlanHabilitation = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequetePlanHabilitation + utilisateurConnecte.getPlanHabilitation()/* + DBOpenHelper.Urls.parametreToken + utilisateurConnecte.getToken()*/;
-            try {
-                if (Looper.myLooper() == null)
-                    Looper.prepare();
-            } catch (RuntimeException e) {
-                Log.e(TAG, "Error Looper :", e);
-            }
 
             JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlCompletRequetePlanHabilitation, null, response -> {
                 try {
@@ -159,6 +165,8 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                             UtilisateurOpenHelper.mettreAJourUtilisateur(db, utilisateurConnecte);
                         }
                     } else {
+                        passageParOnCreate = false;
+
                         // récupération des services auquels l'utilisateur connecté a accès
                         JSONArray planHabilitationJSONArray = response.getJSONArray("plan_habilitation");
 
@@ -204,8 +212,6 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                     Alerte.afficherAlerte(NavigationActivity.this, "Erreur synchronisation", String.valueOf(e.getMessage()), "alerte");
 
                 }
-
-                handler.sendMessage(handler.obtainMessage());
             },
                     error -> {
                         Log.e("Volley", "Error");
@@ -223,18 +229,9 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
 
             obreq.setRetryPolicy(retryPolicy);
             requestQueuePlanHabilitationUtilisateur.add(obreq);
-            try {
-                Looper.loop();
-            } catch (RuntimeException e) {
-                Log.e(TAG, "Error Looper :", e);
-            }
-            passageParOnCreate = false;
         } else {
             afficherMenu();
         }
-
-
-       super.onResume();
 
         //gestion du clic sur la toolbar
         if(toolbar != null)
@@ -301,7 +298,7 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
         else
         {
             toolbar.performClick();
-            arreterSpinner();
+            new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
         }
     }
 
@@ -470,16 +467,17 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
 
                         // Appel de la prochaine activité
                         NavigationActivity.this.startActivity(intentVersService);
+                        NavigationActivity.this.finish();
                     }
                 }
             }
         });
 
-        arreterSpinner();
+        new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
     }
 
     public void recupererIndicateurs() {
-        if (!OutilsGestionConnexionReseau.isServerAccessible(NavigationActivity.this)) {
+        if (!statutConnexion) {
             Alerte.afficherAlerte(NavigationActivity.this, "Alerte", "Veuillez contacter la société Alcyons ! \n Impossible de se connecter à la base de données.", "alerte");
             return;
         }
@@ -644,11 +642,6 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                     }
                 });*/
     }
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
-
     protected void rechercherService()
     {
         final InputMethodManager imm = (InputMethodManager) NavigationActivity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);

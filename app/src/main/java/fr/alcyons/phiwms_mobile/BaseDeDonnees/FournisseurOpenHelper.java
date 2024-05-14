@@ -7,10 +7,6 @@ import android.provider.BaseColumns;
 
 import fr.alcyons.phiwms_mobile.Classes.Fournisseur;
 
-/**
- * Created by quentinlanusse on 19/06/2017.
- */
-
 public class FournisseurOpenHelper extends DBOpenHelper {
 
     public FournisseurOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

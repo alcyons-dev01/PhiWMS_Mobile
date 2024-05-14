@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+
+import androidx.activity.OnBackPressedCallback;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AlertDialog;
 import android.view.Gravity;
@@ -79,10 +81,6 @@ public class AjoutManuelProduitReceptionPADActivity extends ServiceActivity {
         //récupération de la liste des objets déja scanné
         objetDejaScanne = new ArrayList<>();
         objetDejaScanne.addAll((List<ObjetReceptionScannee>) intent.getExtras().getSerializable("ListeObjetScannee"));
-
-        if(objetDejaScanne.size()>1)
-        {
-        }
 
         //récupération de la commande et des ph_reliquats
         commandeID = intent.getExtras().getInt("CommandeId");
@@ -294,18 +292,19 @@ public class AjoutManuelProduitReceptionPADActivity extends ServiceActivity {
                 }
             });
         }
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                AjoutManuelProduitReceptionPADActivity.this.finish();
+            }
+        });
     }
 
     @Override
     protected void onResume()
     {
         super.onResume();
-    }
-
-    @Override
-    public void onBackPressed()
-    {
-        AjoutManuelProduitReceptionPADActivity.this.finish();
     }
 
     // Class static permettant de faire apparaitre le DatePicker du téléphone

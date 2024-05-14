@@ -14,10 +14,6 @@ import fr.alcyons.phiwms_mobile.OriginalActivity;
 import fr.alcyons.phiwms_mobile.Outils.MedicalObjective;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by quentinlanusse on 04/05/2017.
- */
-
 public class InformationImportanteMedicament extends InformationMedicament {
 
     public ImageView photo;

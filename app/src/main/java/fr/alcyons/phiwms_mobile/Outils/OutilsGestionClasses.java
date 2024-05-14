@@ -5,10 +5,6 @@ import android.database.Cursor;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Created by quentinlanusse on 19/06/2017.
- */
-
 public class OutilsGestionClasses {
 
     public static boolean recupererBooleen(JSONObject objetJson, String nomValeur) {

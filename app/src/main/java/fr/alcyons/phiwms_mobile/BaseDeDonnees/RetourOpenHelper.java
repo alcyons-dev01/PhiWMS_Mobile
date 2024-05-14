@@ -37,10 +37,6 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by quentinlanusse on 20/06/2017.
- */
-
 public class RetourOpenHelper extends DBOpenHelper {
 
     public RetourOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -121,8 +117,8 @@ public class RetourOpenHelper extends DBOpenHelper {
         return rowId;
     }
 
-    public static void insererRetourQuarantaine(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+    public static void insererRetourQuarantaine(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion) {
+        if (!statutConnexion) {
             Alerte.afficherAlerte(context, "Alerte", "Veuillez contacter la société Alcyons ! \n Impossible de se connecter à la base de données.", "alerte");
             return;
         }
@@ -248,8 +244,8 @@ public class RetourOpenHelper extends DBOpenHelper {
         requestQueue.add(obreq);
     }
 
-    public static void insererRetourControleDesRetour(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+    public static void insererRetourControleDesRetour(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion) {
+        if (!statutConnexion) {
             Alerte.afficherAlerte(context, "Alerte", "Veuillez contacter la société Alcyons ! \n Impossible de se connecter à la base de données.", "alerte");
             return;
         }
@@ -372,8 +368,8 @@ public class RetourOpenHelper extends DBOpenHelper {
         requestQueue.add(obreq);
     }
 
-    public static void insererRetourRetourPUI(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+    public static void insererRetourRetourPUI(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion) {
+        if (!statutConnexion) {
             Alerte.afficherAlerte(context, "Alerte", "Veuillez contacter la société Alcyons ! \n Impossible de se connecter à la base de données.", "alerte");
             return;
         }
@@ -484,8 +480,8 @@ public class RetourOpenHelper extends DBOpenHelper {
         requestQueue.add(obreq);
     }
 
-    public static void insererRetourRetourFournisseur(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+    public static void insererRetourRetourFournisseur(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion) {
+        if (!statutConnexion) {
             Alerte.afficherAlerte(context, "Alerte", "Veuillez contacter la société Alcyons ! \n Impossible de se connecter à la base de données.", "alerte");
             return;
         }
@@ -592,9 +588,9 @@ public class RetourOpenHelper extends DBOpenHelper {
         requestQueue.add(obreq);
     }
 
-    public static void insererRetourDestruction(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur)
+    public static void insererRetourDestruction(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion)
     {
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+        if (statutConnexion) {
             Alerte.afficherAlerte(context, "Alerte", "Veuillez contacter la société Alcyons ! \n Impossible de se connecter à la base de données.", "alerte");
             return;
         }

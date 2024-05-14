@@ -48,6 +48,9 @@ import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_CODE_GS1;
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LISTE_LOTS;
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LOT;
+
+import androidx.activity.OnBackPressedCallback;
+
 /**
  * Created by olivier on 16/04/2024.
  */
@@ -136,6 +139,13 @@ public class ListeLotsControleDesRetoursActivity extends ServiceActivity {
         listView = (ListView) findViewById(R.id.listeView);
         listView.setItemsCanFocus(true);
         listView.setDivider(footer);
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                ListeLotsControleDesRetoursActivity.this.finish();
+            }
+        });
     }
 
     @Override
@@ -674,11 +684,6 @@ public class ListeLotsControleDesRetoursActivity extends ServiceActivity {
         clicBoutonValider_Intent.putExtras(clicBoutonValider_Bundle);
         ListeLotsControleDesRetoursActivity.this.setResult(RETOUR_LISTE_LOTS, clicBoutonValider_Intent);
         ListeLotsControleDesRetoursActivity.this.finish();
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
     }
 
     View.OnClickListener clicBoutonAjoutParScan = new View.OnClickListener() {

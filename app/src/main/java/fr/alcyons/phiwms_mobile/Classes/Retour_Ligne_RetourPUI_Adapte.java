@@ -4,10 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by quentinlanusse on 03/08/2017.
- */
-
 public class Retour_Ligne_RetourPUI_Adapte implements Serializable {
 
     private int retourLigneID;

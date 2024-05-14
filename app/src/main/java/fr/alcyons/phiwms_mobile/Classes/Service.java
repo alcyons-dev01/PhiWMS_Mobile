@@ -11,10 +11,6 @@ import java.io.Serializable;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ServiceOpenHelper;
 
-/**
- * Created by quentinlanusse on 13/04/2017.
- */
-
 public class Service implements Serializable, Comparable {
     private int id;
     private String nom;

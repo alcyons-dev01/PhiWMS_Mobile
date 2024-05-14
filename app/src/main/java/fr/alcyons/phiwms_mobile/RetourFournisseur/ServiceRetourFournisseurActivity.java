@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
@@ -18,6 +19,7 @@ import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -52,10 +54,12 @@ import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.ControleDesRetours.ServiceControleRetoursActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 /**
@@ -76,7 +80,6 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
         setContentView(R.layout.activity_liste_refresh);
 
         // Modification du titre
-        ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur demandés");
         pm = ServiceRetourFournisseurActivity.this.getPackageManager();
         listViewRetours = findViewById(R.id.listeView);
         listViewRetours.setOnItemClickListener((parent, view, position, id) -> {
@@ -109,6 +112,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                                     }
                                     /* Code nécessaire à l'affichage de la liste */
                                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
+                                    ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur demandés");
                                     adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours);
                                     listViewRetours.setDivider(footer);
                                     listViewRetours.setAdapter(adapter);
@@ -160,13 +164,24 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                     }
                 });
 
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent(ServiceRetourFournisseurActivity.this, NavigationActivity.class);
+                Bundle extras = new Bundle();
+                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                intent.putExtras(extras);
+                ServiceRetourFournisseurActivity.this.startActivity(intent);
+                ServiceRetourFournisseurActivity.this.finish();
+            }
+        });
     }
     @Override
     public void onResume() {
         super.onResume();
 
         /* Code nécessaire afin de réaliser une requête à l' API */
-        if (OutilsGestionConnexionReseau.isServerAccessible(ServiceRetourFournisseurActivity.this) && passageParOnCreate && !connexionDirecte) {
+        if (statutConnexion && passageParOnCreate && !connexionDirecte) {
             if (!swipeRefreshLayout.isRefreshing()) {
                 afficherSpinner(ServiceRetourFournisseurActivity.this,  LayoutInflater.from(ServiceRetourFournisseurActivity.this));;
             }
@@ -178,34 +193,6 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
 
             JsonObjectRequest obreq = getJsonObjectRequest(urlRequete);
             requestQueueRetourFournisseur.add(obreq);
-            try {
-                Looper.loop();
-            } catch (RuntimeException e) {
-                e.printStackTrace();
-            }
-
-            if (listeRetours.isEmpty()) {
-                vide = true;
-                nomServiceVide = "Retour fournisseur";
-                ServiceRetourFournisseurActivity.this.finish();
-            }
-            else
-            {
-                if(passageParOnCreate)
-                {
-                    /* Code nécessaire à l'affichage de la liste */
-                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
-                    adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours);
-                    listViewRetours.setDivider(footer);
-                    listViewRetours.setAdapter(adapter);
-
-                    invalidateOptionsMenu();
-                }
-
-                passageParOnCreate = false;
-            }
-
-            arreterSpinner();
         } else {
             listeRetours = RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(db, getString(R.string.statutEncours), getString(R.string.RetourFRSDemande));
             if (listeRetours.isEmpty()) {
@@ -228,6 +215,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                 {
                     /* Code nécessaire à l'affichage de la liste */
                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
+                    ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur demandés");
                     adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours);
                     listViewRetours.setDivider(footer);
                     listViewRetours.setAdapter(adapter);
@@ -281,11 +269,30 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                                     }
                                 }
                             }
+
+                            if (listeRetours.isEmpty()) {
+                                vide = true;
+                                nomServiceVide = "Retour fournisseur";
+                                ServiceRetourFournisseurActivity.this.finish();
+                            }
+                            else
+                            {
+                                /* Code nécessaire à l'affichage de la liste */
+                                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
+                                ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur demandés");
+                                adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours);
+                                listViewRetours.setDivider(footer);
+                                listViewRetours.setAdapter(adapter);
+
+                                invalidateOptionsMenu();
+
+                                passageParOnCreate = false;
+                            }
+                            new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    handler.sendMessage(handler.obtainMessage());
                 },
                 error -> {
                     Log.e("Volley", "Error");

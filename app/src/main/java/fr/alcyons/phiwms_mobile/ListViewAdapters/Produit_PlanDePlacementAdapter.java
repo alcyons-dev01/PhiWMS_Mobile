@@ -11,11 +11,6 @@ import java.util.List;
 
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.R;
-
-/**
- * Created by quentinlanusse on 22/05/2017.
- */
-
 public class Produit_PlanDePlacementAdapter extends ArrayAdapter {
 
     public List<Produit> produits;

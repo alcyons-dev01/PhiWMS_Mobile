@@ -9,10 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by quentinlanusse on 10/05/2017.
- */
-
 @TargetApi(Build.VERSION_CODES.M)
 public class OutilsDecodage {
 

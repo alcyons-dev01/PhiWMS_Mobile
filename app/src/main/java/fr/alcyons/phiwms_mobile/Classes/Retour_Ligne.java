@@ -12,10 +12,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by quentinlanusse on 20/06/2017.
- */
-
 public class Retour_Ligne implements Serializable, Comparable {
 
     private int retour_UID;

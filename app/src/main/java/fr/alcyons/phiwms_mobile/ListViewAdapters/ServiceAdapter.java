@@ -16,11 +16,6 @@ import java.util.List;
 import fr.alcyons.phiwms_mobile.Classes.Service;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by quentinlanusse on 14/04/2017.
- */
-
-
 public class ServiceAdapter extends ArrayAdapter<Service> implements Filterable {
 
     public List<Service> services;

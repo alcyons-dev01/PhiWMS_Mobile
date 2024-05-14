@@ -22,7 +22,10 @@ import fr.alcyons.phiwms_mobile.ListViewAdapters.Depot_EmplacementAdapter;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
+import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RESULT_ZONE;
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT;
+
+import androidx.activity.OnBackPressedCallback;
 
 /**
  * Created by olivier on 16/04/2024.
@@ -104,6 +107,20 @@ public class ListeEmplacementCreationActivity extends ServiceActivity {
 
             }
         });
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent resultIntent = new Intent();
+
+                Bundle extras = ListeEmplacementCreationActivity.super.getBundle();
+                extras.putInt("emplacementId", -1);
+                resultIntent.putExtras(extras);
+
+                ListeEmplacementCreationActivity.this.setResult(RETOUR_CODE_EMPLACEMENT, resultIntent);
+                ListeEmplacementCreationActivity.this.finish();
+            }
+        });
     }
 
     @Override
@@ -115,24 +132,8 @@ public class ListeEmplacementCreationActivity extends ServiceActivity {
     // Permet de gérer si dans le menu se trouve ou non le bouton de suppression
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-
         super.prepareOptionsMenu(menu, adapter, null, "Nom emplacement...");
 
         return true;
     }
-
-    @Override
-    public void onBackPressed() {
-        // Récupérer les éléments nécessaires à la prochaine activité
-        super.onBackPressed();
-        Intent resultIntent = new Intent();
-
-        Bundle extras = ListeEmplacementCreationActivity.super.getBundle();
-        extras.putInt("emplacementId", -1);
-        resultIntent.putExtras(extras);
-
-        ListeEmplacementCreationActivity.this.setResult(RETOUR_CODE_EMPLACEMENT, resultIntent);
-        ListeEmplacementCreationActivity.this.finish();
-    }
-
 }

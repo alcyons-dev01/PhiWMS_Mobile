@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
@@ -18,6 +19,7 @@ import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -52,10 +54,12 @@ import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 /**
@@ -77,7 +81,6 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
         setContentView(R.layout.activity_liste_refresh);
         pm = ServiceDestructionActivity.this.getPackageManager();
         // Affichage des informations de base
-        ((TextView) findViewById(R.id.titre)).setText("Demandes de destruction");
 
         // Gestion de la listView
         listViewRetours = findViewById(R.id.listeView);
@@ -131,6 +134,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
                                 }
                             } else {
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
+                                ((TextView) findViewById(R.id.titre)).setText("Demandes de destruction");
                                 adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours);
                                 listViewRetours.setDivider(footer);
                                 listViewRetours.setAdapter(adapter);
@@ -145,6 +149,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
                             }
                         } else {
                             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
+                            ((TextView) findViewById(R.id.titre)).setText("Demandes de destruction");
                             adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours);
                             listViewRetours.setDivider(footer);
                             listViewRetours.setAdapter(adapter);
@@ -159,12 +164,22 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
                         }
                     }
                 });
-
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent(ServiceDestructionActivity.this, NavigationActivity.class);
+                Bundle extras = new Bundle();
+                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                intent.putExtras(extras);
+                ServiceDestructionActivity.this.startActivity(intent);
+                ServiceDestructionActivity.this.finish();
+            }
+        });
     }
     @Override
     public void onResume() {
         super.onResume();
-        if (OutilsGestionConnexionReseau.isServerAccessible(ServiceDestructionActivity.this) && passageParOnCreate && !connexionDirecte) {
+        if (statutConnexion && passageParOnCreate && !connexionDirecte) {
 
             if (!swipeRefreshLayout.isRefreshing()) {
                 afficherSpinner(ServiceDestructionActivity.this, LayoutInflater.from(ServiceDestructionActivity.this));
@@ -177,32 +192,6 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
 
             JsonObjectRequest obreq = getJsonObjectRequest(urlRequete);
             requestQueueDestructionUtilisateur.add(obreq);
-            try {
-                Looper.loop();
-            } catch (RuntimeException e) {
-                e.printStackTrace();
-            }
-
-            if (listeRetours.isEmpty()) {
-                vide = true;
-                nomServiceVide = "Destruction";
-                ServiceDestructionActivity.this.finish();
-            }
-            else
-            {
-                if(passageParOnCreate)
-                {
-                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
-                    adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours);
-                    listViewRetours.setDivider(footer);
-                    listViewRetours.setAdapter(adapter);
-
-                    invalidateOptionsMenu();
-                }
-
-                passageParOnCreate = false;
-            }
-            arreterSpinner();
         } else {
             listeRetours = RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(db, getString(R.string.statutEncours), getString(R.string.DestructionDemandee));
             if (listeRetours.isEmpty()) {
@@ -224,6 +213,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
                 if(connexionDirecte)
                 {
                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
+                    ((TextView) findViewById(R.id.titre)).setText("Demandes de destruction");
                     adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours);
                     listViewRetours.setDivider(footer);
                     listViewRetours.setAdapter(adapter);
@@ -290,11 +280,27 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
                                     }
                                 }
                             }
+
+                            if (listeRetours.isEmpty()) {
+                                vide = true;
+                                nomServiceVide = "Destruction";
+                                ServiceDestructionActivity.this.finish();
+                            }
+                            else
+                            {
+                                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
+                                ((TextView) findViewById(R.id.titre)).setText("Demandes de destruction");
+                                adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours);
+                                listViewRetours.setDivider(footer);
+                                listViewRetours.setAdapter(adapter);
+                                invalidateOptionsMenu();
+                                passageParOnCreate = false;
+                            }
+                            new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    handler.sendMessage(handler.obtainMessage());
                 },
                 error -> {
                     Log.e("Volley", "Error");

@@ -14,11 +14,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
-
-/**
- * Created by quentinlanusse on 19/06/2017.
- */
-
 public class Commande implements Serializable, Comparable {
 
     private int ID_commande;

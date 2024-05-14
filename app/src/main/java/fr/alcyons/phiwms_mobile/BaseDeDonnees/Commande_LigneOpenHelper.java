@@ -7,10 +7,6 @@ import android.provider.BaseColumns;
 
 import fr.alcyons.phiwms_mobile.Classes.Commande_Ligne;
 
-/**
- * Created by quentinlanusse on 19/06/2017.
- */
-
 public class Commande_LigneOpenHelper extends DBOpenHelper {
 
     public Commande_LigneOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

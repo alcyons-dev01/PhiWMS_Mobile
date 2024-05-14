@@ -10,11 +10,6 @@ import java.io.Serializable;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
-
-/**
- * Created by quentinlanusse on 21/04/2017.
- */
-
 public class Depot implements Serializable, Comparable {
     private int Depot_UID;
     private String Depot_Reference;

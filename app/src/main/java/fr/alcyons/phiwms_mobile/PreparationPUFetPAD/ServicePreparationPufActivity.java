@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
@@ -25,6 +26,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 
 import com.android.volley.Request;
@@ -60,10 +62,12 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Preparation_PreparationAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 /**
@@ -92,7 +96,6 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
         context = ServicePreparationPufActivity.this;
 
         // Gestion de la listView
-        ((TextView) findViewById(R.id.titre)).setText("Préparations");
         ph_preparation_ListView = (ListView) findViewById(R.id.listeView);
         ph_preparation_ListView.setOnItemClickListener((parent, view, position, id) -> {
             PH_Preparation ph_preparation_Selectionne = (PH_Preparation) ph_preparation_preparationAdapter.getItem(position);
@@ -108,6 +111,18 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
         });
 
         connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(db);
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent(ServicePreparationPufActivity.this, NavigationActivity.class);
+                Bundle extras = new Bundle();
+                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                intent.putExtras(extras);
+                ServicePreparationPufActivity.this.startActivity(intent);
+                ServicePreparationPufActivity.this.finish();
+            }
+        });
     }
 
     @Override
@@ -118,7 +133,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
         listeDepotLivraison = new ArrayList<>();
         listeDepotLivraison.add("Tous");
         /* Code nécessaire afin de réaliser une requête à l' API */
-        if (OutilsGestionConnexionReseau.isServerAccessible(ServicePreparationPufActivity.this) && passageParOnCreate && !connexionDirecte) {
+        if (statutConnexion && passageParOnCreate && !connexionDirecte) {
             if (!swipeRefreshLayout.isRefreshing()) {
                 afficherSpinner(ServicePreparationPufActivity.this, LayoutInflater.from(ServicePreparationPufActivity.this));
             }
@@ -127,39 +142,6 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
 
             JsonObjectRequest obreq = getJsonObjectRequest(urlRequete);
             requestQueue.add(obreq);
-            try {
-                Looper.loop();
-            } catch (Throwable e) {
-                Log.e(TAG, "Error Looper :", e);
-            }
-            if(passageParOnCreate)
-            {
-                //on récupère la preparation du jeu d'essai si elle existe
-                PH_Preparation preparation_alcyons = PH_PreparationOpenHelper.getPreparationEssaiAlcyons(db);
-                if(preparation_alcyons != null)
-                {
-                    ph_preparation_List.add(preparation_alcyons);
-                }
-
-                /* Code nécessaire à l'affichage de la liste */
-                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(ph_preparation_List.size()));
-                ph_preparation_List.sort((o1, o2) -> o2.getLivraisonPrevueDate().compareTo(o1.getLivraisonPrevueDate()));
-                ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPufActivity.this, ph_preparation_List, db, utilisateurConnecte);
-                // Permet d'enlever le séparateur entre deux éléments d'une listeView
-                ph_preparation_ListView.setDivider(footer);
-                ph_preparation_ListView.setAdapter(ph_preparation_preparationAdapter);
-
-                if (ph_preparation_List.isEmpty()) {
-                    vide = true;
-                    nomServiceVide = "Préparation PUF";
-                    ServicePreparationPufActivity.this.finish();
-                }
-
-                invalidateOptionsMenu();
-            }
-
-            passageParOnCreate = false;
-            arreterSpinner();
         }
         else
         {
@@ -212,61 +194,61 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
                     ph_preparation_ListView.setAdapter(ph_preparation_preparationAdapter);
                 }
             }
-        }
 
-        spinner = (Spinner) findViewById(R.id.optionTri);
+            spinner = (Spinner) findViewById(R.id.optionTri);
 
-        spinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listeDepotLivraison);
-        spinner.setAdapter(spinnerArrayAdapter);
+            spinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listeDepotLivraison);
+            spinner.setAdapter(spinnerArrayAdapter);
 
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(((TextView) parent.getChildAt(0)) != null)
-                {
-                    ((TextView) parent.getChildAt(0)).setVisibility(View.INVISIBLE);
-                }
-                String depot = spinner.getItemAtPosition(position).toString();
-
-                ph_preparation_List = new ArrayList<>();
-
-                if(depot.contentEquals("Tous"))
-                {
-                    ph_preparation_List.addAll(ph_preparation_List_base);
-                }
-                else
-                {
-                    for(PH_Preparation preparation_courant : ph_preparation_List_base)
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if(((TextView) parent.getChildAt(0)) != null)
                     {
-                        Depot depotCourant = DepotOpenHelper.getDepotParReference(db, preparation_courant.getDepotDestinataireReference());
-                        if(depotCourant.getNom().contentEquals(depot))
+                        ((TextView) parent.getChildAt(0)).setVisibility(View.INVISIBLE);
+                    }
+                    String depot = spinner.getItemAtPosition(position).toString();
+
+                    ph_preparation_List = new ArrayList<>();
+
+                    if(depot.contentEquals("Tous"))
+                    {
+                        ph_preparation_List.addAll(ph_preparation_List_base);
+                    }
+                    else
+                    {
+                        for(PH_Preparation preparation_courant : ph_preparation_List_base)
                         {
-                            ph_preparation_List.add(preparation_courant);
+                            Depot depotCourant = DepotOpenHelper.getDepotParReference(db, preparation_courant.getDepotDestinataireReference());
+                            if(depotCourant.getNom().contentEquals(depot))
+                            {
+                                ph_preparation_List.add(preparation_courant);
+                            }
                         }
                     }
+
+                    ph_preparation_List.sort((o1, o2) -> o2.getLivraisonPrevueDate().compareTo(o1.getLivraisonPrevueDate()));
+
+                    ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPufActivity.this, ph_preparation_List, db, utilisateurConnecte);
+
+                    ph_preparation_ListView.setDivider(footer);
+                    ph_preparation_ListView.setAdapter(ph_preparation_preparationAdapter);
+
+
+                    int taille_liste = ph_preparation_List.size();
+
+                    /* Code nécessaire à l'affichage de la liste */
+                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(taille_liste));
                 }
 
-                ph_preparation_List.sort((o1, o2) -> o2.getLivraisonPrevueDate().compareTo(o1.getLivraisonPrevueDate()));
+                @Override
+                public void onNothingSelected(AdapterView<?> arg0) {
+                    // TODO Auto-generated method stub
+                }
+            });
 
-                ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPufActivity.this, ph_preparation_List, db, utilisateurConnecte);
-
-                ph_preparation_ListView.setDivider(footer);
-                ph_preparation_ListView.setAdapter(ph_preparation_preparationAdapter);
-
-
-                int taille_liste = ph_preparation_List.size();
-
-                /* Code nécessaire à l'affichage de la liste */
-                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(taille_liste));
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-                // TODO Auto-generated method stub
-            }
-        });
-
-        invalidateOptionsMenu();
+            invalidateOptionsMenu();
+        }
     }
 
     @NonNull
@@ -335,13 +317,94 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
                                         PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, new PH_Preparation_Ligne(ph_preparationLigne_JSONArray.getJSONObject(k)));
                                     }
                                 }
-
                             }
+
+                            if(passageParOnCreate)
+                            {
+                                //on récupère la preparation du jeu d'essai si elle existe
+                                PH_Preparation preparation_alcyons = PH_PreparationOpenHelper.getPreparationEssaiAlcyons(db);
+                                if(preparation_alcyons != null)
+                                {
+                                    ph_preparation_List.add(preparation_alcyons);
+                                }
+
+                                /* Code nécessaire à l'affichage de la liste */
+                                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(ph_preparation_List.size()));
+                                ((TextView) findViewById(R.id.titre)).setText("Préparations");
+
+                                ph_preparation_List.sort((o1, o2) -> o2.getLivraisonPrevueDate().compareTo(o1.getLivraisonPrevueDate()));
+                                ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPufActivity.this, ph_preparation_List, db, utilisateurConnecte);
+                                // Permet d'enlever le séparateur entre deux éléments d'une listeView
+                                ph_preparation_ListView.setDivider(footer);
+                                ph_preparation_ListView.setAdapter(ph_preparation_preparationAdapter);
+
+                                if (ph_preparation_List.isEmpty()) {
+                                    vide = true;
+                                    nomServiceVide = "Préparation PUF";
+                                    ServicePreparationPufActivity.this.finish();
+                                }
+
+                                invalidateOptionsMenu();
+                            }
+
+                            spinner = (Spinner) findViewById(R.id.optionTri);
+
+                            spinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listeDepotLivraison);
+                            spinner.setAdapter(spinnerArrayAdapter);
+
+                            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+                                @Override
+                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                    if(((TextView) parent.getChildAt(0)) != null)
+                                    {
+                                        ((TextView) parent.getChildAt(0)).setVisibility(View.INVISIBLE);
+                                    }
+                                    String depot = spinner.getItemAtPosition(position).toString();
+
+                                    ph_preparation_List = new ArrayList<>();
+
+                                    if(depot.contentEquals("Tous"))
+                                    {
+                                        ph_preparation_List.addAll(ph_preparation_List_base);
+                                    }
+                                    else
+                                    {
+                                        for(PH_Preparation preparation_courant : ph_preparation_List_base)
+                                        {
+                                            Depot depotCourant = DepotOpenHelper.getDepotParReference(db, preparation_courant.getDepotDestinataireReference());
+                                            if(depotCourant.getNom().contentEquals(depot))
+                                            {
+                                                ph_preparation_List.add(preparation_courant);
+                                            }
+                                        }
+                                    }
+
+                                    ph_preparation_List.sort((o1, o2) -> o2.getLivraisonPrevueDate().compareTo(o1.getLivraisonPrevueDate()));
+
+                                    ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPufActivity.this, ph_preparation_List, db, utilisateurConnecte);
+
+                                    ph_preparation_ListView.setDivider(footer);
+                                    ph_preparation_ListView.setAdapter(ph_preparation_preparationAdapter);
+
+
+                                    int taille_liste = ph_preparation_List.size();
+
+                                    /* Code nécessaire à l'affichage de la liste */
+                                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(taille_liste));
+                                }
+
+                                @Override
+                                public void onNothingSelected(AdapterView<?> arg0) {
+                                    // TODO Auto-generated method stub
+                                }
+                            });
+
+                            passageParOnCreate = false;
+                            new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
                         }
                     } catch (JSONException e) {
                         Log.e("JSON Exception", Objects.requireNonNull(e.getMessage()));
                     }
-                    handler.sendMessage(handler.obtainMessage());
                 },
                 error -> {
                     Log.e("Volley", "Error");
@@ -355,7 +418,6 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
                 return headers;
             }
         };
-        obreq.setRetryPolicy(retryPolicy);
         return obreq;
     }
 

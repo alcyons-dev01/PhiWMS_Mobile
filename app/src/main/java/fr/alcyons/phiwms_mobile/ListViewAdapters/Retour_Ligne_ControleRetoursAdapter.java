@@ -16,11 +16,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne_ControleRetour_Adapte;
 import fr.alcyons.phiwms_mobile.R;
-
-/**
- * Created by quentinlanusse on 26/06/2017.
- */
-
 public class Retour_Ligne_ControleRetoursAdapter extends ArrayAdapter {
 
     public List<Retour_Ligne_ControleRetour_Adapte> retour_Lignes;

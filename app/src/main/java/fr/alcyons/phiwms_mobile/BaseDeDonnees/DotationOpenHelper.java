@@ -168,11 +168,11 @@ public class DotationOpenHelper extends DBOpenHelper {
         return listeDepot;
     }
 
-    public static void insererBDDLocaleDotation(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
+    public static void insererBDDLocaleDotation(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion) {
         final String tableNom = "Dotations";
         final String erreurSynchronisationLibelle = "Dotations non synchronisées";
 
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+        if (!statutConnexion) {
             ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, false, erreurSynchronisationLibelle);
         }
         else{

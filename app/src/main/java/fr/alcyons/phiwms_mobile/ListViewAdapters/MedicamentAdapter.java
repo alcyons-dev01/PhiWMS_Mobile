@@ -16,10 +16,6 @@ import java.util.List;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by quentinlanusse on 04/05/2017.
- */
-
 public class MedicamentAdapter extends ArrayAdapter implements Filterable {
 
     public List<Produit> medicamentList;

@@ -10,11 +10,6 @@ import java.io.Serializable;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.NotificationOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
-
-/**
- * Created by quentinlanusse on 27/07/2017.
- */
-
 public class Notification implements Serializable, Comparable {
 
     private int id;

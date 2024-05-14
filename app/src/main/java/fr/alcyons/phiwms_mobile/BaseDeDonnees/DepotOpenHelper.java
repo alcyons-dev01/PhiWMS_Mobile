@@ -39,10 +39,6 @@ import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static java.lang.Math.toRadians;
 
-/**
- * Created by quentinlanusse on 01/06/2017.
- */
-
 public class DepotOpenHelper extends DBOpenHelper {
 
     public DepotOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -233,11 +229,11 @@ public class DepotOpenHelper extends DBOpenHelper {
         return rowId;
     }
 
-    public static void insererBDDLocaleDepots(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
+    public static void insererBDDLocaleDepots(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion) {
         final String tableNom = "Dépôt";
         final String erreurSynchronisationLibelle = "Dépots non synchronisés";
 
-        if (!OutilsGestionConnexionReseau.isServerAccessible(context)) {
+        if (!statutConnexion) {
             String activityName = context.getClass().getSimpleName();
             if(activityName.contentEquals("AuthentificationActivity"))
             {

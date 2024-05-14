@@ -11,10 +11,6 @@ import java.util.List;
 import fr.alcyons.phiwms_mobile.Classes.Service;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 
-/**
- * Created by quentinlanusse on 01/06/2017.
- */
-
 public class UtilisateurOpenHelper extends DBOpenHelper {
 
     public UtilisateurOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

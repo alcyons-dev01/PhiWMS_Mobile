@@ -11,10 +11,6 @@ import java.util.List;
 
 import fr.alcyons.phiwms_mobile.Classes.PerimetreFonctionnel;
 
-/**
- * Created by quentinlanusse on 01/06/2017.
- */
-
 public class PerimetreFonctionnelOpenHelper extends DBOpenHelper {
 
     public PerimetreFonctionnelOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

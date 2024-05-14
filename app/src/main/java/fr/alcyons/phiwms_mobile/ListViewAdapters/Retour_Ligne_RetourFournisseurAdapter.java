@@ -18,10 +18,6 @@ import java.util.List;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by quentinlanusse on 04/07/2017.
- */
-
 public class Retour_Ligne_RetourFournisseurAdapter extends ArrayAdapter {
 
     public List<Retour_Ligne> retour_Lignes;

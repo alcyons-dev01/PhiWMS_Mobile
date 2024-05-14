@@ -110,7 +110,7 @@ import java.util.Objects;
 import me.leolin.shortcutbadger.ShortcutBadger;
 
 
-public class AuthentificationActivity extends AppCompatActivity {
+public class AuthentificationActivity extends MainActivity {
     public static int nbTableAInserer = 8;
     public static int nbTableinserees = 0;
     public boolean pretAPasserActiviteSuivante = false;
@@ -160,6 +160,12 @@ public class AuthentificationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Ouverture de la BDD
+        gestionnaireBaseDeDonnee = new DBOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
+        db = gestionnaireBaseDeDonnee.openDB();
+        gestionnaireBaseDeDonnee.onUpgrade(db, 0, 0);
+        OutilsGestionConnexionReseau.isServerAccessibleV2(AuthentificationActivity.this);
+
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
         setContentView(R.layout.activity_authentification);
 
@@ -206,10 +212,7 @@ public class AuthentificationActivity extends AppCompatActivity {
         Intent newIntent = new Intent(AuthentificationActivity.this, MyFirebaseInstanceIdService.class);
         startService(newIntent);
 
-        // Ouverture de la BDD
-        gestionnaireBaseDeDonnee = new DBOpenHelper(AuthentificationActivity.this, DBOpenHelper.Constantes.NOM_BDD, null, DBOpenHelper.Constantes.DATABASE_VERSION);
-        db = gestionnaireBaseDeDonnee.openDB();
-        gestionnaireBaseDeDonnee.onUpgrade(db, 0, 0);
+
 
         // Vérification que les paramètres serveur ont été enregistrés
         if (ParametresServeurOpenHelper.getNbParametresServeur(db) != 1) {
@@ -452,7 +455,7 @@ public class AuthentificationActivity extends AppCompatActivity {
 
     public void identificationUtilisateur(final String motDePasseHache, final String identifiant) {
         String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteUtilisateur;
-        if (!OutilsGestionConnexionReseau.returnServerAccessible(AuthentificationActivity.this)) {
+        if (!statutConnexion) {
             utilisateurConnecte = UtilisateurOpenHelper.identifierUtilisateurLocalement(identifiant, motDePasseHache, db);
 
             if (utilisateurConnecte != null) {
@@ -719,7 +722,7 @@ public class AuthentificationActivity extends AppCompatActivity {
 
     private void recuperationSysUserRules()  {
         String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteSysUserRules+utilisateurConnecte.getId();
-        if (!OutilsGestionConnexionReseau.isServerAccessible(AuthentificationActivity.this)) {
+        if (!statutConnexion) {
             Toast toast = Toast.makeText(AuthentificationActivity.this, "Impossible de vous connecter !", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
@@ -779,14 +782,14 @@ public class AuthentificationActivity extends AppCompatActivity {
     public void mettreAJourBDD() {
         String token = utilisateurConnecte.getToken();
         ElementASynchroniserOpenHelper.toutSynchroniser(AuthentificationActivity.this, db, utilisateurConnecte, true);
-        ServiceOpenHelper.insererBDDLocaleServicesEtPerimetresFonctionnelsphiwms_mobile(AuthentificationActivity.this, db, token, utilisateurConnecte);
-        ZoneOpenHelper.insererBDDLocaleDepotsZones(AuthentificationActivity.this, db, token, utilisateurConnecte);
-        DepotOpenHelper.insererBDDLocaleDepots(AuthentificationActivity.this, db, token, utilisateurConnecte);
-        EmplacementOpenHelper.insererBDDLocaleDepotsEmplacements(AuthentificationActivity.this, db, token, utilisateurConnecte);
-        ProduitOpenHelper.insererBDDLocaleProduits(AuthentificationActivity.this, db, token, utilisateurConnecte);
-        PH_RetourMotifOpenHelper.insererBDDLocalePH_RetourMotif(AuthentificationActivity.this, db, token, utilisateurConnecte);
-        DotationOpenHelper.insererBDDLocaleDotation(AuthentificationActivity.this, db, token, utilisateurConnecte);
-        ActionUtilisateurOpenHelper.insererBDDLocaleActionUtilisatuer(AuthentificationActivity.this, db, token, utilisateurConnecte);
+        ServiceOpenHelper.insererBDDLocaleServicesEtPerimetresFonctionnelsphiwms_mobile(AuthentificationActivity.this, db, token, utilisateurConnecte, statutConnexion);
+        ZoneOpenHelper.insererBDDLocaleDepotsZones(AuthentificationActivity.this, db, token, utilisateurConnecte, statutConnexion);
+        DepotOpenHelper.insererBDDLocaleDepots(AuthentificationActivity.this, db, token, utilisateurConnecte, statutConnexion);
+        EmplacementOpenHelper.insererBDDLocaleDepotsEmplacements(AuthentificationActivity.this, db, token, utilisateurConnecte, statutConnexion);
+        ProduitOpenHelper.insererBDDLocaleProduits(AuthentificationActivity.this, db, token, utilisateurConnecte, statutConnexion);
+        PH_RetourMotifOpenHelper.insererBDDLocalePH_RetourMotif(AuthentificationActivity.this, db, token, utilisateurConnecte, statutConnexion);
+        DotationOpenHelper.insererBDDLocaleDotation(AuthentificationActivity.this, db, token, utilisateurConnecte, statutConnexion);
+        ActionUtilisateurOpenHelper.insererBDDLocaleActionUtilisatuer(AuthentificationActivity.this, db, token, utilisateurConnecte, statutConnexion);
     }
 
     public void insertionDeTableEffectuee(String tableNom, boolean etat, String erreur) {

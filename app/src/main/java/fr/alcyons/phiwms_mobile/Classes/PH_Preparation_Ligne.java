@@ -14,10 +14,6 @@ import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBool
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by quentinlanusse on 20/06/2017.
- */
-
 public class PH_Preparation_Ligne implements Serializable, Comparable {
 
     private int PreparationID;

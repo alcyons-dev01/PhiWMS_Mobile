@@ -1,5 +1,9 @@
 package fr.alcyons.phiwms_mobile.ReceptionPAD;
 
+import static com.google.android.gms.vision.L.TAG;
+import static fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper.viderTableCommandes;
+import static fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper.viderTablePH_Reliquat;
+
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
@@ -7,11 +11,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,7 +26,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -59,10 +67,12 @@ import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.ReceptionAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 /**
@@ -90,7 +100,6 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
         setContentView(R.layout.activity_liste_refresh);
         pm = ServiceReceptionPadActivity.this.getPackageManager();
         depotPUIPAD = DepotOpenHelper.getDepotPUIPAD(db);
-        ((TextView) findViewById(R.id.titre)).setText("Réceptions");
         tri_choisi =  ParametreUtilisateurOpenHelper.getChoixTriReception(db);
 
         if(tri_choisi == null)
@@ -202,6 +211,17 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                     }
                 });
 
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent(ServiceReceptionPadActivity.this, NavigationActivity.class);
+                Bundle extras = new Bundle();
+                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                intent.putExtras(extras);
+                ServiceReceptionPadActivity.this.startActivity(intent);
+                ServiceReceptionPadActivity.this.finish();
+            }
+        });
     }
 
     @Override
@@ -211,7 +231,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
         commandeList = new ArrayList<>();
 
         //* Code nécessaire afin de réaliser une requête à l' API *//*
-        if (OutilsGestionConnexionReseau.isServerAccessible(ServiceReceptionPadActivity.this) && passageParOnCreate && !connexionDirecte) {
+        if (statutConnexion && passageParOnCreate && !connexionDirecte) {
 
             if (!swipeRefreshLayout.isRefreshing()) {
                 afficherSpinner(ServiceReceptionPadActivity.this, LayoutInflater.from(ServiceReceptionPadActivity.this));
@@ -224,110 +244,11 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-
-            JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
-                    new Response.Listener<JSONObject>() {
-                        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                int resultCount = response.getInt("resultCount");
-                                if (resultCount == 0) {
-                                    String erreur = response.getString("erreur");
-                                    if (erreur.equals(getString(R.string.tokenInvalide))) {
-                                        Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter", "alerte");
-                                        DBOpenHelper.viderBasesDeDonnees(db);
-                                        ServiceReceptionPadActivity.this.finishAffinity();
-                                        Intent intent = new Intent(ServiceReceptionPadActivity.this, AuthentificationActivity.class);
-                                        ServiceReceptionPadActivity.this.startActivity(intent);
-                                    } else if (erreur.equals(getString(R.string.tokenExpire))) {
-                                        Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter", "alerte");
-                                        ServiceReceptionPadActivity.this.finishAffinity();
-                                        Intent intent = new Intent(ServiceReceptionPadActivity.this, AuthentificationActivity.class);
-                                        ServiceReceptionPadActivity.this.startActivity(intent);
-                                    }  else {
-                                        Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Reception PUI", "alerte");
-                                    }
-                                } else {
-                                    commandeJSONArray = response.getJSONArray("PH_Commandes");
-
-                                    viderTablesConcernees();
-
-                                    for (int i = 0; i < commandeJSONArray.length(); i++) {
-                                        JSONObject commandeJSONObject = commandeJSONArray.getJSONObject(i);
-
-                                        Commande commandeCourant = new Commande(commandeJSONObject);
-
-                                        phReliquatJSONArray = commandeJSONObject.getJSONArray("ph_reliquat");
-
-                                        boolean phReliquatPresent = false;
-
-                                        for (int j = 0; j < phReliquatJSONArray.length(); j++) {
-
-                                            PH_Reliquat reliquatCourant = new PH_Reliquat((phReliquatJSONArray.getJSONObject(j)));
-
-
-                                            long phReliquatPHiMR4ID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, reliquatCourant);
-                                            if (phReliquatPHiMR4ID != -1) {
-                                                phReliquatPresent = true;
-                                            }
-                                        }
-
-                                        if (phReliquatPresent) {
-                                            long rowID = CommandeOpenHelper.insererUneCommandeEnBDD(db, commandeCourant);
-                                            if (rowID != -1) {
-                                                if(commandeCourant.getRef_Depot_Dest().contains("-PUI-PAD"))
-                                                {
-                                                    commandeList.add(commandeCourant);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            handler.sendMessage(handler.obtainMessage());
-                        }
-                    },
-                    error -> {
-                        Log.e("Volley", "Error");
-                        Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP Service Reception PUI", "alerte");
-                    }
-            ) {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    HashMap<String, String> headers = new HashMap<>();
-                    headers.put("Authorization", utilisateurConnecte.getToken());
-                    return headers;
-                }
-            };
-            obreq.setRetryPolicy(retryPolicy);
+            JsonObjectRequest obreq = getObjectRequest(urlRequete);
             requestQueueDestructionUtilisateur.add(obreq);
-            try {
-                Looper.loop();
-            } catch (RuntimeException e) {
-                e.printStackTrace();
-            }
-            if(passageParOnCreate && !commandeList.isEmpty())
-            {
-                //lancerScan();
-                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
-                commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPadActivity.this, db, commandeList);
-                commandeListView.setDivider(footer);
-                commandeListView.setAdapter(commandeReceptionPUIAdapter);
-            }
-            else if(commandeList.isEmpty())
-            {
-                vide = true;
-                nomServiceVide = "Réception PAD";
-                ServiceReceptionPadActivity.this.finish();
-            }
-
-            passageParOnCreate = false;
-            arreterSpinner();
-        } else {
+        }
+        else
+        {
             commandeList = CommandeOpenHelper.getAllCommandesPUI(db, depotPUIPAD.getDepot_Reference());
             if (commandeList.isEmpty()) {
                 if(connexionDirecte)
@@ -357,26 +278,140 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                     connexionDirecte = !connexionDirecte;
                 }
             }
+
+            switch (tri_choisi)
+            {
+                case "Numéro de commande":
+                    onClickTriNumero();
+                    break;
+
+                case "Date de livraison":
+                    onClickTriDate();
+                    break;
+
+                case "Fournisseur":
+                    onClickTriFournisseur();
+                    break;
+            }
+            invalidateOptionsMenu();
+
         }
-
-
-        switch (tri_choisi)
-        {
-            case "Numéro de commande":
-                onClickTriNumero();
-                break;
-
-            case "Date de livraison":
-                onClickTriDate();
-                break;
-
-            case "Fournisseur":
-                onClickTriFournisseur();
-                break;
-        }
-
-        invalidateOptionsMenu();
     }
+
+
+    @SuppressLint("SetTextI18n")
+    @NonNull
+    private JsonObjectRequest getObjectRequest(String urlRequete) {
+        return new JsonObjectRequest
+                (Request.Method.GET, urlRequete, null, response -> {
+                    try {
+                        int resultCount = response.getInt("resultCount");
+                        if (resultCount == 0) {
+                            String erreur = response.getString("erreur");
+                            if (erreur.equals(getString(R.string.tokenInvalide))) {
+                                Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter", "alerte");
+                                DBOpenHelper.viderBasesDeDonnees(db);
+                                ServiceReceptionPadActivity.this.finishAffinity();
+                                Intent intent = new Intent(ServiceReceptionPadActivity.this, AuthentificationActivity.class);
+                                ServiceReceptionPadActivity.this.startActivity(intent);
+                            } else if (erreur.equals(getString(R.string.tokenExpire))) {
+                                Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter", "alerte");
+                                ServiceReceptionPadActivity.this.finishAffinity();
+                                Intent intent = new Intent(ServiceReceptionPadActivity.this, AuthentificationActivity.class);
+                                ServiceReceptionPadActivity.this.startActivity(intent);
+                            }  else {
+                                Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Reception PUI", "alerte");
+                            }
+                        } else {
+                            commandeJSONArray = response.getJSONArray("PH_Commandes");
+
+                            viderTablesConcernees();
+
+                            for (int i = 0; i < commandeJSONArray.length(); i++) {
+                                JSONObject commandeJSONObject = commandeJSONArray.getJSONObject(i);
+
+                                Commande commandeCourant = new Commande(commandeJSONObject);
+
+                                phReliquatJSONArray = commandeJSONObject.getJSONArray("ph_reliquat");
+
+                                boolean phReliquatPresent = false;
+
+                                for (int j = 0; j < phReliquatJSONArray.length(); j++) {
+
+                                    PH_Reliquat reliquatCourant = new PH_Reliquat((phReliquatJSONArray.getJSONObject(j)));
+
+
+                                    long phReliquatPHiMR4ID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, reliquatCourant);
+                                    if (phReliquatPHiMR4ID != -1) {
+                                        phReliquatPresent = true;
+                                    }
+                                }
+
+                                if (phReliquatPresent) {
+                                    long rowID = CommandeOpenHelper.insererUneCommandeEnBDD(db, commandeCourant);
+                                    if (rowID != -1) {
+                                        if(commandeCourant.getRef_Depot_Dest().contains("-PUI-PAD"))
+                                        {
+                                            commandeList.add(commandeCourant);
+                                        }
+                                    }
+                                }
+                            }
+
+                            if(passageParOnCreate && !commandeList.isEmpty())
+                            {
+                                //lancerScan();
+                                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
+                                ((TextView) findViewById(R.id.titre)).setText("Réceptions");
+                                commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPadActivity.this, db, commandeList);
+                                commandeListView.setDivider(footer);
+                                commandeListView.setAdapter(commandeReceptionPUIAdapter);
+                            }
+                            else if(commandeList.isEmpty())
+                            {
+                                vide = true;
+                                nomServiceVide = "Réception PAD";
+                                ServiceReceptionPadActivity.this.finish();
+                            }
+
+                            passageParOnCreate = false;
+                            new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
+                            switch (tri_choisi)
+                            {
+                                case "Numéro de commande":
+                                    onClickTriNumero();
+                                    break;
+
+                                case "Date de livraison":
+                                    onClickTriDate();
+                                    break;
+
+                                case "Fournisseur":
+                                    onClickTriFournisseur();
+                                    break;
+                            }
+                            invalidateOptionsMenu();
+                        }
+                    }
+                    catch (Throwable t)
+                    {
+                        Log.e(TAG, "Error JSON", t);
+                    }
+                }, error -> {
+                    // TODO: Handle error
+                    Log.e("Volley", "Error");
+                    Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP Service Récupération Quarantaine", "alerte");
+                }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Authorization", utilisateurConnecte.getToken());
+                return headers;
+            }
+        };
+    }
+
+
 
     public void viderTablesConcernees() {
         for (Commande commande : CommandeOpenHelper.getAllCommandes(db))

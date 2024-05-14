@@ -9,10 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import fr.alcyons.phiwms_mobile.Classes.Notification;
 
-/**
- * Created by quentinlanusse on 31/07/2017.
- */
-
 public class NotificationOpenHelper extends DBOpenHelper {
 
     public NotificationOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

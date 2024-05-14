@@ -9,10 +9,6 @@ import android.widget.TextView;
 
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by quentinlanusse on 04/05/2017.
- */
-
 public class InformationConservationMedicament extends InformationMedicament {
 
     @Override

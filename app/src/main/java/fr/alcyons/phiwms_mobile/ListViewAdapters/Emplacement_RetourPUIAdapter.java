@@ -24,10 +24,6 @@ import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne_RetourPUI_Adapte;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by quentinlanusse on 03/08/2017.
- */
-
 public class Emplacement_RetourPUIAdapter extends ArrayAdapter {
 
     public List<Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte> emplacementAdapteList;

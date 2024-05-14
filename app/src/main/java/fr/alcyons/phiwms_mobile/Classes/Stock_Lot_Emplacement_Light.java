@@ -10,10 +10,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelp
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by quentinlanusse on 13/07/2017.
- */
-
 public class Stock_Lot_Emplacement_Light implements Comparable {
     private double Qte;
     private String Lot;

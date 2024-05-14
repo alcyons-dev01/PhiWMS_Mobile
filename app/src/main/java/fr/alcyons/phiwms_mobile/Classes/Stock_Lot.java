@@ -10,11 +10,6 @@ import java.io.Serializable;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_LotOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
-
-/**
- * Created by quentinlanusse on 20/06/2017.
- */
-
 public class Stock_Lot implements Serializable, Comparable {
 
     private int _UID;

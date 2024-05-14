@@ -31,6 +31,7 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne_RetourPUI_Adapte;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Emplacement_RetourPUIAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.SimpleMultiChoiceModeListener;
@@ -39,6 +40,7 @@ import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
@@ -243,6 +245,13 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
                         }
                     }
                 });
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                ListeEmplacementRetourPUIActivity.this.finish();
+            }
+        });
     }
     @Override
     public void onResume() {
@@ -404,10 +413,5 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
         scanEmplacement_Intent.putExtras(listeLotPreparation_Bundle);
 
         resultListeEmplacementRetour.launch(scanEmplacement_Intent);
-    }
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        ListeEmplacementRetourPUIActivity.this.finish();
     }
 }

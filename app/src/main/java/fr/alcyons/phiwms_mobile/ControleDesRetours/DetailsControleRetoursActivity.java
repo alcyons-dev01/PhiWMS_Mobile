@@ -22,6 +22,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -68,6 +70,7 @@ import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne_ControleRetour_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Retour_Ligne_ControleRetoursAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
@@ -116,25 +119,22 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
         retourLigneControleRetourAdapteListView = (ListView) findViewById(R.id.listeView);
 
         retourLigneControleRetourAdapteListView.setItemsCanFocus(true);
-        retourLigneControleRetourAdapteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Retour_Ligne_ControleRetour_Adapte retourLigneAdapte = retourLigneControleRetoursAdapter.retour_Lignes.get(position);
-                Retour_Ligne retourLigne = Retour_LigneOpenHelper.getRetourLigneByID(db, retourLigneAdapte.getRetourLigneID());
-                Depot depot = DepotOpenHelper.getDepotParReference(db, retourSelectionne.getRef_Depot_Origine());
+        retourLigneControleRetourAdapteListView.setOnItemClickListener((parent, view, position, id) -> {
+            Retour_Ligne_ControleRetour_Adapte retourLigneAdapte = retourLigneControleRetoursAdapter.retour_Lignes.get(position);
+            Retour_Ligne retourLigne = Retour_LigneOpenHelper.getRetourLigneByID(db, retourLigneAdapte.getRetourLigneID());
+            Depot depot = DepotOpenHelper.getDepotParReference(db, retourSelectionne.getRef_Depot_Origine());
 
-                viewHolderAModifier = retourLigneControleRetoursAdapter.retourLigneViewHolderList.get(position);
+            viewHolderAModifier = retourLigneControleRetoursAdapter.retourLigneViewHolderList.get(position);
 
-                Bundle DetailControleRetours_Bundle = DetailsControleRetoursActivity.super.getBundle();
-                if(retourLigne != null)
-                    DetailControleRetours_Bundle.putInt("produitID", retourLigne.getCode_produit());
-                DetailControleRetours_Bundle.putSerializable("retourLigneAdapte", retourLigneAdapte);
-                DetailControleRetours_Bundle.putInt("depotID", depot.getDepot_UID());
+            Bundle DetailControleRetours_Bundle = DetailsControleRetoursActivity.super.getBundle();
+            if(retourLigne != null)
+                DetailControleRetours_Bundle.putInt("produitID", retourLigne.getCode_produit());
+            DetailControleRetours_Bundle.putSerializable("retourLigneAdapte", retourLigneAdapte);
+            DetailControleRetours_Bundle.putInt("depotID", depot.getDepot_UID());
 
-                Intent DetailControleRetours_Intent = new Intent(DetailsControleRetoursActivity.this, ListeLotsControleDesRetoursActivity.class);
-                DetailControleRetours_Intent.putExtras(DetailControleRetours_Bundle);
-                DetailsControleRetoursActivity.this.startActivityForResult(DetailControleRetours_Intent, CodesEchangesActivites.RETOUR_LISTE_LOTS);
-            }
+            Intent DetailControleRetours_Intent = new Intent(DetailsControleRetoursActivity.this, ListeLotsControleDesRetoursActivity.class);
+            DetailControleRetours_Intent.putExtras(DetailControleRetours_Bundle);
+            DetailsControleRetoursActivity.this.startActivityForResult(DetailControleRetours_Intent, CodesEchangesActivites.RETOUR_LISTE_LOTS);
         });
 
         //Initialisation des variables
@@ -155,10 +155,17 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
 
         //gestion du bouton de scan
         lancerScan = (LinearLayout) findViewById(R.id.lancerScan);
-        lancerScan.setOnClickListener(new View.OnClickListener() {
+        lancerScan.setOnClickListener(v -> lancerScanner());
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
-            public void onClick(View v) {
-                lancerScanner();
+            public void handleOnBackPressed() {
+                Intent detailControleIntent = new Intent(DetailsControleRetoursActivity.this, ServiceControleRetoursActivity.class);
+                Bundle detailControleBundle = DetailsControleRetoursActivity.super.getBundle();
+                detailControleBundle.putString("Etat", "Retour");
+                detailControleIntent.putExtras(detailControleBundle);
+                DetailsControleRetoursActivity.this.startActivity(detailControleIntent);
+                DetailsControleRetoursActivity.this.finish();
             }
         });
     }
@@ -166,7 +173,7 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
     @Override
     public void onResume() {
         super.onResume();
-        if (OutilsGestionConnexionReseau.isServerAccessible(DetailsControleRetoursActivity.this) && passageParOnCreate) {
+        if (statutConnexion && passageParOnCreate) {
 
             if (!swipeRefreshLayout.isRefreshing()) {
                 afficherSpinner(DetailsControleRetoursActivity.this, LayoutInflater.from(DetailsControleRetoursActivity.this));
@@ -179,7 +186,6 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
                     new Response.Listener<JSONObject>() {
 
                         // Takes the response from the JSON request
-                        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
                         @Override
                         public void onResponse(JSONObject response) {
                             try {
@@ -204,20 +210,53 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
                                             Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, stockLotEmplacementLight);
                                         }
                                     }
+                                    // Récupération des retours_lignes du Retour présélectionné
+                                    if (retourLigneControleRetourAdapteList.isEmpty()) {
+                                        for (Retour_Ligne retourLigne : liste_retour_ligne) {
+                                            Retour_Ligne_ControleRetour_Adapte retourLigneAdapte = new Retour_Ligne_ControleRetour_Adapte(retourLigne.get_UID());
+                                            Produit produit = ProduitOpenHelper.getProduitByID(db, retourLigne.getCode_produit());
+                                            Depot depot = DepotOpenHelper.getDepotParReference(db, retourSelectionne.getRef_Depot_Origine());
+                                            if(produit != null && depot !=null)
+                                            {
+                                                for (Stock_Lot_Emplacement_Light stockLotEmplacement : Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot)) {
+                                                    retourLigneAdapte.getLotAdaptes().add(retourLigneAdapte.new LotAdapte(stockLotEmplacement));
+                                                }
+                                            }
+                                            retourLigneControleRetourAdapteList.add(retourLigneAdapte);
+                                            liste_id_retour_ligne.add(retourLigne.get_UID());
+                                        }
+                                    }
+                                    switch (tri_choisi)
+                                    {
+                                        case "Designation":
+                                            onClickTriDesignation();
+                                            break;
+                                        case "Place":
+                                            onClickTriParPlace();
+                                            break;
+
+                                        case "Catégorie":
+                                            onClickTriCategorie();
+                                            break;
+
+                                        case "Poids":
+                                            onClickTriParPoids();
+                                            break;
+                                    }
+
+                                    invalidateOptionsMenu();
                                 }
                                 passageParOnCreate = false;
+
+                                arreterSpinner();
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            handler.sendMessage(handler.obtainMessage());
                         }
                     },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e("Volley CdR", error.toString());
-                            Alerte.afficherAlerte(DetailsControleRetoursActivity.this, "Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Contrôle des retours)", "alerte");
-                        }
+                    error -> {
+                        Log.e("Volley CdR", error.toString());
+                        Alerte.afficherAlerte(DetailsControleRetoursActivity.this, "Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Contrôle des retours)", "alerte");
                     }
             ) {
 
@@ -233,54 +272,46 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
             };
             obreq.setRetryPolicy(retryPolicy);
             requestQueue.add(obreq);
-            try {
-                Looper.loop();
-            } catch (RuntimeException e) {
-                e.printStackTrace();
-            }
-            arreterSpinner();
         }
-        // Récupération des retours_lignes du Retour présélectionné
-        if (retourLigneControleRetourAdapteList.size() == 0) {
-            for (Retour_Ligne retourLigne : liste_retour_ligne) {
-                Retour_Ligne_ControleRetour_Adapte retourLigneAdapte = new Retour_Ligne_ControleRetour_Adapte(retourLigne.get_UID());
-                Produit produit = ProduitOpenHelper.getProduitByID(db, retourLigne.getCode_produit());
-                Depot depot = DepotOpenHelper.getDepotParReference(db, retourSelectionne.getRef_Depot_Origine());
-                if(produit != null && depot !=null)
-                {
-                    for (Stock_Lot_Emplacement_Light stockLotEmplacement : Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot)) {
-                        retourLigneAdapte.getLotAdaptes().add(retourLigneAdapte.new LotAdapte(stockLotEmplacement));
+        else
+        {
+            // Récupération des retours_lignes du Retour présélectionné
+            if (retourLigneControleRetourAdapteList.isEmpty()) {
+                for (Retour_Ligne retourLigne : liste_retour_ligne) {
+                    Retour_Ligne_ControleRetour_Adapte retourLigneAdapte = new Retour_Ligne_ControleRetour_Adapte(retourLigne.get_UID());
+                    Produit produit = ProduitOpenHelper.getProduitByID(db, retourLigne.getCode_produit());
+                    Depot depot = DepotOpenHelper.getDepotParReference(db, retourSelectionne.getRef_Depot_Origine());
+                    if(produit != null && depot !=null)
+                    {
+                        for (Stock_Lot_Emplacement_Light stockLotEmplacement : Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot)) {
+                            retourLigneAdapte.getLotAdaptes().add(retourLigneAdapte.new LotAdapte(stockLotEmplacement));
+                        }
                     }
+                    retourLigneControleRetourAdapteList.add(retourLigneAdapte);
+                    liste_id_retour_ligne.add(retourLigne.get_UID());
                 }
-                retourLigneControleRetourAdapteList.add(retourLigneAdapte);
-                liste_id_retour_ligne.add(retourLigne.get_UID());
             }
+            switch (tri_choisi)
+            {
+                case "Designation":
+                    onClickTriDesignation();
+                    break;
+                case "Place":
+                    onClickTriParPlace();
+                    break;
+
+                case "Catégorie":
+                    onClickTriCategorie();
+                    break;
+
+                case "Poids":
+                    onClickTriParPoids();
+                    break;
+            }
+
+            invalidateOptionsMenu();
         }
 
-
-        switch (tri_choisi)
-        {
-            case "Designation":
-                onClickTriDesignation();
-                break;
-            case "Place":
-                onClickTriParPlace();
-                break;
-
-            case "Catégorie":
-                onClickTriCategorie();
-                break;
-
-            case "Poids":
-                onClickTriParPoids();
-                break;
-        }
-
-        if(premierPassage)
-        {
-            //lancerScanner();
-        }
-        invalidateOptionsMenu();
     }
 
     // Lorsqu'on lance une nouvelle activity avec " startActivityForResult ", action à réaliser à la fin de l'activity lancé suivant le " CodesEchangesActivites " passé
@@ -505,7 +536,7 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
         Toast.makeText(DetailsControleRetoursActivity.this, "Retour contrôlé", Toast.LENGTH_SHORT).show();
 
         // Si possible, on essaie de mettre à jour les éléments
-        if (OutilsGestionConnexionReseau.isServerAccessible(DetailsControleRetoursActivity.this)) {
+        if (statutConnexion) {
             ElementASynchroniserOpenHelper.toutSynchroniser(DetailsControleRetoursActivity.this, db, utilisateurConnecte, true);
         }
 
@@ -523,17 +554,6 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
         if (commentaireRetourner != null) {
             retourSelectionne.setCommentaire(commentaireRetourner.trim());
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent detailControleIntent = new Intent(DetailsControleRetoursActivity.this, ServiceControleRetoursActivity.class);
-        Bundle detailControleBundle = super.getBundle();
-        detailControleBundle.putString("Etat", "Retour");
-        detailControleIntent.putExtras(detailControleBundle);
-        DetailsControleRetoursActivity.this.startActivity(detailControleIntent);
-        DetailsControleRetoursActivity.this.finish();
     }
 
     public void lancerScanner()

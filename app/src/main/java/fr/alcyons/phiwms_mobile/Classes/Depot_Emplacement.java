@@ -12,10 +12,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by quentinlanusse on 24/04/2017.
- */
-
 public class Depot_Emplacement implements Serializable, Comparable {
 
     private int _UID = 0;

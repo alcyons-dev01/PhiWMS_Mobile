@@ -58,7 +58,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 
-public class OriginalActivity extends AppCompatActivity {
+public class OriginalActivity extends MainActivity {
     // Création de l'utilisateur connecté
     public Utilisateur utilisateurConnecte = null;
     public Drawable footer;
@@ -70,6 +70,7 @@ public class OriginalActivity extends AppCompatActivity {
     protected DBOpenHelper gestionnaireBDD;
     // Récupération de ce qui a été transmis
     protected Intent intent;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +90,7 @@ public class OriginalActivity extends AppCompatActivity {
         {
             service = Objects.requireNonNull(intent.getExtras()).getString("ServiceCourant");
         }
+
         utilisateurConnecte = UtilisateurOpenHelper.getUtilisateurByID(db, Objects.requireNonNull(intent.getExtras()).getInt("utilisateurConnecteID"));
         if (utilisateurConnecte == null) {
             assert service != null;

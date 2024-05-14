@@ -11,10 +11,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.Commande_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by quentinlanusse on 19/06/2017.
- */
-
 public class Commande_Ligne implements Serializable, Comparable {
 
     private int commande_UID;

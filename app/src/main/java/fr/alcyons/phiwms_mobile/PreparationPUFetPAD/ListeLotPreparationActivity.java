@@ -68,6 +68,8 @@ import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LISTE_LOTS;
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LOT;
 
+import androidx.activity.OnBackPressedCallback;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -224,6 +226,13 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
                 }
             }
         }
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                onMenuSaveClick();
+            }
+        });
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -473,13 +482,6 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
             }
             invalidateOptionsMenu();
         }
-
-    // On remet les quantités à 0 et on quitte l'activité
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        onMenuSaveClick();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -793,7 +795,7 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
                 final int quantiteSaisie = lotcourant.getQteSaisie();
                 final String nomReference = produit.getDesignation_interne();
 
-                if (OutilsGestionConnexionReseau.isServerAccessible(ListeLotPreparationActivity.this))
+                if (statutConnexion)
                 {
                     RequestQueue requestQueue = Volley.newRequestQueue(ListeLotPreparationActivity.this);
                     String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteStock_Lot_Emplacements+"produit/"+ produitCode +"/depot/"+depotReference+"/"+lot+"/"+emplacement+"/verification";
