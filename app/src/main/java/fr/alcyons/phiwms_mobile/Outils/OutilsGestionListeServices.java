@@ -166,7 +166,6 @@ public class OutilsGestionListeServices {
                 //return ServicePlanDePlacementActivity.class;
               //  return ListeProduitsPlanDePlacementActivity.class;
             case "Identification Par Scan":
-                //return ServiceIdentificationParScanActivity.class;
                 return ListeProduitsIdentificationParScanActivity.class;
             case "Zones et Emplacements":
                 return ServiceZonesEtEmplacementsActivity.class;

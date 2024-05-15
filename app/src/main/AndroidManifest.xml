@@ -424,6 +424,27 @@
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation|keyboardHidden"/>
+
+    <!-- Zone et Emplacement -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.IdentificationParScan.ServiceIdentificationParScanActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.IdentificationParScan.DetailProduitIdentificationParScanActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.IdentificationParScan.ListeProduitsIdentificationParScanActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
     </application>
 
 </manifest>

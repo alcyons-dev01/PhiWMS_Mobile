@@ -1,5 +1,6 @@
 package fr.alcyons.phiwms_mobile.IdentificationParScan;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
@@ -51,7 +53,7 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
 
         messageAlerte = "";
         // Récupération des variables globales et du produit selectionné
-        produitSelectionne = ProduitOpenHelper.getProduitByID(db, intent.getExtras().getInt("produitSelectionneID"));
+        produitSelectionne = ProduitOpenHelper.getProduitByID(db, Objects.requireNonNull(intent.getExtras()).getInt("produitSelectionneID"));
         if (intent.getExtras().getString("codeGS1") != null) {
             codeComplet = intent.getExtras().getString("codeGS1");
             estCodeGS1 = true;
@@ -81,7 +83,7 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
                 }
                 else
                 {
-                    if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
+                    if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
                     {
                         Intent newIntent = new Intent(DetailProduitIdentificationParScanActivity.this, BarcodeCaptureActivity.class);
                         Bundle bundle = DetailProduitIdentificationParScanActivity.super.getBundle();
@@ -102,30 +104,28 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
         });
 
         // Gestion du bouton de suppression de code
-        findViewById(R.id.boutonSuppressionCode).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean confirmation = Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Attention", "Etes vous sûr de vouloir supprimer le code de ce produit ?", "OuiNon");
-                if (confirmation) {
-                    if (estCodeGS1) {
-                        produitSelectionne.setGTIN("");
-                    } else {
-                        produitSelectionne.setCodeInconnue("");
-                    }
-
-                    long rowId = ProduitOpenHelper.mettreAJourProduit(db, produitSelectionne);
-                    if (rowId != -1) {
-                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitSelectionne.getPhiMR4UUID(), produitSelectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
-                    }
-                    codeComplet = "";
-                    messageAlerte = "";
-                    onResume();
+        findViewById(R.id.boutonSuppressionCode).setOnClickListener(v -> {
+            boolean confirmation = Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Attention", "Etes vous sûr de vouloir supprimer le code de ce produit ?", "OuiNon");
+            if (confirmation) {
+                if (estCodeGS1) {
+                    produitSelectionne.setGTIN("");
+                } else {
+                    produitSelectionne.setCodeInconnue("");
                 }
+
+                long rowId = ProduitOpenHelper.mettreAJourProduit(db, produitSelectionne);
+                if (rowId != -1) {
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitSelectionne.getPhiMR4UUID(), produitSelectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
+                }
+                codeComplet = "";
+                messageAlerte = "";
+                onResume();
             }
         });
 
     }
 
+    @SuppressLint("SimpleDateFormat")
     @Override
     public void onResume() {
         super.onResume();
@@ -144,7 +144,7 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
                 numLot = gs1Decoupe.get(OutilsDecodage.numeroLot);
                 numeroSerie = gs1Decoupe.get(OutilsDecodage.numeroSerie);
                 if (!produitSelectionne.getGTIN().equals(gs1Decoupe.get(OutilsDecodage.codeGtin))) {
-                    produitSelectionne.setGTIN(gs1Decoupe.get(OutilsDecodage.codeGtin).trim());
+                    produitSelectionne.setGTIN(Objects.requireNonNull(gs1Decoupe.get(OutilsDecodage.codeGtin)).trim());
 
                     long rowId = ProduitOpenHelper.mettreAJourProduit(db, produitSelectionne);
                     if (rowId != -1) {
@@ -177,16 +177,18 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
         ((TextView) findViewById(R.id.codeGS1)).setText(codeComplet.trim());
         ((TextView) findViewById(R.id.gtin)).setText(produitSelectionne.getGTIN().trim());
         ((TextView) findViewById(R.id.nomFournisseur)).setText(produitSelectionne.getFournisseur().trim());
-        ((TextView) findViewById(R.id.referenceFournisseur)).setText(String.valueOf(produitSelectionne.getRef_fourni().trim()));
-        ((TextView) findViewById(R.id.categorie)).setText(String.valueOf(produitSelectionne.getCategorie().trim()));
+        ((TextView) findViewById(R.id.referenceFournisseur)).setText(produitSelectionne.getRef_fourni().trim());
+        ((TextView) findViewById(R.id.categorie)).setText(produitSelectionne.getCategorie().trim());
         ((TextView) findViewById(R.id.condAchat)).setText(String.valueOf(produitSelectionne.getCond_achat()).trim());
         ((TextView) findViewById(R.id.numLot)).setText(numLot.trim());
         ((TextView) findViewById(R.id.conditionnement)).setText(conditionnement.trim());
+        assert numeroSerie != null;
         ((TextView) findViewById(R.id.numSerie)).setText(numeroSerie.trim());
 
         // Gestion de la date de péremption
-        if (dateP != "") {
+        if (!Objects.equals(dateP, "")) {
             DateFormat dateFormat;
+            assert dateP != null;
             if (dateP.length() == 5) {
                 dateFormat = new SimpleDateFormat("yy-MM");
             } else {

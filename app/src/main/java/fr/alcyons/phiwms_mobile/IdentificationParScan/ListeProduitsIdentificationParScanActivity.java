@@ -8,16 +8,17 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
@@ -43,7 +44,7 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
         imm = (InputMethodManager) ListeProduitsIdentificationParScanActivity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
         // Récupération de la liste_view à remplir
         listViewProduits = findViewById(R.id.listeView);
-        codeInconnue = intent.getExtras().getString("codeInconnue");
+        codeInconnue = Objects.requireNonNull(intent.getExtras()).getString("codeInconnue");
         if(codeInconnue == null)
         {
             codeInconnue = "";
@@ -53,6 +54,7 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
 
         if (intent.getExtras().getString("codeGS1") != null) {
             final String codeGS1 = intent.getExtras().getString("codeGS1");
+            assert codeGS1 != null;
             Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeGS1);
             // Récupération et gestion de la liste des produits correspondants en fonction de la longueur de cette liste
             if(gs1Decoupe.size() > 1)
@@ -82,6 +84,13 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
                 toast.show();
             }
         }
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                ListeProduitsIdentificationParScanActivity.this.finish();
+            }
+        });
     }
 
     @Override
@@ -96,26 +105,22 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
         listViewProduits.setDivider(footer);
         listViewProduits.setAdapter(adapter);
 
-        // Gestion des clics sur les produits
-        listViewProduits.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Produit produitSelectionne = (Produit) adapter.getItem(position);
-                passerAuDetailProduit(produitSelectionne);
-            }
+        listViewProduits.setOnItemClickListener((parent, view, position, id) -> {
+            Produit produitSelectionne = (Produit) adapter.getItem(position);
+            assert produitSelectionne != null;
+            passerAuDetailProduit(produitSelectionne);
         });
         // Mise à jour du nombre de produits
         ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeAAfficher.size()));
     }
 
-    // Appeler l'activité correspondante au produit sélectionné
     public void passerAuDetailProduit(Produit produitSelectionne) {
         Intent newIntent = new Intent(ListeProduitsIdentificationParScanActivity.this, DetailProduitIdentificationParScanActivity.class);
 
         // Récupération des éléments à transmettre à la prochaine activité
         Bundle extras = super.getBundle();
         extras.putInt("produitSelectionneID", produitSelectionne.getID_produit());
-        String codeGS1 = intent.getExtras().getString("codeGS1");
+        String codeGS1 = Objects.requireNonNull(intent.getExtras()).getString("codeGS1");
         extras.putString("codeGS1", codeGS1);
         extras.putString("codeInconnue", codeInconnue);
         newIntent.putExtras(extras);
@@ -141,23 +146,12 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.prepareOptionsMenu(menu, adapter, null, "Désignation produit...");
         MenuItem item = menu.findItem(R.id.menuDatamatrix);
-        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                retourScan();
-                return true;
-            }
+        item.setOnMenuItemClickListener(item1 -> {
+            retourScan();
+            return true;
         });
         return true;
     }
-
-    // Si le SlideMenu est ouvert, on le ferme, sinon, on quitte l'activité
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
-
     private void retourScan()
     {
         Intent newIntent = new Intent(ListeProduitsIdentificationParScanActivity.this, ServiceIdentificationParScanActivity.class);

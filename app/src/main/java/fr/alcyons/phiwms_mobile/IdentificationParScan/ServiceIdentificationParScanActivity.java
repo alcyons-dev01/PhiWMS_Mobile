@@ -6,26 +6,19 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
+
 import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 public class ServiceIdentificationParScanActivity extends ServiceActivity {
-
-    /* 
-    *   Le booléen firstPassage permet de savoir si l'on passe pour la première fois par le onResume ou non, il permet de ne pas relancer l'activité
-    * BarcodeCaptureWithGoogleVisionSearchActivity lorsqu'on ne passe pas pour la première fois. Il est nécessaire pour gérer le cas où
-    * l'utilisateur retourne un code valide.
-    *
-    *   Lorsque cela arrive, l'application va tenter de lancer l'activité suivante (cf : "Si le code est valide") puis appeler la méthode onResume.
-    * Sans la gestion du booléen firstPassage, la méthode onResume appellerait à nouveau l'activité BarcodeCaptureWithGoogleVisionSearchActivity ce
-    * qui empêche parfois de passer à l'activité suivante. On évite donc de décoder si on ne passe pas pour la première fois
-    * */
     boolean firstPassage = true;
 
     PackageManager pm;
@@ -37,6 +30,18 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
 
         //gestion du package manager
         pm = ServiceIdentificationParScanActivity.this.getPackageManager();
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent(ServiceIdentificationParScanActivity.this, NavigationActivity.class);
+                Bundle extras = new Bundle();
+                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                intent.putExtras(extras);
+                ServiceIdentificationParScanActivity.this.startActivity(intent);
+                ServiceIdentificationParScanActivity.this.finish();
+            }
+        });
     }
 
     @Override
@@ -56,7 +61,7 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
             }
             else
             {
-                if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
+                if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
                 {
                     // Si on passe pour la première fois, on lance l'activité de décodage.
                     Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, BarcodeCaptureActivity.class);
@@ -79,61 +84,47 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
             }
         }
     }
-
-    // Lorsqu'on lance une nouvelle activity avec " startActivityForResult ", action à réaliser à la fin de l'activity lancé suivant le " CodesEchangesActivites " passé
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data == null) {
             ServiceIdentificationParScanActivity.this.finish();
         } else {
-            switch (requestCode) {
-                case CodesEchangesActivites.RETOUR_CODE_GS1: {
-                    String codeComplet = data.getStringExtra("code");
-                    if(codeComplet != null && !codeComplet.contentEquals(""))
-                    {
-                        Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeComplet);
-                        if (gs1Decoupe.size() != 1) {
-                            // Si le code est valide, on lance l'activité de liste des produits correspondants à ce code
-                            Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
-                            Bundle extras = super.getBundle();
-                            extras.putString("codeGS1", codeComplet);
-                            newIntent.putExtras(extras);
-                            ServiceIdentificationParScanActivity.this.startActivity(newIntent);
-                            ServiceIdentificationParScanActivity.this.finish();
-                        } else {
-                            // Si le code fourni n'est pas valide, on affiche un message d'erreur et on redémarre l'activité pour réinitialiser le booléen firstPassage
-                            Toast toast = Toast.makeText(ServiceIdentificationParScanActivity.this, "Le code fourni n'est pas un code GS1, c'est un code inconnu.", Toast.LENGTH_SHORT);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-
-                            Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
-                            Bundle extras = super.getBundle();
-                            extras.putString("codeInconnue", codeComplet);
-                            newIntent.putExtras(extras);
-                            ServiceIdentificationParScanActivity.this.startActivity(newIntent);
-                            ServiceIdentificationParScanActivity.this.finish();
-                        }
-                    }
-                    else
-                    {
+            if (requestCode == CodesEchangesActivites.RETOUR_CODE_GS1) {
+                String codeComplet = data.getStringExtra("code");
+                if (codeComplet != null && !codeComplet.contentEquals("")) {
+                    Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeComplet);
+                    if (gs1Decoupe.size() != 1) {
+                        // Si le code est valide, on lance l'activité de liste des produits correspondants à ce code
                         Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
                         Bundle extras = super.getBundle();
-                        extras.putString("codeInconnue", "");
+                        extras.putString("codeGS1", codeComplet);
+                        newIntent.putExtras(extras);
+                        ServiceIdentificationParScanActivity.this.startActivity(newIntent);
+                        ServiceIdentificationParScanActivity.this.finish();
+                    } else {
+                        // Si le code fourni n'est pas valide, on affiche un message d'erreur et on redémarre l'activité pour réinitialiser le booléen firstPassage
+                        Toast toast = Toast.makeText(ServiceIdentificationParScanActivity.this, "Le code fourni n'est pas un code GS1, c'est un code inconnu.", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+
+                        Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
+                        Bundle extras = super.getBundle();
+                        extras.putString("codeInconnue", codeComplet);
                         newIntent.putExtras(extras);
                         ServiceIdentificationParScanActivity.this.startActivity(newIntent);
                         ServiceIdentificationParScanActivity.this.finish();
                     }
-                    break;
+                } else {
+                    Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
+                    Bundle extras = super.getBundle();
+                    extras.putString("codeInconnue", "");
+                    newIntent.putExtras(extras);
+                    ServiceIdentificationParScanActivity.this.startActivity(newIntent);
+                    ServiceIdentificationParScanActivity.this.finish();
                 }
             }
             invalidateOptionsMenu();
         }
-    }
-
-    @Override
-    public void onBackPressed()
-    {
-        super.onBackPressed();
     }
 }
