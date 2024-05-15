@@ -3,12 +3,9 @@ package fr.alcyons.phiwms_mobile.ControleDesRetours;
 import static com.google.android.gms.vision.L.TAG;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,17 +14,13 @@ import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -57,7 +50,6 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerDocumentActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
@@ -65,7 +57,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
-import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
@@ -74,13 +65,7 @@ import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity
 import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourAdapter;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
-import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
-import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
-import fr.alcyons.phiwms_mobile.Quarantaine.ServiceQuarantaineActivity;
 import fr.alcyons.phiwms_mobile.R;
-import fr.alcyons.phiwms_mobile.ReceptionPUI.DetailReceptionPuiActivity;
-import fr.alcyons.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity;
-import fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 /**
@@ -167,7 +152,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     Intent data = result.getData();
-                    if (result.getResultCode() == CodesEchangesActivites.RETOUR_DOCUMENT) {
+                    if (result.getResultCode() == ServiceControleRetoursActivity.RESULT_OK) {
                         if (data != null) {
                             String code = Objects.requireNonNull(data.getExtras()).getString("code");
                             if (code != null) {
@@ -321,6 +306,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         return retourVersServiceConnexionDirectIntent;
     }
 
+    @SuppressLint("SetTextI18n")
     @NonNull
     private JsonObjectRequest getJsonObjectRequest(String urlRequete) {
         return new JsonObjectRequest

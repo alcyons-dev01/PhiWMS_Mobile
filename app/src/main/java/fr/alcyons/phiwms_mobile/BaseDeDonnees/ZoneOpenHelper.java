@@ -184,7 +184,7 @@ public class ZoneOpenHelper extends DBOpenHelper {
         // Insertion du dépot en BDD
         long rowId = db.insert(Constantes.TABLE_DEPOT_ZONE, null, contentValues);
 
-        depotZone.setphiwms_mobileUUID((int) rowId);
+        depotZone.setPhiMR4UUID((int) rowId);
 
         return rowId;
     }
@@ -274,7 +274,7 @@ public class ZoneOpenHelper extends DBOpenHelper {
         }
     }
 
-    public long mettreAJourZone(SQLiteDatabase db, Depot_Zone zone) {
+    public static long mettreAJourZone(SQLiteDatabase db, Depot_Zone zone) {
         // Récupération des valeurs à mettre à jour
         ContentValues contentValues = new ContentValues();
         contentValues.put(Constantes.CLE_COL_NOM_DEPOT_ZONE, zone.getZoneName());

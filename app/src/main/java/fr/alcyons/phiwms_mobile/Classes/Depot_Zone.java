@@ -86,7 +86,7 @@ public class Depot_Zone implements Serializable, Comparable {
         return phiwms_mobileUUID;
     }
 
-    public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
+    public void setPhiMR4UUID(int phiwms_mobileUUID) {
         this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 

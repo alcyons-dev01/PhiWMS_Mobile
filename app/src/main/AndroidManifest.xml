@@ -180,12 +180,6 @@
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
 
-        <activity
-        android:name="fr.alcyons.phiwms_mobile.RetourPUI.NewRetourPUIActivity"
-        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:configChanges="orientation|screenSize"/>
-
     <activity
         android:name="fr.alcyons.phiwms_mobile.RetourPUI.DetailRetourPUIActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
@@ -306,6 +300,126 @@
         android:configChanges="orientation|keyboardHidden"/>
     <activity
         android:name="fr.alcyons.phiwms_mobile.PlanDePlacement.ListeEmplacementActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <!-- Médicament au livret -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.MedicamentAuLivret.ServiceMedicamentAuLivretActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.MedicamentAuLivret.DetailMedicamentAuLivretActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <!-- Dispositif médical -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.DispositifAuLivret.ServiceDispositifAuLivretActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.DispositifAuLivret.DetailDispositifAuLivretActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <!-- Liste Fournisseur -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.ListeActivity.ListeFournisseurActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <!-- Liste Catégorie -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.ListeActivity.ListeCategorieActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <!-- Stock -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.Stock.ServiceStockActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.Stock.ListeReferenceActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.Stock.ListeStockActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.Stock.DetailStockActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <!-- Depot sélecteur -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.DepotSelecteur.DepotSelecteurSimpleActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.DepotSelecteur.DepotSelecteurMultipleActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <!-- Zone et Emplacement -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.ZonesEtEmplacements.ServiceZonesEtEmplacementsActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.ZonesEtEmplacements.DetailZoneActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.ZonesEtEmplacements.DetailZoneSaisieActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.ZonesEtEmplacements.ListeZonesParDepotActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.ZonesEtEmplacements.ListeEmplacementsParZoneActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"

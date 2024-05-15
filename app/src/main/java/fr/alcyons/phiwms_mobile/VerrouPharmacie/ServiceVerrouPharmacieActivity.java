@@ -528,12 +528,8 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
     }
 
     public void afficherSnackBarVerrouPharmacie() {
-        Snackbar snackbar = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Document scanné inconnu</b>", 0), Snackbar.LENGTH_LONG);
-        }
-        ;
-
+        Snackbar snackbar;
+        snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Document scanné inconnu</b>", 0), Snackbar.LENGTH_LONG);
         @SuppressLint("RestrictedApi") Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
         layout.setBackgroundColor(getResources().getColor(R.color.rouge2, null));
         TextView textView = (TextView) layout.findViewById(com.google.android.material.R.id.snackbar_text);

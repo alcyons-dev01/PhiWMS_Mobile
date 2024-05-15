@@ -61,7 +61,9 @@ import fr.alcyons.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity;
 import fr.alcyons.phiwms_mobile.RetourFournisseur.ServiceRetourFournisseurActivity;
 import fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity;
 import fr.alcyons.phiwms_mobile.ServiceEnCreationActivity;
+import fr.alcyons.phiwms_mobile.Stock.ServiceStockActivity;
 import fr.alcyons.phiwms_mobile.VerrouPharmacie.ServiceVerrouPharmacieActivity;
+import fr.alcyons.phiwms_mobile.ZonesEtEmplacements.ServiceZonesEtEmplacementsActivity;
 //import fr.alcyons.phiwms_mobile.Stock.ServiceStockActivity;
 //import fr.alcyons.phiwms_mobile.TestMail.TestMailActivity;
 //import fr.alcyons.phiwms_mobile.Utiliser.ServiceUtiliserActivity;
@@ -167,7 +169,7 @@ public class OutilsGestionListeServices {
                 //return ServiceIdentificationParScanActivity.class;
                 return ListeProduitsIdentificationParScanActivity.class;
             case "Zones et Emplacements":
-               // return ServiceZonesEtEmplacementsActivity.class;
+                return ServiceZonesEtEmplacementsActivity.class;
             case "Réception Scannée":
                 //return ServiceReceptionScanneeActivity.class;
             case "Livraison":
@@ -191,7 +193,7 @@ public class OutilsGestionListeServices {
             case "Dispositif au Livret":
                 return ServiceDispositifAuLivretActivity.class;
             case "Stock":
-              //  return ServiceStockActivity.class;
+                return ServiceStockActivity.class;
             case "Notifications":
                // return ServiceNotificationsActivity.class;
             case "Réseaux":

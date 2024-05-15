@@ -1,13 +1,16 @@
 package fr.alcyons.phiwms_mobile.MedicamentAuLivret;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+
+import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.view.menu.ActionMenuItemView;
 import android.view.Gravity;
 import android.view.Menu;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,7 +19,6 @@ import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -28,12 +30,11 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.MedicamentAdapter;
 import fr.alcyons.phiwms_mobile.ListeActivity.ListeCategorieActivity;
 import fr.alcyons.phiwms_mobile.ListeActivity.ListeFournisseurActivity;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
-import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
-
 
 public class ServiceMedicamentAuLivretActivity extends ServiceActivity {
 
@@ -48,6 +49,10 @@ public class ServiceMedicamentAuLivretActivity extends ServiceActivity {
     FloatingActionButton boutonRechercheDataMatrix;
 
     PackageManager pm;
+    ActivityResultLauncher<Intent> activityResultLauncherGS1;
+    ActivityResultLauncher<Intent> activityResultLauncherFournisseur;
+    ActivityResultLauncher<Intent> activityResultLauncherCategorie;
+
 
     @Override
     public void onResume() {
@@ -67,10 +72,11 @@ public class ServiceMedicamentAuLivretActivity extends ServiceActivity {
         ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(medicamentList.size()));
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_service_medicament_au_livret);
+        setContentView(R.layout.activity_liste_floating);
 
         //gestion du package manager
         pm = ServiceMedicamentAuLivretActivity.this.getPackageManager();
@@ -84,6 +90,7 @@ public class ServiceMedicamentAuLivretActivity extends ServiceActivity {
 
         // Afficher le nombre de médicaments
         ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(medicamentList.size()));
+        ((TextView) findViewById(R.id.titre)).setText("Médicaments au livret");
 
         // Création de l'adapter et Affichage de la liste
         medicamentAdapter = new MedicamentAdapter(ServiceMedicamentAuLivretActivity.this, medicamentList);
@@ -93,194 +100,196 @@ public class ServiceMedicamentAuLivretActivity extends ServiceActivity {
 
         //Récupérer le bouton pour activer la recherche par nom
         boutonRechercheNom = (FloatingActionButton) findViewById(R.id.boutonRechercheNom);
-        boutonRechercheNom.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ActionMenuItemView actionMenuItemView = (ActionMenuItemView) findViewById(R.id.rechercheMenu);
+        boutonRechercheNom.setOnClickListener(v -> {
+            @SuppressLint("RestrictedApi") ActionMenuItemView actionMenuItemView = (ActionMenuItemView) findViewById(R.id.rechercheMenu);
 
-                if (actionMenuItemView != null) {
-                    actionMenuItemView.callOnClick();
-                }
-                floatingActionMenu.close(true);
+            if (actionMenuItemView != null) {
+                actionMenuItemView.callOnClick();
             }
+            floatingActionMenu.close(true);
         });
 
         // Récupérer le bouton de filtrage des médicaments par fournisseur et le gérer
         fabTriFournisseur = (FloatingActionButton) findViewById(R.id.fabTriFournisseur);
-        fabTriFournisseur.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent serviceMedicamentAuLivretIntent = new Intent(ServiceMedicamentAuLivretActivity.this, ListeFournisseurActivity.class);
-                Bundle serviceMedicamentAuLivretBundle = ServiceMedicamentAuLivretActivity.super.getBundle();
-                serviceMedicamentAuLivretBundle.putString("produitClasse_numero", "1");
-                serviceMedicamentAuLivretIntent.putExtras(serviceMedicamentAuLivretBundle);
-                ServiceMedicamentAuLivretActivity.this.startActivityForResult(serviceMedicamentAuLivretIntent, CodesEchangesActivites.RETOUR_NOM_FOURNISSEUR);
-                floatingActionMenu.close(true);
-            }
+        fabTriFournisseur.setOnClickListener(v -> {
+            Intent serviceMedicamentAuLivretIntent = new Intent(ServiceMedicamentAuLivretActivity.this, ListeFournisseurActivity.class);
+            Bundle serviceMedicamentAuLivretBundle = ServiceMedicamentAuLivretActivity.super.getBundle();
+            serviceMedicamentAuLivretBundle.putString("produitClasse_numero", "1");
+            serviceMedicamentAuLivretIntent.putExtras(serviceMedicamentAuLivretBundle);
+            activityResultLauncherFournisseur.launch(serviceMedicamentAuLivretIntent);
+            floatingActionMenu.close(true);
         });
 
         // Récupérer le bouton de filtrage des médicaments par catégorie et le gérer
         fabTriCategorie = (FloatingActionButton) findViewById(R.id.fabTriCategorie);
-        fabTriCategorie.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent serviceMedicamentAuLivretIntent = new Intent(ServiceMedicamentAuLivretActivity.this, ListeCategorieActivity.class);
-                Bundle serviceMedicamentAuLivretBundle = ServiceMedicamentAuLivretActivity.super.getBundle();
-                serviceMedicamentAuLivretBundle.putString("produitClasse_numero", "1");
-                serviceMedicamentAuLivretIntent.putExtras(serviceMedicamentAuLivretBundle);
-                ServiceMedicamentAuLivretActivity.this.startActivityForResult(serviceMedicamentAuLivretIntent, CodesEchangesActivites.RETOUR_NOM_CATEGORIE);
-                floatingActionMenu.close(true);
-            }
+        fabTriCategorie.setOnClickListener(v -> {
+            Intent serviceMedicamentAuLivretIntent = new Intent(ServiceMedicamentAuLivretActivity.this, ListeCategorieActivity.class);
+            Bundle serviceMedicamentAuLivretBundle = ServiceMedicamentAuLivretActivity.super.getBundle();
+            serviceMedicamentAuLivretBundle.putString("produitClasse_numero", "1");
+            serviceMedicamentAuLivretIntent.putExtras(serviceMedicamentAuLivretBundle);
+            activityResultLauncherCategorie.launch(serviceMedicamentAuLivretIntent);
+            floatingActionMenu.close(true);
         });
 
         // Gérer le clic sur un élément
-        medicamentListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Produit medicament_Selectionne = (Produit) medicamentAdapter.getItem(position);
-                appelerDetailMedicament(medicament_Selectionne);
-            }
+        medicamentListView.setOnItemClickListener((parent, view, position, id) -> {
+            Produit medicament_Selectionne = (Produit) medicamentAdapter.getItem(position);
+            appelerDetailMedicament(medicament_Selectionne);
         });
 
         // Gérer la recherche par DataMatrix
         boutonRechercheDataMatrix = (FloatingActionButton) findViewById(R.id.boutonRechercheDataMatrix);
 
+        boutonRechercheDataMatrix.setOnClickListener(v -> {
+            Intent serviceMedicamentAuLivretIntent;
+            Bundle scanMedicamentBundle = ServiceMedicamentAuLivretActivity.super.getBundle();
+            scanMedicamentBundle.putBoolean("isBoutonSuppressionExistant", true);
 
-            boutonRechercheDataMatrix.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent serviceMedicamentAuLivretIntent = null;
-                    Bundle scanMedicamentBundle = ServiceMedicamentAuLivretActivity.super.getBundle();
-                    scanMedicamentBundle.putBoolean("isBoutonSuppressionExistant", true);
-
-                    if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
-                    {
-                        serviceMedicamentAuLivretIntent = new Intent(ServiceMedicamentAuLivretActivity.this, ScannerSearchOnlyActivity.class);
-                    }
-                    else
-                    {
-                        if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
-                        {
-                            serviceMedicamentAuLivretIntent = new Intent(ServiceMedicamentAuLivretActivity.this, BarcodeCaptureActivity.class);
-                        }
-                        else
-                        {
-                            serviceMedicamentAuLivretIntent = new Intent(ServiceMedicamentAuLivretActivity.this, ScannerSearchOnlyActivity.class);
-                        }
-                    }
-
-                    serviceMedicamentAuLivretIntent.putExtras(scanMedicamentBundle);
-                    ServiceMedicamentAuLivretActivity.this.startActivityForResult(serviceMedicamentAuLivretIntent, CodesEchangesActivites.RETOUR_CODE_GS1);
-                    floatingActionMenu.close(true);
+            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+            {
+                serviceMedicamentAuLivretIntent = new Intent(ServiceMedicamentAuLivretActivity.this, ScannerSearchOnlyActivity.class);
+            }
+            else
+            {
+                if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
+                {
+                    serviceMedicamentAuLivretIntent = new Intent(ServiceMedicamentAuLivretActivity.this, BarcodeCaptureActivity.class);
                 }
+                else
+                {
+                    serviceMedicamentAuLivretIntent = new Intent(ServiceMedicamentAuLivretActivity.this, ScannerSearchOnlyActivity.class);
+                }
+            }
 
-            });
+            serviceMedicamentAuLivretIntent.putExtras(scanMedicamentBundle);
+            activityResultLauncherGS1.launch(serviceMedicamentAuLivretIntent);
 
-    }
+            floatingActionMenu.close(true);
+        });
 
-    // Lorsqu'on lance une nouvelle activity avec " startActivityForResult ", action à réaliser à la fin de l'activity lancé suivant le " CodesEchangesActivites " passé
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case CodesEchangesActivites.RETOUR_CODE_GS1: {
-                if (resultCode == ServiceMedicamentAuLivretActivity.RESULT_OK) {
-                    String code = data.getStringExtra("code");
-                    if(!code.contentEquals(""))
-                    {
-                        Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(code);
-                        List<Produit> produit_List = new ArrayList<>();
+        activityResultLauncherGS1 = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    Intent data = result.getData();
+                    if (result.getResultCode() == ServiceMedicamentAuLivretActivity.RESULT_OK) {
+                        assert data != null;
+                        String code = data.getStringExtra("code");
+                        assert code != null;
+                        if(!code.contentEquals(""))
+                        {
+                            Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(code);
+                            List<Produit> produit_List;
 
-                        if (gs1Decoupe.size() != 1) {
-                            produit_List = ProduitOpenHelper.getMedicamentsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
-                            if (produit_List.size() == 1) {
-                                appelerDetailMedicament(produit_List.get(0));
-                            } else if (produit_List.size() > 1) {
-                                Alerte.afficherAlerte(ServiceMedicamentAuLivretActivity.this, "Attention", "Plusieurs médicaments correspondent à ce code", "alerte");
-                                medicamentList = produit_List;
-                                onResume();
+                            if (gs1Decoupe.size() != 1) {
+                                produit_List = ProduitOpenHelper.getMedicamentsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+                                if (produit_List.size() == 1) {
+                                    appelerDetailMedicament(produit_List.get(0));
+                                } else if (produit_List.size() > 1) {
+                                    Alerte.afficherAlerte(ServiceMedicamentAuLivretActivity.this, "Attention", "Plusieurs médicaments correspondent à ce code", "alerte");
+                                    medicamentList = produit_List;
+                                    onResume();
+                                } else {
+                                    Toast toast = Toast.makeText(ServiceMedicamentAuLivretActivity.this, "Le produit scanné n'est pas un médicament", Toast.LENGTH_LONG);
+                                    toast.setGravity(Gravity.CENTER, 0, 0);
+                                    toast.show();
+                                }
                             } else {
-                                Toast toast = Toast.makeText(ServiceMedicamentAuLivretActivity.this, "Le produit scanné n'est pas un médicament", Toast.LENGTH_LONG);
-                                toast.setGravity(Gravity.CENTER, 0, 0);
-                                toast.show();
+                                produit_List = ProduitOpenHelper.getProduitsParCodeInconnue(db, code);
+                                if (produit_List.size() == 1) {
+                                    appelerDetailMedicament(produit_List.get(0));
+                                } else if (produit_List.size() > 1) {
+                                    Alerte.afficherAlerte(ServiceMedicamentAuLivretActivity.this, "Attention", "Plusieurs médicaments correspondent à ce code", "alerte");
+                                    medicamentList = produit_List;
+                                    onResume();
+                                } else {
+                                    Toast toast = Toast.makeText(ServiceMedicamentAuLivretActivity.this, "Le produit scanné n'est pas un médicament", Toast.LENGTH_LONG);
+                                    toast.setGravity(Gravity.CENTER, 0, 0);
+                                    toast.show();
+                                }
                             }
+                        }
+                    }
+                });
+
+        activityResultLauncherFournisseur = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    Intent data = result.getData();
+                    if (result.getResultCode() == ServiceMedicamentAuLivretActivity.RESULT_OK) {
+                        assert data != null;
+                        String fournisseur_Selectionne = data.getStringExtra("fournisseur_Selectionne");
+                        List<Produit> produit_List;
+                        produit_List = ProduitOpenHelper.getMedicamentsParFournisseur(db, fournisseur_Selectionne);
+                        if (!produit_List.isEmpty()) {
+                            medicamentList = produit_List;
+                            medicamentList.sort(Comparator.comparing(Produit::getDesignation_interne));
+                            onResume();
                         } else {
-                            produit_List = ProduitOpenHelper.getProduitsParCodeInconnue(db, code);
-                            if (produit_List.size() == 1) {
-                                appelerDetailMedicament(produit_List.get(0));
-                            } else if (produit_List.size() > 1) {
-                                Alerte.afficherAlerte(ServiceMedicamentAuLivretActivity.this, "Attention", "Plusieurs médicaments correspondent à ce code", "alerte");
-                                medicamentList = produit_List;
-                                onResume();
-                            } else {
-                                Toast toast = Toast.makeText(ServiceMedicamentAuLivretActivity.this, "Le produit scanné n'est pas un médicament", Toast.LENGTH_LONG);
-                                toast.setGravity(Gravity.CENTER, 0, 0);
-                                toast.show();
-                            }
+                            Toast toast = Toast.makeText(ServiceMedicamentAuLivretActivity.this, "Aucun médicament ne correspond", Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
                         }
                     }
-                }
-                break;
-            }
-            case CodesEchangesActivites.RETOUR_NOM_FOURNISSEUR: {
-                if (resultCode == ServiceMedicamentAuLivretActivity.RESULT_OK) {
-                    String fournisseur_Selectionne = data.getStringExtra("fournisseur_Selectionne");
-                    List<Produit> produit_List = new ArrayList<>();
-                    produit_List = ProduitOpenHelper.getMedicamentsParFournisseur(db, fournisseur_Selectionne);
-                    if (produit_List.size() >= 1) {
-                        medicamentList = produit_List;
-                        Collections.sort(medicamentList, new Comparator<Produit>() {
-                            @Override
-                            public int compare(Produit o1, Produit o2) {
-                                return o1.getDesignation_interne().compareTo(o2.getDesignation_interne());
-                            }
-                        });
-                        onResume();
-                    } else {
-                        Toast toast = Toast.makeText(ServiceMedicamentAuLivretActivity.this, "Aucun médicament ne correspond", Toast.LENGTH_LONG);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
+                });
+
+        activityResultLauncherCategorie = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    Intent data = result.getData();
+                    if (result.getResultCode() == ServiceMedicamentAuLivretActivity.RESULT_OK) {
+                        assert data != null;
+                        String categorie_Selectionne = data.getStringExtra("categorie_Selectionne");
+                        List<Produit> produit_List;
+                        produit_List = ProduitOpenHelper.getMedicamentsParCategorie(db, categorie_Selectionne);
+                        if (!produit_List.isEmpty()) {
+                            medicamentList = produit_List;
+                            medicamentList.sort(Comparator.comparing(Produit::getDesignation_interne));
+                            onResume();
+                        } else {
+                            Toast toast = Toast.makeText(ServiceMedicamentAuLivretActivity.this, "Aucun médicament ne correspond", Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+                        }
                     }
+                });
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(medicamentList.size()));
+
+                if (floatingActionMenu.isOpened()) {
+                    floatingActionMenu.close(true);
+                    return;
                 }
-                break;
-            }
-            case CodesEchangesActivites.RETOUR_NOM_CATEGORIE: {
-                if (resultCode == ServiceMedicamentAuLivretActivity.RESULT_OK) {
-                    String categorie_Selectionne = data.getStringExtra("categorie_Selectionne");
-                    List<Produit> produit_List = new ArrayList<>();
-                    produit_List = ProduitOpenHelper.getMedicamentsParCategorie(db, categorie_Selectionne);
-                    if (produit_List.size() >= 1) {
-                        medicamentList = produit_List;
-                        Collections.sort(medicamentList, new Comparator<Produit>() {
-                            @Override
-                            public int compare(Produit o1, Produit o2) {
-                                return o1.getDesignation_interne().compareTo(o2.getDesignation_interne());
-                            }
-                        });
-                        onResume();
-                    } else {
-                        Toast toast = Toast.makeText(ServiceMedicamentAuLivretActivity.this, "Aucun médicament ne correspond", Toast.LENGTH_LONG);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
-                    }
+                List<Produit> medicamentsEnBDD_List = ProduitOpenHelper.getAllMedicaments(db);
+                if (medicamentList.size() != medicamentsEnBDD_List.size()) {
+                    medicamentList = medicamentsEnBDD_List;
+                    onResume();
+                } else {
+                    Intent intent = new Intent(ServiceMedicamentAuLivretActivity.this, NavigationActivity.class);
+                    Bundle extras = new Bundle();
+                    extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                    intent.putExtras(extras);
+                    ServiceMedicamentAuLivretActivity.this.startActivity(intent);
+                    ServiceMedicamentAuLivretActivity.this.finish();
                 }
-                break;
             }
-        }
-        invalidateOptionsMenu();
+        });
     }
 
     // Lance l'activity avec le produit sélectionné
     public void appelerDetailMedicament(Produit medicamentSelectionne) {
         Intent serviceMedicamentAuLivretIntent = new Intent(ServiceMedicamentAuLivretActivity.this, DetailMedicamentAuLivretActivity.class);
         Bundle serviceMedicamentAuLivretBundle = super.getBundle();
-        List<Integer> produitID_List = new ArrayList<>();
+        ArrayList<Integer> produitID_List = new ArrayList<>();
 
         for (int i = 0; i < medicamentAdapter.getCount(); i++) {
             Produit produit = (Produit) medicamentAdapter.getItem(i);
+            assert produit != null;
             produitID_List.add(produit.getID_produit());
         }
-        serviceMedicamentAuLivretBundle.putIntegerArrayList("produitID_List", (ArrayList<Integer>) produitID_List);
+        serviceMedicamentAuLivretBundle.putIntegerArrayList("produitID_List", produitID_List);
         serviceMedicamentAuLivretBundle.putInt("produitID_Selectionne", medicamentSelectionne.getID_produit());
         serviceMedicamentAuLivretIntent.putExtras(serviceMedicamentAuLivretBundle);
         ServiceMedicamentAuLivretActivity.this.startActivity(serviceMedicamentAuLivretIntent);
@@ -291,23 +300,5 @@ public class ServiceMedicamentAuLivretActivity extends ServiceActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.prepareOptionsMenu(menu, medicamentAdapter, null, "Désignation produit...");
         return true;
-    }
-
-    // Ferme le floatingActionMenu si ouvert sinon arrete l'activity
-    @Override
-    public void onBackPressed() {
-        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(medicamentList.size()));
-
-        if (floatingActionMenu.isOpened()) {
-            floatingActionMenu.close(true);
-            return;
-        }
-        List<Produit> medicamentsEnBDD_List = ProduitOpenHelper.getAllMedicaments(db);
-        if (medicamentList.size() != medicamentsEnBDD_List.size()) {
-            medicamentList = medicamentsEnBDD_List;
-            onResume();
-        } else {
-            super.onBackPressed();
-        }
     }
 }

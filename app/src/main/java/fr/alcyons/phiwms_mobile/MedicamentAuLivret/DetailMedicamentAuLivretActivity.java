@@ -7,6 +7,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import com.google.android.material.tabs.TabLayout;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -20,6 +22,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
@@ -31,7 +34,6 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.MedicalObjective;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
-import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.PrisePhoto.PrisePhoto;
 import fr.alcyons.phiwms_mobile.PrisePhoto.PrisePhotoV2;
 import fr.alcyons.phiwms_mobile.R;
@@ -44,22 +46,16 @@ public class DetailMedicamentAuLivretActivity extends ServiceActivity {
     Produit medicament_Selectionne;
     int n = 1;
     List<Integer> produitID_List;
-
-    // Permet de lancer l'activity BarcodeCaptureWithTakePicture
     View.OnClickListener onClickListener_Prendre_Photo = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
 
-            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA) && !android.os.Build.MANUFACTURER.contains("Zebra Technologies") && !android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY) && !android.os.Build.MANUFACTURER.contains("Zebra Technologies") && !android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
             {
                 onMenuPhotoClick();
             }
         }
     };
-
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    private ViewPager mViewPager;
 
     PackageManager pm;
 
@@ -72,9 +68,9 @@ public class DetailMedicamentAuLivretActivity extends ServiceActivity {
         //gestion du package manager
         pm = DetailMedicamentAuLivretActivity.this.getPackageManager();
 
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -82,7 +78,7 @@ public class DetailMedicamentAuLivretActivity extends ServiceActivity {
 
 
         /* Code nécessaire à l'exécution du service */
-        produitID_List = intent.getExtras().getIntegerArrayList("produitID_List");
+        produitID_List = Objects.requireNonNull(intent.getExtras()).getIntegerArrayList("produitID_List");
         medicament_Selectionne = ProduitOpenHelper.getProduitByID(db, intent.getExtras().getInt("produitID_Selectionne"));
 
         invalidateOptionsMenu();
@@ -103,16 +99,12 @@ public class DetailMedicamentAuLivretActivity extends ServiceActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // Récupération de l'item ADD et affectation de l'action à réaliser lors d'un clic
-        if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
+        if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
         {
             MenuItem item = menu.findItem(R.id.menuPhoto);
-            item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    onMenuPhotoClick();
-                    return true;
-                }
+            item.setOnMenuItemClickListener(item1 -> {
+                onMenuPhotoClick();
+                return true;
             });
         }
         return true;
@@ -137,16 +129,12 @@ public class DetailMedicamentAuLivretActivity extends ServiceActivity {
                 case CodesEchangesActivites.RETOUR_CODE_GS1:
                     if (resultCode == DetailMedicamentAuLivretActivity.RESULT_OK) {
                         String gs1 = data.getStringExtra("code");
-
-                        int compteurErreur = 0;
-
+                        assert gs1 != null;
                         if (gs1.length() == 13) {
                             medicament_Selectionne.setGTIN(gs1);
-                            compteurErreur++;
                         } else {
                             Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(gs1);
                             medicament_Selectionne.setGTIN(gs1Decoupe.get(OutilsDecodage.codeGtin));
-                            compteurErreur++;
                         }
 
                         long rowId = ProduitOpenHelper.mettreAJourProduit(db, medicament_Selectionne);
@@ -154,24 +142,13 @@ public class DetailMedicamentAuLivretActivity extends ServiceActivity {
                             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, medicament_Selectionne.getPhiMR4UUID(), medicament_Selectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
                         }
 
-
-                        if (compteurErreur == 0) {
-                            Alerte.afficherAlerte(DetailMedicamentAuLivretActivity.this, "Alerte", "Impossible de récupérer le code GTIN du produit.", "alerte");
-                        } else {
-                            Intent detailMedicamentAuLivret_Intent = new Intent(DetailMedicamentAuLivretActivity.this, PrisePhoto.class);
-                            Bundle detailMedicamentAuLivret_Bundle = DetailMedicamentAuLivretActivity.super.getBundle();
-                            detailMedicamentAuLivret_Bundle.putString("nomProduit", medicament_Selectionne.getDesignation_ext());
-                            detailMedicamentAuLivret_Bundle.putInt("id_Produit", medicament_Selectionne.getID_produit());
-                            // Nécessaire pour éviter le message " L'utilisateur connecté a été perdu "
-                            detailMedicamentAuLivret_Bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                            detailMedicamentAuLivret_Intent.putExtras(detailMedicamentAuLivret_Bundle);
-                            DetailMedicamentAuLivretActivity.this.startActivityForResult(detailMedicamentAuLivret_Intent, CodesEchangesActivites.RETOUR_PRISE_PHOTO);
-                        }
+                        Intent detailMedicamentAuLivret_Intent = getDetailMedicamentAuLivretIntent();
+                        DetailMedicamentAuLivretActivity.this.startActivityForResult(detailMedicamentAuLivret_Intent, CodesEchangesActivites.RETOUR_PRISE_PHOTO);
                     }
                     break;
                 case CodesEchangesActivites.RETOUR_PRISE_PHOTO:
-                    //String photoProduit = data.getStringExtra("photoProduit");
                     List<String> listPhoto = (List<String>) data.getSerializableExtra("photoProduit");
+                    assert listPhoto != null;
                     for(String photoProduit : listPhoto)
                     {
                         if (photoProduit != null) {
@@ -204,6 +181,18 @@ public class DetailMedicamentAuLivretActivity extends ServiceActivity {
         }
     }
 
+    @NonNull
+    private Intent getDetailMedicamentAuLivretIntent() {
+        Intent detailMedicamentAuLivret_Intent = new Intent(DetailMedicamentAuLivretActivity.this, PrisePhoto.class);
+        Bundle detailMedicamentAuLivret_Bundle = DetailMedicamentAuLivretActivity.super.getBundle();
+        detailMedicamentAuLivret_Bundle.putString("nomProduit", medicament_Selectionne.getDesignation_ext());
+        detailMedicamentAuLivret_Bundle.putInt("id_Produit", medicament_Selectionne.getID_produit());
+        // Nécessaire pour éviter le message " L'utilisateur connecté a été perdu "
+        detailMedicamentAuLivret_Bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+        detailMedicamentAuLivret_Intent.putExtras(detailMedicamentAuLivret_Bundle);
+        return detailMedicamentAuLivret_Intent;
+    }
+
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
@@ -212,6 +201,7 @@ public class DetailMedicamentAuLivretActivity extends ServiceActivity {
         }
 
         // Initialisation des Fragment
+        @NonNull
         @Override
         public Fragment getItem(int position) {
             switch (position) {
@@ -233,7 +223,7 @@ public class DetailMedicamentAuLivretActivity extends ServiceActivity {
                     return informationConservationMedicament;
             }
             Alerte.afficherAlerte(DetailMedicamentAuLivretActivity.this, "Erreur", "Veuillez contacter la société Alcyons (erreur onglets médicaments au livret)", "alerte");
-            return null;
+            return informationImportanteMedicament;
         }
 
 
