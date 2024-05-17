@@ -223,6 +223,7 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                     HashMap<String, String> headers = new HashMap<>();
                     headers.put("Content-Type", "application/json;charset=utf-8");
                     headers.put("Authorization", utilisateurConnecte.getToken());
+                    headers.put("ApplicationName", "PhiWMS");
                     return headers;
                 }
             };

@@ -27,6 +27,7 @@ import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity
 //import fr.alcyons.phiwms_mobile.DemandeReassort.ServiceDemandeReassortActivity;
 //import fr.alcyons.phiwms_mobile.Destruction.ServiceDestructionActivity;
 import fr.alcyons.phiwms_mobile.ControleDesRetours.ServiceControleRetoursActivity;
+import fr.alcyons.phiwms_mobile.DemandePleinVide.ServiceDemandePleinVideActivity;
 import fr.alcyons.phiwms_mobile.Destruction.ServiceDestructionActivity;
 import fr.alcyons.phiwms_mobile.DispositifAuLivret.ServiceDispositifAuLivretActivity;
 //import fr.alcyons.phiwms_mobile.DotationService.ServiceDotationServiceActivity;
@@ -220,7 +221,9 @@ public class OutilsGestionListeServices {
             case "Préparation UF Scan":
               //  return ServicePreparationPufScanneeActivity.class;
             case "Demande PleinVide":
-                //return ServiceDemandePleinVideActivity.class;
+                return ServiceDemandePleinVideActivity.class;
+            case "Demande Plein Vide":
+                return ServiceDemandePleinVideActivity.class;
             case "Demande Dotation Globale":
                // return ServiceDemandeDotationGlobaleActivity.class;
             case "Actions utilisateurs":
