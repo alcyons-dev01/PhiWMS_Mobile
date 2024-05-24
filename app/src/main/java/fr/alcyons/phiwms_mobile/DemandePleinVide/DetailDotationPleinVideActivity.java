@@ -63,6 +63,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Demande_PleinVide;
@@ -71,6 +72,7 @@ import fr.alcyons.phiwms_mobile.Classes.Detail_Dot;
 import fr.alcyons.phiwms_mobile.Classes.Dotation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
+import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.DetailPleinVideAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
@@ -285,24 +287,13 @@ public class DetailDotationPleinVideActivity extends ServiceAvecConnexionActivit
                                                 preparation_ligne.setQte_Demander(detail_dot.getQte());
                                                 preparation_ligne.setQte_RAL(detail_dot.getQte());
                                                 compteur ++;
+                                                MAJPreparationLigne(preparation_ligne, compteur);
                                             }
                                             else
                                             {
-                                                preparation_ligne.setQte_APreparer(0);
-                                                preparation_ligne.setQte_Demander(0);
-                                                preparation_ligne.setQte_RAL(0);
-                                                compteur --;
+                                                Detail_Dot detail_dot = Detail_DotOpenHelper.getDetailDotByProduitAndDotation(db, preparation_ligne.getProduitID(), dotation.get_UID());
+                                                afficherAlerteDetailPleinVide(DetailDotationPleinVideActivity.this, DetailDotationPleinVideActivity.this.getLayoutInflater(), preparation_ligne, compteur, detail_dot);
                                             }
-
-                                            PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, preparation_ligne);
-                                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, preparation_ligne.getPhiMR4UUID(), preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
-                                            ElementASynchroniserOpenHelper.toutSynchroniser(DetailDotationPleinVideActivity.this, db, utilisateurConnecte, false);
-
-                                            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(compteur));
-                                            detailPleinVideAdapter.notifyDataSetChanged();
-
-                                            if(!searchBar.getText().toString().contentEquals(""))
-                                                removeSearch.performClick();
                                         }
                                     });
 
@@ -353,24 +344,13 @@ public class DetailDotationPleinVideActivity extends ServiceAvecConnexionActivit
                         preparation_ligne.setQte_Demander(detail_dot.getQte());
                         preparation_ligne.setQte_RAL(detail_dot.getQte());
                         compteur ++;
+                        MAJPreparationLigne(preparation_ligne, compteur);
                     }
                     else
                     {
-                        preparation_ligne.setQte_APreparer(0);
-                        preparation_ligne.setQte_Demander(0);
-                        preparation_ligne.setQte_RAL(0);
-                        compteur --;
+                        Detail_Dot detail_dot = Detail_DotOpenHelper.getDetailDotByProduitAndDotation(db, preparation_ligne.getProduitID(), dotation.get_UID());
+                        afficherAlerteDetailPleinVide(DetailDotationPleinVideActivity.this, DetailDotationPleinVideActivity.this.getLayoutInflater(), preparation_ligne, compteur, detail_dot);
                     }
-
-                    PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, preparation_ligne);
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, preparation_ligne.getPhiMR4UUID(), preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
-                    ElementASynchroniserOpenHelper.toutSynchroniser(DetailDotationPleinVideActivity.this, db, utilisateurConnecte, false);
-
-                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(compteur));
-                    detailPleinVideAdapter.notifyDataSetChanged();
-
-                    if(!searchBar.getText().toString().contentEquals(""))
-                        removeSearch.performClick();
                 }
             });
         }
@@ -606,5 +586,64 @@ public class DetailDotationPleinVideActivity extends ServiceAvecConnexionActivit
     private void stopSpinner()
     {
         new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
+    }
+
+    @SuppressLint("SetTextI18n")
+    public void afficherAlerteDetailPleinVide(Context context, LayoutInflater inflater, final PH_Preparation_Ligne preparation_ligne, final int compteur, final Detail_Dot detail_dot) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View layout = inflater.inflate(R.layout.alerteconfirmationpleinvide, null);
+
+        LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
+        LinearLayout buttonAnnuler = (LinearLayout) layout.findViewById(R.id.buttonAnnuler);
+        TextView designationProduit = (TextView) layout.findViewById(R.id.designationProduit);
+        TextView nbSuppression = (TextView) layout.findViewById(R.id.nbSuppression);
+        TextView nbAjout = (TextView) layout.findViewById(R.id.nbAjout);
+        ImageView quitteModale = (ImageView) layout.findViewById(R.id.quitteModale);
+
+        Produit produit = ProduitOpenHelper.getProduitByID(db, detail_dot.getCode_produit());
+        designationProduit.setText(detail_dot.getDesignation());
+        nbSuppression.setText(detail_dot.getQte() +" "+produit.getUnite());
+        nbAjout.setText(detail_dot.getQte() +" "+produit.getUnite());
+        builder.setView(layout);
+
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        quitteModale.setOnClickListener(view -> alertDialog.dismiss());
+
+        zoneok.setOnClickListener(v -> {
+            preparation_ligne.setQte_APreparer(preparation_ligne.getQte_APreparer()+detail_dot.getQte());
+            preparation_ligne.setQte_Demander(preparation_ligne.getQte_Demander()+detail_dot.getQte());
+            preparation_ligne.setQte_RAL(preparation_ligne.getQte_RAL()+detail_dot.getQte());
+            alertDialog.dismiss();
+            MAJPreparationLigne(preparation_ligne, compteur);
+        });
+
+        buttonAnnuler.setOnClickListener(v -> {
+            if(preparation_ligne.getQte_Demander() >= 0)
+            {
+                preparation_ligne.setQte_APreparer(preparation_ligne.getQte_APreparer()-detail_dot.getQte());
+                preparation_ligne.setQte_Demander(preparation_ligne.getQte_Demander()-detail_dot.getQte());
+                preparation_ligne.setQte_RAL(preparation_ligne.getQte_RAL()-detail_dot.getQte());
+            }
+
+            alertDialog.dismiss();
+            MAJPreparationLigne(preparation_ligne, compteur);
+        });
+    }
+
+    public void MAJPreparationLigne(PH_Preparation_Ligne preparation_ligne, int compteur)
+    {
+        if(preparation_ligne.getQte_APreparer() == 0)
+            compteur --;
+        PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, preparation_ligne);
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, preparation_ligne.getPhiMR4UUID(), preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+        ElementASynchroniserOpenHelper.toutSynchroniser(DetailDotationPleinVideActivity.this, db, utilisateurConnecte, false);
+
+        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(compteur));
+        detailPleinVideAdapter.notifyDataSetChanged();
+
+        if(!searchBar.getText().toString().contentEquals(""))
+            removeSearch.performClick();
     }
 }
