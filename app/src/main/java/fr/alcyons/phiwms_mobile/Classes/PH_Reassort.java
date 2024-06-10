@@ -15,10 +15,6 @@ import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBool
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by jessica on 02/10/2017.
- */
-
 public class PH_Reassort implements Serializable, Comparable {
 
     private int Code;
@@ -33,23 +29,7 @@ public class PH_Reassort implements Serializable, Comparable {
     private int Valorisation_TTC;
     private int phiwms_mobileUUID = -1;
 
-    public PH_Reassort(JSONObject jsonObject) {
-
-        try {
-            this.Code = jsonObject.getInt("Code");
-            this.Liste = OutilsGestionClasses.recupererString(jsonObject.getString("Liste"));
-            this.SYS_DT_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_DT_MAJ"));
-            this.SYS_HEURE_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_HEURE_MAJ"));
-            this.SYS_USER_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_USER_MAJ"));
-            this.Depot_Reference = OutilsGestionClasses.recupererString(jsonObject.getString("Depot_Reference"));
-            this.Frequence = OutilsGestionClasses.recupererString(jsonObject.getString("Frequence"));
-            this.SynchroDM_Medicament = OutilsGestionClasses.recupererBooleen(jsonObject, "SynchroDM_Medicament");
-            this.SynchroDM_DMDMS = OutilsGestionClasses.recupererBooleen(jsonObject, "SynchroDM_DMDMS");
-            this.Valorisation_TTC = jsonObject.getInt("Valorisation_TTC");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
+    private String dateLivraison;
 
     public PH_Reassort(Cursor cursor) {
         this.Code = cursor.getInt(PH_ReassortOpenHelper.Constantes.NUM_COL_CODE_PH_REASSORT);
@@ -63,6 +43,19 @@ public class PH_Reassort implements Serializable, Comparable {
         this.SynchroDM_DMDMS = OutilsGestionClasses.recupererBooleen(cursor, PH_ReassortOpenHelper.Constantes.NUM_COL_SYNCHRODM_DMDMS_PH_REASSORT);
         this.Valorisation_TTC = cursor.getInt(PH_ReassortOpenHelper.Constantes.NUM_COL_VALORISATION_TTC_PH_REASSORT);
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
+    }
+
+    public PH_Reassort(JSONObject jsonObject) {
+        this.Code = jsonObject.optInt("Code");
+        this.Liste = jsonObject.optString("Liste");
+        this.SYS_DT_MAJ = jsonObject.optString("SYS_DT_MAJ");
+        this.SYS_HEURE_MAJ = jsonObject.optString("SYS_HEURE_MAJ");
+        this.SYS_USER_MAJ = jsonObject.optString("SYS_USER_MAJ");
+        this.Depot_Reference = jsonObject.optString("Depot_Reference");
+        this.Frequence = jsonObject.optString("Frequence");
+        this.SynchroDM_Medicament = jsonObject.optBoolean("SynchroDM_Medicament");
+        this.SynchroDM_DMDMS = jsonObject.optBoolean("SynchroDM_DMDMS");
+        this.Valorisation_TTC = jsonObject.optInt("Valorisation_TTC");
     }
 
     public int getCode() {
@@ -153,6 +146,14 @@ public class PH_Reassort implements Serializable, Comparable {
         this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
 
+    public void setDateLivraison(String dateLivraison) {
+        this.dateLivraison = dateLivraison;
+    }
+
+    public String getDateLivraison() {
+        return dateLivraison;
+    }
+
     public JSONObject toJson() {
         JSONObject jsonObject = new JSONObject();
         try {
@@ -203,14 +204,7 @@ public class PH_Reassort implements Serializable, Comparable {
 
     @Override
     public boolean equals(Object obj) {
-        boolean valeurARetourner = false;
-        if (((PH_Reassort) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
-            valeurARetourner = true;
-        }
 
-        if (!(obj instanceof PH_Reassort)) {
-            valeurARetourner = false;
-        }
-        return valeurARetourner;
+        return ((PH_Reassort) obj).getPhiMR4UUID() == this.getPhiMR4UUID();
     }
 }

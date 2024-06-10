@@ -10,11 +10,6 @@ import android.widget.TextView;
 import java.util.List;
 
 import fr.alcyons.phiwms_mobile.R;
-
-/**
- * Created by jessica on 23/11/2017.
- */
-
 public class CategorieAdapter extends ArrayAdapter {
 
     public List<String> categories;

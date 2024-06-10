@@ -18,11 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-
-/**
- * Created by jessica on 12/10/2017.
- */
-
 public class MultipartRequest extends Request<NetworkResponse> {
     public static final String KEY_PICTURE = "file";
     public static final String KEY_PICTURE_NAME = "filename";

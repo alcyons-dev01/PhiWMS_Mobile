@@ -31,7 +31,7 @@ public class Commande implements Serializable, Comparable {
     private double Frais_de_port;
     private String Situation;
     private String Date_echeance;
-    private String Modalités;
+    private String Modalites;
     private String Facture_Date;
     private double Mt_TTC;
     private String Situation2;
@@ -69,7 +69,7 @@ public class Commande implements Serializable, Comparable {
     private String Transport_Type;
     private int phiwms_mobileUUID = -1;
 
-    public Commande(int ID_commande, String numero, int ID_Frs, String commentaire, double mt_ht, double mt_TVA, double taux_TVA, String date_Cde, String date_Liv, String fournisseur, String ville_Frs, String devise, double frais_de_port, String situation, String date_echeance, String modalités, String facture_Date, double mt_TTC, String situation2, String ref_Depot_Dest, String ville_Dest, int ID_Depot, String struct_depot, String SYS_DT_MAJ, String SYS_HEURE_MAJ, String SYS_USER_MAJ, int delai_Livraison, Boolean urgent, String date_Liv2, String CB_Bon_Commande, String livraison_Autre, Boolean depot_adresse_2, String code_analytique, int protocole_Patient_ID, String patient_identite, String patient_IPP, String livrerDate, String BLNumero, String factureDate, String factureNumero, int nbColisTotal_CE, int nbPaletteTotal_CE, int poidsTotal_CE, String avaliser_Par_UserInitiale, int avaliser_Par_UserID, String avaliser_Le, int volume_Total, Boolean anImport, String transitaire_Metropole, String transitaire_Local, String transport_Type) {
+    public Commande(int ID_commande, String numero, int ID_Frs, String commentaire, double mt_ht, double mt_TVA, double taux_TVA, String date_Cde, String date_Liv, String fournisseur, String ville_Frs, String devise, double frais_de_port, String situation, String date_echeance, String modalites, String facture_Date, double mt_TTC, String situation2, String ref_Depot_Dest, String ville_Dest, int ID_Depot, String struct_depot, String SYS_DT_MAJ, String SYS_HEURE_MAJ, String SYS_USER_MAJ, int delai_Livraison, Boolean urgent, String date_Liv2, String CB_Bon_Commande, String livraison_Autre, Boolean depot_adresse_2, String code_analytique, int protocole_Patient_ID, String patient_identite, String patient_IPP, String livrerDate, String BLNumero, String factureDate, String factureNumero, int nbColisTotal_CE, int nbPaletteTotal_CE, int poidsTotal_CE, String avaliser_Par_UserInitiale, int avaliser_Par_UserID, String avaliser_Le, int volume_Total, Boolean anImport, String transitaire_Metropole, String transitaire_Local, String transport_Type) {
         this.ID_commande = ID_commande;
         this.Numero = numero;
         this.ID_Frs = ID_Frs;
@@ -85,7 +85,7 @@ public class Commande implements Serializable, Comparable {
         this.Frais_de_port = frais_de_port;
         this.Situation = situation;
         this.Date_echeance = date_echeance;
-        this.Modalités = modalités;
+        this.Modalites = modalites;
         this.Facture_Date = facture_Date;
         this.Mt_TTC = mt_TTC;
         this.Situation2 = situation2;
@@ -158,135 +158,17 @@ public class Commande implements Serializable, Comparable {
         this.Avaliser_Par_UserID = avaliser_Par_UserID;
         this.Avaliser_Le = avaliser_Le;
     }
-
-/*    public Commande(JSONObject commandeJson) {
-        try {
-            this.ID_commande = commandeJson.getInt("ID_commande");
-            this.Numero = recupererString(commandeJson.getString("Numero"));
-            this.ID_Frs = commandeJson.getInt("ID_Frs");
-            this.Commentaire = recupererString(commandeJson.getString("Commentaire"));
-            this.Mt_ht = commandeJson.getDouble("Mt_ht");
-            this.Mt_TVA = commandeJson.getDouble("Mt_TVA");
-            this.Taux_TVA = commandeJson.getDouble("Taux_TVA");
-            this.Date_Cde = recupererString(commandeJson.getString("Date_Cde"));
-            this.Date_Liv = recupererString(commandeJson.getString("Date_Liv"));
-            this.Fournisseur = recupererString(commandeJson.getString("Fournisseur"));
-            this.Ville_Frs = recupererString(commandeJson.getString("Ville_Frs"));
-            this.Devise = recupererString(commandeJson.getString("Devise"));
-            this.Frais_de_port = commandeJson.getDouble("Frais_de_port");
-            this.Situation = recupererString(commandeJson.getString("Situation"));
-            this.Date_echeance = recupererString(commandeJson.getString("Date_echeance"));
-            this.Modalités = recupererString(commandeJson.getString("Modalités"));
-            this.Facture_Date = recupererString(commandeJson.getString("Facture_Date"));
-            this.Mt_TTC = commandeJson.getDouble("Mt_TTC");
-            this.Situation2 = recupererString(commandeJson.getString("Situation2"));
-            this.Ref_Depot_Dest = recupererString(commandeJson.getString("Ref_Depot_Dest"));
-            this.Ville_Dest = recupererString(commandeJson.getString("Ville_Dest"));
-            this.ID_Depot = commandeJson.getInt("ID_Depot");
-            this.Struct_depot = recupererString(commandeJson.getString("Struct_depot"));
-            this.SYS_DT_MAJ = recupererString(commandeJson.getString("SYS_DT_MAJ"));
-            this.SYS_HEURE_MAJ = recupererString(commandeJson.getString("SYS_HEURE_MAJ"));
-            this.SYS_USER_MAJ = recupererString(commandeJson.getString("SYS_USER_MAJ"));
-            this.Delai_Livraison = commandeJson.getInt("Delai_Livraison");
-            this.Urgent = recupererBooleen(commandeJson, "Urgent");
-            this.Date_Liv2 = recupererString(commandeJson.getString("Date_Liv2"));
-            this.CB_Bon_Commande = recupererString(commandeJson.getString("CB_Bon_Commande"));
-            this.Livraison_Autre = recupererString(commandeJson.getString("Livraison_Autre"));
-            this.Depot_adresse_2 = recupererBooleen(commandeJson, "Depot_adresse_2");
-            this.Code_analytique = recupererString(commandeJson.getString("Code_analytique"));
-            this.Protocole_Patient_ID = commandeJson.getInt("Protocole_Patient_ID");
-            this.Patient_identite = recupererString(commandeJson.getString("Patient_identite"));
-            this.Patient_IPP = recupererString(commandeJson.getString("Patient_IPP"));
-            this.LivrerDate = recupererString(commandeJson.getString("LivrerDate"));
-            this.BLNumero = recupererString(commandeJson.getString("BLNumero"));
-            this.FactureDate = recupererString(commandeJson.getString("FactureDate"));
-            this.FactureNumero = recupererString(commandeJson.getString("FactureNumero"));
-            this.NbColisTotal_CE = commandeJson.getInt("NbColisTotal_CE");
-            this.NbPaletteTotal_CE = commandeJson.getInt("NbPaletteTotal_CE");
-            this.PoidsTotal_CE = commandeJson.getInt("PoidsTotal_CE");
-            this.Avaliser_Par_UserInitiale = recupererString(commandeJson.getString("Avaliser_Par_UserInitiale"));
-            this.Avaliser_Par_UserID = commandeJson.getInt("Avaliser_Par_UserID");
-            this.Avaliser_Le = recupererString(commandeJson.getString("Avaliser_Le"));
-            this.Volume_Total = commandeJson.getInt("Volume_Total");
-            this.Import = recupererBooleen(commandeJson, "Import");
-            this.Transitaire_Metropole = recupererString(commandeJson.getString("Transitaire_Metropole"));
-            this.Transitaire_Local = recupererString(commandeJson.getString("Transitaire_Local"));
-            this.Transport_Type = recupererString(commandeJson.getString("Transport_Type"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }*/
-
     public Commande(JSONObject commandeJson) {
-        try {
-            this.ID_commande = commandeJson.getInt("ID_commande");
-            this.Numero = OutilsGestionClasses.recupererString(commandeJson.getString("Numero"));
-            this.Fournisseur = OutilsGestionClasses.recupererString(commandeJson.getString("Fournisseur"));
-            this.Situation = OutilsGestionClasses.recupererString(commandeJson.getString("Situation"));
-            this.Date_Liv = OutilsGestionClasses.recupererString(commandeJson.getString("Date_Liv"));
-            this.Ref_Depot_Dest = OutilsGestionClasses.recupererString(commandeJson.getString("Ref_Depot_Dest"));
-            this.Patient_identite = OutilsGestionClasses.recupererString(commandeJson.getString("Patient_identite"));
-            this.NbColisTotal_CE = commandeJson.getInt("NbColisTotal_CE");
-            this.PoidsTotal_CE = commandeJson.getInt("PoidsTotal_CE");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this.ID_commande = commandeJson.optInt("ID_commande");
+        this.Numero = commandeJson.optString("Numero");
+        this.Fournisseur = commandeJson.optString("Fournisseur");
+        this.Situation = commandeJson.optString("Situation");
+        this.Date_Liv = commandeJson.optString("Date_Liv");
+        this.Ref_Depot_Dest = commandeJson.optString("Ref_Depot_Dest");
+        this.Patient_identite = commandeJson.optString("Patient_identite");
+        this.NbColisTotal_CE = commandeJson.optInt("NbColisTotal_CE");
+        this.PoidsTotal_CE = commandeJson.optInt("PoidsTotal_CE");
     }
-
-/*    public Commande(Cursor commandeCursor) {
-        this.ID_commande = commandeCursor.getInt(CommandeOpenHelper.Constantes.NUM_COL_ID_COMMANDE_COMMANDE);
-        this.Numero = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_NUMERO_COMMANDE);
-        this.ID_Frs = commandeCursor.getInt(CommandeOpenHelper.Constantes.NUM_COL_ID_FRS_COMMANDE);
-        this.Commentaire = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_COMMENTAIRE_COMMANDE);
-        this.Mt_ht = commandeCursor.getDouble(CommandeOpenHelper.Constantes.NUM_COL_MT_HT_COMMANDE);
-        this.Mt_TVA = commandeCursor.getDouble(CommandeOpenHelper.Constantes.NUM_COL_MT_TVA_COMMANDE);
-        this.Taux_TVA = commandeCursor.getDouble(CommandeOpenHelper.Constantes.NUM_COL_TAUX_TVA_COMMANDE);
-        this.Date_Cde = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_DATE_CDE_COMMANDE);
-        this.Date_Liv = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_DATE_LIV_COMMANDE);
-        this.Fournisseur = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_FOURNISSEUR_COMMANDE);
-        this.Ville_Frs = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_VILLE_FRS_COMMANDE);
-        this.Devise = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_DEVISE_COMMANDE);
-        this.Frais_de_port = commandeCursor.getDouble(CommandeOpenHelper.Constantes.NUM_COL_FRAIS_DE_PORT_COMMANDE);
-        this.Situation = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_SITUATION_COMMANDE);
-        this.Date_echeance = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_DATE_ECHEANCE_COMMANDE);
-        this.Modalités = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_MODALITES_COMMANDE);
-        this.Facture_Date = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_FACTURE_DATE_COMMANDE);
-        this.Mt_TTC = commandeCursor.getDouble(CommandeOpenHelper.Constantes.NUM_COL_MT_TTC_COMMANDE);
-        this.Situation2 = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_SITUATION2_COMMANDE);
-        this.Ref_Depot_Dest = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_REF_DEPOT_DEST_COMMANDE);
-        this.Ville_Dest = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_VILLE_DEST_COMMANDE);
-        this.ID_Depot = commandeCursor.getInt(CommandeOpenHelper.Constantes.NUM_COL_ID_DEPOT_COMMANDE);
-        this.Struct_depot = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_STRUCT_DEPOT_COMMANDE);
-        this.SYS_DT_MAJ = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_SYS_DT_MAJ_COMMANDE);
-        this.SYS_HEURE_MAJ = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_SYS_HEURE_MAJ_COMMANDE);
-        this.SYS_USER_MAJ = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_SYS_USER_MAJ_COMMANDE);
-        this.Delai_Livraison = commandeCursor.getInt(CommandeOpenHelper.Constantes.NUM_COL_DELAI_LIVRAISON_COMMANDE);
-        this.Urgent = recupererBooleen(commandeCursor, CommandeOpenHelper.Constantes.NUM_COL_URGENT_COMMANDE);
-        this.Date_Liv2 = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_DATE_LIV2_COMMANDE);
-        this.CB_Bon_Commande = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_CB_BON_COMMANDE_COMMANDE);
-        this.Livraison_Autre = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_LIVRAISON_AUTRE_COMMANDE);
-        this.Depot_adresse_2 = recupererBooleen(commandeCursor, CommandeOpenHelper.Constantes.NUM_COL_DEPOT_ADRESSE_2_COMMANDE);
-        this.Code_analytique = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_CODE_ANALYTIQUE_COMMANDE);
-        this.Protocole_Patient_ID = commandeCursor.getInt(CommandeOpenHelper.Constantes.NUM_COL_PROTOCOLE_PATIENT_ID_COMMANDE);
-        this.Patient_identite = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_PATIENT_IDENTITE_COMMANDE);
-        this.Patient_IPP = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_PATIENT_IPP_COMMANDE);
-        this.LivrerDate = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_LIVRERDATE_COMMANDE);
-        this.BLNumero = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_BLNUMERO_COMMANDE);
-        this.FactureDate = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_FACTUREDATE_COMMANDE);
-        this.FactureNumero = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_FACTURENUMERO_COMMANDE);
-        this.NbColisTotal_CE = commandeCursor.getInt(CommandeOpenHelper.Constantes.NUM_COL_NBCOLISTOTAL_CE_COMMANDE);
-        this.NbPaletteTotal_CE = commandeCursor.getInt(CommandeOpenHelper.Constantes.NUM_COL_NBPALETTETOTAL_CE_COMMANDE);
-        this.PoidsTotal_CE = commandeCursor.getInt(CommandeOpenHelper.Constantes.NUM_COL_POIDSTOTAL_CE_COMMANDE);
-        this.Avaliser_Par_UserInitiale = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_AVALISER_PAR_USERINITIALE_COMMANDE);
-        this.Avaliser_Par_UserID = commandeCursor.getInt(CommandeOpenHelper.Constantes.NUM_COL_AVALISER_PAR_USERID_COMMANDE);
-        this.Avaliser_Le = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_AVALISER_LE_COMMANDE);
-        this.Volume_Total = commandeCursor.getInt(CommandeOpenHelper.Constantes.NUM_COL_VOLUME_TOTAL_COMMANDE);
-        this.Import = recupererBooleen(commandeCursor, CommandeOpenHelper.Constantes.NUM_COL_IMPORT_COMMANDE);
-        this.Transitaire_Metropole = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_TRANSITAIRE_METROPOLE_COMMANDE);
-        this.Transitaire_Local = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_TRANSITAIRE_LOCAL_COMMANDE);
-        this.Transport_Type = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_TRANSPORT_TYPE_COMMANDE);
-        this.phiwms_mobileUUID = commandeCursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
-    }*/
 
     public Commande(Cursor commandeCursor) {
         this.ID_commande = commandeCursor.getInt(CommandeOpenHelper.Constantes.NUM_COL_ID_COMMANDE_COMMANDE);
@@ -430,12 +312,12 @@ public class Commande implements Serializable, Comparable {
         Date_echeance = date_echeance;
     }
 
-    public String getModalités() {
-        return Modalités;
+    public String getModalites() {
+        return Modalites;
     }
 
-    public void setModalités(String modalités) {
-        Modalités = modalités;
+    public void setModalites(String modalites) {
+        Modalites = modalites;
     }
 
     public String getFacture_Date() {
@@ -772,7 +654,7 @@ public class Commande implements Serializable, Comparable {
             jsonObject.put("Frais_de_port", Frais_de_port);
             jsonObject.put("Situation", Situation);
             jsonObject.put("Date_echeance", Date_echeance);
-            jsonObject.put("Modalités", Modalités);
+            jsonObject.put("Modalites", Modalites);
             jsonObject.put("Facture_Date", Facture_Date);
             jsonObject.put("Mt_TTC", Mt_TTC);
             jsonObject.put("Situation2", Situation2);

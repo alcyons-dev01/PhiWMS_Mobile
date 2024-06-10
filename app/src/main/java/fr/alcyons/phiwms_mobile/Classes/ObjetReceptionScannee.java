@@ -1,11 +1,6 @@
 package fr.alcyons.phiwms_mobile.Classes;
 
 import java.io.Serializable;
-
-/**
- * Created by olivier on 17/05/2019.
- */
-
 public class ObjetReceptionScannee implements Serializable {
 
     private String gs1_scannee;

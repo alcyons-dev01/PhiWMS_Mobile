@@ -42,10 +42,6 @@ import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
-/**
- * Created by olivier on 16/04/2024.
- */
-
 public class DetailDestructionActivity extends ServiceActivity {
     Retour retourSelectionne;
     List<Retour_Ligne> listeRetourLignes;

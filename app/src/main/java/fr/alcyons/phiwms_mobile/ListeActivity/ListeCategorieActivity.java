@@ -15,11 +15,6 @@ import fr.alcyons.phiwms_mobile.ListViewAdapters.CategorieAdapter;
 import fr.alcyons.phiwms_mobile.MedicamentAuLivret.ServiceMedicamentAuLivretActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
-
-/**
- * Created by jessica on 23/11/2017.
- */
-
 public class ListeCategorieActivity extends ServiceActivity {
 
     CategorieAdapter categorieAdapter;

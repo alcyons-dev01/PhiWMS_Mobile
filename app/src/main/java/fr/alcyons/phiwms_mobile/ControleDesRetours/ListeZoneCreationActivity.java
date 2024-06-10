@@ -33,9 +33,6 @@ import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_CODE
 
 import androidx.activity.OnBackPressedCallback;
 
-/**
- * Created by olivier on 16/04/2024.
- */
 public class ListeZoneCreationActivity extends ServiceActivity {
     Depot depotSelectionne;
 

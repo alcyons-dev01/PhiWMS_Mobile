@@ -29,10 +29,6 @@ import fr.alcyons.phiwms_mobile.MainActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 
-/**
- * Created by olivier on 26/02/2019.
- */
-
 public class WS_SUPPORT extends MainActivity {
 
     public static Handler handler = new Handler() {

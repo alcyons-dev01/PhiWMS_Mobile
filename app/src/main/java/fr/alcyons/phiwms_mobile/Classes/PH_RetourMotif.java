@@ -12,10 +12,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_RetourMotifOpenHelper;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by jessica on 29/11/2017.
- */
-
 public class PH_RetourMotif implements Serializable, Comparable {
 
     private int _UID;

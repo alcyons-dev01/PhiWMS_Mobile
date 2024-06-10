@@ -15,10 +15,6 @@ import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBool
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by jessica on 02/10/2017.
- */
-
 public class Detail_Dot implements Serializable, Comparable {
     private int dotation_UID;
     private int Code_produit;
@@ -38,25 +34,21 @@ public class Detail_Dot implements Serializable, Comparable {
     private int phiwms_mobileUUID = -1;
 
     public Detail_Dot(JSONObject jsonObject) {
-        try {
-            this.dotation_UID = jsonObject.getInt("dotation_UID");
-            this.Code_produit = jsonObject.getInt("Code_produit");
-            this.Designation = OutilsGestionClasses.recupererString(jsonObject.getString("Designation"));
-            this.Cond = jsonObject.getInt("Cond");
-            this.Qte = jsonObject.getInt("Qte");
-            this.Ref_four = OutilsGestionClasses.recupererString(jsonObject.getString("Ref_four"));
-            this.Categorie = OutilsGestionClasses.recupererString(jsonObject.getString("Categorie"));
-            this.Livraison_Directe = OutilsGestionClasses.recupererBooleen(jsonObject, "Livraison_Directe");
-            this.SYS_DT_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_DT_MAJ"));
-            this.SYS_HEURE_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_HEURE_MAJ"));
-            this.SYS_USER_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_USER_MAJ"));
-            this._UID = jsonObject.getInt("_UID");
-            this.Valeur_TTC = jsonObject.getInt("Valeur_TTC");
-            this.Stock_minimum = jsonObject.getInt("Stock_minimum");
-            this.PleinVide_Adressage = OutilsGestionClasses.recupererString(jsonObject.getString("PleinVide_Adressage"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this.dotation_UID = jsonObject.optInt("dotation_UID");
+        this.Code_produit = jsonObject.optInt("Code_produit");
+        this.Designation = jsonObject.optString("Designation");
+        this.Cond = jsonObject.optInt("Cond");
+        this.Qte = jsonObject.optInt("Qte");
+        this.Ref_four = jsonObject.optString("Ref_four");
+        this.Categorie = jsonObject.optString("Categorie");
+        this.Livraison_Directe = jsonObject.optBoolean("Livraison_Directe", false);
+        this.SYS_DT_MAJ = jsonObject.optString("SYS_DT_MAJ");
+        this.SYS_HEURE_MAJ = jsonObject.optString("SYS_HEURE_MAJ");
+        this.SYS_USER_MAJ = jsonObject.optString("SYS_USER_MAJ");
+        this._UID = jsonObject.optInt("_UID");
+        this.Valeur_TTC = jsonObject.optInt("Valeur_TTC");
+        this.Stock_minimum = jsonObject.optInt("Stock_minimum");
+        this.PleinVide_Adressage = jsonObject.optString("PleinVide_Adressage");
     }
 
     public Detail_Dot(Cursor cursor) {

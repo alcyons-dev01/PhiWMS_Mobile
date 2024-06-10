@@ -8,10 +8,6 @@ import android.provider.BaseColumns;
 
 import fr.alcyons.phiwms_mobile.Classes.SYS_User_Rules;
 
-/**
- * Created by olivier on 25/04/2019.
- */
-
 public class SYS_User_RulesOpenHelper extends DBOpenHelper {
 
     public SYS_User_RulesOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

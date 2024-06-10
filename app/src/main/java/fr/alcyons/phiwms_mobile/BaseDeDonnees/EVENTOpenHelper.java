@@ -11,10 +11,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-/**
- * Created by jessica on 09/10/2017.
- */
-
 public class EVENTOpenHelper extends DBOpenHelper {
 
     public EVENTOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

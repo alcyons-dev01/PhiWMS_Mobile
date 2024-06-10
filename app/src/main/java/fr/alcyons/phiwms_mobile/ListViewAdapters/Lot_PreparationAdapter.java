@@ -22,12 +22,6 @@ import java.util.List;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_Preparation_Adapte;
 import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparationActivity;
 import fr.alcyons.phiwms_mobile.R;
-
-
-/**
- * Created by olivier on 28/09/2017.
- */
-
 public class Lot_PreparationAdapter extends ArrayAdapter {
 
     public List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte> lotPreparationsAdaptes;

@@ -45,11 +45,6 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.EnvoyerMailSurveillance;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
 import fr.alcyons.phiwms_mobile.R;
-
-/**
- * Created by olivier on 12/06/2019.
- */
-
 public class ReceptionPADScannerContexte extends MainActivity {
 
     private Context context;

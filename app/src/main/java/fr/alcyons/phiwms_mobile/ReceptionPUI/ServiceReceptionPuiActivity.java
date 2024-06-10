@@ -76,10 +76,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 
-/**
- * Created by olivier on 16/04/2024.
- */
-
 public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
 
     //déclaration des variables

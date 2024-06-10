@@ -14,10 +14,6 @@ import android.widget.TextView;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 10/04/2019.
- */
-
 public class AuthentificationContext {
 
     private Context context;

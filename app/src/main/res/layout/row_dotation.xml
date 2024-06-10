@@ -42,14 +42,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:text="intituleDotation"
+                    android:text=""
                     android:textColor="#000000" />
 
             </LinearLayout>
 
 
             <LinearLayout
-                android:id="@+id/linearQuantitePleinVide"
+                android:id="@+id/linearQuantite"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -70,7 +70,7 @@
                     android:visibility="visible"/>
 
                 <ImageView
-                    android:id="@+id/separateurQuantitePleinVide"
+                    android:id="@+id/separateurQuantite"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/bleu_clair_alcyons"

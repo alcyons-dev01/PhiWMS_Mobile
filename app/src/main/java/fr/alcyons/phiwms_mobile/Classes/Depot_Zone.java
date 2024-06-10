@@ -52,20 +52,16 @@ public class Depot_Zone implements Serializable, Comparable {
     }
 
     public Depot_Zone(JSONObject depotZoneJson) {
-        try {
-            this.ZoneID = depotZoneJson.getInt("ZoneID");
-            this.ZoneName = OutilsGestionClasses.recupererString(depotZoneJson.getString("ZoneName"));
-            this.ZoneLongitude = depotZoneJson.getDouble("ZoneLongitude");
-            this.ZoneLatitude = depotZoneJson.getDouble("ZoneLatitude");
-            this.DataMatrixReference = OutilsGestionClasses.recupererString(depotZoneJson.getString("DataMatrixReference"));
-            this.DepotID = depotZoneJson.getInt("DepotID");
-            this.Conservation = OutilsGestionClasses.recupererString(depotZoneJson.getString("Conservation"));
-            this.Depot_Reference = OutilsGestionClasses.recupererString(depotZoneJson.getString("Depot_Reference"));
-            this.Type_Emplacement = OutilsGestionClasses.recupererString(depotZoneJson.getString("Type_Emplacement"));
-            this.emplacements = new ArrayList<>();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this.ZoneID = depotZoneJson.optInt("ZoneID");
+        this.ZoneName = depotZoneJson.optString("ZoneName");
+        this.ZoneLongitude = depotZoneJson.optDouble("ZoneLongitude");
+        this.ZoneLatitude = depotZoneJson.optDouble("ZoneLatitude");
+        this.DataMatrixReference = depotZoneJson.optString("DataMatrixReference");
+        this.DepotID = depotZoneJson.optInt("DepotID");
+        this.Conservation = depotZoneJson.optString("Conservation");
+        this.Depot_Reference = depotZoneJson.optString("Depot_Reference");
+        this.Type_Emplacement = depotZoneJson.optString("Type_Emplacement");
+        this.emplacements = new ArrayList<>();
     }
 
     public Depot_Zone(Cursor cursorZones) {

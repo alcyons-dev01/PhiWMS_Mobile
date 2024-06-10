@@ -21,6 +21,35 @@ public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
         db.delete(Constantes.TABLE_PH_PREPARATION_LIGNE, null, null);
     }
 
+    public static int getCountPHPreparationLignesParPHPreparation(SQLiteDatabase db, PH_Preparation phPreparation) {
+        int total = 0;
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION_LIGNE + " WHERE " + Constantes.CLE_COL_PREPARATIONID_PH_PREPARATION_LIGNE + "=?", new String[]{String.valueOf(phPreparation.getUID())});
+        total = cursor.getCount();
+        cursor.close();
+        cursor = null;
+        return total;
+    }
+
+    public static int getCountPHPreparationLignesDemandeParPHPreparation(SQLiteDatabase db, PH_Preparation phPreparation) {
+        int total = 0;
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION_LIGNE + " WHERE " + Constantes.CLE_COL_PREPARATIONID_PH_PREPARATION_LIGNE + "=?", new String[]{String.valueOf(phPreparation.getUID())});
+
+        while (cursor.moveToNext()) {
+            PH_Preparation_Ligne ph_preparation_ligne = new PH_Preparation_Ligne(cursor);
+            if (ph_preparation_ligne.getQte_StockSaisie() != -1) {
+                total ++;
+            }
+        }
+
+        cursor.close();
+        cursor = null;
+        return total;
+    }
+
+
+    public static void viderTablePH_Preparation_LignesParPreparation(SQLiteDatabase db, int preparationID) {
+        db.delete(Constantes.TABLE_PH_PREPARATION_LIGNE, Constantes.CLE_COL_PREPARATIONID_PH_PREPARATION_LIGNE+" = ?", new String[]{String.valueOf(preparationID)});
+    }
     public static long insererUnPH_Preparation_LigneEnBDD(SQLiteDatabase db, PH_Preparation_Ligne ph_preparation_ligne) {
         // Récupération des éléments du dépot
         ContentValues contentValues = new ContentValues();

@@ -20,10 +20,6 @@ import fr.alcyons.phiwms_mobile.Classes.SurveillanceReference;
 import fr.alcyons.phiwms_mobile.Outils.Mail;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
-/**
- * Created by olivier on 26/02/2019.
- */
-
 public class EnvoyerMailSurveillance extends ServiceActivity {
 
     public static String subject_mail;

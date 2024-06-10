@@ -26,10 +26,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.NotificationOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Notification;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by jessica on 03/08/2017.
- */
-
 public class NotificationAdapter extends ArrayAdapter implements Filterable {
 
     public List<Notification> notificationList;

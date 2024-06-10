@@ -6,10 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 import fr.alcyons.phiwms_mobile.Classes.Parametres_Serialisation;
 
-/**
- * Created by olivier on 26/02/2019.
- */
-
 public class Parametres_SerialisationOpenHelper  extends DBOpenHelper {
 
     private static final int MY_SOCKET_TIMEOUT_MS = 100;

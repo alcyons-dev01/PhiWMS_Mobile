@@ -23,7 +23,7 @@ public class Retour implements Serializable, Comparable {
     private String Numero;
     private String Ref_Depot_Origine;
     private int Code_Patient;
-    private String Intitulé;
+    private String Intitule;
     private String Ref_Depot_Dest;
     private String Statut;
     private String Date_retour;
@@ -45,12 +45,12 @@ public class Retour implements Serializable, Comparable {
     private String Signature_Chauffeur;
     private int phiwms_mobileUUID = -1;
 
-    public Retour(int _UID, String numero, String ref_Depot_Origine, int code_Patient, String intitulé, String ref_Depot_Dest, String statut, String date_retour, double montant_TTC, String commentaire, String motif, String devise, String SYS_DT_MAJ, String SYS_HEURE_MAJ, String SYS_USER_MAJ, String en_Attente_de, String date_Reprise, String date_Validation, String provenance_Reference, Boolean avoir_Attendu) {
+    public Retour(int _UID, String numero, String ref_Depot_Origine, int code_Patient, String intitule, String ref_Depot_Dest, String statut, String date_retour, double montant_TTC, String commentaire, String motif, String devise, String SYS_DT_MAJ, String SYS_HEURE_MAJ, String SYS_USER_MAJ, String en_Attente_de, String date_Reprise, String date_Validation, String provenance_Reference, Boolean avoir_Attendu) {
         this._UID = _UID;
         this.Numero = numero;
         this.Ref_Depot_Origine = ref_Depot_Origine;
         this.Code_Patient = code_Patient;
-        this.Intitulé = intitulé;
+        this.Intitule = intitule;
         this.Ref_Depot_Dest = ref_Depot_Dest;
         this.Statut = statut;
         this.Date_retour = date_retour;
@@ -68,11 +68,11 @@ public class Retour implements Serializable, Comparable {
         this.Avoir_Attendu = avoir_Attendu;
     }
 
-    public Retour(int _UID, String numero, int code_Patient, String intitulé, String ref_Depot_Dest, String statut, String date_retour, double montant_TTC, String commentaire, String ref_Depot_Origine, String motif, String en_Attente_de, String date_Reprise, String provenance_Reference) {
+    public Retour(int _UID, String numero, int code_Patient, String intitule, String ref_Depot_Dest, String statut, String date_retour, double montant_TTC, String commentaire, String ref_Depot_Origine, String motif, String en_Attente_de, String date_Reprise, String provenance_Reference) {
         this._UID = _UID;
         this.Numero = numero;
         this.Code_Patient = code_Patient;
-        this.Intitulé = intitulé;
+        this.Intitule = intitule;
         this.Ref_Depot_Dest = ref_Depot_Dest;
         this.Statut = statut;
         this.Date_retour = date_retour;
@@ -85,81 +85,25 @@ public class Retour implements Serializable, Comparable {
         this.Provenance_Reference = provenance_Reference;
     }
 
-/*    public Retour(JSONObject jsonObject) {
-        try {
-            this._UID = jsonObject.getInt("_UID");
-            this.Numero = recupererString(jsonObject.getString("Numero"));
-            this.Ref_Depot_Origine = recupererString(jsonObject.getString("Ref_Depot_Origine"));
-            this.Code_Patient = jsonObject.getInt("Code_Patient");
-            this.Intitulé = recupererString(jsonObject.getString("Intitulé"));
-            this.Ref_Depot_Dest = recupererString(jsonObject.getString("Ref_Depot_Dest"));
-            this.Statut = recupererString(jsonObject.getString("Statut"));
-            this.Date_retour = recupererString(jsonObject.getString("Date_retour"));
-            this.Montant_TTC = jsonObject.getDouble("Montant_TTC");
-            this.Commentaire = recupererString(jsonObject.getString("Commentaire"));
-            this.Motif = recupererString(jsonObject.getString("Motif"));
-            this.Devise = recupererString(jsonObject.getString("Devise"));
-            this.SYS_DT_MAJ = recupererString(jsonObject.getString("SYS_DT_MAJ"));
-            this.SYS_HEURE_MAJ = recupererString(jsonObject.getString("SYS_HEURE_MAJ"));
-            this.SYS_USER_MAJ = recupererString(jsonObject.getString("SYS_USER_MAJ"));
-            this.En_Attente_de = recupererString(jsonObject.getString("En_Attente_de"));
-            this.Date_Reprise = recupererString(jsonObject.getString("Date_Reprise"));
-            this.Date_Validation = recupererString(jsonObject.getString("Date_Validation"));
-            this.Provenance_Reference = recupererString(jsonObject.getString("Provenance_Reference"));
-            this.Avoir_Attendu = recupererBooleen(jsonObject, "Avoir_Attendu");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }*/
-
-
     public Retour(JSONObject jsonObject) {
-        try {
-            this._UID = jsonObject.getInt("_UID");
-            this.Numero = OutilsGestionClasses.recupererString(jsonObject.getString("Numero"));
-            this.Ref_Depot_Origine = OutilsGestionClasses.recupererString(jsonObject.getString("Ref_Depot_Origine"));
-            this.Intitulé = OutilsGestionClasses.recupererString(jsonObject.getString("Intitulé"));
-            this.Statut = OutilsGestionClasses.recupererString(jsonObject.getString("Statut"));
-            this.Ref_Depot_Dest = OutilsGestionClasses.recupererString(jsonObject.getString("Ref_Depot_Dest"));
-            this.Date_retour = OutilsGestionClasses.recupererString(jsonObject.getString("Date_retour"));
-            this.Commentaire = OutilsGestionClasses.recupererString(jsonObject.getString("Commentaire"));
-            this.Motif = OutilsGestionClasses.recupererString(jsonObject.getString("Motif"));
-            this.En_Attente_de = OutilsGestionClasses.recupererString(jsonObject.getString("En_Attente_de"));
-            this.Avoir_Attendu = OutilsGestionClasses.recupererBooleen(jsonObject, "Avoir_Attendu");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this._UID = jsonObject.optInt("_UID");
+        this.Numero = jsonObject.optString("Numero");
+        this.Ref_Depot_Origine = jsonObject.optString("Ref_Depot_Origine");
+        this.Intitule = jsonObject.optString("Intitule");
+        this.Statut = jsonObject.optString("Statut");
+        this.Ref_Depot_Dest = jsonObject.optString("Ref_Depot_Dest");
+        this.Date_retour = jsonObject.optString("Date_retour");
+        this.Commentaire = jsonObject.optString("Commentaire");
+        this.Motif = jsonObject.optString("Motif");
+        this.En_Attente_de = jsonObject.optString("En_Attente_de");
+        this.Avoir_Attendu = jsonObject.optBoolean("Avoir_Attendu", false);
     }
-
-/*    public Retour(Cursor cursor) {
-        this._UID = cursor.getInt(RetourOpenHelper.Constantes.NUM_COL__UID_RETOUR);
-        this.Numero = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_NUMERO_RETOUR);
-        this.Ref_Depot_Origine = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_REF_DEPOT_ORIGINE_RETOUR);
-        this.Code_Patient = cursor.getInt(RetourOpenHelper.Constantes.NUM_COL_CODE_PATIENT_RETOUR);
-        this.Intitulé = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_INTITULE_RETOUR);
-        this.Ref_Depot_Dest = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_REF_DEPOT_DEST_RETOUR);
-        this.Statut = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_STATUT_RETOUR);
-        this.Date_retour = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_DATE_RETOUR_RETOUR);
-        this.Montant_TTC = cursor.getDouble(RetourOpenHelper.Constantes.NUM_COL_MONTANT_TTC_RETOUR);
-        this.Commentaire = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_COMMENTAIRE_RETOUR);
-        this.Motif = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_MOTIF_RETOUR);
-        this.Devise = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_DEVISE_RETOUR);
-        this.SYS_DT_MAJ = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_SYS_DT_MAJ_RETOUR);
-        this.SYS_HEURE_MAJ = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_SYS_HEURE_MAJ_RETOUR);
-        this.SYS_USER_MAJ = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_SYS_USER_MAJ_RETOUR);
-        this.En_Attente_de = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_EN_ATTENTE_DE_RETOUR);
-        this.Date_Reprise = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_DATE_REPRISE_RETOUR);
-        this.Date_Validation = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_DATE_VALIDATION_RETOUR);
-        this.Provenance_Reference = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_PROVENANCE_REFERENCE_RETOUR);
-        this.Avoir_Attendu = recupererBooleen(cursor, RetourOpenHelper.Constantes.NUM_COL_AVOIR_ATTENDU_RETOUR);
-        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
-    }*/
 
     public Retour(Cursor cursor) {
         this._UID = cursor.getInt(RetourOpenHelper.Constantes.NUM_COL__UID_RETOUR);
         this.Numero = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_NUMERO_RETOUR);
         this.Ref_Depot_Origine = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_REF_DEPOT_ORIGINE_RETOUR);
-        this.Intitulé = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_INTITULE_RETOUR);
+        this.Intitule = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_INTITULE_RETOUR);
         this.Statut = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_STATUT_RETOUR);
         this.Date_retour = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_DATE_RETOUR_RETOUR);
         this.Commentaire = cursor.getString(RetourOpenHelper.Constantes.NUM_COL_COMMENTAIRE_RETOUR);
@@ -221,11 +165,11 @@ public class Retour implements Serializable, Comparable {
     }
 
     public String getIntitule() {
-        return Intitulé;
+        return Intitule;
     }
 
-    public void setIntitule(String intitulé) {
-        Intitulé = intitulé;
+    public void setIntitule(String intitule) {
+        Intitule = intitule;
     }
 
     public String getRef_Depot_Dest() {
@@ -387,7 +331,7 @@ public class Retour implements Serializable, Comparable {
             jsonObject.put("Numero", this.getNumero());
             jsonObject.put("Ref_Depot_Origine", this.getRef_Depot_Origine());
             jsonObject.put("Code_Patient", this.getCode_Patient());
-            jsonObject.put("Intitulé", this.getIntitule());
+            jsonObject.put("Intitule", this.getIntitule());
             jsonObject.put("Ref_Depot_Dest", this.getRef_Depot_Dest());
             jsonObject.put("Statut", this.getStatut());
             jsonObject.put("Date_retour", this.getDate_retour());

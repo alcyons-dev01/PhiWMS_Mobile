@@ -70,11 +70,6 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsGestionListeServices;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhraseSnackbar;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
-
-/**
- * Created by olivier on 19/06/2019.
- */
-
 public class ServiceConnexionDirecteActivity extends ServiceAvecConnexionActivity {
 
     public ExpandableListView expandablelistViewConnexionDirecte;

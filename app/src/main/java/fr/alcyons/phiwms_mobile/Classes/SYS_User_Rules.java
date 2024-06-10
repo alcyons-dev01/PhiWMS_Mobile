@@ -10,11 +10,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.SYS_User_RulesOpenHelper;
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
-
-/**
- * Created by olivier on 25/04/2019.
- */
-
 public class SYS_User_Rules {
 
     private String Nom;
@@ -47,38 +42,33 @@ public class SYS_User_Rules {
     private int phiwms_mobileUUID=-1;
     
     public SYS_User_Rules(JSONObject jsonObject){
-        try{
-            Nom= OutilsGestionClasses.recupererString(jsonObject.getString("Nom"));
-            Profil= OutilsGestionClasses.recupererString(jsonObject.getString("Profil"));
-            Initiale= OutilsGestionClasses.recupererString(jsonObject.getString("Initiale"));
-            X_MotPasse= OutilsGestionClasses.recupererString(jsonObject.getString("X_MotPasse"));
-            User_UID=jsonObject.getInt("User_UID");
-            SYS_DT_MAJ= OutilsGestionClasses.recupererString(jsonObject.getString("SYS_DT_MAJ"));
-            SYS_HEURE_MAJ= OutilsGestionClasses.recupererString(jsonObject.getString("SYS_HEURE_MAJ"));
-            SYS_USER_MAJ= OutilsGestionClasses.recupererString(jsonObject.getString("SYS_USER_MAJ"));
-            Droits= OutilsGestionClasses.recupererString(jsonObject.getString("Droits"));
-            Acces_Classification= OutilsGestionClasses.recupererString(jsonObject.getString("Acces_Classification"));
-            Avaliser_Commande_Autoriser= OutilsGestionClasses.recupererBooleen(jsonObject,"Avaliser_Commande_Autoriser");
-            Administrateur= OutilsGestionClasses.recupererBooleen(jsonObject,"Administrateur");
-            Quarantaine_Autoriser= OutilsGestionClasses.recupererBooleen(jsonObject,"Quarantaine_Autoriser");
-            Perimetre_ParDefaut= OutilsGestionClasses.recupererString(jsonObject.getString("Perimetre_ParDefaut"));
-            planHabilitation=jsonObject.getInt("planHabilitation");
-            Modification_DPP_Autoriser= OutilsGestionClasses.recupererBooleen(jsonObject,"Modification_DPP_Autoriser");
-            Regulation_Demande_Particuliere= OutilsGestionClasses.recupererBooleen(jsonObject,"Regulation_Demande_Particuliere");
-            Anonymiser= OutilsGestionClasses.recupererBooleen(jsonObject,"Anonymiser");
-            Bureau_ParDefaut= OutilsGestionClasses.recupererString(jsonObject.getString("Bureau_ParDefaut"));
-            LocalisationParDefaut= OutilsGestionClasses.recupererString(jsonObject.getString("LocalisationParDefaut"));
-            Regulation_Automatique= OutilsGestionClasses.recupererBooleen(jsonObject,"Regulation_Automatique");
-            Acces_Serialisation= OutilsGestionClasses.recupererBooleen(jsonObject,"Acces_Serialisation");
-            Serialisation_identifiant= OutilsGestionClasses.recupererString(jsonObject.getString("Serialisation_identifiant"));
-            Serialisation_mdp= OutilsGestionClasses.recupererString(jsonObject.getString("Serialisation_mdp"));
-            Serialisation_tan= OutilsGestionClasses.recupererString(jsonObject.getString("Serialisation_tan"));
-            Serialisation_clientLoginId= OutilsGestionClasses.recupererString(jsonObject.getString("Serialisation_clientLoginId"));
-            SerialisationTermsEtConditions= OutilsGestionClasses.recupererBooleen(jsonObject,"SerialisationTermsEtConditions");
-        }catch(JSONException e)
-        {
-            e.printStackTrace();
-        }
+        Nom= jsonObject.optString("Nom");
+        Profil= jsonObject.optString("Profil");
+        Initiale= jsonObject.optString("Initiale");
+        X_MotPasse= jsonObject.optString("X_MotPasse");
+        User_UID=jsonObject.optInt("User_UID");
+        SYS_DT_MAJ= jsonObject.optString("SYS_DT_MAJ");
+        SYS_HEURE_MAJ= jsonObject.optString("SYS_HEURE_MAJ");
+        SYS_USER_MAJ= jsonObject.optString("SYS_USER_MAJ");
+        Droits= jsonObject.optString("Droits");
+        Acces_Classification= jsonObject.optString("Acces_Classification");
+        Avaliser_Commande_Autoriser= jsonObject.optBoolean("Avaliser_Commande_Autoriser");
+        Administrateur= jsonObject.optBoolean("Administrateur");
+        Quarantaine_Autoriser= jsonObject.optBoolean("Quarantaine_Autoriser");
+        Perimetre_ParDefaut= jsonObject.optString("Perimetre_ParDefaut");
+        planHabilitation=jsonObject.optInt("planHabilitation");
+        Modification_DPP_Autoriser= jsonObject.optBoolean("Modification_DPP_Autoriser");
+        Regulation_Demande_Particuliere= jsonObject.optBoolean("Regulation_Demande_Particuliere");
+        Anonymiser= jsonObject.optBoolean("Anonymiser");
+        Bureau_ParDefaut= jsonObject.optString("Bureau_ParDefaut");
+        LocalisationParDefaut= jsonObject.optString("LocalisationParDefaut");
+        Regulation_Automatique= jsonObject.optBoolean("Regulation_Automatique");
+        Acces_Serialisation= jsonObject.optBoolean("Acces_Serialisation");
+        Serialisation_identifiant= jsonObject.optString("Serialisation_identifiant");
+        Serialisation_mdp= jsonObject.optString("Serialisation_mdp");
+        Serialisation_tan= jsonObject.optString("Serialisation_tan");
+        Serialisation_clientLoginId= jsonObject.optString("Serialisation_clientLoginId");
+        SerialisationTermsEtConditions= jsonObject.optBoolean("SerialisationTermsEtConditions");
     }
 
     public SYS_User_Rules(Cursor cursor){

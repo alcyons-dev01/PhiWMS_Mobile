@@ -16,10 +16,6 @@ import fr.alcyons.phiwms_mobile.ListViewAdapters.Emplacement_RetourPUIAdapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.NotificationAdapter;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by jessica on 15/12/2017.
- */
-
 public class SimpleMultiChoiceModeListener implements AbsListView.MultiChoiceModeListener {
     int count = 0;
     android.view.ActionMode actionMode = null;

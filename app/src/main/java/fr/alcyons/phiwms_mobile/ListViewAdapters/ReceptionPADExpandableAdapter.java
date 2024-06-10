@@ -23,10 +23,6 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ReceptionPAD.DetailReceptionPadActivity;
 
-/**
- * Created by olivier on 12/06/2019.
- */
-
 public class ReceptionPADExpandableAdapter extends BaseExpandableListAdapter {
 
     Map<String, List<ObjetReceptionScannee>> tempObjetParentListItems;

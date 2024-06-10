@@ -21,10 +21,6 @@ import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 20/05/2019.
- */
-
 public class Produit_ReceptionScanneeAdapter extends BaseExpandableListAdapter {
 
     Map<String, List<ObjetReceptionScannee>> tempObjetParentListItems;

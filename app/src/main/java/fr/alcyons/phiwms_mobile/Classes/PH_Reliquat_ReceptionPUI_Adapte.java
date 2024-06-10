@@ -3,11 +3,6 @@ package fr.alcyons.phiwms_mobile.Classes;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-/**
- * Created by jessica on 05/12/2017.
- */
-
 public class PH_Reliquat_ReceptionPUI_Adapte implements Serializable {
 
     private int phReliquatUID;

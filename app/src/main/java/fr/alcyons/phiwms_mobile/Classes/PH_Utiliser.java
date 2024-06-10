@@ -14,10 +14,6 @@ import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBool
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by jessica on 21/06/2018.
- */
-
 public class PH_Utiliser implements Serializable, Comparable {
 
     int _UID;
@@ -41,53 +37,6 @@ public class PH_Utiliser implements Serializable, Comparable {
     int controleQuantite;
     boolean produitSoumisTracabilite;
     private int phiwms_mobileUUID=-1;
-
-    public PH_Utiliser(int _UID, double lat, double lng, int quantiteUtilisee, int zoneUID, int emplacementUID, int depotUID, String photoNom, int photoUID, int produitUID, String utilisationDate, String utilisationHeure, boolean controleEffectue, String lot, String peremptionDate, int controleQuantite, boolean produitSoumisTracabilite){
-        this._UID = _UID;
-        this.lat = lat;
-        this.lng = lng;
-        this.quantiteUtilisee = quantiteUtilisee;
-        this.zoneUID = zoneUID;
-        this.emplacementUID = emplacementUID;
-        this.depotUID = depotUID;
-        this.photoNom = photoNom;
-        this.photoUID = photoUID;
-        this.produitUID = produitUID;
-        this.utilisationDate = utilisationDate;
-        this.utilisationHeure = utilisationHeure;
-        this.controleEffectue = controleEffectue;
-        this.lot = lot;
-        this.peremptionDate = peremptionDate;
-        this.controleQuantite = controleQuantite;
-        this.produitSoumisTracabilite = produitSoumisTracabilite;
-    }
-
-    public PH_Utiliser(JSONObject jsonObject){
-        try{
-            _UID=jsonObject.getInt("_UID");
-            lat=jsonObject.getDouble("lat");
-            lng=jsonObject.getDouble("lng");
-            SYS_USER_ID=jsonObject.getInt("SYS_USER_ID");
-            quantiteUtilisee=jsonObject.getInt("quantiteUtilisee");
-            SYS_DT_MAJ= OutilsGestionClasses.recupererString(jsonObject.getString("SYS_DT_MAJ"));
-            SYS_HEURE_MAJ= OutilsGestionClasses.recupererString(jsonObject.getString("SYS_HEURE_MAJ"));
-            zoneUID=jsonObject.getInt("zoneUID");
-            emplacementUID=jsonObject.getInt("emplacementUID");
-            depotUID=jsonObject.getInt("depotUID");
-            photoNom= OutilsGestionClasses.recupererString(jsonObject.getString("photoNom"));
-            photoUID=jsonObject.getInt("photoUID");
-            produitUID=jsonObject.getInt("produitUID");
-            utilisationDate= OutilsGestionClasses.recupererString(jsonObject.getString("utilisationDate"));
-            utilisationHeure= OutilsGestionClasses.recupererString(jsonObject.getString("utilisationHeure"));
-            controleEffectue= OutilsGestionClasses.recupererBooleen(jsonObject,"controleEffectue");
-            lot= OutilsGestionClasses.recupererString(jsonObject.getString("lot"));
-            peremptionDate= OutilsGestionClasses.recupererString(jsonObject.getString("peremptionDate"));
-            controleQuantite=jsonObject.getInt("controleQuantite");
-            produitSoumisTracabilite= OutilsGestionClasses.recupererBooleen(jsonObject,"produitSoumisTracabilite");
-        }catch(JSONException e){
-            e.printStackTrace();
-        }
-    }
 
     public PH_Utiliser(Cursor cursor){
         _UID=cursor.getInt(PH_UtiliserOpenHelper.Constantes.NUM_COL__UID_PH_UTILISER);
@@ -324,14 +273,7 @@ public class PH_Utiliser implements Serializable, Comparable {
 
     @Override
     public boolean equals(Object obj) {
-        boolean valeurARetourner = false;
-        if (((PH_Utiliser) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
-            valeurARetourner = true;
-        }
 
-        if (!(obj instanceof PH_Utiliser)) {
-            valeurARetourner = false;
-        }
-        return valeurARetourner;
+        return ((PH_Utiliser) obj).getPhiMR4UUID() == this.getPhiMR4UUID();
     }
 }

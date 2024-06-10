@@ -6,10 +6,6 @@ import org.json.JSONObject;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by olivier on 04/06/2019.
- */
-
 public class ObjetPreparationScannee implements Comparable{
     private double Qte;
     private String Lot;
@@ -22,34 +18,6 @@ public class ObjetPreparationScannee implements Comparable{
     private String Serie;
     private int _UID = 0;
     private int phiwms_mobileUUID = -1;
-
-    public ObjetPreparationScannee(JSONObject jsonObject) {
-        try {
-            this._UID = jsonObject.getInt("_UID");
-            this.Produit_Code = jsonObject.getInt("Produit_Code");
-            this.Depot_Reference = OutilsGestionClasses.recupererString(jsonObject.getString("Depot_Reference"));
-            this.Zone = OutilsGestionClasses.recupererString(jsonObject.getString("Zone"));
-            this.Emplacement = OutilsGestionClasses.recupererString(jsonObject.getString("Emplacement"));
-            this.Lot = OutilsGestionClasses.recupererString(jsonObject.getString("Lot"));
-            this.Qte = jsonObject.getDouble("Qte");
-            this.peremptionDate = OutilsGestionClasses.recupererString(jsonObject.getString("peremptionDate"));
-            this.Serie = OutilsGestionClasses.recupererString(jsonObject.getString("Serie"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public ObjetPreparationScannee(double qte, String lot, String peremptionDate, String emplacement, String depot_Reference, String zone, int produit_Code, int qtePrep, String numSerie) {
-        this.Qte = qte;
-        this.Lot = lot;
-        this.peremptionDate = peremptionDate;
-        this.Emplacement = emplacement;
-        this.Depot_Reference = depot_Reference;
-        this.Zone = zone;
-        this.Produit_Code = produit_Code;
-        this.Qte_Preparer = qtePrep;
-        this.Serie = numSerie;
-    }
 
     public int getPhiMR4UUID() {
         return phiwms_mobileUUID;

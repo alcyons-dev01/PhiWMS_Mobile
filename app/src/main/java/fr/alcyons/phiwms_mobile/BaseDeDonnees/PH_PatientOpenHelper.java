@@ -7,11 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 import fr.alcyons.phiwms_mobile.Classes.PH_Patient;
-
-/**
- * Created by jessica on 02/10/2017.
- */
-
 public class PH_PatientOpenHelper extends DBOpenHelper {
 
     public PH_PatientOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -25,9 +20,9 @@ public class PH_PatientOpenHelper extends DBOpenHelper {
     public static long insererPH_PatientEnBDD(SQLiteDatabase db, PH_Patient objet) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(Constantes.CLE_COL__PATIENTUID_PH_PATIENT, objet.get_patientUID());
-        contentValues.put(Constantes.CLE_COL_CIVILITE_PH_PATIENT, objet.getCivilité());
+        contentValues.put(Constantes.CLE_COL_CIVILITE_PH_PATIENT, objet.getCivilite());
         contentValues.put(Constantes.CLE_COL_NOM_NAISSANCE_PH_PATIENT, objet.getNom_naissance());
-        contentValues.put(Constantes.CLE_COL_PRENOM_PH_PATIENT, objet.getPrénom());
+        contentValues.put(Constantes.CLE_COL_PRENOM_PH_PATIENT, objet.getPrenom());
         contentValues.put(Constantes.CLE_COL_ADRESSE1_PH_PATIENT, objet.getAdresse1());
         contentValues.put(Constantes.CLE_COL_ADRESSE2_PH_PATIENT, objet.getAdresse2());
         contentValues.put(Constantes.CLE_COL_CP_PH_PATIENT, objet.getCP());
@@ -59,7 +54,7 @@ public class PH_PatientOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_RESSOURCE_CP_PH_PATIENT, objet.getRessource_CP());
         contentValues.put(Constantes.CLE_COL_RESSOURCE_VILLE_PH_PATIENT, objet.getRessource_Ville());
         contentValues.put(Constantes.CLE_COL_PERSONNE_RESSOURCE_PH_PATIENT, objet.getPersonne_Ressource());
-        contentValues.put(Constantes.CLE_COL_RESSOURCE_TEL_PH_PATIENT, objet.getRessource_Tél());
+        contentValues.put(Constantes.CLE_COL_RESSOURCE_TEL_PH_PATIENT, objet.getRessource_Tel());
         contentValues.put(Constantes.CLE_COL_RESSOURCE_FAX_PH_PATIENT, objet.getRessource_Fax());
         contentValues.put(Constantes.CLE_COL_CENTRE_HOSPITALIER_PH_PATIENT, objet.getCentre_Hospitalier());
         contentValues.put(Constantes.CLE_COL_PRATICIEN_PH_PATIENT, objet.getPraticien());
@@ -71,7 +66,7 @@ public class PH_PatientOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_INF_CP_PH_PATIENT, objet.getInf_CP());
         contentValues.put(Constantes.CLE_COL_INF_VILLE_PH_PATIENT, objet.getInf_Ville());
         contentValues.put(Constantes.CLE_COL_INF_FAX_PH_PATIENT, objet.getInf_Fax());
-        contentValues.put(Constantes.CLE_COL_INF_TEL_PH_PATIENT, objet.getInf_Tél());
+        contentValues.put(Constantes.CLE_COL_INF_TEL_PH_PATIENT, objet.getInf_Tel());
         contentValues.put(Constantes.CLE_COL_INF_EMAIL_PH_PATIENT, objet.getInf_Email());
         contentValues.put(Constantes.CLE_COL_DATE_ENTREE_PH_PATIENT, objet.getDate_entree());
         contentValues.put(Constantes.CLE_COL_DATE_DEBUT_TRAITEMENT_PH_PATIENT, objet.getDate_Debut_Traitement());

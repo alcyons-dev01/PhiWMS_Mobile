@@ -2,16 +2,12 @@ package fr.alcyons.phiwms_mobile.Classes;
 
 import java.io.Serializable;
 
-/**
- * Created by jessica on 03/10/2017.
- */
-
 public class Demande_PUI implements Serializable {
 
-    private String catégorie;
-    private String désignation;
-    private String référence;
-    private String unité;
+    private String categorie;
+    private String designation;
+    private String reference;
+    private String unite;
     private double stock_pui;
     private double stock_destinataire;
     private int a_preparer;
@@ -23,10 +19,10 @@ public class Demande_PUI implements Serializable {
     //Dotation Service
     public Demande_PUI(Dotation dotation, Detail_Dot detail_dot, Produit produit, double stock_pui, double stock_destinataire) {
         this.code_produit = detail_dot.getCode_produit();
-        this.catégorie = detail_dot.getCategorie();
-        this.désignation = detail_dot.getDesignation();
-        this.référence = produit.getRef_fourni();
-        this.unité = produit.getUnite();
+        this.categorie = detail_dot.getCategorie();
+        this.designation = detail_dot.getDesignation();
+        this.reference = produit.getRef_fourni();
+        this.unite = produit.getUnite();
         this.stock_pui = stock_pui;
         this.stock_destinataire = stock_destinataire;
         this.conditionnement = (int) produit.getCond_distrib();
@@ -53,10 +49,10 @@ public class Demande_PUI implements Serializable {
     // Demande Particulière
     public Demande_PUI(Produit produit, double stock_pui, double stock_destinataire) {
         this.code_produit = produit.getID_produit();
-        this.catégorie = produit.getCategorie();
-        this.désignation = produit.getDesignation_interne();
-        this.référence = produit.getRef_fourni();
-        this.unité = produit.getUnite();
+        this.categorie = produit.getCategorie();
+        this.designation = produit.getDesignation_interne();
+        this.reference = produit.getRef_fourni();
+        this.unite = produit.getUnite();
         this.stock_pui = stock_pui;
         this.stock_destinataire = stock_destinataire;
         this.conditionnement = (int) produit.getCond_distrib();
@@ -65,13 +61,13 @@ public class Demande_PUI implements Serializable {
         this.a_preparer = (int) produit.getCond_distrib();
     }
 
-    //Réassort de service
+    //Reassort de service
     public Demande_PUI(PH_Reassort_Ligne ph_reassort_ligne, Produit produit, double stock_pui, double stock_destinataire) {
         this.code_produit = ph_reassort_ligne.getProduit_ID();
-        this.catégorie = ph_reassort_ligne.getCategorie();
-        this.désignation = produit.getDesignation_interne();
-        this.référence = produit.getRef_fourni();
-        this.unité = produit.getUnite();
+        this.categorie = ph_reassort_ligne.getCategorie();
+        this.designation = produit.getDesignation_interne();
+        this.reference = produit.getRef_fourni();
+        this.unite = produit.getUnite();
         this.stock_pui = stock_pui;
         this.stock_destinataire = stock_destinataire;
         this.conditionnement = (int) produit.getCond_distrib();
@@ -91,22 +87,22 @@ public class Demande_PUI implements Serializable {
 
     }
 
-    public double Conditionnement_Calcul(Integer qté, Integer conditionnement) {
+    public double Conditionnement_Calcul(Integer qte, Integer conditionnement) {
         double qte_conditionnee = 0;
 
         switch (conditionnement) {
             case 0:
-                qte_conditionnee = qté;
+                qte_conditionnee = qte;
                 break;
             case 1:
-                qte_conditionnee = qté;
+                qte_conditionnee = qte;
                 break;
             default:
-                Integer reste = mod(qté, conditionnement);
+                Integer reste = mod(qte, conditionnement);
                 if (reste == 0) {
-                    qte_conditionnee = qté;
+                    qte_conditionnee = qte;
                 } else {
-                    double nb_conditionnement = Math.ceil(qté / conditionnement);
+                    double nb_conditionnement = Math.ceil(qte / conditionnement);
                     qte_conditionnee = (nb_conditionnement + 1) * conditionnement;
                 }
                 break;
@@ -138,36 +134,36 @@ public class Demande_PUI implements Serializable {
         this.code_produit = code_produit;
     }
 
-    public String getCatégorie() {
-        return catégorie;
+    public String getCategorie() {
+        return categorie;
     }
 
-    public void setCatégorie(String catégorie) {
-        this.catégorie = catégorie;
+    public void setCategorie(String categorie) {
+        this.categorie = categorie;
     }
 
-    public String getDésignation() {
-        return désignation;
+    public String getDesignation() {
+        return designation;
     }
 
-    public void setDésignation(String désignation) {
-        this.désignation = désignation;
+    public void setDesignation(String designation) {
+        this.designation = designation;
     }
 
-    public String getRéférence() {
-        return référence;
+    public String getReference() {
+        return reference;
     }
 
-    public void setRéférence(String référence) {
-        this.référence = référence;
+    public void setReference(String reference) {
+        this.reference = reference;
     }
 
-    public String getUnité() {
-        return unité;
+    public String getUnite() {
+        return unite;
     }
 
-    public void setUnité(String unité) {
-        this.unité = unité;
+    public void setUnite(String unite) {
+        this.unite = unite;
     }
 
     public double getStock_pui() {

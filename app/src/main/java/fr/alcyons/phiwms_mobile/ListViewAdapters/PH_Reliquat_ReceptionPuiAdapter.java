@@ -20,10 +20,6 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_ReceptionPUI_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 28/11/2017.
- */
-
 public class PH_Reliquat_ReceptionPuiAdapter extends ArrayAdapter {
 
     public List<PH_Reliquat_ReceptionPUI_Adapte> phReliquatReceptionPUIAdapteList;

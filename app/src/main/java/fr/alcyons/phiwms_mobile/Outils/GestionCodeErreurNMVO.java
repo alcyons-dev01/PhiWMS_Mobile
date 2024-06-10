@@ -1,9 +1,5 @@
 package fr.alcyons.phiwms_mobile.Outils;
 
-/**
- * Created by olivier on 26/02/2019.
- */
-
 public class GestionCodeErreurNMVO {
 
     public static String getMessage(String code) {

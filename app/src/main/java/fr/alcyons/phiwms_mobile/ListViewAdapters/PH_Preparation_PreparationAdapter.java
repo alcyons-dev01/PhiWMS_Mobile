@@ -27,10 +27,6 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 27/09/2017.
- */
-
 public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements Filterable {
 
     public List<PH_Preparation> phPreparationPreparation;

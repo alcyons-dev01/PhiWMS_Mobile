@@ -64,6 +64,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.FrequencesOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.NotificationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReassortOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_RetourMotifOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
@@ -78,6 +79,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ServiceOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.UtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.CGU.CguActivity;
+import fr.alcyons.phiwms_mobile.Classes.PH_Reassort;
 import fr.alcyons.phiwms_mobile.Classes.SYS_User_Rules;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
@@ -111,7 +113,7 @@ import me.leolin.shortcutbadger.ShortcutBadger;
 
 
 public class AuthentificationActivity extends MainActivity {
-    public static int nbTableAInserer = 8;
+    public static int nbTableAInserer = 9;
     public static int nbTableinserees = 0;
     public boolean pretAPasserActiviteSuivante = false;
     // base de donnée
@@ -396,7 +398,7 @@ public class AuthentificationActivity extends MainActivity {
     @Override
     public void onResume() {
         super.onResume();
-        nbTableAInserer = 8;
+        nbTableAInserer = 9;
         nbTableinserees = 0;
         activerAuthentificationForte = ParametreUtilisateurOpenHelper.getAuthentificationForte(db);
         connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(db);
@@ -789,6 +791,7 @@ public class AuthentificationActivity extends MainActivity {
         ProduitOpenHelper.insererBDDLocaleProduits(AuthentificationActivity.this, db, token, utilisateurConnecte, statutConnexion);
         PH_RetourMotifOpenHelper.insererBDDLocalePH_RetourMotif(AuthentificationActivity.this, db, token, utilisateurConnecte, statutConnexion);
         DotationOpenHelper.insererBDDLocaleDotation(AuthentificationActivity.this, db, token, utilisateurConnecte, statutConnexion);
+        PH_ReassortOpenHelper.insererBDDLocaleReassort(AuthentificationActivity.this, db, token, utilisateurConnecte);
         ActionUtilisateurOpenHelper.insererBDDLocaleActionUtilisatuer(AuthentificationActivity.this, db, token, utilisateurConnecte, statutConnexion);
     }
 
@@ -864,7 +867,8 @@ public class AuthentificationActivity extends MainActivity {
         textViewList.add(Dotation);
         TextView Action = layout.findViewById(R.id.Action);
         textViewList.add(Action);
-
+        TextView Reassort = layout.findViewById(R.id.Reassort);
+        textViewList.add(Reassort);
 
         zoneok = layout.findViewById(R.id.barDeProgression);
         zoneok.setOnTouchListener((v, event) -> true);
@@ -885,9 +889,10 @@ public class AuthentificationActivity extends MainActivity {
         imageViewList.add(checkMotif);
         ImageView checkDotation = layout.findViewById(R.id.checkDotation);
         imageViewList.add(checkDotation);
-
         ImageView checkAction = layout.findViewById(R.id.checkAction);
         imageViewList.add(checkAction);
+        ImageView checkReassort = layout.findViewById(R.id.checkReassort);
+        imageViewList.add(checkReassort);
 
         gestionExpandable = layout.findViewById(R.id.gestionExpandable);
 

@@ -14,10 +14,6 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.PleinVideContexte;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
-/**
- * Created by jessica on 07/06/2018.
- */
-
 public class KeyboardActivity extends ServiceActivity {
 
     List<String> detailDotPleinVide_AdressageList;

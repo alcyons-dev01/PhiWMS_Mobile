@@ -17,10 +17,6 @@ import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_ReceptionPUI_Adapte;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 07/12/2017.
- */
-
 public class ZonetEtEmplacementExpandableAdapter extends BaseExpandableListAdapter {
 
     Map<Depot_Zone, List<PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement>> ParentListItemsTemp;

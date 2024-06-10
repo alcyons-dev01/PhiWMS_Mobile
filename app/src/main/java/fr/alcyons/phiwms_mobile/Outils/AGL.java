@@ -3,10 +3,6 @@ package fr.alcyons.phiwms_mobile.Outils;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Created by olivier on 26/02/2019.
- */
-
 public class AGL {
 
     public static String AGL_AAMMJJ(Date date) {

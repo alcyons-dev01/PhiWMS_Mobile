@@ -35,18 +35,14 @@ public class Notification implements Serializable, Comparable {
     }
 
     public Notification(JSONObject notificationJson) {
-        try {
-            this.id = notificationJson.getInt("id");
-            this.titre = OutilsGestionClasses.recupererString(notificationJson.getString("titre"));
-            this.body = OutilsGestionClasses.recupererString(notificationJson.getString("body"));
-            this.color = OutilsGestionClasses.recupererString(notificationJson.getString("color"));
-            this.tag = OutilsGestionClasses.recupererString(notificationJson.getString("tag"));
-            this.aEteGeree = OutilsGestionClasses.recupererBooleen(notificationJson, "aEteGeree");
-            this.date = notificationJson.getString("date");
-            this.channel = notificationJson.getString("channel");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this.id = notificationJson.optInt("id");
+        this.titre = notificationJson.optString("titre");
+        this.body = notificationJson.optString("body");
+        this.color = notificationJson.optString("color");
+        this.tag = notificationJson.optString("tag");
+        this.aEteGeree = notificationJson.optBoolean("aEteGeree", false);
+        this.date = notificationJson.optString("date");
+        this.channel = notificationJson.optString("channel");
     }
 
 

@@ -75,9 +75,6 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotos;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
-/**
- * Created by olivier on 18/04/2024.
- */
 public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static final String[] PERMISSIONS_STORAGE = {

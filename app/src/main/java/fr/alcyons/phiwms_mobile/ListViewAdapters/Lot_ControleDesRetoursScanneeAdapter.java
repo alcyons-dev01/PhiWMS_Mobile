@@ -25,10 +25,6 @@ import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeLotsControleDesRetoursActivity;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 14/06/2019.
- */
-
 public class Lot_ControleDesRetoursScanneeAdapter extends ArrayAdapter {
 
     public List<Retour_Ligne_ControleRetour_Adapte.LotAdapte> lotAdaptes;

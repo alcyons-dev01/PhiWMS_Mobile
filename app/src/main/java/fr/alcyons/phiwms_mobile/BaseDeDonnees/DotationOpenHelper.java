@@ -33,10 +33,6 @@ import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by jessica on 02/10/2017.
- */
-
 public class DotationOpenHelper extends DBOpenHelper {
     public DotationOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -46,12 +42,28 @@ public class DotationOpenHelper extends DBOpenHelper {
         db.delete(Constantes.TABLE_DOTATION, null, null);
     }
 
+    public static ArrayList<Dotation> getDotationGlobale(SQLiteDatabase db) {
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_DOTATION + " WHERE " + Constantes.CLE_COL_PLEINVIDE_DOTATION + " = 0 AND "+Constantes.CLE_COL_URGENCE_DOTATION+" = 0 AND "+Constantes.CLE_COL_INSTALLATION_DOTATION +" = 0", new String[]{});
+
+        ArrayList<Dotation> dotationList = new ArrayList<>();
+
+        while (cursor.moveToNext()) {
+            Dotation dotation = new Dotation(cursor);
+            dotationList.add(dotation);
+        }
+        cursor.close();
+        cursor = null;
+        return dotationList;
+    }
+
+
     public static long insererDotationEnBDD(SQLiteDatabase db, Dotation objet) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(Constantes.CLE_COL__UID_DOTATION, objet.get_UID());
         contentValues.put(Constantes.CLE_COL_INTITULE_DOTATION, objet.getIntitule());
         contentValues.put(Constantes.CLE_COL_REF_DEPOT_DOTATION, objet.getRef_Depot());
-        contentValues.put(Constantes.CLE_COL_DEBUT_DOTATION, objet.getDébut());
+        contentValues.put(Constantes.CLE_COL_DEBUT_DOTATION, objet.getDebut());
         contentValues.put(Constantes.CLE_COL_FIN_DOTATION, objet.getFin());
         contentValues.put(Constantes.CLE_COL_INTERROMPU_DOTATION, objet.isInterrompu());
         contentValues.put(Constantes.CLE_COL_NB_SEMAINE_DOTATION, objet.getNB_Semaine());
@@ -76,6 +88,25 @@ public class DotationOpenHelper extends DBOpenHelper {
         return rowID;
     }
 
+    public static Dotation getDotationByNomAndDepot(SQLiteDatabase db, String nom, String depotid) {
+        Dotation dotationCorrespondant = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_DOTATION + " WHERE " + Constantes.CLE_COL_DEPOT_UID_DOTATION + "= ? AND "+Constantes.CLE_COL_INTITULE_DOTATION+"= ?", new String[]{depotid, nom});
+
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+            Dotation dotation = new Dotation(cursor);
+            if (dotation.isPLEINVIDE()) {
+                dotationCorrespondant = dotation;
+            }
+
+        }
+        cursor.close();
+        cursor = null;
+        return dotationCorrespondant;
+    }
+
+
     public static Dotation getDotationByphiwms_mobileUUID(SQLiteDatabase db, int id) {
         Dotation dotation = null;
         Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_DOTATION + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " =? ", new String[]{String.valueOf(id)});
@@ -88,7 +119,7 @@ public class DotationOpenHelper extends DBOpenHelper {
         return dotation;
     }
 
-    public List<Dotation> getDotationByDepot(SQLiteDatabase db, Integer depotUID) {
+    public static List<Dotation> getDotationByDepot(SQLiteDatabase db, Integer depotUID) {
         String critereRecherche = String.valueOf(depotUID);
         Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_DOTATION + " WHERE " + Constantes.CLE_COL_DEPOT_UID_DOTATION + " LIKE ?", new String[]{critereRecherche});
 

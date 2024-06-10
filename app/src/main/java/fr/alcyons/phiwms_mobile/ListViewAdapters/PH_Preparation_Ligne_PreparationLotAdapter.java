@@ -25,10 +25,6 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by jessica on 27/09/2017.
- */
-
 public class PH_Preparation_Ligne_PreparationLotAdapter extends ArrayAdapter {
 
     public List<PH_Preparation_Ligne_Preparation_Adapte> ph_preparation_lignes_Adaptes;

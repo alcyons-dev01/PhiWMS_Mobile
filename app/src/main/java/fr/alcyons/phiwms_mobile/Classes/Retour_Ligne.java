@@ -167,103 +167,24 @@ public class Retour_Ligne implements Serializable, Comparable {
         this.patientID = 0;
     }
 
-/*    public Retour_Ligne(JSONObject jsonObject) {
-        try {
-            this.retour_UID = jsonObject.getInt("retour_UID");
-            this.Code_produit = jsonObject.getInt("Code_produit");
-            this.produit_Reference = recupererString(jsonObject.getString("produit_Reference"));
-            this.Qte_Retourner = jsonObject.getDouble("Qte_Retourner");
-            this.produit_Fournisseur = recupererString(jsonObject.getString("produit_Fournisseur"));
-            this.produit_PUHT = jsonObject.getDouble("produit_PUHT");
-            this.produit_TVA = jsonObject.getDouble("produit_TVA");
-            this.produit_Designation = recupererString(jsonObject.getString("produit_Designation"));
-            this.Montant_TTC = jsonObject.getDouble("Montant_TTC");
-            this.piece_Code = jsonObject.getInt("piece_Code");
-            this.Date_validation = recupererString(jsonObject.getString("Date_validation"));
-            this.Destination = recupererString(jsonObject.getString("Destination"));
-            this.Devise = recupererString(jsonObject.getString("Devise"));
-            this.Qte_avant_retour = jsonObject.getDouble("Qte_avant_retour");
-            this.SYS_DT_MAJ = recupererString(jsonObject.getString("SYS_DT_MAJ"));
-            this.SYS_HEURE_MAJ = recupererString(jsonObject.getString("SYS_HEURE_MAJ"));
-            this.SYS_USER_MAJ = recupererString(jsonObject.getString("SYS_USER_MAJ"));
-            this.Lot = recupererString(jsonObject.getString("Lot"));
-            this.patientIdentite = recupererString(jsonObject.getString("patientIdentite"));
-            this._UID = jsonObject.getInt("_UID");
-            this.Qte_Demander = jsonObject.getDouble("Qte_Demander");
-            this.Lot_Retourner = recupererString(jsonObject.getString("Lot_Retourner"));
-            this.peremptionDate = recupererString(jsonObject.getString("peremptionDate"));
-            this.Destruction_Qte = jsonObject.getInt("Destruction_Qte");
-            this.RetourPui_Qte = jsonObject.getInt("RetourPui_Qte");
-            this.RetourFrs_Qte = jsonObject.getInt("RetourFrs_Qte");
-            this.Quarantaine_Qte_Demander = jsonObject.getInt("Quarantaine_Qte_Demander");
-            this.RetourPUI_Emplacement = recupererString(jsonObject.getString("RetourPUI_Emplacement"));
-            this.RetourPUI_Zone = recupererString(jsonObject.getString("RetourPUI_Zone"));
-            this.emplacementOrigine = recupererString(jsonObject.getString("emplacementOrigine"));
-            this.patientID = jsonObject.getInt("patientID");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }*/
-
     public Retour_Ligne(JSONObject jsonObject) {
-        try {
-            this.retour_UID = jsonObject.getInt("retour_UID");
-            this.produit_Reference = OutilsGestionClasses.recupererString(jsonObject.getString("produit_Reference"));
-            this.Code_produit = jsonObject.getInt("Code_produit");
-            this.Qte_Retourner = jsonObject.getDouble("Qte_Retourner");
-            this.produit_Fournisseur = OutilsGestionClasses.recupererString(jsonObject.getString("produit_Fournisseur"));
-            this.produit_Designation = OutilsGestionClasses.recupererString(jsonObject.getString("produit_Designation"));
-            this.Destination = OutilsGestionClasses.recupererString(jsonObject.getString("Destination"));
-            this.Qte_avant_retour = jsonObject.getDouble("Qte_avant_retour");
-            this._UID = jsonObject.getInt("_UID");
-            this.Qte_Demander = jsonObject.getDouble("Qte_Demander");
-            this.Lot_Retourner = OutilsGestionClasses.recupererString(jsonObject.getString("Lot_Retourner"));
-            this.peremptionDate = OutilsGestionClasses.recupererString(jsonObject.getString("peremptionDate"));
-            this.Destruction_Qte = jsonObject.getInt("Destruction_Qte");
-            this.RetourPui_Qte = jsonObject.getInt("RetourPui_Qte");
-            this.RetourFrs_Qte = jsonObject.getInt("RetourFrs_Qte");
-            this.Serie_Retourner = jsonObject.getString("Serie_Retourner");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this.retour_UID = jsonObject.optInt("retour_UID");
+        this.produit_Reference = jsonObject.optString("produit_Reference");
+        this.Code_produit = jsonObject.optInt("Code_produit");
+        this.Qte_Retourner = jsonObject.optDouble("Qte_Retourner");
+        this.produit_Fournisseur = jsonObject.optString("produit_Fournisseur");
+        this.produit_Designation = jsonObject.optString("produit_Designation");
+        this.Destination = jsonObject.optString("Destination");
+        this.Qte_avant_retour = jsonObject.optDouble("Qte_avant_retour");
+        this._UID = jsonObject.optInt("_UID");
+        this.Qte_Demander = jsonObject.optDouble("Qte_Demander");
+        this.Lot_Retourner = jsonObject.optString("Lot_Retourner");
+        this.peremptionDate = jsonObject.optString("peremptionDate");
+        this.Destruction_Qte = jsonObject.optInt("Destruction_Qte");
+        this.RetourPui_Qte = jsonObject.optInt("RetourPui_Qte");
+        this.RetourFrs_Qte = jsonObject.optInt("RetourFrs_Qte");
+        this.Serie_Retourner = jsonObject.optString("Serie_Retourner");
     }
-
-/*    public Retour_Ligne(Cursor cursor) {
-        this.retour_UID = cursor.getInt(Retour_LigneOpenHelper.Constantes.NUM_COL_RETOUR_UID_RETOUR_LIGNE);
-        this.Code_produit = cursor.getInt(Retour_LigneOpenHelper.Constantes.NUM_COL_CODE_PRODUIT_RETOUR_LIGNE);
-        this.produit_Reference = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_PRODUIT_REFERENCE_RETOUR_LIGNE);
-        this.Qte_Retourner = cursor.getDouble(Retour_LigneOpenHelper.Constantes.NUM_COL_QTE_RETOURNER_RETOUR_LIGNE);
-        this.produit_Fournisseur = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_PRODUIT_FOURNISSEUR_RETOUR_LIGNE);
-        this.produit_PUHT = cursor.getDouble(Retour_LigneOpenHelper.Constantes.NUM_COL_PRODUIT_PUHT_RETOUR_LIGNE);
-        this.produit_TVA = cursor.getDouble(Retour_LigneOpenHelper.Constantes.NUM_COL_PRODUIT_TVA_RETOUR_LIGNE);
-        this.produit_Designation = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_PRODUIT_DESIGNATION_RETOUR_LIGNE);
-        this.Montant_TTC = cursor.getDouble(Retour_LigneOpenHelper.Constantes.NUM_COL_MONTANT_TTC_RETOUR_LIGNE);
-        this.piece_Code = cursor.getInt(Retour_LigneOpenHelper.Constantes.NUM_COL_PIECE_CODE_RETOUR_LIGNE);
-        this.Date_validation = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_DATE_VALIDATION_RETOUR_LIGNE);
-        this.Destination = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_DESTINATION_RETOUR_LIGNE);
-        this.Devise = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_DEVISE_RETOUR_LIGNE);
-        this.Qte_avant_retour = cursor.getDouble(Retour_LigneOpenHelper.Constantes.NUM_COL_QTE_AVANT_RETOUR_RETOUR_LIGNE);
-        this.SYS_DT_MAJ = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_SYS_DT_MAJ_RETOUR_LIGNE);
-        this.SYS_HEURE_MAJ = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_SYS_HEURE_MAJ_RETOUR_LIGNE);
-        this.SYS_USER_MAJ = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_SYS_USER_MAJ_RETOUR_LIGNE);
-        this.Lot = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_LOT_RETOUR_LIGNE);
-        this.patientIdentite = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_PATIENTIDENTITE_RETOUR_LIGNE);
-        this._UID = cursor.getInt(Retour_LigneOpenHelper.Constantes.NUM_COL__UID_RETOUR_LIGNE);
-        this.Qte_Demander = cursor.getDouble(Retour_LigneOpenHelper.Constantes.NUM_COL_QTE_DEMANDER_RETOUR_LIGNE);
-        this.Lot_Retourner = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_LOT_RETOURNER_RETOUR_LIGNE);
-        this.peremptionDate = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_PEREMPTIONDATE_RETOUR_LIGNE);
-        this.Destruction_Qte = cursor.getInt(Retour_LigneOpenHelper.Constantes.NUM_COL_DESTRUCTION_QTE_RETOUR_LIGNE);
-        this.RetourPui_Qte = cursor.getInt(Retour_LigneOpenHelper.Constantes.NUM_COL_RETOURPUI_QTE_RETOUR_LIGNE);
-        this.RetourFrs_Qte = cursor.getInt(Retour_LigneOpenHelper.Constantes.NUM_COL_RETOURFRS_QTE_RETOUR_LIGNE);
-        this.Quarantaine_Qte_Demander = cursor.getInt(Retour_LigneOpenHelper.Constantes.NUM_COL_QUARANTAINE_QTE_DEMANDER_RETOUR_LIGNE);
-        this.RetourPUI_Emplacement = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_RETOURPUI_EMPLACEMENT_RETOUR_LIGNE);
-        this.RetourPUI_Zone = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_RETOURPUI_ZONE_RETOUR_LIGNE);
-        this.emplacementOrigine = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_EMPLACEMENTORIGINE_RETOUR_LIGNE);
-        this.patientID = cursor.getInt(Retour_LigneOpenHelper.Constantes.NUM_COL_PATIENTID_RETOUR_LIGNE);
-        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
-    }*/
 
     public Retour_Ligne(Cursor cursor) {
         this.retour_UID = cursor.getInt(Retour_LigneOpenHelper.Constantes.NUM_COL_RETOUR_UID_RETOUR_LIGNE);
@@ -597,15 +518,8 @@ public class Retour_Ligne implements Serializable, Comparable {
 
     @Override
     public boolean equals(Object obj) {
-        boolean valeurARetourner = false;
-        if (obj == this) {
-            valeurARetourner = true;
-        }
 
-        if (!(obj instanceof Retour_Ligne)) {
-            valeurARetourner = false;
-        }
-        return valeurARetourner;
+        return obj == this;
     }
 
     @Override

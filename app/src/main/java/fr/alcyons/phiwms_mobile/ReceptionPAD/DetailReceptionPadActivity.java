@@ -79,10 +79,6 @@ import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotos.verifyStoragePermissions;
 
-/**
- * Created by olivier on 11/06/2019.
- */
-
 public class DetailReceptionPadActivity extends ServiceActivity {
 
     Bitmap bonLivraisonBitmap;

@@ -161,11 +161,11 @@ public class DepotOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_PAD_VACANCES_CP_DEPOT, depot.getPAD_Vacances_CP());
         contentValues.put(Constantes.CLE_COL_PAD_VACANCES_VILLE_DEPOT, depot.getPAD_Vacances_Ville());
         contentValues.put(Constantes.CLE_COL_PAD_VACANCES_PAYS_DEPOT, depot.getPAD_Vacances_Pays());
-        contentValues.put(Constantes.CLE_COL_PAD_VACANCES_TEL_DEPOT, depot.getPAD_Vacances_Tél());
+        contentValues.put(Constantes.CLE_COL_PAD_VACANCES_TEL_DEPOT, depot.getPAD_Vacances_Tel());
         contentValues.put(Constantes.CLE_COL_PAD_VACANCES_COMMENTAIRES_DEPOT, depot.getPAD_Vacances_Commentaires());
         contentValues.put(Constantes.CLE_COL_PAD_LOCALISATION_POCHES_DEPOT, depot.getPAD_Localisation_Poches());
-        contentValues.put(Constantes.CLE_COL_PAD_PRECISION_LOCALISATION_DEPOT, depot.getPAD_Précision_Localisation());
-        contentValues.put(Constantes.CLE_COL_PAD_COORDONNEES_GPS_DEPOT, depot.getPAD_Coordonnées_GPS());
+        contentValues.put(Constantes.CLE_COL_PAD_PRECISION_LOCALISATION_DEPOT, depot.getPAD_Precision_Localisation());
+        contentValues.put(Constantes.CLE_COL_PAD_COORDONNEES_GPS_DEPOT, depot.getPAD_Coordonnees_GPS());
         contentValues.put(Constantes.CLE_COL_PAD_VEHICULE_LIVRAISON_DEPOT, depot.getPAD_Vehicule_Livraison());
         contentValues.put(Constantes.CLE_COL_LIVRAISON_SEMAINE_1_DEPOT, depot.getLivraison_Semaine_1());
         contentValues.put(Constantes.CLE_COL_PAD_EMAIL_DEPOT, depot.getPAD_Email());
@@ -204,7 +204,7 @@ public class DepotOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_ACCUSE_RECEPTION_DEPOT, depot.isAccuse_Reception());
         contentValues.put(Constantes.CLE_COL_INVENTAIRE_FIN_DE_MOIS_DEPOT, depot.isInventaire_fin_de_Mois());
         contentValues.put(Constantes.CLE_COL_RAZ_STOCK_INVENTAIRE_DEPOT, depot.isRAZ_Stock_Inventaire());
-        contentValues.put(Constantes.CLE_COL_JOURS_DE_RESERVE_PAR_LIVRAISON_DEPOT, depot.getJours_de_réserve_par_livraison());
+        contentValues.put(Constantes.CLE_COL_JOURS_DE_RESERVE_PAR_LIVRAISON_DEPOT, depot.getJours_de_reserve_par_livraison());
         contentValues.put(Constantes.CLE_COL_ID_UF_RATTACHEMENT_DEPOT, depot.getID_UF_Rattachement());
         contentValues.put(Constantes.CLE_COL_LIVRAISON_PERIODE_DEPOT, depot.getLivraison_Periode());
         contentValues.put(Constantes.CLE_COL_PAD_COMMENTAIRE_LIVRAISON_DEPOT, depot.getPAD_Commentaire_Livraison());
@@ -219,7 +219,7 @@ public class DepotOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_LATITUDE_DEPOT, depot.getLatitude());
         contentValues.put(Constantes.CLE_COL_LONGITUDE_DEPOT, depot.getLongitude());
         contentValues.put(Constantes.CLE_COL_ORDRE_DEPOT, depot.getOrdre());
-        contentValues.put(Constantes.CLE_COL_JOURS_DE_RESERVE_PAR_DEFAUT_DEPOT, depot.getJours_de_réserve_par_defaut());
+        contentValues.put(Constantes.CLE_COL_JOURS_DE_RESERVE_PAR_DEFAUT_DEPOT, depot.getJours_de_reserve_par_defaut());
 
         // Insertion du dépot en BDD
         long rowId = db.insert(Constantes.TABLE_DEPOT, null, contentValues);
@@ -266,33 +266,36 @@ public class DepotOpenHelper extends DBOpenHelper {
                                     }
                                 } else {
                                     viderTableDepot(db);
-
-                                    JSONArray depotJSONArray = response.getJSONArray("PH_Depots");
+                                    JSONArray depotJSONArrayAll = response.getJSONArray("PH_Depots");
                                     int compteurReussite = 0;
 
-                                    for (int i = 0; i < depotJSONArray.length(); i++) {
-                                        // Récupération du service courant
-                                        JSONObject depotJSONObject = depotJSONArray.getJSONObject(i);
+                                    for(int j = 0; j < depotJSONArrayAll.length(); j++)
+                                    {
+                                        JSONArray depotJSONArray = depotJSONArrayAll.getJSONArray(j);
+                                        for (int i = 0; i < depotJSONArray.length(); i++) {
+                                            // Récupération du service courant
+                                            JSONObject depotJSONObject = depotJSONArray.getJSONObject(i);
 
-                                        Depot depot = new Depot(depotJSONObject);
+                                            Depot depot = new Depot(depotJSONObject);
 
-                                        //gestion depot alcyons
-                                        if(utilisateur.getIdentifiant().toLowerCase().contentEquals("alcyons") && depot.getStructure().contentEquals("PAD"))
-                                        {
-                                            depot.setNom("XXX PAD");
-                                            String[] tab_reference = depot.getDepot_Reference().split("-");
-                                            String new_ref = tab_reference[tab_reference.length-1];
-                                            //depot.setDepot_Reference("XXXX - PAD - "+new_ref);
-                                            depot.setAdresse1("50 avenue du lac marion");
-                                            depot.setCP("64200");
-                                            depot.setVille("Biarritz");
-                                            depot.setTel("0559225008");
-                                        }
+                                            //gestion depot alcyons
+                                            if(utilisateur.getIdentifiant().toLowerCase().contentEquals("alcyons") && depot.getStructure().contentEquals("PAD"))
+                                            {
+                                                depot.setNom("XXX PAD");
+                                                String[] tab_reference = depot.getDepot_Reference().split("-");
+                                                String new_ref = tab_reference[tab_reference.length-1];
+                                                //depot.setDepot_Reference("XXXX - PAD - "+new_ref);
+                                                depot.setAdresse1("50 avenue du lac marion");
+                                                depot.setCP("64200");
+                                                depot.setVille("Biarritz");
+                                                depot.setTel("0559225008");
+                                            }
 
-                                        // insertion du service en bdd
-                                        long rowID = insererUnDepotEnBDD(db, depot);
-                                        if (rowID != -1) {
-                                            compteurReussite++;
+                                            // insertion du service en bdd
+                                            long rowID = insererUnDepotEnBDD(db, depot);
+                                            if (rowID != -1) {
+                                                compteurReussite++;
+                                            }
                                         }
                                     }
                                     if (resultCount != compteurReussite) {

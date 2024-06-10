@@ -20,13 +20,13 @@ public class Commande_LigneOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_RIEN_COMMANDE_LIGNE, commande_ligne.getRien());
         contentValues.put(Constantes.CLE_COL_PRODUIT_REFERENCE_COMMANDE_LIGNE, commande_ligne.getProduit_Reference());
         contentValues.put(Constantes.CLE_COL_TYPE_PRODUIT_COMMANDE_LIGNE, commande_ligne.getType_produit());
-        contentValues.put(Constantes.CLE_COL_QTE_COM_COMMANDE_LIGNE, commande_ligne.getQté_COM());
+        contentValues.put(Constantes.CLE_COL_QTE_COM_COMMANDE_LIGNE, commande_ligne.getQte_COM());
         contentValues.put(Constantes.CLE_COL_PU_COM_COMMANDE_LIGNE, commande_ligne.getPU_Com());
         contentValues.put(Constantes.CLE_COL_REMISE_COMMANDE_LIGNE, commande_ligne.getRemise());
-        contentValues.put(Constantes.CLE_COL_DESIGNATION_COMMANDE_LIGNE, commande_ligne.getDésignation());
+        contentValues.put(Constantes.CLE_COL_DESIGNATION_COMMANDE_LIGNE, commande_ligne.getDesignation());
         contentValues.put(Constantes.CLE_COL_CODE_PRODUIT_COMMANDE_LIGNE, commande_ligne.getCode_produit());
-        contentValues.put(Constantes.CLE_COL_CATEGORIE_COMMANDE_LIGNE, commande_ligne.getCatégorie());
-        contentValues.put(Constantes.CLE_COL_UNITE_COMMANDE_LIGNE, commande_ligne.getUnité());
+        contentValues.put(Constantes.CLE_COL_CATEGORIE_COMMANDE_LIGNE, commande_ligne.getCategorie());
+        contentValues.put(Constantes.CLE_COL_UNITE_COMMANDE_LIGNE, commande_ligne.getUnite());
         contentValues.put(Constantes.CLE_COL_CONDITIONNEMENT_COMMANDE_LIGNE, commande_ligne.getConditionnement());
         contentValues.put(Constantes.CLE_COL_CODE_FOURNISSEU_COMMANDE_LIGNE, commande_ligne.getCode_fournisseu());
         contentValues.put(Constantes.CLE_COL_FOURNISSEUR_COMMANDE_LIGNE, commande_ligne.getFournisseur());

@@ -1,9 +1,5 @@
 package fr.alcyons.phiwms_mobile.Outils;
 
-/**
- * Created by olivier on 27/06/2019.
- */
-
 public class OutilsGestionPhraseSnackbar {
 
     public static String obtenirPhraseSnackbar(String service)

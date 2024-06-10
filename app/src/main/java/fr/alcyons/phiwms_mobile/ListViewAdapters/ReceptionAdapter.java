@@ -31,10 +31,6 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 16/04/2024.
- */
-
 public class ReceptionAdapter extends ArrayAdapter implements Filterable {
 
     public List<Commande> commandeList;

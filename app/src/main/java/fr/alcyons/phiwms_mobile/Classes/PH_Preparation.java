@@ -88,7 +88,6 @@ public class PH_Preparation implements Serializable, Comparable {
         this.SYS_DT_MAJ = SYS_DT_MAJ;
         this.SYS_HEURE_MAJ = SYS_HEURE_MAJ;
         this.SYS_USER_MAJ = SYS_USER_MAJ;
-        this.PreparationDate = prescription_date;
         this.depotOrigineReference = depotOrigineReference;
         this.depotOrigineID = depotOrigineID;
         this.Commentaires = commentaires;
@@ -164,141 +163,33 @@ public class PH_Preparation implements Serializable, Comparable {
         this.numero_scelle = numero_scelle;
     }
 
-/*    public PH_Preparation(JSONObject jsonObject) {
-        try {
-            this.UID = jsonObject.getInt("UID");
-            this.Service = OutilsGestionClasses.recupererString(jsonObject.getString("Service"));
-            this.Erreur_Valid = OutilsGestionClasses.recupererBooleen(jsonObject, "Erreur_Valid");
-            this.PHIE_Tag = OutilsGestionClasses.recupererString(jsonObject.getString("PHIE_Tag"));
-            this.Saisie_Le = OutilsGestionClasses.recupererString(jsonObject.getString("Saisie_Le"));
-            this.A_tel_heure = OutilsGestionClasses.recupererString(jsonObject.getString("A_tel_heure"));
-            this.produitID = jsonObject.getInt("produitID");
-            this.produitDesignation = OutilsGestionClasses.recupererString(jsonObject.getString("produitDesignation"));
-            this.Qte_demandee = jsonObject.getDouble("Qte_demandee");
-            this.Livree = OutilsGestionClasses.recupererBooleen(jsonObject, "Livree");
-            this.Validee = OutilsGestionClasses.recupererBooleen(jsonObject, "Validee");
-            this.Origine = OutilsGestionClasses.recupererString(jsonObject.getString("Origine"));
-            this.Liste = OutilsGestionClasses.recupererString(jsonObject.getString("Liste"));
-            this.depotDestinataireID = jsonObject.getInt("depotDestinataireID");
-            this.depotDestinataireReference = OutilsGestionClasses.recupererString(jsonObject.getString("depotDestinataireReference"));
-            this.SYS_DT_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_DT_MAJ"));
-            this.SYS_HEURE_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_HEURE_MAJ"));
-            this.SYS_USER_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_USER_MAJ"));
-            this.PrescripteurReference = OutilsGestionClasses.recupererString(jsonObject.getString("PrescripteurReference"));
-            this.Prescription_date = OutilsGestionClasses.recupererString(jsonObject.getString("Prescription_date"));
-            this.PrescripteurNom = OutilsGestionClasses.recupererString(jsonObject.getString("PrescripteurNom"));
-            this.depotOrigineReference = OutilsGestionClasses.recupererString(jsonObject.getString("depotOrigineReference"));
-            this.depotOrigineID = jsonObject.getInt("depotOrigineID");
-            this.Commentaires = OutilsGestionClasses.recupererString(jsonObject.getString("Commentaires"));
-            this.PreparationDate = OutilsGestionClasses.recupererString(jsonObject.getString("PreparationDate"));
-            this.LivraisonPrevueDate = OutilsGestionClasses.recupererString(jsonObject.getString("LivraisonPrevueDate"));
-            this.DN_Groupe = OutilsGestionClasses.recupererString(jsonObject.getString("DN_Groupe"));
-            this.Montant_HT = jsonObject.getDouble("Montant_HT");
-            this.Montant_TTC = jsonObject.getDouble("Montant_TTC");
-            this.Poids = jsonObject.getDouble("Poids");
-            this.Commande_ID = jsonObject.getInt("Commande_ID");
-            this.Preparateur = OutilsGestionClasses.recupererString(jsonObject.getString("Preparateur"));
-            this.Statut = OutilsGestionClasses.recupererString(jsonObject.getString("Statut"));
-            this.PHIE_SYNCHRO = OutilsGestionClasses.recupererString(jsonObject.getString("PHIE_SYNCHRO"));
-            this.receptionUFNonComforme = OutilsGestionClasses.recupererString(jsonObject.getString("receptionUFNonComforme"));
-            this.livraisonDate = OutilsGestionClasses.recupererString(jsonObject.getString("livraisonDate"));
-            this.Frequence = OutilsGestionClasses.recupererString(jsonObject.getString("Frequence"));
-            this.previsionDateDebut = OutilsGestionClasses.recupererString(jsonObject.getString("previsionDateDebut"));
-            this.previsionDateFin = OutilsGestionClasses.recupererString(jsonObject.getString("previsionDateFin"));
-            this.URGENT = OutilsGestionClasses.recupererBooleen(jsonObject, "URGENT");
-            this.Motif = OutilsGestionClasses.recupererString(jsonObject.getString("Motif"));
-            this.preparateur_userID = jsonObject.getInt("preparateur_userID");
-            this.pharmacien_userID = jsonObject.getInt("pharmacien_userID");
-            this.Volume = jsonObject.getDouble("Volume");
-            this.PaletteNB = jsonObject.getInt("PaletteNB");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }*/
-
     public PH_Preparation(JSONObject jsonObject) {
-        try {
-            this.UID = jsonObject.getInt("UID");
-            this.Validee = OutilsGestionClasses.recupererBooleen(jsonObject, "Validee");
-            this.Liste = OutilsGestionClasses.recupererString(jsonObject.getString("Liste"));
-            this.depotDestinataireID = jsonObject.getInt("depotDestinataireID");
-            this.depotDestinataireReference = OutilsGestionClasses.recupererString(jsonObject.getString("depotDestinataireReference"));
-            this.depotOrigineReference = OutilsGestionClasses.recupererString(jsonObject.getString("depotOrigineReference"));
-            this.depotOrigineID = jsonObject.getInt("depotOrigineID");
-            this.Commentaires = OutilsGestionClasses.recupererString(jsonObject.getString("Commentaires"));
-            this.LivraisonPrevueDate = OutilsGestionClasses.recupererString(jsonObject.getString("LivraisonPrevueDate"));
-            this.Statut = OutilsGestionClasses.recupererString(jsonObject.getString("Statut"));
-            this.livraisonDate = OutilsGestionClasses.recupererString(jsonObject.getString("livraisonDate"));
-            this.URGENT = OutilsGestionClasses.recupererBooleen(jsonObject, "URGENT");
-            this.Motif = OutilsGestionClasses.recupererString(jsonObject.getString("Motif"));
-            this.Volume = jsonObject.getDouble("Volume");
-            this.livreur_userID = jsonObject.getInt("livreur_userID");
-            this.Livree = OutilsGestionClasses.recupererBooleen(jsonObject, "Livree");
-            this.Preparateur = OutilsGestionClasses.recupererString(jsonObject.getString("Preparateur"));
-            this.ColisNB = jsonObject.getInt("ColisNB");
-            this.PaletteNB = jsonObject.getInt("PaletteNB");
-            this.Conteneur_NB = jsonObject.getInt("Conteneur_NB");
-            this.TempsPreparation = OutilsGestionClasses.recupererString(jsonObject.getString("TempsPreparation"));
-            this.Montant_HT = jsonObject.getDouble("Montant_HT");
-            this.Montant_TTC = jsonObject.getDouble("Montant_TTC");
-            this.Poids = jsonObject.getDouble("Poids");
-            this.Commande_ID = jsonObject.getInt("Commande_ID");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this.UID = jsonObject.optInt("UID");
+        this.Validee = jsonObject.optBoolean( "Validee", false);
+        this.Liste = jsonObject.optString("Liste");
+        this.depotDestinataireID = jsonObject.optInt("depotDestinataireID");
+        this.depotDestinataireReference = jsonObject.optString("depotDestinataireReference");
+        this.depotOrigineReference = jsonObject.optString("depotOrigineReference");
+        this.depotOrigineID = jsonObject.optInt("depotOrigineID");
+        this.Commentaires = jsonObject.optString("Commentaires");
+        this.LivraisonPrevueDate = jsonObject.optString("LivraisonPrevueDate");
+        this.Statut = jsonObject.optString("Statut");
+        this.livraisonDate = jsonObject.optString("livraisonDate");
+        this.URGENT = jsonObject.optBoolean( "URGENT", false);
+        this.Motif = jsonObject.optString("Motif");
+        this.Volume = jsonObject.optDouble("Volume");
+        this.livreur_userID = jsonObject.optInt("livreur_userID");
+        this.Livree = jsonObject.optBoolean( "Livree", false);
+        this.Preparateur = jsonObject.optString("Preparateur");
+        this.ColisNB = jsonObject.optInt("ColisNB");
+        this.PaletteNB = jsonObject.optInt("PaletteNB");
+        this.Conteneur_NB = jsonObject.optInt("Conteneur_NB");
+        this.TempsPreparation = jsonObject.optString("TempsPreparation");
+        this.Montant_HT = jsonObject.optDouble("Montant_HT");
+        this.Montant_TTC = jsonObject.optDouble("Montant_TTC");
+        this.Poids = jsonObject.optDouble("Poids");
+        this.Commande_ID = jsonObject.optInt("Commande_ID");
     }
-
-/*    public PH_Preparation(Cursor cursor) {
-        this.UID = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_UID_PH_PREPARATION);
-        this.Service = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_SERVICE_PH_PREPARATION);
-        this.Erreur_Valid = OutilsGestionClasses.recupererBooleen(cursor, PH_PreparationOpenHelper.Constantes.NUM_COL_ERREUR_VALID_PH_PREPARATION);
-        this.PHIE_Tag = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_PHIE_TAG_PH_PREPARATION);
-        this.Saisie_Le = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_SAISIE_LE_PH_PREPARATION);
-        this.A_tel_heure = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_A_TEL_HEURE_PH_PREPARATION);
-        this.produitID = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_PRODUITID_PH_PREPARATION);
-        this.produitDesignation = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_PRODUITDESIGNATION_PH_PREPARATION);
-        this.Qte_demandee = cursor.getDouble(PH_PreparationOpenHelper.Constantes.NUM_COL_QTE_DEMANDEE_PH_PREPARATION);
-        this.Livree = OutilsGestionClasses.recupererBooleen(cursor, PH_PreparationOpenHelper.Constantes.NUM_COL_LIVREE_PH_PREPARATION);
-        this.Validee = OutilsGestionClasses.recupererBooleen(cursor, PH_PreparationOpenHelper.Constantes.NUM_COL_VALIDEE_PH_PREPARATION);
-        this.Origine = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_ORIGINE_PH_PREPARATION);
-        this.Liste = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_LISTE_PH_PREPARATION);
-        this.depotDestinataireID = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_DEPOTDESTINATAIREID_PH_PREPARATION);
-        this.depotDestinataireReference = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_DEPOTDESTINATAIREREFERENCE_PH_PREPARATION);
-        this.SYS_DT_MAJ = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_SYS_DT_MAJ_PH_PREPARATION);
-        this.SYS_HEURE_MAJ = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_SYS_HEURE_MAJ_PH_PREPARATION);
-        this.SYS_USER_MAJ = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_SYS_USER_MAJ_PH_PREPARATION);
-        this.PrescripteurReference = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_PRESCRIPTEURREFERENCE_PH_PREPARATION);
-        this.Prescription_date = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_PRESCRIPTION_DATE_PH_PREPARATION);
-        this.PrescripteurNom = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_PRESCRIPTEURNOM_PH_PREPARATION);
-        this.depotOrigineReference = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_DEPOTORIGINEREFERENCE_PH_PREPARATION);
-        this.depotOrigineID = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_DEPOTORIGINEID_PH_PREPARATION);
-        this.Commentaires = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_COMMENTAIRES_PH_PREPARATION);
-        this.PreparationDate = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_PREPARATIONDATE_PH_PREPARATION);
-        this.LivraisonPrevueDate = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_LIVRAISONPREVUEDATE_PH_PREPARATION);
-        this.DN_Groupe = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_DN_GROUPE_PH_PREPARATION);
-        this.Montant_HT = cursor.getDouble(PH_PreparationOpenHelper.Constantes.NUM_COL_MONTANT_HT_PH_PREPARATION);
-        this.Montant_TTC = cursor.getDouble(PH_PreparationOpenHelper.Constantes.NUM_COL_MONTANT_TTC_PH_PREPARATION);
-        this.Poids = cursor.getDouble(PH_PreparationOpenHelper.Constantes.NUM_COL_POIDS_PH_PREPARATION);
-        this.Commande_ID = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_COMMANDE_ID_PH_PREPARATION);
-        this.Preparateur = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_PREPARATEUR_PH_PREPARATION);
-        this.Statut = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_STATUT_PH_PREPARATION);
-        this.PHIE_SYNCHRO = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_PHIE_SYNCHRO_PH_PREPARATION);
-        this.receptionUFNonComforme = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_RECEPTIONUFNONCOMFORME_PH_PREPARATION);
-        this.livraisonDate = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_LIVRAISONDATE_PH_PREPARATION);
-        this.Frequence = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_FREQUENCE_PH_PREPARATION);
-        this.previsionDateDebut = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_PREVISIONDATEDEBUT_PH_PREPARATION);
-        this.previsionDateFin = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_PREVISIONDATEFIN_PH_PREPARATION);
-        this.URGENT = OutilsGestionClasses.recupererBooleen(cursor, PH_PreparationOpenHelper.Constantes.NUM_COL_URGENT_PH_PREPARATION);
-        this.Motif = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_MOTIF_PH_PREPARATION);
-        this.preparateur_userID = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_PREPARATEUR_USERID_PH_PREPARATION);
-        this.pharmacien_userID = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_PHARMACIEN_USERID_PH_PREPARATION);
-        this.Volume = cursor.getDouble(PH_PreparationOpenHelper.Constantes.NUM_COL_VOLUME_PH_PREPARATION);
-        this.PaletteNB = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_PALETTENB_PH_PREPARATION);
-        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
-    }*/
-
 
     public PH_Preparation(Cursor cursor) {
         this.UID = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_UID_PH_PREPARATION);

@@ -42,9 +42,6 @@ import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 
-/**
- * Created by olivier on 17/04/2024.
- */
 public class ZoneEtEmplacementSelecteurMultipleActivity extends ServiceActivity {
     Map<Depot_Zone, List<PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement>> ParentListItems;
     List<Depot_Zone> ParentList;

@@ -40,11 +40,6 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.MenuActivity;
-
-/**
- * Created by jessica on 17/08/2017.
- */
-
 public class OutilsGestionPDF {
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;

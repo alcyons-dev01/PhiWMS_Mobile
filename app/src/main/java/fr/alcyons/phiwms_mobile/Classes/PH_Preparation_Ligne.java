@@ -178,240 +178,52 @@ public class PH_Preparation_Ligne implements Serializable, Comparable {
         this.Verrouiller = ph_preparation_ligne.isVerrouiller();
     }
 
-/*
     public PH_Preparation_Ligne(JSONObject jsonObject) {
-        try {
-            this.PreparationID = jsonObject.getInt("PreparationID");
-            this._UID = jsonObject.getInt("_UID");
-            this.produitID = jsonObject.getInt("produitID");
-            this.produitDesignation = recupererString(jsonObject.getString("produitDesignation"));
-            this.Qte_APreparer = jsonObject.getInt("Qte_APreparer");
-            this.Qte_livrer = jsonObject.getInt("Qte_livrer");
-            this.Livrer = recupererBooleen(jsonObject, "Livrer");
-            this.Valider = recupererBooleen(jsonObject, "Valider");
-            this.ValidationDate = recupererString(jsonObject.getString("ValidationDate"));
-            this.produitReference = recupererString(jsonObject.getString("produitReference"));
-            this.ZoneDepot = recupererString(jsonObject.getString("ZoneDepot"));
-            this.produitCategorie = recupererString(jsonObject.getString("produitCategorie"));
-            this.Qte_RAL = jsonObject.getInt("Qte_RAL");
-            this.SYS_DT_MAJ = recupererString(jsonObject.getString("SYS_DT_MAJ"));
-            this.SYS_HEURE_MAJ = recupererString(jsonObject.getString("SYS_HEURE_MAJ"));
-            this.SYS_USER_MAJ = recupererString(jsonObject.getString("SYS_USER_MAJ"));
-            this.produitCondDistrib = jsonObject.getDouble("produitCondDistrib");
-            this.produitPUHT = jsonObject.getDouble("produitPUHT");
-            this.Suivi_Par_Lot = recupererBooleen(jsonObject, "Suivi_Par_Lot");
-            this.patientID = jsonObject.getInt("patientID");
-            this.PatientNom = recupererString(jsonObject.getString("PatientNom"));
-            this.PrescripteurNom = recupererString(jsonObject.getString("PrescripteurNom"));
-            this.prescripteurReference = recupererString(jsonObject.getString("prescripteurReference"));
-            this.Ordre_Impression = jsonObject.getInt("Ordre_Impression");
-            this.Prescription_ID = jsonObject.getInt("Prescription_ID");
-            this.LotNumero = recupererString(jsonObject.getString("LotNumero"));
-            this.PeremptionDate = recupererString(jsonObject.getString("PeremptionDate"));
-            this.produitPoids = jsonObject.getDouble("produitPoids");
-            this.produitTVA = jsonObject.getDouble("produitTVA");
-            this.Montant_HT = jsonObject.getDouble("Montant_HT");
-            this.Montant_TTC = jsonObject.getDouble("Montant_TTC");
-            this.PoidsTotal = jsonObject.getDouble("PoidsTotal");
-            this.depot_Destinataire_Reference = recupererString(jsonObject.getString("depot_Destinataire_Reference"));
-            this.utilisation_Date_Prevue = recupererString(jsonObject.getString("utilisation_Date_Prevue"));
-            this.Qte_besoin = jsonObject.getInt("Qte_besoin");
-            this.Qte_StockSaisie = jsonObject.getInt("Qte_StockSaisie");
-            this.Qte_Demander = jsonObject.getInt("Qte_Demander");
-            this.EmplacementParDefaut = recupererString(jsonObject.getString("EmplacementParDefaut"));
-            this.Qte_preparer = jsonObject.getInt("Qte_preparer");
-            this.accepter = jsonObject.getBoolean("Accepter");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-*/
-
-    public PH_Preparation_Ligne(JSONObject jsonObject) {
-        try {
-            this.PreparationID = jsonObject.getInt("PreparationID");
-            this._UID = jsonObject.getInt("_UID");
-            this.produitID = jsonObject.getInt("produitID");
-            this.produitDesignation = OutilsGestionClasses.recupererString(jsonObject.getString("produitDesignation"));
-            if(jsonObject.isNull("Qte_APreparer"))
-            {
-                this.Qte_APreparer = 0;
-            }
-            else
-            {
-                this.Qte_APreparer = jsonObject.getInt("Qte_APreparer");
-            }
-
-            if(jsonObject.isNull("Qte_livrer"))
-            {
-                this.Qte_livrer = 0;
-            }
-            else
-            {
-                this.Qte_livrer = jsonObject.getInt("Qte_livrer");
-            }
-
-            if(jsonObject.isNull("Qte_Demander"))
-            {
-                this.Qte_Demander = 0;
-            }
-            else
-            {
-                this.Qte_Demander = jsonObject.getInt("Qte_Demander");
-            }
-
-            if(jsonObject.isNull("Qte_preparer"))
-            {
-                this.Qte_preparer = 0;
-            }
-            else
-            {
-                this.Qte_preparer = jsonObject.getInt("Qte_preparer");
-            }
-
-            if(jsonObject.isNull("produitPoids"))
-            {
-                this.produitPoids = 0;
-            }
-            else
-            {
-                this.produitPoids = jsonObject.getDouble("produitPoids");
-            }
-
-            if(jsonObject.isNull("PoidsTotal"))
-            {
-                this.PoidsTotal = 0;
-            }
-            else
-            {
-                this.PoidsTotal = jsonObject.getDouble("PoidsTotal");
-            }
-
-            if(jsonObject.isNull("Qte_RAL"))
-            {
-                this.Qte_RAL = 0;
-            }
-            else
-            {
-                this.Qte_RAL = jsonObject.getInt("Qte_RAL");
-            }
-
-            if(jsonObject.isNull("_UID_4D"))
-            {
-                this._UID_4D = 0;
-            }
-            else
-            {
-                this._UID_4D = jsonObject.getInt("_UID_4D");
-            }
-
-            this.produitReference = OutilsGestionClasses.recupererString(jsonObject.getString("produitReference"));
-            this.LotNumero = OutilsGestionClasses.recupererString(jsonObject.getString("LotNumero"));
-            this.PeremptionDate = OutilsGestionClasses.recupererString(jsonObject.getString("PeremptionDate"));
-            this.ZoneDepot = OutilsGestionClasses.recupererString(jsonObject.getString("ZoneDepot"));
-            this.EmplacementParDefaut = OutilsGestionClasses.recupererString(jsonObject.getString("EmplacementParDefaut"));
-            this.Suivi_Par_Lot = OutilsGestionClasses.recupererBooleen(jsonObject,"Suivi_Par_Lot");
-            this.Suivi_Par_Serie = OutilsGestionClasses.recupererBooleen(jsonObject,"Suivi_Par_Serie");
-            this.Serialiser_Reception = OutilsGestionClasses.recupererBooleen(jsonObject,"Serialiser_Reception");
-            this.SerieNumero = OutilsGestionClasses.recupererString(jsonObject.getString("SerieNumero"));
-            this.Verrouiller = true;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this.PreparationID = jsonObject.optInt("PreparationID");
+        this._UID = jsonObject.optInt("_UID");
+        this.produitID = jsonObject.optInt("produitID");
+        this.produitDesignation = jsonObject.optString("produitDesignation");
+        this.Qte_livrer = jsonObject.optInt("Qte_livrer");
+        this.Qte_Demander = jsonObject.optInt("Qte_Demander");
+        this.Qte_preparer = jsonObject.optInt("Qte_preparer");
+        this.produitPoids = jsonObject.optDouble("produitPoids");
+        this.PoidsTotal = jsonObject.optDouble("PoidsTotal");
+        this.Qte_RAL = jsonObject.optInt("Qte_RAL");
+        this._UID_4D = jsonObject.optInt("_UID_4D");
+        this.produitReference = jsonObject.optString("produitReference");
+        this.LotNumero = jsonObject.optString("LotNumero");
+        this.PeremptionDate = jsonObject.optString("PeremptionDate");
+        this.ZoneDepot = jsonObject.optString("ZoneDepot");
+        this.EmplacementParDefaut = jsonObject.optString("EmplacementParDefaut");
+        this.Suivi_Par_Lot = jsonObject.optBoolean("Suivi_Par_Lot", false);
+        this.Suivi_Par_Serie = jsonObject.optBoolean("Suivi_Par_Serie", false);
+        this.Serialiser_Reception = jsonObject.optBoolean("Serialiser_Reception", false);
+        this.SerieNumero = jsonObject.optString("SerieNumero");
+        this.Verrouiller = true;
     }
 
     public PH_Preparation_Ligne(JSONObject jsonObject, int PreparationID) {
-        try {
-            this.PreparationID = PreparationID;
-            this._UID = jsonObject.getInt("_UID");
-            this.produitID = jsonObject.getInt("produitID");
-            this.produitDesignation = OutilsGestionClasses.recupererString(jsonObject.getString("produitDesignation"));
-            if(jsonObject.isNull("Qte_APreparer"))
-            {
-                this.Qte_APreparer = 0;
-            }
-            else
-            {
-                this.Qte_APreparer = jsonObject.getInt("Qte_APreparer");
-            }
-
-            if(jsonObject.isNull("Qte_livrer"))
-            {
-                this.Qte_livrer = 0;
-            }
-            else
-            {
-                this.Qte_livrer = jsonObject.getInt("Qte_livrer");
-            }
-
-            if(jsonObject.isNull("Qte_Demander"))
-            {
-                this.Qte_Demander = 0;
-            }
-            else
-            {
-                this.Qte_Demander = jsonObject.getInt("Qte_Demander");
-            }
-
-            if(jsonObject.isNull("Qte_preparer"))
-            {
-                this.Qte_preparer = 0;
-            }
-            else
-            {
-                this.Qte_preparer = jsonObject.getInt("Qte_preparer");
-            }
-
-            if(jsonObject.isNull("produitPoids"))
-            {
-                this.produitPoids = 0;
-            }
-            else
-            {
-                this.produitPoids = jsonObject.getDouble("produitPoids");
-            }
-
-            if(jsonObject.isNull("PoidsTotal"))
-            {
-                this.PoidsTotal = 0;
-            }
-            else
-            {
-                this.PoidsTotal = jsonObject.getDouble("PoidsTotal");
-            }
-
-            if(jsonObject.isNull("Qte_RAL"))
-            {
-                this.Qte_RAL = 0;
-            }
-            else
-            {
-                this.Qte_RAL = jsonObject.getInt("Qte_RAL");
-            }
-
-            if(jsonObject.isNull("_UID_4D"))
-            {
-                this._UID_4D = 0;
-            }
-            else
-            {
-                this._UID_4D = jsonObject.getInt("_UID_4D");
-            }
-
-            this.produitReference = OutilsGestionClasses.recupererString(jsonObject.getString("produitReference"));
-            this.LotNumero = OutilsGestionClasses.recupererString(jsonObject.getString("LotNumero"));
-            this.PeremptionDate = OutilsGestionClasses.recupererString(jsonObject.getString("PeremptionDate"));
-            this.ZoneDepot = OutilsGestionClasses.recupererString(jsonObject.getString("ZoneDepot"));
-            this.EmplacementParDefaut = OutilsGestionClasses.recupererString(jsonObject.getString("EmplacementParDefaut"));
-            this.Suivi_Par_Lot = OutilsGestionClasses.recupererBooleen(jsonObject,"Suivi_Par_Lot");
-            this.Suivi_Par_Serie = OutilsGestionClasses.recupererBooleen(jsonObject,"Suivi_Par_Serie");
-            this.Serialiser_Reception = OutilsGestionClasses.recupererBooleen(jsonObject,"Serialiser_Reception");
-            this.SerieNumero = OutilsGestionClasses.recupererString(jsonObject.getString("SerieNumero"));
-            this.Verrouiller = true;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this.PreparationID = PreparationID;
+        this._UID = jsonObject.optInt("_UID");
+        this.produitID = jsonObject.optInt("produitID");
+        this.produitDesignation = jsonObject.optString("produitDesignation");
+        this.Qte_livrer = jsonObject.optInt("Qte_livrer");
+        this.Qte_Demander = jsonObject.optInt("Qte_Demander");
+        this.Qte_preparer = jsonObject.optInt("Qte_preparer");
+        this.produitPoids = jsonObject.optDouble("produitPoids");
+        this.PoidsTotal = jsonObject.optDouble("PoidsTotal");
+        this.Qte_RAL = jsonObject.optInt("Qte_RAL");
+        this._UID_4D = jsonObject.optInt("_UID_4D");
+        this.produitReference = jsonObject.optString("produitReference");
+        this.LotNumero = jsonObject.optString("LotNumero");
+        this.PeremptionDate = jsonObject.optString("PeremptionDate");
+        this.ZoneDepot = jsonObject.optString("ZoneDepot");
+        this.EmplacementParDefaut = jsonObject.optString("EmplacementParDefaut");
+        this.Suivi_Par_Lot = jsonObject.optBoolean("Suivi_Par_Lot", false);
+        this.Suivi_Par_Serie = jsonObject.optBoolean("Suivi_Par_Serie", false);
+        this.Serialiser_Reception = jsonObject.optBoolean("Serialiser_Reception", false);
+        this.SerieNumero = jsonObject.optString("SerieNumero");
+        this.Verrouiller = true;
     }
 
 
@@ -463,28 +275,6 @@ public class PH_Preparation_Ligne implements Serializable, Comparable {
         this.Verrouiller = OutilsGestionClasses.recupererBooleen(cursor, PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_VERROUILLER);
         this.PhiMR4UUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
-/*
-
-    public PH_Preparation_Ligne(Cursor cursor) {
-        this.PreparationID = cursor.getInt(PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_PREPARATIONID_PH_PREPARATION_LIGNE);
-        this._UID = cursor.getInt(PH_Preparation_LigneOpenHelper.Constantes.NUM_COL__UID_PH_PREPARATION_LIGNE);
-        this.produitID = cursor.getInt(PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_PRODUITID_PH_PREPARATION_LIGNE);
-        this.produitDesignation = cursor.getString(PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_PRODUITDESIGNATION_PH_PREPARATION_LIGNE);
-        this.Qte_APreparer = cursor.getInt(PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_QTE_APREPARER_PH_PREPARATION_LIGNE);
-        this.Qte_livrer = cursor.getInt(PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_QTE_LIVRER_PH_PREPARATION_LIGNE);
-        this.produitReference = cursor.getString(PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_PRODUITREFERENCE_PH_PREPARATION_LIGNE);
-        this.Qte_Demander = cursor.getInt(PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_QTE_DEMANDER_PH_PREPARATION_LIGNE);
-        this.accepter = recupererBooleen(cursor, PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_ACCEPTER_PH_PREPARATION_LIGNE);
-        this.ZoneDepot = cursor.getString(PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_ZONEDEPOT_PH_PREPARATION_LIGNE);
-        this.EmplacementParDefaut = cursor.getString(PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_EMPLACEMENTPARDEFAUT_PH_PREPARATION_LIGNE);
-        this.PeremptionDate = cursor.getString(PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_PEREMPTIONDATE_PH_PREPARATION_LIGNE);
-        this.Qte_preparer = cursor.getInt(PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_QTE_PREPARER_PH_PREPARATION_LIGNE);
-        this.LotNumero = cursor.getString(PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_LOTNUMERO_PH_PREPARATION_LIGNE);
-        this.Suivi_Par_Lot = recupererBooleen(cursor, PH_Preparation_LigneOpenHelper.Constantes.NUM_COL_SUIVI_PAR_LOT_PH_PREPARATION_LIGNE);
-        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
-    }
-*/
-
 
     public int getPhiMR4UUID() {
         return PhiMR4UUID;
@@ -863,6 +653,36 @@ public class PH_Preparation_Ligne implements Serializable, Comparable {
         return getProduitDesignation();
     }
 
+    public double Conditionnement_Calcul(Integer qté, Integer conditionnement) {
+        double qte_conditionnee = 0;
+
+        switch (conditionnement) {
+            case 0:
+                qte_conditionnee = qté;
+                break;
+            case 1:
+                qte_conditionnee = qté;
+                break;
+            default:
+                Integer reste = mod(qté, conditionnement);
+                if (reste == 0) {
+                    qte_conditionnee = qté;
+                } else {
+                    double nb_conditionnement = Math.ceil(qté / conditionnement);
+                    qte_conditionnee = (nb_conditionnement + 1) * conditionnement;
+                }
+                break;
+        }
+
+        return qte_conditionnee;
+    }
+
+    private int mod(int x, int y) {
+        int result = x % y;
+        if (result < 0)
+            result += y;
+        return result;
+    }
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;

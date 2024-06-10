@@ -142,111 +142,15 @@ public class Stock implements Serializable, Comparable {
         this.produitSelect = produitSelect;
     }
 
-    /*public Stock(JSONObject jsonObject) {
-        try {
-            this.Produit_UID = jsonObject.getInt("Produit_UID");
-            this.Depot_Reference = OutilsGestionClasses.recupererString(jsonObject.getString("Depot_Reference"));
-            this.STO_DT_INVENTAIRE = OutilsGestionClasses.recupererString(jsonObject.getString("STO_DT_INVENTAIRE"));
-            this.STO_QTE_INVENT = jsonObject.getDouble("STO_QTE_INVENT");
-            this.STO_DT_DER_ENTREE = OutilsGestionClasses.recupererString(jsonObject.getString("STO_DT_DER_ENTREE"));
-            this.STO_QTE_ENTREE = jsonObject.getDouble("STO_QTE_ENTREE");
-            this.STO_DT_DER_SORTIE = OutilsGestionClasses.recupererString(jsonObject.getString("STO_DT_DER_SORTIE"));
-            this.STO_QTE_SORTIE = jsonObject.getDouble("STO_QTE_SORTIE");
-            this.STO_QTE_AVANT_INVENT = jsonObject.getDouble("STO_QTE_AVANT_INVENT");
-            this.STO_QTE_ATTENDUE = jsonObject.getDouble("STO_QTE_ATTENDUE");
-            this.Quantite_Actuelle = jsonObject.getDouble("Quantite_Actuelle");
-            this.STO_PRIX = jsonObject.getDouble("STO_PRIX");
-            this.STO_VAL_ENTREES = jsonObject.getDouble("STO_VAL_ENTREES");
-            this.STO_VAL_SORTIES = jsonObject.getDouble("STO_VAL_SORTIES");
-            this.STO_VAL_INVENT = jsonObject.getDouble("STO_VAL_INVENT");
-            this.STO_JOURS_ROTATION = jsonObject.getInt("STO_JOURS_ROTATION");
-            this.STO_DT_CREAT = OutilsGestionClasses.recupererString(jsonObject.getString("STO_DT_CREAT"));
-            this.SYS_DT_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_DT_MAJ"));
-            this.SYS_USER_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_USER_MAJ"));
-            this.SYS_HEURE_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_HEURE_MAJ"));
-            this.TVA = jsonObject.getDouble("TVA");
-            this.Categorie = OutilsGestionClasses.recupererString(jsonObject.getString("Categorie"));
-            this.produit_Reference = OutilsGestionClasses.recupererString(jsonObject.getString("produit_Reference"));
-            this.Designation = OutilsGestionClasses.recupererString(jsonObject.getString("Designation"));
-            this.Arret_distribution = OutilsGestionClasses.recupererBooleen(jsonObject, "Arret_distribution");
-            this.Valeur_HT = jsonObject.getDouble("Valeur_HT");
-            this.Valeur_TTC = jsonObject.getDouble("Valeur_TTC");
-            this.ZONE_STOCKAGE = OutilsGestionClasses.recupererString(jsonObject.getString("ZONE_STOCKAGE"));
-            this.Fournisseur = OutilsGestionClasses.recupererString(jsonObject.getString("Fournisseur"));
-            this.Livraison_Directe = OutilsGestionClasses.recupererBooleen(jsonObject, "Livraison_Directe");
-            this.PUMP_HT_Derniere_cloture = jsonObject.getDouble("PUMP_HT_Derniere_cloture");
-            this.Valeur_PUMP_HT = jsonObject.getDouble("Valeur_PUMP_HT");
-            this.Valeur_PUMP_TTC = jsonObject.getDouble("Valeur_PUMP_TTC");
-            this.PUMP_TTC_Derniere_cloture = jsonObject.getDouble("PUMP_TTC_Derniere_cloture");
-            this.Classification = jsonObject.getInt("Classification");
-            this.Inventaire_Fin_de_Mois = OutilsGestionClasses.recupererBooleen(jsonObject, "Inventaire_Fin_de_Mois");
-            this.RAZ_Stock_Inventaire = OutilsGestionClasses.recupererBooleen(jsonObject, "RAZ_Stock_Inventaire");
-            this.SeuilAlerte = jsonObject.getDouble("SeuilAlerte");
-            this.produitSelect = OutilsGestionClasses.recupererBooleen(jsonObject, "ProduitSelect");
-            this._UID = jsonObject.getInt("_UID");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }*/
-
     public Stock(JSONObject jsonObject) {
-        try {
-            this.Produit_UID = jsonObject.getInt("Produit_UID");
-            this.Depot_Reference = OutilsGestionClasses.recupererString(jsonObject.getString("Depot_Reference"));
-            this.Quantite_Actuelle = jsonObject.getDouble("Quantite_Actuelle");
-            this.produit_Reference = OutilsGestionClasses.recupererString(jsonObject.getString("produit_Reference"));
-            this.Designation = OutilsGestionClasses.recupererString(jsonObject.getString("Designation"));
-            this.Fournisseur = OutilsGestionClasses.recupererString(jsonObject.getString("Fournisseur"));
-            this._UID = jsonObject.getInt("_UID");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this.Produit_UID = jsonObject.optInt("Produit_UID");
+        this.Depot_Reference = jsonObject.optString("Depot_Reference");
+        this.Quantite_Actuelle = jsonObject.optDouble("Quantite_Actuelle");
+        this.produit_Reference = jsonObject.optString("produit_Reference");
+        this.Designation = jsonObject.optString("Designation");
+        this.Fournisseur = jsonObject.optString("Fournisseur");
+        this._UID = jsonObject.optInt("_UID");
     }
-
-/*    public Stock(Cursor cursor) {
-        this.Produit_UID = cursor.getInt(StockOpenHelper.Constantes.NUM_COL_PRODUIT_UID_STOCK);
-        this.Depot_Reference = cursor.getString(StockOpenHelper.Constantes.NUM_COL_DEPOT_REFERENCE_STOCK);
-        this.STO_DT_INVENTAIRE = cursor.getString(StockOpenHelper.Constantes.NUM_COL_STO_DT_INVENTAIRE_STOCK);
-        this.STO_QTE_INVENT = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_STO_QTE_INVENT_STOCK);
-        this.STO_DT_DER_ENTREE = cursor.getString(StockOpenHelper.Constantes.NUM_COL_STO_DT_DER_ENTREE_STOCK);
-        this.STO_QTE_ENTREE = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_STO_QTE_ENTREE_STOCK);
-        this.STO_DT_DER_SORTIE = cursor.getString(StockOpenHelper.Constantes.NUM_COL_STO_DT_DER_SORTIE_STOCK);
-        this.STO_QTE_SORTIE = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_STO_QTE_SORTIE_STOCK);
-        this.STO_QTE_AVANT_INVENT = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_STO_QTE_AVANT_INVENT_STOCK);
-        this.STO_QTE_ATTENDUE = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_STO_QTE_ATTENDUE_STOCK);
-        this.Quantite_Actuelle = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_QUANTITE_ACTUELLE_STOCK);
-        this.STO_PRIX = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_STO_PRIX_STOCK);
-        this.STO_VAL_ENTREES = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_STO_VAL_ENTREES_STOCK);
-        this.STO_VAL_SORTIES = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_STO_VAL_SORTIES_STOCK);
-        this.STO_VAL_INVENT = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_STO_VAL_INVENT_STOCK);
-        this.STO_JOURS_ROTATION = cursor.getInt(StockOpenHelper.Constantes.NUM_COL_STO_JOURS_ROTATION_STOCK);
-        this.STO_DT_CREAT = cursor.getString(StockOpenHelper.Constantes.NUM_COL_STO_DT_CREAT_STOCK);
-        this.SYS_DT_MAJ = cursor.getString(StockOpenHelper.Constantes.NUM_COL_SYS_DT_MAJ_STOCK);
-        this.SYS_USER_MAJ = cursor.getString(StockOpenHelper.Constantes.NUM_COL_SYS_USER_MAJ_STOCK);
-        this.SYS_HEURE_MAJ = cursor.getString(StockOpenHelper.Constantes.NUM_COL_SYS_HEURE_MAJ_STOCK);
-        this.TVA = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_TVA_STOCK);
-        this.Categorie = cursor.getString(StockOpenHelper.Constantes.NUM_COL_CATEGORIE_STOCK);
-        this.produit_Reference = cursor.getString(StockOpenHelper.Constantes.NUM_COL_PRODUIT_REFERENCE_STOCK);
-        this.Designation = cursor.getString(StockOpenHelper.Constantes.NUM_COL_DESIGNATION_STOCK);
-        this.Arret_distribution = OutilsGestionClasses.recupererBooleen(cursor, StockOpenHelper.Constantes.NUM_COL_ARRET_DISTRIBUTION_STOCK);
-        this.Valeur_HT = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_VALEUR_HT_STOCK);
-        this.Valeur_TTC = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_VALEUR_TTC_STOCK);
-        this.ZONE_STOCKAGE = cursor.getString(StockOpenHelper.Constantes.NUM_COL_ZONE_STOCKAGE_STOCK);
-        this.Fournisseur = cursor.getString(StockOpenHelper.Constantes.NUM_COL_FOURNISSEUR_STOCK);
-        this.Livraison_Directe = OutilsGestionClasses.recupererBooleen(cursor, StockOpenHelper.Constantes.NUM_COL_LIVRAISON_DIRECTE_STOCK);
-        this.PUMP_HT_Derniere_cloture = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_PUMP_HT_DERNIERE_CLOTURE_STOCK);
-        this.Valeur_PUMP_HT = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_VALEUR_PUMP_HT_STOCK);
-        this.Valeur_PUMP_TTC = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_VALEUR_PUMP_TTC_STOCK);
-        this.PUMP_TTC_Derniere_cloture = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_PUMP_TTC_DERNIERE_CLOTURE_STOCK);
-        this.Classification = cursor.getInt(StockOpenHelper.Constantes.NUM_COL_CLASSIFICATION_STOCK);
-        this.Inventaire_Fin_de_Mois = OutilsGestionClasses.recupererBooleen(cursor, StockOpenHelper.Constantes.NUM_COL_INVENTAIRE_FIN_DE_MOIS_STOCK);
-        this.RAZ_Stock_Inventaire = OutilsGestionClasses.recupererBooleen(cursor, StockOpenHelper.Constantes.NUM_COL_RAZ_STOCK_INVENTAIRE_STOCK);
-        this.SeuilAlerte = cursor.getDouble(StockOpenHelper.Constantes.NUM_COL_SEUILALERTE_STOCK);
-        this._UID = cursor.getInt(StockOpenHelper.Constantes.NUM_COL__UID_STOCK);
-        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
-    }*/
-
     public Stock(Cursor cursor) {
         this.Produit_UID = cursor.getInt(StockOpenHelper.Constantes.NUM_COL_PRODUIT_UID_STOCK);
         this.Depot_Reference = cursor.getString(StockOpenHelper.Constantes.NUM_COL_DEPOT_REFERENCE_STOCK);

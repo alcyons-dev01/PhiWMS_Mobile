@@ -19,11 +19,6 @@ import java.util.Map;
 import fr.alcyons.phiwms_mobile.Classes.PerimetreFonctionnel;
 import fr.alcyons.phiwms_mobile.Classes.Service;
 import fr.alcyons.phiwms_mobile.R;
-
-/**
- * Created by olivier on 19/06/2019.
- */
-
 public class ConnexionDirecteExpandableAdapter extends BaseExpandableListAdapter {
 
     private Activity context;

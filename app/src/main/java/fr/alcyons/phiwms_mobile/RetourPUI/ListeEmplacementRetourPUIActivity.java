@@ -44,9 +44,6 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
-/**
- * Created by olivier on 16/04/2024.
- */
 public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
     Retour_Ligne retourLigne;
     Retour_Ligne_RetourPUI_Adapte retourLigneSelectionne;

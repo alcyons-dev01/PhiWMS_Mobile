@@ -60,7 +60,7 @@ public class FournisseurOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_CONTACT_PORTABLE_COM_FOURNISSEUR, fournisseur.getContact_Portable_com());
         contentValues.put(Constantes.CLE_COL_AFFECTATION_FOURNISSEUR, fournisseur.getAffectation());
         contentValues.put(Constantes.CLE_COL_ST_CIVILITE_FOURNISSEUR, fournisseur.getST_Civilite());
-        contentValues.put(Constantes.CLE_COL_ST_PRENOM_FOURNISSEUR, fournisseur.getST_Prénom());
+        contentValues.put(Constantes.CLE_COL_ST_PRENOM_FOURNISSEUR, fournisseur.getST_Prenom());
         contentValues.put(Constantes.CLE_COL_ST_NOM_FOURNISSEUR, fournisseur.getST_Nom());
         contentValues.put(Constantes.CLE_COL_ST_ADRESSE1_COM_FOURNISSEUR, fournisseur.getST_Adresse1_com());
         contentValues.put(Constantes.CLE_COL_ST_ADRESSE2_COM_FOURNISSEUR, fournisseur.getST_Adresse2_Com());

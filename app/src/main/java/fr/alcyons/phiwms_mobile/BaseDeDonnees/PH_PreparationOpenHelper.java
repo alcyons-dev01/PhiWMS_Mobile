@@ -51,6 +51,61 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
         db.delete(Constantes.TABLE_PH_PREPARATION, null, null);
     }
 
+    public static PH_Preparation getDemandeDemandeReassortEnInstance(SQLiteDatabase db, String Liste, String DateProchaineLivraison) {
+        PH_Preparation ph_preparation = null;
+
+        if(DateProchaineLivraison.contains("/"))
+        {
+            String tab[] = DateProchaineLivraison.split("/");
+            String annee = tab[tab.length-1];
+            String mois = tab[1];
+            String jour = tab[0];
+            DateProchaineLivraison = annee+"-"+mois+"-"+jour;
+        }
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION+" WHERE "+Constantes.CLE_COL_LISTE_PH_PREPARATION+ " = ? AND "+Constantes.CLE_COL_STATUT_PH_PREPARATION+"= ?  AND "+Constantes.CLE_COL_LIVRAISONPREVUEDATE_PH_PREPARATION+"= ? ", new String[]{Liste, "En instance", DateProchaineLivraison});
+        if (cursor.getCount() >= 1) {
+            cursor.moveToFirst();
+            ph_preparation = new PH_Preparation(cursor);
+        }
+        cursor.close();
+        cursor = null;
+
+        if(ph_preparation == null)
+        {
+            cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION+" WHERE "+Constantes.CLE_COL_LISTE_PH_PREPARATION+ " = ? AND "+Constantes.CLE_COL_STATUT_PH_PREPARATION+"= ? AND "+Constantes.CLE_COL_LIVRAISONPREVUEDATE_PH_PREPARATION+"= ?" , new String[]{Liste, "En cours de régularisation", DateProchaineLivraison});
+            if (cursor.getCount() >= 1) {
+                cursor.moveToFirst();
+                ph_preparation = new PH_Preparation(cursor);
+            }
+            cursor.close();
+            cursor = null;
+        }
+
+        if(ph_preparation == null)
+        {
+            cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION+" WHERE "+Constantes.CLE_COL_LISTE_PH_PREPARATION+ " = ? AND "+Constantes.CLE_COL_STATUT_PH_PREPARATION+"= ? AND "+Constantes.CLE_COL_LIVRAISONPREVUEDATE_PH_PREPARATION+"= ?", new String[]{Liste, "En cours de préparation", DateProchaineLivraison});
+            if (cursor.getCount() >= 1) {
+                cursor.moveToFirst();
+                ph_preparation = new PH_Preparation(cursor);
+            }
+            cursor.close();
+            cursor = null;
+        }
+
+        if(ph_preparation == null)
+        {
+            cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION+" WHERE "+Constantes.CLE_COL_LISTE_PH_PREPARATION+ " = ? AND "+Constantes.CLE_COL_STATUT_PH_PREPARATION+"= ? AND "+Constantes.CLE_COL_LIVRAISONPREVUEDATE_PH_PREPARATION+"= ?", new String[]{Liste, "En cours de livraison", DateProchaineLivraison});
+            if (cursor.getCount() >= 1) {
+                cursor.moveToFirst();
+                ph_preparation = new PH_Preparation(cursor);
+            }
+            cursor.close();
+            cursor = null;
+        }
+        return ph_preparation;
+    }
+
     public static long insererUnPH_PreparationEnBDD(SQLiteDatabase db, PH_Preparation ph_preparation) {
         // Récupération des éléments du dépot
         ContentValues contentValues = new ContentValues();
@@ -243,6 +298,86 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
 
 
         return ph_preparationList;
+    }
+
+    public static PH_Preparation getDemandeDotationGlobaleEnInstance(SQLiteDatabase db, String Liste, String DateProchaineLivraison) {
+        PH_Preparation ph_preparation = null;
+
+        if(DateProchaineLivraison.contains("/"))
+        {
+            String tab[] = DateProchaineLivraison.split("/");
+            String annee = tab[tab.length-1];
+            String mois = tab[1];
+            String jour = tab[0];
+            DateProchaineLivraison = annee+"-"+mois+"-"+jour;
+        }
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION+" WHERE "+Constantes.CLE_COL_LISTE_PH_PREPARATION+ " = ? AND "+Constantes.CLE_COL_STATUT_PH_PREPARATION+"= ?  AND "+Constantes.CLE_COL_LIVRAISONPREVUEDATE_PH_PREPARATION+"= ? ", new String[]{Liste, "En instance", DateProchaineLivraison});
+        if (cursor.getCount() >= 1) {
+            cursor.moveToFirst();
+            ph_preparation = new PH_Preparation(cursor);
+        }
+        cursor.close();
+        cursor = null;
+
+        if(ph_preparation == null)
+        {
+            cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION+" WHERE "+Constantes.CLE_COL_LISTE_PH_PREPARATION+ " = ? AND "+Constantes.CLE_COL_STATUT_PH_PREPARATION+"= ? AND "+Constantes.CLE_COL_LIVRAISONPREVUEDATE_PH_PREPARATION+"= ?" , new String[]{Liste, "En cours de régularisation", DateProchaineLivraison});
+            if (cursor.getCount() >= 1) {
+                cursor.moveToFirst();
+                ph_preparation = new PH_Preparation(cursor);
+            }
+            cursor.close();
+            cursor = null;
+        }
+
+        if(ph_preparation == null)
+        {
+            cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION+" WHERE "+Constantes.CLE_COL_LISTE_PH_PREPARATION+ " = ? AND "+Constantes.CLE_COL_STATUT_PH_PREPARATION+"= ? AND "+Constantes.CLE_COL_LIVRAISONPREVUEDATE_PH_PREPARATION+"= ?", new String[]{Liste, "En cours de préparation", DateProchaineLivraison});
+            if (cursor.getCount() >= 1) {
+                cursor.moveToFirst();
+                ph_preparation = new PH_Preparation(cursor);
+            }
+            cursor.close();
+            cursor = null;
+        }
+
+        if(ph_preparation == null)
+        {
+            cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION+" WHERE "+Constantes.CLE_COL_LISTE_PH_PREPARATION+ " = ? AND "+Constantes.CLE_COL_STATUT_PH_PREPARATION+"= ? AND "+Constantes.CLE_COL_LIVRAISONPREVUEDATE_PH_PREPARATION+"= ?", new String[]{Liste, "En cours de livraison", DateProchaineLivraison});
+            if (cursor.getCount() >= 1) {
+                cursor.moveToFirst();
+                ph_preparation = new PH_Preparation(cursor);
+            }
+            cursor.close();
+            cursor = null;
+        }
+        return ph_preparation;
+    }
+
+    public static ArrayList<Integer> getUIDDotationGlobaleEnInstance(SQLiteDatabase db) {
+        ArrayList<Integer> listeUID = new ArrayList<>();
+
+        PH_Preparation ph_preparation = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION+" WHERE "+Constantes.CLE_COL_STATUT_PH_PREPARATION+"= ? AND "+Constantes.CLE_COL_LISTE_PH_PREPARATION+" LIKE '%Dotation Globale :%'", new String[]{"En instance"});
+        while (cursor.moveToNext()) {
+            ph_preparation = new PH_Preparation(cursor);
+            listeUID.add(ph_preparation.getUID());
+        }
+
+        cursor.close();
+        cursor = null;
+
+        cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION+" WHERE "+Constantes.CLE_COL_STATUT_PH_PREPARATION+"= ?  AND "+Constantes.CLE_COL_LISTE_PH_PREPARATION+" LIKE '%Dotation Globale :%'", new String[]{"En cours de régularisation"});
+        while (cursor.moveToNext()) {
+            ph_preparation = new PH_Preparation(cursor);
+            listeUID.add(ph_preparation.getUID());
+        }
+        cursor.close();
+        cursor = null;
+
+        return listeUID;
     }
 
     public static List<PH_Preparation> getAllPHPreparationVerrouPharmacie(SQLiteDatabase db) {

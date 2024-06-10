@@ -11,10 +11,6 @@ import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBool
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by olivier on 12/03/2018.
- */
-
 public class Frequences {
 
     int _UID;
@@ -45,40 +41,6 @@ public class Frequences {
     String SYS_HEURE_MAJ;
     String SYS_USER_MAJ;
     private int phiwms_mobileUUID = -1;
-
-    public Frequences(JSONObject jsonObject) {
-        try {
-            _UID = jsonObject.getInt("_UID");
-            ident = OutilsGestionClasses.recupererString(jsonObject.getString("ident"));
-            Codage = jsonObject.getInt("Codage");
-            L1 = OutilsGestionClasses.recupererBooleen(jsonObject, "L1");
-            Ma = OutilsGestionClasses.recupererBooleen(jsonObject, "Ma");
-            Mer = OutilsGestionClasses.recupererBooleen(jsonObject, "Mer");
-            J = OutilsGestionClasses.recupererBooleen(jsonObject, "J");
-            V = OutilsGestionClasses.recupererBooleen(jsonObject, "V");
-            S = OutilsGestionClasses.recupererBooleen(jsonObject, "S");
-            D = OutilsGestionClasses.recupererBooleen(jsonObject, "D");
-            L2 = OutilsGestionClasses.recupererBooleen(jsonObject, "L2");
-            Commentaire = OutilsGestionClasses.recupererString(jsonObject.getString("Commentaire"));
-            _01 = OutilsGestionClasses.recupererBooleen(jsonObject, "01");
-            _02 = OutilsGestionClasses.recupererBooleen(jsonObject, "02");
-            _03 = OutilsGestionClasses.recupererBooleen(jsonObject, "03");
-            _04 = OutilsGestionClasses.recupererBooleen(jsonObject, "04");
-            _05 = OutilsGestionClasses.recupererBooleen(jsonObject, "05");
-            _06 = OutilsGestionClasses.recupererBooleen(jsonObject, "06");
-            _07 = OutilsGestionClasses.recupererBooleen(jsonObject, "07");
-            _08 = OutilsGestionClasses.recupererBooleen(jsonObject, "08");
-            _09 = OutilsGestionClasses.recupererBooleen(jsonObject, "09");
-            _10 = OutilsGestionClasses.recupererBooleen(jsonObject, "10");
-            _11 = OutilsGestionClasses.recupererBooleen(jsonObject, "11");
-            _12 = OutilsGestionClasses.recupererBooleen(jsonObject, "12");
-            SYS_DT_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_DT_MAJ"));
-            SYS_HEURE_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_HEURE_MAJ"));
-            SYS_USER_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_USER_MAJ"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
 
     public Frequences(Cursor cursor) {
         _UID = cursor.getInt(FrequencesOpenHelper.Constantes.NUM_COL__UID_FREQUENCES);

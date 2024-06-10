@@ -8,10 +8,6 @@ import android.text.Editable;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 09/04/2019.
- */
-
 public class DocumentContext {
     private Context context;
     private SQLiteDatabase db;

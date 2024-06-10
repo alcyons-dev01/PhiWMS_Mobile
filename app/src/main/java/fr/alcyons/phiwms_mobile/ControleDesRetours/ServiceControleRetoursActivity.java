@@ -68,9 +68,6 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
-/**
- * Created by olivier on 16/04/2024.
- */
 public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity {
     Context context;
     List<Retour> retourList;

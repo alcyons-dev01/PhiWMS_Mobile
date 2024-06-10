@@ -106,7 +106,7 @@ public class PleinVideAdapter extends BaseAdapter {
             viewHolder = new DotationViewHolder();
             switch (rowType) {
                 case TYPE_ITEM:
-                    convertView =  mInflater.inflate(R.layout.row_dotation, parent, false);
+                    convertView =  mInflater.inflate(R.layout.row_dotation_pleinvide, parent, false);
                     // Récupération des objets graphiques
                     viewHolder.nom = convertView.findViewById(R.id.intituleDotation);
                     viewHolder.nbProduitDotation = convertView.findViewById(R.id.nbProduitDotation);

@@ -13,10 +13,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.EVENTOpenHelper;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by jessica on 09/10/2017.
- */
-
 public class EVENT implements Serializable, Comparable {
 
     private int _UID;
@@ -33,21 +29,17 @@ public class EVENT implements Serializable, Comparable {
     private int phiwms_mobileUUID = -1;
 
     public EVENT(JSONObject jsonObject) {
-        try {
-            this._UID = jsonObject.getInt("_UID");
-            this.Date_event = OutilsGestionClasses.recupererString(jsonObject.getString("Date_event"));
-            this.ID_Ressource = jsonObject.getInt("ID_Ressource");
-            this.Jour_event = OutilsGestionClasses.recupererString(jsonObject.getString("Jour_event"));
-            this.Semaine_event = jsonObject.getInt("Semaine_event");
-            this.mois_de = OutilsGestionClasses.recupererString(jsonObject.getString("mois_de"));
-            this.Jour_de = OutilsGestionClasses.recupererString(jsonObject.getString("Jour_de"));
-            this.annee_de = OutilsGestionClasses.recupererString(jsonObject.getString("annee_de"));
-            this.Mois_livraison = OutilsGestionClasses.recupererString(jsonObject.getString("Mois_livraison"));
-            this.moisReference = OutilsGestionClasses.recupererString(jsonObject.getString("moisReference"));
-            this.TourneeID = jsonObject.getInt("TourneeID");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this._UID = jsonObject.optInt("_UID");
+        this.Date_event = jsonObject.optString("Date_event");
+        this.ID_Ressource = jsonObject.optInt("ID_Ressource");
+        this.Jour_event = jsonObject.optString("Jour_event");
+        this.Semaine_event = jsonObject.optInt("Semaine_event");
+        this.mois_de = jsonObject.optString("mois_de");
+        this.Jour_de = jsonObject.optString("Jour_de");
+        this.annee_de = jsonObject.optString("annee_de");
+        this.Mois_livraison = jsonObject.optString("Mois_livraison");
+        this.moisReference = jsonObject.optString("moisReference");
+        this.TourneeID = jsonObject.optInt("TourneeID");
     }
 
     public EVENT(Cursor cursor) {
@@ -213,15 +205,8 @@ public class EVENT implements Serializable, Comparable {
 
     @Override
     public boolean equals(Object obj) {
-        boolean valeurARetourner = false;
-        if (((EVENT) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
-            valeurARetourner = true;
-        }
 
-        if (!(obj instanceof EVENT)) {
-            valeurARetourner = false;
-        }
-        return valeurARetourner;
+        return ((EVENT) obj).getPhiMR4UUID() == this.getPhiMR4UUID();
     }
 
 

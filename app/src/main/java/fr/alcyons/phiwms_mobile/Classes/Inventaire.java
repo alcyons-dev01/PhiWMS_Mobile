@@ -32,52 +32,6 @@ public class Inventaire implements Serializable, Comparable {
     private double Valeur_TTC;
     private double Valeur_PUMP_TTC;
     private int phiwms_mobileUUID = -1;
-
-    public Inventaire(int inventaire_ID, String cycle, String inventaireDate, String cycleDateDebut, String _SYS_DT_MAJ, String _SYS_USER_MAJ, String _SYS_HEURE_MAJ, String cycleDateFin, Boolean clotureActive, String objet, String mode_Comptabilisation, String depotReference, String depotNom, String operateur, int NBLignes, double valeur_TTC, double valeur_PUMP_TTC) {
-        this.Inventaire_ID = inventaire_ID;
-        this.Cycle = cycle;
-        this.InventaireDate = inventaireDate;
-        this.cycleDateDebut = cycleDateDebut;
-        this._SYS_DT_MAJ = _SYS_DT_MAJ;
-        this._SYS_USER_MAJ = _SYS_USER_MAJ;
-        this._SYS_HEURE_MAJ = _SYS_HEURE_MAJ;
-        this.cycleDateFin = cycleDateFin;
-        this.clotureActive = clotureActive;
-        this.objet = objet;
-        this.Mode_Comptabilisation = mode_Comptabilisation;
-        this.depotReference = depotReference;
-        this.depotNom = depotNom;
-        this.operateur = operateur;
-        this.NBLignes = NBLignes;
-        this.Valeur_TTC = valeur_TTC;
-        this.Valeur_PUMP_TTC = valeur_PUMP_TTC;
-    }
-
-    public Inventaire(JSONObject jsonObject) {
-        try {
-            this.Inventaire_ID = jsonObject.getInt("Inventaire_ID");
-            this.Cycle = OutilsGestionClasses.recupererString(jsonObject.getString("Cycle"));
-            this.InventaireDate = OutilsGestionClasses.recupererString(jsonObject.getString("InventaireDate"));
-            this.cycleDateDebut = OutilsGestionClasses.recupererString(jsonObject.getString("cycleDateDebut"));
-            this._SYS_DT_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("_SYS_DT_MAJ"));
-            this._SYS_USER_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("_SYS_USER_MAJ"));
-            this._SYS_HEURE_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("_SYS_HEURE_MAJ"));
-            this.cycleDateFin = OutilsGestionClasses.recupererString(jsonObject.getString("cycleDateFin"));
-            this.clotureActive = OutilsGestionClasses.recupererBooleen(jsonObject, "clotureActive");
-            this.objet = OutilsGestionClasses.recupererString(jsonObject.getString("objet"));
-            this.Mode_Comptabilisation = OutilsGestionClasses.recupererString(jsonObject.getString("Mode_Comptabilisation"));
-            this.depotReference = OutilsGestionClasses.recupererString(jsonObject.getString("depotReference"));
-            this.depotNom = OutilsGestionClasses.recupererString(jsonObject.getString("depotNom"));
-            this.operateur = OutilsGestionClasses.recupererString(jsonObject.getString("operateur"));
-            this.NBLignes = jsonObject.getInt("NBLignes");
-            this.Valeur_TTC = jsonObject.getDouble("Valeur_TTC");
-            this.Valeur_PUMP_TTC = jsonObject.getDouble("Valeur_PUMP_TTC");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
     public Inventaire(Cursor cursor) {
         this.Inventaire_ID = cursor.getInt(InventaireOpenHelper.Constantes.NUM_COL_INVENTAIRE_ID_INVENTAIRE);
         this.Cycle = cursor.getString(InventaireOpenHelper.Constantes.NUM_COL_CYCLE_INVENTAIRE);

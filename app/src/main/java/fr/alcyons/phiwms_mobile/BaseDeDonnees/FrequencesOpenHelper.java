@@ -7,10 +7,6 @@ import android.provider.BaseColumns;
 
 import fr.alcyons.phiwms_mobile.Classes.Frequences;
 
-/**
- * Created by olivier on 12/03/2018.
- */
-
 public class FrequencesOpenHelper extends DBOpenHelper {
 
     public FrequencesOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

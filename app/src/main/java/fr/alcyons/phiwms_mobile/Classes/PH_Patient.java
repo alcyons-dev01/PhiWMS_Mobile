@@ -14,16 +14,11 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PatientOpenHelper;
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
-
-/**
- * Created by jessica on 02/10/2017.
- */
-
 public class PH_Patient implements Serializable, Comparable {
     private int _patientUID;
-    private String Civilité;
+    private String Civilite;
     private String Nom_naissance;
-    private String Prénom;
+    private String Prenom;
     private String Adresse1;
     private String Adresse2;
     private String CP;
@@ -55,7 +50,7 @@ public class PH_Patient implements Serializable, Comparable {
     private String Ressource_CP;
     private String Ressource_Ville;
     private String Personne_Ressource;
-    private String Ressource_Tél;
+    private String Ressource_Tel;
     private String Ressource_Fax;
     private String Centre_Hospitalier;
     private String Praticien;
@@ -67,7 +62,7 @@ public class PH_Patient implements Serializable, Comparable {
     private String Inf_CP;
     private String Inf_Ville;
     private String Inf_Fax;
-    private String Inf_Tél;
+    private String Inf_Tel;
     private String Inf_Email;
     private String Date_entree;
     private String Date_Debut_Traitement;
@@ -98,94 +93,11 @@ public class PH_Patient implements Serializable, Comparable {
     private String discipline_Medicale;
     private int phiwms_mobileUUID = -1;
 
-    public PH_Patient(JSONObject jsonObject) {
-        try {
-            this._patientUID = jsonObject.getInt("_patientUID");
-            this.Civilité = OutilsGestionClasses.recupererString(jsonObject.getString("Civilité"));
-            this.Nom_naissance = OutilsGestionClasses.recupererString(jsonObject.getString("Nom_naissance"));
-            this.Prénom = OutilsGestionClasses.recupererString(jsonObject.getString("Prénom"));
-            this.Adresse1 = OutilsGestionClasses.recupererString(jsonObject.getString("Adresse1"));
-            this.Adresse2 = OutilsGestionClasses.recupererString(jsonObject.getString("Adresse2"));
-            this.CP = OutilsGestionClasses.recupererString(jsonObject.getString("CP"));
-            this.Ville = OutilsGestionClasses.recupererString(jsonObject.getString("Ville"));
-            this.Tel1 = OutilsGestionClasses.recupererString(jsonObject.getString("Tel1"));
-            this.IPP = OutilsGestionClasses.recupererString(jsonObject.getString("IPP"));
-            this.Fax = OutilsGestionClasses.recupererString(jsonObject.getString("Fax"));
-            this.SYS_DT_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_DT_MAJ"));
-            this.SYS_HEURE_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_HEURE_MAJ"));
-            this.SYS_USER_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_USER_MAJ"));
-            this.Adresse3 = OutilsGestionClasses.recupererString(jsonObject.getString("Adresse3"));
-            this.Tel_Professionnel = OutilsGestionClasses.recupererString(jsonObject.getString("Tel_Professionnel"));
-            this.Tel2 = OutilsGestionClasses.recupererString(jsonObject.getString("Tel2"));
-            this.Technique = OutilsGestionClasses.recupererString(jsonObject.getString("Technique"));
-            this.IPP_Fac = OutilsGestionClasses.recupererString(jsonObject.getString("IPP_Fac"));
-            this.IPP_DM = OutilsGestionClasses.recupererString(jsonObject.getString("IPP_DM"));
-            this.Nom_Marital = OutilsGestionClasses.recupererString(jsonObject.getString("Nom_Marital"));
-            this.Date_Naissance = OutilsGestionClasses.recupererString(jsonObject.getString("Date_Naissance"));
-            this.Matricule = OutilsGestionClasses.recupererString(jsonObject.getString("Matricule"));
-            this.Clef = OutilsGestionClasses.recupererString(jsonObject.getString("Clef"));
-            this.Lieu_Naissance = OutilsGestionClasses.recupererString(jsonObject.getString("Lieu_Naissance"));
-            this.Sexe_Masculin_Feminin = OutilsGestionClasses.recupererBooleen(jsonObject, "Sexe_Masculin_Feminin");
-            this.Fax_Professionnel = OutilsGestionClasses.recupererString(jsonObject.getString("Fax_Professionnel"));
-            this.Profession = OutilsGestionClasses.recupererString(jsonObject.getString("Profession"));
-            this.Nom_Usuel = OutilsGestionClasses.recupererString(jsonObject.getString("Nom_Usuel"));
-            this.Email = OutilsGestionClasses.recupererString(jsonObject.getString("Email"));
-            this.Ressource_Adr1 = OutilsGestionClasses.recupererString(jsonObject.getString("Ressource_Adr1"));
-            this.Ressource_Adr2 = OutilsGestionClasses.recupererString(jsonObject.getString("Ressource_Adr2"));
-            this.Ressource_CP = OutilsGestionClasses.recupererString(jsonObject.getString("Ressource_CP"));
-            this.Ressource_Ville = OutilsGestionClasses.recupererString(jsonObject.getString("Ressource_Ville"));
-            this.Personne_Ressource = OutilsGestionClasses.recupererString(jsonObject.getString("Personne_Ressource"));
-            this.Ressource_Tél = OutilsGestionClasses.recupererString(jsonObject.getString("Ressource_Tél"));
-            this.Ressource_Fax = OutilsGestionClasses.recupererString(jsonObject.getString("Ressource_Fax"));
-            this.Centre_Hospitalier = OutilsGestionClasses.recupererString(jsonObject.getString("Centre_Hospitalier"));
-            this.Praticien = OutilsGestionClasses.recupererString(jsonObject.getString("Praticien"));
-            this.Motif_Suspension_Traitement = OutilsGestionClasses.recupererString(jsonObject.getString("Motif_Suspension_Traitement"));
-            this.Detail_Etat_patient = OutilsGestionClasses.recupererString(jsonObject.getString("Detail_Etat_patient"));
-            this.Infirmier = OutilsGestionClasses.recupererString(jsonObject.getString("Infirmier"));
-            this.Inf_Adr1 = OutilsGestionClasses.recupererString(jsonObject.getString("Inf_Adr1"));
-            this.Inf_Adr2 = OutilsGestionClasses.recupererString(jsonObject.getString("Inf_Adr2"));
-            this.Inf_CP = OutilsGestionClasses.recupererString(jsonObject.getString("Inf_CP"));
-            this.Inf_Ville = OutilsGestionClasses.recupererString(jsonObject.getString("Inf_Ville"));
-            this.Inf_Fax = OutilsGestionClasses.recupererString(jsonObject.getString("Inf_Fax"));
-            this.Inf_Tél = OutilsGestionClasses.recupererString(jsonObject.getString("Inf_Tél"));
-            this.Inf_Email = OutilsGestionClasses.recupererString(jsonObject.getString("Inf_Email"));
-            this.Date_entree = OutilsGestionClasses.recupererString(jsonObject.getString("Date_entree"));
-            this.Date_Debut_Traitement = OutilsGestionClasses.recupererString(jsonObject.getString("Date_Debut_Traitement"));
-            this.Sous_Technique = OutilsGestionClasses.recupererString(jsonObject.getString("Sous_Technique"));
-            this.Approvisionnement = OutilsGestionClasses.recupererString(jsonObject.getString("Approvisionnement"));
-            this.Lieu_Traitement = OutilsGestionClasses.recupererString(jsonObject.getString("Lieu_Traitement"));
-            this.ID_Lieu_Traitement = jsonObject.getInt("ID_Lieu_Traitement");
-            this.Ascenceur = OutilsGestionClasses.recupererBooleen(jsonObject, "Ascenceur");
-            this.Escalier = OutilsGestionClasses.recupererString(jsonObject.getString("Escalier"));
-            this.Etage = jsonObject.getInt("Etage");
-            this.Dgicode = OutilsGestionClasses.recupererString(jsonObject.getString("Dgicode"));
-            this.Date_Etat = OutilsGestionClasses.recupererString(jsonObject.getString("Date_Etat"));
-            this.Archive = OutilsGestionClasses.recupererBooleen(jsonObject, "Archive");
-            this.Securite_Sociale = OutilsGestionClasses.recupererString(jsonObject.getString("Securite_Sociale"));
-            this.Autre_Tel = OutilsGestionClasses.recupererString(jsonObject.getString("Autre_Tel"));
-            this.Autre_Nom = OutilsGestionClasses.recupererString(jsonObject.getString("Autre_Nom"));
-            this.CPAM_Nom = OutilsGestionClasses.recupererString(jsonObject.getString("CPAM_Nom"));
-            this.CPAM_Adresse = OutilsGestionClasses.recupererString(jsonObject.getString("CPAM_Adresse"));
-            this.CPAM_CP = OutilsGestionClasses.recupererString(jsonObject.getString("CPAM_CP"));
-            this.CPAM_Ville = OutilsGestionClasses.recupererString(jsonObject.getString("CPAM_Ville"));
-            this.Poids = jsonObject.getInt("Poids");
-            this.INSC = OutilsGestionClasses.recupererString(jsonObject.getString("INSC"));
-            this.Sexe = OutilsGestionClasses.recupererString(jsonObject.getString("Sexe"));
-            this.Pharmacie = OutilsGestionClasses.recupererString(jsonObject.getString("Pharmacie"));
-            this.Traitement_Modalite = OutilsGestionClasses.recupererString(jsonObject.getString("Traitement_Modalite"));
-            this.Photo_lien = OutilsGestionClasses.recupererString(jsonObject.getString("Photo_lien"));
-            this.Document_partage = OutilsGestionClasses.recupererString(jsonObject.getString("Document_partage"));
-            this.discipline_Medicale = OutilsGestionClasses.recupererString(jsonObject.getString("discipline_Medicale"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
     public PH_Patient(Cursor cursor) {
         this._patientUID = cursor.getInt(PH_PatientOpenHelper.Constantes.NUM_COL__PATIENTUID_PH_PATIENT);
-        this.Civilité = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_CIVILITE_PH_PATIENT);
+        this.Civilite = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_CIVILITE_PH_PATIENT);
         this.Nom_naissance = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_NOM_NAISSANCE_PH_PATIENT);
-        this.Prénom = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_PRENOM_PH_PATIENT);
+        this.Prenom = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_PRENOM_PH_PATIENT);
         this.Adresse1 = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_ADRESSE1_PH_PATIENT);
         this.Adresse2 = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_ADRESSE2_PH_PATIENT);
         this.CP = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_CP_PH_PATIENT);
@@ -217,7 +129,7 @@ public class PH_Patient implements Serializable, Comparable {
         this.Ressource_CP = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_RESSOURCE_CP_PH_PATIENT);
         this.Ressource_Ville = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_RESSOURCE_VILLE_PH_PATIENT);
         this.Personne_Ressource = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_PERSONNE_RESSOURCE_PH_PATIENT);
-        this.Ressource_Tél = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_RESSOURCE_TEL_PH_PATIENT);
+        this.Ressource_Tel = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_RESSOURCE_TEL_PH_PATIENT);
         this.Ressource_Fax = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_RESSOURCE_FAX_PH_PATIENT);
         this.Centre_Hospitalier = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_CENTRE_HOSPITALIER_PH_PATIENT);
         this.Praticien = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_PRATICIEN_PH_PATIENT);
@@ -229,7 +141,7 @@ public class PH_Patient implements Serializable, Comparable {
         this.Inf_CP = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_INF_CP_PH_PATIENT);
         this.Inf_Ville = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_INF_VILLE_PH_PATIENT);
         this.Inf_Fax = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_INF_FAX_PH_PATIENT);
-        this.Inf_Tél = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_INF_TEL_PH_PATIENT);
+        this.Inf_Tel = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_INF_TEL_PH_PATIENT);
         this.Inf_Email = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_INF_EMAIL_PH_PATIENT);
         this.Date_entree = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_DATE_ENTREE_PH_PATIENT);
         this.Date_Debut_Traitement = cursor.getString(PH_PatientOpenHelper.Constantes.NUM_COL_DATE_DEBUT_TRAITEMENT_PH_PATIENT);
@@ -269,12 +181,12 @@ public class PH_Patient implements Serializable, Comparable {
         this._patientUID = _patientUID;
     }
 
-    public String getCivilité() {
-        return Civilité;
+    public String getCivilite() {
+        return Civilite;
     }
 
-    public void setCivilité(String civilité) {
-        Civilité = civilité;
+    public void setCivilite(String civilite) {
+        Civilite = civilite;
     }
 
     public String getNom_naissance() {
@@ -285,12 +197,12 @@ public class PH_Patient implements Serializable, Comparable {
         Nom_naissance = nom_naissance;
     }
 
-    public String getPrénom() {
-        return Prénom;
+    public String getPrenom() {
+        return Prenom;
     }
 
-    public void setPrénom(String prénom) {
-        Prénom = prénom;
+    public void setPrenom(String prenom) {
+        Prenom = prenom;
     }
 
     public String getAdresse1() {
@@ -541,12 +453,12 @@ public class PH_Patient implements Serializable, Comparable {
         Personne_Ressource = personne_Ressource;
     }
 
-    public String getRessource_Tél() {
-        return Ressource_Tél;
+    public String getRessource_Tel() {
+        return Ressource_Tel;
     }
 
-    public void setRessource_Tél(String ressource_Tél) {
-        Ressource_Tél = ressource_Tél;
+    public void setRessource_Tel(String ressource_Tel) {
+        Ressource_Tel = ressource_Tel;
     }
 
     public String getRessource_Fax() {
@@ -637,12 +549,12 @@ public class PH_Patient implements Serializable, Comparable {
         Inf_Fax = inf_Fax;
     }
 
-    public String getInf_Tél() {
-        return Inf_Tél;
+    public String getInf_Tel() {
+        return Inf_Tel;
     }
 
-    public void setInf_Tél(String inf_Tél) {
-        Inf_Tél = inf_Tél;
+    public void setInf_Tel(String inf_Tel) {
+        Inf_Tel = inf_Tel;
     }
 
     public String getInf_Email() {
@@ -881,9 +793,9 @@ public class PH_Patient implements Serializable, Comparable {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("_patientUID", _patientUID);
-            jsonObject.put("Civilité", Civilité);
+            jsonObject.put("Civilite", Civilite);
             jsonObject.put("Nom_naissance", Nom_naissance);
-            jsonObject.put("Prénom", Prénom);
+            jsonObject.put("Prenom", Prenom);
             jsonObject.put("Adresse1", Adresse1);
             jsonObject.put("Adresse2", Adresse2);
             jsonObject.put("CP", CP);
@@ -915,7 +827,7 @@ public class PH_Patient implements Serializable, Comparable {
             jsonObject.put("Ressource_CP", Ressource_CP);
             jsonObject.put("Ressource_Ville", Ressource_Ville);
             jsonObject.put("Personne_Ressource", Personne_Ressource);
-            jsonObject.put("Ressource_Tél", Ressource_Tél);
+            jsonObject.put("Ressource_Tel", Ressource_Tel);
             jsonObject.put("Ressource_Fax", Ressource_Fax);
             jsonObject.put("Centre_Hospitalier", Centre_Hospitalier);
             jsonObject.put("Praticien", Praticien);
@@ -927,7 +839,7 @@ public class PH_Patient implements Serializable, Comparable {
             jsonObject.put("Inf_CP", Inf_CP);
             jsonObject.put("Inf_Ville", Inf_Ville);
             jsonObject.put("Inf_Fax", Inf_Fax);
-            jsonObject.put("Inf_Tél", Inf_Tél);
+            jsonObject.put("Inf_Tel", Inf_Tel);
             jsonObject.put("Inf_Email", Inf_Email);
             jsonObject.put("Date_entree", Date_entree);
             jsonObject.put("Date_Debut_Traitement", Date_Debut_Traitement);
@@ -967,9 +879,9 @@ public class PH_Patient implements Serializable, Comparable {
     public String toString() {
         return "PH_Patient{" +
                 "_patientUID=" + _patientUID +
-                ", Civilité='" + Civilité + '\'' +
+                ", Civilite='" + Civilite + '\'' +
                 ", Nom_naissance='" + Nom_naissance + '\'' +
-                ", Prénom='" + Prénom + '\'' +
+                ", Prenom='" + Prenom + '\'' +
                 ", Adresse1='" + Adresse1 + '\'' +
                 ", Adresse2='" + Adresse2 + '\'' +
                 ", CP='" + CP + '\'' +
@@ -1001,7 +913,7 @@ public class PH_Patient implements Serializable, Comparable {
                 ", Ressource_CP='" + Ressource_CP + '\'' +
                 ", Ressource_Ville='" + Ressource_Ville + '\'' +
                 ", Personne_Ressource='" + Personne_Ressource + '\'' +
-                ", Ressource_Tél='" + Ressource_Tél + '\'' +
+                ", Ressource_Tel='" + Ressource_Tel + '\'' +
                 ", Ressource_Fax='" + Ressource_Fax + '\'' +
                 ", Centre_Hospitalier='" + Centre_Hospitalier + '\'' +
                 ", Praticien='" + Praticien + '\'' +
@@ -1013,7 +925,7 @@ public class PH_Patient implements Serializable, Comparable {
                 ", Inf_CP='" + Inf_CP + '\'' +
                 ", Inf_Ville='" + Inf_Ville + '\'' +
                 ", Inf_Fax='" + Inf_Fax + '\'' +
-                ", Inf_Tél='" + Inf_Tél + '\'' +
+                ", Inf_Tel='" + Inf_Tel + '\'' +
                 ", Inf_Email='" + Inf_Email + '\'' +
                 ", Date_entree='" + Date_entree + '\'' +
                 ", Date_Debut_Traitement='" + Date_Debut_Traitement + '\'' +

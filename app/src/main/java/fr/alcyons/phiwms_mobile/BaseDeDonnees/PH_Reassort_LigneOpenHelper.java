@@ -12,10 +12,6 @@ import java.util.List;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reassort;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reassort_Ligne;
 
-/**
- * Created by jessica on 02/10/2017.
- */
-
 public class PH_Reassort_LigneOpenHelper extends DBOpenHelper {
 
     public PH_Reassort_LigneOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

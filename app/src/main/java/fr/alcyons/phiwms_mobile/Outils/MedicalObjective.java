@@ -60,11 +60,6 @@ import fr.alcyons.phiwms_mobile.DispositifAuLivret.DetailDispositifAuLivretActiv
 import fr.alcyons.phiwms_mobile.IdentificationParScan.DetailProduitIdentificationParScanActivity;
 import fr.alcyons.phiwms_mobile.MedicamentAuLivret.DetailMedicamentAuLivretActivity;
 import fr.alcyons.phiwms_mobile.OriginalActivity;
-
-/**
- * Created by jessica on 08/11/2017.
- */
-
 public class MedicalObjective {
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;

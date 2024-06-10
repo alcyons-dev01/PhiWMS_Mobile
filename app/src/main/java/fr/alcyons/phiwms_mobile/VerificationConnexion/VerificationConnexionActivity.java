@@ -123,10 +123,6 @@ import fr.alcyons.phiwms_mobile.R;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 
-/**
- * Created by olivier on 05/03/2018.
- */
-
 public class VerificationConnexionActivity extends AppCompatActivity {
 
     public SQLiteDatabase db;

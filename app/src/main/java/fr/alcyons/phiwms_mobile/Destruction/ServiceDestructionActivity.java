@@ -61,11 +61,6 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
-
-/**
- * Created by olivier on 16/04/2024.
- */
-
 public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
     List<Retour> listeRetours;
     ListView listViewRetours;
