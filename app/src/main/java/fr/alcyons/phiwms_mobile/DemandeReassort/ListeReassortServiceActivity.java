@@ -221,11 +221,7 @@ public class ListeReassortServiceActivity extends ServiceAvecConnexionActivity {
             };
             obreq.setRetryPolicy(retryPolicy);
             requestQueue.add(obreq);
-            try {
-                Looper.loop();
-            } catch (RuntimeException e) {
-                e.printStackTrace();
-            }
+
             passageParOnCreate = false;
         } else {
             phReassortList = PH_ReassortOpenHelper.getPH_Reassort(db);

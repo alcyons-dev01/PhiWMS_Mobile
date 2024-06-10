@@ -27,7 +27,9 @@ import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity
 //import fr.alcyons.phiwms_mobile.DemandeReassort.ServiceDemandeReassortActivity;
 //import fr.alcyons.phiwms_mobile.Destruction.ServiceDestructionActivity;
 import fr.alcyons.phiwms_mobile.ControleDesRetours.ServiceControleRetoursActivity;
+import fr.alcyons.phiwms_mobile.DemandeDotationGlobale.ListeDotationServiceActivity;
 import fr.alcyons.phiwms_mobile.DemandePleinVide.ServiceDemandePleinVideActivity;
+import fr.alcyons.phiwms_mobile.DemandeReassort.ListeReassortServiceActivity;
 import fr.alcyons.phiwms_mobile.Destruction.ServiceDestructionActivity;
 import fr.alcyons.phiwms_mobile.DispositifAuLivret.ServiceDispositifAuLivretActivity;
 //import fr.alcyons.phiwms_mobile.DotationService.ServiceDotationServiceActivity;
@@ -181,7 +183,7 @@ public class OutilsGestionListeServices {
             case "Dotation Service":
                // return ServiceDotationServiceActivity.class;
             case "Demande Réassort":
-               // return ServiceDemandeReassortActivity.class;
+                return ListeReassortServiceActivity.class;
             case "Demande Dotation PAD":
                // return ServiceDemandeDotationPADActivity.class;
             case "Demande Protocole PAD":
@@ -225,7 +227,7 @@ public class OutilsGestionListeServices {
             case "Demande Plein Vide":
                 return ServiceDemandePleinVideActivity.class;
             case "Demande Dotation Globale":
-               // return ServiceDemandeDotationGlobaleActivity.class;
+                return ListeDotationServiceActivity.class;
             case "Actions utilisateurs":
                // return ServiceActionUtilisateurActivity.class;
 

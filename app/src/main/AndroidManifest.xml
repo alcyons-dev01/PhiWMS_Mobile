@@ -459,6 +459,34 @@
         android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation|keyboardHidden"/>
 
+    <!-- Demande Dotation Globale -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.DemandeDotationGlobale.ListeDotationServiceActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.DemandeDotationGlobale.InformationDotationServiceActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <!-- Demande Demande Reassort -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.DemandeReassort.ListeReassortServiceActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.DemandeReassort.InformationDemandeReassortActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
     </application>
 
 </manifest>
