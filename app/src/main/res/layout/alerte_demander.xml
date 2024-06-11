@@ -70,35 +70,43 @@
 
     </LinearLayout>
 
-    <TextView
+    <LinearLayout
+        android:id="@+id/layoutStock"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_marginTop="5dp"
-        android:textSize="18dp"
-        android:textColor="@color/orange"
-        android:text="Saisissez votre stock"
-        android:gravity="center"/>
+        android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/np_qteStock"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:textSize="20dp"
-        android:text=""
-        android:textColor="@color/orange"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:inputType="number"
-        android:layout_gravity="center"
-        android:selectAllOnFocus="true"
-        android:focusable="true"
-        android:focusableInTouchMode="true"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="5dp"
+            android:textSize="18dp"
+            android:textColor="@color/orange"
+            android:text="Saisissez votre stock"
+            android:gravity="center"/>
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/bleu_clair_alcyons"/>
+        <EditText
+            android:id="@+id/np_qteStock"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:text=""
+            android:textColor="@color/orange"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_gravity="center"
+            android:selectAllOnFocus="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bleu_clair_alcyons"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/np_valider_stock"

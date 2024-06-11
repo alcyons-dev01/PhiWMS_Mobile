@@ -427,6 +427,8 @@ public class ListeDotationServiceActivity extends ServiceAvecConnexionActivity {
             String utilisation_Date_Prevue = "";
             int Qte_besoin = detailDot.getQte();
             int Qte_StockSaisie = -1;
+            if(dotation.isCommandeAB())
+                Qte_StockSaisie = 0;
             int Qte_Demander = 0;
             String EmplacementParDefaut = "";
             int Qte_preparer = 0;

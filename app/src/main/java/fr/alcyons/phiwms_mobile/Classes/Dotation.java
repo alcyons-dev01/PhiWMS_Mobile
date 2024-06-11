@@ -44,6 +44,8 @@ public class Dotation implements Serializable, Comparable {
 
     private String dateLivraison;
 
+    private boolean commandeAB;
+
     public Dotation(JSONObject jsonObject) {
         this._UID = jsonObject.optInt("_UID");
         this.Intitule = jsonObject.optString("Intitulé");
@@ -67,6 +69,7 @@ public class Dotation implements Serializable, Comparable {
         this.TauxStockIdeal = jsonObject.optInt("TauxStockIdeal");
         this.INSTALLATION = recupererBooleen(jsonObject,"INSTALLATION");
         this.PLEINVIDE = recupererBooleen(jsonObject, "PLEINVIDE");
+        this.commandeAB = recupererBooleen(jsonObject, "Commande_AB");
         this.protocole_UID = jsonObject.optInt("protocole_UID");
     }
 
@@ -94,6 +97,7 @@ public class Dotation implements Serializable, Comparable {
         this.INSTALLATION = OutilsGestionClasses.recupererBooleen(cursor, DotationOpenHelper.Constantes.NUM_COL_INSTALLATION_DOTATION);
         this.PLEINVIDE = OutilsGestionClasses.recupererBooleen(cursor, DotationOpenHelper.Constantes.NUM_COL_PLEINVIDE_DOTATION);
         this.protocole_UID = cursor.getInt(DotationOpenHelper.Constantes.NUM_COL_PROTOCOLE_UID_DOTATION);
+        this.commandeAB = OutilsGestionClasses.recupererBooleen(cursor, DotationOpenHelper.Constantes.NUM_COL_COMMANDEAB_DOTATION);
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
@@ -296,6 +300,14 @@ public class Dotation implements Serializable, Comparable {
     public String getDateLivraison() {
         return dateLivraison;
     }
+
+    public boolean isCommandeAB() {
+        return commandeAB;
+    }
+
+    public void setCommandeAB(boolean commandeAB) {
+        this.commandeAB = commandeAB;
+    }
     public JSONObject toJson() {
         JSONObject jsonObject = new JSONObject();
         try {
@@ -322,6 +334,7 @@ public class Dotation implements Serializable, Comparable {
             jsonObject.put("INSTALLATION", INSTALLATION);
             jsonObject.put("PLEINVIDE", PLEINVIDE);
             jsonObject.put("protocole_UID", protocole_UID);
+            jsonObject.put("commandeAB", commandeAB);
         } catch (JSONException e) {
             e.printStackTrace();
             jsonObject = null;
@@ -356,6 +369,7 @@ public class Dotation implements Serializable, Comparable {
                 ", PLEINVIDE=" + PLEINVIDE +
                 ", protocole_UID=" + protocole_UID +
                 ", phiwms_mobileUUID=" + phiwms_mobileUUID +
+                ", commandeAB=" + commandeAB +
                 '}';
     }
 

@@ -325,6 +325,7 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
         LinearLayout layoutdotation_ll = layout.findViewById(R.id.layoutdotation);
         ImageView quitterModale_iv = layout.findViewById(R.id.np_quitterModale);
         LinearLayout validerstock_ll = layout.findViewById(R.id.np_valider_stock);
+        LinearLayout layoutStock_ll = layout.findViewById(R.id.layoutStock);
 
         designation_tv.setText(ph_preparation_ligne.getProduitDesignation());
         reference_tv.setText(ph_preparation_ligne.getProduitReference());
@@ -421,7 +422,7 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
             }
         });
 
-        if(ph_preparation_ligne.getQte_StockSaisie() == -1)
+        if(ph_preparation_ligne.getQte_StockSaisie() == -1 && !dotation.isCommandeAB())
         {
             stock_et.setText("");
             stock_et.requestFocus();
@@ -434,6 +435,10 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
             demande_et.setText(String.valueOf(ph_preparation_ligne.getQte_Demander()));
             validerstock_ll.performClick();
         }
+
+        if(dotation.isCommandeAB())
+            layoutStock_ll.setVisibility(View.GONE);
+
         alertDialog = builder.create();
         Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
         alertDialog.setCanceledOnTouchOutside(false);

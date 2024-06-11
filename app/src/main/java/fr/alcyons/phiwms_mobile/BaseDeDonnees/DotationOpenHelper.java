@@ -381,6 +381,10 @@ public class DotationOpenHelper extends DBOpenHelper {
         public static final int NUM_COL_PROTOCOLE_UID_DOTATION = 23;
         public static final String TYPE_COL_PROTOCOLE_UID_DOTATION = "INTEGER";
 
+        public static final String CLE_COL_COMMANDEAB_DOTATION = "commandeAB";
+        public static final int NUM_COL_COMMANDEAB_DOTATION = 24;
+        public static final String TYPE_COL_COMMANDEAB_DOTATION = "INTEGER";
+
         public static final String CREATION_TABLE_DOTATION = " CREATE TABLE       " + Constantes.TABLE_DOTATION
                 + "("
                 + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + "    PRIMARY KEY,"
@@ -406,7 +410,8 @@ public class DotationOpenHelper extends DBOpenHelper {
                 + Constantes.CLE_COL_TAUXSTOCKIDEAL_DOTATION + " " + Constantes.TYPE_COL_TAUXSTOCKIDEAL_DOTATION + " , "
                 + Constantes.CLE_COL_INSTALLATION_DOTATION + " " + Constantes.TYPE_COL_INSTALLATION_DOTATION + " , "
                 + Constantes.CLE_COL_PLEINVIDE_DOTATION + " " + Constantes.TYPE_COL_PLEINVIDE_DOTATION + " , "
-                + Constantes.CLE_COL_PROTOCOLE_UID_DOTATION + " " + Constantes.TYPE_COL_PROTOCOLE_UID_DOTATION
+                + Constantes.CLE_COL_PROTOCOLE_UID_DOTATION + " " + Constantes.TYPE_COL_PROTOCOLE_UID_DOTATION  + " , "
+                + Constantes.CLE_COL_COMMANDEAB_DOTATION + " " + Constantes.TYPE_COL_COMMANDEAB_DOTATION
                 + " ); ";
 
     }
