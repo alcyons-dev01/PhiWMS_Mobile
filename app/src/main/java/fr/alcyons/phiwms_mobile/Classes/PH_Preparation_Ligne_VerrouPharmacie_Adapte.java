@@ -45,24 +45,6 @@ public class PH_Preparation_Ligne_VerrouPharmacie_Adapte {
         this.produitCorrespondant = ProduitOpenHelper.getProduitByID(db, stockLotEmplacement.getProduit_Code());
     }
 
-    public PH_Preparation_Ligne_VerrouPharmacie_Adapte(String designation, String produitRef, String nbColis, String qteRALLot, String qteParLot, String numLot, String peremptionDate, PH_Preparation_Ligne phPreparationLigne, PH_Preparation phPreparation, boolean Suivi_Par_Serie, boolean Serialiser_Reception, String SerieNumero, SQLiteDatabase db, boolean Verrouiller) {
-        this.designation = designation;
-        this.produitRef = produitRef;
-        this.nbColis = nbColis;
-        this.qteRALLot = qteRALLot;
-        this.qteParLot = qteParLot;
-        this.numLot = numLot;
-        this.peremptionDate = peremptionDate;
-        this.phPreparationLigne = phPreparationLigne;
-        this.phPreparation = phPreparation;
-        this.Suivi_Par_Serie = Suivi_Par_Serie;
-        this.Serialiser_Reception = Serialiser_Reception;
-        this.SerieNumero = SerieNumero;
-        this.db = db;
-        this.Verouiller = Verrouiller;
-
-        this.produitCorrespondant = ProduitOpenHelper.getProduitByID(db, phPreparationLigne.getProduitID());
-    }
 
     public String getDesignation() {
         return designation;

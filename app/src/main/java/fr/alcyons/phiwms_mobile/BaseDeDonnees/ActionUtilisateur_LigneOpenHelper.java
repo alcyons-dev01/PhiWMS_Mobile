@@ -11,10 +11,6 @@ import java.util.List;
 
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne;
 
-/**
- * Created by olivier on 11/04/2019.
- */
-
 public class ActionUtilisateur_LigneOpenHelper extends DBOpenHelper {
 
     public ActionUtilisateur_LigneOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

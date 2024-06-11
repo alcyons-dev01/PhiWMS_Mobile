@@ -14,9 +14,6 @@ import java.util.List;
 import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 
-/**
- * Created by olivier on 26/02/2019.
- */
 
 public class PH_SerialisationOpenHelper extends DBOpenHelper {
 

@@ -4,10 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by jessica on 28/09/2017.
- */
-
 public class PH_Preparation_Ligne_Preparation_Adapte implements Serializable {
     private int ph_preparationLigneID;
     private List<LotAdapte> lotAdaptes;

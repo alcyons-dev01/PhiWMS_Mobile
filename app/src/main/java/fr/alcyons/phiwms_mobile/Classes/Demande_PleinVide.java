@@ -2,10 +2,6 @@ package fr.alcyons.phiwms_mobile.Classes;
 
 import java.io.Serializable;
 
-/**
- * Created by jessica on 31/01/2018.
- */
-
 public class Demande_PleinVide implements Serializable {
 
     private int depot_UID;

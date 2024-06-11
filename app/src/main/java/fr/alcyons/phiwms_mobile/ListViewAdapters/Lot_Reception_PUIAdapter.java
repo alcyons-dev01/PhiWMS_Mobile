@@ -42,10 +42,6 @@ import fr.alcyons.phiwms_mobile.ReceptionPUI.ListeLotReceptionPuiActivity;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-/**
- * Created by olivier on 04/12/2017.
- */
-
 public class Lot_Reception_PUIAdapter extends ArrayAdapter {
     public List<PH_Reliquat_ReceptionPUI_Adapte.Lot> lotList;
     public List<PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement> zoneEtEmplacementList;

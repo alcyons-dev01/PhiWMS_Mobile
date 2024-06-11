@@ -1,8 +1,6 @@
 package fr.alcyons.phiwms_mobile.Outils;
 
 /**
- * Created by jessica on 14/08/2017.
- *
  * @author Alexander Y. Kleymenov
  * @version $Revision$
  * @author Alexander Y. Kleymenov

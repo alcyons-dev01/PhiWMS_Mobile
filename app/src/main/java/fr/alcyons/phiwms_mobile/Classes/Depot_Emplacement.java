@@ -40,20 +40,16 @@ public class Depot_Emplacement implements Serializable, Comparable {
 
 
     public Depot_Emplacement(JSONObject depotEmplacementJson) {
-        try {
-            this._UID = depotEmplacementJson.getInt("_UID");
-            this.Adressage = OutilsGestionClasses.recupererString(depotEmplacementJson.getString("Adressage"));
-            this.Hall = OutilsGestionClasses.recupererString(depotEmplacementJson.getString("Hall"));
-            this.Paletier = OutilsGestionClasses.recupererString(depotEmplacementJson.getString("Paletier"));
-            this.Alveole = OutilsGestionClasses.recupererString(depotEmplacementJson.getString("Alveole"));
-            this.Niveau = OutilsGestionClasses.recupererString(depotEmplacementJson.getString("Niveau"));
-            this.ZoneID = depotEmplacementJson.getInt("ZoneID");
-            this.DepotID = depotEmplacementJson.getInt("DepotID");
-            this.Depot_Reference = OutilsGestionClasses.recupererString(depotEmplacementJson.getString("Depot_Reference"));
-            this.Code_GLN = OutilsGestionClasses.recupererString(depotEmplacementJson.getString("Code_GLN"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this._UID = depotEmplacementJson.optInt("_UID");
+        this.Adressage = depotEmplacementJson.optString("Adressage");
+        this.Hall = depotEmplacementJson.optString("Hall");
+        this.Paletier = depotEmplacementJson.optString("Paletier");
+        this.Alveole = depotEmplacementJson.optString("Alveole");
+        this.Niveau = depotEmplacementJson.optString("Niveau");
+        this.ZoneID = depotEmplacementJson.optInt("ZoneID");
+        this.DepotID = depotEmplacementJson.optInt("DepotID");
+        this.Depot_Reference = depotEmplacementJson.optString("Depot_Reference");
+        this.Code_GLN = depotEmplacementJson.optString("Code_GLN");
     }
 
 

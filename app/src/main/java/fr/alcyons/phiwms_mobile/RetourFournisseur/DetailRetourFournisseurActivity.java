@@ -45,10 +45,6 @@ import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
-/**
- * Created by olivier on 16/04/2024.
- */
-
 public class DetailRetourFournisseurActivity extends ServiceActivity {
     Retour retourSelectionne;
     List<Retour_Ligne> listeRetourLignes;

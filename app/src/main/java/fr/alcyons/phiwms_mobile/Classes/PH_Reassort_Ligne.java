@@ -13,10 +13,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Reassort_LigneOpenHelper;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by jessica on 02/10/2017.
- */
-
 public class PH_Reassort_Ligne implements Serializable, Comparable {
     private int reassort_UID;
     private int produit_ID;
@@ -33,26 +29,6 @@ public class PH_Reassort_Ligne implements Serializable, Comparable {
     private int _UID;
     private int phiwms_mobileUUID = -1;
 
-    public PH_Reassort_Ligne(JSONObject jsonObject) {
-        try {
-            this.reassort_UID = jsonObject.getInt("reassort_UID");
-            this.produit_ID = jsonObject.getInt("produit_ID");
-            this.Designation_int = OutilsGestionClasses.recupererString(jsonObject.getString("Designation_int"));
-            this.Conditionnement = jsonObject.getInt("Conditionnement");
-            this.Quantite = jsonObject.getInt("Quantite");
-            this.produit_Reference = OutilsGestionClasses.recupererString(jsonObject.getString("produit_Reference"));
-            this.Zone_stockage = OutilsGestionClasses.recupererString(jsonObject.getString("Zone_stockage"));
-            this.Categorie = OutilsGestionClasses.recupererString(jsonObject.getString("Categorie"));
-            this.SYS_DT_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_DT_MAJ"));
-            this.SYS_HEURE_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_HEURE_MAJ"));
-            this.SYS_USER_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_USER_MAJ"));
-            this.stock_Minimum = jsonObject.getInt("stock_Minimum");
-            this._UID = jsonObject.getInt("_UID");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
     public PH_Reassort_Ligne(Cursor cursor) {
         this.reassort_UID = cursor.getInt(PH_Reassort_LigneOpenHelper.Constantes.NUM_COL_REASSORT_UID_PH_REASSORT_LIGNE);
         this.produit_ID = cursor.getInt(PH_Reassort_LigneOpenHelper.Constantes.NUM_COL_PRODUIT_ID_PH_REASSORT_LIGNE);
@@ -68,6 +44,22 @@ public class PH_Reassort_Ligne implements Serializable, Comparable {
         this.stock_Minimum = cursor.getInt(PH_Reassort_LigneOpenHelper.Constantes.NUM_COL_STOCK_MINIMUM_PH_REASSORT_LIGNE);
         this._UID = cursor.getInt(PH_Reassort_LigneOpenHelper.Constantes.NUM_COL__UID_PH_REASSORT_LIGNE);
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
+    }
+
+    public PH_Reassort_Ligne(JSONObject jsonObject) {
+        this.reassort_UID = jsonObject.optInt("reassort_UID");
+        this.produit_ID = jsonObject.optInt("produit_ID");
+        this.Designation_int = jsonObject.optString("Designation_int");
+        this.Conditionnement = jsonObject.optInt("Conditionnement");
+        this.Quantite = jsonObject.optInt("Quantite");
+        this.produit_Reference = jsonObject.optString("produit_Reference");
+        this.Zone_stockage = jsonObject.optString("Zone_stockage");
+        this.Categorie = jsonObject.optString("Categorie");
+        this.SYS_DT_MAJ = jsonObject.optString("SYS_DT_MAJ");
+        this.SYS_HEURE_MAJ = jsonObject.optString("SYS_HEURE_MAJ");
+        this.SYS_USER_MAJ = jsonObject.optString("SYS_USER_MAJ");
+        this.stock_Minimum = jsonObject.optInt("stock_Minimum");
+        this._UID = jsonObject.optInt("_UID");
     }
 
     public int getReassort_UID() {
@@ -218,15 +210,8 @@ public class PH_Reassort_Ligne implements Serializable, Comparable {
 
     @Override
     public boolean equals(Object obj) {
-        boolean valeurARetourner = false;
-        if (((PH_Reassort_Ligne) obj).getPhiMR4UUID() == this.getPhiMR4UUID()) {
-            valeurARetourner = true;
-        }
 
-        if (!(obj instanceof PH_Reassort_Ligne)) {
-            valeurARetourner = false;
-        }
-        return valeurARetourner;
+        return ((PH_Reassort_Ligne) obj).getPhiMR4UUID() == this.getPhiMR4UUID();
     }
 
     @Override

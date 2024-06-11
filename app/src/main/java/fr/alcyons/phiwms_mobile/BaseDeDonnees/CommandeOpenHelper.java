@@ -88,7 +88,7 @@ public class CommandeOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_FRAIS_DE_PORT_COMMANDE, commande.getFrais_de_port());
         contentValues.put(Constantes.CLE_COL_SITUATION_COMMANDE, commande.getSituation());
         contentValues.put(Constantes.CLE_COL_DATE_ECHEANCE_COMMANDE, commande.getDate_echeance());
-        contentValues.put(Constantes.CLE_COL_MODALITES_COMMANDE, commande.getModalités());
+        contentValues.put(Constantes.CLE_COL_MODALITES_COMMANDE, commande.getModalites());
         contentValues.put(Constantes.CLE_COL_FACTURE_DATE_COMMANDE, commande.getFacture_Date());
         contentValues.put(Constantes.CLE_COL_MT_TTC_COMMANDE, commande.getMt_TTC());
         contentValues.put(Constantes.CLE_COL_SITUATION2_COMMANDE, commande.getSituation2());
@@ -150,7 +150,7 @@ public class CommandeOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_FRAIS_DE_PORT_COMMANDE, commande.getFrais_de_port());
         contentValues.put(Constantes.CLE_COL_SITUATION_COMMANDE, commande.getSituation());
         contentValues.put(Constantes.CLE_COL_DATE_ECHEANCE_COMMANDE, commande.getDate_echeance());
-        contentValues.put(Constantes.CLE_COL_MODALITES_COMMANDE, commande.getModalités());
+        contentValues.put(Constantes.CLE_COL_MODALITES_COMMANDE, commande.getModalites());
         contentValues.put(Constantes.CLE_COL_FACTURE_DATE_COMMANDE, commande.getFacture_Date());
         contentValues.put(Constantes.CLE_COL_MT_TTC_COMMANDE, commande.getMt_TTC());
         contentValues.put(Constantes.CLE_COL_SITUATION2_COMMANDE, commande.getSituation2());

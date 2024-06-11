@@ -34,10 +34,6 @@ import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 11/04/2019.
- */
-
 public class ActionUtilisateurOpenHelper extends DBOpenHelper {
 
     public ActionUtilisateurOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

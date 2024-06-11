@@ -7,11 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 import fr.alcyons.phiwms_mobile.Classes.PH_Utiliser;
-
-/**
- * Created by jessica on 21/06/2018.
- */
-
 public class PH_UtiliserOpenHelper extends DBOpenHelper {
 
     public static class Constantes implements BaseColumns {

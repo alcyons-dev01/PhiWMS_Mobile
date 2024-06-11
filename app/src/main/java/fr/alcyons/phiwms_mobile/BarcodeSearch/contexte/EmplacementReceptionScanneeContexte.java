@@ -16,9 +16,6 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 06/05/2019.
- */
 
 public class EmplacementReceptionScanneeContexte {
     private Context context;

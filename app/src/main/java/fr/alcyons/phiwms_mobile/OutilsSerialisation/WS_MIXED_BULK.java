@@ -41,10 +41,6 @@ import fr.alcyons.phiwms_mobile.Outils.AGL;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.GestionCodeErreurNMVO;
 
-/**
- * Created by olivier on 26/02/2019.
- */
-
 public class WS_MIXED_BULK {
 
     public static Handler handler = new Handler() {

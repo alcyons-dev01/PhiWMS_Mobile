@@ -9,10 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by olivier on 27/02/2019.
- */
-
 public class DecodageSerialisation {
 
     public static String codeGtin = "codeGtin";

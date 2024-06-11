@@ -15,16 +15,12 @@ import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBool
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by jessica on 02/10/2017.
- */
-
 public class Dotation implements Serializable, Comparable {
 
     private int _UID;
-    private String Intitulé;
+    private String Intitule;
     private String Ref_Depot;
-    private String Début;
+    private String Debut;
     private String Fin;
     private boolean Interrompu;
     private int NB_Semaine;
@@ -49,40 +45,36 @@ public class Dotation implements Serializable, Comparable {
     private String dateLivraison;
 
     public Dotation(JSONObject jsonObject) {
-        try {
-            this._UID = jsonObject.getInt("_UID");
-            this.Intitulé = OutilsGestionClasses.recupererString(jsonObject.getString("Intitulé"));
-            this.Ref_Depot = OutilsGestionClasses.recupererString(jsonObject.getString("Ref_Depot"));
-            this.Début = OutilsGestionClasses.recupererString(jsonObject.getString("Début"));
-            this.Fin = OutilsGestionClasses.recupererString(jsonObject.getString("Fin"));
-            this.Interrompu = OutilsGestionClasses.recupererBooleen(jsonObject, "Interrompu");
-            this.NB_Semaine = jsonObject.getInt("NB_Semaine");
-            this.Valorisation_TTC = jsonObject.getInt("Valorisation_TTC");
-            this.Dotation_Std = OutilsGestionClasses.recupererString(jsonObject.getString("Dotation_Std"));
-            this.Commentaire = OutilsGestionClasses.recupererString(jsonObject.getString("Commentaire"));
-            this.depot_UID = jsonObject.getInt("depot_UID");
-            this.nb_patients = jsonObject.getInt("nb_patients");
-            this.Tournee_Reference = OutilsGestionClasses.recupererString(jsonObject.getString("Tournee_Reference"));
-            this.SYS_DT_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_DT_MAJ"));
-            this.SYS_HEURE_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_HEURE_MAJ"));
-            this.SYS_USER_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("SYS_USER_MAJ"));
-            this.tech_UID = jsonObject.getInt("tech_UID");
-            this.URGENCE = OutilsGestionClasses.recupererBooleen(jsonObject, "URGENCE");
-            this.SECURISE = OutilsGestionClasses.recupererBooleen(jsonObject, "SECURISE");
-            this.TauxStockIdeal = jsonObject.getInt("TauxStockIdeal");
-            this.INSTALLATION = OutilsGestionClasses.recupererBooleen(jsonObject, "INSTALLATION");
-            this.PLEINVIDE = OutilsGestionClasses.recupererBooleen(jsonObject, "PLEINVIDE");
-            this.protocole_UID = jsonObject.getInt("protocole_UID");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this._UID = jsonObject.optInt("_UID");
+        this.Intitule = jsonObject.optString("Intitulé");
+        this.Ref_Depot = jsonObject.optString("Ref_Depot");
+        this.Debut = jsonObject.optString("Début");
+        this.Fin = jsonObject.optString("Fin");
+        this.Interrompu = recupererBooleen(jsonObject,"Interrompu");
+        this.NB_Semaine = jsonObject.optInt("NB_Semaine");
+        this.Valorisation_TTC = jsonObject.optInt("Valorisation_TTC");
+        this.Dotation_Std = jsonObject.optString("Dotation_Std");
+        this.Commentaire = jsonObject.optString("Commentaire");
+        this.depot_UID = jsonObject.optInt("depot_UID");
+        this.nb_patients = jsonObject.optInt("nb_patients");
+        this.Tournee_Reference = jsonObject.optString("Tournee_Reference");
+        this.SYS_DT_MAJ = jsonObject.optString("SYS_DT_MAJ");
+        this.SYS_HEURE_MAJ = jsonObject.optString("SYS_HEURE_MAJ");
+        this.SYS_USER_MAJ = jsonObject.optString("SYS_USER_MAJ");
+        this.tech_UID = jsonObject.optInt("tech_UID");
+        this.URGENCE = recupererBooleen(jsonObject,"URGENCE");
+        this.SECURISE = recupererBooleen(jsonObject,"SECURISE");
+        this.TauxStockIdeal = jsonObject.optInt("TauxStockIdeal");
+        this.INSTALLATION = recupererBooleen(jsonObject,"INSTALLATION");
+        this.PLEINVIDE = recupererBooleen(jsonObject, "PLEINVIDE");
+        this.protocole_UID = jsonObject.optInt("protocole_UID");
     }
 
     public Dotation(Cursor cursor) {
         this._UID = cursor.getInt(DotationOpenHelper.Constantes.NUM_COL__UID_DOTATION);
-        this.Intitulé = cursor.getString(DotationOpenHelper.Constantes.NUM_COL_INTITULE_DOTATION);
+        this.Intitule = cursor.getString(DotationOpenHelper.Constantes.NUM_COL_INTITULE_DOTATION);
         this.Ref_Depot = cursor.getString(DotationOpenHelper.Constantes.NUM_COL_REF_DEPOT_DOTATION);
-        this.Début = cursor.getString(DotationOpenHelper.Constantes.NUM_COL_DEBUT_DOTATION);
+        this.Debut = cursor.getString(DotationOpenHelper.Constantes.NUM_COL_DEBUT_DOTATION);
         this.Fin = cursor.getString(DotationOpenHelper.Constantes.NUM_COL_FIN_DOTATION);
         this.Interrompu = OutilsGestionClasses.recupererBooleen(cursor, DotationOpenHelper.Constantes.NUM_COL_INTERROMPU_DOTATION);
         this.NB_Semaine = cursor.getInt(DotationOpenHelper.Constantes.NUM_COL_NB_SEMAINE_DOTATION);
@@ -114,11 +106,11 @@ public class Dotation implements Serializable, Comparable {
     }
 
     public String getIntitule() {
-        return Intitulé;
+        return Intitule;
     }
 
-    public void setIntitule(String intitulé) {
-        Intitulé = intitulé;
+    public void setIntitule(String intitule) {
+        Intitule = intitule;
     }
 
     public String getRef_Depot() {
@@ -129,12 +121,12 @@ public class Dotation implements Serializable, Comparable {
         Ref_Depot = ref_Depot;
     }
 
-    public String getDébut() {
-        return Début;
+    public String getDebut() {
+        return Debut;
     }
 
-    public void setDébut(String début) {
-        Début = début;
+    public void setDebut(String debut) {
+        Debut = debut;
     }
 
     public String getFin() {
@@ -308,9 +300,9 @@ public class Dotation implements Serializable, Comparable {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("_UID", _UID);
-            jsonObject.put("Intitulé", Intitulé);
+            jsonObject.put("Intitule", Intitule);
             jsonObject.put("Ref_Depot", Ref_Depot);
-            jsonObject.put("Début", Début);
+            jsonObject.put("Debut", Debut);
             jsonObject.put("Fin", Fin);
             jsonObject.put("Interrompu", Interrompu);
             jsonObject.put("NB_Semaine", NB_Semaine);
@@ -341,9 +333,9 @@ public class Dotation implements Serializable, Comparable {
     public String toString() {
         return "Dotation{" +
                 "_UID=" + _UID +
-                ", Intitulé='" + Intitulé + '\'' +
+                ", Intitule='" + Intitule + '\'' +
                 ", Ref_Depot='" + Ref_Depot + '\'' +
-                ", Début='" + Début + '\'' +
+                ", Debut='" + Debut + '\'' +
                 ", Fin='" + Fin + '\'' +
                 ", Interrompu=" + Interrompu +
                 ", NB_Semaine=" + NB_Semaine +

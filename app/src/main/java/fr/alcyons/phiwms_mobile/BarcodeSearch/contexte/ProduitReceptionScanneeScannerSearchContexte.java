@@ -46,10 +46,6 @@ import fr.alcyons.phiwms_mobile.OutilsSerialisation.EnvoyerMailSurveillance;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 20/05/2019.
- */
-
 public class ProduitReceptionScanneeScannerSearchContexte extends MainActivity {
     private Context context;
     private SQLiteDatabase db;

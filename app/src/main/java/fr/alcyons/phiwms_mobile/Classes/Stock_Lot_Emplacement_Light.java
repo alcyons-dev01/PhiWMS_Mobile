@@ -24,19 +24,15 @@ public class Stock_Lot_Emplacement_Light implements Comparable {
     private int phiwms_mobileUUID = -1;
 
     public Stock_Lot_Emplacement_Light(JSONObject jsonObject) {
-        try {
-            this._UID = jsonObject.getInt("_UID");
-            this.Produit_Code = jsonObject.getInt("Produit_Code");
-            this.Depot_Reference = OutilsGestionClasses.recupererString(jsonObject.getString("Depot_Reference"));
-            this.Zone = OutilsGestionClasses.recupererString(jsonObject.getString("Zone"));
-            this.Emplacement = OutilsGestionClasses.recupererString(jsonObject.getString("Emplacement"));
-            this.Lot = OutilsGestionClasses.recupererString(jsonObject.getString("Lot"));
-            this.Qte = jsonObject.getDouble("Qte");
-            this.peremptionDate = OutilsGestionClasses.recupererString(jsonObject.getString("peremptionDate"));
-            this.Serie = OutilsGestionClasses.recupererString(jsonObject.getString("Serie"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this._UID = jsonObject.optInt("_UID");
+        this.Produit_Code = jsonObject.optInt("Produit_Code");
+        this.Depot_Reference = jsonObject.optString("Depot_Reference");
+        this.Zone = jsonObject.optString("Zone");
+        this.Emplacement = jsonObject.optString("Emplacement");
+        this.Lot = jsonObject.optString("Lot");
+        this.Qte = jsonObject.optDouble("Qte");
+        this.peremptionDate = jsonObject.optString("peremptionDate");
+        this.Serie = jsonObject.optString("Serie");
     }
 
     public Stock_Lot_Emplacement_Light(double qte, String lot, String peremptionDate, String emplacement, String depot_Reference, String zone, int produit_Code, int qtePrep, String numSerie) {

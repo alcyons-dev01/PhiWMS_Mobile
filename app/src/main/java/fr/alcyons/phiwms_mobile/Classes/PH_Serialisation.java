@@ -14,11 +14,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
-
-/**
- * Created by olivier on 26/02/2019.
- */
-
 public class PH_Serialisation implements Serializable, Comparable {
 
     int _UID;
@@ -75,29 +70,25 @@ public class PH_Serialisation implements Serializable, Comparable {
     }
 
     public PH_Serialisation(JSONObject jsonObject) {
-        try {
-            _UID = jsonObject.getInt("id");
-            produitUID = jsonObject.getInt("ProduitUID");
-            datamatrix = OutilsGestionClasses.recupererString(jsonObject.getString("Datamatrix"));
-            produitCodeValue = OutilsGestionClasses.recupererString(jsonObject.getString("ProduitCodeValue"));
-            produitCodeSheme = OutilsGestionClasses.recupererString(jsonObject.getString("ProduitCodeSheme"));
-            numeroLot = OutilsGestionClasses.recupererString(jsonObject.getString("NumeroLot"));
-            datePeremptionAAMMJJ = OutilsGestionClasses.recupererString(jsonObject.getString("DatePeremptionAAMMJJ"));
-            numeroSerie = OutilsGestionClasses.recupererString(jsonObject.getString("NumeroSerie"));
-            refClientTrxId = OutilsGestionClasses.recupererString(jsonObject.getString("RefClientTrxId"));
-            reqType = OutilsGestionClasses.recupererString(jsonObject.getString("ReqType"));
-            resultat = OutilsGestionClasses.recupererString(jsonObject.getString("Resultat"));
-            statut = OutilsGestionClasses.recupererString(jsonObject.getString("Statut"));
-            NMVSTrxId = OutilsGestionClasses.recupererString(jsonObject.getString("NMVSTrxId"));
-            userUID = jsonObject.getInt("UserId");
-            demandeDate = OutilsGestionClasses.recupererString(jsonObject.getString("DemandeDate"));
-            demandeHeure = OutilsGestionClasses.recupererString(jsonObject.getString("DemandeHeure"));
-            mvtType = OutilsGestionClasses.recupererString(jsonObject.getString("MvtType"));
-            mvtUID = OutilsGestionClasses.recupererString(jsonObject.getString("MvtUid"));
-            raison = OutilsGestionClasses.recupererString(jsonObject.getString("Raison"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        _UID = jsonObject.optInt("id");
+        produitUID = jsonObject.optInt("ProduitUID");
+        datamatrix = jsonObject.optString("Datamatrix");
+        produitCodeValue = jsonObject.optString("ProduitCodeValue");
+        produitCodeSheme = jsonObject.optString("ProduitCodeSheme");
+        numeroLot = jsonObject.optString("NumeroLot");
+        datePeremptionAAMMJJ = jsonObject.optString("DatePeremptionAAMMJJ");
+        numeroSerie = jsonObject.optString("NumeroSerie");
+        refClientTrxId = jsonObject.optString("RefClientTrxId");
+        reqType = jsonObject.optString("ReqType");
+        resultat = jsonObject.optString("Resultat");
+        statut = jsonObject.optString("Statut");
+        NMVSTrxId = jsonObject.optString("NMVSTrxId");
+        userUID = jsonObject.optInt("UserId");
+        demandeDate = jsonObject.optString("DemandeDate");
+        demandeHeure = jsonObject.optString("DemandeHeure");
+        mvtType = jsonObject.optString("MvtType");
+        mvtUID = jsonObject.optString("MvtUid");
+        raison = jsonObject.optString("Raison");
     }
 
     public PH_Serialisation(Cursor cursor) {
@@ -341,15 +332,8 @@ public class PH_Serialisation implements Serializable, Comparable {
 
     @Override
     public boolean equals(Object obj) {
-        boolean valeurARetourner = false;
-        if (obj == this) {
-            valeurARetourner = true;
-        }
 
-        if (!(obj instanceof PH_Serialisation)) {
-            valeurARetourner = false;
-        }
-        return valeurARetourner;
+        return obj == this;
     }
 
     @Override

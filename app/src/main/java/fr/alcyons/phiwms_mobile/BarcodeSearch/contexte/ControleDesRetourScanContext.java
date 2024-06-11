@@ -39,10 +39,6 @@ import fr.alcyons.phiwms_mobile.OutilsSerialisation.EnvoyerMailSurveillance;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 14/06/2019.
- */
-
 public class ControleDesRetourScanContext extends MainActivity {
 
     private Context context;

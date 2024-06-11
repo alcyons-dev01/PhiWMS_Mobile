@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1"
+            android:background="@color/bleu_fonce_alcyons">
+
+            <TextView
+                android:id="@+id/titre"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Confirmation"
+                android:textSize="20sp"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:padding="10dp" />
+
+            <ImageView
+                android:id="@+id/quitteModale"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/ic_clear"
+                android:layout_gravity="center"
+                android:layout_marginEnd="5dp"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/designationProduit"
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Designation"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:maxLines="2"
+            android:paddingEnd="10dp"
+            android:paddingStart="10dp"
+            android:layout_marginBottom="5dp"
+            android:ellipsize="middle"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Souhaitez-vous \n\n Supprimer ou Ajouter ?"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:layout_marginTop="20dp"
+            android:textColor="@android:color/black"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bleu_fonce_alcyons"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="5dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <LinearLayout
+                android:id="@+id/buttonAnnuler"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_remove"
+                    android:backgroundTint="@color/rouge"
+                    android:layout_gravity="center"
+                    android:layout_centerHorizontal="true" />
+
+                <TextView
+                    android:id="@+id/TitreAnnulation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Supprimer"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textColor="@color/noir"/>
+
+                <TextView
+                    android:id="@+id/nbSuppression"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textStyle="bold"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textColor="@color/noir"/>
+
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/bleu_fonce_alcyons"/>
+
+            <LinearLayout
+                android:id="@+id/buttonOk"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_plus"
+                    android:layout_gravity="center"
+                    android:layout_centerHorizontal="true" />
+
+                <TextView
+                    android:id="@+id/TitreConfirmation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ajouter"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textColor="@color/noir"/>
+
+                <TextView
+                    android:id="@+id/nbAjout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:textColor="@color/noir"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bleu_fonce_alcyons"
+            android:layout_marginTop="5dp"/>
+
+    </LinearLayout>
+
+
+</RelativeLayout>

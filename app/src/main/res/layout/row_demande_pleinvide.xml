@@ -54,20 +54,36 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="3"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:layout_gravity="center"
-                android:gravity="center">
+                android:gravity="center"
+                android:weightSum="4">
 
                 <TextView
                     android:id="@+id/designationProduit"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:layout_weight="3"
                     android:gravity="center_vertical"
                     android:paddingRight="5dp"
                     android:text="Designation"
+                    android:maxLines="2"
+                    android:lines="2"
+                    android:ellipsize="middle"
                     android:textColor="@android:color/black"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/conditionnement"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:paddingRight="5dp"
+                    android:text=""
+                    android:textColor="@android:color/black" />
 
             </LinearLayout>
 
@@ -92,6 +108,7 @@
                     android:layout_weight="5"
                     android:text=""
                     android:gravity="center"
+                    android:textStyle="bold"
                     android:textColor="@android:color/black" />
 
             </LinearLayout>

@@ -74,11 +74,6 @@ import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotos.verifyStoragePermissions;
-
-/**
- * Created by olivier on 17/04/2024.
- */
-
 public class DetailReceptionPuiActivity extends ServiceActivity {
     Commande commandeSelectionne;
     List<PH_Reliquat> phReliquatList;

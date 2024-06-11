@@ -30,10 +30,6 @@ import fr.alcyons.phiwms_mobile.OriginalActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 
-/**
- * Created by olivier on 26/02/2019.
- */
-
 public class WS_PKI extends MainActivity {
 
     public static Handler handler = new Handler() {

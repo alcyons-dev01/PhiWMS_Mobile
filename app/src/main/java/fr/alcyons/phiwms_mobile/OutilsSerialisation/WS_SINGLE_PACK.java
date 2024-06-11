@@ -41,10 +41,6 @@ import fr.alcyons.phiwms_mobile.Outils.GestionCodeErreurNMVO;
 import fr.alcyons.phiwms_mobile.Outils.OutilsEncodage;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 
-/**
- * Created by olivier on 26/02/2019.
- */
-
 public class WS_SINGLE_PACK extends MainActivity {
 
     public static Handler handler = new Handler() {

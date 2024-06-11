@@ -14,10 +14,6 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by jessica on 07/06/2018.
- */
-
 public class PleinVideLocalisationContexte {
 
     private Context context;

@@ -11,10 +11,6 @@ import java.util.List;
 
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 
-/**
- * Created by olivier on 28/11/2017.
- */
-
 public class PH_ReliquatOpenHelper extends DBOpenHelper {
 
     public PH_ReliquatOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

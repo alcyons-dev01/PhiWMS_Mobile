@@ -1,5 +1,7 @@
 package fr.alcyons.phiwms_mobile.Classes;
 
+import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
+
 import android.database.Cursor;
 
 import org.json.JSONException;
@@ -43,11 +45,11 @@ public class Depot implements Serializable, Comparable {
     private String PAD_Vacances_CP;
     private String PAD_Vacances_Ville;
     private String PAD_Vacances_Pays;
-    private String PAD_Vacances_Tél;
+    private String PAD_Vacances_Tel;
     private String PAD_Vacances_Commentaires;
     private String PAD_Localisation_Poches;
-    private String PAD_Précision_Localisation;
-    private String PAD_Coordonnées_GPS;
+    private String PAD_Precision_Localisation;
+    private String PAD_Coordonnees_GPS;
     private boolean PAD_Acces_Chariot;
     private boolean PAD_Acces_Roll;
     private boolean PAD_Acces_Manuelle;
@@ -76,8 +78,8 @@ public class Depot implements Serializable, Comparable {
     private boolean Service_externe;
     private int Ordre;
     private boolean Accuse_Reception;
-    private int Jours_de_réserve_par_defaut;
-    private int Jours_de_réserve_par_livraison;
+    private int Jours_de_reserve_par_defaut;
+    private int Jours_de_reserve_par_livraison;
     private boolean Inventaire_fin_de_Mois;
     private boolean RAZ_Stock_Inventaire;
     private String Ref_Depot_Phi;
@@ -112,227 +114,34 @@ public class Depot implements Serializable, Comparable {
         this.Tel = Tel;
         this.Structure = Structure;
     }
-/*    public Depot(JSONObject depotJson) {
-        try {
-            this.Depot_UID = depotJson.getInt("Depot_UID");
-            this.Depot_Reference = OutilsGestionClasses.recupererString(depotJson.getString("Depot_Reference"));
-            this.Nom = OutilsGestionClasses.recupererString(depotJson.getString("Nom"));
-            this.Adresse1 = OutilsGestionClasses.recupererString(depotJson.getString("Adresse1"));
-            this.Adresse2 = OutilsGestionClasses.recupererString(depotJson.getString("Adresse2"));
-            this.CP = OutilsGestionClasses.recupererString(depotJson.getString("CP"));
-            this.Ville = OutilsGestionClasses.recupererString(depotJson.getString("Ville"));
-            this.Tel = OutilsGestionClasses.recupererString(depotJson.getString("Tel"));
-            this.Fax = OutilsGestionClasses.recupererString(depotJson.getString("Fax"));
-            this.Livraison_Directe = OutilsGestionClasses.recupererBooleen(depotJson, "Livraison_Directe");
-            this.Structure = OutilsGestionClasses.recupererString(depotJson.getString("Structure"));
-            this.Responsable = OutilsGestionClasses.recupererString(depotJson.getString("Responsable"));
-            this.PAD_IPP = OutilsGestionClasses.recupererString(depotJson.getString("PAD_IPP"));
-            this.PAD_Patient = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Patient"));
-            this.Hor_ouv = OutilsGestionClasses.recupererString(depotJson.getString("Hor_ouv"));
-            this.R_adresse1 = OutilsGestionClasses.recupererString(depotJson.getString("R_adresse1"));
-            this.R_adresse2 = OutilsGestionClasses.recupererString(depotJson.getString("R_adresse2"));
-            this.R_CP = OutilsGestionClasses.recupererString(depotJson.getString("R_CP"));
-            this.R_Ville = OutilsGestionClasses.recupererString(depotJson.getString("R_Ville"));
-            this.R_tel = OutilsGestionClasses.recupererString(depotJson.getString("R_tel"));
-            this.R_fax = OutilsGestionClasses.recupererString(depotJson.getString("R_fax"));
-            this.Archive = OutilsGestionClasses.recupererBooleen(depotJson, "Archive");
-            this.ID_UF_Rattachement = depotJson.getInt("ID_UF_Rattachement");
-            this.SYS_DT_MAJ = OutilsGestionClasses.recupererString(depotJson.getString("SYS_DT_MAJ"));
-            this.SYS_HEURE_MAJ = OutilsGestionClasses.recupererString(depotJson.getString("SYS_HEURE_MAJ"));
-            this.SYS_USER_MAJ = OutilsGestionClasses.recupererString(depotJson.getString("SYS_USER_MAJ"));
-            this.Dialyse_Frequence = OutilsGestionClasses.recupererString(depotJson.getString("Dialyse_Frequence"));
-            this.PAD_Vacances_Adr1 = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Vacances_Adr1"));
-            this.PAD_Vacances_Adr2 = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Vacances_Adr2"));
-            this.PAD_Vacances_CP = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Vacances_CP"));
-            this.PAD_Vacances_Ville = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Vacances_Ville"));
-            this.PAD_Vacances_Pays = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Vacances_Pays"));
-            this.PAD_Vacances_Tél = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Vacances_Tél"));
-            this.PAD_Vacances_Commentaires = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Vacances_Commentaires"));
-            this.PAD_Localisation_Poches = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Localisation_Poches"));
-            this.PAD_Précision_Localisation = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Précision_Localisation"));
-            this.PAD_Coordonnées_GPS = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Coordonnées_GPS"));
-            this.PAD_Acces_Chariot = OutilsGestionClasses.recupererBooleen(depotJson, "PAD_Acces_Chariot");
-            this.PAD_Acces_Roll = OutilsGestionClasses.recupererBooleen(depotJson, "PAD_Acces_Roll");
-            this.PAD_Acces_Manuelle = OutilsGestionClasses.recupererBooleen(depotJson, "PAD_Acces_Manuelle");
-            this.PAD_Vehicule_Livraison = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Vehicule_Livraison"));
-            this.Livraison_Semaine_1 = OutilsGestionClasses.recupererString(depotJson.getString("Livraison_Semaine_1"));
-            this.Livraison_Periode = depotJson.getInt("Livraison_Periode");
-            this.PAD_Commentaire_Livraison = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Commentaire_Livraison"));
-            this.PAD_Email = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Email"));
-            this.Statut = OutilsGestionClasses.recupererString(depotJson.getString("Statut"));
-            //this.PAD_Plan  = recupererString(depotJson.getString("PAD_Plan");
-            this.Praticient_Par_defaut = OutilsGestionClasses.recupererString(depotJson.getString("Praticient_Par_defaut"));
-            this.PAD_Lieu_Traitement = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Lieu_Traitement"));
-            this.PAD_ID_Lieu_Traitement = depotJson.getInt("PAD_ID_Lieu_Traitement");
-            this.PAD_Utiliser_Adresse_Vacances = OutilsGestionClasses.recupererBooleen(depotJson, "PAD_Utiliser_Adresse_Vacances");
-            this.PAD_Ascenceur = OutilsGestionClasses.recupererBooleen(depotJson, "PAD_Ascenceur");
-            this.PAD_etage = depotJson.getInt("PAD_etage");
-            this.PAD_escalier = OutilsGestionClasses.recupererString(depotJson.getString("PAD_escalier"));
-            this.PAD_digicode = OutilsGestionClasses.recupererString(depotJson.getString("PAD_digicode"));
-            this.Livraison_Jour = OutilsGestionClasses.recupererString(depotJson.getString("Livraison_Jour"));
-            this.Livraison_Semaine_2 = OutilsGestionClasses.recupererString(depotJson.getString("Livraison_Semaine_2"));
-            this.Tournee_nom = OutilsGestionClasses.recupererString(depotJson.getString("Tournee_nom"));
-            this.Tournee_code = depotJson.getInt("Tournee_code");
-            this.Section_Analytique = OutilsGestionClasses.recupererString(depotJson.getString("Section_Analytique"));
-            this.PAD_ID_Pret = depotJson.getInt("PAD_ID_Pret");
-            //Symbole  = recupererString(depotJson.getString("Symbole");
-            this.Service_externe = OutilsGestionClasses.recupererBooleen(depotJson, "Service_externe");
-            this.Ordre = depotJson.getInt("Ordre");
-            this.Accuse_Reception = OutilsGestionClasses.recupererBooleen(depotJson, "Accuse_Reception");
-            this.Jours_de_réserve_par_defaut = depotJson.getInt("Jours_de_réserve_par_defaut");
-            this.Jours_de_réserve_par_livraison = depotJson.getInt("Jours_de_réserve_par_livraison");
-            this.Inventaire_fin_de_Mois = OutilsGestionClasses.recupererBooleen(depotJson, "Inventaire_fin_de_Mois");
-            this.RAZ_Stock_Inventaire = OutilsGestionClasses.recupererBooleen(depotJson, "RAZ_Stock_Inventaire");
-            this.Ref_Depot_Phi = OutilsGestionClasses.recupererString(depotJson.getString("Ref_Depot_Phi"));
-            this.Livraison_Semaine_3 = OutilsGestionClasses.recupererString(depotJson.getString("Livraison_Semaine_3"));
-            this.Livraison_Semaine_4 = OutilsGestionClasses.recupererString(depotJson.getString("Livraison_Semaine_4"));
-            this.Livraison_Semaine_5 = OutilsGestionClasses.recupererString(depotJson.getString("Livraison_Semaine_5"));
-            this.Commentaire_Commande = OutilsGestionClasses.recupererString(depotJson.getString("Commentaire_Commande"));
-            this.CAHP = OutilsGestionClasses.recupererString(depotJson.getString("CAHP"));
-            this.Horaire_livraison = OutilsGestionClasses.recupererString(depotJson.getString("Horaire_livraison"));
-            this.ATIR_Reference_Depot = OutilsGestionClasses.recupererString(depotJson.getString("ATIR_Reference_Depot"));
-            //this.DM_Localisation  = recupererString(depotJson.getString("DM_Localisation");
-            this.Reference_Depot_Avant_PHI = OutilsGestionClasses.recupererString(depotJson.getString("Reference_Depot_Avant_PHI"));
-            this.Livraison_Frequence_Type = OutilsGestionClasses.recupererString(depotJson.getString("Livraison_Frequence_Type"));
-            this.Livraison_Nb_Semaines = depotJson.getInt("Livraison_Nb_Semaines");
-            this.dossier_document = OutilsGestionClasses.recupererString(depotJson.getString("dossier_document"));
-            this.ProtocoleStd = OutilsGestionClasses.recupererString(depotJson.getString("ProtocoleStd"));
-            this.latitude = depotJson.getDouble("latitude");
-            this.longitude = depotJson.getDouble("longitude");
-            this.Etablissement_UID = depotJson.getInt("Etablissement_UID");
-            this.FInessGeo = OutilsGestionClasses.recupererString(depotJson.getString("FInessGeo"));
-            this.Nombre_Postes = depotJson.getInt("Nombre_Postes");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }*/
-
 
     public Depot(JSONObject depotJson) {
-        try {
-            this.Depot_UID = depotJson.getInt("Depot_UID");
-            this.Depot_Reference = OutilsGestionClasses.recupererString(depotJson.getString("Depot_Reference"));
-            this.Nom = OutilsGestionClasses.recupererString(depotJson.getString("Nom"));
-            this.Adresse1 = OutilsGestionClasses.recupererString(depotJson.getString("Adresse1"));
-            this.Adresse2 = OutilsGestionClasses.recupererString(depotJson.getString("Adresse2"));
-            this.CP = OutilsGestionClasses.recupererString(depotJson.getString("CP"));
-            this.Ville = OutilsGestionClasses.recupererString(depotJson.getString("Ville"));
-            this.Tel = OutilsGestionClasses.recupererString(depotJson.getString("Tel"));
-            this.Fax = OutilsGestionClasses.recupererString(depotJson.getString("Fax"));
-            this.Structure = OutilsGestionClasses.recupererString(depotJson.getString("Structure"));
-            this.SYS_DT_MAJ = OutilsGestionClasses.recupererString(depotJson.getString("SYS_DT_MAJ"));
-            this.SYS_HEURE_MAJ = OutilsGestionClasses.recupererString(depotJson.getString("SYS_HEURE_MAJ"));
-            this.SYS_USER_MAJ = OutilsGestionClasses.recupererString(depotJson.getString("SYS_USER_MAJ"));
-            this.PAD_Vacances_Adr1 = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Vacances_Adr1"));
-            this.PAD_Vacances_Adr2 = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Vacances_Adr2"));
-            this.PAD_Vacances_CP = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Vacances_CP"));
-            this.PAD_Vacances_Ville = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Vacances_Ville"));
-            this.latitude = depotJson.getDouble("latitude");
-            this.longitude = depotJson.getDouble("longitude");
-            this.Jours_de_réserve_par_livraison = depotJson.getInt("Jours_de_réserve_par_livraison");
-            this.PAD_IPP = depotJson.getString("PAD_IPP");
-            this.PAD_Patient = depotJson.getString("PAD_Patient");
-            this.PAD_Lieu_Traitement = OutilsGestionClasses.recupererString(depotJson.getString("PAD_Lieu_Traitement"));
-            this.Etablissement_UID = depotJson.getInt("Etablissement_UID");
-            this.Archive = OutilsGestionClasses.recupererBooleen(depotJson, "Archive");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this.Depot_UID = depotJson.optInt("Depot_UID");
+        this.Depot_Reference = depotJson.optString("Depot_Reference");
+        this.Nom = depotJson.optString("Nom");
+        this.Adresse1 = depotJson.optString("Adresse1");
+        this.Adresse2 = depotJson.optString("Adresse2");
+        this.CP = depotJson.optString("CP");
+        this.Ville = depotJson.optString("Ville");
+        this.Tel = depotJson.optString("Tel");
+        this.Fax = depotJson.optString("Fax");
+        this.Structure = depotJson.optString("Structure");
+        this.SYS_DT_MAJ = depotJson.optString("SYS_DT_MAJ");
+        this.SYS_HEURE_MAJ = depotJson.optString("SYS_HEURE_MAJ");
+        this.SYS_USER_MAJ = depotJson.optString("SYS_USER_MAJ");
+        this.PAD_Vacances_Adr1 = depotJson.optString("PAD_Vacances_Adr1");
+        this.PAD_Vacances_Adr2 = depotJson.optString("PAD_Vacances_Adr2");
+        this.PAD_Vacances_CP = depotJson.optString("PAD_Vacances_CP");
+        this.PAD_Vacances_Ville = depotJson.optString("PAD_Vacances_Ville");
+        this.latitude = depotJson.optDouble("latitude");
+        this.longitude = depotJson.optDouble("longitude");
+        this.Jours_de_reserve_par_livraison = depotJson.optInt("Jours_de_réserve_par_livraison");
+        this.PAD_IPP = depotJson.optString("PAD_IPP");
+        this.PAD_Patient = depotJson.optString("PAD_Patient");
+        this.PAD_Lieu_Traitement = depotJson.optString("PAD_Lieu_Traitement");
+        this.Etablissement_UID = depotJson.optInt("Etablissement_UID");
+        this.Archive = recupererBooleen(depotJson, "Archive");
     }
-
-
-
- /*   public Depot(Cursor cursor) {
-        this.Depot_UID = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_ID_DEPOT);
-        this.Depot_Reference = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_DEPOT_REFERENCE_DEPOT);
-        this.Nom = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_NOM_DEPOT);
-        this.Adresse1 = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_ADRESSE1_DEPOT);
-        this.Adresse2 = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_ADRESSE2_DEPOT);
-        this.CP = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_CP_DEPOT);
-        this.Ville = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_VILLE_DEPOT);
-        this.Tel = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_TEL_DEPOT);
-        this.Fax = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_FAX_DEPOT);
-        this.Livraison_Directe = intToBoolean(cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_LIVRAISON_DIRECTE_DEPOT));
-        this.Structure = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_STRUCTURE_DEPOT);
-        this.Responsable = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_RESPONSABLE_DEPOT);
-        this.PAD_IPP = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_IPP_DEPOT);
-        this.PAD_Patient = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_Patient_DEPOT);
-        this.Hor_ouv = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_HOR_OUV_DEPOT);
-        this.R_adresse1 = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_R_ADRESSE1_DEPOT);
-        this.R_adresse2 = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_R_ADRESSE2_DEPOT);
-        this.R_CP = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_R_CP_DEPOT);
-        this.R_Ville = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_R_VILLE_DEPOT);
-        this.R_tel = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_R_TEL_DEPOT);
-        this.R_fax = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_R_FAX_DEPOT);
-        this.Archive = intToBoolean(DepotOpenHelper.Constantes.NUM_COL_ARCHIVE_DEPOT);
-        this.ID_UF_Rattachement = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_ID_UF_RATTACHEMENT_DEPOT);
-        this.SYS_DT_MAJ = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_SYS_DT_MAJ_DEPOT);
-        this.SYS_HEURE_MAJ = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_SYS_HEURE_MAJ_DEPOT);
-        this.SYS_USER_MAJ = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_SYS_USER_MAJ_DEPOT);
-        this.Dialyse_Frequence = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_DIALYSE_FREQUENCE_DEPOT);
-        this.PAD_Vacances_Adr1 = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_VACANCES_ADR1_DEPOT);
-        this.PAD_Vacances_Adr2 = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_VACANCES_ADR2_DEPOT);
-        this.PAD_Vacances_CP = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_VACANCES_CP_DEPOT);
-        this.PAD_Vacances_Ville = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_VACANCES_VILLE_DEPOT);
-        this.PAD_Vacances_Pays = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_VACANCES_PAYS_DEPOT);
-        this.PAD_Vacances_Tél = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_VACANCES_TEL_DEPOT);
-        this.PAD_Vacances_Commentaires = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_VACANCES_COMMENTAIRES_DEPOT);
-        this.PAD_Localisation_Poches = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_LOCALISATION_POCHES_DEPOT);
-        this.PAD_Précision_Localisation = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_PRECISION_LOCALISATION_DEPOT);
-        this.PAD_Coordonnées_GPS = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_COORDONNEES_GPS_DEPOT);
-        this.PAD_Acces_Chariot = intToBoolean(cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_PAD_ACCES_CHARIOT_DEPOT));
-        this.PAD_Acces_Roll = intToBoolean(cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_PAD_ACCES_ROLL_DEPOT));
-        this.PAD_Acces_Manuelle = intToBoolean(cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_PAD_ACCES_MANUELLE_DEPOT));
-        this.PAD_Vehicule_Livraison = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_VEHICULE_LIVRAISON_DEPOT);
-        this.Livraison_Semaine_1 = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_LIVRAISON_SEMAINE_1_DEPOT);
-        this.Livraison_Periode = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_LIVRAISON_PERIODE_DEPOT);
-        this.PAD_Commentaire_Livraison = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_COMMENTAIRE_LIVRAISON_DEPOT);
-        this.PAD_Email = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_EMAIL_DEPOT);
-        this.Statut = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_STATUT_DEPOT);
-        this.PAD_Plan = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_PLAN_DEPOT);
-        this.Praticient_Par_defaut = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PRATICIENT_PAR_DEFAUT_DEPOT);
-        this.PAD_Lieu_Traitement = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_LIEU_TRAITEMENT_DEPOT);
-        this.PAD_ID_Lieu_Traitement = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_PAD_ID_LIEU_TRAITEMENT_DEPOT);
-        this.PAD_Utiliser_Adresse_Vacances = intToBoolean(cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_PAD_UTILISER_ADRESSE_VACANCES_DEPOT));
-        this.PAD_Ascenceur = intToBoolean(cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_PAD_ASCENSEUR_DEPOT));
-        this.PAD_etage = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_PAD_ETAGE_DEPOT);
-        this.PAD_escalier = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_ESCALIER_DEPOT);
-        this.PAD_digicode = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_DIGICODE_DEPOT);
-        this.Livraison_Jour = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_LIVRAISON_JOUR_DEPOT);
-        this.Livraison_Semaine_2 = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_LIVRAISON_SEMAINE_2_DEPOT);
-        this.Tournee_nom = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_TOURNEE_NOM_DEPOT);
-        this.Tournee_code = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_TOURNEE_CODE_DEPOT);
-        this.Section_Analytique = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_SECTION_ANALYTIQUE_DEPOT);
-        this.PAD_ID_Pret = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_PAD_ID_PRET_DEPOT);
-        this.Symbole = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_SYMBOLE_DEPOT);
-        this.Service_externe = intToBoolean(cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_SERVICE_EXTERNE_DEPOT));
-        this.Ordre = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_ORDRE_DEPOT);
-        this.Accuse_Reception = intToBoolean(cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_ACCUSE_RECEPTION_DEPOT));
-        this.Jours_de_réserve_par_defaut = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_JOURS_DE_RESERVE_PAR_DEFAUT_DEPOT);
-        this.Jours_de_réserve_par_livraison = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_JOURS_DE_RESERVE_PAR_LIVRAISON_DEPOT);
-        this.Inventaire_fin_de_Mois = intToBoolean(cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_INVENTAIRE_FIN_DE_MOIS_DEPOT));
-        this.RAZ_Stock_Inventaire = intToBoolean(cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_RAZ_STOCK_INVENTAIRE_DEPOT));
-        this.Ref_Depot_Phi = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_REF_DEPOT_PHI_DEPOT);
-        this.Livraison_Semaine_3 = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_LIVRAISON_SEMAINE_3_DEPOT);
-        this.Livraison_Semaine_4 = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_LIVRAISON_SEMAINE_4_DEPOT);
-        this.Livraison_Semaine_5 = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_LIVRAISON_SEMAINE_5_DEPOT);
-        this.Commentaire_Commande = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_COMMENTAIRE_COMMANDE_DEPOT);
-        this.CAHP = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_CAHP_DEPOT);
-        this.Horaire_livraison = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_HORAIRE_LIVRAISON_DEPOT);
-        this.ATIR_Reference_Depot = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_ATIR_REFERENCE_DEPOT);
-        this.DM_Localisation = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_DM_LOCALISATION_DEPOT);
-        this.Reference_Depot_Avant_PHI = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_REFERENCE_DEPOT_AVANT_PHI_DEPOT);
-        this.Livraison_Frequence_Type = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_LIVRAISON_FREQUENCE_TYPE_DEPOT);
-        this.Livraison_Nb_Semaines = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_LIVRAISON_NB_SEMAINES_DEPOT);
-        this.dossier_document = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_DOSSIER_DOCUMENT_DEPOT);
-        this.ProtocoleStd = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PROTOCOLESTD_DEPOT);
-        this.latitude = cursor.getDouble(DepotOpenHelper.Constantes.NUM_COL_LATITUDE_DEPOT);
-        this.longitude = cursor.getDouble(DepotOpenHelper.Constantes.NUM_COL_LONGITUDE_DEPOT);
-        this.Etablissement_UID = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_ETABLISSEMENT_UID_DEPOT);
-        this.FInessGeo = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_FINESSGEO_DEPOT);
-        this.Nombre_Postes = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_NOMBRE_POSTES_DEPOT);
-        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
-    }*/
 
     public Depot(Cursor cursor) {
         this.Depot_UID = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_ID_DEPOT);
@@ -354,13 +163,13 @@ public class Depot implements Serializable, Comparable {
         this.PAD_Vacances_Ville = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_VACANCES_VILLE_DEPOT);
         this.latitude = cursor.getDouble(DepotOpenHelper.Constantes.NUM_COL_LATITUDE_DEPOT);
         this.longitude = cursor.getDouble(DepotOpenHelper.Constantes.NUM_COL_LONGITUDE_DEPOT);
-        this.Jours_de_réserve_par_livraison = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_JOURS_DE_RESERVE_PAR_LIVRAISON_DEPOT);
+        this.Jours_de_reserve_par_livraison = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_JOURS_DE_RESERVE_PAR_LIVRAISON_DEPOT);
         this.PAD_Lieu_Traitement = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_LIEU_TRAITEMENT_DEPOT);
         this.Etablissement_UID = cursor.getInt(DepotOpenHelper.Constantes.NUM_COL_ETABLISSEMENT_UID_DEPOT);
         this.PAD_IPP = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_IPP_DEPOT);
         this.PAD_Patient = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_Patient_DEPOT);
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
-        this.Archive = OutilsGestionClasses.recupererBooleen(cursor, DepotOpenHelper.Constantes.NUM_COL_ARCHIVE_DEPOT);
+        this.Archive = recupererBooleen(cursor, DepotOpenHelper.Constantes.NUM_COL_ARCHIVE_DEPOT);
     }
 
     public int getPhiMR4UUID() {
@@ -631,12 +440,12 @@ public class Depot implements Serializable, Comparable {
         this.PAD_Vacances_Pays = PAD_Vacances_Pays;
     }
 
-    public String getPAD_Vacances_Tél() {
-        return PAD_Vacances_Tél;
+    public String getPAD_Vacances_Tel() {
+        return PAD_Vacances_Tel;
     }
 
-    public void setPAD_Vacances_Tél(String PAD_Vacances_Tél) {
-        this.PAD_Vacances_Tél = PAD_Vacances_Tél;
+    public void setPAD_Vacances_Tel(String PAD_Vacances_Tel) {
+        this.PAD_Vacances_Tel = PAD_Vacances_Tel;
     }
 
     public String getPAD_Vacances_Commentaires() {
@@ -655,20 +464,20 @@ public class Depot implements Serializable, Comparable {
         this.PAD_Localisation_Poches = PAD_Localisation_Poches;
     }
 
-    public String getPAD_Précision_Localisation() {
-        return PAD_Précision_Localisation;
+    public String getPAD_Precision_Localisation() {
+        return PAD_Precision_Localisation;
     }
 
-    public void setPAD_Précision_Localisation(String PAD_Précision_Localisation) {
-        this.PAD_Précision_Localisation = PAD_Précision_Localisation;
+    public void setPAD_Precision_Localisation(String PAD_Precision_Localisation) {
+        this.PAD_Precision_Localisation = PAD_Precision_Localisation;
     }
 
-    public String getPAD_Coordonnées_GPS() {
-        return PAD_Coordonnées_GPS;
+    public String getPAD_Coordonnees_GPS() {
+        return PAD_Coordonnees_GPS;
     }
 
-    public void setPAD_Coordonnées_GPS(String PAD_Coordonnées_GPS) {
-        this.PAD_Coordonnées_GPS = PAD_Coordonnées_GPS;
+    public void setPAD_Coordonnees_GPS(String PAD_Coordonnees_GPS) {
+        this.PAD_Coordonnees_GPS = PAD_Coordonnees_GPS;
     }
 
     public boolean isPAD_Acces_Chariot() {
@@ -895,20 +704,20 @@ public class Depot implements Serializable, Comparable {
         Accuse_Reception = accuse_Reception;
     }
 
-    public int getJours_de_réserve_par_defaut() {
-        return Jours_de_réserve_par_defaut;
+    public int getJours_de_reserve_par_defaut() {
+        return Jours_de_reserve_par_defaut;
     }
 
-    public void setJours_de_réserve_par_defaut(int jours_de_réserve_par_defaut) {
-        Jours_de_réserve_par_defaut = jours_de_réserve_par_defaut;
+    public void setJours_de_reserve_par_defaut(int jours_de_reserve_par_defaut) {
+        Jours_de_reserve_par_defaut = jours_de_reserve_par_defaut;
     }
 
-    public int getJours_de_réserve_par_livraison() {
-        return Jours_de_réserve_par_livraison;
+    public int getJours_de_reserve_par_livraison() {
+        return Jours_de_reserve_par_livraison;
     }
 
-    public void setJours_de_réserve_par_livraison(int jours_de_réserve_par_livraison) {
-        Jours_de_réserve_par_livraison = jours_de_réserve_par_livraison;
+    public void setJours_de_reserve_par_livraison(int jours_de_reserve_par_livraison) {
+        Jours_de_reserve_par_livraison = jours_de_reserve_par_livraison;
     }
 
     public boolean isInventaire_fin_de_Mois() {

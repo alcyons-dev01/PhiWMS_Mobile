@@ -32,10 +32,6 @@ import fr.alcyons.phiwms_mobile.R;
 
 import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 
-/**
- * Created by olivier on 06/06/2019.
- */
-
 public class Produit_PreparationScanneeAdapter extends BaseExpandableListAdapter {
 
     Map<String, List<ObjetReceptionScannee>> tempObjetParentListItems;

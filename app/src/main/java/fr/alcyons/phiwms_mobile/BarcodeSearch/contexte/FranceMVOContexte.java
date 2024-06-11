@@ -41,10 +41,6 @@ import fr.alcyons.phiwms_mobile.OutilsSerialisation.GestionResultatNMVO;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 05/03/2019.
- */
-
 public class FranceMVOContexte  extends MainActivity {
 
     private Context context;

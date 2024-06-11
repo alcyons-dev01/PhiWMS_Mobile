@@ -8,10 +8,6 @@ import android.text.Editable;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 17/06/2019.
- */
-
 public class DocumentScannerContext {
 
 

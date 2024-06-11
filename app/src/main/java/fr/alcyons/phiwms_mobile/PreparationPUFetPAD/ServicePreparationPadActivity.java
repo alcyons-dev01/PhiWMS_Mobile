@@ -70,9 +70,6 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
-/**
- * Created by olivier on 18/04/2024.
- */
 public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity {
     Context context;
     List<PH_Preparation> ph_preparation_List;

@@ -1,6 +1,10 @@
 package fr.alcyons.phiwms_mobile.Classes;
 
+import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
+
 import android.database.Cursor;
+
+import com.google.api.client.json.Json;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,7 +56,7 @@ public class Fournisseur implements Serializable, Comparable {
     private String Contact_Portable_com;
     private String Affectation;
     private String ST_Civilite;
-    private String ST_Prénom;
+    private String ST_Prenom;
     private String ST_Nom;
     private String ST_Adresse1_com;
     private String ST_Adresse2_Com;
@@ -104,7 +108,7 @@ public class Fournisseur implements Serializable, Comparable {
         this.raisonSociale = raisonSociale;
     }
 
-    public Fournisseur(String numero, String raisonSociale, String commande_adresse1, String commande_adresse2, String commande_CP, String commande_Ville, String commande_Pays, String commande_Telephone, String commande_Fax, String contact_civilite, String contact_prenom, String contact_nom, String compte, int _UID, double en_cours, double seuil_encours, double CA, String referenceClient, String contact_Adresse1, String certification, double taux_Escompte1, double nbj_escompte1, double taux_escompte2, double nbj_escompte2, String groupe, String referanceGroupe, String modeReglement, String conditionsReglement, String contact_Adresse2, String contact_Tel, String contact_Fax, String contact_CP, String contact_Ville, double seuil_pour_franco, String web, String commande_Email, String contact_Portable_com, String affectation, String ST_Civilite, String ST_Prénom, String ST_Nom, String ST_Adresse1_com, String ST_Adresse2_Com, String ST_CP_com, String ST_Ville_com, String ST_Tel_com, String ST_Fax_com, String st_Email_com, String ST_Portable_com, String _SYS_DT_MAJ, String _SYS_HEURE_MAJ, String _SYS_USER_MAJ, String type_franco, Boolean SAP_Groupe, String SAp_Compte, int delai_Livraison, double montant_Min, String distrib_Raison_Sociale, Boolean distributeur, double montant_Frais, String pharmaco_Vigilance_Tel, Boolean archive, String commentaire_Commande_Edition, String commentaire_Cde_Confidentiel, Boolean livraisonDomicileAutoriser, String document_marche, String document_developpementDurable, String document_certification, String developpementDurable, String responsableAchat, String livraisonFrequence, String livraisonJourSemaine, Boolean fabricant, String contact_Email, String pharmaco_Vigilance_Email, String transport_Type, Boolean import_transitaire, String affectation_Detaillee, String transitaire_Metropolitain, String transitaire_Local, Boolean import_DDP, String devise_Facturation) {
+    public Fournisseur(String numero, String raisonSociale, String commande_adresse1, String commande_adresse2, String commande_CP, String commande_Ville, String commande_Pays, String commande_Telephone, String commande_Fax, String contact_civilite, String contact_prenom, String contact_nom, String compte, int _UID, double en_cours, double seuil_encours, double CA, String referenceClient, String contact_Adresse1, String certification, double taux_Escompte1, double nbj_escompte1, double taux_escompte2, double nbj_escompte2, String groupe, String referanceGroupe, String modeReglement, String conditionsReglement, String contact_Adresse2, String contact_Tel, String contact_Fax, String contact_CP, String contact_Ville, double seuil_pour_franco, String web, String commande_Email, String contact_Portable_com, String affectation, String ST_Civilite, String ST_Prenom, String ST_Nom, String ST_Adresse1_com, String ST_Adresse2_Com, String ST_CP_com, String ST_Ville_com, String ST_Tel_com, String ST_Fax_com, String st_Email_com, String ST_Portable_com, String _SYS_DT_MAJ, String _SYS_HEURE_MAJ, String _SYS_USER_MAJ, String type_franco, Boolean SAP_Groupe, String SAp_Compte, int delai_Livraison, double montant_Min, String distrib_Raison_Sociale, Boolean distributeur, double montant_Frais, String pharmaco_Vigilance_Tel, Boolean archive, String commentaire_Commande_Edition, String commentaire_Cde_Confidentiel, Boolean livraisonDomicileAutoriser, String document_marche, String document_developpementDurable, String document_certification, String developpementDurable, String responsableAchat, String livraisonFrequence, String livraisonJourSemaine, Boolean fabricant, String contact_Email, String pharmaco_Vigilance_Email, String transport_Type, Boolean import_transitaire, String affectation_Detaillee, String transitaire_Metropolitain, String transitaire_Local, Boolean import_DDP, String devise_Facturation) {
         this.Numero = numero;
         this.raisonSociale = raisonSociale;
         this.Commande_adresse1 = commande_adresse1;
@@ -144,7 +148,7 @@ public class Fournisseur implements Serializable, Comparable {
         this.Contact_Portable_com = contact_Portable_com;
         this.Affectation = affectation;
         this.ST_Civilite = ST_Civilite;
-        this.ST_Prénom = ST_Prénom;
+        this.ST_Prenom = ST_Prenom;
         this.ST_Nom = ST_Nom;
         this.ST_Adresse1_com = ST_Adresse1_com;
         this.ST_Adresse2_Com = ST_Adresse2_Com;
@@ -190,92 +194,88 @@ public class Fournisseur implements Serializable, Comparable {
     }
 
     public Fournisseur(JSONObject fournisseurJson) {
-        try {
-            this.Numero = OutilsGestionClasses.recupererString(fournisseurJson.getString("Numero"));
-            this.raisonSociale = OutilsGestionClasses.recupererString(fournisseurJson.getString("raisonSociale"));
-            this.Commande_adresse1 = OutilsGestionClasses.recupererString(fournisseurJson.getString("Commande_adresse1"));
-            this.Commande_adresse2 = OutilsGestionClasses.recupererString(fournisseurJson.getString("Commande_adresse2"));
-            this.Commande_CP = OutilsGestionClasses.recupererString(fournisseurJson.getString("Commande_CP"));
-            this.Commande_Ville = OutilsGestionClasses.recupererString(fournisseurJson.getString("Commande_Ville"));
-            this.Commande_Pays = OutilsGestionClasses.recupererString(fournisseurJson.getString("Commande_Pays"));
-            this.Commande_Telephone = OutilsGestionClasses.recupererString(fournisseurJson.getString("Commande_Telephone"));
-            this.Commande_Fax = OutilsGestionClasses.recupererString(fournisseurJson.getString("Commande_Fax"));
-            this.Contact_civilite = OutilsGestionClasses.recupererString(fournisseurJson.getString("Contact_civilite"));
-            this.Contact_prenom = OutilsGestionClasses.recupererString(fournisseurJson.getString("Contact_prenom"));
-            this.Contact_nom = OutilsGestionClasses.recupererString(fournisseurJson.getString("Contact_nom"));
-            this.compte = OutilsGestionClasses.recupererString(fournisseurJson.getString("compte"));
-            this._UID = fournisseurJson.getInt("_UID");
-            this.En_cours = fournisseurJson.getDouble("En_cours");
-            this.Seuil_encours = fournisseurJson.getDouble("Seuil_encours");
-            this.CA = fournisseurJson.getDouble("CA");
-            this.ReferenceClient = OutilsGestionClasses.recupererString(fournisseurJson.getString("ReferenceClient"));
-            this.Contact_Adresse1 = OutilsGestionClasses.recupererString(fournisseurJson.getString("Contact_Adresse1"));
-            this.Certification = OutilsGestionClasses.recupererString(fournisseurJson.getString("Certification"));
-            this.Taux_Escompte1 = fournisseurJson.getDouble("Taux_Escompte1");
-            this.Nbj_escompte1 = fournisseurJson.getDouble("Nbj_escompte1");
-            this.Taux_escompte2 = fournisseurJson.getDouble("Taux_escompte2");
-            this.Nbj_escompte2 = fournisseurJson.getDouble("Nbj_escompte2");
-            this.Groupe = OutilsGestionClasses.recupererString(fournisseurJson.getString("Groupe"));
-            this.ReferanceGroupe = OutilsGestionClasses.recupererString(fournisseurJson.getString("ReferanceGroupe"));
-            this.ModeReglement = OutilsGestionClasses.recupererString(fournisseurJson.getString("ModeReglement"));
-            this.ConditionsReglement = OutilsGestionClasses.recupererString(fournisseurJson.getString("ConditionsReglement"));
-            this.Contact_Adresse2 = OutilsGestionClasses.recupererString(fournisseurJson.getString("Contact_Adresse2"));
-            this.Contact_Tel = OutilsGestionClasses.recupererString(fournisseurJson.getString("Contact_Tel"));
-            this.Contact_Fax = OutilsGestionClasses.recupererString(fournisseurJson.getString("Contact_Fax"));
-            this.Contact_CP = OutilsGestionClasses.recupererString(fournisseurJson.getString("Contact_CP"));
-            this.Contact_Ville = OutilsGestionClasses.recupererString(fournisseurJson.getString("Contact_Ville"));
-            this.Seuil_pour_franco = fournisseurJson.getDouble("Seuil_pour_franco");
-            this.Web = OutilsGestionClasses.recupererString(fournisseurJson.getString("Web"));
-            this.Commande_Email = OutilsGestionClasses.recupererString(fournisseurJson.getString("Commande_Email"));
-            this.Contact_Portable_com = OutilsGestionClasses.recupererString(fournisseurJson.getString("Contact_Portable_com"));
-            this.Affectation = OutilsGestionClasses.recupererString(fournisseurJson.getString("Affectation"));
-            this.ST_Civilite = OutilsGestionClasses.recupererString(fournisseurJson.getString("ST_Civilite"));
-            this.ST_Prénom = OutilsGestionClasses.recupererString(fournisseurJson.getString("ST_Prénom"));
-            this.ST_Nom = OutilsGestionClasses.recupererString(fournisseurJson.getString("ST_Nom"));
-            this.ST_Adresse1_com = OutilsGestionClasses.recupererString(fournisseurJson.getString("ST_Adresse1_com"));
-            this.ST_Adresse2_Com = OutilsGestionClasses.recupererString(fournisseurJson.getString("ST_Adresse2_Com"));
-            this.ST_CP_com = OutilsGestionClasses.recupererString(fournisseurJson.getString("ST_CP_com"));
-            this.ST_Ville_com = OutilsGestionClasses.recupererString(fournisseurJson.getString("ST_Ville_com"));
-            this.ST_Tel_com = OutilsGestionClasses.recupererString(fournisseurJson.getString("ST_Tel_com"));
-            this.ST_Fax_com = OutilsGestionClasses.recupererString(fournisseurJson.getString("ST_Fax_com"));
-            this.St_Email_com = OutilsGestionClasses.recupererString(fournisseurJson.getString("St_Email_com"));
-            this.ST_Portable_com = OutilsGestionClasses.recupererString(fournisseurJson.getString("ST_Portable_com"));
-            this._SYS_DT_MAJ = OutilsGestionClasses.recupererString(fournisseurJson.getString("_SYS_DT_MAJ"));
-            this._SYS_HEURE_MAJ = OutilsGestionClasses.recupererString(fournisseurJson.getString("_SYS_HEURE_MAJ"));
-            this._SYS_USER_MAJ = OutilsGestionClasses.recupererString(fournisseurJson.getString("_SYS_USER_MAJ"));
-            this.Type_franco = OutilsGestionClasses.recupererString(fournisseurJson.getString("Type_franco"));
-            this.SAP_Groupe = OutilsGestionClasses.recupererBooleen(fournisseurJson, "SAP_Groupe");
-            this.SAp_Compte = OutilsGestionClasses.recupererString(fournisseurJson.getString("SAp_Compte"));
-            this.Delai_Livraison = fournisseurJson.getInt("Delai_Livraison");
-            this.Montant_Min = fournisseurJson.getDouble("Montant_Min");
-            this.Distrib_Raison_Sociale = OutilsGestionClasses.recupererString(fournisseurJson.getString("Distrib_Raison_Sociale"));
-            this.Distributeur = OutilsGestionClasses.recupererBooleen(fournisseurJson, "Distributeur");
-            this.Montant_Frais = fournisseurJson.getDouble("Montant_Frais");
-            this.Pharmaco_Vigilance_Tel = OutilsGestionClasses.recupererString(fournisseurJson.getString("Pharmaco_Vigilance_Tel"));
-            this.Archive = OutilsGestionClasses.recupererBooleen(fournisseurJson, "Archive");
-            this.Commentaire_Commande_Edition = OutilsGestionClasses.recupererString(fournisseurJson.getString("Commentaire_Commande_Edition"));
-            this.Commentaire_Cde_Confidentiel = OutilsGestionClasses.recupererString(fournisseurJson.getString("Commentaire_Cde_Confidentiel"));
-            this.LivraisonDomicileAutoriser = OutilsGestionClasses.recupererBooleen(fournisseurJson, "LivraisonDomicileAutoriser");
-            this.document_marche = OutilsGestionClasses.recupererString(fournisseurJson.getString("document_marche"));
-            this.document_developpementDurable = OutilsGestionClasses.recupererString(fournisseurJson.getString("document_developpementDurable"));
-            this.document_certification = OutilsGestionClasses.recupererString(fournisseurJson.getString("document_certification"));
-            this.developpementDurable = OutilsGestionClasses.recupererString(fournisseurJson.getString("developpementDurable"));
-            this.responsableAchat = OutilsGestionClasses.recupererString(fournisseurJson.getString("responsableAchat"));
-            this.LivraisonFrequence = OutilsGestionClasses.recupererString(fournisseurJson.getString("LivraisonFrequence"));
-            this.LivraisonJourSemaine = OutilsGestionClasses.recupererString(fournisseurJson.getString("LivraisonJourSemaine"));
-            this.Fabricant = OutilsGestionClasses.recupererBooleen(fournisseurJson, "Fabricant");
-            this.Contact_Email = OutilsGestionClasses.recupererString(fournisseurJson.getString("Contact_Email"));
-            this.Pharmaco_Vigilance_Email = OutilsGestionClasses.recupererString(fournisseurJson.getString("Pharmaco_Vigilance_Email"));
-            this.Transport_Type = OutilsGestionClasses.recupererString(fournisseurJson.getString("Transport_Type"));
-            this.import_transitaire = OutilsGestionClasses.recupererBooleen(fournisseurJson, "import_transitaire");
-            this.Affectation_Detaillee = OutilsGestionClasses.recupererString(fournisseurJson.getString("Affectation_Detaillee"));
-            this.Transitaire_Metropolitain = OutilsGestionClasses.recupererString(fournisseurJson.getString("Transitaire_Metropolitain"));
-            this.Transitaire_Local = OutilsGestionClasses.recupererString(fournisseurJson.getString("Transitaire_Local"));
-            this.Import_DDP = OutilsGestionClasses.recupererBooleen(fournisseurJson, "Import_DDP");
-            this.Devise_Facturation = OutilsGestionClasses.recupererString(fournisseurJson.getString("Devise_Facturation"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this.Numero = fournisseurJson.optString("Numero");
+        this.raisonSociale = fournisseurJson.optString("raisonSociale");
+        this.Commande_adresse1 = fournisseurJson.optString("Commande_adresse1");
+        this.Commande_adresse2 = fournisseurJson.optString("Commande_adresse2");
+        this.Commande_CP = fournisseurJson.optString("Commande_CP");
+        this.Commande_Ville = fournisseurJson.optString("Commande_Ville");
+        this.Commande_Pays = fournisseurJson.optString("Commande_Pays");
+        this.Commande_Telephone = fournisseurJson.optString("Commande_Telephone");
+        this.Commande_Fax = fournisseurJson.optString("Commande_Fax");
+        this.Contact_civilite = fournisseurJson.optString("Contact_civilite");
+        this.Contact_prenom = fournisseurJson.optString("Contact_prenom");
+        this.Contact_nom = fournisseurJson.optString("Contact_nom");
+        this.compte = fournisseurJson.optString("compte");
+        this._UID = fournisseurJson.optInt("_UID");
+        this.En_cours = fournisseurJson.optDouble("En_cours");
+        this.Seuil_encours = fournisseurJson.optDouble("Seuil_encours");
+        this.CA = fournisseurJson.optDouble("CA");
+        this.ReferenceClient = fournisseurJson.optString("ReferenceClient");
+        this.Contact_Adresse1 = fournisseurJson.optString("Contact_Adresse1");
+        this.Certification = fournisseurJson.optString("Certification");
+        this.Taux_Escompte1 = fournisseurJson.optDouble("Taux_Escompte1");
+        this.Nbj_escompte1 = fournisseurJson.optDouble("Nbj_escompte1");
+        this.Taux_escompte2 = fournisseurJson.optDouble("Taux_escompte2");
+        this.Nbj_escompte2 = fournisseurJson.optDouble("Nbj_escompte2");
+        this.Groupe = fournisseurJson.optString("Groupe");
+        this.ReferanceGroupe = fournisseurJson.optString("ReferanceGroupe");
+        this.ModeReglement = fournisseurJson.optString("ModeReglement");
+        this.ConditionsReglement = fournisseurJson.optString("ConditionsReglement");
+        this.Contact_Adresse2 = fournisseurJson.optString("Contact_Adresse2");
+        this.Contact_Tel = fournisseurJson.optString("Contact_Tel");
+        this.Contact_Fax = fournisseurJson.optString("Contact_Fax");
+        this.Contact_CP = fournisseurJson.optString("Contact_CP");
+        this.Contact_Ville = fournisseurJson.optString("Contact_Ville");
+        this.Seuil_pour_franco = fournisseurJson.optDouble("Seuil_pour_franco");
+        this.Web = fournisseurJson.optString("Web");
+        this.Commande_Email = fournisseurJson.optString("Commande_Email");
+        this.Contact_Portable_com = fournisseurJson.optString("Contact_Portable_com");
+        this.Affectation = fournisseurJson.optString("Affectation");
+        this.ST_Civilite = fournisseurJson.optString("ST_Civilite");
+        this.ST_Prenom = fournisseurJson.optString("ST_Prenom");
+        this.ST_Nom = fournisseurJson.optString("ST_Nom");
+        this.ST_Adresse1_com = fournisseurJson.optString("ST_Adresse1_com");
+        this.ST_Adresse2_Com = fournisseurJson.optString("ST_Adresse2_Com");
+        this.ST_CP_com = fournisseurJson.optString("ST_CP_com");
+        this.ST_Ville_com = fournisseurJson.optString("ST_Ville_com");
+        this.ST_Tel_com = fournisseurJson.optString("ST_Tel_com");
+        this.ST_Fax_com = fournisseurJson.optString("ST_Fax_com");
+        this.St_Email_com = fournisseurJson.optString("St_Email_com");
+        this.ST_Portable_com = fournisseurJson.optString("ST_Portable_com");
+        this._SYS_DT_MAJ = fournisseurJson.optString("_SYS_DT_MAJ");
+        this._SYS_HEURE_MAJ = fournisseurJson.optString("_SYS_HEURE_MAJ");
+        this._SYS_USER_MAJ = fournisseurJson.optString("_SYS_USER_MAJ");
+        this.Type_franco = fournisseurJson.optString("Type_franco");
+        this.SAP_Groupe = recupererBooleen(fournisseurJson, "SAP_Groupe");
+        this.SAp_Compte = fournisseurJson.optString("SAp_Compte");
+        this.Delai_Livraison = fournisseurJson.optInt("Delai_Livraison");
+        this.Montant_Min = fournisseurJson.optDouble("Montant_Min");
+        this.Distrib_Raison_Sociale = fournisseurJson.optString("Distrib_Raison_Sociale");
+        this.Distributeur = recupererBooleen(fournisseurJson, "Distributeur");
+        this.Montant_Frais = fournisseurJson.optDouble("Montant_Frais");
+        this.Pharmaco_Vigilance_Tel = fournisseurJson.optString("Pharmaco_Vigilance_Tel");
+        this.Archive = recupererBooleen(fournisseurJson, "Archive");
+        this.Commentaire_Commande_Edition = fournisseurJson.optString("Commentaire_Commande_Edition");
+        this.Commentaire_Cde_Confidentiel = fournisseurJson.optString("Commentaire_Cde_Confidentiel");
+        this.LivraisonDomicileAutoriser = recupererBooleen(fournisseurJson, "LivraisonDomicileAutoriser");
+        this.document_marche = fournisseurJson.optString("document_marche");
+        this.document_developpementDurable = fournisseurJson.optString("document_developpementDurable");
+        this.document_certification = fournisseurJson.optString("document_certification");
+        this.developpementDurable = fournisseurJson.optString("developpementDurable");
+        this.responsableAchat = fournisseurJson.optString("responsableAchat");
+        this.LivraisonFrequence = fournisseurJson.optString("LivraisonFrequence");
+        this.LivraisonJourSemaine = fournisseurJson.optString("LivraisonJourSemaine");
+        this.Fabricant = recupererBooleen(fournisseurJson, "Fabricant");
+        this.Contact_Email = fournisseurJson.optString("Contact_Email");
+        this.Pharmaco_Vigilance_Email = fournisseurJson.optString("Pharmaco_Vigilance_Email");
+        this.Transport_Type = fournisseurJson.optString("Transport_Type");
+        this.import_transitaire = recupererBooleen(fournisseurJson, "import_transitaire");
+        this.Affectation_Detaillee = fournisseurJson.optString("Affectation_Detaillee");
+        this.Transitaire_Metropolitain = fournisseurJson.optString("Transitaire_Metropolitain");
+        this.Transitaire_Local = fournisseurJson.optString("Transitaire_Local");
+        this.Import_DDP = recupererBooleen(fournisseurJson, "Import_DDP");
+        this.Devise_Facturation = fournisseurJson.optString("Devise_Facturation");
     }
 
     public Fournisseur(Cursor cursorFournisseur) {
@@ -318,7 +318,7 @@ public class Fournisseur implements Serializable, Comparable {
         this.Contact_Portable_com = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_CONTACT_PORTABLE_COM_FOURNISSEUR);
         this.Affectation = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_AFFECTATION_FOURNISSEUR);
         this.ST_Civilite = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_ST_CIVILITE_FOURNISSEUR);
-        this.ST_Prénom = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_ST_PRENOM_FOURNISSEUR);
+        this.ST_Prenom = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_ST_PRENOM_FOURNISSEUR);
         this.ST_Nom = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_ST_NOM_FOURNISSEUR);
         this.ST_Adresse1_com = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_ST_ADRESSE1_COM_FOURNISSEUR);
         this.ST_Adresse2_Com = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_ST_ADRESSE2_COM_FOURNISSEUR);
@@ -332,18 +332,18 @@ public class Fournisseur implements Serializable, Comparable {
         this._SYS_HEURE_MAJ = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL__SYS_HEURE_MAJ_FOURNISSEUR);
         this._SYS_USER_MAJ = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL__SYS_USER_MAJ_FOURNISSEUR);
         this.Type_franco = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_TYPE_FRANCO_FOURNISSEUR);
-        this.SAP_Groupe = OutilsGestionClasses.recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_SAP_GROUPE_FOURNISSEUR);
+        this.SAP_Groupe = recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_SAP_GROUPE_FOURNISSEUR);
         this.SAp_Compte = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_SAP_COMPTE_FOURNISSEUR);
         this.Delai_Livraison = cursorFournisseur.getInt(FournisseurOpenHelper.Constantes.NUM_COL_DELAI_LIVRAISON_FOURNISSEUR);
         this.Montant_Min = cursorFournisseur.getDouble(FournisseurOpenHelper.Constantes.NUM_COL_MONTANT_MIN_FOURNISSEUR);
         this.Distrib_Raison_Sociale = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_DISTRIB_RAISON_SOCIALE_FOURNISSEUR);
-        this.Distributeur = OutilsGestionClasses.recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_DISTRIBUTEUR_FOURNISSEUR);
+        this.Distributeur = recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_DISTRIBUTEUR_FOURNISSEUR);
         this.Montant_Frais = cursorFournisseur.getDouble(FournisseurOpenHelper.Constantes.NUM_COL_MONTANT_FRAIS_FOURNISSEUR);
         this.Pharmaco_Vigilance_Tel = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_PHARMACO_VIGILANCE_TEL_FOURNISSEUR);
-        this.Archive = OutilsGestionClasses.recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_ARCHIVE_FOURNISSEUR);
+        this.Archive = recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_ARCHIVE_FOURNISSEUR);
         this.Commentaire_Commande_Edition = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_COMMENTAIRE_COMMANDE_EDITION_FOURNISSEUR);
         this.Commentaire_Cde_Confidentiel = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_COMMENTAIRE_CDE_CONFIDENTIEL_FOURNISSEUR);
-        this.LivraisonDomicileAutoriser = OutilsGestionClasses.recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_LIVRAISONDOMICILEAUTORISER_FOURNISSEUR);
+        this.LivraisonDomicileAutoriser = recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_LIVRAISONDOMICILEAUTORISER_FOURNISSEUR);
         this.document_marche = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_DOCUMENT_MARCHE_FOURNISSEUR);
         this.document_developpementDurable = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_DOCUMENT_DEVELOPPEMENTDURABLE_FOURNISSEUR);
         this.document_certification = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_DOCUMENT_CERTIFICATION_FOURNISSEUR);
@@ -351,15 +351,15 @@ public class Fournisseur implements Serializable, Comparable {
         this.responsableAchat = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_RESPONSABLEACHAT_FOURNISSEUR);
         this.LivraisonFrequence = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_LIVRAISONFREQUENCE_FOURNISSEUR);
         this.LivraisonJourSemaine = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_LIVRAISONJOURSEMAINE_FOURNISSEUR);
-        this.Fabricant = OutilsGestionClasses.recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_FABRICANT_FOURNISSEUR);
+        this.Fabricant = recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_FABRICANT_FOURNISSEUR);
         this.Contact_Email = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_CONTACT_EMAIL_FOURNISSEUR);
         this.Pharmaco_Vigilance_Email = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_PHARMACO_VIGILANCE_EMAIL_FOURNISSEUR);
         this.Transport_Type = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_TRANSPORT_TYPE_FOURNISSEUR);
-        this.import_transitaire = OutilsGestionClasses.recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_IMPORT_TRANSITAIRE_FOURNISSEUR);
+        this.import_transitaire = recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_IMPORT_TRANSITAIRE_FOURNISSEUR);
         this.Affectation_Detaillee = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_AFFECTATION_DETAILLEE_FOURNISSEUR);
         this.Transitaire_Metropolitain = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_TRANSITAIRE_METROPOLITAIN_FOURNISSEUR);
         this.Transitaire_Local = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_TRANSITAIRE_LOCAL_FOURNISSEUR);
-        this.Import_DDP = OutilsGestionClasses.recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_IMPORT_DDP_FOURNISSEUR);
+        this.Import_DDP = recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_IMPORT_DDP_FOURNISSEUR);
         this.Devise_Facturation = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_DEVISE_FACTURATION_FOURNISSEUR);
         this.phiwms_mobileUUID = cursorFournisseur.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
@@ -684,12 +684,12 @@ public class Fournisseur implements Serializable, Comparable {
         this.ST_Civilite = ST_Civilite;
     }
 
-    public String getST_Prénom() {
-        return ST_Prénom;
+    public String getST_Prenom() {
+        return ST_Prenom;
     }
 
-    public void setST_Prénom(String ST_Prénom) {
-        this.ST_Prénom = ST_Prénom;
+    public void setST_Prenom(String ST_Prenom) {
+        this.ST_Prenom = ST_Prenom;
     }
 
     public String getST_Nom() {
@@ -1030,15 +1030,8 @@ public class Fournisseur implements Serializable, Comparable {
 
     @Override
     public boolean equals(Object obj) {
-        boolean valeurARetourner = false;
-        if (obj == this) {
-            valeurARetourner = true;
-        }
 
-        if (!(obj instanceof Fournisseur)) {
-            valeurARetourner = false;
-        }
-        return valeurARetourner;
+        return obj == this;
     }
 
     @Override

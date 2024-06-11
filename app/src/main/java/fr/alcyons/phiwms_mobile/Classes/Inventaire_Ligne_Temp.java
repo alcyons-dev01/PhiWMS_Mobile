@@ -46,69 +46,6 @@ public class Inventaire_Ligne_Temp implements Serializable, Comparable {
     private int _UID;
     private int phiwms_mobileUUID = -1;
 
-    public Inventaire_Ligne_Temp(int produitID, String produitReference, String fournisseurNom, String categorie, String designation, double stockTheorique, double stockPhysique, String depotReference, String _SYS_DT_MAJ, String _SYS_HEURE_MAJ, String _SYS_USER_MAJ, String zone, int inventaire_ID, Boolean _NePasImprimer, double PUHT, double tvaTx, Boolean suspendu, double valeurTTC, double ecart, String unite, double cond_Achat, String classe, String emplacement, String lot, String peremptionDate, int _UID) {
-        this.produitID = produitID;
-        this.produitReference = produitReference;
-        this.fournisseurNom = fournisseurNom;
-        this.categorie = categorie;
-        this.designation = designation;
-        this.stockTheorique = stockTheorique;
-        this.stockPhysique = stockPhysique;
-        this.depotReference = depotReference;
-        this._SYS_DT_MAJ = _SYS_DT_MAJ;
-        this._SYS_HEURE_MAJ = _SYS_HEURE_MAJ;
-        this._SYS_USER_MAJ = _SYS_USER_MAJ;
-        this.zone = zone;
-        this.Inventaire_ID = inventaire_ID;
-        this._NePasImprimer = _NePasImprimer;
-        this.PUHT = PUHT;
-        this.tvaTx = tvaTx;
-        this.suspendu = suspendu;
-        this.valeurTTC = valeurTTC;
-        this.ecart = ecart;
-        this.unite = unite;
-        this.Cond_Achat = cond_Achat;
-        this.classe = classe;
-        this.emplacement = emplacement;
-        this.lot = lot;
-        this.PeremptionDate = peremptionDate;
-        this._UID = _UID;
-    }
-
-    public Inventaire_Ligne_Temp(JSONObject jsonObject) {
-        try {
-            this.produitID = jsonObject.getInt("produitID");
-            this.produitReference = OutilsGestionClasses.recupererString(jsonObject.getString("produitReference"));
-            this.fournisseurNom = OutilsGestionClasses.recupererString(jsonObject.getString("fournisseurNom"));
-            this.categorie = OutilsGestionClasses.recupererString(jsonObject.getString("categorie"));
-            this.designation = OutilsGestionClasses.recupererString(jsonObject.getString("designation"));
-            this.stockTheorique = jsonObject.getDouble("stockTheorique");
-            this.stockPhysique = jsonObject.getDouble("stockPhysique");
-            this.depotReference = OutilsGestionClasses.recupererString(jsonObject.getString("depotReference"));
-            this._SYS_DT_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("_SYS_DT_MAJ"));
-            this._SYS_HEURE_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("_SYS_HEURE_MAJ"));
-            this._SYS_USER_MAJ = OutilsGestionClasses.recupererString(jsonObject.getString("_SYS_USER_MAJ"));
-            this.zone = OutilsGestionClasses.recupererString(jsonObject.getString("zone"));
-            this.Inventaire_ID = jsonObject.getInt("Inventaire_ID");
-            this._NePasImprimer = OutilsGestionClasses.recupererBooleen(jsonObject, "_NePasImprimer");
-            this.PUHT = jsonObject.getDouble("PUHT");
-            this.tvaTx = jsonObject.getDouble("tvaTx");
-            this.suspendu = OutilsGestionClasses.recupererBooleen(jsonObject, "suspendu");
-            this.valeurTTC = jsonObject.getDouble("valeurTTC");
-            this.ecart = jsonObject.getDouble("ecart");
-            this.unite = OutilsGestionClasses.recupererString(jsonObject.getString("unite"));
-            this.Cond_Achat = jsonObject.getDouble("Cond_Achat");
-            this.classe = OutilsGestionClasses.recupererString(jsonObject.getString("classe"));
-            this.emplacement = OutilsGestionClasses.recupererString(jsonObject.getString("emplacement"));
-            this.lot = OutilsGestionClasses.recupererString(jsonObject.getString("lot"));
-            this.PeremptionDate = OutilsGestionClasses.recupererString(jsonObject.getString("PeremptionDate"));
-            this._UID = jsonObject.getInt("_UID");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
     public Inventaire_Ligne_Temp(Cursor cursor) {
         this.produitID = cursor.getInt(Inventaire_Ligne_TempOpenHelper.Constantes.NUM_COL_PRODUITID_INVENTAIRE_LIGNE_TEMP);
         this.produitReference = cursor.getString(Inventaire_Ligne_TempOpenHelper.Constantes.NUM_COL_PRODUITREFERENCE_INVENTAIRE_LIGNE_TEMP);

@@ -204,6 +204,8 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         public static final String uriRequetePHLotLigne = "PH_Lot_Ligne/";
         public static final String uriRequeteVerrouPharmacieInterne = "ph_preparations/delivrance";
         public static final String uriRequetePleinVideCourant = "ph_preparations/pleinvide";
+        public static final String uriRequeteDotationGlobaleCourant = "ph_preparations/dotationglobale";
+        public static final String uriRequeteDemandeReassortCourant = "ph_preparations/phreassort";
 
     }
 

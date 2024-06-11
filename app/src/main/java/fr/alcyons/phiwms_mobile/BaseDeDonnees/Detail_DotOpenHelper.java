@@ -11,11 +11,6 @@ import java.util.List;
 
 import fr.alcyons.phiwms_mobile.Classes.Detail_Dot;
 import fr.alcyons.phiwms_mobile.Classes.Dotation;
-
-/**
- * Created by jessica on 02/10/2017.
- */
-
 public class Detail_DotOpenHelper extends DBOpenHelper {
     public Detail_DotOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);

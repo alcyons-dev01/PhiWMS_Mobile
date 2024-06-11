@@ -16,11 +16,6 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.camera.CameraSource;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotos;
 import fr.alcyons.phiwms_mobile.R;
 
-
-/**
- * Created by jessica on 25/09/2017.
- */
-
 public class BarcodeCaptureWithTakePicture extends BarcodeCaptureActivity {
 
     Bitmap bitmap;

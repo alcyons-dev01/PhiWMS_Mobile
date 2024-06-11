@@ -86,11 +86,6 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
-
-/**
- * Created by jessica on 19/02/2018.
- */
-
 public class BarcodeCaptureNegativeActivity extends ServiceActivity {
 
     // CAMERA

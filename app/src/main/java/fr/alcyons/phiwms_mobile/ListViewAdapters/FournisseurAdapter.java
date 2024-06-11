@@ -11,10 +11,6 @@ import java.util.List;
 
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by jessica on 26/09/2017.
- */
-
 public class FournisseurAdapter extends ArrayAdapter {
 
     public List<String> fournisseurs;

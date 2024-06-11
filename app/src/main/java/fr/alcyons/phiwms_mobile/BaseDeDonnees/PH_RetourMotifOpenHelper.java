@@ -31,10 +31,6 @@ import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by jessica on 29/11/2017.
- */
-
 public class PH_RetourMotifOpenHelper extends DBOpenHelper {
 
     public PH_RetourMotifOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

@@ -2,6 +2,8 @@ package fr.alcyons.phiwms_mobile.Classes;
 
 import android.database.Cursor;
 
+import androidx.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -60,18 +62,10 @@ public class PerimetreFonctionnel implements Serializable {
         return valeurARetourner;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return this.getNom();
-    }
-
-    public String getFiltre(List<Service> services) {
-        String string = " ";
-        for (Service service : services
-                ) {
-            string += " " + service.getNom();
-        }
-        return this.getNom() + string;
     }
 
 }

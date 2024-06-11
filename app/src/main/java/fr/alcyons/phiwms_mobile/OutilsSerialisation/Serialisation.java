@@ -18,11 +18,6 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.AGL;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
-
-/**
- * Created by olivier on 26/02/2019.
- */
-
 public class Serialisation {
 
     protected static SQLiteDatabase db;

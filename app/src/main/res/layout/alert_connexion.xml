@@ -33,7 +33,7 @@
                 android:layout_height="30dp"
                 android:layout_weight="4.5"
                 android:layout_gravity="center|left"
-                android:max="8"
+                android:max="9"
                 android:progress="0"
                 android:progressTint="@color/bleu_clair_alcyons"
                 android:thumbTint="@color/bleu_clair_alcyons" />
@@ -302,6 +302,32 @@
                 android:layout_margin="5px"/>
 
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <ImageView
+                android:id="@+id/checkReassort"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_check_circle"
+                android:backgroundTint="@color/grey_color_fonce" />
+
+            <TextView
+                android:id="@+id/Reassort"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:text="Réassort"
+                android:textSize="18sp"
+                android:layout_margin="5px"/>
+
+        </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"

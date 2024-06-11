@@ -9,10 +9,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by olivier on 26/02/2019.
- */
-
 public class SurveillanceReference {
 
     private int _UID;
@@ -27,11 +23,11 @@ public class SurveillanceReference {
     private String traiteDate;
     private String traiteHeure;
     private String produitLot;
-    private String produitDatePéremption;
+    private String produitDatePeremption;
     private String produitNumeroSerie;
     private int serialexpressUUID = -1;
 
-    public SurveillanceReference(int _UID, String surveillanceDate, String surveillanceHeure, int produitID, int serialisationID, String motif, String actionAMener, String statut, String traitePar, String traiteDate, String traiteHeure, String produitLot, String produitDatePéremption, String produitNumeroSerie) {
+    public SurveillanceReference(int _UID, String surveillanceDate, String surveillanceHeure, int produitID, int serialisationID, String motif, String actionAMener, String statut, String traitePar, String traiteDate, String traiteHeure, String produitLot, String produitDatePeremption, String produitNumeroSerie) {
         this._UID = _UID;
         this.surveillanceDate = surveillanceDate;
         this.surveillanceHeure = surveillanceHeure;
@@ -44,29 +40,25 @@ public class SurveillanceReference {
         this.traiteDate = traiteDate;
         this.traiteHeure = traiteHeure;
         this.produitLot = produitLot;
-        this.produitDatePéremption = produitDatePéremption;
+        this.produitDatePeremption = produitDatePeremption;
         this.produitNumeroSerie = produitNumeroSerie;
     }
 
     public SurveillanceReference(JSONObject jsonObject) {
-        try {
-            _UID = jsonObject.getInt("_UID");
-            surveillanceDate = OutilsGestionClasses.recupererString(jsonObject.getString("surveillanceDate"));
-            surveillanceHeure = OutilsGestionClasses.recupererString(jsonObject.getString("surveillanceHeure"));
-            produitID = jsonObject.getInt("produitID");
-            serialisationID = jsonObject.getInt("serialisationID");
-            motif = OutilsGestionClasses.recupererString(jsonObject.getString("motif"));
-            actionAMener = OutilsGestionClasses.recupererString(jsonObject.getString("actionAMener"));
-            statut = OutilsGestionClasses.recupererString(jsonObject.getString("statut"));
-            traitePar = OutilsGestionClasses.recupererString(jsonObject.getString("traitePar"));
-            traiteDate = OutilsGestionClasses.recupererString(jsonObject.getString("traiteDate"));
-            traiteHeure = OutilsGestionClasses.recupererString(jsonObject.getString("traiteHeure"));
-            produitLot = OutilsGestionClasses.recupererString(jsonObject.getString("produitLot"));
-            produitDatePéremption = OutilsGestionClasses.recupererString(jsonObject.getString("produitDatePéremption"));
-            produitNumeroSerie = OutilsGestionClasses.recupererString(jsonObject.getString("produitNumeroSerie"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        _UID = jsonObject.optInt("_UID");
+        surveillanceDate = jsonObject.optString("surveillanceDate");
+        surveillanceHeure = jsonObject.optString("surveillanceHeure");
+        produitID = jsonObject.optInt("produitID");
+        serialisationID = jsonObject.optInt("serialisationID");
+        motif = jsonObject.optString("motif");
+        actionAMener = jsonObject.optString("actionAMener");
+        statut = jsonObject.optString("statut");
+        traitePar = jsonObject.optString("traitePar");
+        traiteDate = jsonObject.optString("traiteDate");
+        traiteHeure = jsonObject.optString("traiteHeure");
+        produitLot = jsonObject.optString("produitLot");
+        produitDatePeremption = jsonObject.optString("produitDatePéremption");
+        produitNumeroSerie = jsonObject.optString("produitNumeroSerie");
     }
     public JSONObject toJson() {
         JSONObject jsonObject = new JSONObject();
@@ -83,7 +75,7 @@ public class SurveillanceReference {
             jsonObject.put("traiteDate", traiteDate);
             jsonObject.put("traiteHeure", traiteHeure);
             jsonObject.put("produitLot", produitLot);
-            jsonObject.put("produitDatePéremption", produitDatePéremption);
+            jsonObject.put("produitDatePeremption", produitDatePeremption);
             jsonObject.put("produitNumeroSerie", produitNumeroSerie);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -188,12 +180,12 @@ public class SurveillanceReference {
         this.produitLot = produitLot;
     }
 
-    public String getProduitDatePéremption() {
-        return produitDatePéremption;
+    public String getProduitDatePeremption() {
+        return produitDatePeremption;
     }
 
-    public void setProduitDatePéremption(String produitDatePéremption) {
-        this.produitDatePéremption = produitDatePéremption;
+    public void setProduitDatePeremption(String produitDatePeremption) {
+        this.produitDatePeremption = produitDatePeremption;
     }
 
     public String getProduitNumeroSerie() {

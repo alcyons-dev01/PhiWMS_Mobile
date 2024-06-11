@@ -43,10 +43,6 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
-/**
- * Created by olivier on 20/06/2019.
- */
-
 public class ServiceParametreUtilisateurActivity extends ServiceActivity {
 
     Switch authentificationForte;

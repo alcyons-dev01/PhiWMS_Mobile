@@ -28,10 +28,6 @@ import fr.alcyons.phiwms_mobile.PrisePhoto.PrisePhoto;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
-/**
- * Created by olivier on 24/04/2019.
- */
-
 public class OutilsGestionPhotoApercu extends ServiceActivity implements View.OnTouchListener{
 
     Bitmap photo_courante;

@@ -47,10 +47,6 @@ import fr.alcyons.phiwms_mobile.PrisePhoto.camera.CameraSourcePreview;
 import fr.alcyons.phiwms_mobile.PrisePhoto.camera.GraphicOverlay;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by jessica on 08/11/2017.
- */
-
 public class PrisePhoto extends OriginalActivity {
     // constants used to pass extra data in the intent
     public static final String AutoFocus = "AutoFocus";

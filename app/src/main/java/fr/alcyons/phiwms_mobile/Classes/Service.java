@@ -184,7 +184,6 @@ public class Service implements Serializable, Comparable {
 
     @Override
     public int compareTo(Object obj) {
-        Service service = (Service) obj;
 
         if (this.getPhiMR4UUID() == ((Service) obj).getPhiMR4UUID()) {
             return 0;

@@ -41,10 +41,6 @@ import fr.alcyons.phiwms_mobile.OutilsSerialisation.GestionResultatNMVO;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 05/06/2019.
- */
-
 public class PreparationScanneeScanProduitContext {
 
     private Context context;

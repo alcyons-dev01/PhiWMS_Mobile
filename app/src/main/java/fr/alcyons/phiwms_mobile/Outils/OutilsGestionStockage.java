@@ -13,11 +13,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-/**
- * Created by jessica on 11/01/2018.
- */
-
 public class OutilsGestionStockage {
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;

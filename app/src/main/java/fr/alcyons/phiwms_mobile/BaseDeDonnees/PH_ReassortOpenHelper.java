@@ -1,19 +1,37 @@
 package fr.alcyons.phiwms_mobile.BaseDeDonnees;
 
+import static fr.alcyons.phiwms_mobile.BaseDeDonnees.DotationOpenHelper.viderTableDotation;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
+import android.util.Log;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reassort;
-
-/**
- * Created by jessica on 02/10/2017.
- */
+import fr.alcyons.phiwms_mobile.Classes.PH_Reassort_Ligne;
+import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
+import fr.alcyons.phiwms_mobile.R;
 
 public class PH_ReassortOpenHelper extends DBOpenHelper {
 
@@ -40,6 +58,103 @@ public class PH_ReassortOpenHelper extends DBOpenHelper {
         return rowID;
     }
 
+    public static void insererBDDLocaleReassort(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
+        final String tableNom = "Dotations";
+        final String erreurSynchronisationLibelle = "Dotations non synchronisées";
+
+        String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriRequetePH_Reassort;
+        RequestQueue requestQueue = new Volley().newRequestQueue(context);
+
+        viderTableDotation(db);
+        Detail_DotOpenHelper.viderTableDetail_Dot(db);
+
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    String erreur = "";
+                    boolean etat = true;
+                    int resultCount = response.getInt("resultCount");
+                    if (resultCount == 0) {
+                        etat = false;
+                        erreur = response.getString("erreur");
+                        if (erreur.equals(context.getString(R.string.tokenInvalide))) {
+                            DBOpenHelper.viderBasesDeDonnees(db);
+                            erreur = "Votre identifiant de connexion est invalide, veuillez vous reconnecter.";
+                        } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
+                            erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
+                        } else if (!erreur.equals("Aucune Dotation trouvée")) {
+                            erreur = "Erreur API Dotations";
+                        }
+                        else{
+                            etat = true;
+                        }
+                    } else {
+
+                        JSONArray reassortJSONArray = response.getJSONArray("PH_Reassorts");
+
+                        for (int i = 0; i < reassortJSONArray.length(); i++) {
+                            JSONObject reassortJSONObject = reassortJSONArray.getJSONObject(i);
+                            PH_Reassort reassort = new PH_Reassort(reassortJSONObject);
+
+                            long rowID = insererPH_ReassortEnBDD(db, reassort);
+                            if(reassortJSONObject.has("ph_reassort_lignes"))
+                            {
+                                JSONArray reassortLigneJsonArray = reassortJSONObject.getJSONArray("ph_reassort_lignes");
+                                for (int j = 0; j < reassortLigneJsonArray.length(); j++) {
+                                    JSONObject detailDotationJSONObject = reassortLigneJsonArray.getJSONObject(j);
+                                    PH_Reassort_Ligne reassort_ligne = new PH_Reassort_Ligne(detailDotationJSONObject);
+                                    long detailRowID = PH_Reassort_LigneOpenHelper.insererPH_Reassort_LigneEnBDD(db, reassort_ligne);
+                                }
+                            }
+                        }
+                    }
+                    ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("Dotation volley", error.toString());
+                        ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, false, erreurSynchronisationLibelle);
+                    }
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Authorization", token);
+                headers.put("UserId", String.valueOf(utilisateur.getId()));
+                headers.put("EtablissementId", String.valueOf(utilisateur.getEtablissementId()));
+                return headers;
+            }
+        };
+
+        obreq.setRetryPolicy(new RetryPolicy() {
+            @Override
+            public int getCurrentTimeout() {
+                return 70000;
+            }
+
+            @Override
+            public int getCurrentRetryCount() {
+                return 50000;
+            }
+
+            @Override
+            public void retry(VolleyError error) throws VolleyError {
+
+            }
+        });
+
+        requestQueue.add(obreq);
+    }
+
+
     public static PH_Reassort getPH_ReassortByphiwms_mobileUUID(SQLiteDatabase db, int id) {
         PH_Reassort phReassort = null;
         Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_REASSORT + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=? ", new String[]{String.valueOf(id)});
@@ -50,6 +165,19 @@ public class PH_ReassortOpenHelper extends DBOpenHelper {
         cursor.close();
         cursor = null;
         return phReassort;
+    }
+
+    public static List<PH_Reassort> getPH_Reassort(SQLiteDatabase db) {
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_REASSORT, new String[]{});
+
+        List<PH_Reassort> phReassortList = new ArrayList<>();
+
+        while (cursor.moveToNext()) {
+            phReassortList.add(new PH_Reassort(cursor));
+        }
+        cursor.close();
+        cursor = null;
+        return phReassortList;
     }
 
 

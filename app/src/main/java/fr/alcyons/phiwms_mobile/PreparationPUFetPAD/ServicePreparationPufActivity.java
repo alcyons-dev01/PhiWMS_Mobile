@@ -70,10 +70,6 @@ import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
-/**
- * Created by olivier on 18/04/2024.
- */
-
 public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity {
 
     Context context;

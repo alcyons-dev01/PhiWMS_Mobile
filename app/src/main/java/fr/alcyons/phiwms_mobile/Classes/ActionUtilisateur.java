@@ -12,10 +12,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by olivier on 11/04/2019.
- */
-
 public class ActionUtilisateur implements Serializable, Comparable {
 
     private int Id;
@@ -66,19 +62,15 @@ public class ActionUtilisateur implements Serializable, Comparable {
     }
 
     public ActionUtilisateur(JSONObject jsonObject) {
-        try {
-            this.Id = jsonObject.getInt("Id");
-            this.UserId = jsonObject.getInt("UserId");
-            this.Date = OutilsGestionClasses.recupererString(jsonObject.getString("Date"));
-            this.ServiceId = jsonObject.getInt("ServiceId");
-            this.EtablissementId = jsonObject.getInt("EtablissementId");
-            this.Statut = OutilsGestionClasses.recupererString(jsonObject.getString("Statut"));
-            this.ChampsParentId = jsonObject.getInt("ChampsParentId");
-            this.CheminPhoto = jsonObject.getString("CheminPhoto");
-            this.ActionName = jsonObject.getString("ActionName");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this.Id = jsonObject.optInt("Id");
+        this.UserId = jsonObject.optInt("UserId");
+        this.Date = jsonObject.optString("Date");
+        this.ServiceId = jsonObject.optInt("ServiceId");
+        this.EtablissementId = jsonObject.optInt("EtablissementId");
+        this.Statut = jsonObject.optString("Statut");
+        this.ChampsParentId = jsonObject.optInt("ChampsParentId");
+        this.CheminPhoto = jsonObject.optString("CheminPhoto");
+        this.ActionName = jsonObject.optString("ActionName");
     }
 
     public ActionUtilisateur(Cursor cursor) {

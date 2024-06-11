@@ -19,10 +19,6 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotos;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by jessica on 07/06/2018.
- */
-
 public class ProduitContexte {
 
     private Context context;

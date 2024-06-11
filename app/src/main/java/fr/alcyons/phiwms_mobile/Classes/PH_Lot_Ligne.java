@@ -24,28 +24,15 @@ public class PH_Lot_Ligne implements Serializable, Comparable {
     private boolean verrouiller;
     private int phiwms_mobileUUID = -1;
 
-    public PH_Lot_Ligne(int UID, int docLigneId, String numLot, String datePeremption, int quantite, String numSerie)
-    {
-        this.UID = UID;
-        this.docLigneId = docLigneId;
-        this.numLot = numLot;
-        this.datePeremption = datePeremption;
-        this.quantite = quantite;
-        this.numSerie = numSerie;
-    }
 
     public PH_Lot_Ligne(JSONObject jsonObject) {
-        try {
-            this.UID = jsonObject.getInt("UID");
-            this.docLigneId = jsonObject.getInt("DocLigneId");
-            this.numLot = OutilsGestionClasses.recupererString(jsonObject.getString("NumLot"));
-            this.datePeremption = OutilsGestionClasses.recupererString(jsonObject.getString("DatePeremption"));
-            this.quantite = jsonObject.getInt("Quantite");
-            this.numSerie = jsonObject.getString("NumSerie");
-            this.verrouiller = true;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this.UID = jsonObject.optInt("UID");
+        this.docLigneId = jsonObject.optInt("DocLigneId");
+        this.numLot = jsonObject.optString("NumLot");
+        this.datePeremption = jsonObject.optString("DatePeremption");
+        this.quantite = jsonObject.optInt("Quantite");
+        this.numSerie = jsonObject.optString("NumSerie");
+        this.verrouiller = true;
     }
 
     public PH_Lot_Ligne(Cursor cursor) {

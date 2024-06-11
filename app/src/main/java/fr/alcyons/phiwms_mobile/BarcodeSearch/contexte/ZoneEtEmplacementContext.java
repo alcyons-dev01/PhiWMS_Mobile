@@ -19,10 +19,6 @@ import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 27/06/2019.
- */
-
 public class ZoneEtEmplacementContext {
 
     private Context context;

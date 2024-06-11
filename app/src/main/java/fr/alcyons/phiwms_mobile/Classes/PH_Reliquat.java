@@ -14,11 +14,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
-
-/**
- * Created by olivier on 28/11/2017.
- */
-
 public class PH_Reliquat implements Serializable, Comparable {
 
     private int Reliquat_UID;
@@ -100,127 +95,23 @@ public class PH_Reliquat implements Serializable, Comparable {
         this.PatientNom = patientNom;
     }
 
-/*    public PH_Reliquat(JSONObject jsonObject) {
-        try {
-            this.Reliquat_UID = jsonObject.getInt("Reliquat_UID");
-            this.ProduitID = jsonObject.getInt("ProduitID");
-            this.Produit_Reference = recupererString(jsonObject.getString("Produit_Reference"));
-            this.PU_commande = jsonObject.getInt("PU_commande");
-            this.designationCourte = recupererString(jsonObject.getString("designationCourte"));
-            this.unite = recupererString(jsonObject.getString("unite"));
-            this.fournisseurNom = recupererString(jsonObject.getString("fournisseurNom"));
-            this.FournisseurID = jsonObject.getInt("FournisseurID");
-            this.QteCommande = jsonObject.getInt("QteCommande");
-            this.QteLivraison = jsonObject.getInt("QteLivraison");
-            this.QteReliquat_X = jsonObject.getInt("QteReliquat_X");
-            this.reliquatEncours = recupererBooleen(jsonObject, "reliquatEncours");
-            this.entreeDate = recupererString(jsonObject.getString("entreeDate"));
-            this.selection = recupererBooleen(jsonObject, "selection");
-            this.commandeNumero = recupererString(jsonObject.getString("commandeNumero"));
-            this.commandeDate = recupererString(jsonObject.getString("commandeDate"));
-            this.ConditionnementAchat = jsonObject.getInt("ConditionnementAchat");
-            this.ConditionnementDistribution = jsonObject.getInt("ConditionnementDistribution");
-            this.peremptionDate = recupererString(jsonObject.getString("peremptionDate"));
-            this.lot = recupererString(jsonObject.getString("lot"));
-            this.scanReference = recupererString(jsonObject.getString("scanReference"));
-            this.peremptionActive = recupererBooleen(jsonObject, "peremptionActive");
-            this.commandeLigneID = jsonObject.getInt("commandeLigneID");
-            this.Pu_facture = jsonObject.getInt("Pu_facture");
-            this.Repris = jsonObject.getInt("Repris");
-            this.QteMouvement = jsonObject.getInt("QteMouvement");
-            this.QteReliquat_Y = jsonObject.getInt("QteReliquat_Y");
-            this.ProduitGratuits = recupererBooleen(jsonObject, "ProduitGratuits");
-            this.Devise = recupererString(jsonObject.getString("Devise"));
-            this.DepotReference = recupererString(jsonObject.getString("DepotReference"));
-            this._SYS_DT_MAJ = recupererString(jsonObject.getString("_SYS_DT_MAJ"));
-            this._SYS_HEURE_MAJ = recupererString(jsonObject.getString("_SYS_HEURE_MAJ"));
-            this._SYS_USER_MAJ = recupererString(jsonObject.getString("_SYS_USER_MAJ"));
-            this.SuiviParLotActif = recupererBooleen(jsonObject, "SuiviParLotActif");
-            this.SynchroTimeStamp = recupererString(jsonObject.getString("SynchroTimeStamp"));
-            this.SynchroStatut = recupererString(jsonObject.getString("SynchroStatut"));
-            this.Finness = recupererString(jsonObject.getString("Finness"));
-            this.ScanValue = recupererString(jsonObject.getString("ScanValue"));
-            this.PatientIPP = recupererString(jsonObject.getString("PatientIPP"));
-            this.PatientNom = recupererString(jsonObject.getString("PatientNom"));
-            this.tech_UID = jsonObject.getInt("tech_UID");
-            this.Zone = recupererString(jsonObject.getString("Zone"));
-            this.Emplacement = recupererString(jsonObject.getString("Emplacement"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }*/
-
     public PH_Reliquat(JSONObject jsonObject) {
-        try {
-            this.Reliquat_UID = jsonObject.getInt("Reliquat_UID");
-            this.designationCourte = OutilsGestionClasses.recupererString(jsonObject.getString("designationCourte"));
-            this.Produit_Reference = OutilsGestionClasses.recupererString(jsonObject.getString("Produit_Reference"));
-            this.ProduitID = jsonObject.getInt("ProduitID");
-            this.QteCommande = jsonObject.getInt("QteCommande");
-            this.QteLivraison = jsonObject.getInt("QteLivraison");
-            this.QteReliquat_X = jsonObject.getInt("QteReliquat_X");
-            this.commandeLigneID = jsonObject.getInt("commandeLigneID");
-            this.ConditionnementAchat = jsonObject.getInt("ConditionnementAchat");
-            this.commandeNumero = OutilsGestionClasses.recupererString(jsonObject.getString("commandeNumero"));
-            this.peremptionDate = OutilsGestionClasses.recupererString(jsonObject.getString("peremptionDate"));
-           // this.IPP = recupererString(jsonObject.getString("IPP"));
-            this.SuiviParSerieActif = OutilsGestionClasses.recupererBooleen(jsonObject, "SuiviParSerieActif");
-            this.SerialiserReception = OutilsGestionClasses.recupererBooleen(jsonObject, "SerialiserReception");
-            this.Serie = OutilsGestionClasses.recupererString(jsonObject.getString("Serie"));
-            this.BL_Numero = OutilsGestionClasses.recupererString("BL_Numero");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this.Reliquat_UID = jsonObject.optInt("Reliquat_UID");
+        this.designationCourte = jsonObject.optString("designationCourte");
+        this.Produit_Reference = jsonObject.optString("Produit_Reference");
+        this.ProduitID = jsonObject.optInt("ProduitID");
+        this.QteCommande = jsonObject.optInt("QteCommande");
+        this.QteLivraison = jsonObject.optInt("QteLivraison");
+        this.QteReliquat_X = jsonObject.optInt("QteReliquat_X");
+        this.commandeLigneID = jsonObject.optInt("commandeLigneID");
+        this.ConditionnementAchat = jsonObject.optInt("ConditionnementAchat");
+        this.commandeNumero = jsonObject.optString("commandeNumero");
+        this.peremptionDate = jsonObject.optString("peremptionDate");
+        this.SuiviParSerieActif = OutilsGestionClasses.recupererBooleen(jsonObject, "SuiviParSerieActif");
+        this.SerialiserReception = OutilsGestionClasses.recupererBooleen(jsonObject, "SerialiserReception");
+        this.Serie = jsonObject.optString("Serie");
+        this.BL_Numero = jsonObject.optString("BL_Numero");
     }
-
-/*    public PH_Reliquat(Cursor cursor) {
-        this.Reliquat_UID = cursor.getInt(PH_ReliquatOpenHelper.Constantes.NUM_COL_RELIQUAT_UID_PH_RELIQUAT);
-        this.ProduitID = cursor.getInt(PH_ReliquatOpenHelper.Constantes.NUM_COL_PRODUITID_PH_RELIQUAT);
-        this.Produit_Reference = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_PRODUIT_REFERENCE_PH_RELIQUAT);
-        this.PU_commande = cursor.getInt(PH_ReliquatOpenHelper.Constantes.NUM_COL_PU_COMMANDE_PH_RELIQUAT);
-        this.designationCourte = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_DESIGNATIONCOURTE_PH_RELIQUAT);
-        this.unite = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_UNITE_PH_RELIQUAT);
-        this.fournisseurNom = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_FOURNISSEURNOM_PH_RELIQUAT);
-        this.FournisseurID = cursor.getInt(PH_ReliquatOpenHelper.Constantes.NUM_COL_FOURNISSEURID_PH_RELIQUAT);
-        this.QteCommande = cursor.getInt(PH_ReliquatOpenHelper.Constantes.NUM_COL_QTECOMMANDE_PH_RELIQUAT);
-        this.QteLivraison = cursor.getInt(PH_ReliquatOpenHelper.Constantes.NUM_COL_QTELIVRAISON_PH_RELIQUAT);
-        this.QteReliquat_X = cursor.getInt(PH_ReliquatOpenHelper.Constantes.NUM_COL_QTERELIQUAT_X_PH_RELIQUAT);
-        this.reliquatEncours = recupererBooleen(cursor, PH_ReliquatOpenHelper.Constantes.NUM_COL_RELIQUATENCOURS_PH_RELIQUAT);
-        this.entreeDate = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_ENTREEDATE_PH_RELIQUAT);
-        this.selection = recupererBooleen(cursor, PH_ReliquatOpenHelper.Constantes.NUM_COL_SELECTION_PH_RELIQUAT);
-        this.commandeNumero = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_COMMANDENUMERO_PH_RELIQUAT);
-        this.commandeDate = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_COMMANDEDATE_PH_RELIQUAT);
-        this.ConditionnementAchat = cursor.getInt(PH_ReliquatOpenHelper.Constantes.NUM_COL_CONDITIONNEMENTACHAT_PH_RELIQUAT);
-        this.ConditionnementDistribution = cursor.getInt(PH_ReliquatOpenHelper.Constantes.NUM_COL_CONDITIONNEMENTDISTRIBUTION_PH_RELIQUAT);
-        this.peremptionDate = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_PEREMPTIONDATE_PH_RELIQUAT);
-        this.lot = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_LOT_PH_RELIQUAT);
-        this.scanReference = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_SCANREFERENCE_PH_RELIQUAT);
-        this.peremptionActive = recupererBooleen(cursor, PH_ReliquatOpenHelper.Constantes.NUM_COL_PEREMPTIONACTIVE_PH_RELIQUAT);
-        this.commandeLigneID = cursor.getInt(PH_ReliquatOpenHelper.Constantes.NUM_COL_COMMANDELIGNEID_PH_RELIQUAT);
-        this.Pu_facture = cursor.getInt(PH_ReliquatOpenHelper.Constantes.NUM_COL_PU_FACTURE_PH_RELIQUAT);
-        this.Repris = cursor.getInt(PH_ReliquatOpenHelper.Constantes.NUM_COL_REPRIS_PH_RELIQUAT);
-        this.QteMouvement = cursor.getInt(PH_ReliquatOpenHelper.Constantes.NUM_COL_QTEMOUVEMENT_PH_RELIQUAT);
-        this.QteReliquat_Y = cursor.getInt(PH_ReliquatOpenHelper.Constantes.NUM_COL_QTERELIQUAT_Y_PH_RELIQUAT);
-        this.ProduitGratuits = recupererBooleen(cursor, PH_ReliquatOpenHelper.Constantes.NUM_COL_PRODUITGRATUITS_PH_RELIQUAT);
-        this.Devise = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_DEVISE_PH_RELIQUAT);
-        this.DepotReference = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_DEPOTREFERENCE_PH_RELIQUAT);
-        this._SYS_DT_MAJ = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL__SYS_DT_MAJ_PH_RELIQUAT);
-        this._SYS_HEURE_MAJ = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL__SYS_HEURE_MAJ_PH_RELIQUAT);
-        this._SYS_USER_MAJ = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL__SYS_USER_MAJ_PH_RELIQUAT);
-        this.SuiviParLotActif = recupererBooleen(cursor, PH_ReliquatOpenHelper.Constantes.NUM_COL_SUIVIPARLOTACTIF_PH_RELIQUAT);
-        this.SynchroTimeStamp = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_SYNCHROTIMESTAMP_PH_RELIQUAT);
-        this.SynchroStatut = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_SYNCHROSTATUT_PH_RELIQUAT);
-        this.Finness = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_FINNESS_PH_RELIQUAT);
-        this.ScanValue = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_SCANVALUE_PH_RELIQUAT);
-        this.PatientIPP = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_PATIENTIPP_PH_RELIQUAT);
-        this.PatientNom = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_PATIENTNOM_PH_RELIQUAT);
-        this.tech_UID = cursor.getInt(PH_ReliquatOpenHelper.Constantes.NUM_COL_TECH_UID_PH_RELIQUAT);
-        this.Zone = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_ZONE_PH_RELIQUAT);
-        this.Emplacement = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_EMPLACEMENT_PH_RELIQUAT);
-        this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
-
-    }*/
 
     public PH_Reliquat(Cursor cursor) {
         this.Reliquat_UID = cursor.getInt(PH_ReliquatOpenHelper.Constantes.NUM_COL_RELIQUAT_UID_PH_RELIQUAT);

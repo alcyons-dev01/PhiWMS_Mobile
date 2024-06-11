@@ -44,10 +44,6 @@ import fr.alcyons.phiwms_mobile.OutilsSerialisation.GestionResultatNMVO;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 30/04/2019.
- */
-
 public class PreparationScanneeContexte {
     private Context context;
     private SQLiteDatabase db;

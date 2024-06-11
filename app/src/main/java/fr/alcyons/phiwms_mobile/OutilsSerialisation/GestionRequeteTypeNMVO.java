@@ -1,9 +1,5 @@
 package fr.alcyons.phiwms_mobile.OutilsSerialisation;
 
-/**
- * Created by olivier on 27/02/2019.
- */
-
 public class GestionRequeteTypeNMVO {
 
     public static String getType(String code) {

@@ -17,10 +17,6 @@ import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Livraison.InformationLivraisonActivity;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 09/01/2018.
- */
-
 public class Dialogue {
 
 

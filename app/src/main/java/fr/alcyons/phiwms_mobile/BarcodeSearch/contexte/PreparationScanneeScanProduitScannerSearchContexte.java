@@ -41,10 +41,6 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
 import fr.alcyons.phiwms_mobile.R;
 
-/**
- * Created by olivier on 06/06/2019.
- */
-
 public class PreparationScanneeScanProduitScannerSearchContexte {
     private Context context;
     private SQLiteDatabase db;

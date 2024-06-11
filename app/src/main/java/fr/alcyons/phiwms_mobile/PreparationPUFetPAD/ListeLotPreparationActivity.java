@@ -73,12 +73,6 @@ import androidx.activity.OnBackPressedCallback;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-
-/**
- * Created by olivier on 18/04/2024.
- */
-
 public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
 
     public PH_Preparation_Ligne_Preparation_Adapte phPreparationLignePreparationAdapte;

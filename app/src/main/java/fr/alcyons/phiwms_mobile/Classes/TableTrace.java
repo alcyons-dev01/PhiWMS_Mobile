@@ -9,7 +9,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.TableTraceOpenHelper;
 
 public class TableTrace {
-
     int id;
     String date;
     String service;

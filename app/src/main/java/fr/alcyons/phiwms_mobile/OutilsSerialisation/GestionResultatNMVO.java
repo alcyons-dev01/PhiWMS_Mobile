@@ -1,9 +1,4 @@
 package fr.alcyons.phiwms_mobile.OutilsSerialisation;
-
-/**
- * Created by olivier on 27/02/2019.
- */
-
 public class GestionResultatNMVO {
 
     public static String getResultat(String resultat) {

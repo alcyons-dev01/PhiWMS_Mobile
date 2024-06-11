@@ -6,10 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
-/**
- * Created by olivier on 15/03/2018.
- */
-
 public class ParametreUtilisateurOpenHelper extends DBOpenHelper {
 
     public ParametreUtilisateurOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {

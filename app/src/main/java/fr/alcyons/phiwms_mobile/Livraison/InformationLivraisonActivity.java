@@ -71,9 +71,6 @@ import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 import static fr.alcyons.phiwms_mobile.AuthentificationActivity.hasPermissions;
 
-/**
- * Created by olivier on 18/04/2024.
- */
 public class InformationLivraisonActivity extends ServiceActivity {
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;

@@ -16,10 +16,6 @@ import fr.alcyons.phiwms_mobile.MedicamentAuLivret.ServiceMedicamentAuLivretActi
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
-/**
- * Created by jessica on 26/09/2017.
- */
-
 public class ListeFournisseurActivity extends ServiceActivity {
 
     FournisseurAdapter fournisseurAdapter;

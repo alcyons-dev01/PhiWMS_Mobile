@@ -10,11 +10,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.Parametres_SerialisationOpenHelper
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
-
-/**
- * Created by olivier on 26/02/2019.
- */
-
 public class Parametres_Serialisation {
 
     private int ID;
@@ -35,30 +30,6 @@ public class Parametres_Serialisation {
     private boolean franceMVO_termesEtConditions;
     private boolean moduleVision;
     private int phiwms_mobileUUID=-1;
-
-    public Parametres_Serialisation(JSONObject jsonObject){
-        try{
-            ID=jsonObject.getInt("ID");
-            serveurAPI_host= OutilsGestionClasses.recupererString(jsonObject.getString("serveurAPI_host"));
-            serveurLDAP_host= OutilsGestionClasses.recupererString(jsonObject.getString("serveurLDAP_host"));
-            communicationDiffere= OutilsGestionClasses.recupererBooleen(jsonObject,"communicationDiffere");
-            dispenserReception= OutilsGestionClasses.recupererBooleen(jsonObject,"dispenserReception");
-            dispenserDelivrance= OutilsGestionClasses.recupererBooleen(jsonObject,"dispenserDelivrance");
-            stockParNumeroDeSerie= OutilsGestionClasses.recupererBooleen(jsonObject,"stockParNumeroDeSerie");
-            serveurLDAP_port= OutilsGestionClasses.recupererString(jsonObject.getString("serveurLDAP_port"));
-            serveurLDAP_login= OutilsGestionClasses.recupererString(jsonObject.getString("serveurLDAP_login"));
-            serveurLDAP_password= OutilsGestionClasses.recupererString(jsonObject.getString("serveurLDAP_password"));
-            serveurLDAP_nomDomaine= OutilsGestionClasses.recupererString(jsonObject.getString("serveurLDAP_nomDomaine"));
-            dossierVision= OutilsGestionClasses.recupererString(jsonObject.getString("dossierVision"));
-            franceMVO_identifiant= OutilsGestionClasses.recupererString(jsonObject.getString("franceMVO_identifiant"));
-            franceMVO_mdp= OutilsGestionClasses.recupererString(jsonObject.getString("franceMVO_mdp"));
-            franceMVO_tan= OutilsGestionClasses.recupererString(jsonObject.getString("franceMVO_tan"));
-            franceMVO_termesEtConditions= OutilsGestionClasses.recupererBooleen(jsonObject,"franceMVO_termesEtConditions");
-            moduleVision= OutilsGestionClasses.recupererBooleen(jsonObject,"moduleVision");
-        }catch(JSONException e){
-            e.printStackTrace();
-        }
-    }
 
     public Parametres_Serialisation(Cursor cursor){
         ID=cursor.getInt(Parametres_SerialisationOpenHelper.Constantes.NUM_COL_ID_PARAMETRES_SERIALISATION);

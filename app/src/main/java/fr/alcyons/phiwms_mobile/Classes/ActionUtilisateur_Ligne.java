@@ -12,9 +12,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
-/**
- * Created by olivier on 11/04/2019.
- */
 
 public class ActionUtilisateur_Ligne implements Serializable, Comparable {
 
@@ -64,18 +61,14 @@ public class ActionUtilisateur_Ligne implements Serializable, Comparable {
     }
 
     public ActionUtilisateur_Ligne(JSONObject jsonObject) {
-        try {
-            this.Id = jsonObject.getInt("Id");
-            this.IdActionUtilisateur = jsonObject.getInt("IdActionUtilisateur");
-            this.TableConcerne = OutilsGestionClasses.recupererString(jsonObject.getString("TableConcerne"));
-            this.NumChamps = jsonObject.getInt("NumChamps");
-            this.GS1 = jsonObject.getString("GS1");
-            this.EmplacementId = jsonObject.getInt("EmplacementId");
-            this.Quantite = jsonObject.getInt("Quantite");
-            this.Nom_Produit = jsonObject.getString("Nom_Produit");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this.Id = jsonObject.optInt("Id");
+        this.IdActionUtilisateur = jsonObject.optInt("IdActionUtilisateur");
+        this.TableConcerne = jsonObject.optString("TableConcerne");
+        this.NumChamps = jsonObject.optInt("NumChamps");
+        this.GS1 = jsonObject.optString("GS1");
+        this.EmplacementId = jsonObject.optInt("EmplacementId");
+        this.Quantite = jsonObject.optInt("Quantite");
+        this.Nom_Produit = jsonObject.optString("Nom_Produit");
     }
 
     public ActionUtilisateur_Ligne(Cursor cursor) {

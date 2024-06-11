@@ -98,23 +98,18 @@ public class Utilisateur implements Serializable {
     }
 
     public Utilisateur(JSONObject utilisateurJson) {
-        try {
-            // Récupération des attributs de l'utilisateur
-            this.id = utilisateurJson.getInt("id");
-            this.identifiant = utilisateurJson.getString("identifiant");
-            this.mdp = utilisateurJson.getString("mdp");
-            this.mail = utilisateurJson.getString("mail");
-            this.nom = utilisateurJson.getString("nom");
-            this.prenom = utilisateurJson.getString("prenom");
-            this.active = OutilsGestionClasses.recupererBooleen(utilisateurJson, "active");
-            this.planHabilitation = utilisateurJson.getInt("planHabilitation");
-            this.bloque = OutilsGestionClasses.recupererBooleen(utilisateurJson, "bloque");
-            this.depot_UID = utilisateurJson.getInt("Depot_UID");
-            this.Etablissement = utilisateurJson.getString("etablissement");
-            this.EtablissementId = utilisateurJson.getInt("Etablissement_UID");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this.id = utilisateurJson.optInt("id");
+        this.identifiant = utilisateurJson.optString("identifiant");
+        this.mdp = utilisateurJson.optString("mdp");
+        this.mail = utilisateurJson.optString("mail");
+        this.nom = utilisateurJson.optString("nom");
+        this.prenom = utilisateurJson.optString("prenom");
+        this.active = OutilsGestionClasses.recupererBooleen(utilisateurJson, "active");
+        this.planHabilitation = utilisateurJson.optInt("planHabilitation");
+        this.bloque = OutilsGestionClasses.recupererBooleen(utilisateurJson, "bloque");
+        this.depot_UID = utilisateurJson.optInt("Depot_UID");
+        this.Etablissement = utilisateurJson.optString("etablissement");
+        this.EtablissementId = utilisateurJson.optInt("Etablissement_UID");
     }
 
     public List<String> getChannels() {

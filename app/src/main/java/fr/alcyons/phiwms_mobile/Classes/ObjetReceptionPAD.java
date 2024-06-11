@@ -2,10 +2,6 @@ package fr.alcyons.phiwms_mobile.Classes;
 
 import java.io.Serializable;
 
-/**
- * Created by olivier on 12/06/2019.
- */
-
 public class ObjetReceptionPAD implements Serializable {
 
     private String designation_produit;
