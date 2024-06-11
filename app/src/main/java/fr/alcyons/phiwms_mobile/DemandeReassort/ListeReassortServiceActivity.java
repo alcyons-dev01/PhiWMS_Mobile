@@ -3,6 +3,7 @@ package fr.alcyons.phiwms_mobile.DemandeReassort;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,6 +42,7 @@ import java.util.Random;
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DotationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EVENTOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
@@ -50,11 +52,14 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Reassort_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
+import fr.alcyons.phiwms_mobile.Classes.Dotation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reassort;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reassort_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.DemandeDotationGlobale.ListeDotationServiceActivity;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.DotationAdapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.ReassortAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.R;
@@ -142,8 +147,6 @@ public class ListeReassortServiceActivity extends ServiceAvecConnexionActivity {
                                     ListeReassortServiceActivity.this.finishAffinity();
                                     Intent intent = new Intent(ListeReassortServiceActivity.this, AuthentificationActivity.class);
                                     ListeReassortServiceActivity.this.startActivity(intent);
-                                } else {
-                                    Alerte.afficherAlerte(ListeReassortServiceActivity.this, "Alerte", "Aucun Reassort de service trouvé", "alerte");
                                 }
                             } else {
                                 JSONArray phPreparationJSONArray = response.getJSONArray("PH_Preparations");
@@ -199,11 +202,10 @@ public class ListeReassortServiceActivity extends ServiceAvecConnexionActivity {
 
                                 }
                             }
-
+                            gestionAdapter();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        handler.sendMessage(handler.obtainMessage());
                     },
                     error -> {
                         Log.e("Volley", "Error");
@@ -227,81 +229,14 @@ public class ListeReassortServiceActivity extends ServiceAvecConnexionActivity {
             phReassortList = PH_ReassortOpenHelper.getPH_Reassort(db);
             if (phReassortList.isEmpty()) {
                 connexionNecessaire();
-                return;
             }
-        }
-
-        List<String>listeDate = new ArrayList<>();
-        List<PH_Reassort> reassortListe;
-        reassortListe = PH_ReassortOpenHelper.getPH_Reassort(db);
-        /* Code nécessaire à l'affichage de la liste */
-        reassortAdapter = new ReassortAdapter(ListeReassortServiceActivity.this, db, utilisateurConnecte);
-
-        for (PH_Reassort reassortCourant : reassortListe) {
-            Depot depot = DepotOpenHelper.getDepotParReference(db, reassortCourant.getDepot_Reference());
-            String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, depot.getDepot_UID());
-            if(Objects.equals(dateProchaineLivraison, ""))
+            else
             {
-                Calendar calendar = Calendar.getInstance();
-                calendar.add(Calendar.DAY_OF_YEAR, 1);
-                Date tomorrow = calendar.getTime();
-                @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
-                dateProchaineLivraison = dateFormat.format(tomorrow);
+                gestionAdapter();
             }
-
-            reassortCourant.setDateLivraison(dateProchaineLivraison);
-
-            //on check la présence des préparations en base
-            PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandeDemandeReassortEnInstance(db, "Réassort de service : " + reassortCourant.getListe(), dateProchaineLivraison);
-
-            if(phPreparationCourante == null)
-            {
-                phPreparationCourante = CreationPhPreparation(reassortCourant);
-            }
-
-            phPreparationList.add(phPreparationCourante);
-        }
-        ElementASynchroniserOpenHelper.toutSynchroniser(ListeReassortServiceActivity.this, db, utilisateurConnecte, false);
-        reassortListe.sort(new Comparator<PH_Reassort>() {
-            @SuppressLint("SimpleDateFormat")
-            final DateFormat f = new SimpleDateFormat("dd/MM/yyyy");
-
-            @Override
-            public int compare(PH_Reassort o1, PH_Reassort o2) {
-                try {
-                    return Objects.requireNonNull(f.parse(o1.getDateLivraison())).compareTo(f.parse(o2.getDateLivraison()));
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-
-        ArrayList<String> listeDepot = new ArrayList<>();
-        for (PH_Reassort reassort : reassortListe) {
-            if (!listeDate.contains(reassort.getDateLivraison()) || !listeDepot.contains(reassort.getDepot_Reference())) {
-                listeDate.add(reassort.getDateLivraison());
-                listeDepot.add(reassort.getDepot_Reference());
-                reassortAdapter.addSectionHeaderItem(reassort);
-            }
-
-            reassortAdapter.addItem(reassort);
         }
 
 
-        // Permet d'enlever le séparateur entre deux éléments d'une listeView
-        phReassortListView.setDivider(footer);
-        phReassortListView.setAdapter(reassortAdapter);
-
-        if (reassortListe.isEmpty()) {
-            vide = true;
-            nomServiceVide = "PH_Reassort";
-            ListeReassortServiceActivity.this.finish();
-        } else {
-            reassortListe.size();
-        }
-
-        invalidateOptionsMenu();
     }
 
     // Nécessaire afin d'avoir l'item Search
@@ -482,11 +417,86 @@ public class ListeReassortServiceActivity extends ServiceAvecConnexionActivity {
 
             // Création et insertion en base du PH_Preparation_Ligne
             PH_Preparation_Ligne ph_preparation_ligne = new PH_Preparation_Ligne(PreparationID, _UID, produitID, produitDesignation, Qte_APreparer, Qte_livrer, Livrer, Valider, ValidationDate, produitReference, ZoneDepot, produitCategorie, Qte_RAL, SYS_DT_MAJ, SYS_HEURE_MAJ, SYS_USER_MAJ, produitCondDistrib, produitPUHT, Suivi_Par_Lot, patientID, PatientNom, PrescripteurNom, prescripteurReference, Ordre_Impression, Prescription_ID, LotNumero, PeremptionDate, produitPoids, produitTVA, Montant_HT, Montant_TTC, PoidsTotal, depot_Destinataire_Reference, utilisation_Date_Prevue, Qte_besoin, Qte_StockSaisie, Qte_Demander, EmplacementParDefaut, Qte_preparer, accepter, phPreparationCourante.getUID());
+            PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, ph_preparation_ligne);
 
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparation_ligne.getPhiMR4UUID(), ph_preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.AJOUT);
         }
     }
 
+    private void gestionAdapter()
+    {
+        List<String>listeDate = new ArrayList<>();
+        List<PH_Reassort> reassortListe;
+        reassortListe = PH_ReassortOpenHelper.getPH_Reassort(db);
+        /* Code nécessaire à l'affichage de la liste */
+        reassortAdapter = new ReassortAdapter(ListeReassortServiceActivity.this, db, utilisateurConnecte);
 
+        for (PH_Reassort reassortCourant : reassortListe) {
+            Depot depot = DepotOpenHelper.getDepotParReference(db, reassortCourant.getDepot_Reference());
+            String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, depot.getDepot_UID());
+            if(Objects.equals(dateProchaineLivraison, ""))
+            {
+                Calendar calendar = Calendar.getInstance();
+                calendar.add(Calendar.DAY_OF_YEAR, 1);
+                Date tomorrow = calendar.getTime();
+                @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+                dateProchaineLivraison = dateFormat.format(tomorrow);
+            }
+
+            reassortCourant.setDateLivraison(dateProchaineLivraison);
+
+            //on check la présence des préparations en base
+            PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandeDemandeReassortEnInstance(db, "Réassort de service : " + reassortCourant.getListe(), dateProchaineLivraison);
+
+            if(phPreparationCourante == null)
+            {
+                phPreparationCourante = CreationPhPreparation(reassortCourant);
+            }
+
+            phPreparationList.add(phPreparationCourante);
+        }
+        ElementASynchroniserOpenHelper.toutSynchroniser(ListeReassortServiceActivity.this, db, utilisateurConnecte, false);
+        reassortListe.sort(new Comparator<PH_Reassort>() {
+            @SuppressLint("SimpleDateFormat")
+            final DateFormat f = new SimpleDateFormat("dd/MM/yyyy");
+
+            @Override
+            public int compare(PH_Reassort o1, PH_Reassort o2) {
+                try {
+                    return Objects.requireNonNull(f.parse(o1.getDateLivraison())).compareTo(f.parse(o2.getDateLivraison()));
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        ArrayList<String> listeDepot = new ArrayList<>();
+        for (PH_Reassort reassort : reassortListe) {
+            if (!listeDate.contains(reassort.getDateLivraison()) || !listeDepot.contains(reassort.getDepot_Reference())) {
+                listeDate.add(reassort.getDateLivraison());
+                listeDepot.add(reassort.getDepot_Reference());
+                reassortAdapter.addSectionHeaderItem(reassort);
+            }
+
+            reassortAdapter.addItem(reassort);
+        }
+
+
+        // Permet d'enlever le séparateur entre deux éléments d'une listeView
+        phReassortListView.setDivider(footer);
+        phReassortListView.setAdapter(reassortAdapter);
+
+        if (reassortListe.isEmpty()) {
+            vide = true;
+            nomServiceVide = "PH_Reassort";
+            ListeReassortServiceActivity.this.finish();
+        } else {
+            reassortListe.size();
+        }
+
+        invalidateOptionsMenu();
+        new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
+    }
 
 }

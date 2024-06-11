@@ -1,5 +1,7 @@
 package fr.alcyons.phiwms_mobile.Classes;
 
+import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
+
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -165,7 +167,7 @@ public class PH_Preparation implements Serializable, Comparable {
 
     public PH_Preparation(JSONObject jsonObject) {
         this.UID = jsonObject.optInt("UID");
-        this.Validee = jsonObject.optBoolean( "Validee", false);
+        this.Validee = recupererBooleen(jsonObject,  "Validee");
         this.Liste = jsonObject.optString("Liste");
         this.depotDestinataireID = jsonObject.optInt("depotDestinataireID");
         this.depotDestinataireReference = jsonObject.optString("depotDestinataireReference");
@@ -175,11 +177,11 @@ public class PH_Preparation implements Serializable, Comparable {
         this.LivraisonPrevueDate = jsonObject.optString("LivraisonPrevueDate");
         this.Statut = jsonObject.optString("Statut");
         this.livraisonDate = jsonObject.optString("livraisonDate");
-        this.URGENT = jsonObject.optBoolean( "URGENT", false);
+        this.URGENT = recupererBooleen(jsonObject,  "URGENT");
         this.Motif = jsonObject.optString("Motif");
         this.Volume = jsonObject.optDouble("Volume");
         this.livreur_userID = jsonObject.optInt("livreur_userID");
-        this.Livree = jsonObject.optBoolean( "Livree", false);
+        this.Livree = recupererBooleen(jsonObject,  "Livree");
         this.Preparateur = jsonObject.optString("Preparateur");
         this.ColisNB = jsonObject.optInt("ColisNB");
         this.PaletteNB = jsonObject.optInt("PaletteNB");
@@ -193,7 +195,7 @@ public class PH_Preparation implements Serializable, Comparable {
 
     public PH_Preparation(Cursor cursor) {
         this.UID = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_UID_PH_PREPARATION);
-        this.Validee = OutilsGestionClasses.recupererBooleen(cursor, PH_PreparationOpenHelper.Constantes.NUM_COL_VALIDEE_PH_PREPARATION);
+        this.Validee = recupererBooleen(cursor, PH_PreparationOpenHelper.Constantes.NUM_COL_VALIDEE_PH_PREPARATION);
         this.Liste = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_LISTE_PH_PREPARATION);
         this.depotDestinataireID = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_DEPOTDESTINATAIREID_PH_PREPARATION);
         this.depotDestinataireReference = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_DEPOTDESTINATAIREREFERENCE_PH_PREPARATION);
@@ -207,12 +209,12 @@ public class PH_Preparation implements Serializable, Comparable {
         this.Commande_ID = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_COMMANDE_ID_PH_PREPARATION);
         this.Statut = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_STATUT_PH_PREPARATION);
         this.livraisonDate = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_LIVRAISONDATE_PH_PREPARATION);
-        this.URGENT = OutilsGestionClasses.recupererBooleen(cursor, PH_PreparationOpenHelper.Constantes.NUM_COL_URGENT_PH_PREPARATION);
+        this.URGENT = recupererBooleen(cursor, PH_PreparationOpenHelper.Constantes.NUM_COL_URGENT_PH_PREPARATION);
         this.Motif = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_MOTIF_PH_PREPARATION);
         this.Volume = cursor.getDouble(PH_PreparationOpenHelper.Constantes.NUM_COL_VOLUME_PH_PREPARATION);
         this.livreur_userID = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_LIVREUR_USERID);
         this.Signature_Livraison = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_SIGNATURE_LIVRAISON);
-        this.Livree = OutilsGestionClasses.recupererBooleen(cursor, PH_PreparationOpenHelper.Constantes.NUM_COL_LIVREE_PH_PREPARATION);
+        this.Livree = recupererBooleen(cursor, PH_PreparationOpenHelper.Constantes.NUM_COL_LIVREE_PH_PREPARATION);
         this.ColisNB = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_CAISSENB_PH_PREPARATION);
         this.Conteneur_NB = cursor.getInt(PH_PreparationOpenHelper.Constantes.NUM_COL_CONTENEUR_NB);
         this.numero_scelle = cursor.getString(PH_PreparationOpenHelper.Constantes.NUM_COL_NUMERO_SCELLE);

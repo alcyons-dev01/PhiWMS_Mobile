@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -286,6 +287,7 @@ public class InformationDemandeReassortActivity  extends ServiceAvecConnexionAct
         });
 
         invalidateOptionsMenu();
+        new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
     }
 
     @Override

@@ -1,6 +1,10 @@
 package fr.alcyons.phiwms_mobile.Classes;
 
+import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
+
 import android.database.Cursor;
+
+import com.google.api.client.json.Json;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -243,18 +247,18 @@ public class Fournisseur implements Serializable, Comparable {
         this._SYS_HEURE_MAJ = fournisseurJson.optString("_SYS_HEURE_MAJ");
         this._SYS_USER_MAJ = fournisseurJson.optString("_SYS_USER_MAJ");
         this.Type_franco = fournisseurJson.optString("Type_franco");
-        this.SAP_Groupe = fournisseurJson.optBoolean("SAP_Groupe", false);
+        this.SAP_Groupe = recupererBooleen(fournisseurJson, "SAP_Groupe");
         this.SAp_Compte = fournisseurJson.optString("SAp_Compte");
         this.Delai_Livraison = fournisseurJson.optInt("Delai_Livraison");
         this.Montant_Min = fournisseurJson.optDouble("Montant_Min");
         this.Distrib_Raison_Sociale = fournisseurJson.optString("Distrib_Raison_Sociale");
-        this.Distributeur = fournisseurJson.optBoolean("Distributeur", false);
+        this.Distributeur = recupererBooleen(fournisseurJson, "Distributeur");
         this.Montant_Frais = fournisseurJson.optDouble("Montant_Frais");
         this.Pharmaco_Vigilance_Tel = fournisseurJson.optString("Pharmaco_Vigilance_Tel");
-        this.Archive = fournisseurJson.optBoolean("Archive", false);
+        this.Archive = recupererBooleen(fournisseurJson, "Archive");
         this.Commentaire_Commande_Edition = fournisseurJson.optString("Commentaire_Commande_Edition");
         this.Commentaire_Cde_Confidentiel = fournisseurJson.optString("Commentaire_Cde_Confidentiel");
-        this.LivraisonDomicileAutoriser = fournisseurJson.optBoolean("LivraisonDomicileAutoriser", false);
+        this.LivraisonDomicileAutoriser = recupererBooleen(fournisseurJson, "LivraisonDomicileAutoriser");
         this.document_marche = fournisseurJson.optString("document_marche");
         this.document_developpementDurable = fournisseurJson.optString("document_developpementDurable");
         this.document_certification = fournisseurJson.optString("document_certification");
@@ -262,15 +266,15 @@ public class Fournisseur implements Serializable, Comparable {
         this.responsableAchat = fournisseurJson.optString("responsableAchat");
         this.LivraisonFrequence = fournisseurJson.optString("LivraisonFrequence");
         this.LivraisonJourSemaine = fournisseurJson.optString("LivraisonJourSemaine");
-        this.Fabricant = fournisseurJson.optBoolean("Fabricant", false);
+        this.Fabricant = recupererBooleen(fournisseurJson, "Fabricant");
         this.Contact_Email = fournisseurJson.optString("Contact_Email");
         this.Pharmaco_Vigilance_Email = fournisseurJson.optString("Pharmaco_Vigilance_Email");
         this.Transport_Type = fournisseurJson.optString("Transport_Type");
-        this.import_transitaire = fournisseurJson.optBoolean("import_transitaire", false);
+        this.import_transitaire = recupererBooleen(fournisseurJson, "import_transitaire");
         this.Affectation_Detaillee = fournisseurJson.optString("Affectation_Detaillee");
         this.Transitaire_Metropolitain = fournisseurJson.optString("Transitaire_Metropolitain");
         this.Transitaire_Local = fournisseurJson.optString("Transitaire_Local");
-        this.Import_DDP = fournisseurJson.optBoolean("Import_DDP", false);
+        this.Import_DDP = recupererBooleen(fournisseurJson, "Import_DDP");
         this.Devise_Facturation = fournisseurJson.optString("Devise_Facturation");
     }
 
@@ -328,18 +332,18 @@ public class Fournisseur implements Serializable, Comparable {
         this._SYS_HEURE_MAJ = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL__SYS_HEURE_MAJ_FOURNISSEUR);
         this._SYS_USER_MAJ = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL__SYS_USER_MAJ_FOURNISSEUR);
         this.Type_franco = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_TYPE_FRANCO_FOURNISSEUR);
-        this.SAP_Groupe = OutilsGestionClasses.recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_SAP_GROUPE_FOURNISSEUR);
+        this.SAP_Groupe = recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_SAP_GROUPE_FOURNISSEUR);
         this.SAp_Compte = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_SAP_COMPTE_FOURNISSEUR);
         this.Delai_Livraison = cursorFournisseur.getInt(FournisseurOpenHelper.Constantes.NUM_COL_DELAI_LIVRAISON_FOURNISSEUR);
         this.Montant_Min = cursorFournisseur.getDouble(FournisseurOpenHelper.Constantes.NUM_COL_MONTANT_MIN_FOURNISSEUR);
         this.Distrib_Raison_Sociale = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_DISTRIB_RAISON_SOCIALE_FOURNISSEUR);
-        this.Distributeur = OutilsGestionClasses.recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_DISTRIBUTEUR_FOURNISSEUR);
+        this.Distributeur = recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_DISTRIBUTEUR_FOURNISSEUR);
         this.Montant_Frais = cursorFournisseur.getDouble(FournisseurOpenHelper.Constantes.NUM_COL_MONTANT_FRAIS_FOURNISSEUR);
         this.Pharmaco_Vigilance_Tel = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_PHARMACO_VIGILANCE_TEL_FOURNISSEUR);
-        this.Archive = OutilsGestionClasses.recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_ARCHIVE_FOURNISSEUR);
+        this.Archive = recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_ARCHIVE_FOURNISSEUR);
         this.Commentaire_Commande_Edition = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_COMMENTAIRE_COMMANDE_EDITION_FOURNISSEUR);
         this.Commentaire_Cde_Confidentiel = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_COMMENTAIRE_CDE_CONFIDENTIEL_FOURNISSEUR);
-        this.LivraisonDomicileAutoriser = OutilsGestionClasses.recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_LIVRAISONDOMICILEAUTORISER_FOURNISSEUR);
+        this.LivraisonDomicileAutoriser = recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_LIVRAISONDOMICILEAUTORISER_FOURNISSEUR);
         this.document_marche = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_DOCUMENT_MARCHE_FOURNISSEUR);
         this.document_developpementDurable = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_DOCUMENT_DEVELOPPEMENTDURABLE_FOURNISSEUR);
         this.document_certification = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_DOCUMENT_CERTIFICATION_FOURNISSEUR);
@@ -347,15 +351,15 @@ public class Fournisseur implements Serializable, Comparable {
         this.responsableAchat = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_RESPONSABLEACHAT_FOURNISSEUR);
         this.LivraisonFrequence = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_LIVRAISONFREQUENCE_FOURNISSEUR);
         this.LivraisonJourSemaine = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_LIVRAISONJOURSEMAINE_FOURNISSEUR);
-        this.Fabricant = OutilsGestionClasses.recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_FABRICANT_FOURNISSEUR);
+        this.Fabricant = recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_FABRICANT_FOURNISSEUR);
         this.Contact_Email = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_CONTACT_EMAIL_FOURNISSEUR);
         this.Pharmaco_Vigilance_Email = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_PHARMACO_VIGILANCE_EMAIL_FOURNISSEUR);
         this.Transport_Type = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_TRANSPORT_TYPE_FOURNISSEUR);
-        this.import_transitaire = OutilsGestionClasses.recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_IMPORT_TRANSITAIRE_FOURNISSEUR);
+        this.import_transitaire = recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_IMPORT_TRANSITAIRE_FOURNISSEUR);
         this.Affectation_Detaillee = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_AFFECTATION_DETAILLEE_FOURNISSEUR);
         this.Transitaire_Metropolitain = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_TRANSITAIRE_METROPOLITAIN_FOURNISSEUR);
         this.Transitaire_Local = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_TRANSITAIRE_LOCAL_FOURNISSEUR);
-        this.Import_DDP = OutilsGestionClasses.recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_IMPORT_DDP_FOURNISSEUR);
+        this.Import_DDP = recupererBooleen(cursorFournisseur, FournisseurOpenHelper.Constantes.NUM_COL_IMPORT_DDP_FOURNISSEUR);
         this.Devise_Facturation = cursorFournisseur.getString(FournisseurOpenHelper.Constantes.NUM_COL_DEVISE_FACTURATION_FOURNISSEUR);
         this.phiwms_mobileUUID = cursorFournisseur.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }

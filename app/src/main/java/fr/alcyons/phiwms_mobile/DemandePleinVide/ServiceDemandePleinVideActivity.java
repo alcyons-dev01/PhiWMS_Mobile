@@ -1,10 +1,9 @@
 package fr.alcyons.phiwms_mobile.DemandePleinVide;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,13 +16,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -33,12 +36,13 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
@@ -51,25 +55,37 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ServiceOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Demande_PleinVide;
+import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Detail_Dot;
 import fr.alcyons.phiwms_mobile.Classes.Dotation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
+import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Service;
+import fr.alcyons.phiwms_mobile.DemandeReassort.ListeReassortServiceActivity;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.DotationAdapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.PleinVideAdapter;
 import fr.alcyons.phiwms_mobile.Navigation.WebViewServiceActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
+import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
+
+/**
+ * Created by jessica on 17/05/2018.
+ */
 
 public class ServiceDemandePleinVideActivity extends ServiceAvecConnexionActivity {
 
     boolean passageOnResume = true;
     PackageManager pm;
+
     List<Dotation> liste_plein_vide;
+    DotationAdapter dotationAdapterOld;
 
     PleinVideAdapter pleinVideAdapter;
     ListView dotationListView;
@@ -77,11 +93,15 @@ public class ServiceDemandePleinVideActivity extends ServiceAvecConnexionActivit
     TextView textLancerScan;
     ImageView iconLancerScan;
 
+    List<String> detailDotPleinVide_AdressageList;
+    List<Detail_Dot> detailDotList;
     List<Demande_PleinVide> demandePleinVideList;
 
     Boolean passageParOnCreate;
 
     JSONArray phPreparationJSONArray;
+
+    boolean quantiteDotation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,10 +112,10 @@ public class ServiceDemandePleinVideActivity extends ServiceAvecConnexionActivit
         passageOnResume = false;
         liste_plein_vide = new ArrayList<>();
         demandePleinVideList = new ArrayList<>();
-        dotationListView = findViewById(R.id.listeView);
-        lancerScan = findViewById(R.id.lancerScan);
-        textLancerScan = findViewById(R.id.textLancerScan);
-        iconLancerScan = findViewById(R.id.iconLancerScan);
+        dotationListView = (ListView) findViewById(R.id.listeView);
+        lancerScan = (LinearLayout) findViewById(R.id.lancerScan);
+        textLancerScan = (TextView) findViewById(R.id.textLancerScan);
+        iconLancerScan = (ImageView) findViewById(R.id.iconLancerScan);
         passageParOnCreate = true;
 
         Animation anim = new AlphaAnimation(0.0f, 1.0f);
@@ -106,48 +126,14 @@ public class ServiceDemandePleinVideActivity extends ServiceAvecConnexionActivit
         textLancerScan.startAnimation(anim);
         iconLancerScan.startAnimation(anim);
 
-        dotationListView.setOnItemClickListener((parent, view, position, id) -> {
-            demandePleinVideList = new ArrayList<>();
-            Dotation dotationCourante = pleinVideAdapter.listeDotation.get(position);
-            String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, dotationCourante.getDepot_UID());
-
-            PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandePleinVideEnInstance(db, "Dotation PleinVide DPV" + dotationCourante.get_UID() + ":" + dotationCourante.getIntitule(), dateProchaineLivraison);
-            List<PH_Preparation_Ligne> ListPhPreparationLigne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, phPreparationCourante);
-
-            for(PH_Preparation_Ligne ligne_courante : ListPhPreparationLigne)
-            {
-                int codeProduitCourant = ligne_courante.getProduitID();
-
-                Detail_Dot detailDotCorrespondant = Detail_DotOpenHelper.getDetailDotByProduitAndDotation(db, codeProduitCourant, dotationCourante.get_UID());
-
-                if(detailDotCorrespondant != null)
-                {
-                    demandePleinVideList.add(new Demande_PleinVide(dotationCourante.getDepot_UID(), detailDotCorrespondant));
-                }
-            }
-
-            Bundle demandePleinVide_Bundle = ServiceDemandePleinVideActivity.super.getBundle();
-            demandePleinVide_Bundle.putInt("depotUID_Selectionne", dotationCourante.getDepot_UID());
-            demandePleinVide_Bundle.putInt("Dotation_Selection_PhiMR4UUID", dotationCourante.get_UID());
-            demandePleinVide_Bundle.putInt("PreparationID", phPreparationCourante.getUID());
-            demandePleinVide_Bundle.putSerializable("ListePleinVide", (Serializable) demandePleinVideList);
-
-            Intent demandePleinVide_Intent = new Intent(ServiceDemandePleinVideActivity.this, DetailDotationPleinVideActivity.class);
-            demandePleinVide_Intent.putExtras(demandePleinVide_Bundle);
-            ServiceDemandePleinVideActivity.this.startActivity(demandePleinVide_Intent);
-            ServiceDemandePleinVideActivity.this.finish();
-        });
-
-
-        lancerScan.setOnClickListener(v -> {
-            List<String> detailDotPleinVide_AdressageList = new ArrayList<>();
-            List<String> pleinVideAdressageScanneList = new ArrayList<>();
-            HashMap<String, String> mapPleinVide = new LinkedHashMap<>();
-            demandePleinVideList = new ArrayList<>();
-            for(Dotation dotationCourante : liste_plein_vide)
-            {
+        dotationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                demandePleinVideList = new ArrayList<>();
+                Dotation dotationCourante = pleinVideAdapter.listeDotation.get(position);
                 String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, dotationCourante.getDepot_UID());
-                PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandePleinVideEnInstance(db, "Dotation PleinVide DPV" + dotationCourante.get_UID() + ":" + dotationCourante.getIntitule(), dateProchaineLivraison);
+
+                PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandePleinVideEnInstance(db, "Dotation PleinVide DPV" + String.valueOf(dotationCourante.get_UID()) + ":" + dotationCourante.getIntitule(), dateProchaineLivraison);
                 List<PH_Preparation_Ligne> ListPhPreparationLigne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, phPreparationCourante);
 
                 for(PH_Preparation_Ligne ligne_courante : ListPhPreparationLigne)
@@ -156,38 +142,88 @@ public class ServiceDemandePleinVideActivity extends ServiceAvecConnexionActivit
 
                     Detail_Dot detailDotCorrespondant = Detail_DotOpenHelper.getDetailDotByProduitAndDotation(db, codeProduitCourant, dotationCourante.get_UID());
 
-                    if(ligne_courante.getQte_APreparer() > 0)
+                    if(detailDotCorrespondant != null)
                     {
-                        if(detailDotCorrespondant != null) {
-                            detailDotPleinVide_AdressageList.add(detailDotCorrespondant.getPleinVide_Adressage());
-
-                            demandePleinVideList.add(new Demande_PleinVide(dotationCourante.getDepot_UID(), detailDotCorrespondant));
-                        }
+                        demandePleinVideList.add(new Demande_PleinVide(dotationCourante.getDepot_UID(), detailDotCorrespondant));
                     }
-                    assert detailDotCorrespondant != null;
-                    mapPleinVide.put(detailDotCorrespondant.getPleinVide_Adressage(), detailDotCorrespondant.getDesignation());
                 }
+
+                Bundle demandePleinVide_Bundle = ServiceDemandePleinVideActivity.super.getBundle();
+                demandePleinVide_Bundle.putInt("depotUID_Selectionne", dotationCourante.getDepot_UID());
+                demandePleinVide_Bundle.putInt("Dotation_Selection_PhiMR4UUID", dotationCourante.get_UID());
+                demandePleinVide_Bundle.putInt("PreparationID", phPreparationCourante.getUID());
+                demandePleinVide_Bundle.putSerializable("DemandePleinVide", (Serializable) demandePleinVideList);
+                demandePleinVide_Bundle.putBoolean("quantiteDotation", quantiteDotation);
+
+                Intent demandePleinVide_Intent = new Intent(ServiceDemandePleinVideActivity.this, DetailDotationPleinVideActivity.class);
+                demandePleinVide_Intent.putExtras(demandePleinVide_Bundle);
+                ServiceDemandePleinVideActivity.this.startActivity(demandePleinVide_Intent);
+                ServiceDemandePleinVideActivity.this.finish();
             }
-
-            Intent detailDotationPleinVideIntent = new Intent(ServiceDemandePleinVideActivity.this, BarcodeCaptureActivity.class);
-            Bundle detailDotationPleinVideBundle = ServiceDemandePleinVideActivity.super.getBundle();
-
-            if(Build.MANUFACTURER.contains("Zebra Technologies"))
-            {
-                detailDotationPleinVideIntent = new Intent(ServiceDemandePleinVideActivity.this, ScannerPreparationPleinVideActivity.class);
-                detailDotationPleinVideBundle.putInt("scannerContexteInt", R.string.scannerContextePleinVide);
-            }
-
-            detailDotationPleinVideBundle.putString("contexte", String.valueOf(R.string.scannerContextePleinVide));
-            detailDotationPleinVideBundle.putBoolean("isBoutonSuppressionExistant", true);
-            detailDotationPleinVideBundle.putBoolean("modeRafale", true);
-            detailDotationPleinVideBundle.putStringArrayList("stringList", (ArrayList) pleinVideAdressageScanneList);
-            detailDotationPleinVideBundle.putStringArrayList("detailDotPleinVide_AdressageList", (ArrayList) detailDotPleinVide_AdressageList);
-            detailDotationPleinVideBundle.putString("dotationIntitule", "");
-            detailDotationPleinVideIntent.putExtras(detailDotationPleinVideBundle);
-            detailDotationPleinVideIntent.putExtra("designationArrayList", (HashMap) mapPleinVide);
-            ServiceDemandePleinVideActivity.this.startActivityForResult(detailDotationPleinVideIntent, CodesEchangesActivites.RESULT_PLEINVIDE_LOCALISATION);
         });
+
+
+        lancerScan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<String> detailDotPleinVide_AdressageList = new ArrayList<>();
+                List<String> pleinVideAdressageScanneList = new ArrayList<>();
+                List<String> designationListe = new ArrayList<>();
+                HashMap<String, String> mapPleinVide = new LinkedHashMap<>();
+                demandePleinVideList = new ArrayList<>();
+                for(Dotation dotationCourante : liste_plein_vide)
+                {
+                    String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, dotationCourante.getDepot_UID());
+                    PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandePleinVideEnInstance(db, "Dotation PleinVide DPV" + String.valueOf(dotationCourante.get_UID()) + ":" + dotationCourante.getIntitule(), dateProchaineLivraison);
+                    List<PH_Preparation_Ligne> ListPhPreparationLigne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, phPreparationCourante);
+
+                    for(PH_Preparation_Ligne ligne_courante : ListPhPreparationLigne)
+                    {
+                        int codeProduitCourant = ligne_courante.getProduitID();
+
+                        Detail_Dot detailDotCorrespondant = Detail_DotOpenHelper.getDetailDotByProduitAndDotation(db, codeProduitCourant, dotationCourante.get_UID());
+
+                        if(ligne_courante.getQte_APreparer() > 0)
+                        {
+                            if(detailDotCorrespondant != null) {
+                                detailDotPleinVide_AdressageList.add(detailDotCorrespondant.getPleinVide_Adressage());
+                                //pleinVideAdressageScanneList.add(detailDotCorrespondant.getPleinVide_Adressage());
+
+                                demandePleinVideList.add(new Demande_PleinVide(dotationCourante.getDepot_UID(), detailDotCorrespondant));
+                            }
+                        }
+                        mapPleinVide.put(detailDotCorrespondant.getPleinVide_Adressage(), detailDotCorrespondant.getDesignation());
+                    }
+                }
+
+                Intent detailDotationPleinVideIntent = new Intent(ServiceDemandePleinVideActivity.this, BarcodeCaptureActivity.class);
+                Bundle detailDotationPleinVideBundle = ServiceDemandePleinVideActivity.super.getBundle();
+
+                if(android.os.Build.MANUFACTURER.contains("Zebra Technologies"))
+                {
+                    detailDotationPleinVideIntent = new Intent(ServiceDemandePleinVideActivity.this, ScannerPreparationPleinVideActivity.class);
+                    detailDotationPleinVideBundle.putInt("scannerContexteInt", R.string.scannerContextePleinVide);
+                }
+
+                detailDotationPleinVideBundle.putString("contexte", String.valueOf(R.string.scannerContextePleinVide));
+                detailDotationPleinVideBundle.putBoolean("isBoutonSuppressionExistant", true);
+                detailDotationPleinVideBundle.putBoolean("modeRafale", true);
+                detailDotationPleinVideBundle.putStringArrayList("stringList", (ArrayList) pleinVideAdressageScanneList);
+                detailDotationPleinVideBundle.putStringArrayList("detailDotPleinVide_AdressageList", (ArrayList) detailDotPleinVide_AdressageList);
+                detailDotationPleinVideBundle.putString("dotationIntitule", "");
+                detailDotationPleinVideIntent.putExtras(detailDotationPleinVideBundle);
+                detailDotationPleinVideIntent.putExtra("designationArrayList", (HashMap) mapPleinVide);
+                ServiceDemandePleinVideActivity.this.startActivityForResult(detailDotationPleinVideIntent, CodesEchangesActivites.RESULT_PLEINVIDE_LOCALISATION);
+            }
+        });
+
+
+        quantiteDotation = false;
+
+        if(utilisateurConnecte.getEtablissement().toLowerCase().contentEquals("anider pharmacie") || utilisateurConnecte.getEtablissement().toLowerCase().contentEquals("association anider"))
+        {
+            quantiteDotation = true;
+        }
     }
 
     @Override
@@ -270,38 +306,9 @@ public class ServiceDemandePleinVideActivity extends ServiceAvecConnexionActivit
                                         }
                                     }
                                 }
-
-                                passageParOnCreate = false;
-                                liste_plein_vide = DotationOpenHelper.getAllDotationPleinVide(db);
-
-                                List<String>listeDate = new ArrayList<>();
-
-                                pleinVideAdapter = new PleinVideAdapter(ServiceDemandePleinVideActivity.this, db, utilisateurConnecte);
-
-                                for (Dotation dotationCourante : liste_plein_vide) {
-                                    String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, dotationCourante.getDepot_UID());
-                                    dotationCourante.setDateLivraison(dateProchaineLivraison);
-                                }
-
-                                liste_plein_vide.sort(Comparator.comparing(Dotation::getDateLivraison));
-
-                                for (Dotation dotationCourante : liste_plein_vide) {
-                                    if (!listeDate.contains(dotationCourante.getDateLivraison())) {
-                                        listeDate.add(dotationCourante.getDateLivraison());
-                                        pleinVideAdapter.addSectionHeaderItem(dotationCourante);
-                                    }
-
-                                    pleinVideAdapter.addItem(dotationCourante);
-                                }
-
-                                dotationListView.setDivider(footer);
-                                dotationListView.setAdapter(pleinVideAdapter);
-
-                                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(liste_plein_vide.size()));
-                                passageOnResume = true;
-
-                                new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
                             }
+
+                            gestionAdapter();
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -316,8 +323,9 @@ public class ServiceDemandePleinVideActivity extends ServiceAvecConnexionActivit
                  * Passing some request headers
                  */
                 @Override
-                public Map<String, String> getHeaders() {
-                    HashMap<String, String> headers = new HashMap<>();
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    HashMap<String, String> headers = new HashMap<String, String>();
+                    //headers.put("Content-Type", "application/json");
                     headers.put("Authorization", utilisateurConnecte.getToken());
                     headers.put("UserId", String.valueOf(utilisateurConnecte.getId()));
                     headers.put("EtablissementId", String.valueOf(utilisateurConnecte.getEtablissementId()));
@@ -329,35 +337,9 @@ public class ServiceDemandePleinVideActivity extends ServiceAvecConnexionActivit
         }
         else
         {
-            passageParOnCreate = false;
-            liste_plein_vide = DotationOpenHelper.getAllDotationPleinVide(db);
-
-            List<String>listeDate = new ArrayList<>();
-
-            pleinVideAdapter = new PleinVideAdapter(ServiceDemandePleinVideActivity.this, db, utilisateurConnecte);
-
-            for (Dotation dotationCourante : liste_plein_vide) {
-                String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, dotationCourante.getDepot_UID());
-                dotationCourante.setDateLivraison(dateProchaineLivraison);
-            }
-
-            liste_plein_vide.sort(Comparator.comparing(Dotation::getDateLivraison));
-
-            for (Dotation dotationCourante : liste_plein_vide) {
-                if (!listeDate.contains(dotationCourante.getDateLivraison())) {
-                    listeDate.add(dotationCourante.getDateLivraison());
-                    pleinVideAdapter.addSectionHeaderItem(dotationCourante);
-                }
-
-                pleinVideAdapter.addItem(dotationCourante);
-            }
-
-            dotationListView.setDivider(footer);
-            dotationListView.setAdapter(pleinVideAdapter);
-
-            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(liste_plein_vide.size()));
-            passageOnResume = true;
+            gestionAdapter();
         }
+
     }
 
     // Lorsqu'on lance une nouvelle activity avec " startActivityForResult ", action à réaliser à la fin de l'activity lancé suivant le " CodesEchangesActivites " passé
@@ -367,111 +349,133 @@ public class ServiceDemandePleinVideActivity extends ServiceAvecConnexionActivit
         if (data == null) {
             ServiceDemandePleinVideActivity.this.finish();
         } else {
-            if (requestCode == CodesEchangesActivites.RESULT_PLEINVIDE_LOCALISATION) {
-                String PHITAGLOCALISATION = data.getStringExtra("code");
-                List<String> stringList = Objects.requireNonNull(data.getExtras()).getStringArrayList("listeString");
+            switch (requestCode) {
+                case CodesEchangesActivites.RESULT_PLEINVIDE_LOCALISATION: {
+                    String PHITAGLOCALISATION = data.getStringExtra("code");
+                    List<String> stringList = data.getExtras().getStringArrayList("listeString");
 
-                if (PHITAGLOCALISATION != null) {
-                    String dotationId = PHITAGLOCALISATION.replace("PHITAGLOCALISATION_", "");
+                    if(PHITAGLOCALISATION != null)
+                    {
+                        String dotationId = PHITAGLOCALISATION.replace("PHITAGLOCALISATION_", "");
 
-                    Dotation dotationCourante = DotationOpenHelper.getDotationPleinByStringId(db, dotationId);
-                    demandePleinVideList = new ArrayList<>();
-
-                    String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, dotationCourante.getDepot_UID());
-                    PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandePleinVideEnInstance(db, "Dotation PleinVide DPV" + dotationCourante.get_UID() + ":" + dotationCourante.getIntitule(), dateProchaineLivraison);
-                    List<PH_Preparation_Ligne> ListPhPreparationLigne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, phPreparationCourante);
-
-                    for (PH_Preparation_Ligne ligne_courante : ListPhPreparationLigne) {
-                        int codeProduitCourant = ligne_courante.getProduitID();
-
-                        Detail_Dot detailDotCorrespondant = Detail_DotOpenHelper.getDetailDotByProduitAndDotation(db, codeProduitCourant, dotationCourante.get_UID());
-
-                        if (detailDotCorrespondant != null) {
-                            demandePleinVideList.add(new Demande_PleinVide(dotationCourante.getDepot_UID(), detailDotCorrespondant));
-                        }
-                    }
-
-                    Bundle demandePleinVide_Bundle = ServiceDemandePleinVideActivity.super.getBundle();
-                    demandePleinVide_Bundle.putInt("depotUID_Selectionne", dotationCourante.getDepot_UID());
-                    demandePleinVide_Bundle.putInt("Dotation_Selection_phiwms_mobileUUID", dotationCourante.get_UID());
-                    demandePleinVide_Bundle.putInt("PreparationID", phPreparationCourante.getUID());
-                    demandePleinVide_Bundle.putSerializable("ListePleinVide", (Serializable) demandePleinVideList);
-
-                    Intent demandePleinVide_Intent = new Intent(ServiceDemandePleinVideActivity.this, DetailDotationPleinVideActivity.class);
-                    demandePleinVide_Intent.putExtras(demandePleinVide_Bundle);
-                    ServiceDemandePleinVideActivity.this.startActivity(demandePleinVide_Intent);
-                    ServiceDemandePleinVideActivity.this.finish();
-                } else if (stringList != null) {
-                    if (demandePleinVideList == null) {
+                        Dotation dotationCourante = DotationOpenHelper.getDotationPleinByStringId(db, dotationId);
                         demandePleinVideList = new ArrayList<>();
-                    }
-                    boolean doitEtreAjouter = true;
-                    boolean valider = false;
-                    for (String pleinVideAdressage : stringList) {
 
-                        Detail_Dot detailDotAjouter = null;
-                        Detail_Dot detailDotSupprimer = null;
+                        String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, dotationCourante.getDepot_UID());
+                        PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandePleinVideEnInstance(db, "Dotation PleinVide DPV" + String.valueOf(dotationCourante.get_UID()) + ":" + dotationCourante.getIntitule(), dateProchaineLivraison);
+                        List<PH_Preparation_Ligne> ListPhPreparationLigne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, phPreparationCourante);
 
-                        switch (pleinVideAdressage) {
-                            case "PHITAGACTION_Supprimer":
-                                doitEtreAjouter = false;
-                                break;
-                            case "PHITAGACTION_Valider":
-                                valider = true;
-                                break;
-                            default:
-                                Detail_Dot detail_dot = Detail_DotOpenHelper.getDetailDotPleinVideAdressage(db, pleinVideAdressage);
-                                if (doitEtreAjouter) {
-                                    detailDotAjouter = detail_dot;
-                                } else {
-                                    detailDotSupprimer = detail_dot;
-                                }
-                                doitEtreAjouter = true;
-                                break;
-                        }
+                        for(PH_Preparation_Ligne ligne_courante : ListPhPreparationLigne)
+                        {
+                            int codeProduitCourant = ligne_courante.getProduitID();
 
-                        if (valider) {
-                            break;
-                        } else if (detailDotAjouter != null) {
-                            Dotation dotation = DotationOpenHelper.getDotationPleinByStringId(db, String.valueOf(detailDotAjouter.getDotation_UID()));
-                            String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, dotation.getDepot_UID());
-                            PH_Preparation ph_preparation = PH_PreparationOpenHelper.getDemandePleinVideEnInstance(db, "Dotation PleinVide DPV" + dotation.get_UID() + ":" + dotation.getIntitule(), dateProchaineLivraison);
-                            if (!ph_preparation.getStatut().contentEquals("En cours de préparation")) {
-                                PH_Preparation_Ligne ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByPreparationAndIdProduit(db, ph_preparation, detailDotAjouter.getCode_produit());
-                                if (utilisateurConnecte.getEtablissement().toUpperCase().contentEquals("AVODD")) {
-                                    int quantite = detailDotAjouter.getQte() - detailDotAjouter.getStock_minimum();
-                                    ph_preparation_ligne.setQte_APreparer(quantite);
-                                    ph_preparation_ligne.setQte_Demander(quantite);
-                                    ph_preparation_ligne.setQte_RAL(quantite);
-                                } else {
-                                    ph_preparation_ligne.setQte_APreparer(detailDotAjouter.getQte());
-                                    ph_preparation_ligne.setQte_Demander(detailDotAjouter.getQte());
-                                    ph_preparation_ligne.setQte_RAL(detailDotAjouter.getQte());
-                                }
+                            Detail_Dot detailDotCorrespondant = Detail_DotOpenHelper.getDetailDotByProduitAndDotation(db, codeProduitCourant, dotationCourante.get_UID());
 
-                                PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
-                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparation_ligne.getPhiMR4UUID(), ph_preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
-                            }
-                        } else if (detailDotSupprimer != null) {
-                            Dotation dotation = DotationOpenHelper.getDotationPleinByStringId(db, String.valueOf(detailDotAjouter.getDotation_UID()));
-                            String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, dotation.getDepot_UID());
-                            PH_Preparation ph_preparation = PH_PreparationOpenHelper.getDemandePleinVideEnInstance(db, "Dotation PleinVide DPV" + dotation.get_UID() + ":" + dotation.getIntitule(), dateProchaineLivraison);
-                            if (!ph_preparation.getStatut().contentEquals("En cours de préparation")) {
-                                PH_Preparation_Ligne ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByPreparationAndIdProduit(db, ph_preparation, detailDotSupprimer.getCode_produit());
-                                ph_preparation_ligne.setQte_APreparer(0);
-                                ph_preparation_ligne.setQte_Demander(0);
-                                ph_preparation_ligne.setQte_RAL(0);
-                                PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
-                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparation_ligne.getPhiMR4UUID(), ph_preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+                            if(detailDotCorrespondant != null)
+                            {
+                                demandePleinVideList.add(new Demande_PleinVide(dotationCourante.getDepot_UID(), detailDotCorrespondant));
                             }
                         }
+
+                        Bundle demandePleinVide_Bundle = ServiceDemandePleinVideActivity.super.getBundle();
+                        demandePleinVide_Bundle.putInt("depotUID_Selectionne", dotationCourante.getDepot_UID());
+                        demandePleinVide_Bundle.putInt("Dotation_Selection_PhiMR4UUID", dotationCourante.get_UID());
+                        demandePleinVide_Bundle.putInt("PreparationID", phPreparationCourante.getUID());
+                        demandePleinVide_Bundle.putSerializable("DemandePleinVide", (Serializable) demandePleinVideList);
+
+                        Intent demandePleinVide_Intent = new Intent(ServiceDemandePleinVideActivity.this, DetailDotationPleinVideActivity.class);
+                        demandePleinVide_Intent.putExtras(demandePleinVide_Bundle);
+                        ServiceDemandePleinVideActivity.this.startActivity(demandePleinVide_Intent);
+                        ServiceDemandePleinVideActivity.this.finish();
                     }
+                    else if(stringList != null)
+                    {
+                        if(demandePleinVideList == null)
+                        {
+                            demandePleinVideList = new ArrayList<>();
+                        }
+                        List<Demande_PleinVide> demandePleinVideASupprimerList = new ArrayList<>();
+                        boolean doitEtreAjouter = true;
+                        boolean valider = false;
+                        for (String pleinVideAdressage : stringList) {
 
-                    ElementASynchroniserOpenHelper.toutSynchroniser(ServiceDemandePleinVideActivity.this, db, utilisateurConnecte, false);
+                            Detail_Dot detailDotAjouter = null;
+                            Detail_Dot detailDotSupprimer = null;
 
-                    onResume();
-                } else {
-                    onBackPressed();
+                            switch (pleinVideAdressage){
+                                case "PHITAGACTION_Supprimer":
+                                    doitEtreAjouter = false;
+                                    break;
+                                case "PHITAGACTION_Valider":
+                                    valider = true;
+                                    break;
+                                default:
+                                    Detail_Dot detail_dot = Detail_DotOpenHelper.getDetailDotPleinVideAdressage(db, pleinVideAdressage);
+                                    if(doitEtreAjouter) {
+                                        detailDotAjouter = detail_dot;
+                                    }
+                                    else{
+                                        detailDotSupprimer = detail_dot;
+                                    }
+                                    doitEtreAjouter = true;
+                                    break;
+                            }
+
+                            if(valider){
+                                break;
+                            }
+                            else if (detailDotAjouter != null) {
+                                Dotation dotation = DotationOpenHelper.getDotationPleinByStringId(db, String.valueOf(detailDotAjouter.getDotation_UID()));
+                                String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, dotation.getDepot_UID());
+                                PH_Preparation ph_preparation = PH_PreparationOpenHelper.getDemandePleinVideEnInstance(db,"Dotation PleinVide DPV" + String.valueOf(dotation.get_UID()) + ":" + dotation.getIntitule(), dateProchaineLivraison);
+                                if(!ph_preparation.getStatut().contentEquals("En cours de préparation"))
+                                {
+                                    PH_Preparation_Ligne ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByPreparationAndIdProduit(db, ph_preparation, detailDotAjouter.getCode_produit());
+
+                                    if(quantiteDotation)
+                                    {
+                                        ph_preparation_ligne.setQte_APreparer(detailDotAjouter.getQte());
+                                        ph_preparation_ligne.setQte_Demander(detailDotAjouter.getQte());
+                                        ph_preparation_ligne.setQte_RAL(detailDotAjouter.getQte());
+                                    }
+                                    else
+                                    {
+                                        int quantite = detailDotAjouter.getQte() - detailDotAjouter.getStock_minimum();
+                                        ph_preparation_ligne.setQte_APreparer(quantite);
+                                        ph_preparation_ligne.setQte_Demander(quantite);
+                                        ph_preparation_ligne.setQte_RAL(quantite);
+                                        ph_preparation_ligne.setQte_StockSaisie(quantite);
+                                    }
+
+                                    PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
+                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparation_ligne.getPhiMR4UUID(), ph_preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+                                }
+                            }
+                            else if(detailDotSupprimer != null){
+                                Dotation dotation = DotationOpenHelper.getDotationPleinByStringId(db, String.valueOf(detailDotAjouter.getDotation_UID()));
+                                String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, dotation.getDepot_UID());
+                                PH_Preparation ph_preparation = PH_PreparationOpenHelper.getDemandePleinVideEnInstance(db,"Dotation PleinVide DPV" + String.valueOf(dotation.get_UID()) + ":" + dotation.getIntitule(), dateProchaineLivraison);
+                                if(!ph_preparation.getStatut().contentEquals("En cours de préparation"))
+                                {
+                                    PH_Preparation_Ligne ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByPreparationAndIdProduit(db, ph_preparation, detailDotSupprimer.getCode_produit());
+                                    ph_preparation_ligne.setQte_APreparer(0);
+                                    ph_preparation_ligne.setQte_Demander(0);
+                                    ph_preparation_ligne.setQte_RAL(0);
+                                    PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
+                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparation_ligne.getPhiMR4UUID(), ph_preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+                                }
+                            }
+                        }
+
+                        ElementASynchroniserOpenHelper.toutSynchroniser(ServiceDemandePleinVideActivity.this, db, utilisateurConnecte, false);
+
+                        onResume();
+                    }
+                    else
+                    {
+                        onBackPressed();
+                    }
+                    break;
                 }
             }
         }
@@ -483,37 +487,43 @@ public class ServiceDemandePleinVideActivity extends ServiceAvecConnexionActivit
         super.onBackPressed();
     }
 
-    @SuppressLint("SetTextI18n")
     public void afficherAlerte()
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(ServiceDemandePleinVideActivity.this);
         View layout = ServiceDemandePleinVideActivity.this.getLayoutInflater().inflate(R.layout.alerte_confirmation, null);
 
-        ImageView buttonOk = layout.findViewById(R.id.buttonOk);
-        TextView messageFin = layout.findViewById(R.id.messageFin);
-        TextView titre = layout.findViewById(R.id.titre);
+        ImageView buttonOk = (ImageView) layout.findViewById(R.id.buttonOk);
+        TextView messageFin = (TextView) layout.findViewById(R.id.messageFin);
+        TextView titre = (TextView) layout.findViewById(R.id.titre);
 
         titre.setText("Conseil");
         messageFin.setText("Avant de commencer, réaliser un tour dans votre stock pour vérifier que vous disposez de toutes les étiquettes.");
         builder.setView(layout);
 
         final AlertDialog alertDialog = builder.create();
-        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
+        alertDialog.getWindow().setGravity(Gravity.CENTER);
         alertDialog.show();
 
-        buttonOk.setOnClickListener(v -> {
-            alertDialog.dismiss();
-            passageOnResume = true;
-            onResume();
+        buttonOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+                passageOnResume = true;
+                onResume();
+            }
         });
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem item = menu.findItem(R.id.menuInformation);
-        item.setOnMenuItemClickListener(item1 -> {
-            afficherInformationService();
-            return true;
+        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                afficherInformationService();
+                return true;
+            }
         });
         return true;
     }
@@ -530,7 +540,7 @@ public class ServiceDemandePleinVideActivity extends ServiceAvecConnexionActivit
 
     protected void afficherInformationService()
     {
-        Service serviceCourant = ServiceOpenHelper.getServiceByID(db, Objects.requireNonNull(intent.getExtras()).getInt("serviceSelectionneID"));
+        Service serviceCourant = ServiceOpenHelper.getServiceByID(db, intent.getExtras().getInt("serviceSelectionneID"));
         Intent intentWebView = new Intent(ServiceDemandePleinVideActivity.this, WebViewServiceActivity.class);
 
         Bundle extras = new Bundle();
@@ -540,5 +550,117 @@ public class ServiceDemandePleinVideActivity extends ServiceAvecConnexionActivit
 
         // Appel de la prochaine activité
         ServiceDemandePleinVideActivity.this.startActivity(intentWebView);
+    }
+
+    public int CreatePhPreparationLigne(Detail_Dot detailDot, Dotation dotation, Depot depot)
+    {
+        int id = 0;
+
+        String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, dotation.getDepot_UID());
+        PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandePleinVideEnInstance(db, "Dotation PleinVide DPV" + String.valueOf(dotation.get_UID()) + ":" + dotation.getIntitule(), dateProchaineLivraison);
+        PH_Preparation_Ligne ph_preparation_ligneCourant = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByPreparationAndIdProduit(db, phPreparationCourante, detailDot.getCode_produit());
+
+        if(ph_preparation_ligneCourant == null)
+        {
+            Produit produitCorrespondant = ProduitOpenHelper.getProduitByID(db, detailDot.getCode_produit());
+
+            Random phPreparationRandom = new Random();
+            int phPreparationLigneID = phPreparationRandom.nextInt();
+            if (phPreparationLigneID > 0) {
+                phPreparationLigneID = phPreparationLigneID * -1;
+            }
+
+            // Initialisation des données permettant de créer un PH_Préparation_Ligne
+            int PreparationID = phPreparationCourante.getUID();
+            int _UID = phPreparationLigneID;
+            int produitID = produitCorrespondant.getID_produit();
+            String produitDesignation = produitCorrespondant.getDesignation_interne();
+            int Qte_APreparer = detailDot.getQte();
+            int qteDemander = detailDot.getQte() - detailDot.getStock_minimum();
+            int Qte_livrer = 0;
+            Boolean Livrer = false;
+            Boolean Valider = false;
+            String ValidationDate = "";
+            String produitReference = produitCorrespondant.getRef_fourni();
+            String ZoneDepot = "";
+            String produitCategorie = produitCorrespondant.getCategorie();
+            int Qte_RAL = Qte_APreparer;
+            String SYS_DT_MAJ = "";
+            String SYS_HEURE_MAJ = "";
+            String SYS_USER_MAJ = "";
+            double produitCondDistrib = produitCorrespondant.getCond_distrib();
+            double produitPUHT = 0;
+            Boolean Suivi_Par_Lot = produitCorrespondant.isSuivi_Lot();
+            int patientID = 0;
+            String PatientNom = "";
+            String PrescripteurNom = "";
+            String prescripteurReference = "";
+            int Ordre_Impression = 0;
+            int Prescription_ID = 0;
+            String LotNumero = "";
+            String PeremptionDate = "0000-00-00";
+            double produitPoids = 0;
+            double produitTVA = 0;
+            double Montant_HT = 0;
+            double Montant_TTC = 0;
+            double PoidsTotal = 0;
+            String depot_Destinataire_Reference = "";
+            String utilisation_Date_Prevue = "";
+            int Qte_besoin = Qte_APreparer;
+            int Qte_StockSaisie = Qte_APreparer;
+            int Qte_Demander = qteDemander;
+            String EmplacementParDefaut = "";
+            int Qte_preparer = 0;
+            boolean accepter = false;
+
+            // Création et insertion en base du PH_Preparation_Ligne
+            PH_Preparation_Ligne ph_preparation_ligne = new PH_Preparation_Ligne(PreparationID, _UID, produitID, produitDesignation, Qte_APreparer, Qte_livrer, Livrer, Valider, ValidationDate, produitReference, ZoneDepot, produitCategorie, Qte_RAL, SYS_DT_MAJ, SYS_HEURE_MAJ, SYS_USER_MAJ, produitCondDistrib, produitPUHT, Suivi_Par_Lot, patientID, PatientNom, PrescripteurNom, prescripteurReference, Ordre_Impression, Prescription_ID, LotNumero, PeremptionDate, produitPoids, produitTVA, Montant_HT, Montant_TTC, PoidsTotal, depot_Destinataire_Reference, utilisation_Date_Prevue, Qte_besoin, Qte_StockSaisie, Qte_Demander, EmplacementParDefaut, Qte_preparer, accepter, phPreparationCourante.getUID());
+            id = (int) PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, ph_preparation_ligne);
+
+            long rowId = ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparation_ligne.getPhiMR4UUID(), ph_preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.AJOUT);
+        }
+
+        return id;
+    }
+
+    private void gestionAdapter()
+    {
+        passageParOnCreate = false;
+        liste_plein_vide = DotationOpenHelper.getAllDotationPleinVide(db);
+
+
+        List<String>listeDate = new ArrayList<String>();
+
+        pleinVideAdapter = new PleinVideAdapter(ServiceDemandePleinVideActivity.this, db, utilisateurConnecte);
+
+        for (Dotation dotationCourante : liste_plein_vide) {
+            String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, dotationCourante.getDepot_UID());
+            dotationCourante.setDateLivraison(dateProchaineLivraison);
+        }
+
+        Collections.sort(liste_plein_vide, new Comparator<Dotation>() {
+            @Override
+            public int compare(Dotation o1, Dotation o2) {
+                return o1.getDateLivraison().compareTo(o2.getDateLivraison());
+            }
+        });
+
+        for (Dotation dotationCourante : liste_plein_vide) {
+            if (!listeDate.contains(dotationCourante.getDateLivraison())) {
+                listeDate.add(dotationCourante.getDateLivraison());
+                pleinVideAdapter.addSectionHeaderItem(dotationCourante);
+            }
+
+            pleinVideAdapter.addItem(dotationCourante);
+        }
+
+        dotationListView.setDivider(footer);
+        dotationListView.setAdapter(pleinVideAdapter);
+
+
+
+        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(liste_plein_vide.size()));
+        passageOnResume = true;
+        new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
     }
 }

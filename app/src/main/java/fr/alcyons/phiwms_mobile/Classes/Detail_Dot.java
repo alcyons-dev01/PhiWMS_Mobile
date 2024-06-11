@@ -41,7 +41,7 @@ public class Detail_Dot implements Serializable, Comparable {
         this.Qte = jsonObject.optInt("Qte");
         this.Ref_four = jsonObject.optString("Ref_four");
         this.Categorie = jsonObject.optString("Categorie");
-        this.Livraison_Directe = jsonObject.optBoolean("Livraison_Directe", false);
+        this.Livraison_Directe = recupererBooleen(jsonObject, "Livraison_Directe");
         this.SYS_DT_MAJ = jsonObject.optString("SYS_DT_MAJ");
         this.SYS_HEURE_MAJ = jsonObject.optString("SYS_HEURE_MAJ");
         this.SYS_USER_MAJ = jsonObject.optString("SYS_USER_MAJ");

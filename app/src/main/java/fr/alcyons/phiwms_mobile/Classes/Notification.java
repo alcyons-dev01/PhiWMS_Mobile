@@ -1,5 +1,7 @@
 package fr.alcyons.phiwms_mobile.Classes;
 
+import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
+
 import android.database.Cursor;
 
 import org.json.JSONException;
@@ -40,7 +42,7 @@ public class Notification implements Serializable, Comparable {
         this.body = notificationJson.optString("body");
         this.color = notificationJson.optString("color");
         this.tag = notificationJson.optString("tag");
-        this.aEteGeree = notificationJson.optBoolean("aEteGeree", false);
+        this.aEteGeree = recupererBooleen(notificationJson, "aEteGeree");
         this.date = notificationJson.optString("date");
         this.channel = notificationJson.optString("channel");
     }
@@ -52,7 +54,7 @@ public class Notification implements Serializable, Comparable {
         this.body = notificationCursor.getString(NotificationOpenHelper.Constantes.NUM_COL_BODY_NOTIFICATION);
         this.color = notificationCursor.getString(NotificationOpenHelper.Constantes.NUM_COL_COLOR_NOTIFICATION);
         this.tag = notificationCursor.getString(NotificationOpenHelper.Constantes.NUM_COL_TAG_NOTIFICATION);
-        this.aEteGeree = OutilsGestionClasses.recupererBooleen(notificationCursor, NotificationOpenHelper.Constantes.NUM_COL_AETEGEREE_NOTIFICATION);
+        this.aEteGeree = recupererBooleen(notificationCursor, NotificationOpenHelper.Constantes.NUM_COL_AETEGEREE_NOTIFICATION);
         this.date = notificationCursor.getString(NotificationOpenHelper.Constantes.NUM_COL_DATE_NOTIFICATION);
         this.channel = notificationCursor.getString(NotificationOpenHelper.Constantes.NUM_COL_CHANNEL_NOTIFICATION);
         this.phiwms_mobileUUID = notificationCursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);

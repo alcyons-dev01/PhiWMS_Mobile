@@ -1,5 +1,7 @@
 package fr.alcyons.phiwms_mobile.Classes;
 
+import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
+
 import android.database.Cursor;
 
 import org.json.JSONException;
@@ -133,12 +135,12 @@ public class Depot implements Serializable, Comparable {
         this.PAD_Vacances_Ville = depotJson.optString("PAD_Vacances_Ville");
         this.latitude = depotJson.optDouble("latitude");
         this.longitude = depotJson.optDouble("longitude");
-        this.Jours_de_reserve_par_livraison = depotJson.optInt("Jours_de_reserve_par_livraison");
+        this.Jours_de_reserve_par_livraison = depotJson.optInt("Jours_de_réserve_par_livraison");
         this.PAD_IPP = depotJson.optString("PAD_IPP");
         this.PAD_Patient = depotJson.optString("PAD_Patient");
         this.PAD_Lieu_Traitement = depotJson.optString("PAD_Lieu_Traitement");
         this.Etablissement_UID = depotJson.optInt("Etablissement_UID");
-        this.Archive = depotJson.optBoolean("Archive", false);
+        this.Archive = recupererBooleen(depotJson, "Archive");
     }
 
     public Depot(Cursor cursor) {
@@ -167,7 +169,7 @@ public class Depot implements Serializable, Comparable {
         this.PAD_IPP = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_IPP_DEPOT);
         this.PAD_Patient = cursor.getString(DepotOpenHelper.Constantes.NUM_COL_PAD_Patient_DEPOT);
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
-        this.Archive = OutilsGestionClasses.recupererBooleen(cursor, DepotOpenHelper.Constantes.NUM_COL_ARCHIVE_DEPOT);
+        this.Archive = recupererBooleen(cursor, DepotOpenHelper.Constantes.NUM_COL_ARCHIVE_DEPOT);
     }
 
     public int getPhiMR4UUID() {

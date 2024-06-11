@@ -46,11 +46,11 @@ public class Dotation implements Serializable, Comparable {
 
     public Dotation(JSONObject jsonObject) {
         this._UID = jsonObject.optInt("_UID");
-        this.Intitule = jsonObject.optString("Intitule");
+        this.Intitule = jsonObject.optString("Intitulé");
         this.Ref_Depot = jsonObject.optString("Ref_Depot");
-        this.Debut = jsonObject.optString("Debut");
+        this.Debut = jsonObject.optString("Début");
         this.Fin = jsonObject.optString("Fin");
-        this.Interrompu = jsonObject.optBoolean("Interrompu", false);
+        this.Interrompu = recupererBooleen(jsonObject,"Interrompu");
         this.NB_Semaine = jsonObject.optInt("NB_Semaine");
         this.Valorisation_TTC = jsonObject.optInt("Valorisation_TTC");
         this.Dotation_Std = jsonObject.optString("Dotation_Std");
@@ -62,11 +62,11 @@ public class Dotation implements Serializable, Comparable {
         this.SYS_HEURE_MAJ = jsonObject.optString("SYS_HEURE_MAJ");
         this.SYS_USER_MAJ = jsonObject.optString("SYS_USER_MAJ");
         this.tech_UID = jsonObject.optInt("tech_UID");
-        this.URGENCE = jsonObject.optBoolean("URGENCE", false);
-        this.SECURISE = jsonObject.optBoolean("SECURISE", false);
+        this.URGENCE = recupererBooleen(jsonObject,"URGENCE");
+        this.SECURISE = recupererBooleen(jsonObject,"SECURISE");
         this.TauxStockIdeal = jsonObject.optInt("TauxStockIdeal");
-        this.INSTALLATION = jsonObject.optBoolean("INSTALLATION", false);
-        this.PLEINVIDE = jsonObject.optBoolean("PLEINVIDE", false);
+        this.INSTALLATION = recupererBooleen(jsonObject,"INSTALLATION");
+        this.PLEINVIDE = recupererBooleen(jsonObject, "PLEINVIDE");
         this.protocole_UID = jsonObject.optInt("protocole_UID");
     }
 

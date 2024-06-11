@@ -57,7 +57,7 @@ public class SurveillanceReference {
         traiteDate = jsonObject.optString("traiteDate");
         traiteHeure = jsonObject.optString("traiteHeure");
         produitLot = jsonObject.optString("produitLot");
-        produitDatePeremption = jsonObject.optString("produitDatePeremption");
+        produitDatePeremption = jsonObject.optString("produitDatePéremption");
         produitNumeroSerie = jsonObject.optString("produitNumeroSerie");
     }
     public JSONObject toJson() {

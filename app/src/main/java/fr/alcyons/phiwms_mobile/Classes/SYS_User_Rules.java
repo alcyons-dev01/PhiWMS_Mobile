@@ -52,23 +52,23 @@ public class SYS_User_Rules {
         SYS_USER_MAJ= jsonObject.optString("SYS_USER_MAJ");
         Droits= jsonObject.optString("Droits");
         Acces_Classification= jsonObject.optString("Acces_Classification");
-        Avaliser_Commande_Autoriser= jsonObject.optBoolean("Avaliser_Commande_Autoriser");
-        Administrateur= jsonObject.optBoolean("Administrateur");
-        Quarantaine_Autoriser= jsonObject.optBoolean("Quarantaine_Autoriser");
+        Avaliser_Commande_Autoriser= recupererBooleen( jsonObject,"Avaliser_Commande_Autoriser");
+        Administrateur= recupererBooleen( jsonObject,"Administrateur");
+        Quarantaine_Autoriser= recupererBooleen( jsonObject,"Quarantaine_Autoriser");
         Perimetre_ParDefaut= jsonObject.optString("Perimetre_ParDefaut");
         planHabilitation=jsonObject.optInt("planHabilitation");
-        Modification_DPP_Autoriser= jsonObject.optBoolean("Modification_DPP_Autoriser");
-        Regulation_Demande_Particuliere= jsonObject.optBoolean("Regulation_Demande_Particuliere");
-        Anonymiser= jsonObject.optBoolean("Anonymiser");
+        Modification_DPP_Autoriser= recupererBooleen( jsonObject,"Modification_DPP_Autoriser");
+        Regulation_Demande_Particuliere= recupererBooleen( jsonObject,"Regulation_Demande_Particuliere");
+        Anonymiser= recupererBooleen( jsonObject,"Anonymiser");
         Bureau_ParDefaut= jsonObject.optString("Bureau_ParDefaut");
         LocalisationParDefaut= jsonObject.optString("LocalisationParDefaut");
-        Regulation_Automatique= jsonObject.optBoolean("Regulation_Automatique");
-        Acces_Serialisation= jsonObject.optBoolean("Acces_Serialisation");
+        Regulation_Automatique= recupererBooleen( jsonObject,"Regulation_Automatique");
+        Acces_Serialisation= recupererBooleen( jsonObject,"Acces_Serialisation");
         Serialisation_identifiant= jsonObject.optString("Serialisation_identifiant");
         Serialisation_mdp= jsonObject.optString("Serialisation_mdp");
         Serialisation_tan= jsonObject.optString("Serialisation_tan");
         Serialisation_clientLoginId= jsonObject.optString("Serialisation_clientLoginId");
-        SerialisationTermsEtConditions= jsonObject.optBoolean("SerialisationTermsEtConditions");
+        SerialisationTermsEtConditions= recupererBooleen( jsonObject,"SerialisationTermsEtConditions");
     }
 
     public SYS_User_Rules(Cursor cursor){

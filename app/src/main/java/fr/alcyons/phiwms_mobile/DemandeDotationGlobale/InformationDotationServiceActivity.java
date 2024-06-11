@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -281,6 +282,8 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
             PH_Preparation_Ligne preparation_ligne = dotationGlobaleAdapter.phPreparationLigneList.get(i);
             afficherNumberPicker(InformationDotationServiceActivity.this, InformationDotationServiceActivity.this.getLayoutInflater(), preparation_ligne);
         });
+
+        new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
 
         invalidateOptionsMenu();
     }

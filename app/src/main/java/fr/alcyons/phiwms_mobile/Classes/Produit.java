@@ -1,5 +1,7 @@
 package fr.alcyons.phiwms_mobile.Classes;
 
+import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
+
 import android.database.Cursor;
 
 import org.json.JSONException;
@@ -187,11 +189,11 @@ public class Produit implements Serializable, Comparable {
         this.Designation_ext = produitJson.optString("Designation_ext");
         this.Categorie = produitJson.optString("Categorie");
         this.Taux_de_TVA = produitJson.optDouble("Taux_de_TVA");
-        this.Peremption = produitJson.optBoolean("Peremption", false);
+        this.Peremption = recupererBooleen(produitJson, "Peremption");
         this.Cond_achat = produitJson.optInt("Cond_achat");
         this.Cond_distrib = produitJson.optDouble("Cond_distrib");
         this.Prix_unitaire = produitJson.optDouble("Prix_unitaire");
-        this.Suivi_Lot = produitJson.optBoolean("Suivi_Lot", false);
+        this.Suivi_Lot = recupererBooleen(produitJson, "Suivi_Lot");
         this.Zone_PUI_Defaut = produitJson.optString("Zone_PUI_Defaut");
         this.Ref_fourni = produitJson.optString("Ref_fourni");
         this.Code_fourn = produitJson.optInt("Code_fourn");
@@ -199,9 +201,9 @@ public class Produit implements Serializable, Comparable {
         this.Unite = produitJson.optString("Unite");
         this.Designation_interne = produitJson.optString("Designation_interne");
         this.Forme = produitJson.optString("Forme");
-        this.Sterile =produitJson.optBoolean( "Sterile", false);
+        this.Sterile =recupererBooleen(produitJson,  "Sterile");
         this.Conservation = produitJson.optString("Conservation");
-        this.Arret_Dis =produitJson.optBoolean( "Arret_Dis", false);
+        this.Arret_Dis =recupererBooleen(produitJson,  "Arret_Dis");
         this.Sterilisation_Mode = produitJson.optString("Sterilisation_Mode");
         this.Secteur = produitJson.optString("Secteur");
         this.Devise = produitJson.optString("Devise");
@@ -210,7 +212,7 @@ public class Produit implements Serializable, Comparable {
         this.SYS_USER_MAJ = produitJson.optString("SYS_USER_MAJ");
         this.Cond_Achat_Gros_volume = produitJson.optDouble("Cond_Achat_Gros_volume");
         this.UCD_Code = produitJson.optString("UCD_Code");
-        this.Arret_Commande =produitJson.optBoolean( "Arret_Commande", false);
+        this.Arret_Commande =recupererBooleen(produitJson,  "Arret_Commande");
         this.Commentaire = produitJson.optString("Commentaire");
         this.Classe_numero = produitJson.optInt("Classe_numero");
         this.GTIN = produitJson.optString("GTIN");
@@ -226,39 +228,39 @@ public class Produit implements Serializable, Comparable {
         this.Effets_indesirables = produitJson.optString("Effets_indesirables");
         this.Conservation_temperature_min = produitJson.optDouble("Conservation_temperature_min");
         this.Conservation_temperature_Max = produitJson.optDouble("Conservation_temperature_Max");
-        this.Conservation_sec =produitJson.optBoolean( "Conservation_sec", false);
-        this.Conservation_abri =produitJson.optBoolean( "Conservation_abri", false);
-        this.Condition_Fragile =produitJson.optBoolean( "Condition_Fragile", false);
-        this.Condition_usage_unique =produitJson.optBoolean( "Condition_usage_unique", false);
-        this.Condition_peremption =produitJson.optBoolean( "Condition_peremption", false);
+        this.Conservation_sec =recupererBooleen(produitJson,  "Conservation_sec");
+        this.Conservation_abri =recupererBooleen(produitJson,  "Conservation_abri");
+        this.Condition_Fragile =recupererBooleen(produitJson,  "Condition_Fragile");
+        this.Condition_usage_unique =recupererBooleen(produitJson,  "Condition_usage_unique");
+        this.Condition_peremption =recupererBooleen(produitJson,  "Condition_peremption");
         this.Contenant = produitJson.optString("Contenant");
-        this.NePasResteriliser =produitJson.optBoolean( "NePasResteriliser", false);
+        this.NePasResteriliser =recupererBooleen(produitJson,  "NePasResteriliser");
         this.Risque_Substance_presence = produitJson.optString("Risque_Substance_presence");
         this.Risque_Substance_absence = produitJson.optString("Risque_Substance_absence");
-        this.Risque_latex =produitJson.optBoolean( "Risque_latex", false);
-        this.Risque_PHT =produitJson.optBoolean( "Risque_PHT", false);
-        this.Medicament_dotation_urgence =produitJson.optBoolean( "Medicament_dotation_urgence", false);
-        this.Temperature_Refrigere =produitJson.optBoolean( "Temperature_Refrigere", false);
-        this.Medicament_Risque =produitJson.optBoolean( "Medicament_Risque", false);
-        this.Temperature_Ambiante =produitJson.optBoolean( "Temperature_Ambiante", false);
+        this.Risque_latex =recupererBooleen(produitJson,  "Risque_latex");
+        this.Risque_PHT =recupererBooleen(produitJson,  "Risque_PHT");
+        this.Medicament_dotation_urgence =recupererBooleen(produitJson,  "Medicament_dotation_urgence");
+        this.Temperature_Refrigere =recupererBooleen(produitJson,  "Temperature_Refrigere");
+        this.Medicament_Risque =recupererBooleen(produitJson,  "Medicament_Risque");
+        this.Temperature_Ambiante =recupererBooleen(produitJson,  "Temperature_Ambiante");
         this.UI_Conversion = produitJson.optDouble("UI_Conversion");
         this.Zone_PAD_Defaut = produitJson.optString("Zone_PAD_Defaut");
         this.Emplacement_PAD_Defaut = produitJson.optString("Emplacement_PAD_Defaut");
         this.UCD_NomCourt = produitJson.optString("UCD_NomCourt");
         this.codeInconnue = produitJson.optString("codeInconnue");
-        this.Suivi_Serialisation =produitJson.optBoolean("Suivi_Serialisation", false);
-        this.Serialiser_Reception_Delivrance =produitJson.optBoolean("Serialiser_Reception_Delivrance", false);
+        this.Suivi_Serialisation =recupererBooleen(produitJson, "Suivi_Serialisation");
+        this.Serialiser_Reception_Delivrance =recupererBooleen(produitJson, "Serialiser_Reception_Delivrance");
     }
 
     public Produit(Cursor cursor) {
         this.ID_produit = cursor.getInt(ProduitOpenHelper.Constantes.NUM_COL_ID_PRODUIT);
         this.Designation_ext = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_DESIGNATION_EXT_PRODUIT);
         this.Categorie = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_CATEGORIE_PRODUIT);
-        this.Peremption = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_PEREMPTION_PRODUIT);
+        this.Peremption = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_PEREMPTION_PRODUIT);
         this.Cond_achat = cursor.getInt(ProduitOpenHelper.Constantes.NUM_COL_COND_ACHAT_PRODUIT);
         this.Cond_distrib = cursor.getDouble(ProduitOpenHelper.Constantes.NUM_COL_COND_DISTRIB_PRODUIT);
         this.Prix_unitaire = cursor.getDouble(ProduitOpenHelper.Constantes.NUM_COL_PRIX_UNITAIRE_PRODUIT);
-        this.Suivi_Lot = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_SUIVI_LOT_PRODUIT);
+        this.Suivi_Lot = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_SUIVI_LOT_PRODUIT);
         this.Zone_PUI_Defaut = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_ZONE_PUI_DEFAUT_PRODUIT);
         this.Ref_fourni = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_REF_FOURNI_PRODUIT);
         this.Code_fourn = cursor.getInt(ProduitOpenHelper.Constantes.NUM_COL_CODE_FOURN_PRODUIT);
@@ -266,9 +268,9 @@ public class Produit implements Serializable, Comparable {
         this.Unite = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_UNITE_PRODUIT);
         this.Designation_interne = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_DESIGNATION_INTERNE_PRODUIT);
         this.Forme = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_FORME_PRODUIT);
-        this.Sterile = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_STERILE_PRODUIT);
+        this.Sterile = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_STERILE_PRODUIT);
         this.Conservation = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_CONSERVATION_PRODUIT);
-        this.Arret_Dis = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_ARRET_DIS_PRODUIT);
+        this.Arret_Dis = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_ARRET_DIS_PRODUIT);
         this.Sterilisation_Mode = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_STERILISATION_MODE_PRODUIT);
         this.Secteur = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_SECTEUR_PRODUIT);
         this.Devise = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_DEVISE_PRODUIT);
@@ -277,7 +279,7 @@ public class Produit implements Serializable, Comparable {
         this.SYS_USER_MAJ = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_SYS_USER_MAJ_PRODUIT);
         this.Cond_Achat_Gros_volume = cursor.getDouble(ProduitOpenHelper.Constantes.NUM_COL_COND_ACHAT_GROS_VOLUME_PRODUIT);
         this.UCD_Code = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_UCD_CODE_PRODUIT);
-        this.Arret_Commande = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_ARRET_COMMANDE_PRODUIT);
+        this.Arret_Commande = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_ARRET_COMMANDE_PRODUIT);
         this.Commentaire = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_COMMENTAIRE_PRODUIT);
         this.Classe_numero = cursor.getInt(ProduitOpenHelper.Constantes.NUM_COL_CLASSE_NUMERO_PRODUIT);
         this.GTIN = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_GTIN_PRODUIT);
@@ -293,29 +295,29 @@ public class Produit implements Serializable, Comparable {
         this.Effets_indesirables = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_EFFETS_INDESIRABLES_PRODUIT);
         this.Conservation_temperature_min = cursor.getDouble(ProduitOpenHelper.Constantes.NUM_COL_CONSERVATION_TEMPERATURE_MIN_PRODUIT);
         this.Conservation_temperature_Max = cursor.getDouble(ProduitOpenHelper.Constantes.NUM_COL_CONSERVATION_TEMPERATURE_MAX_PRODUIT);
-        this.Conservation_sec = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_CONSERVATION_SEC_PRODUIT);
-        this.Conservation_abri = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_CONSERVATION_ABRI_PRODUIT);
-        this.Condition_Fragile = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_CONDITION_FRAGILE_PRODUIT);
-        this.Condition_usage_unique = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_CONDITION_USAGE_UNIQUE_PRODUIT);
-        this.Condition_peremption = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_CONDITION_PEREMPTION_PRODUIT);
+        this.Conservation_sec = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_CONSERVATION_SEC_PRODUIT);
+        this.Conservation_abri = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_CONSERVATION_ABRI_PRODUIT);
+        this.Condition_Fragile = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_CONDITION_FRAGILE_PRODUIT);
+        this.Condition_usage_unique = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_CONDITION_USAGE_UNIQUE_PRODUIT);
+        this.Condition_peremption = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_CONDITION_PEREMPTION_PRODUIT);
         this.Contenant = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_CONTENANT_PRODUIT);
-        this.NePasResteriliser = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_NEPASRESTERILISER_PRODUIT);
+        this.NePasResteriliser = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_NEPASRESTERILISER_PRODUIT);
         this.Risque_Substance_presence = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_RISQUE_SUBSTANCE_PRESENCE_PRODUIT);
         this.Risque_Substance_absence = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_RISQUE_SUBSTANCE_ABSENCE_PRODUIT);
-        this.Risque_latex = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_RISQUE_LATEX_PRODUIT);
-        this.Risque_PHT = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_RISQUE_PHT_PRODUIT);
-        this.Medicament_dotation_urgence = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_MEDICAMENT_DOTATION_URGENCE_PRODUIT);
-        this.Temperature_Refrigere = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_TEMPERATURE_REFRIGERE_PRODUIT);
-        this.Medicament_Risque = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_MEDICAMENT_RISQUE_PRODUIT);
-        this.Temperature_Ambiante = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_TEMPERATURE_AMBIANTE_PRODUIT);
+        this.Risque_latex = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_RISQUE_LATEX_PRODUIT);
+        this.Risque_PHT = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_RISQUE_PHT_PRODUIT);
+        this.Medicament_dotation_urgence = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_MEDICAMENT_DOTATION_URGENCE_PRODUIT);
+        this.Temperature_Refrigere = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_TEMPERATURE_REFRIGERE_PRODUIT);
+        this.Medicament_Risque = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_MEDICAMENT_RISQUE_PRODUIT);
+        this.Temperature_Ambiante = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_TEMPERATURE_AMBIANTE_PRODUIT);
         this.UI_Conversion = cursor.getDouble(ProduitOpenHelper.Constantes.NUM_COL_UI_CONVERSION_PRODUIT);
         this.Zone_PAD_Defaut = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_ZONE_PAD_DEFAUT_PRODUIT);
         this.Emplacement_PAD_Defaut = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_EMPLACEMENT_PAD_DEFAUT_PRODUIT);
         this.UCD_NomCourt = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_UCD_NOMCOURT_PRODUIT);
         this.codeInconnue = cursor.getString(ProduitOpenHelper.Constantes.NUM_COL_CODE_INCONNU);
         this.Taux_de_TVA = cursor.getDouble(ProduitOpenHelper.Constantes.NUM_COL_TAUX_DE_TVA_PRODUIT);
-        this.Suivi_Serialisation = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_SUIVI_SERIALISATION);
-        this.Serialiser_Reception_Delivrance = OutilsGestionClasses.recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_SERIALISER_RECEPTION_DELIVRANCE);
+        this.Suivi_Serialisation = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_SUIVI_SERIALISATION);
+        this.Serialiser_Reception_Delivrance = recupererBooleen(cursor, ProduitOpenHelper.Constantes.NUM_COL_SERIALISER_RECEPTION_DELIVRANCE);
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
 
     }

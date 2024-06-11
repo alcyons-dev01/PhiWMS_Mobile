@@ -195,10 +195,11 @@ public class PH_Preparation_Ligne implements Serializable, Comparable {
         this.PeremptionDate = jsonObject.optString("PeremptionDate");
         this.ZoneDepot = jsonObject.optString("ZoneDepot");
         this.EmplacementParDefaut = jsonObject.optString("EmplacementParDefaut");
-        this.Suivi_Par_Lot = jsonObject.optBoolean("Suivi_Par_Lot", false);
-        this.Suivi_Par_Serie = jsonObject.optBoolean("Suivi_Par_Serie", false);
-        this.Serialiser_Reception = jsonObject.optBoolean("Serialiser_Reception", false);
+        this.Suivi_Par_Lot = recupererBooleen(jsonObject, "Suivi_Par_Lot");
+        this.Suivi_Par_Serie = recupererBooleen(jsonObject, "Suivi_Par_Serie");
+        this.Serialiser_Reception = recupererBooleen(jsonObject, "Serialiser_Reception");
         this.SerieNumero = jsonObject.optString("SerieNumero");
+        this.Qte_StockSaisie = jsonObject.optInt("Qte_StockSaisie");
         this.Verrouiller = true;
     }
 
@@ -219,10 +220,11 @@ public class PH_Preparation_Ligne implements Serializable, Comparable {
         this.PeremptionDate = jsonObject.optString("PeremptionDate");
         this.ZoneDepot = jsonObject.optString("ZoneDepot");
         this.EmplacementParDefaut = jsonObject.optString("EmplacementParDefaut");
-        this.Suivi_Par_Lot = jsonObject.optBoolean("Suivi_Par_Lot", false);
-        this.Suivi_Par_Serie = jsonObject.optBoolean("Suivi_Par_Serie", false);
-        this.Serialiser_Reception = jsonObject.optBoolean("Serialiser_Reception", false);
+        this.Suivi_Par_Lot = recupererBooleen(jsonObject, "Suivi_Par_Lot");
+        this.Suivi_Par_Serie = recupererBooleen(jsonObject, "Suivi_Par_Serie");
+        this.Serialiser_Reception = recupererBooleen(jsonObject, "Serialiser_Reception");
         this.SerieNumero = jsonObject.optString("SerieNumero");
+        this.Qte_StockSaisie = jsonObject.optInt("Qte_StockSaisie");
         this.Verrouiller = true;
     }
 

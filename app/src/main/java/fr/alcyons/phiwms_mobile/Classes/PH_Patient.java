@@ -879,9 +879,9 @@ public class PH_Patient implements Serializable, Comparable {
     public String toString() {
         return "PH_Patient{" +
                 "_patientUID=" + _patientUID +
-                ", Civilite='" + Civilite + '\'' +
+                ", Civilité='" + Civilite + '\'' +
                 ", Nom_naissance='" + Nom_naissance + '\'' +
-                ", Prenom='" + Prenom + '\'' +
+                ", Prénom='" + Prenom + '\'' +
                 ", Adresse1='" + Adresse1 + '\'' +
                 ", Adresse2='" + Adresse2 + '\'' +
                 ", CP='" + CP + '\'' +
@@ -913,7 +913,7 @@ public class PH_Patient implements Serializable, Comparable {
                 ", Ressource_CP='" + Ressource_CP + '\'' +
                 ", Ressource_Ville='" + Ressource_Ville + '\'' +
                 ", Personne_Ressource='" + Personne_Ressource + '\'' +
-                ", Ressource_Tel='" + Ressource_Tel + '\'' +
+                ", Ressource_Tél='" + Ressource_Tel + '\'' +
                 ", Ressource_Fax='" + Ressource_Fax + '\'' +
                 ", Centre_Hospitalier='" + Centre_Hospitalier + '\'' +
                 ", Praticien='" + Praticien + '\'' +
@@ -925,7 +925,7 @@ public class PH_Patient implements Serializable, Comparable {
                 ", Inf_CP='" + Inf_CP + '\'' +
                 ", Inf_Ville='" + Inf_Ville + '\'' +
                 ", Inf_Fax='" + Inf_Fax + '\'' +
-                ", Inf_Tel='" + Inf_Tel + '\'' +
+                ", Inf_Tél='" + Inf_Tel + '\'' +
                 ", Inf_Email='" + Inf_Email + '\'' +
                 ", Date_entree='" + Date_entree + '\'' +
                 ", Date_Debut_Traitement='" + Date_Debut_Traitement + '\'' +

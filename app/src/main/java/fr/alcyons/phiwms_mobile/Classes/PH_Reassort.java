@@ -53,8 +53,8 @@ public class PH_Reassort implements Serializable, Comparable {
         this.SYS_USER_MAJ = jsonObject.optString("SYS_USER_MAJ");
         this.Depot_Reference = jsonObject.optString("Depot_Reference");
         this.Frequence = jsonObject.optString("Frequence");
-        this.SynchroDM_Medicament = jsonObject.optBoolean("SynchroDM_Medicament");
-        this.SynchroDM_DMDMS = jsonObject.optBoolean("SynchroDM_DMDMS");
+        this.SynchroDM_Medicament = recupererBooleen(jsonObject,"SynchroDM_Medicament");
+        this.SynchroDM_DMDMS = recupererBooleen(jsonObject, "SynchroDM_DMDMS");
         this.Valorisation_TTC = jsonObject.optInt("Valorisation_TTC");
     }
 

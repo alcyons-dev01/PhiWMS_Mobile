@@ -46,28 +46,27 @@ public class DetailPleinVideAdapter extends ArrayAdapter {
 
         ph_preparation_ligneListOriginal = new ArrayList<>();
         ph_preparation_ligneListOriginal.addAll(ph_preparation_ligneList);
-
-        demandePleinVideViewHolderList = new ArrayList<>();
-        for (int i = 0; i < ph_preparation_ligneList.size(); i++) {
-            New_DetailPleinVideViewHolder viewHolder = new New_DetailPleinVideViewHolder();
-            demandePleinVideViewHolderList.add(viewHolder);
-        }
-
     }
     @NonNull
     @SuppressLint({"UseCompatLoadingForDrawables", "ViewHolder", "SetTextI18n"})
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        New_DetailPleinVideViewHolder viewHolder = demandePleinVideViewHolderList.get(position);
+        if(convertView == null)
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_demande_pleinvide, parent, false);
 
-        convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_demande_pleinvide, parent, false);
+        New_DetailPleinVideViewHolder viewHolder = (New_DetailPleinVideViewHolder) convertView.getTag();
 
-        viewHolder.designationProduit = convertView.findViewById(R.id.designationProduit);
-        viewHolder.adressagePleinVide = convertView.findViewById(R.id.adressagePleinVide);
-        viewHolder.quantitePleinVide = convertView.findViewById(R.id.quantitePleinVide);
-        viewHolder.layoutPrincipal = convertView.findViewById(R.id.layoutPrincipal);
-        viewHolder.cartouchePleinVide = convertView.findViewById(R.id.cartouchePleinVide);
-        viewHolder.conditionnement = convertView.findViewById(R.id.conditionnement);
+        if(viewHolder == null)
+        {
+            viewHolder.designationProduit = convertView.findViewById(R.id.designationProduit);
+            viewHolder.adressagePleinVide = convertView.findViewById(R.id.adressagePleinVide);
+            viewHolder.quantitePleinVide = convertView.findViewById(R.id.quantitePleinVide);
+            viewHolder.layoutPrincipal = convertView.findViewById(R.id.layoutPrincipal);
+            viewHolder.cartouchePleinVide = convertView.findViewById(R.id.cartouchePleinVide);
+            viewHolder.conditionnement = convertView.findViewById(R.id.conditionnement);
+            convertView.setTag(viewHolder);
+        }
+
 
         Depot depot = DepotOpenHelper.getDepotPUI(db);
         PH_Preparation_Ligne ph_preparation_ligne = (PH_Preparation_Ligne) getItem(position);

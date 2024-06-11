@@ -89,14 +89,14 @@ public class Retour implements Serializable, Comparable {
         this._UID = jsonObject.optInt("_UID");
         this.Numero = jsonObject.optString("Numero");
         this.Ref_Depot_Origine = jsonObject.optString("Ref_Depot_Origine");
-        this.Intitule = jsonObject.optString("Intitule");
+        this.Intitule = jsonObject.optString("Intitulé");
         this.Statut = jsonObject.optString("Statut");
         this.Ref_Depot_Dest = jsonObject.optString("Ref_Depot_Dest");
         this.Date_retour = jsonObject.optString("Date_retour");
         this.Commentaire = jsonObject.optString("Commentaire");
         this.Motif = jsonObject.optString("Motif");
         this.En_Attente_de = jsonObject.optString("En_Attente_de");
-        this.Avoir_Attendu = jsonObject.optBoolean("Avoir_Attendu", false);
+        this.Avoir_Attendu = recupererBooleen(jsonObject, "Avoir_Attendu");
     }
 
     public Retour(Cursor cursor) {
@@ -331,7 +331,7 @@ public class Retour implements Serializable, Comparable {
             jsonObject.put("Numero", this.getNumero());
             jsonObject.put("Ref_Depot_Origine", this.getRef_Depot_Origine());
             jsonObject.put("Code_Patient", this.getCode_Patient());
-            jsonObject.put("Intitule", this.getIntitule());
+            jsonObject.put("Intitulé", this.getIntitule());
             jsonObject.put("Ref_Depot_Dest", this.getRef_Depot_Dest());
             jsonObject.put("Statut", this.getStatut());
             jsonObject.put("Date_retour", this.getDate_retour());

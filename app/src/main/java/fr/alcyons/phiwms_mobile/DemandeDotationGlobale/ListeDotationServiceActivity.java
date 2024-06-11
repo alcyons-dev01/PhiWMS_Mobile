@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -230,14 +231,12 @@ public class ListeDotationServiceActivity extends ServiceAvecConnexionActivity {
                                             PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db,preparation_ligne);
                                         }
                                     }
-
                                 }
                             }
-
+                            gestionAdapter();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        handler.sendMessage(handler.obtainMessage());
                     },
                     error -> {
                         Log.e("Volley", "Error");
@@ -253,82 +252,13 @@ public class ListeDotationServiceActivity extends ServiceAvecConnexionActivity {
             };
             obreq.setRetryPolicy(retryPolicy);
             requestQueue.add(obreq);
-            try {
-                Looper.loop();
-            } catch (RuntimeException e) {
-                e.printStackTrace();
-            }
             passageParOnCreate = false;
         }
-
-        List<String>listeDate = new ArrayList<>();
-        ArrayList<Dotation> dotationsListe;
-        dotationsListe = DotationOpenHelper.getDotationGlobale(db);
-        /* Code nécessaire à l'affichage de la liste */
-        dotationAdapter = new DotationAdapter(ListeDotationServiceActivity.this, db, utilisateurConnecte);
-
-        for (Dotation dotationCourante : dotationsListe) {
-            String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, dotationCourante.getDepot_UID());
-            if(Objects.equals(dateProchaineLivraison, ""))
-            {
-                Calendar calendar = Calendar.getInstance();
-                calendar.add(Calendar.DAY_OF_YEAR, 1);
-                Date tomorrow = calendar.getTime();
-                @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
-                dateProchaineLivraison = dateFormat.format(tomorrow);
-            }
-
-            dotationCourante.setDateLivraison(dateProchaineLivraison);
-
-            //on check la présence des préparations en base
-            PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandeDotationGlobaleEnInstance(db, "Dotation Globale : " + dotationCourante.getIntitule(), dateProchaineLivraison);
-
-            if(phPreparationCourante == null)
-            {
-                phPreparationCourante = CreationPhPreparation(dotationCourante);
-            }
-
-            phPreparationList.add(phPreparationCourante);
-        }
-        ElementASynchroniserOpenHelper.toutSynchroniser(ListeDotationServiceActivity.this, db, utilisateurConnecte, false);
-        dotationsListe.sort(new Comparator<Dotation>() {
-            @SuppressLint("SimpleDateFormat")
-            DateFormat f = new SimpleDateFormat("dd/MM/yyyy");
-
-            @Override
-            public int compare(Dotation o1, Dotation o2) {
-                try {
-                    return Objects.requireNonNull(f.parse(o1.getDateLivraison())).compareTo(f.parse(o2.getDateLivraison()));
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-
-        ArrayList<String> listeDepot = new ArrayList<>();
-        for (Dotation dotationCourante : dotationsListe) {
-            if (!listeDate.contains(dotationCourante.getDateLivraison()) || !listeDepot.contains(dotationCourante.getRef_Depot())) {
-                listeDate.add(dotationCourante.getDateLivraison());
-                listeDepot.add(dotationCourante.getRef_Depot());
-                dotationAdapter.addSectionHeaderItem(dotationCourante);
-            }
-
-            dotationAdapter.addItem(dotationCourante);
+        else
+        {
+            gestionAdapter();
         }
 
-
-        // Permet d'enlever le séparateur entre deux éléments d'une listeView
-        dotationListView.setDivider(footer);
-        dotationListView.setAdapter(dotationAdapter);
-
-        if (dotationsListe.isEmpty()) {
-            vide = true;
-            nomServiceVide = "Dotation Service";
-            ListeDotationServiceActivity.this.finish();
-        }
-
-        invalidateOptionsMenu();
     }
 
     // Nécessaire afin d'avoir l'item Search
@@ -517,5 +447,78 @@ public class ListeDotationServiceActivity extends ServiceAvecConnexionActivity {
             if (requestCode == CodesEchangesActivites.RESULT_PLEINVIDE_LOCALISATION) {
             }
         }
+    }
+
+    private void gestionAdapter()
+    {
+        List<String>listeDate = new ArrayList<>();
+        ArrayList<Dotation> dotationsListe;
+        dotationsListe = DotationOpenHelper.getDotationGlobale(db);
+        /* Code nécessaire à l'affichage de la liste */
+        dotationAdapter = new DotationAdapter(ListeDotationServiceActivity.this, db, utilisateurConnecte);
+
+        for (Dotation dotationCourante : dotationsListe) {
+            String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, dotationCourante.getDepot_UID());
+            if(Objects.equals(dateProchaineLivraison, ""))
+            {
+                Calendar calendar = Calendar.getInstance();
+                calendar.add(Calendar.DAY_OF_YEAR, 1);
+                Date tomorrow = calendar.getTime();
+                @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+                dateProchaineLivraison = dateFormat.format(tomorrow);
+            }
+
+            dotationCourante.setDateLivraison(dateProchaineLivraison);
+
+            //on check la présence des préparations en base
+            PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandeDotationGlobaleEnInstance(db, "Dotation Globale : " + dotationCourante.getIntitule(), dateProchaineLivraison);
+
+            if(phPreparationCourante == null)
+            {
+                phPreparationCourante = CreationPhPreparation(dotationCourante);
+            }
+
+            phPreparationList.add(phPreparationCourante);
+        }
+        ElementASynchroniserOpenHelper.toutSynchroniser(ListeDotationServiceActivity.this, db, utilisateurConnecte, false);
+        dotationsListe.sort(new Comparator<Dotation>() {
+            @SuppressLint("SimpleDateFormat")
+            DateFormat f = new SimpleDateFormat("dd/MM/yyyy");
+
+            @Override
+            public int compare(Dotation o1, Dotation o2) {
+                try {
+                    return Objects.requireNonNull(f.parse(o1.getDateLivraison())).compareTo(f.parse(o2.getDateLivraison()));
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        ArrayList<String> listeDepot = new ArrayList<>();
+        for (Dotation dotationCourante : dotationsListe) {
+            if (!listeDate.contains(dotationCourante.getDateLivraison()) || !listeDepot.contains(dotationCourante.getRef_Depot())) {
+                listeDate.add(dotationCourante.getDateLivraison());
+                listeDepot.add(dotationCourante.getRef_Depot());
+                dotationAdapter.addSectionHeaderItem(dotationCourante);
+            }
+
+            dotationAdapter.addItem(dotationCourante);
+        }
+
+        // Permet d'enlever le séparateur entre deux éléments d'une listeView
+        dotationListView.setDivider(footer);
+        dotationListView.setAdapter(dotationAdapter);
+
+        if (dotationsListe.isEmpty()) {
+            vide = true;
+            nomServiceVide = "Dotation Service";
+            ListeDotationServiceActivity.this.finish();
+        }
+
+        invalidateOptionsMenu();
+        new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
+
     }
 }
