@@ -202,6 +202,7 @@ public class PH_Preparation_Ligne implements Serializable, Comparable {
         this.Qte_StockSaisie = jsonObject.optInt("Qte_StockSaisie");
         this.SYS_DT_MAJ = jsonObject.optString("SYS_DT_MAJ");
         this.SYS_HEURE_MAJ = jsonObject.optString("SYS_HEURE_MAJ");
+        this.produitCondDistrib = jsonObject.optDouble("produitCondDistrib");
         this.Verrouiller = true;
     }
 
@@ -229,6 +230,7 @@ public class PH_Preparation_Ligne implements Serializable, Comparable {
         this.Qte_StockSaisie = jsonObject.optInt("Qte_StockSaisie");
         this.SYS_DT_MAJ = jsonObject.optString("SYS_DT_MAJ");
         this.SYS_HEURE_MAJ = jsonObject.optString("SYS_HEURE_MAJ");
+        this.produitCondDistrib = jsonObject.optDouble("produitCondDistrib");
         this.Verrouiller = true;
     }
 
