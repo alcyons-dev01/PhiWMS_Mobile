@@ -98,7 +98,7 @@ dependencies {
     implementation 'com.google.guava:guava:28.2-android'
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
     implementation group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
-
+    implementation "androidx.preference:preference-ktx:1.2.1"
 }
 configurations {
     implementation.exclude group: 'com.google.guava', module: 'guava-jdk5'
