@@ -83,6 +83,7 @@ public class DotationOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_INSTALLATION_DOTATION, objet.isINSTALLATION());
         contentValues.put(Constantes.CLE_COL_PLEINVIDE_DOTATION, objet.isPLEINVIDE());
         contentValues.put(Constantes.CLE_COL_PROTOCOLE_UID_DOTATION, objet.getProtocole_UID());
+        contentValues.put(Constantes.CLE_COL_COMMANDEAB_DOTATION, objet.isCommandeAB());
         long rowID = db.insert(Constantes.TABLE_DOTATION, null, contentValues);
         objet.setphiwms_mobileUUID((int) rowID);
         return rowID;
