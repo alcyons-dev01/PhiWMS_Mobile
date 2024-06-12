@@ -149,7 +149,7 @@ public class DotationAdapter extends BaseAdapter {
             List<PH_Preparation_Ligne> ListPhPreparationLigne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, phPreparationCourante);
             for(PH_Preparation_Ligne preparation_ligne : ListPhPreparationLigne)
             {
-                if(preparation_ligne.getQte_StockSaisie() > -1)
+                if(preparation_ligne.getQte_StockSaisie() > -1 && !preparation_ligne.getSYS_DT_MAJ().contentEquals("0000-00-00"))
                 {
                     nbDetail ++;
                 }

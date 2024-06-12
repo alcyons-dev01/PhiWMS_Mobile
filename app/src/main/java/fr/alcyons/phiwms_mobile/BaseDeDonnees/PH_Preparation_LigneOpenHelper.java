@@ -6,7 +6,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
@@ -36,7 +40,7 @@ public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
 
         while (cursor.moveToNext()) {
             PH_Preparation_Ligne ph_preparation_ligne = new PH_Preparation_Ligne(cursor);
-            if (ph_preparation_ligne.getQte_StockSaisie() != -1) {
+            if (ph_preparation_ligne.getQte_StockSaisie() != -1 && !ph_preparation_ligne.getSYS_DT_MAJ().contentEquals("0000-00-00")) {
                 total ++;
             }
         }
@@ -99,6 +103,8 @@ public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_VERROUILLER, ph_preparation_ligne.isVerrouiller());
         contentValues.put(Constantes.CLE_COL_UID_4D, ph_preparation_ligne.get_UID_4D());
 
+        contentValues.put(Constantes.CLE_COL_SYS_DT_MAJ_PH_PREPARATION_LIGNE, ph_preparation_ligne.getSYS_DT_MAJ());
+        contentValues.put(Constantes.CLE_COL_SYS_HEURE_MAJ_PH_PREPARATION_LIGNE, ph_preparation_ligne.getSYS_HEURE_MAJ());
 
         // Insertion du dépot en BDD
         long rowId = db.insert(Constantes.TABLE_PH_PREPARATION_LIGNE, null, contentValues);
@@ -157,7 +163,6 @@ public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_UID_4D, ph_preparation_ligne.get_UID_4D());
         contentValues.put(Constantes.CLE_COL_VERROUILLER, ph_preparation_ligne.isVerrouiller());
         contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, ph_preparation_ligne.getPhiMR4UUID());
-
 
         long rowId = db.update(Constantes.TABLE_PH_PREPARATION_LIGNE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + ph_preparation_ligne.getPhiMR4UUID(), null);
 

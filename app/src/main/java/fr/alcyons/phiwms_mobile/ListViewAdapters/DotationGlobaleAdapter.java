@@ -17,8 +17,10 @@ import androidx.core.content.res.ResourcesCompat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import fr.alcyons.phiwms_mobile.Classes.Demande_PUI;
+import fr.alcyons.phiwms_mobile.Classes.Dotation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.DemandeDotationGlobale.InformationDotationServiceActivity;
@@ -33,11 +35,12 @@ public class DotationGlobaleAdapter extends ArrayAdapter {
     Demande_PUI demandePUI;
     SQLiteDatabase db;
     Utilisateur utilisateur;
-    public DotationGlobaleAdapter(Context context, List<PH_Preparation_Ligne> phPreparationLigneList, SQLiteDatabase db, Utilisateur utilisateur) {
+    Dotation dotation;
+    public DotationGlobaleAdapter(Context context, List<PH_Preparation_Ligne> phPreparationLigneList, SQLiteDatabase db, Utilisateur utilisateur, Dotation dotationCourante) {
         super(context, 0, phPreparationLigneList);
         this.phPreparationLigneList = phPreparationLigneList;
         this.context = context;
-
+        this.dotation = dotationCourante;
         this.db = db;
         this.utilisateur = utilisateur;
         this.phPreparationLigneOriginalList = new ArrayList<>();
@@ -77,15 +80,31 @@ public class DotationGlobaleAdapter extends ArrayAdapter {
             viewHolder.reference.setText(PreparationLigneCourant.getProduitReference());
             viewHolder.qteConditionnement.setText("(x"+ (int) PreparationLigneCourant.getProduitCondDistrib() +")");
 
-            if(PreparationLigneCourant.getQte_StockSaisie() == -1)
+            if(dotation.isCommandeAB())
             {
-                viewHolder.separateur_iv.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_gestion_statut_action_soumis, null));
-                viewHolder.qte_a_preparer.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.bleu_clair_alcyons,null));
+                if(!Objects.equals(PreparationLigneCourant.getSYS_DT_MAJ(), "0000-00-00"))
+                {
+                    viewHolder.separateur_iv.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_gestion_statut_action_valider, null));
+                    viewHolder.qte_a_preparer.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.vert,null));
+                }
+                else
+                {
+                    viewHolder.separateur_iv.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_gestion_statut_action_soumis, null));
+                    viewHolder.qte_a_preparer.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.bleu_clair_alcyons,null));
+                }
             }
             else
             {
-                viewHolder.separateur_iv.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_gestion_statut_action_valider, null));
-                viewHolder.qte_a_preparer.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.vert,null));
+                if(PreparationLigneCourant.getQte_StockSaisie() == -1)
+                {
+                    viewHolder.separateur_iv.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_gestion_statut_action_soumis, null));
+                    viewHolder.qte_a_preparer.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.bleu_clair_alcyons,null));
+                }
+                else
+                {
+                    viewHolder.separateur_iv.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_gestion_statut_action_valider, null));
+                    viewHolder.qte_a_preparer.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.vert,null));
+                }
             }
 
             viewHolder.qte_a_preparer.setText(String.valueOf(PreparationLigneCourant.getQte_Demander()));

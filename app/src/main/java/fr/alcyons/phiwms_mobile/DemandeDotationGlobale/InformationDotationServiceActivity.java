@@ -35,6 +35,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -275,7 +276,7 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
         phPreparationLigneList.sort(Comparator.comparing(PH_Preparation_Ligne::getProduitDesignation));
 
         // Initialisation de l'adapter puis transfere de l'adapter à la listeView pour l'affichage
-        dotationGlobaleAdapter = new DotationGlobaleAdapter(InformationDotationServiceActivity.this, phPreparationLigneList, db, utilisateurConnecte);
+        dotationGlobaleAdapter = new DotationGlobaleAdapter(InformationDotationServiceActivity.this, phPreparationLigneList, db, utilisateurConnecte, dotation);
         demandePuiListeView.setAdapter(dotationGlobaleAdapter);
         demandePuiListeView.setItemsCanFocus(true);
         demandePuiListeView.setOnItemClickListener((adapterView, view, i, l) -> {
@@ -353,7 +354,7 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
         validerstock_ll.setOnClickListener(view -> {
             String stock_string = stock_et.getText().toString().trim();
 
-            if(!stock_string.contentEquals(""))
+            if(!stock_string.contentEquals("") && !dotation.isCommandeAB())
             {
                 int valueStock = Integer.parseInt(stock_et.getText().toString());
                 ph_preparation_ligne.setQte_StockSaisie(valueStock);
@@ -384,6 +385,12 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
                 validerstock_ll.setVisibility(View.GONE);
                 demande_et.requestFocus();
             }
+            else if(dotation.isCommandeAB())
+            {
+                layoutdotation_ll.setVisibility(View.VISIBLE);
+                validerstock_ll.setVisibility(View.GONE);
+                demande_et.requestFocus();
+            }
         });
 
         valider_ll.setOnClickListener(view -> {
@@ -400,6 +407,14 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
                 demandeValue = Integer.parseInt(demande_string);
 
             ph_preparation_ligne.setQte_StockSaisie(stockValue);
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            DateFormat heureFormat = new SimpleDateFormat("HH:mm:ss");
+            Date date = new Date();
+
+            String dateDuJour = dateFormat.format(date);
+            String heureCourante = heureFormat.format(date);
+            ph_preparation_ligne.setSYS_DT_MAJ(dateDuJour);
+            ph_preparation_ligne.setSYS_HEURE_MAJ(heureCourante);
             PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparation_ligne.getPhiMR4UUID(), ph_preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
             ElementASynchroniserOpenHelper.toutSynchroniser(InformationDotationServiceActivity.this, db, utilisateurConnecte, false);
@@ -413,7 +428,8 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
             {
                 ph_preparation_ligne.setQte_APreparer(demandeValue);
                 ph_preparation_ligne.setQte_Demander(demandeValue);
-
+                ph_preparation_ligne.setSYS_DT_MAJ(dateDuJour);
+                ph_preparation_ligne.setSYS_HEURE_MAJ(heureCourante);
                 PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
                 ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparation_ligne.getPhiMR4UUID(), ph_preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
                 ElementASynchroniserOpenHelper.toutSynchroniser(InformationDotationServiceActivity.this, db, utilisateurConnecte, false);
@@ -476,7 +492,14 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
     {
         ph_preparation_ligne.setQte_Demander(quantite);
         ph_preparation_ligne.setQte_APreparer(quantite);
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat heureFormat = new SimpleDateFormat("HH:mm:ss");
+        Date date = new Date();
 
+        String dateDuJour = dateFormat.format(date);
+        String heureCourante = heureFormat.format(date);
+        ph_preparation_ligne.setSYS_DT_MAJ(dateDuJour);
+        ph_preparation_ligne.setSYS_HEURE_MAJ(heureCourante);
         PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
         ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparation_ligne.getPhiMR4UUID(), ph_preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
         ElementASynchroniserOpenHelper.toutSynchroniser(InformationDotationServiceActivity.this, db, utilisateurConnecte, false);
