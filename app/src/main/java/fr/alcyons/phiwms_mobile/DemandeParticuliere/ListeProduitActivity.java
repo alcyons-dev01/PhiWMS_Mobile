@@ -8,6 +8,7 @@ import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -29,6 +30,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -88,6 +91,9 @@ public class ListeProduitActivity extends ServiceActivity implements DemandePart
     RecyclerView recyclerView;
     String motif = "";
     boolean viewscan;
+
+    ActivityResultLauncher<Intent> resultScan;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -135,6 +141,65 @@ public class ListeProduitActivity extends ServiceActivity implements DemandePart
         recyclerView.setAdapter(adapter);
         sousSelection = false;
         viewscan = false;
+
+        resultScan = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    Intent data = result.getData();
+                    if (data != null) {
+                        Produit produit = null;
+                        removeSearch.performClick();
+                        String codeComplet = data.getStringExtra("code");
+                        if (codeComplet != null && !codeComplet.contentEquals("")) {
+                            if(codeComplet.toLowerCase().startsWith("phitagtin:"))
+                            {
+                                String[] tabProduit = codeComplet.toLowerCase().split("phitagtin:");
+                                if (tabProduit.length > 1) {
+                                    String gtin = tabProduit[tabProduit.length - 1];
+                                    produit = ProduitOpenHelper.getUnProduitParGTIN(db, gtin);
+                                }
+                            }
+                            else if(codeComplet.toLowerCase().startsWith("phitagref:"))
+                            {
+                                String[] tabProduit = codeComplet.toLowerCase().split("phitagref:");
+                                if (tabProduit.length > 1) {
+                                    int id = Integer.parseInt(tabProduit[tabProduit.length - 1]);
+                                    produit = ProduitOpenHelper.getProduitByID(db, id);
+                                }
+                            }
+
+                            if (produit != null) {
+                                int position = -1;
+                                for (Produit produitCourant : adapter.produits) {
+                                    position++;
+                                    if (produitCourant.getDesignation_interne().toLowerCase().contains(produit.getDesignation_interne().toLowerCase()) && produitCourant.getRef_fourni().toLowerCase().contains(produit.getRef_fourni().toLowerCase()) && produitCourant.getCategorie().toLowerCase().contains(produit.getCategorie().toLowerCase()) && produitCourant.getFournisseur().toLowerCase().contains(produit.getFournisseur().toLowerCase())) {
+                                        break;
+                                    }
+                                }
+
+                                if (position != -1) {
+                                    int positionListe = getPositionListe(position);
+
+                                    Objects.requireNonNull(recyclerView.getLayoutManager()).scrollToPosition(positionListe);
+                                    int finalPosition = position;
+                                    viewscan = true;
+                                    new Handler(Looper.getMainLooper()).postDelayed(() -> Objects.requireNonNull(recyclerView.getLayoutManager().findViewByPosition(finalPosition)).performClick(), 250);
+                                }
+                            }
+                        }
+                    }
+                });
+    }
+
+    private int getPositionListe(int position) {
+        int positionListe = position;
+        if(positionListe + 3 <= adapter.produits.size() -1)
+            positionListe = positionListe + 3;
+        else if(positionListe + 2 <= adapter.produits.size() - 1)
+            positionListe = positionListe + 2;
+        else if(positionListe + 1 <= adapter.produits.size() - 1)
+            positionListe = positionListe + 1;
+        return positionListe;
     }
 
     private String getNomDepot() {
@@ -288,7 +353,7 @@ public class ListeProduitActivity extends ServiceActivity implements DemandePart
                 Bundle extras = ListeProduitActivity.this.getBundle();
                 extras.putBoolean("isBoutonSuppressionExistant", true);
                 newIntent.putExtras(extras);
-                ListeProduitActivity.this.startActivityForResult(newIntent, CodesEchangesActivites.RETOUR_CODE_GS1);
+                resultScan.launch(newIntent);
             }
             else
             {
@@ -299,7 +364,7 @@ public class ListeProduitActivity extends ServiceActivity implements DemandePart
                     Bundle extras = ListeProduitActivity.this.getBundle();
                     extras.putBoolean("isBoutonSuppressionExistant", true);
                     newIntent.putExtras(extras);
-                    ListeProduitActivity.this.startActivityForResult(newIntent, CodesEchangesActivites.RETOUR_CODE_GS1);
+                    resultScan.launch(newIntent);
                 }
                 else
                 {
@@ -308,7 +373,7 @@ public class ListeProduitActivity extends ServiceActivity implements DemandePart
                     Bundle extras = ListeProduitActivity.this.getBundle();
                     extras.putBoolean("isBoutonSuppressionExistant", true);
                     newIntent.putExtras(extras);
-                    ListeProduitActivity.this.startActivityForResult(newIntent, CodesEchangesActivites.RETOUR_CODE_GS1);
+                    resultScan.launch(newIntent);
                 }
             }
         });
@@ -395,64 +460,6 @@ public class ListeProduitActivity extends ServiceActivity implements DemandePart
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (data != null)  {
-            if (requestCode == CodesEchangesActivites.RETOUR_CODE_GS1) {
-                Produit produit = null;
-                removeSearch.performClick();
-                String codeComplet = data.getStringExtra("code");
-                if (codeComplet != null && !codeComplet.contentEquals("")) {
-                    if(codeComplet.toLowerCase().startsWith("phitagtin:"))
-                    {
-                        String[] tabProduit = codeComplet.toLowerCase().split("phitagtin:");
-                        if (tabProduit.length > 1) {
-                            String gtin = tabProduit[tabProduit.length - 1];
-                            produit = ProduitOpenHelper.getUnProduitParGTIN(db, gtin);
-                        }
-                    }
-                    else if(codeComplet.toLowerCase().startsWith("phitagref:"))
-                    {
-                        String[] tabProduit = codeComplet.toLowerCase().split("phitagref:");
-                        if (tabProduit.length > 1) {
-                            int id = Integer.parseInt(tabProduit[tabProduit.length - 1]);
-                            produit = ProduitOpenHelper.getProduitByID(db, id);
-                        }
-                    }
-
-                    if (produit != null) {
-                        int position = -1;
-                        for (Produit produitCourant : adapter.produits) {
-                            position++;
-                            if (produitCourant.getDesignation_interne().toLowerCase().contains(produit.getDesignation_interne().toLowerCase()) && produitCourant.getRef_fourni().toLowerCase().contains(produit.getRef_fourni().toLowerCase()) && produitCourant.getCategorie().toLowerCase().contains(produit.getCategorie().toLowerCase()) && produitCourant.getFournisseur().toLowerCase().contains(produit.getFournisseur().toLowerCase())) {
-                                break;
-                            }
-                        }
-
-                        if (position != -1) {
-                            int positionListe = position;
-                            if(positionListe + 3 <= adapter.produits.size() -1)
-                                positionListe = positionListe + 3;
-                            else if(positionListe + 2 <= adapter.produits.size() - 1)
-                                positionListe = positionListe + 2;
-                            else if(positionListe + 1 <= adapter.produits.size() - 1)
-                                positionListe = positionListe + 1;
-
-                            Objects.requireNonNull(recyclerView.getLayoutManager()).scrollToPosition(positionListe);
-                            int finalPosition = position;
-                            viewscan = true;
-                            new Handler().postDelayed(() -> Objects.requireNonNull(recyclerView.getLayoutManager().findViewByPosition(finalPosition)).performClick(), 250);
-                        }
-                    }
-
-                }
-            }
-            invalidateOptionsMenu();
-        }
-    }
-
-
-    @Override
     public void onItemClick(View view, int position) {
         EditText edit = view.findViewById(R.id.qte_demander);
         edit.requestFocus();
@@ -514,7 +521,11 @@ public class ListeProduitActivity extends ServiceActivity implements DemandePart
             String commentaire = commentaire_et.getText().toString();
             boolean urgent = urgent_s.isChecked();
 
-            onClick_Action_envoyerDemande(motif, commentaire, urgent);
+            try {
+                onClick_Action_envoyerDemande(motif, commentaire, urgent);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
         });
 
         builder.setView(layout);
@@ -528,19 +539,20 @@ public class ListeProduitActivity extends ServiceActivity implements DemandePart
         alertDialog.show();
     }
 
-    public void onClick_Action_envoyerDemande(String motif, String commentaire, boolean urgent) {
+    public void onClick_Action_envoyerDemande(String motif, String commentaire, boolean urgent) throws ParseException {
 
         boolean confirmer = Alerte.afficherAlerte(this, "Envoyer", "Êtes-vous sûr de vouloir envoyer cette demande ?", "OuiNon");
         if (confirmer) {
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.DAY_OF_YEAR, 1);
             Date tomorrow = calendar.getTime();
-            @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+            @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            @SuppressLint("SimpleDateFormat") DateFormat dateFormatDDMMYY = new SimpleDateFormat("dd/MM/yyyy");
             String datePL = EVENTOpenHelper.getDateProchaineLivraison(db, depot.getDepot_UID());
             String livraisonDatePrevue;
             if(!datePL.contentEquals(""))
             {
-                Date datelivraison = new Date(EVENTOpenHelper.getDateProchaineLivraison(db, depot.getDepot_UID()));
+                Date datelivraison = dateFormatDDMMYY.parse(datePL);
                 livraisonDatePrevue = dateFormat.format(datelivraison);
             }
             else
@@ -615,22 +627,6 @@ public class ListeProduitActivity extends ServiceActivity implements DemandePart
             int CaisseNB = 0;
             int Conteneur_NB = 0;
             String numero_scelle = "";
-
-            // Pour enregistrer les dates en base de données nous avons besoin de les transformer au format yyyy-MM-dd
-            @SuppressLint("SimpleDateFormat") DateFormat dateDecodeur = new SimpleDateFormat("dd/MM/yyyy");
-
-            try {
-                Date dateFournie = dateDecodeur.parse(LivraisonPrevueDate);
-                LivraisonPrevueDate = dateFormat.format(dateFournie);
-
-                dateFournie = dateDecodeur.parse(previsionDateDebut);
-                previsionDateDebut = dateFormat.format(dateFournie);
-
-                dateFournie = dateDecodeur.parse(previsionDateFin);
-                previsionDateFin = dateFormat.format(dateFournie);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
 
             // Création et insertion en base du PH_Preparation
             PH_Preparation ph_preparation = new PH_Preparation(UID, Service, Erreur_Valid, PHIE_Tag, Saisie_Le, A_tel_heure, produitID, produitDesignation, Qte_demandee, Livree, Validee, Origine, Liste, depotDestinataireID, depotDestinataireReference, SYS_DT_MAJ, SYS_HEURE_MAJ, SYS_USER_MAJ, PrescripteurReference, Prescription_date, PrescripteurNom, depotOrigineReference, depotOrigineID, commentaire, PreparationDate, LivraisonPrevueDate, DN_Groupe, Montant_HT, Montant_TTC, Poids, Commande_ID, Preparateur, Statut, PHIE_SYNCHRO, receptionUFNonComforme, livraisonDate, Frequence, previsionDateDebut, previsionDateFin, URGENT, motif, preparateur_userID, pharmacien_userID, Volume, PaletteNB, CaisseNB, Conteneur_NB, numero_scelle);

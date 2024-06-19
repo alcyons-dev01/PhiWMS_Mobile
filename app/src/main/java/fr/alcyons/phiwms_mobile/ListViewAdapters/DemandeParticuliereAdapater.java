@@ -47,7 +47,7 @@ public class DemandeParticuliereAdapater extends RecyclerView.Adapter<DemandePar
     // inflates the row layout from xml when needed
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.row_produit_demande_particuliere, parent, false);
+        View view = mInflater.inflate(R.layout.row_dotation_globale, parent, false);
         return new ViewHolder(view);
     }
 
@@ -153,6 +153,7 @@ public class DemandeParticuliereAdapater extends RecyclerView.Adapter<DemandePar
         public EditText qte_demander;
         ImageView separateur;
         LinearLayout linearLigneProduit;
+        TextView qte_a_preparer;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -160,9 +161,13 @@ public class DemandeParticuliereAdapater extends RecyclerView.Adapter<DemandePar
             reference = itemView.findViewById(R.id.reference);
             qteConditionnement = itemView.findViewById(R.id.qteConditionnement);
             qte_demander = itemView.findViewById(R.id.qte_demander);
+            qte_a_preparer = itemView.findViewById(R.id.qte_a_preparer);
             separateur = itemView.findViewById(R.id.separateur);
             linearLigneProduit = itemView.findViewById(R.id.linearLigneProduit);
             itemView.setOnClickListener(this);
+
+            qte_a_preparer.setVisibility(View.GONE);
+            qte_demander.setVisibility(View.VISIBLE);
         }
 
         @Override

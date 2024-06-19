@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:backgroundTint="@android:color/white"
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/linearLigneProduit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
@@ -88,6 +89,22 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="4dp"/>
 
+            <EditText
+                android:id="@+id/qte_demander"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20dp"
+                android:text=""
+                android:textStyle="bold"
+                android:textColor="@color/bleu_clair_alcyons"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="20dp"
+                android:inputType="number"
+                android:selectAllOnFocus="true"
+                android:imeOptions="actionDone"
+                android:visibility="gone"/>
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -98,4 +115,4 @@
 
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>
