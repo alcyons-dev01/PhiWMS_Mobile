@@ -181,6 +181,8 @@ public class OutilsGestionListeServices {
                // return ServiceUtiliserActivity.class;
             case "Demande Particuliere":
                 return ServiceDemandeParticuliereActivity.class;
+            case "Demande Particulière":
+                return ServiceDemandeParticuliereActivity.class;
             case "Dotation Service":
                // return ServiceDotationServiceActivity.class;
             case "Demande Réassort":
