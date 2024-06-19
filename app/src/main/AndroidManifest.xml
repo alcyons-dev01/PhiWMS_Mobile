@@ -480,7 +480,7 @@
         android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation|keyboardHidden"/>
 
-    <!-- Demande Demande Reassort -->
+    <!-- Demande Reassort -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.DemandeReassort.ListeReassortServiceActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
@@ -494,6 +494,19 @@
         android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation|keyboardHidden"/>
 
+        <!-- Demande Particulière -->
+        <activity
+            android:name="fr.alcyons.phiwms_mobile.DemandeParticuliere.ServiceDemandeParticuliereActivity"
+            android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|keyboardHidden"/>
+        <activity
+            android:name="fr.alcyons.phiwms_mobile.DemandeParticuliere.ListeProduitActivity"
+            android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|keyboardHidden"/>
     </application>
 
 </manifest>

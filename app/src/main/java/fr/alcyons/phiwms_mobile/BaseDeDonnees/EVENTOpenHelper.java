@@ -1,14 +1,32 @@
 package fr.alcyons.phiwms_mobile.BaseDeDonnees;
+import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.Classes.EVENT;
+import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
+import fr.alcyons.phiwms_mobile.R;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
+import android.util.Log;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.RetryPolicy;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class EVENTOpenHelper extends DBOpenHelper {
@@ -70,6 +88,82 @@ public class EVENTOpenHelper extends DBOpenHelper {
         objet.setphiwms_mobileUUID((int) rowID);
         return rowID;
     }
+
+    public static void insererBDDLocaleEvent(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur) {
+        final String tableNom = "Events";
+        final String erreurSynchronisationLibelle = "Events non synchronisées";
+
+        String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriRequeteEvent;
+        RequestQueue requestQueue = new Volley().newRequestQueue(context);
+
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null, response -> {
+            try {
+                String erreur = "";
+                boolean etat = true;
+                int resultCount = response.getInt("resultCount");
+                if (resultCount == 0) {
+                    etat = false;
+                    erreur = response.getString("erreur");
+                    if (erreur.equals(context.getString(R.string.tokenInvalide))) {
+                        DBOpenHelper.viderBasesDeDonnees(db);
+                        erreur = "Votre identifiant de connexion est invalide, veuillez vous reconnecter.";
+                    } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
+                        erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
+                    } else if (!erreur.equals("Aucun Events trouvé")) {
+                    }
+                    else{
+                        etat = true;
+                    }
+                } else {
+                    JSONArray eventJSONArray = response.getJSONArray("EVENTS");
+                    for (int i = 0; i < eventJSONArray.length(); i++) {
+                        JSONObject eventJSONObject = eventJSONArray.getJSONObject(i);
+                        EVENT event = new EVENT(eventJSONObject);
+
+                        long rowID = EVENTOpenHelper.insererEVENTEnBDD(db, event);
+                    }
+                }
+                ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        },
+                error -> {
+                    Log.e("Event volley", error.toString());
+                    ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, false, erreurSynchronisationLibelle);
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Authorization", token);
+                headers.put("UserId", String.valueOf(utilisateur.getId()));
+                headers.put("EtablissementId", String.valueOf(utilisateur.getEtablissementId()));
+                return headers;
+            }
+        };
+
+        obreq.setRetryPolicy(new RetryPolicy() {
+            @Override
+            public int getCurrentTimeout() {
+                return 70000;
+            }
+
+            @Override
+            public int getCurrentRetryCount() {
+                return 50000;
+            }
+
+            @Override
+            public void retry(VolleyError error) throws VolleyError {
+
+            }
+        });
+
+        requestQueue.add(obreq);
+    }
+
 
     public static class Constantes implements BaseColumns {
         public static final String TABLE_EVENT = "EVENT";

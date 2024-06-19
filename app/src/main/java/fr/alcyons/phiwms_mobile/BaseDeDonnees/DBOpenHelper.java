@@ -58,6 +58,7 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         db.delete(SYS_User_RulesOpenHelper.Constantes.TABLE_SYS_USER_RULES, null, null);
         db.delete(TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, null, null);
         db.delete(EVENTOpenHelper.Constantes.TABLE_EVENT, null, null);
+        db.delete(PH_Demande_MotifOpenHelper.Constantes.TABLE_DEMANDE_MOTIF, null, null);
     }
 
     @Override
@@ -105,6 +106,7 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         db.execSQL(SYS_User_RulesOpenHelper.Constantes.CREATION_TABLE_SYS_USER_RULES);
         db.execSQL(TableTraceOpenHelper.Constantes.CREATION_TABLE_TABLE_TRACE);
         db.execSQL(EVENTOpenHelper.Constantes.CREATION_TABLE_EVENT);
+        db.execSQL(PH_Demande_MotifOpenHelper.Constantes.CREATION_TABLE_DEMANDE_MOTIF);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -206,6 +208,7 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         public static final String uriRequetePleinVideCourant = "ph_preparations/pleinvide";
         public static final String uriRequeteDotationGlobaleCourant = "ph_preparations/dotationglobale";
         public static final String uriRequeteDemandeReassortCourant = "ph_preparations/phreassort";
+        public static final String uriRequeteDemandeMotif = "ph_demande_motif/";
 
     }
 

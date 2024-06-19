@@ -78,58 +78,66 @@ public class DemandeParticuliereAdapater extends RecyclerView.Adapter<DemandePar
                 if(hasfocus)
                     finalViewHolder.linearLigneProduit.setBackground(context.getResources().getDrawable(R.drawable.background_plain_vert, null));
                 else
-                    ((ListeProduitActivity) context).gestionCompteur();
+                {
+                    gestionQuantite(produit, finalViewHolder);
+                }
             }
         });
         holder.qte_demander.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                int quantite = 0;
-                if(!finalViewHolder.qte_demander.getText().toString().isEmpty())
-                    quantite = Integer.parseInt(finalViewHolder.qte_demander.getText().toString());
-
-                quantite = (int)Conditionnement_Calcul(quantite, (int)produit.getCond_distrib());
-
-                finalViewHolder.qte_demander.setText(String.valueOf(quantite));
-
-                int positionReference = -1;
-                for(Produit produitCourant : produitsOriginal)
-                {
-                    positionReference ++;
-
-                    if(produitCourant.getDesignation_interne().contentEquals(produit.getDesignation_interne()) && produitCourant.getFournisseur().contentEquals(produit.getFournisseur()) && produitCourant.getRef_fourni().contentEquals(produit.getRef_fourni()))
-                    {
-                        break;
-                    }
-                }
-                listQuantiteOriginal.set(positionReference, quantite);
-
-                int positionProduit = -1;
-                for(Produit produitCourant : produits)
-                {
-                    positionProduit ++;
-
-                    if(produitCourant.getDesignation_interne().contentEquals(produit.getDesignation_interne()) && produitCourant.getFournisseur().contentEquals(produit.getFournisseur()) && produitCourant.getRef_fourni().contentEquals(produit.getRef_fourni()))
-                    {
-                        break;
-                    }
-                }
-
-                listQuantite.set(positionProduit, quantite);
-
-                if(quantite > 0)
-                {
-                    finalViewHolder.separateur.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_gestion_statut_action_valider, null));
-                    finalViewHolder.qte_demander.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.vert,null));
-                }
-                else
-                {
-                    finalViewHolder.separateur.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_gestion_statut_action_soumis, null));
-                    finalViewHolder.qte_demander.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.bleu_clair_alcyons,null));
-                }
-                finalViewHolder.linearLigneProduit.setBackground(context.getResources().getDrawable(R.drawable.background_element_list_droit, null));
+                gestionQuantite(produit, finalViewHolder);
             }
             return false;
         });
+    }
+
+    private void gestionQuantite(Produit produit, ViewHolder holder)
+    {
+        int quantite = 0;
+        if(!holder.qte_demander.getText().toString().isEmpty())
+            quantite = Integer.parseInt(holder.qte_demander.getText().toString());
+
+        quantite = (int)Conditionnement_Calcul(quantite, (int)produit.getCond_distrib());
+
+        holder.qte_demander.setText(String.valueOf(quantite));
+
+        int positionReference = -1;
+        for(Produit produitCourant : produitsOriginal)
+        {
+            positionReference ++;
+
+            if(produitCourant.getDesignation_interne().contentEquals(produit.getDesignation_interne()) && produitCourant.getFournisseur().contentEquals(produit.getFournisseur()) && produitCourant.getRef_fourni().contentEquals(produit.getRef_fourni()))
+            {
+                break;
+            }
+        }
+        listQuantiteOriginal.set(positionReference, quantite);
+
+        int positionProduit = -1;
+        for(Produit produitCourant : produits)
+        {
+            positionProduit ++;
+
+            if(produitCourant.getDesignation_interne().contentEquals(produit.getDesignation_interne()) && produitCourant.getFournisseur().contentEquals(produit.getFournisseur()) && produitCourant.getRef_fourni().contentEquals(produit.getRef_fourni()))
+            {
+                break;
+            }
+        }
+
+        listQuantite.set(positionProduit, quantite);
+
+        if(quantite > 0)
+        {
+            holder.separateur.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_gestion_statut_action_valider, null));
+            holder.qte_demander.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.vert,null));
+        }
+        else
+        {
+            holder.separateur.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_gestion_statut_action_soumis, null));
+            holder.qte_demander.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.bleu_clair_alcyons,null));
+        }
+        holder.linearLigneProduit.setBackground(context.getResources().getDrawable(R.drawable.background_element_list_droit, null));
+        ((ListeProduitActivity) context).gestionCompteur();
     }
 
     // total number of rows

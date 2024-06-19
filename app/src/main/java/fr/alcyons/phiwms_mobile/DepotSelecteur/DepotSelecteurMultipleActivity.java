@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,7 +30,6 @@ import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.GPSTracker;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
-import fr.alcyons.phiwms_mobile.ZonesEtEmplacements.ListeZonesParDepotActivity;
 
 public class DepotSelecteurMultipleActivity extends ServiceActivity {
 
@@ -134,11 +132,11 @@ public class DepotSelecteurMultipleActivity extends ServiceActivity {
 
         nbDepotType = depotParentList.size();
 
-        nbElementInAdapterTextView = (TextView) findViewById(R.id.nbElementInAdapter);
+        nbElementInAdapterTextView = findViewById(R.id.nbElementInAdapter);
         depotNombre = depotList.size();
         nbElementInAdapterTextView.setText(String.valueOf(depotNombre));
 
-        depotExpandablelistView = (ExpandableListView) findViewById(R.id.expandableListViewDepot);
+        depotExpandablelistView = findViewById(R.id.expandableListViewDepot);
 
         depotExpandableListAdapter = new DepotExpandableListAdapter(this, depotParentList, depotParentListItems, utilisateurConnecte);
         depotExpandablelistView.setAdapter(depotExpandableListAdapter);
@@ -156,90 +154,87 @@ public class DepotSelecteurMultipleActivity extends ServiceActivity {
             return false;
         });
 
-        boutonGeolocalisation = (FloatingActionButton) findViewById(R.id.boutonGeolocalisation);
-        boutonGeolocalisation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        boutonGeolocalisation = findViewById(R.id.boutonGeolocalisation);
+        boutonGeolocalisation.setOnClickListener(view -> {
 
-                double latitude = 0;
-                double longitude = 0;
+            double latitude = 0;
+            double longitude = 0;
 
-                // create class object
-                GPSTracker gps = new GPSTracker(DepotSelecteurMultipleActivity.this);
+            // create class object
+            GPSTracker gps = new GPSTracker(DepotSelecteurMultipleActivity.this);
 
-                // check if GPS enabled
-                if (gps.canGetLocation()) {
+            // check if GPS enabled
+            if (gps.canGetLocation()) {
 
-                    latitude = gps.getLatitude();
-                    longitude = gps.getLongitude();
+                latitude = gps.getLatitude();
+                longitude = gps.getLongitude();
 
-                    Toast.makeText(getApplicationContext(), "Votre localisation est - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
-                } else {
-                    gps.showSettingsAlert();
+                Toast.makeText(getApplicationContext(), "Votre localisation est - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+            } else {
+                gps.showSettingsAlert();
+            }
+
+            ArrayList<DepotOpenHelper.CustomObject> depotLesPlusProche = gestionnaireDepot.getDepotLesPlusProche(latitude, longitude, depotList);
+            if (latitude == 0 && longitude == 0) {
+                Alerte.afficherAlerte(DepotSelecteurMultipleActivity.this, "Alerte", "Nous n'avons pas réussi à vous géolocaliser. Veuillez sélectionner manuellement votre dépot.", "alerte");
+            } else if (depotLesPlusProche.isEmpty()) {
+                Alerte.afficherAlerte(DepotSelecteurMultipleActivity.this, "Alerte", "Aucun dépot n'est situé à moins de 1km. Veuillez sélectionner manuellement votre dépot.", "alerte");
+            } else if (depotLesPlusProche.size() == 1) {
+                Depot depotLePlusProche = DepotOpenHelper.getDepotParID(db, depotLesPlusProche.get(0).getKey());
+                boolean choixUtilisateur = Alerte.afficherAlerte(DepotSelecteurMultipleActivity.this, "Alerte", "Vous allez être redirigé vers le dépôt " + depotLePlusProche.getNom() + ". Voulez vous continuer ?", "OuiNon");
+
+                if (choixUtilisateur) {
+                    Intent resultIntent = new Intent();
+                    Bundle extras = new Bundle();
+                    extras.putInt("depotUID_Selectionne", depotLePlusProche.getDepot_UID());
+                    resultIntent.putExtras(extras);
+                    setResult(CodesEchangesActivites.RESULT_SELECTION_DEPOT, resultIntent);
+                    finish();
                 }
+            } else {
+                Alerte.afficherAlerte(DepotSelecteurMultipleActivity.this, "Alerte", "Plusieurs dépots se situent à moins de 1km. Veuillez sélectionner manuellement votre dépot.", "alerte");
+                depotParentList = new ArrayList<>();
+                depotParentListItems = new LinkedHashMap<>();
+                depotList = new ArrayList<>();
 
-                ArrayList<DepotOpenHelper.CustomObject> depotLesPlusProche = gestionnaireDepot.getDepotLesPlusProche(latitude, longitude, depotList);
-                if (latitude == 0 && longitude == 0) {
-                    Alerte.afficherAlerte(DepotSelecteurMultipleActivity.this, "Alerte", "Nous n'avons pas réussi à vous géolocaliser. Veuillez sélectionner manuellement votre dépot.", "alerte");
-                } else if (depotLesPlusProche.isEmpty()) {
-                    Alerte.afficherAlerte(DepotSelecteurMultipleActivity.this, "Alerte", "Aucun dépot n'est situé à moins de 1km. Veuillez sélectionner manuellement votre dépot.", "alerte");
-                } else if (depotLesPlusProche.size() == 1) {
-                    Depot depotLePlusProche = DepotOpenHelper.getDepotParID(db, depotLesPlusProche.get(0).getKey());
-                    boolean choixUtilisateur = Alerte.afficherAlerte(DepotSelecteurMultipleActivity.this, "Alerte", "Vous allez être redirigé vers le dépôt " + depotLePlusProche.getNom() + ". Voulez vous continuer ?", "OuiNon");
+                if (depotType.contentEquals("all")) {
+                    depotParentList.add("PUI");
+                    depotPuiList = new ArrayList<>();
 
-                    if (choixUtilisateur) {
-                        Intent resultIntent = new Intent();
-                        Bundle extras = new Bundle();
-                        extras.putInt("depotUID_Selectionne", depotLePlusProche.getDepot_UID());
-                        resultIntent.putExtras(extras);
-                        setResult(CodesEchangesActivites.RESULT_SELECTION_DEPOT, resultIntent);
-                        finish();
-                    }
-                } else {
-                    Alerte.afficherAlerte(DepotSelecteurMultipleActivity.this, "Alerte", "Plusieurs dépots se situent à moins de 1km. Veuillez sélectionner manuellement votre dépot.", "alerte");
-                    depotParentList = new ArrayList<>();
-                    depotParentListItems = new LinkedHashMap<>();
-                    depotList = new ArrayList<>();
-
-                    if (depotType.contentEquals("all")) {
-                        depotParentList.add("PUI");
-                        depotPuiList = new ArrayList<>();
-
-                    }
-                    depotParentList.add("PUF");
-                    depotPufList = new ArrayList<>();
-
-                    depotParentList.add("PAD");
-                    depotPadList = new ArrayList<>();
-
-                    for (DepotOpenHelper.CustomObject customObject : depotLesPlusProche) {
-                        Depot depotLePlusProche = DepotOpenHelper.getDepotParID(db, customObject.getKey());
-                        if (depotLePlusProche.getStructure().contentEquals("PUI")) {
-                            depotPuiList.add(depotLePlusProche);
-                        } else if (depotLePlusProche.getStructure().contentEquals("PUF")) {
-                            depotPufList.add(depotLePlusProche);
-                        } else if (depotLePlusProche.getStructure().contentEquals("PAD")) {
-                            depotPadList.add(depotLePlusProche);
-                        }
-                    }
-                    if (depotType.contentEquals("all")) {
-                        depotParentListItems.put("PUI", depotPuiList);
-                        depotList.addAll(depotPuiList);
-                    }
-                    depotParentListItems.put("PUF", depotPufList);
-                    depotList.addAll(depotPufList);
-                    depotParentListItems.put("PAD", depotPadList);
-                    depotList.addAll(depotPadList);
-
-                    nbElementInAdapterTextView = (TextView) findViewById(R.id.nbElementInAdapter);
-                    depotNombre = depotList.size();
-                    nbElementInAdapterTextView.setText(String.valueOf(depotNombre));
-
-                    depotExpandablelistView = (ExpandableListView) findViewById(R.id.expandableListView);
-
-                    depotExpandableListAdapter = new DepotExpandableListAdapter(DepotSelecteurMultipleActivity.this, depotParentList, depotParentListItems, utilisateurConnecte);
-                    depotExpandablelistView.setAdapter(depotExpandableListAdapter);
                 }
+                depotParentList.add("PUF");
+                depotPufList = new ArrayList<>();
+
+                depotParentList.add("PAD");
+                depotPadList = new ArrayList<>();
+
+                for (DepotOpenHelper.CustomObject customObject : depotLesPlusProche) {
+                    Depot depotLePlusProche = DepotOpenHelper.getDepotParID(db, customObject.getKey());
+                    if (depotLePlusProche.getStructure().contentEquals("PUI")) {
+                        depotPuiList.add(depotLePlusProche);
+                    } else if (depotLePlusProche.getStructure().contentEquals("PUF")) {
+                        depotPufList.add(depotLePlusProche);
+                    } else if (depotLePlusProche.getStructure().contentEquals("PAD")) {
+                        depotPadList.add(depotLePlusProche);
+                    }
+                }
+                if (depotType.contentEquals("all")) {
+                    depotParentListItems.put("PUI", depotPuiList);
+                    depotList.addAll(depotPuiList);
+                }
+                depotParentListItems.put("PUF", depotPufList);
+                depotList.addAll(depotPufList);
+                depotParentListItems.put("PAD", depotPadList);
+                depotList.addAll(depotPadList);
+
+                nbElementInAdapterTextView = findViewById(R.id.nbElementInAdapter);
+                depotNombre = depotList.size();
+                nbElementInAdapterTextView.setText(String.valueOf(depotNombre));
+
+                depotExpandablelistView = findViewById(R.id.expandableListView);
+
+                depotExpandableListAdapter = new DepotExpandableListAdapter(DepotSelecteurMultipleActivity.this, depotParentList, depotParentListItems, utilisateurConnecte);
+                depotExpandablelistView.setAdapter(depotExpandableListAdapter);
             }
         });
         invalidateOptionsMenu();
@@ -247,6 +242,18 @@ public class DepotSelecteurMultipleActivity extends ServiceActivity {
         if(nbDepotType == 1)
         {
             expandAll();
+        }
+
+        if(depotList.size() == 1)
+        {
+            Depot depotSelectionne = depotList.get(0);
+
+            Intent resultIntent = new Intent();
+            Bundle extras = new Bundle();
+            extras.putInt("depotUID_Selectionne", depotSelectionne.getDepot_UID());
+            resultIntent.putExtras(extras);
+            setResult(CodesEchangesActivites.RESULT_SELECTION_DEPOT, resultIntent);
+            DepotSelecteurMultipleActivity.this.finish();
         }
     }
 
@@ -276,15 +283,12 @@ public class DepotSelecteurMultipleActivity extends ServiceActivity {
 
             @Override
             public boolean onQueryTextChange(final String newText) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        depotExpandableListAdapter.filter(newText);
-                        //display the list
-                        depotExpandablelistView.setAdapter(depotExpandableListAdapter);
-                        //expand all Groups
-                        expandAll();
-                    }
+                runOnUiThread(() -> {
+                    depotExpandableListAdapter.filter(newText);
+                    //display the list
+                    depotExpandablelistView.setAdapter(depotExpandableListAdapter);
+                    //expand all Groups
+                    expandAll();
                 });
                 return false;
             }

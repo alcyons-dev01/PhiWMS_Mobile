@@ -144,6 +144,7 @@ public class ProduitContexte {
 
     public boolean onTap(String chaine){
         boolean confirmation = true;
+        code = chaine;
 
 /*
         if(!serialisation)

@@ -4,7 +4,6 @@ import static com.google.android.gms.vision.L.TAG;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,9 +22,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -38,15 +35,11 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
@@ -55,13 +48,12 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.Detail_DotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DotationOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.EVENTOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.FournisseurOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.FrequencesOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.NotificationOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Demande_MotifOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReassortOpenHelper;
@@ -69,8 +61,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_RetourMotifOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.Parametres_SerialisationOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.PerimetreFonctionnelOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
@@ -79,7 +69,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ServiceOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.UtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.CGU.CguActivity;
-import fr.alcyons.phiwms_mobile.Classes.PH_Reassort;
 import fr.alcyons.phiwms_mobile.Classes.SYS_User_Rules;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
@@ -113,7 +102,7 @@ import me.leolin.shortcutbadger.ShortcutBadger;
 
 
 public class AuthentificationActivity extends MainActivity {
-    public static int nbTableAInserer = 9;
+    public static int nbTableAInserer = 11;
     public static int nbTableinserees = 0;
     public boolean pretAPasserActiviteSuivante = false;
     // base de donnée
@@ -227,26 +216,23 @@ public class AuthentificationActivity extends MainActivity {
 
         //lancer le lecteur de scan en cliquant sur le datamatrix
         if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
-            ((ImageView) findViewById(R.id.vers_identification_scan)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            findViewById(R.id.vers_identification_scan).setOnClickListener(v -> {
 
-                    Intent scanDocumentIntent = new Intent(AuthentificationActivity.this, BarcodeCaptureActivity.class);
-                    Bundle scanDocumentBundle = new Bundle();
+                Intent scanDocumentIntent = new Intent(AuthentificationActivity.this, BarcodeCaptureActivity.class);
+                Bundle scanDocumentBundle = new Bundle();
 
-                    if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
-                    {
-                        scanDocumentIntent = new Intent(AuthentificationActivity.this, ScannerSearchOnlyActivity.class);
-                        scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteAuthentification);
-                    }
-
-                    scanDocumentBundle.putString("contexte", String.valueOf(R.string.scannerContexteAuthentification));
-                    scanDocumentBundle.putBoolean("isBoutonSuppressionExistant", true);
-                    scanDocumentBundle.putBoolean("modeRafale", false);
-                    scanDocumentBundle.putString("ServiceCourant", "Authentification");
-                    scanDocumentIntent.putExtras(scanDocumentBundle);
-                    AuthentificationActivity.this.startActivityForResult(scanDocumentIntent, CodesEchangesActivites.RETOUR_AUTHENTIFICATION);
+                if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+                {
+                    scanDocumentIntent = new Intent(AuthentificationActivity.this, ScannerSearchOnlyActivity.class);
+                    scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteAuthentification);
                 }
+
+                scanDocumentBundle.putString("contexte", String.valueOf(R.string.scannerContexteAuthentification));
+                scanDocumentBundle.putBoolean("isBoutonSuppressionExistant", true);
+                scanDocumentBundle.putBoolean("modeRafale", false);
+                scanDocumentBundle.putString("ServiceCourant", "Authentification");
+                scanDocumentIntent.putExtras(scanDocumentBundle);
+                AuthentificationActivity.this.startActivityForResult(scanDocumentIntent, CodesEchangesActivites.RETOUR_AUTHENTIFICATION);
             });
         } else {
             findViewById(R.id.vers_identification_scan).setVisibility(View.INVISIBLE);
@@ -301,7 +287,7 @@ public class AuthentificationActivity extends MainActivity {
             // Vérification qu'un identifiant et un mot de passe ont bien été rentrés
             if (!(motDePasse.isEmpty() || identifiant.isEmpty())) {
                 // Encodage du mot de passe
-                String motDePasseHache = "";
+                String motDePasseHache;
                 if (authentification_scan) {
                     motDePasseHache = motDePasse;
                     authentification_scan = false;
@@ -352,7 +338,7 @@ public class AuthentificationActivity extends MainActivity {
                 if (ActivityCompat.checkSelfPermission(AuthentificationActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
                     return;
                 }
-                String device_id = "";
+                String device_id;
 
                 if(tm != null && !Build.MANUFACTURER.toLowerCase().contains("crosscall") && !Build.MANUFACTURER.toLowerCase().contains("huawei") && !Build.MANUFACTURER.toLowerCase().contains("zebra") && !Build.MANUFACTURER.toLowerCase().contains("samsung"))
                 {
@@ -398,7 +384,7 @@ public class AuthentificationActivity extends MainActivity {
     @Override
     public void onResume() {
         super.onResume();
-        nbTableAInserer = 9;
+        nbTableAInserer = 11;
         nbTableinserees = 0;
         activerAuthentificationForte = ParametreUtilisateurOpenHelper.getAuthentificationForte(db);
         connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(db);
@@ -792,6 +778,8 @@ public class AuthentificationActivity extends MainActivity {
         PH_RetourMotifOpenHelper.insererBDDLocalePH_RetourMotif(AuthentificationActivity.this, db, token, utilisateurConnecte, statutConnexion);
         DotationOpenHelper.insererBDDLocaleDotation(AuthentificationActivity.this, db, token, utilisateurConnecte, statutConnexion);
         PH_ReassortOpenHelper.insererBDDLocaleReassort(AuthentificationActivity.this, db, token, utilisateurConnecte);
+        PH_Demande_MotifOpenHelper.insererBDDLocaleDemandeMotif(AuthentificationActivity.this, db,token, utilisateurConnecte);
+        EVENTOpenHelper.insererBDDLocaleEvent(AuthentificationActivity.this, db,token, utilisateurConnecte);
         ActionUtilisateurOpenHelper.insererBDDLocaleActionUtilisatuer(AuthentificationActivity.this, db, token, utilisateurConnecte, statutConnexion);
     }
 
@@ -869,6 +857,10 @@ public class AuthentificationActivity extends MainActivity {
         textViewList.add(Action);
         TextView Reassort = layout.findViewById(R.id.Reassort);
         textViewList.add(Reassort);
+        TextView MotifDemande = layout.findViewById(R.id.MotifDemande);
+        textViewList.add(MotifDemande);
+        TextView Event = layout.findViewById(R.id.Event);
+        textViewList.add(Event);
 
         zoneok = layout.findViewById(R.id.barDeProgression);
         zoneok.setOnTouchListener((v, event) -> true);
@@ -893,6 +885,10 @@ public class AuthentificationActivity extends MainActivity {
         imageViewList.add(checkAction);
         ImageView checkReassort = layout.findViewById(R.id.checkReassort);
         imageViewList.add(checkReassort);
+        ImageView checkMotifDemande = layout.findViewById(R.id.checkMotifDemande);
+        imageViewList.add(checkMotifDemande);
+        ImageView checkEvent = layout.findViewById(R.id.checkEvent);
+        imageViewList.add(checkEvent);
 
         gestionExpandable = layout.findViewById(R.id.gestionExpandable);
 

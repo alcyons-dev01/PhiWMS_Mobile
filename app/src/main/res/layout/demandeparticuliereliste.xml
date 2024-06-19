@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/white">
+
+    <LinearLayout
+        android:id="@+id/barreDeTitre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bleu_fonce_alcyons"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/nbElementInAdapter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="0"
+            android:textColor="@color/bleu_clair_alcyons"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingLeft="10dp"/>
+
+        <TextView
+            android:id="@+id/titre"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Produits"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginLeft="20dp"/>
+
+        <TextView
+            android:id="@+id/nomDepot"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="NomDepot"
+            android:gravity="center_vertical|end"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:paddingRight="10dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/zoneSousSelection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/barreDeTitre"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="5dp"
+        android:weightSum="10">
+
+        <LinearLayout
+            android:id="@+id/layoutTextAEnvoyer"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="9"
+            android:layout_marginStart="5dp">
+
+            <TextView
+                android:id="@+id/textEnvoi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0 Référence commandée"
+                android:textColor="#000000"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:layout_marginLeft="10dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutValider"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/iconEnvoi"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:background="@drawable/ic_check_circle"
+                android:backgroundTint="@color/bleu_clair_alcyons"
+                android:textAlignment="center" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lancerScan"
+        android:layout_below="@id/zoneSousSelection"
+        android:layout_width="match_parent"
+        android:layout_height="50sp"
+        android:background="@drawable/background_plain_rouge"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginVertical="5dp"
+        android:layout_marginHorizontal="5dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:weightSum="4">
+
+        <TextView
+            android:id="@+id/textLancerScan"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="SCANNER"
+            android:layout_gravity="center"
+            android:gravity="center_vertical"
+            android:layout_weight="4"
+            android:textColor="#FFFFFF"
+            android:textSize="30sp"
+            android:paddingStart="10dp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/iconLancerScan"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="10dp"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/ic_datamatrix"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutRecherche"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_below="@+id/lancerScan"
+        android:orientation="horizontal"
+        android:background="@drawable/contour_gestion_statut_action_soumise">
+
+        <ImageView
+            android:id="@+id/iconRecherche"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="5dp"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:title="Search"
+            android:background="@drawable/ic_search_black"/>
+
+        <EditText
+            android:id="@+id/searchBarDemande"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginEnd="10dp"
+            android:inputType="text"
+            android:maxLines="1"
+            android:hint="Rechercher une référence"/>
+
+        <ImageView
+            android:id="@+id/removeSearchDemande"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="5dp"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:title="Search"
+            android:visibility="gone"
+            android:background="@drawable/ic_croix_noir"/>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_liste"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_below="@+id/layoutRecherche"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_marginBottom="10dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </RelativeLayout>
+
+</RelativeLayout>
+
