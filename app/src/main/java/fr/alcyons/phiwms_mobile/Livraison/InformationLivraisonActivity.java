@@ -62,12 +62,12 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.Dialogue;
 import fr.alcyons.phiwms_mobile.Outils.Mail;
-import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPDF;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotos;
 import fr.alcyons.phiwms_mobile.PrisePhoto.PrisePhoto;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceLivraisonActivity;
 
 import static fr.alcyons.phiwms_mobile.AuthentificationActivity.hasPermissions;
 
@@ -671,7 +671,7 @@ public class InformationLivraisonActivity extends ServiceActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent serviceLivraison_Intent = new Intent(InformationLivraisonActivity.this, ListePointDeLivraison.class);
+        Intent serviceLivraison_Intent = new Intent(InformationLivraisonActivity.this, ServiceLivraisonActivity.class);
         Bundle serviceLivraison_Bundle = InformationLivraisonActivity.super.getBundle();
         serviceLivraison_Intent.putExtras(serviceLivraison_Bundle);
         InformationLivraisonActivity.this.startActivity(serviceLivraison_Intent);

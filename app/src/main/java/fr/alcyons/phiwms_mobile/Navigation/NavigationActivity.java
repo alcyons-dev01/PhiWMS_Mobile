@@ -189,6 +189,7 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                             String videoServiceCourant = planHabilitationJSONObject.getString("video");
                             String whitePaperServiceCourant= planHabilitationJSONObject.getString("whitepaper");
                             int score = planHabilitationJSONObject.getInt("score");
+                            String activiteMobile = planHabilitationJSONObject.getString("activiteMobile");
                             int phiwms_mobileuuid = 0;
                             Service serviceBDD = ServiceOpenHelper.getServiceByID(db, idServiceCourant);
                             if(serviceBDD != null)
@@ -196,7 +197,7 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                                 phiwms_mobileuuid = serviceBDD.getPhiMR4UUID();
                             }
 
-                            Service service = new Service(idServiceCourant, nomServiceCourant, ordreServiceCourant, idPerimetreFonctionnelServiceCourant, nomPerimetreFonctionnelServiceCourant, statutServiceCourant, indicateurServiceCourant, descriptionServiceCourant, videoServiceCourant, whitePaperServiceCourant, score, phiwms_mobileuuid);
+                            Service service = new Service(idServiceCourant, nomServiceCourant, ordreServiceCourant, idPerimetreFonctionnelServiceCourant, nomPerimetreFonctionnelServiceCourant, statutServiceCourant, indicateurServiceCourant, descriptionServiceCourant, videoServiceCourant, whitePaperServiceCourant, score, phiwms_mobileuuid, activiteMobile);
                             serviceList.add(service);
                         }
                         utilisateurConnecte.setServicesHabilites(serviceList);
@@ -444,8 +445,13 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
             {
                 if (serviceSelectionne != null) {
 
-                    Class classe_demande = OutilsGestionListeServices.recupererActiviteCorrespondanteAUnService(serviceSelectionne);
-                    if (classe_demande.getName().contentEquals("fr.alcyons.phiwms_mobile.ServiceEnCreationActivity")) {
+                    //Class classe_demande = OutilsGestionListeServices.recupererActiviteCorrespondanteAUnService(serviceSelectionne);
+                    Class classe_demande = null;
+                    try {
+                        classe_demande = Class.forName("fr.alcyons.phiwms_mobile.Services."+serviceSelectionne.getActiviteMobile());
+                    } catch (ClassNotFoundException ignored) {
+                    }
+                    if (classe_demande ==  null || classe_demande.getName().isEmpty() || classe_demande.getName().contentEquals("fr.alcyons.phiwms_mobile.ServiceEnCreationActivity")) {
                         afficherSnackBar("EnCoursDeDeveloppement");
                     } else {
                         serviceSelectionne.setScore(serviceSelectionne.getScore()+1);

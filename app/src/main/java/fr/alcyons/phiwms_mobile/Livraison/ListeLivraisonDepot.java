@@ -69,11 +69,11 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.Dialogue;
 import fr.alcyons.phiwms_mobile.Outils.Mail;
-import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPDF;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotos;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceLivraisonActivity;
 
 public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
@@ -638,7 +638,7 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent serviceLivraison_Intent = new Intent(ListeLivraisonDepot.this, ListePointDeLivraison.class);
+        Intent serviceLivraison_Intent = new Intent(ListeLivraisonDepot.this, ServiceLivraisonActivity.class);
         Bundle serviceLivraison_Bundle = ListeLivraisonDepot.super.getBundle();
         serviceLivraison_Intent.putExtras(serviceLivraison_Bundle);
         ListeLivraisonDepot.this.startActivity(serviceLivraison_Intent);

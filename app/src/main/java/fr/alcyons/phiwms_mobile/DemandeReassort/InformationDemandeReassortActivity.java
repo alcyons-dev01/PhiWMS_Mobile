@@ -66,6 +66,7 @@ import fr.alcyons.phiwms_mobile.ListViewAdapters.PhReassortAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceDemandeReassortActivity;
 
 public class InformationDemandeReassortActivity  extends ServiceAvecConnexionActivity {
     PH_Reassort reassort;
@@ -301,7 +302,7 @@ public class InformationDemandeReassortActivity  extends ServiceAvecConnexionAct
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem menuQuitter = menu.findItem(R.id.quitteMenu);
         menuQuitter.setOnMenuItemClickListener(item -> {
-            Intent detailDotationIntent = new Intent(InformationDemandeReassortActivity.this, ListeReassortServiceActivity.class);
+            Intent detailDotationIntent = new Intent(InformationDemandeReassortActivity.this, ServiceDemandeReassortActivity.class);
             Bundle detailDotationBundle = InformationDemandeReassortActivity.this.getBundle();
             detailDotationIntent.putExtras(detailDotationBundle);
             InformationDemandeReassortActivity.this.startActivity(detailDotationIntent);
@@ -561,7 +562,7 @@ public class InformationDemandeReassortActivity  extends ServiceAvecConnexionAct
         }
 
         Toast.makeText(InformationDemandeReassortActivity.this, "Enregistrement en cours", Toast.LENGTH_SHORT).show();
-        Intent detailPleinVideIntent = new Intent(InformationDemandeReassortActivity.this, ListeReassortServiceActivity.class);
+        Intent detailPleinVideIntent = new Intent(InformationDemandeReassortActivity.this, ServiceDemandeReassortActivity.class);
         Bundle detailPleinVideBundle = super.getBundle();
         detailPleinVideIntent.putExtras(detailPleinVideBundle);
         InformationDemandeReassortActivity.this.startActivity(detailPleinVideIntent);

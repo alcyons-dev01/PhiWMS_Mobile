@@ -12,7 +12,7 @@ import java.util.List;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.FournisseurAdapter;
-import fr.alcyons.phiwms_mobile.MedicamentAuLivret.ServiceMedicamentAuLivretActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceMedicamentAuLivretActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 

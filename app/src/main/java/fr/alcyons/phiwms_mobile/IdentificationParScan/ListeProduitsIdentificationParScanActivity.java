@@ -27,6 +27,7 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceIdentificationParScanActivity;
 
 public class ListeProduitsIdentificationParScanActivity extends ServiceActivity {
 

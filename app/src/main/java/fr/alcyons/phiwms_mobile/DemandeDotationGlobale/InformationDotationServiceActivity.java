@@ -67,6 +67,7 @@ import fr.alcyons.phiwms_mobile.ListViewAdapters.DotationGlobaleAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceDemandeDotationGlobaleActivity;
 
 public class InformationDotationServiceActivity extends ServiceAvecConnexionActivity {
     Dotation dotation;
@@ -300,7 +301,7 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem menuQuitter = menu.findItem(R.id.quitteMenu);
         menuQuitter.setOnMenuItemClickListener(item -> {
-            Intent detailDotationIntent = new Intent(InformationDotationServiceActivity.this, ListeDotationServiceActivity.class);
+            Intent detailDotationIntent = new Intent(InformationDotationServiceActivity.this, ServiceDemandeDotationGlobaleActivity.class);
             Bundle detailDotationBundle = InformationDotationServiceActivity.this.getBundle();
             detailDotationIntent.putExtras(detailDotationBundle);
             InformationDotationServiceActivity.this.startActivity(detailDotationIntent);
@@ -583,7 +584,7 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
         }
 
         Toast.makeText(InformationDotationServiceActivity.this, "Enregistrement en cours", Toast.LENGTH_SHORT).show();
-        Intent detailPleinVideIntent = new Intent(InformationDotationServiceActivity.this, ListeDotationServiceActivity.class);
+        Intent detailPleinVideIntent = new Intent(InformationDotationServiceActivity.this, ServiceDemandeDotationGlobaleActivity.class);
         Bundle detailPleinVideBundle = super.getBundle();
         detailPleinVideIntent.putExtras(detailPleinVideBundle);
         InformationDotationServiceActivity.this.startActivity(detailPleinVideIntent);

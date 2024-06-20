@@ -21,6 +21,7 @@ import fr.alcyons.phiwms_mobile.ListViewAdapters.Produit_PlanDePlacementAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
+import fr.alcyons.phiwms_mobile.Services.ServicePlanDePlacementActivity;
 
 public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
 

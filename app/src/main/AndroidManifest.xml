@@ -69,7 +69,7 @@
 
     <!-- Service Réception PUI -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServiceReceptionPuiActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
@@ -100,7 +100,7 @@
 
     <!-- Service Réception PAD -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.ReceptionPAD.ServiceReceptionPadActivity"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServiceReceptionPadActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
@@ -119,7 +119,7 @@
 
     <!-- Service Verrou Pharmacie -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.VerrouPharmacie.ServiceVerrouPharmacieActivity"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServiceVerrouPharmacieActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
@@ -132,7 +132,7 @@
 
     <!-- Contrôle des retours -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.ControleDesRetours.ServiceControleRetoursActivity"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServiceControleRetoursActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
@@ -169,7 +169,7 @@
 
     <!-- Quarantaine -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.Quarantaine.ServiceQuarantaineActivity"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServiceQuarantaineActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
@@ -182,7 +182,7 @@
 
         <!-- Retour PUI -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServiceRetourPUIActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
@@ -201,7 +201,7 @@
 
     <!-- Retour Fournisseur -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.RetourFournisseur.ServiceRetourFournisseurActivity"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServiceRetourFournisseurActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
@@ -214,7 +214,7 @@
 
     <!-- Destruction -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.Destruction.ServiceDestructionActivity"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServiceDestructionActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
@@ -227,13 +227,13 @@
 
     <!-- Preparation UF & PAD -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ServicePreparationPadActivity"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServicePreparationPadActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
 
     <activity
-        android:name="fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ServicePreparationPufActivity"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServicePreparationPufActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
@@ -258,7 +258,7 @@
 
     <!-- Livraison -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.Livraison.ListePointDeLivraison"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServiceLivraisonActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
@@ -314,7 +314,7 @@
 
     <!-- Médicament au livret -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.MedicamentAuLivret.ServiceMedicamentAuLivretActivity"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServiceMedicamentAuLivretActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
@@ -328,7 +328,7 @@
 
     <!-- Dispositif médical -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.DispositifAuLivret.ServiceDispositifAuLivretActivity"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServiceDispositifAuLivretActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
@@ -358,7 +358,7 @@
 
     <!-- Stock -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.Stock.ServiceStockActivity"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServiceStockActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
@@ -402,7 +402,7 @@
 
     <!-- Zone et Emplacement -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.ZonesEtEmplacements.ServiceZonesEtEmplacementsActivity"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServiceZonesEtEmplacementsActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
@@ -434,7 +434,7 @@
 
     <!-- Zone et Emplacement -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.IdentificationParScan.ServiceIdentificationParScanActivity"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServiceIdentificationParScanActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
@@ -454,7 +454,7 @@
 
     <!-- Demande Plein Vide -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.DemandePleinVide.ServiceDemandePleinVideActivity"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServiceDemandePleinVideActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
@@ -468,7 +468,7 @@
 
     <!-- Demande Dotation Globale -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.DemandeDotationGlobale.ListeDotationServiceActivity"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServiceDemandeDotationGlobaleActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
@@ -482,7 +482,7 @@
 
     <!-- Demande Reassort -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.DemandeReassort.ListeReassortServiceActivity"
+        android:name="fr.alcyons.phiwms_mobile.Services.ServiceDemandeReassortActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
@@ -496,7 +496,7 @@
 
         <!-- Demande Particulière -->
         <activity
-            android:name="fr.alcyons.phiwms_mobile.DemandeParticuliere.ServiceDemandeParticuliereActivity"
+            android:name="fr.alcyons.phiwms_mobile.Services.ServiceDemandeParticuliereActivity"
             android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden"

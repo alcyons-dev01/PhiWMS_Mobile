@@ -19,61 +19,61 @@ import fr.alcyons.phiwms_mobile.Classes.Service;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 //import fr.alcyons.phiwms_mobile.ControleDesRetoursScannee.ServiceControleRetoursScanneeActivity;
-//import fr.alcyons.phiwms_mobile.DemandeDotationGlobale.ServiceDemandeDotationGlobaleActivity;
+//import fr.alcyons.phiwms_mobile.Services.ServiceDemandeDotationGlobaleActivity;
 //import fr.alcyons.phiwms_mobile.DemandeDotationPAD.ServiceDemandeDotationPADActivity;
-//import fr.alcyons.phiwms_mobile.DemandeParticuliere.ServiceDemandeParticuliereActivity;
-//import fr.alcyons.phiwms_mobile.DemandePleinVide.ServiceDemandePleinVideActivity;
+//import fr.alcyons.phiwms_mobile.Services.ServiceDemandeParticuliereActivity;
+//import fr.alcyons.phiwms_mobile.Services.ServiceDemandePleinVideActivity;
 //import fr.alcyons.phiwms_mobile.DemandeProtocolePAD.ServiceDemandeProtocolePADActivity;
-//import fr.alcyons.phiwms_mobile.DemandeReassort.ServiceDemandeReassortActivity;
-//import fr.alcyons.phiwms_mobile.Destruction.ServiceDestructionActivity;
-import fr.alcyons.phiwms_mobile.ControleDesRetours.ServiceControleRetoursActivity;
-import fr.alcyons.phiwms_mobile.DemandeDotationGlobale.ListeDotationServiceActivity;
-import fr.alcyons.phiwms_mobile.DemandeParticuliere.ServiceDemandeParticuliereActivity;
-import fr.alcyons.phiwms_mobile.DemandePleinVide.ServiceDemandePleinVideActivity;
-import fr.alcyons.phiwms_mobile.DemandeReassort.ListeReassortServiceActivity;
-import fr.alcyons.phiwms_mobile.Destruction.ServiceDestructionActivity;
-import fr.alcyons.phiwms_mobile.DispositifAuLivret.ServiceDispositifAuLivretActivity;
+//import fr.alcyons.phiwms_mobile.Services.ServiceDemandeReassortActivity;
+//import fr.alcyons.phiwms_mobile.Services.ServiceDestructionActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceControleRetoursActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceDemandeDotationGlobaleActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceDemandeParticuliereActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceDemandePleinVideActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceDemandeReassortActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceDestructionActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceDispositifAuLivretActivity;
 //import fr.alcyons.phiwms_mobile.DotationService.ServiceDotationServiceActivity;
 import fr.alcyons.phiwms_mobile.IdentificationParScan.ListeProduitsIdentificationParScanActivity;
 //import fr.alcyons.phiwms_mobile.InventaireScanner.ServiceInventaireScannerActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.ServiceAdapter;
-import fr.alcyons.phiwms_mobile.Livraison.ListePointDeLivraison;
-import fr.alcyons.phiwms_mobile.MedicamentAuLivret.ServiceMedicamentAuLivretActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceLivraisonActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceMedicamentAuLivretActivity;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 //import fr.alcyons.phiwms_mobile.Notifications.ServiceNotificationsActivity;
 //import fr.alcyons.phiwms_mobile.PAD.ServicePADActivity;
 import fr.alcyons.phiwms_mobile.ParametresServeur.ServiceParametresServeurActivity;
 import fr.alcyons.phiwms_mobile.ParametresUtilisateur.ServiceParametreUtilisateurActivity;
 //import fr.alcyons.phiwms_mobile.PlanDePlacement.ListeProduitsPlanDePlacementActivity;
-//import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ServicePreparationPadActivity;
-//import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ServicePreparationPufActivity;
+//import fr.alcyons.phiwms_mobile.Services.ServicePreparationPadActivity;
+//import fr.alcyons.phiwms_mobile.Services.ServicePreparationPufActivity;
 //import fr.alcyons.phiwms_mobile.PreparationPUFetPADScannee.ServicePreparationPadScanneeActivity;
 //import fr.alcyons.phiwms_mobile.PreparationPUFetPADScannee.ServicePreparationPufScanneeActivity;
-//import fr.alcyons.phiwms_mobile.Quarantaine.ServiceQuarantaineActivity;
-import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ServicePreparationPadActivity;
-import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ServicePreparationPufActivity;
-import fr.alcyons.phiwms_mobile.Quarantaine.ServiceQuarantaineActivity;
+//import fr.alcyons.phiwms_mobile.Services.ServiceQuarantaineActivity;
+import fr.alcyons.phiwms_mobile.Services.ServicePreparationPadActivity;
+import fr.alcyons.phiwms_mobile.Services.ServicePreparationPufActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceQuarantaineActivity;
 import fr.alcyons.phiwms_mobile.R;
-import fr.alcyons.phiwms_mobile.ReceptionPAD.ServiceReceptionPadActivity;
-//import fr.alcyons.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceReceptionPadActivity;
+//import fr.alcyons.phiwms_mobile.Services.ServiceReceptionPuiActivity;
 //import fr.alcyons.phiwms_mobile.ReceptionScanne.ServiceReceptionScanneeActivity;
 //import fr.alcyons.phiwms_mobile.RetourDemande.ServiceRetourDemandeActivity;
-//import fr.alcyons.phiwms_mobile.RetourFournisseur.ServiceRetourFournisseurActivity;
-//import fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity;
+//import fr.alcyons.phiwms_mobile.Services.ServiceRetourFournisseurActivity;
+//import fr.alcyons.phiwms_mobile.Services.ServiceRetourPUIActivity;
 //import fr.alcyons.phiwms_mobile.Serialisation.ServiceSerialisationActivity;
-import fr.alcyons.phiwms_mobile.ReceptionPUI.ServiceReceptionPuiActivity;
-import fr.alcyons.phiwms_mobile.RetourFournisseur.ServiceRetourFournisseurActivity;
-import fr.alcyons.phiwms_mobile.RetourPUI.ServiceRetourPUIActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceReceptionPuiActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceRetourFournisseurActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceRetourPUIActivity;
 import fr.alcyons.phiwms_mobile.ServiceEnCreationActivity;
-import fr.alcyons.phiwms_mobile.Stock.ServiceStockActivity;
-import fr.alcyons.phiwms_mobile.VerrouPharmacie.ServiceVerrouPharmacieActivity;
-import fr.alcyons.phiwms_mobile.ZonesEtEmplacements.ServiceZonesEtEmplacementsActivity;
-//import fr.alcyons.phiwms_mobile.Stock.ServiceStockActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceStockActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceVerrouPharmacieActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceZonesEtEmplacementsActivity;
+//import fr.alcyons.phiwms_mobile.Services.ServiceStockActivity;
 //import fr.alcyons.phiwms_mobile.TestMail.TestMailActivity;
 //import fr.alcyons.phiwms_mobile.Utiliser.ServiceUtiliserActivity;
-//import fr.alcyons.phiwms_mobile.VerrouPharmacie.ServiceVerrouPharmacieActivity;
+//import fr.alcyons.phiwms_mobile.Services.ServiceVerrouPharmacieActivity;
 //import fr.alcyons.phiwms_mobile.VerrouPharmacieInterne.ServiceVerrouPharmacieInterneActivity;
-//import fr.alcyons.phiwms_mobile.ZonesEtEmplacements.ServiceZonesEtEmplacementsActivity;
+//import fr.alcyons.phiwms_mobile.Services.ServiceZonesEtEmplacementsActivity;
 
 public class OutilsGestionListeServices {
 
@@ -176,7 +176,7 @@ public class OutilsGestionListeServices {
             case "Réception Scannée":
                 //return ServiceReceptionScanneeActivity.class;
             case "Livraison":
-                return ListePointDeLivraison.class;
+                return ServiceLivraisonActivity.class;
             case "Utiliser":
                // return ServiceUtiliserActivity.class;
             case "Demande Particuliere":
@@ -186,7 +186,7 @@ public class OutilsGestionListeServices {
             case "Dotation Service":
                // return ServiceDotationServiceActivity.class;
             case "Demande Réassort":
-                return ListeReassortServiceActivity.class;
+                return ServiceDemandeReassortActivity.class;
             case "Demande Dotation PAD":
                // return ServiceDemandeDotationPADActivity.class;
             case "Demande Protocole PAD":
@@ -230,7 +230,7 @@ public class OutilsGestionListeServices {
             case "Demande Plein Vide":
                 return ServiceDemandePleinVideActivity.class;
             case "Demande Dotation Globale":
-                return ListeDotationServiceActivity.class;
+                return ServiceDemandeDotationGlobaleActivity.class;
             case "Actions utilisateurs":
                // return ServiceActionUtilisateurActivity.class;
 

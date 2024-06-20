@@ -25,6 +25,8 @@ public class Service implements Serializable, Comparable {
     private int score;
     private int phiwms_mobileUUID = -1;
 
+    private String activiteMobile;
+
     public Service(int id, String nom, int ordre, int idPerimetreFonctionnel, String nomPerimetrefonctionnel, String statut, int indicateur, String description, String lien_video, String whitePaper, int score) {
         this.id = id;
         this.nom = nom;
@@ -39,7 +41,7 @@ public class Service implements Serializable, Comparable {
         this.score = score;
     }
 
-    public Service(int id, String nom, int ordre, int idPerimetreFonctionnel, String nomPerimetrefonctionnel, String statut, int indicateur, String description, String lien_video, String whitePaper, int score, int phiwms_mobileUUID) {
+    public Service(int id, String nom, int ordre, int idPerimetreFonctionnel, String nomPerimetrefonctionnel, String statut, int indicateur, String description, String lien_video, String whitePaper, int score, int phiwms_mobileUUID, String activiteMobile) {
         this.id = id;
         this.nom = nom;
         this.ordre = ordre;
@@ -52,6 +54,7 @@ public class Service implements Serializable, Comparable {
         this.whitePaper = whitePaper;
         this.score = score;
         this.phiwms_mobileUUID = phiwms_mobileUUID;
+        this.activiteMobile= activiteMobile;
     }
 
     public Service(Cursor cursor) {
@@ -163,6 +166,14 @@ public class Service implements Serializable, Comparable {
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public String getActiviteMobile() {
+        return activiteMobile;
+    }
+
+    public void setActiviteMobile(String activiteMobile) {
+        this.activiteMobile = activiteMobile;
     }
 
     public boolean existe(SQLiteDatabase db, ServiceOpenHelper gestionnaireBDD) {

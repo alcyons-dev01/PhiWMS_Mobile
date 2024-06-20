@@ -75,7 +75,7 @@ public class ServiceOpenHelper extends DBOpenHelper {
                         String videoServiceCourant = "";
                         String whitePaperServiceCourant= "";
                         int score = 0;
-
+                        String activiteMobile = "";
                         Service serviceBDD = ServiceOpenHelper.getServiceByID(db, id);
                         int phiwms_mobileuuid = 0;
                         if(serviceBDD != null)
@@ -85,8 +85,9 @@ public class ServiceOpenHelper extends DBOpenHelper {
                             videoServiceCourant = serviceBDD.getLien_video();
                             whitePaperServiceCourant = serviceBDD.getWhitePaper();
                             score = serviceBDD.getScore();
+                            activiteMobile = serviceBDD.getActiviteMobile();
                         }
-                        Service service = new Service(id, nom, ordre, idPerimetreFonctionnel, nomPerimetrefonctionnel, statut, indicateur, descriptionServiceCourant, videoServiceCourant, whitePaperServiceCourant, score, phiwms_mobileuuid);
+                        Service service = new Service(id, nom, ordre, idPerimetreFonctionnel, nomPerimetrefonctionnel, statut, indicateur, descriptionServiceCourant, videoServiceCourant, whitePaperServiceCourant, score, phiwms_mobileuuid, activiteMobile);
                         serviceList.add(service);
                     }
                 }
