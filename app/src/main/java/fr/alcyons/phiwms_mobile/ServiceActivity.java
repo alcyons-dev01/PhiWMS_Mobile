@@ -185,8 +185,12 @@ public class ServiceActivity extends MenuActivity {
                     Service  serviceSelectionne = (Service) navigationExpandableListAdapter.getChild(groupPosition, childPosition);
                     if (serviceSelectionne != null) {
 
-                        Class classe_demande = OutilsGestionListeServices.recupererActiviteCorrespondanteAUnService(serviceSelectionne);
-                        if(classe_demande.getName().contentEquals("fr.alcyons.phiwms_mobile.ServiceEnCreationActivity"))
+                        Class classe_demande = null;
+                        try {
+                            classe_demande = Class.forName("fr.alcyons.phiwms_mobile.Services."+serviceSelectionne.getActiviteMobile());
+                        } catch (ClassNotFoundException ignored) {
+                        }
+                        if (classe_demande ==  null || classe_demande.getName().isEmpty() || classe_demande.getName().contentEquals("fr.alcyons.phiwms_mobile.ServiceEnCreationActivity"))
                         {
                             afficherSnackBar("EnCoursDeDeveloppement");
                         }

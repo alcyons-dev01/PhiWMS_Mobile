@@ -29,7 +29,7 @@ public class Service implements Serializable, Comparable {
 
     public Service(int id, String nom, int ordre, int idPerimetreFonctionnel, String nomPerimetrefonctionnel, String statut, int indicateur, String description, String lien_video, String whitePaper, int score) {
         this.id = id;
-        this.nom = nom;
+        this.nom = nom.trim();
         this.ordre = ordre;
         this.idPerimetreFonctionnel = idPerimetreFonctionnel;
         this.nomPerimetrefonctionnel = nomPerimetrefonctionnel;
@@ -43,7 +43,7 @@ public class Service implements Serializable, Comparable {
 
     public Service(int id, String nom, int ordre, int idPerimetreFonctionnel, String nomPerimetrefonctionnel, String statut, int indicateur, String description, String lien_video, String whitePaper, int score, int phiwms_mobileUUID, String activiteMobile) {
         this.id = id;
-        this.nom = nom;
+        this.nom = nom.trim();
         this.ordre = ordre;
         this.idPerimetreFonctionnel = idPerimetreFonctionnel;
         this.nomPerimetrefonctionnel = nomPerimetrefonctionnel;

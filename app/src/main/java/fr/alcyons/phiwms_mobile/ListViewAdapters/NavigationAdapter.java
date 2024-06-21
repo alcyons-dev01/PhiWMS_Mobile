@@ -74,14 +74,15 @@ public class NavigationAdapter extends ArrayAdapter<Service> implements Filterab
         final Service serviceCourant = getItem(position);
 
         viewHolder.nom.setText(serviceCourant.getNom());
+
         viewHolder.descriptionService.setText(serviceCourant.getDescription());
         if(!nomPerimetreFonctionnel.toLowerCase().contentEquals("commun"))
         {
             if(mapServiceIndicateur != null)
             {
-                if(mapServiceIndicateur.containsKey(serviceCourant.getNom()))
+                if(mapServiceIndicateur.containsKey(serviceCourant.getNom().trim()))
                 {
-                    int indicateur = (int) mapServiceIndicateur.get(serviceCourant.getNom());
+                    int indicateur = (int) mapServiceIndicateur.get(serviceCourant.getNom().trim());
                     if(serviceCourant.getNom().contentEquals("Demande PleinVide"))
                     {
                         if(indicateur == 0)

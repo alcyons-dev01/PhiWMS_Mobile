@@ -614,18 +614,28 @@ public class ServiceConnexionDirecteActivity extends ServiceAvecConnexionActivit
         if(progressBar.getMax() == progressBar.getProgress())
         {
             // Appeler l'activité correspondante au service sélectionné
-            Intent intentVersService = new Intent(ServiceConnexionDirecteActivity.this, OutilsGestionListeServices.recupererActiviteCorrespondanteAUnService(serviceSelectionne));
+            Class classe_demande = null;
+            try {
+                classe_demande = Class.forName("fr.alcyons.phiwms_mobile.Services."+serviceSelectionne.getActiviteMobile());
+            } catch (ClassNotFoundException ignored) {
+            }
+            if (classe_demande ==  null || classe_demande.getName().isEmpty() || classe_demande.getName().contentEquals("fr.alcyons.phiwms_mobile.ServiceEnCreationActivity"))
+            {
+                afficherSnackBar("EnCoursDeDeveloppement");
+            }
+            else
+            {
+                Intent intentVersService = new Intent(ServiceConnexionDirecteActivity.this, classe_demande);
+                Bundle extras = new Bundle();
+                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                extras.putInt("serviceSelectionneID", serviceSelectionne.getId());
+                intentVersService.putExtras(extras);
 
-            // Récupération des éléments à transmettre à la prochaine activité
-            Bundle extras = new Bundle();
-            extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-            extras.putInt("serviceSelectionneID", serviceSelectionne.getId()); //!\ Il est nécessaire de transmettre cet élément pour gérer les services non disponible avec une seule activité
-            intentVersService.putExtras(extras);
-
-            // Appel de la prochaine activité
-            ServiceConnexionDirecteActivity.this.startActivity(intentVersService);
-            ServiceConnexionDirecteActivity.this.finish();
-            alertDialog.dismiss();
+                // Appel de la prochaine activité
+                ServiceConnexionDirecteActivity.this.startActivity(intentVersService);
+                ServiceConnexionDirecteActivity.this.finish();
+                alertDialog.dismiss();
+            }
         }
     }
 

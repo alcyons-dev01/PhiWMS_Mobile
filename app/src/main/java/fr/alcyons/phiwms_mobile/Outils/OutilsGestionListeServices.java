@@ -110,35 +110,47 @@ public class OutilsGestionListeServices {
                 // Récupération du service sélectionné
                 Service serviceSelectionne = adapter.getItem(position);
 
-                // Appeler l'activité correspondante au service sélectionné
-                Intent intentVersService = new Intent(context, recupererActiviteCorrespondanteAUnService(serviceSelectionne));
-
-                if (finirActivite) {
-                    // Ici on supprimer toutes les activités courantes et on relance l'activité de liste des périmètres fonctionnels
-                    ((Activity) context).finishAffinity();
-                    Intent intentRedemmarrageListePerimetres = new Intent(context, NavigationActivity.class);
-                    intentRedemmarrageListePerimetres.putExtra("utilisateurConnecteID", utilisateurConnecte.getId());
-                    context.startActivity(intentRedemmarrageListePerimetres);
+                Class classe_demande = null;
+                try {
+                    classe_demande = Class.forName("fr.alcyons.phiwms_mobile.Services."+serviceSelectionne.getActiviteMobile());
+                } catch (ClassNotFoundException ignored) {
                 }
-                // Récupération des éléments à transmettre à la prochaine activité
-                Bundle extras = new Bundle();
-                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                extras.putInt("serviceSelectionneID", serviceSelectionne.getId()); //!\ Il est nécessaire de transmettre cet élément pour gérer les services non disponible avec une seule activité
-                intentVersService.putExtras(extras);
-                View.OnClickListener onClickListener = new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                if (classe_demande ==  null || classe_demande.getName().isEmpty() || classe_demande.getName().contentEquals("fr.alcyons.phiwms_mobile.ServiceEnCreationActivity"))
+                {
+                    Alerte.afficherAlerte(context, "Erreur", "Erreur à l'ouverture du service", "alerte");
+                }
+                else
+                {
 
+                    // Appeler l'activité correspondante au service sélectionné
+                    Intent intentVersService = new Intent(context, classe_demande);
+
+                    if (finirActivite) {
+                        // Ici on supprimer toutes les activités courantes et on relance l'activité de liste des périmètres fonctionnels
+                        ((Activity) context).finishAffinity();
+                        Intent intentRedemmarrageListePerimetres = new Intent(context, NavigationActivity.class);
+                        intentRedemmarrageListePerimetres.putExtra("utilisateurConnecteID", utilisateurConnecte.getId());
+                        context.startActivity(intentRedemmarrageListePerimetres);
                     }
-                };
+                    // Récupération des éléments à transmettre à la prochaine activité
+                    Bundle extras = new Bundle();
+                    extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                    extras.putInt("serviceSelectionneID", serviceSelectionne.getId()); //!\ Il est nécessaire de transmettre cet élément pour gérer les services non disponible avec une seule activité
+                    intentVersService.putExtras(extras);
+                    View.OnClickListener onClickListener = new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
 
-                // Appel de la prochaine activité
-                context.startActivity(intentVersService);
+                        }
+                    };
+
+                    // Appel de la prochaine activité
+                    context.startActivity(intentVersService);
+                }
+
             }
         });
     }
-
-
     public static Class recupererActiviteCorrespondanteAUnService(Service serviceConcerne) {
         Class activiteDemandee = ServiceEnCreationActivity.class;
         switch (serviceConcerne.getNom()) {

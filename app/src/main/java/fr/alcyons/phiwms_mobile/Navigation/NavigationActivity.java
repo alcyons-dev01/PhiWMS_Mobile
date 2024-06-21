@@ -25,6 +25,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -395,17 +396,20 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                         if (serviceSelectionneScan == null) {
                             afficherSnackBar("NavigationService");
                         } else {
-                            // Appeler l'activité correspondante au service sélectionné
-                            Intent intentVersService = new Intent(NavigationActivity.this, OutilsGestionListeServices.recupererActiviteCorrespondanteAUnService(serviceSelectionneScan));
+                            Class classe_demande = null;
+                            try {
+                                classe_demande = Class.forName("fr.alcyons.phiwms_mobile.Services."+serviceSelectionneScan.getActiviteMobile());
+                            } catch (ClassNotFoundException ignored) {
+                            }
 
-                            // Récupération des éléments à transmettre à la prochaine activité
-                            Bundle extras = new Bundle();
-                            extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                            extras.putInt("serviceSelectionneID", serviceSelectionneScan.getId()); //!\ Il est nécessaire de transmettre cet élément pour gérer les services non disponible avec une seule activité
-                            intentVersService.putExtras(extras);
+                            if (classe_demande ==  null || classe_demande.getName().isEmpty() || classe_demande.getName().contentEquals("fr.alcyons.phiwms_mobile.ServiceEnCreationActivity")) {
+                                afficherSnackBar("EnCoursDeDeveloppement");
+                            } else {
+                                Intent intentVersService = getIntentVersService(classe_demande, serviceSelectionneScan);
 
-                            // Appel de la prochaine activité
-                            NavigationActivity.this.startActivity(intentVersService);
+                                // Appel de la prochaine activité
+                                NavigationActivity.this.startActivity(intentVersService);
+                            }
                         }
                     }
                 }
@@ -424,6 +428,18 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                 }
                 break;
         }
+    }
+
+    @NonNull
+    private Intent getIntentVersService(Class classe_demande, Service serviceSelectionneScan) {
+        Intent intentVersService = new Intent(NavigationActivity.this, classe_demande);
+
+        // Récupération des éléments à transmettre à la prochaine activité
+        Bundle extras = new Bundle();
+        extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+        extras.putInt("serviceSelectionneID", serviceSelectionneScan.getId());
+        intentVersService.putExtras(extras);
+        return intentVersService;
     }
 
     void gestionLancementService(PerimetreFonctionnel perimetreFonctionnel)
@@ -445,7 +461,6 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
             {
                 if (serviceSelectionne != null) {
 
-                    //Class classe_demande = OutilsGestionListeServices.recupererActiviteCorrespondanteAUnService(serviceSelectionne);
                     Class classe_demande = null;
                     try {
                         classe_demande = Class.forName("fr.alcyons.phiwms_mobile.Services."+serviceSelectionne.getActiviteMobile());
@@ -457,21 +472,7 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                         serviceSelectionne.setScore(serviceSelectionne.getScore()+1);
                         ServiceOpenHelper.mettreAJourUnServiceEnBD(db, serviceSelectionne);
                         ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ServiceOpenHelper.Constantes.TABLE_SERVICE, serviceSelectionne.getId(), serviceSelectionne.getId(), DBOpenHelper.ActionsEAS.MAJ);
-                        Intent intentVersService = new Intent(NavigationActivity.this, classe_demande);
-
-                        // Récupération des éléments à transmettre à la prochaine activité
-                        Bundle extras = new Bundle();
-
-                        if (serviceActuel != null) {
-                            intentVersService.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            intentVersService.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            intentVersService.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            intentVersService.putExtra("EXIT", true);
-                        }
-
-                        extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                        extras.putInt("serviceSelectionneID", serviceSelectionne.getId()); //!\ Il est nécessaire de transmettre cet élément pour gérer les services non disponible avec une seule activité
-                        intentVersService.putExtras(extras);
+                        Intent intentVersService = getVersService(classe_demande, serviceSelectionne);
 
                         // Appel de la prochaine activité
                         NavigationActivity.this.startActivity(intentVersService);
@@ -482,6 +483,26 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
         });
 
         new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
+    }
+
+    @NonNull
+    private Intent getVersService(Class classe_demande, Service serviceSelectionne) {
+        Intent intentVersService = new Intent(NavigationActivity.this, classe_demande);
+
+        // Récupération des éléments à transmettre à la prochaine activité
+        Bundle extras = new Bundle();
+
+        if (serviceActuel != null) {
+            intentVersService.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intentVersService.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intentVersService.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intentVersService.putExtra("EXIT", true);
+        }
+
+        extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+        extras.putInt("serviceSelectionneID", serviceSelectionne.getId()); //!\ Il est nécessaire de transmettre cet élément pour gérer les services non disponible avec une seule activité
+        intentVersService.putExtras(extras);
+        return intentVersService;
     }
 
     public void recupererIndicateurs() {
@@ -526,9 +547,9 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                     mapServiceIndicateur.put("Quarantaine", indicateurQuarantaine);
 
                     int indicateurControleDesRetours = indicateurJSONObject.getInt("ControleDesRetours");
-                    serviceIndicateurNom.add("Contrôle des retours");
+                    serviceIndicateurNom.add("Contrôles des retours");
                     serviceIndicateurValeur.add(indicateurControleDesRetours);
-                    mapServiceIndicateur.put("Contrôle des retours", indicateurControleDesRetours);
+                    mapServiceIndicateur.put("Contrôles des retours", indicateurControleDesRetours);
 
                     int indicateurRetourPUI = indicateurJSONObject.getInt("RetourPUI");
                     serviceIndicateurNom.add("Retour PUI");
@@ -536,9 +557,9 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                     mapServiceIndicateur.put("Retour PUI", indicateurRetourPUI);
 
                     int indicateurRetourFrs = indicateurJSONObject.getInt("RetourFrs");
-                    serviceIndicateurNom.add("Retour Frs");
+                    serviceIndicateurNom.add("Retour Fournisseur");
                     serviceIndicateurValeur.add(indicateurRetourFrs);
-                    mapServiceIndicateur.put("Retour Frs", indicateurRetourFrs);
+                    mapServiceIndicateur.put("Retour Fournisseur", indicateurRetourFrs);
 
                     int indicateurDestruction = indicateurJSONObject.getInt("Destruction");
                     serviceIndicateurNom.add("Destruction");

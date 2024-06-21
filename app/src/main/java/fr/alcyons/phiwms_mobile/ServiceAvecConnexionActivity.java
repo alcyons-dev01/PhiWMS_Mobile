@@ -1,6 +1,7 @@
 package fr.alcyons.phiwms_mobile;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -22,9 +23,11 @@ import com.android.volley.VolleyError;
 
 import java.util.Objects;
 
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.R;
 
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
+import fr.alcyons.phiwms_mobile.Services.ServiceControleRetoursActivity;
 
 public class ServiceAvecConnexionActivity extends ServiceActivity {
 
@@ -127,5 +130,15 @@ public class ServiceAvecConnexionActivity extends ServiceActivity {
                 }
             });
         }
+    }
+
+    public void retourNavigation(Context context)
+    {
+        Intent intent = new Intent(context, NavigationActivity.class);
+        Bundle extras = new Bundle();
+        extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+        intent.putExtras(extras);
+        context.startActivity(intent);
+        ((Activity)context).finish();
     }
 }

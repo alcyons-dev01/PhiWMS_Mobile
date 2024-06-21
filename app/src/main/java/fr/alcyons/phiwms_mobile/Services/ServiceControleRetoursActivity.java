@@ -224,12 +224,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                Intent intent = new Intent(ServiceControleRetoursActivity.this, NavigationActivity.class);
-                Bundle extras = new Bundle();
-                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                intent.putExtras(extras);
-                ServiceControleRetoursActivity.this.startActivity(intent);
-                ServiceControleRetoursActivity.this.finish();
+                retourNavigation(ServiceControleRetoursActivity.this);
             }
         });
     }
@@ -327,7 +322,11 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                             } else if (!erreur.contentEquals("Aucun PH_Retour trouvé")) {
                                 Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Contrôle des retours", "alerte");
                                 ServiceControleRetoursActivity.this.finishAffinity();
-                            }
+                            }else {
+                                vide = true;
+                                nomServiceVide = "Contrôle des retours";
+                                retourNavigation(ServiceControleRetoursActivity.this);
+                   }
                         } else {
                             JSONArray retoursJSONArray = response.getJSONArray("PH_Retours");
                             viderTablesConcernees();
