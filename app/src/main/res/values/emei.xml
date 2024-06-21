@@ -8,4 +8,30 @@
     <string name="EMEI_6">66e4d0b5f734a6e7</string>
     <string name="EMEI_7">351921588915688</string>
     <string name="EMEI_8">7db4057f77ad69c0</string>
+
+    <!--ALCYONS GALAXY XCover6 Pro-->
+    <string name="EMEI_9">352681302875720</string>
+    <string name="EMEI_10">356196632875726</string>
+
+    <!--("6b3405cfd1cf57fd")
+    || ("359467074856616")
+    || ("42b3cc2997eab48e")
+    || ("283fd36870b99d52")
+    || ("865545031537572")
+    || ("358439079740070")
+    || ("e76b2dc0dc33f6b2")
+    ||("baad6c7f647267d2")
+    ||("66e4d0b5f734a6e7")
+    || ("356672848915688")
+    || ("351921588915688")
+    || ("7db4057f77ad69c0"))-->
+    <string name="EMEI_11">6b3405cfd1cf57fd</string>
+    <string name="EMEI_12">356672848915688</string>
+    <string name="EMEI_13">42b3cc2997eab48e</string>
+    <string name="EMEI_14">283fd36870b99d52</string>
+
+
 </resources>
+
+
+

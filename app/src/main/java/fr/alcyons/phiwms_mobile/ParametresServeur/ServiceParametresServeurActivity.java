@@ -156,7 +156,7 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
             }
 
             if (device_id != null) {
-                if (device_id.contentEquals("359467074856616") || device_id.contentEquals("865545031537572") || device_id.contentEquals("358439079740070") || device_id.contentEquals("e76b2dc0dc33f6b2") || device_id.contentEquals("baad6c7f647267d2")||device_id.contentEquals("66e4d0b5f734a6e7")|| device_id.contentEquals("356672848915688") || device_id.contentEquals("351921588915688")|| device_id.contentEquals("7db4057f77ad69c0")) {
+                if (device_id.contentEquals("359467074856616") || device_id.contentEquals("865545031537572") || device_id.contentEquals("358439079740070") || device_id.contentEquals("e76b2dc0dc33f6b2") || device_id.contentEquals("baad6c7f647267d2")||device_id.contentEquals("66e4d0b5f734a6e7")|| device_id.contentEquals("356672848915688") || device_id.contentEquals("351921588915688")|| device_id.contentEquals("7db4057f77ad69c0") || device_id.contentEquals("352681302875720")) {
                     boutonAlcyonsParametre.setVisibility(View.VISIBLE);
                     boutonAlcyonsParametre.setOnClickListener(new View.OnClickListener() {
                         @Override
