@@ -161,7 +161,7 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
                     boutonAlcyonsParametre.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            ipServeurEditText.setText("95.85.48.92");
+                            ipServeurEditText.setText("192.81.222.83");
                             numeroPortEditText.setText("89");
                             versionAPIEditText.setText("1");
                         }
