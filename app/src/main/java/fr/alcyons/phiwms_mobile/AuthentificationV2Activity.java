@@ -47,46 +47,12 @@ import fr.alcyons.phiwms_mobile.WebView.WebViewManager;
 public class AuthentificationV2Activity extends MainActivity {
 
     private Button boutonConnexion;
-    private WebViewManager manager;
-
-    private String calculerTotp() throws InvalidKeyException, NoSuchAlgorithmException{
-        final Charset asciiCs = Charset.forName("US-ASCII");
-        String totp = "";
-        int numberOfCodeDigits = 6;
-        String secretKey = "Alcyons64BtzPhiWMSiOS2024";
-        String validityInterval = Long.toBinaryString((System.currentTimeMillis() / 1000 / 30));
-        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256");
-        Mac mac = Mac.getInstance("HmacSHA256");
-        mac.init(secretKeySpec);
-        byte[] byteArray = mac.doFinal(asciiCs.encode(validityInterval).array());
-        String hashCode = "";
-        for (final byte element : byteArray)
-        {
-            hashCode += Integer.toString((element & 0xff) + 0x100, 16).substring(1);
-        }
-        int offset = ((int) hashCode.charAt(hashCode.length() - 1)) & 0x0f;
-        String truncatedHashCode = "";
-        for (int i = offset; i < offset + 4; i ++)
-        {
-            truncatedHashCode += Integer.toString((byteArray[i] & 0xff) + 0x100, 16).substring(1);
-        }
-        int numericHashCode = (int) (Long.parseLong(truncatedHashCode, 16) % Math.pow(10 , numberOfCodeDigits));
-        totp = String.valueOf(numericHashCode);
-        if (totp.length() < numberOfCodeDigits){
-            for (int i = totp.length() ; i < numberOfCodeDigits ; i ++){
-                totp = "0" + totp;
-            }
-        }
-
-        return totp;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        manager = WebViewManager.getInstance(this);
+        WebViewManager.getInstance(this);
         Intent laWebview = new Intent(AuthentificationV2Activity.this, WebViewActivity.class);
-        //laWebview.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         setContentView(R.layout.activity_authentification);
         boutonConnexion = findViewById(R.id.boutonConnexion);
 
@@ -109,7 +75,7 @@ public class AuthentificationV2Activity extends MainActivity {
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
-            String urlRequete = "http://192.81.222.83:89/api/v1/utilisateurs/connexion";
+            String urlRequete = "http://phiwms.alcyons.fr:89/api/v1/utilisateurs/connexion";
 
             JSONObject body = new JSONObject();
             try {
@@ -122,12 +88,15 @@ public class AuthentificationV2Activity extends MainActivity {
             JsonObjectRequest requeteAuth = new JsonObjectRequest(Request.Method.POST, urlRequete, body, response -> {
                 try {
                     int nbResultats = response.getInt("resultCount");
-                    Log.d("test", String.valueOf(nbResultats));
+                    //Log.d("test", String.valueOf(nbResultats));
                     if (nbResultats != 1) {
 
                     }
                     else {
-                        manager.authentification(idStr, mdp.getText().toString());
+                        String token = response.getString("token");
+                        laWebview.putExtra("identifiant", idStr);
+                        laWebview.putExtra("mdp", mdp.getText().toString());
+                        laWebview.putExtra("token", token);
                         startActivity(laWebview);
                     }
                 } catch (JSONException exception) {

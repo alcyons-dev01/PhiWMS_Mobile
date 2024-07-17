@@ -24,13 +24,17 @@ public class WebViewManager {
         offscreenWebView.setWebViewClient(new MyWebViewClient());
         offscreenWebView.setVisibility(View.GONE);
         offscreenWebView.getSettings().setJavaScriptEnabled(true);
-        offscreenWebView.loadUrl("phiwms.alcyons.fr");
+        offscreenWebView.loadUrl("http://10.0.2.2:8000");
     }
 
     public void authentification(String username, String password) {
         offscreenWebView.evaluateJavascript("$('#inputIdentifiant').val('" + username + "');", null);
         offscreenWebView.evaluateJavascript("$('#inputPassword').val('" + password + "');", null);
         offscreenWebView.evaluateJavascript("$('#bouton_connexion').click();", null);
+    }
+
+    public static void destroy(){
+        instance = null;
     }
 
     public static synchronized WebViewManager getInstance(Context context) {
