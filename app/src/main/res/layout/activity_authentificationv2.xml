@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/bleu_fonce_alcyons"
+    android:theme="@style/AppTheme"
+    tools:context="fr.alcyons.phiwms_mobile.AuthentificationActivity">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        tools:ignore="UselessParent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/formulaireConnexion"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:weightSum="3">
+
+            <ImageView
+                android:id="@+id/imageLogo"
+                android:layout_width="300dp"
+                android:layout_height="0dp"
+                android:layout_weight="2"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/logophiwms"
+                android:src="@mipmap/ic_logo_phiwms" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/formulaireConnexion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:orientation="vertical"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
+
+            <EditText
+                android:id="@+id/identifiant"
+                android:layout_width="match_parent"
+                android:layout_height="48sp"
+                android:backgroundTint="@android:color/white"
+                android:fontFamily="sans-serif"
+                android:hint="@string/identifiant"
+                android:text="alcyons"
+                android:inputType="text"
+                android:imeOptions="actionNext"
+                android:textColor="@android:color/white"
+                android:textColorHint="@android:color/white"
+                android:textCursorDrawable="@null"
+                android:autofillHints="" />
+
+            <EditText
+                android:id="@+id/motDePasse"
+                android:layout_width="match_parent"
+                android:layout_height="48sp"
+                android:backgroundTint="@android:color/white"
+                android:fontFamily="sans-serif"
+                android:hint="@string/mot_de_passe"
+                android:inputType="textPassword"
+                android:text="helpdesk"
+                android:imeOptions="actionDone"
+                android:textColor="@android:color/white"
+                android:textColorHint="@android:color/white"
+                android:textCursorDrawable="@null"
+                android:autofillHints="" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="10">
+
+                <TextView
+                    android:id="@+id/mdpOublie"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:text="Mot de passe oublié ?"
+                    android:textAlignment="textEnd"
+                    android:textColor="@color/bleu_clair_alcyons"
+                    android:textSize="15sp"
+                    android:textStyle="normal" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:weightSum="10">
+
+                <Button
+                    android:id="@+id/boutonConnexion"
+                    android:layout_width="0dp"
+                    android:layout_height="48sp"
+                    android:layout_gravity="center"
+                    android:layout_margin="20dp"
+                    android:layout_weight="5"
+                    android:background="@color/bleu_clair_alcyons"
+                    android:text="@string/se_connecter"
+                    android:textColor="@android:color/white" />
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    android:indeterminateTint="@color/bleu_clair_alcyons"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:weightSum="10">
+
+                <Button
+                    android:id="@+id/boutonInscription"
+                    android:layout_width="0dp"
+                    android:layout_height="48sp"
+                    android:layout_gravity="center"
+                    android:layout_margin="20dp"
+                    android:layout_weight="5"
+                    android:background="@color/vert2"
+                    android:text="Inscription"
+                    android:textColor="@android:color/white" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:orientation="vertical"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:weightSum="2"
+            android:id="@+id/linearLayout2">
+
+            <TextView
+                android:id="@+id/versCGU"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/cgu"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                android:textColor="@color/bleu_clair_alcyons"
+                android:layout_marginBottom="50dp"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

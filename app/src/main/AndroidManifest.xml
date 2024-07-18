@@ -73,6 +73,12 @@
         </intent-filter>
     </activity>
 
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.InscriptionActivity"
+        android:exported="true"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize">
+    </activity>
 
     <activity
         android:name="fr.alcyons.phiwms_mobile.WebView.WebViewActivity"
