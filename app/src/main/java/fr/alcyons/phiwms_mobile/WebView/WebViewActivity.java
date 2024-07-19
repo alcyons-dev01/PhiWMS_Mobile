@@ -3,23 +3,18 @@ package fr.alcyons.phiwms_mobile.WebView;
 import static com.google.android.gms.vision.L.TAG;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.webkit.WebMessage;
-import android.webkit.WebMessagePort;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
-import androidx.datastore.preferences.protobuf.UInt64Value;
 import androidx.webkit.JavaScriptReplyProxy;
 import androidx.webkit.WebMessageCompat;
 import androidx.webkit.WebViewCompat;
@@ -34,16 +29,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.Timestamp;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -51,10 +41,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 
 import fr.alcyons.phiwms_mobile.AuthentificationV2Activity;
 import fr.alcyons.phiwms_mobile.MainActivity;
@@ -63,31 +49,17 @@ import fr.alcyons.phiwms_mobile.R;
 
 public class WebViewActivity extends MainActivity {
 
-    private WebView vueActuelle;
     private static FrameLayout webviewConteneur;
     private static TextView affichageCode;
     private static String toCompleteTotp = "";
     private static String totp = "";
     private boolean vueOuverte = false;
     private boolean premiereDefinitionTotp = true;
+    private boolean mdpOublie;
     private View.OnClickListener fonctionBouton;
+    private String ipServ;
     private Timer timer;
-
-    private static boolean appendToCompleteTotp(Character c){
-        if (toCompleteTotp.length() == 6){
-            toCompleteTotp = toCompleteTotp.substring(1);
-        }
-        toCompleteTotp += c;
-        affichageCode.setText(toCompleteTotp);
-        boolean retour;
-        if (toCompleteTotp.length() == 6){
-            retour = true;
-        }
-        else {
-            retour = false;
-        }
-        return retour;
-    }
+    private WebView vueActuelle;
 
     private String calculerTotp() throws InvalidKeyException, NoSuchAlgorithmException, UnsupportedEncodingException {
         String totp = "";
@@ -124,12 +96,12 @@ public class WebViewActivity extends MainActivity {
     }
 
     private void lancerTotp(String identifiant){
-        String urlRequete = "http://10.0.2.2:8000/sendTotpCode";
+        String urlRequete = "http://" + ipServ + "/sendTotpCode";
         JSONObject body = new JSONObject();
         try {
             body.put("identifiant", identifiant);
             body.put("app_name", "PhiWMS Android");
-            body.put("for_recovery", false);
+            body.put("for_recovery", mdpOublie);
             body.put("device_info", Build.DEVICE);
         } catch (JSONException e) {
             Log.e(TAG, "JSONException :", e);
@@ -156,14 +128,17 @@ public class WebViewActivity extends MainActivity {
                 try {
                     boolean success = response.getBoolean("success");
                     if (success){
-                        if ( premiereDefinitionTotp){
-                            premiereDefinitionTotp = false;
-                            for (int i = 0 ; i < 10 ; i ++){
-                                int buttonId = getResources().getIdentifier("boutonNum" + i, "id", getPackageName());
-                                Button bouton = (Button) findViewById(buttonId);
+                        List<String> charList = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
+                        Collections.shuffle(charList);
+                        for (int i = 0 ; i < 10 ; i ++){
+                            int buttonId = getResources().getIdentifier("boutonNum" + i, "id", getPackageName());
+                            Button bouton = (Button) findViewById(buttonId);
+                            bouton.setText(charList.get(i));
+                            if (premiereDefinitionTotp) {
                                 bouton.setOnClickListener(fonctionBouton);
                             }
                         }
+                        premiereDefinitionTotp = false;
                     }
                     else {
                         Alerte.afficherAlerte(WebViewActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete sendTotpCode", "alerte");
@@ -195,6 +170,22 @@ public class WebViewActivity extends MainActivity {
         }
     }
 
+    private static boolean appendToCompleteTotp(Character c){
+        if (toCompleteTotp.length() == 6){
+            toCompleteTotp = toCompleteTotp.substring(1);
+        }
+        toCompleteTotp += c;
+        affichageCode.setText(toCompleteTotp);
+        boolean retour;
+        if (toCompleteTotp.length() == 6){
+            retour = true;
+        }
+        else {
+            retour = false;
+        }
+        return retour;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -205,18 +196,29 @@ public class WebViewActivity extends MainActivity {
         vueActuelle = WebViewManager.getInstance(null).getOffscreenWebView();
         webviewConteneur.addView(vueActuelle);
 
+        SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
+        ipServ = sharedPreferences.getString("ipServeur", "");
+
         Intent monIntention = getIntent();
+        mdpOublie = monIntention.getBooleanExtra("etat_mdp", false);
+        if (mdpOublie){
+            vueActuelle.evaluateJavascript("window.location ='/demandemotdepasseoublie';", null);
+        }
+
         String identifiant = monIntention.getStringExtra("identifiant");
         WebViewManager manager = WebViewManager.getInstance(this);
+
         Button boutonValider = findViewById(R.id.boutonEnvoi);
         boutonValider.setOnClickListener(v -> {
             if (affichageCode.getText().toString().equals(totp) && totp != ""){
-                manager.authentification(identifiant, monIntention.getStringExtra("mdp"));
+                if (!mdpOublie){
+                    manager.authentification(identifiant, monIntention.getStringExtra("mdp"));
+                }
+                vueActuelle.setVisibility(View.VISIBLE);
             }
         });
 
         Button boutonTotp = findViewById(R.id.boutonTotp);
-
         boutonTotp.setOnClickListener(v -> {
             lancerTotp(identifiant);
         });
@@ -224,6 +226,7 @@ public class WebViewActivity extends MainActivity {
         Set<String> allowedOrigins = new HashSet<>();
         allowedOrigins.add("http://10.0.2.2:8000");
         allowedOrigins.add("http://phiwms.alcyons.fr");
+        allowedOrigins.add("http://" + ipServ);
         WebViewCompat.WebMessageListener myListener = new WebViewCompat.WebMessageListener() {
             @Override
             public void onPostMessage(WebView view, WebMessageCompat message, Uri sourceOrigin,
@@ -248,6 +251,7 @@ public class WebViewActivity extends MainActivity {
         };
 
         WebViewCompat.addWebMessageListener(vueActuelle, "androidMessageHandler", allowedOrigins, myListener);
+
         fonctionBouton = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -272,11 +276,6 @@ public class WebViewActivity extends MainActivity {
             }
         });
 
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 
 }

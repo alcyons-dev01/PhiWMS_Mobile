@@ -1,13 +1,11 @@
 package fr.alcyons.phiwms_mobile.WebView;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class WebViewManager {
 
@@ -24,13 +22,19 @@ public class WebViewManager {
         offscreenWebView.setWebViewClient(new MyWebViewClient());
         offscreenWebView.setVisibility(View.GONE);
         offscreenWebView.getSettings().setJavaScriptEnabled(true);
-        offscreenWebView.loadUrl("http://10.0.2.2:8000");
+        SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context);
+        String ipServ = sharedPreferences.getString("ipServeur", "");
+        offscreenWebView.loadUrl("http://" + ipServ);
     }
 
     public void authentification(String username, String password) {
         offscreenWebView.evaluateJavascript("$('#inputIdentifiant').val('" + username + "');", null);
         offscreenWebView.evaluateJavascript("$('#inputPassword').val('" + password + "');", null);
         offscreenWebView.evaluateJavascript("$('#bouton_connexion').click();", null);
+    }
+
+    public WebView getOffscreenWebView() {
+        return offscreenWebView;
     }
 
     public static void destroy(){
@@ -42,10 +46,6 @@ public class WebViewManager {
             instance = new WebViewManager(context);
         }
         return instance;
-    }
-
-    public WebView getOffscreenWebView() {
-        return offscreenWebView;
     }
 
     private static class MyWebViewClient extends WebViewClient {

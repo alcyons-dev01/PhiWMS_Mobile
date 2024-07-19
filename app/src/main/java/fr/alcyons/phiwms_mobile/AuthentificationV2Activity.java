@@ -3,6 +3,7 @@ package fr.alcyons.phiwms_mobile;
 import static com.google.android.gms.vision.L.TAG;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -17,29 +18,17 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.methods.HttpPostHC4;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
+import fr.alcyons.phiwms_mobile.CGU.CguActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.WebView.WebViewActivity;
 import fr.alcyons.phiwms_mobile.WebView.WebViewManager;
@@ -56,6 +45,12 @@ public class AuthentificationV2Activity extends MainActivity {
         WebViewManager.getInstance(this);
         Intent laWebview = new Intent(AuthentificationV2Activity.this, WebViewActivity.class);
         setContentView(R.layout.activity_authentificationv2);
+
+        SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
+        String ipServ = sharedPreferences.getString("ipServeur", "");
+        String numPort = sharedPreferences.getString("numPort", "");
+        String versAPI = sharedPreferences.getString("versAPI", "");
+
         boutonConnexion = findViewById(R.id.boutonConnexion);
 
         boutonConnexion.setOnClickListener(v -> {
@@ -78,12 +73,13 @@ public class AuthentificationV2Activity extends MainActivity {
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
-            String urlRequete = "http://phiwms.alcyons.fr:89/api/v1/utilisateurs/connexion";
+            String urlRequete = "http://" + ipServ + ":" + numPort + "/api/v" + versAPI + "/utilisateurs/connexion";
 
             JSONObject body = new JSONObject();
             try {
                 body.put("identifiant", idStr);
                 body.put("mdp", "26c7dbc0993cff610de54c4d059333f2");
+                body.put("etat_mdp", false);
             } catch (JSONException e) {
                 Log.e(TAG, "JSONException :", e);
             }
@@ -138,7 +134,7 @@ public class AuthentificationV2Activity extends MainActivity {
         boutonInscription.setOnClickListener(v -> {
             Intent toInscription = new Intent(AuthentificationV2Activity.this, InscriptionActivity.class);
 
-            String urlRequete = "http://10.0.2.2:8000/inscription";
+            String urlRequete = "http://" + ipServ + "/inscription";
 
             JSONObject body = new JSONObject();
             try {
@@ -181,21 +177,20 @@ public class AuthentificationV2Activity extends MainActivity {
             requestQueueUtilisateur.add(requeteInscript);
 
         });
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
+        //ouverture CGU
+        findViewById(R.id.versCGU).setOnClickListener(v -> {
+            Intent versCGU = new Intent(AuthentificationV2Activity.this, CguActivity.class);
+            startActivity(versCGU);
+        });
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+        findViewById(R.id.mdpOublie).setOnClickListener(v -> {
+            Boolean mdpOublie = true;
+            String identifiant = ((EditText) findViewById(R.id.identifiant)).getText().toString();
+            laWebview.putExtra("identifiant", identifiant);
+            laWebview.putExtra("etat_mdp", mdpOublie);
+            startActivity(laWebview);
+        });
     }
 
 }

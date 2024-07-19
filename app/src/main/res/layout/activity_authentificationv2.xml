@@ -27,10 +27,10 @@
                 android:id="@+id/imageLogo"
                 android:layout_width="300dp"
                 android:layout_height="0dp"
-                android:layout_weight="2"
+                android:layout_weight="3"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/logophiwms"
-                android:src="@mipmap/ic_logo_phiwms" />
+                android:src="@mipmap/ic_logo_phiwms"/>
         </LinearLayout>
 
         <LinearLayout
@@ -42,7 +42,8 @@
             android:layout_centerVertical="true"
             android:orientation="vertical"
             android:paddingLeft="20dp"
-            android:paddingRight="20dp">
+            android:paddingRight="20dp"
+            android:paddingTop="150sp">
 
             <EditText
                 android:id="@+id/identifiant"
@@ -57,7 +58,8 @@
                 android:textColor="@android:color/white"
                 android:textColorHint="@android:color/white"
                 android:textCursorDrawable="@null"
-                android:autofillHints="" />
+                android:autofillHints=""
+                android:layout_marginBottom="15dp"/>
 
             <EditText
                 android:id="@+id/motDePasse"
@@ -77,7 +79,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:weightSum="10">
+                android:weightSum="10"
+                android:layout_marginBottom="15dp">
 
                 <TextView
                     android:id="@+id/mdpOublie"
@@ -87,7 +90,7 @@
                     android:text="Mot de passe oublié ?"
                     android:textAlignment="textEnd"
                     android:textColor="@color/bleu_clair_alcyons"
-                    android:textSize="15sp"
+                    android:textSize="20sp"
                     android:textStyle="normal" />
 
             </LinearLayout>
@@ -102,9 +105,12 @@
                 <Button
                     android:id="@+id/boutonConnexion"
                     android:layout_width="0dp"
-                    android:layout_height="48sp"
+                    android:layout_height="60sp"
                     android:layout_gravity="center"
-                    android:layout_margin="20dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="15dp"
                     android:layout_weight="5"
                     android:background="@color/bleu_clair_alcyons"
                     android:text="@string/se_connecter"
@@ -130,9 +136,12 @@
                 <Button
                     android:id="@+id/boutonInscription"
                     android:layout_width="0dp"
-                    android:layout_height="48sp"
+                    android:layout_height="60sp"
                     android:layout_gravity="center"
-                    android:layout_margin="20dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
                     android:layout_weight="5"
                     android:background="@color/vert2"
                     android:text="Inscription"
