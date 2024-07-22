@@ -33,7 +33,18 @@
         android:name="fr.alcyons.phiwms_mobile.MySettingsActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"
-        android:exported="true"/>
+        android:label="@string/app_name"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.DEFAULT" />
+        </intent-filter>
+        <intent-filter>
+            <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+            <category android:name="android.intent.category.DEFAULT" />
+        </intent-filter>
+    </activity>
+
 
     <!-- Authentification -->
     <activity
@@ -47,11 +58,33 @@
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"
         android:exported="true">
+
+    </activity>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.AuthentificationV2Activity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"
+        android:exported="true">
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
 
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
+    </activity>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.InscriptionActivity"
+        android:exported="true"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize">
+    </activity>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.WebView.WebViewActivity"
+        android:exported="true"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize">
     </activity>
 
     <!-- Paramètre Serveur -->
