@@ -43,7 +43,7 @@ public class AuthentificationV2Activity extends MainActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         WebViewManager.getInstance(this);
-        Intent laWebview = new Intent(AuthentificationV2Activity.this, WebViewActivity.class);
+        Intent laWebview = new Intent(AuthentificationV2Activity.this, AuthentificationTotpActivity.class);
         setContentView(R.layout.activity_authentificationv2);
 
         SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
