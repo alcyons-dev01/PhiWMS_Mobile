@@ -548,12 +548,16 @@ public class AuthentificationActivity extends MainActivity {
                 } catch (JSONException exception) {
                     Log.e(TAG, "JSONException :", exception);
                     effacerAlerte(alertDialog);
+                    progressBar.setVisibility(View.GONE);
+                    boutonConnexion.setVisibility(View.VISIBLE);
                 }
             },
                     error -> {
                         Log.e("Idenitifcation Volley", error.toString());
                         Alerte.afficherAlerte(AuthentificationActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP identificationUtilisateur", "alerte");
                         effacerAlerte(alertDialog);
+                        progressBar.setVisibility(View.GONE);
+                        boutonConnexion.setVisibility(View.VISIBLE);
                     }
             ) {
                 @Override
