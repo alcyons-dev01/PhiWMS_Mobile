@@ -224,7 +224,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
         @SuppressLint("SimpleDateFormat") SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date =new Date();
         String date_string = parseFormat.format(date);
-        ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), Integer.parseInt(ParametresServeurOpenHelper.getPortServeur(db)), "En attente", commande.getID_commande(), "", "Réception PUI");
+        ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", commande.getID_commande(), "", "Réception PUI");
         ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
 
         for (PH_Reliquat_ReceptionPUI_Adapte phReliquatReceptionPUIAdapte : phReliquatReceptionPUIAdapteList) {

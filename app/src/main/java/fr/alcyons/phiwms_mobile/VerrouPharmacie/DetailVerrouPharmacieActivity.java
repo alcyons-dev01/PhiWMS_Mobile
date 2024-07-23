@@ -464,7 +464,7 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
             String date_string = parseFormat.format(date);
             String only_date = parseDateFormat.format(date);
             String only_heure = parseHeureFormat.format(date);
-            ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), Integer.parseInt(ParametresServeurOpenHelper.getPortServeur(db)), "En attente", phPreparationSelectionne.getUID(), "", "Verrou Pharmacie");
+            ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", phPreparationSelectionne.getUID(), "", "Verrou Pharmacie");
             ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
             //fin de la création de l'action utilisateur

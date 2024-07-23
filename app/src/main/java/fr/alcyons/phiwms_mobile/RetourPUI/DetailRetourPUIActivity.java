@@ -182,7 +182,7 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
             @SuppressLint("SimpleDateFormat") SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date date =new Date();
             String date_string = parseFormat.format(date);
-            ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), Integer.parseInt(ParametresServeurOpenHelper.getPortServeur(db)), "En attente", retourSelectionne.get_UID(), "", "Retour PUI");
+            ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", retourSelectionne.get_UID(), "", "Retour PUI");
             ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
 
             for (Retour_Ligne_RetourPUI_Adapte retour_ligneAdapte : adapter.retourLigneRetourPUIAdapteList) {
