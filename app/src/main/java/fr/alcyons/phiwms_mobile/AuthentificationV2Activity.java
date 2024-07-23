@@ -30,6 +30,7 @@ import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.CGU.CguActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
+import fr.alcyons.phiwms_mobile.ParametresServeur.ServiceParametresServeurActivity;
 import fr.alcyons.phiwms_mobile.WebView.WebViewActivity;
 import fr.alcyons.phiwms_mobile.WebView.WebViewManager;
 
@@ -50,6 +51,13 @@ public class AuthentificationV2Activity extends MainActivity {
         String ipServ = sharedPreferences.getString("ipServeur", "");
         String numPort = sharedPreferences.getString("numPort", "");
         String versAPI = sharedPreferences.getString("versAPI", "");
+
+        if(ipServ.isEmpty() || numPort.isEmpty() || versAPI.isEmpty())
+        {
+            Intent newIntent = new Intent(AuthentificationV2Activity.this, ServiceParametresServeurActivity.class);
+            AuthentificationV2Activity.this.startActivity(newIntent);
+        }
+
 
         boutonConnexion = findViewById(R.id.boutonConnexion);
 
@@ -112,6 +120,9 @@ public class AuthentificationV2Activity extends MainActivity {
                     }
                 } catch (JSONException exception) {
                     Log.e(TAG, "JSONException :", exception);
+                    boutonConnexion.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
+
                 }
             },
                     error -> {
