@@ -8,11 +8,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.webkit.JavaScriptReplyProxy;
@@ -95,7 +97,7 @@ public class AuthentificationTotpActivity extends MainActivity {
     }
 
     private void lancerTotp(String identifiant){
-        String urlRequete = "http://" + ipServ + "/sendTotpCode";
+        String urlRequete = "http://10.0.2.2:8000" + /*ipServ +*/ "/sendTotpCode";
         JSONObject body = new JSONObject();
         try {
             body.put("identifiant", identifiant);
@@ -122,7 +124,7 @@ public class AuthentificationTotpActivity extends MainActivity {
                 }
             };
             timer.schedule(doAsynchronousTask, 300000, 1);
-            Log.d("test", totp);
+            //Log.d("test", totp);
             JsonObjectRequest requeteAuth = new JsonObjectRequest(Request.Method.POST, urlRequete, body, response -> {
                 try {
                     boolean success = response.getBoolean("success");
@@ -192,7 +194,7 @@ public class AuthentificationTotpActivity extends MainActivity {
         affichageCode = (TextView) findViewById(R.id.codeTotp);
         webviewConteneur = (FrameLayout) findViewById(R.id.webview_container);
         webviewConteneur.removeAllViews();
-        vueActuelle = WebViewManager.getInstance(null).getOffscreenWebView();
+        vueActuelle = WebViewManager.getInstance(this).getOffscreenWebView();
         webviewConteneur.addView(vueActuelle);
 
         SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
@@ -205,11 +207,14 @@ public class AuthentificationTotpActivity extends MainActivity {
         }
 
         String identifiant = monIntention.getStringExtra("identifiant");
-        WebViewManager manager = WebViewManager.getInstance(this);
+        WebViewManager manager = WebViewManager.getInstance(AuthentificationTotpActivity.this);
 
         Button boutonValider = findViewById(R.id.boutonEnvoi);
         boutonValider.setOnClickListener(v -> {
-            if (affichageCode.getText().toString().equals(totp) && totp != ""){
+            if (affichageCode.getText().toString().equals(totp) && totp != "AAAAAA"){
+                totp = "AAAAAA";
+                toCompleteTotp = "";
+                affichageCode.setText("");
                 if (!mdpOublie){
                     manager.authentification(identifiant, monIntention.getStringExtra("mdp"));
                 }
@@ -218,6 +223,12 @@ public class AuthentificationTotpActivity extends MainActivity {
                     webviewConteneur.removeAllViews();
                     startActivity(laWebview);
                 }
+            }
+            else {
+                Log.d("test", totp);
+                Toast toast = Toast.makeText(AuthentificationTotpActivity.this, "Code invalide !", Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
             }
         });
 
@@ -237,9 +248,11 @@ public class AuthentificationTotpActivity extends MainActivity {
                 if (message.getData().equals("userIsLoggedOut")){
                     Intent backToAuth = new Intent(AuthentificationTotpActivity.this, AuthentificationV2Activity.class);
                     backToAuth.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(backToAuth);
+                    WebViewCompat.removeWebMessageListener(vueActuelle, "androidMessageHandler");
                     WebViewManager.destroy();
                     vueOuverte = false;
-                    startActivity(backToAuth);
+                    webviewConteneur.removeAllViews();
                     finish();
                 } else if (message.getData().equals("userLoginFailed")){
                     Alerte.afficherAlerte(AuthentificationTotpActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Erreur differenceMdpMobileWeb", "alerte");
@@ -247,6 +260,7 @@ public class AuthentificationTotpActivity extends MainActivity {
                     vueOuverte = true;
                     affichageCode.setText("");
                     toCompleteTotp = "";
+                    totp = "AAAAAA";
                     Intent laWebview = new Intent(AuthentificationTotpActivity.this, WebViewActivity.class);
                     webviewConteneur.removeAllViews();
                     startActivity(laWebview);
@@ -281,6 +295,13 @@ public class AuthentificationTotpActivity extends MainActivity {
             }
         });
 
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        toCompleteTotp = "";
+        affichageCode.setText("");
     }
 
 }

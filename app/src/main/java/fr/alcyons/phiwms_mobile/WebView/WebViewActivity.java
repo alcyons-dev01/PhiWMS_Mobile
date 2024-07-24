@@ -25,4 +25,10 @@ public class WebViewActivity extends MainActivity {
 
     }
 
+    @Override
+    protected void onPause(){
+        super.onPause();
+        webviewConteneur.removeAllViews();
+    }
+
 }

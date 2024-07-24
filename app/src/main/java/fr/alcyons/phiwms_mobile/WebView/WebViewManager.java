@@ -2,6 +2,7 @@ package fr.alcyons.phiwms_mobile.WebView;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
@@ -16,7 +17,7 @@ public class WebViewManager {
 
     private WebViewManager(Context context) {
         // Utilisez un contexte d'application pour éviter les fuites de mémoire
-        this.context = context.getApplicationContext();
+        this.context = context;
         isWebViewReady = false;
         offscreenWebView = new WebView(this.context);
         offscreenWebView.setWebViewClient(new MyWebViewClient());
@@ -24,7 +25,7 @@ public class WebViewManager {
         offscreenWebView.getSettings().setJavaScriptEnabled(true);
         SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context);
         String ipServ = sharedPreferences.getString("ipServeur", "");
-        offscreenWebView.loadUrl("http://" + ipServ);
+        offscreenWebView.loadUrl("http://10.0.2.2:8000" /*+ ipServ*/);
     }
 
     public void authentification(String username, String password) {
