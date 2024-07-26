@@ -1,5 +1,6 @@
 package fr.alcyons.phiwms_mobile;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -13,6 +14,12 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.ParametresServeur.ServiceParametresServeurActivity;
 
 public class MySettingsFragment extends PreferenceFragmentCompat {
+
+    private Intent intention;
+
+    public MySettingsFragment(Intent intention){
+        this.intention = intention;
+    }
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -57,6 +64,10 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                             Mail_Emetteur, MDP_Emetteur, SMTP_Port, SMTP_Serveur, SMTP_Session, loginEmetteur);
 
                     Log.d("","test");
+
+                    if (this.intention != null){
+                        startActivity(intention);
+                    }
 
                 }
                 return true; // Return true if the event is handled.

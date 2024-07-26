@@ -1,15 +1,34 @@
 package fr.alcyons.phiwms_mobile.WebView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import androidx.webkit.JavaScriptReplyProxy;
+import androidx.webkit.WebMessageCompat;
+import androidx.webkit.WebViewCompat;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import fr.alcyons.phiwms_mobile.AuthentificationTotp.AuthentificationTotpActivity;
+import fr.alcyons.phiwms_mobile.AuthentificationV2Activity;
+import fr.alcyons.phiwms_mobile.Outils.Alerte;
+
 public class WebViewManager {
 
+    private List<Runnable> uponLogin;
+    private List<Runnable> uponLogout;
+    private List<Runnable> uponLogFailed;
+    private Boolean userLoggedInOnce;
     private static Boolean isWebViewReady;
     private static WebViewManager instance;
     private WebView offscreenWebView;
@@ -18,6 +37,10 @@ public class WebViewManager {
     private WebViewManager(Context context) {
         // Utilisez un contexte d'application pour éviter les fuites de mémoire
         this.context = context;
+        userLoggedInOnce = false;
+        uponLogin = new ArrayList<Runnable>();
+        uponLogout = new ArrayList<Runnable>();
+        uponLogFailed = new ArrayList<Runnable>();
         isWebViewReady = false;
         offscreenWebView = new WebView(this.context);
         offscreenWebView.setWebViewClient(new MyWebViewClient());
@@ -25,7 +48,38 @@ public class WebViewManager {
         offscreenWebView.getSettings().setJavaScriptEnabled(true);
         SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context);
         String ipServ = sharedPreferences.getString("ipServeur", "");
-        offscreenWebView.loadUrl("http://10.0.2.2:8000" /*+ ipServ*/);
+        offscreenWebView.loadUrl("http://" + ipServ);
+
+        Set<String> allowedOrigins = new HashSet<>();
+        allowedOrigins.add("http://10.0.2.2:8000");
+        allowedOrigins.add("http://phiwms.alcyons.fr");
+        allowedOrigins.add("http://" + ipServ);
+        WebViewCompat.WebMessageListener myListener = new WebViewCompat.WebMessageListener() {
+            @Override
+            public void onPostMessage(WebView view, WebMessageCompat message, Uri sourceOrigin,
+                                      boolean isMainFrame, JavaScriptReplyProxy replyProxy) {
+                if (message.getData().equals("userIsLoggedOut")){
+                    for (Runnable fonction: uponLogout)
+                    {
+                        fonction.run();
+                    }
+                } else if (message.getData().equals("userLoginFailed")){
+                    for (Runnable fonction: uponLogFailed)
+                    {
+                        fonction.run();
+                    }
+                } else if (message.getData().equals("userIsLogged")) {
+                    userLoggedInOnce = true;
+                    for (Runnable fonction: uponLogin)
+                    {
+                        fonction.run();
+                    }
+                }
+
+            }
+        };
+
+        WebViewCompat.addWebMessageListener(offscreenWebView, "androidMessageHandler", allowedOrigins, myListener);
     }
 
     public void authentification(String username, String password) {
@@ -36,6 +90,30 @@ public class WebViewManager {
 
     public WebView getOffscreenWebView() {
         return offscreenWebView;
+    }
+
+    public void addUponLogin(Runnable toRun){
+        uponLogin.add(toRun);
+    }
+
+    public void removeUponLogin(Runnable toRun){
+        uponLogin.remove(toRun);
+    }
+
+    public void addUponLogout(Runnable toRun){
+        uponLogout.add(toRun);
+    }
+
+    public void removeUponLogout(Runnable toRun){
+        uponLogout.remove(toRun);
+    }
+
+    public void addUponLogFailed(Runnable toRun){
+        uponLogFailed.add(toRun);
+    }
+
+    public void removeUponLogFailed(Runnable toRun){
+        uponLogFailed.remove(toRun);
     }
 
     public static void destroy(){

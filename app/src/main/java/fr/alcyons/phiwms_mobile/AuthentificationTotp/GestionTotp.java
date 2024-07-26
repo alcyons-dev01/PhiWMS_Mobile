@@ -75,7 +75,7 @@ public class GestionTotp {
         totp = "AAAAAA";
         SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context);
         String ipServ = sharedPreferences.getString("ipServeur", "");
-        String urlRequete = "http://10.0.2.2:8000" +/* ipServ +*/ "/sendTotpCode";
+        String urlRequete = "http://" + ipServ + "/sendTotpCode";
         JSONObject body = new JSONObject();
         try {
             body.put("identifiant", identifiant);

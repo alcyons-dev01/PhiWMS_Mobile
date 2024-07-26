@@ -110,6 +110,7 @@ public class AuthentificationTotpActivity extends MainActivity {
                     Intent laWebview = new Intent(AuthentificationTotpActivity.this, WebViewActivity.class);
                     webviewConteneur.removeAllViews();
                     startActivity(laWebview);
+                    finish();
                 }
             }
             else {
@@ -136,41 +137,52 @@ public class AuthentificationTotpActivity extends MainActivity {
             }
         });
 
-        SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
-
-        Set<String> allowedOrigins = new HashSet<>();
-        allowedOrigins.add("http://10.0.2.2:8000");
-        allowedOrigins.add("http://phiwms.alcyons.fr");
-        allowedOrigins.add("http://" + sharedPreferences.getString("ipServeur", ""));
-        WebViewCompat.WebMessageListener myListener = new WebViewCompat.WebMessageListener() {
+        Runnable onLogin = new Runnable() {
             @Override
-            public void onPostMessage(WebView view, WebMessageCompat message, Uri sourceOrigin,
-                                      boolean isMainFrame, JavaScriptReplyProxy replyProxy) {
-                if (message.getData().equals("userIsLoggedOut")){
-                    Intent backToAuth = new Intent(AuthentificationTotpActivity.this, AuthentificationV2Activity.class);
-                    backToAuth.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(backToAuth);
-                    WebViewCompat.removeWebMessageListener(vueActuelle, "androidMessageHandler");
-                    WebViewManager.destroy();
-                    vueOuverte = false;
-                    webviewConteneur.removeAllViews();
-                    finish();
-                } else if (message.getData().equals("userLoginFailed")){
-                    Alerte.afficherAlerte(AuthentificationTotpActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Erreur differenceMdpMobileWeb", "alerte");
-                } else if (message.getData().equals("userIsLogged")) {
-                    vueOuverte = true;
-                    affichageCode.setText("");
-                    toCompleteTotp = "";
-                    gestionnaireTotp.totpDone();
-                    Intent laWebview = new Intent(AuthentificationTotpActivity.this, WebViewActivity.class);
-                    webviewConteneur.removeAllViews();
-                    startActivity(laWebview);
-                }
-
+            public void run() {
+                vueOuverte = true;
+                affichageCode.setText("");
+                toCompleteTotp = "";
+                gestionnaireTotp.totpDone();
+                Intent laWebview = new Intent(AuthentificationTotpActivity.this, WebViewActivity.class);
+                webviewConteneur.removeAllViews();
+                startActivity(laWebview);
+                finish();
             }
         };
 
-        WebViewCompat.addWebMessageListener(vueActuelle, "androidMessageHandler", allowedOrigins, myListener);
+        Runnable onLogout = new Runnable() {
+            @Override
+            public void run() {
+                Intent backToAuth = new Intent(AuthentificationTotpActivity.this, AuthentificationV2Activity.class);
+                backToAuth.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(backToAuth);
+                WebViewCompat.removeWebMessageListener(vueActuelle, "androidMessageHandler");
+                WebViewManager.destroy();
+                vueOuverte = false;
+                webviewConteneur.removeAllViews();
+                finish();
+            }
+        };
+
+        Runnable onLogFailed = new Runnable() {
+            @Override
+            public void run() {
+                //Alerte.afficherAlerte(AuthentificationTotpActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Erreur differenceMdpMobileWeb", "alerte");
+                Intent backToAuth = new Intent(AuthentificationTotpActivity.this, AuthentificationV2Activity.class);
+                backToAuth.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(backToAuth);
+                WebViewCompat.removeWebMessageListener(vueActuelle, "androidMessageHandler");
+                WebViewManager.destroy();
+                vueOuverte = false;
+                webviewConteneur.removeAllViews();
+                finish();
+            }
+        };
+
+        manager.addUponLogin(onLogin);
+        manager.addUponLogout(onLogout);
+        manager.addUponLogFailed(onLogFailed);
 
         fonctionBouton = new View.OnClickListener() {
             @Override

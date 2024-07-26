@@ -43,31 +43,37 @@ public class AuthentificationV2Activity extends MainActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        WebViewManager.getInstance(this);
-        Intent laWebview = new Intent(AuthentificationV2Activity.this, AuthentificationTotpActivity.class);
         setContentView(R.layout.activity_authentificationv2);
 
+        // On créé l'instance de WebViewManager ici car sinon l'instance ne fonctionne pas
+        WebViewManager.getInstance(this);
+        // On prépare l'intention pour se rendre sur l'activité d'authentification par TOTP
+        Intent goToTotp = new Intent(AuthentificationV2Activity.this, AuthentificationTotpActivity.class);
+
+        // On récupère les paramètres de serveur
         SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
         String ipServ = sharedPreferences.getString("ipServeur", "");
         String numPort = sharedPreferences.getString("numPort", "");
         String versAPI = sharedPreferences.getString("versAPI", "");
-
+        // Si l'un de ces paramètres n'existe pas, on envoie l'utilisateur à la page de paramètres
         if(ipServ.isEmpty() || numPort.isEmpty() || versAPI.isEmpty())
         {
-            Intent newIntent = new Intent(AuthentificationV2Activity.this, ServiceParametresServeurActivity.class);
+            Intent newIntent = new Intent(AuthentificationV2Activity.this, MySettingsActivity.class);
+            newIntent.putExtra("retourAAuth", true);
             AuthentificationV2Activity.this.startActivity(newIntent);
         }
 
-
+        // On définit ce qu'il se passe lorsque l'utilisateur appuie sur le bouton de connexion
         boutonConnexion = findViewById(R.id.boutonConnexion);
-
         boutonConnexion.setOnClickListener(v -> {
+            // On récupère les informations de connexion
             EditText identifiant = findViewById(R.id.identifiant);
             String idStr = identifiant.getText().toString();
             EditText mdp = findViewById(R.id.motDePasse);
             String mdpStr = "";
             ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
             progressBar.setVisibility(View.VISIBLE);
+            // On passe le mot de passe dans l'algorithme de hashage
             try {
                 MessageDigest md = null;
                 md = MessageDigest.getInstance("MD5");
@@ -81,6 +87,8 @@ public class AuthentificationV2Activity extends MainActivity {
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
+
+            // On prépare la requête au serveur pour s'y connecter
             String urlRequete = "http://" + ipServ + ":" + numPort + "/api/v" + versAPI + "/utilisateurs/connexion";
 
             JSONObject body = new JSONObject();
@@ -97,11 +105,13 @@ public class AuthentificationV2Activity extends MainActivity {
                     int nbResultats = response.getInt("resultCount");
                     //Log.d("test", String.valueOf(nbResultats));
                     if (nbResultats != 1) {
+                        // Si plus d'un compte utilisateur correspond, il y a une erreur du côté d'ALCYONS
                         if (nbResultats > 1) {
                             Alerte.afficherAlerte(AuthentificationV2Activity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete identificationUtilisateur", "alerte");
                             boutonConnexion.setVisibility(View.VISIBLE);
                             progressBar.setVisibility(View.GONE);
                         }
+                        // Si aucun compte utilisateur ne correspond, on renvoie un message concernant l'erreur de connexion
                         if (nbResultats == 0) {
                             Toast toast = Toast.makeText(AuthentificationV2Activity.this, "Identifiant ou mot de passe incorrect !", Toast.LENGTH_SHORT);
                             toast.setGravity(Gravity.CENTER, 0, 0);
@@ -111,12 +121,13 @@ public class AuthentificationV2Activity extends MainActivity {
                         }
                     }
                     else {
+                        // On passe les informations nécessaires à l'authentification TOTP
                         progressBar.setVisibility(View.GONE);
                         String token = response.getString("token");
-                        laWebview.putExtra("identifiant", idStr);
-                        laWebview.putExtra("mdp", mdp.getText().toString());
-                        laWebview.putExtra("token", token);
-                        startActivity(laWebview);
+                        goToTotp.putExtra("identifiant", idStr);
+                        goToTotp.putExtra("mdp", mdp.getText().toString());
+                        goToTotp.putExtra("token", token);
+                        startActivity(goToTotp);
                     }
                 } catch (JSONException exception) {
                     Log.e(TAG, "JSONException :", exception);
@@ -140,12 +151,14 @@ public class AuthentificationV2Activity extends MainActivity {
             requestQueueUtilisateur.add(requeteAuth);
         });
 
+        // On définit ce qu'il se passe lorsque l'utilisateur appuie sur le bouton d'inscription
         boutonInscription = findViewById(R.id.boutonInscription);
-
         boutonInscription.setOnClickListener(v -> {
+            // On créé l'intention de se rendre dans l'activité d'inscription
             Intent toInscription = new Intent(AuthentificationV2Activity.this, InscriptionActivity.class);
 
-            String urlRequete = "http://10.0.2.2:8000" +/* ipServ +*/ "/inscription";
+            // On prépare la requête pour obtenir les informations nécessaires à l'inscription
+            String urlRequete = "http://" + ipServ + "/inscription";
 
             JSONObject body = new JSONObject();
             try {
@@ -156,6 +169,7 @@ public class AuthentificationV2Activity extends MainActivity {
 
             JsonObjectRequest requeteInscript = new JsonObjectRequest(Request.Method.POST, urlRequete, body, response -> {
                 try {
+                    // On récupère les listes de profils et d'établissements puis on les traduit dans un type que l'on peut transmettre facilement
                     JSONArray profils = response.getJSONArray("profils");
                     JSONArray etablissements = response.getJSONArray("etablissements");
                     String[] listeProfils = new String[profils.length()];
@@ -195,12 +209,13 @@ public class AuthentificationV2Activity extends MainActivity {
             startActivity(versCGU);
         });
 
+        // Mot de passe oublié
         findViewById(R.id.mdpOublie).setOnClickListener(v -> {
             Boolean mdpOublie = true;
             String identifiant = ((EditText) findViewById(R.id.identifiant)).getText().toString();
-            laWebview.putExtra("identifiant", identifiant);
-            laWebview.putExtra("etat_mdp", mdpOublie);
-            startActivity(laWebview);
+            goToTotp.putExtra("identifiant", identifiant);
+            goToTotp.putExtra("etat_mdp", mdpOublie);
+            startActivity(goToTotp);
         });
     }
 
