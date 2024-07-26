@@ -3,6 +3,7 @@ package fr.alcyons.phiwms_mobile;
 import static com.google.android.gms.vision.L.TAG;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -54,13 +55,15 @@ public class InscriptionActivity extends MainActivity {
         selecteurEtablissement.setAdapter(adapterEtablissement);
 
         Button envoiDemande = (Button) findViewById(R.id.boutonDemande);
+        SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
+        String ipServ = sharedPreferences.getString("ipServeur", "");
 
         envoiDemande.setOnClickListener(v -> {
             String email = inputEmail.getText().toString();
             String profil = selecteurProfil.getSelectedItem().toString();
             String etablissement = selecteurEtablissement.getSelectedItem().toString();
             if (email != null && email != "" && profil != null && profil != "" && etablissement != null && etablissement != ""){
-                String urlRequete = "http://10.0.2.2:8000/demandeInscription";
+                String urlRequete = "http://10.0.2.2:8000" + /*ipServ +*/ "/demandeInscription";
 
                 JSONObject body = new JSONObject();
                 try {

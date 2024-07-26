@@ -28,10 +28,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
+import fr.alcyons.phiwms_mobile.AuthentificationTotp.AuthentificationTotpActivity;
 import fr.alcyons.phiwms_mobile.CGU.CguActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.ParametresServeur.ServiceParametresServeurActivity;
-import fr.alcyons.phiwms_mobile.WebView.WebViewActivity;
 import fr.alcyons.phiwms_mobile.WebView.WebViewManager;
 
 
@@ -145,7 +145,7 @@ public class AuthentificationV2Activity extends MainActivity {
         boutonInscription.setOnClickListener(v -> {
             Intent toInscription = new Intent(AuthentificationV2Activity.this, InscriptionActivity.class);
 
-            String urlRequete = "http://10.0.2.2:8000" + /*ipServ +*/ "/inscription";
+            String urlRequete = "http://10.0.2.2:8000" +/* ipServ +*/ "/inscription";
 
             JSONObject body = new JSONObject();
             try {

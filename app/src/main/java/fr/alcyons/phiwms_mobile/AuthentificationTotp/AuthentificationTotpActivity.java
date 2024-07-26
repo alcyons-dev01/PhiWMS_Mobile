@@ -1,4 +1,4 @@
-package fr.alcyons.phiwms_mobile;
+package fr.alcyons.phiwms_mobile.AuthentificationTotp;
 
 import static com.google.android.gms.vision.L.TAG;
 
@@ -44,7 +44,10 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import fr.alcyons.phiwms_mobile.AuthentificationV2Activity;
+import fr.alcyons.phiwms_mobile.MainActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
+import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.WebView.WebViewActivity;
 import fr.alcyons.phiwms_mobile.WebView.WebViewManager;
 
@@ -53,123 +56,11 @@ public class AuthentificationTotpActivity extends MainActivity {
     private static FrameLayout webviewConteneur;
     private static TextView affichageCode;
     private static String toCompleteTotp = "";
-    private static String totp = "";
     private boolean vueOuverte = false;
-    private boolean premiereDefinitionTotp = true;
     private boolean mdpOublie;
     private View.OnClickListener fonctionBouton;
-    private String ipServ;
-    private Timer timer;
     private WebView vueActuelle;
-
-    private String calculerTotp() throws InvalidKeyException, NoSuchAlgorithmException, UnsupportedEncodingException {
-        String totp = "";
-        int numberOfCodeDigits = 6;
-        String secretKey = "Alcyons64BtzPhiWMSiOS2024";
-        String validityInterval = String.format("%64s", Long.toBinaryString((System.currentTimeMillis() / 1000 / 30))).replace(' ', '0');
-
-        byte [] arrayOctets = new byte[8];
-        for (int i = 0; i < 64 ; i += 8){
-            String byteString = validityInterval.substring(i, i + 8);
-            byte b = (byte) Integer.parseInt(byteString, 2);
-            arrayOctets[i / 8] = b;
-        }
-
-        String hashCode = Hashing.hmacSha256(secretKey.getBytes(StandardCharsets.UTF_8)).hashBytes(arrayOctets).toString();
-        byte [] byteArray = hashCode.getBytes();
-        //Log.d("test", hashCode);
-        int taille = hashCode.length();
-        int offset = ((int) Integer.parseInt(hashCode.substring(taille - 2, taille), 16)) & 0x0f;
-
-        //Log.d("test", String.valueOf(offset));
-        String truncatedHashCode = hashCode.substring(offset * 2, (offset + 4) * 2);
-        //Log.d("test", truncatedHashCode);
-
-        int numericHashCode = (int) (Long.parseLong(truncatedHashCode, 16) % Math.pow(10 , numberOfCodeDigits));
-        totp = String.valueOf(numericHashCode);
-        if (totp.length() < numberOfCodeDigits){
-            for (int i = totp.length() ; i < numberOfCodeDigits ; i ++){
-                totp = "0" + totp;
-            }
-        }
-
-        return totp;
-    }
-
-    private void lancerTotp(String identifiant){
-        String urlRequete = "http://10.0.2.2:8000" + /*ipServ +*/ "/sendTotpCode";
-        JSONObject body = new JSONObject();
-        try {
-            body.put("identifiant", identifiant);
-            body.put("app_name", "PhiWMS Android");
-            body.put("for_recovery", mdpOublie);
-            body.put("device_info", Build.DEVICE);
-        } catch (JSONException e) {
-            Log.e(TAG, "JSONException :", e);
-        }
-
-        try {
-            totp = calculerTotp();
-            if (! premiereDefinitionTotp){
-                timer.cancel();
-                timer.purge();
-            }
-            timer = new Timer();
-            TimerTask doAsynchronousTask = new TimerTask() {
-                @Override
-                public void run() {
-                    Log.d("test", "suppression totp");
-                    totp = "AAAAAA";
-                    timer.cancel();
-                }
-            };
-            timer.schedule(doAsynchronousTask, 300000, 1);
-            //Log.d("test", totp);
-            JsonObjectRequest requeteAuth = new JsonObjectRequest(Request.Method.POST, urlRequete, body, response -> {
-                try {
-                    boolean success = response.getBoolean("success");
-                    if (success){
-                        List<String> charList = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
-                        Collections.shuffle(charList);
-                        for (int i = 0 ; i < 10 ; i ++){
-                            int buttonId = getResources().getIdentifier("boutonNum" + i, "id", getPackageName());
-                            Button bouton = (Button) findViewById(buttonId);
-                            bouton.setText(charList.get(i));
-                            if (premiereDefinitionTotp) {
-                                bouton.setOnClickListener(fonctionBouton);
-                            }
-                        }
-                        premiereDefinitionTotp = false;
-                    }
-                    else {
-                        Alerte.afficherAlerte(AuthentificationTotpActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete sendTotpCode", "alerte");
-                    }
-                } catch (JSONException exception) {
-                    Log.e(TAG, "JSONException :", exception);
-                }
-            },
-                    error -> {
-                        Log.e("Idenitifcation Volley", error.toString());
-                    }
-            ) {
-                @Override
-                public Map<String, String> getHeaders() {
-                    Map<String, String> params = new HashMap<>();
-                    params.put("Content-Type", "application/json;charset=utf-8");
-                    params.put("Authorization", getIntent().getStringExtra("token"));
-                    return params;
-                }
-            };
-            RequestQueue requestQueueUtilisateur = Volley.newRequestQueue(this);
-            requestQueueUtilisateur.add(requeteAuth);
-        } catch (InvalidKeyException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private GestionTotp gestionnaireTotp;
 
     private static boolean appendToCompleteTotp(Character c){
         if (toCompleteTotp.length() == 6){
@@ -191,14 +82,12 @@ public class AuthentificationTotpActivity extends MainActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authentification_totp);
+        gestionnaireTotp = GestionTotp.getInstance();
         affichageCode = (TextView) findViewById(R.id.codeTotp);
         webviewConteneur = (FrameLayout) findViewById(R.id.webview_container);
         webviewConteneur.removeAllViews();
         vueActuelle = WebViewManager.getInstance(this).getOffscreenWebView();
         webviewConteneur.addView(vueActuelle);
-
-        SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
-        ipServ = sharedPreferences.getString("ipServeur", "");
 
         Intent monIntention = getIntent();
         mdpOublie = monIntention.getBooleanExtra("etat_mdp", false);
@@ -211,8 +100,7 @@ public class AuthentificationTotpActivity extends MainActivity {
 
         Button boutonValider = findViewById(R.id.boutonEnvoi);
         boutonValider.setOnClickListener(v -> {
-            if (affichageCode.getText().toString().equals(totp) && totp != "AAAAAA"){
-                totp = "AAAAAA";
+            if (gestionnaireTotp.totpCorrect(toCompleteTotp)){
                 toCompleteTotp = "";
                 affichageCode.setText("");
                 if (!mdpOublie){
@@ -225,7 +113,6 @@ public class AuthentificationTotpActivity extends MainActivity {
                 }
             }
             else {
-                Log.d("test", totp);
                 Toast toast = Toast.makeText(AuthentificationTotpActivity.this, "Code invalide !", Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
@@ -234,13 +121,27 @@ public class AuthentificationTotpActivity extends MainActivity {
 
         Button boutonTotp = findViewById(R.id.boutonTotp);
         boutonTotp.setOnClickListener(v -> {
-            lancerTotp(identifiant);
+            boolean fonctionne = gestionnaireTotp.lancerTotp(identifiant, mdpOublie, monIntention.getStringExtra("token"), AuthentificationTotpActivity.this);
+            if (! fonctionne){
+                Alerte.afficherAlerte(AuthentificationTotpActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete sendTotpCode", "alerte");
+            }
+            else {
+                List<String> charList = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
+                Collections.shuffle(charList);
+                for (int i = 0 ; i < 10 ; i ++){
+                    int buttonId = getResources().getIdentifier("boutonNum" + i, "id", getPackageName());
+                    Button bouton = (Button) findViewById(buttonId);
+                    bouton.setText(charList.get(i));
+                }
+            }
         });
+
+        SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
 
         Set<String> allowedOrigins = new HashSet<>();
         allowedOrigins.add("http://10.0.2.2:8000");
         allowedOrigins.add("http://phiwms.alcyons.fr");
-        allowedOrigins.add("http://" + ipServ);
+        allowedOrigins.add("http://" + sharedPreferences.getString("ipServeur", ""));
         WebViewCompat.WebMessageListener myListener = new WebViewCompat.WebMessageListener() {
             @Override
             public void onPostMessage(WebView view, WebMessageCompat message, Uri sourceOrigin,
@@ -260,7 +161,7 @@ public class AuthentificationTotpActivity extends MainActivity {
                     vueOuverte = true;
                     affichageCode.setText("");
                     toCompleteTotp = "";
-                    totp = "AAAAAA";
+                    gestionnaireTotp.totpDone();
                     Intent laWebview = new Intent(AuthentificationTotpActivity.this, WebViewActivity.class);
                     webviewConteneur.removeAllViews();
                     startActivity(laWebview);
@@ -280,7 +181,20 @@ public class AuthentificationTotpActivity extends MainActivity {
             }
         };
 
-        lancerTotp(identifiant);
+        boolean fonctionne = gestionnaireTotp.lancerTotp(identifiant, mdpOublie, getIntent().getStringExtra("token"), AuthentificationTotpActivity.this);
+        if (! fonctionne){
+            Alerte.afficherAlerte(AuthentificationTotpActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete sendTotpCode", "alerte");
+        }
+        else {
+            List<String> charList = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
+            Collections.shuffle(charList);
+            for (int i = 0 ; i < 10 ; i ++){
+                int buttonId = getResources().getIdentifier("boutonNum" + i, "id", getPackageName());
+                Button bouton = (Button) findViewById(buttonId);
+                bouton.setText(charList.get(i));
+                bouton.setOnClickListener(fonctionBouton);
+            }
+        }
 
         getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
             @Override
@@ -300,6 +214,7 @@ public class AuthentificationTotpActivity extends MainActivity {
     @Override
     protected void onPause(){
         super.onPause();
+        gestionnaireTotp.totpDone();
         toCompleteTotp = "";
         affichageCode.setText("");
     }

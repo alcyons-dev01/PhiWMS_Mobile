@@ -74,7 +74,7 @@
     </activity>
 
     <activity
-        android:name="fr.alcyons.phiwms_mobile.AuthentificationTotpActivity"
+        android:name="fr.alcyons.phiwms_mobile.AuthentificationTotp.AuthentificationTotpActivity"
         android:exported="true"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize">
