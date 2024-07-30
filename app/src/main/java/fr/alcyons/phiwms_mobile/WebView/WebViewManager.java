@@ -28,7 +28,6 @@ public class WebViewManager {
     private List<Runnable> uponLogin;
     private List<Runnable> uponLogout;
     private List<Runnable> uponLogFailed;
-    private Boolean userLoggedInOnce;
     private static Boolean isWebViewReady;
     private static WebViewManager instance;
     private WebView offscreenWebView;
@@ -37,7 +36,6 @@ public class WebViewManager {
     private WebViewManager(Context context) {
         // Utilisez un contexte d'application pour éviter les fuites de mémoire
         this.context = context;
-        userLoggedInOnce = false;
         uponLogin = new ArrayList<Runnable>();
         uponLogout = new ArrayList<Runnable>();
         uponLogFailed = new ArrayList<Runnable>();
@@ -48,7 +46,7 @@ public class WebViewManager {
         offscreenWebView.getSettings().setJavaScriptEnabled(true);
         SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context);
         String ipServ = sharedPreferences.getString("ipServeur", "");
-        offscreenWebView.loadUrl("http://" + ipServ);
+        offscreenWebView.loadUrl("http://10.0.2.2:8000" /*+ ipServ*/);
 
         Set<String> allowedOrigins = new HashSet<>();
         allowedOrigins.add("http://10.0.2.2:8000");
@@ -69,7 +67,7 @@ public class WebViewManager {
                         fonction.run();
                     }
                 } else if (message.getData().equals("userIsLogged")) {
-                    userLoggedInOnce = true;
+                    Log.d("test", "test");
                     for (Runnable fonction: uponLogin)
                     {
                         fonction.run();

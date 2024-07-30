@@ -2,8 +2,11 @@ package fr.alcyons.phiwms_mobile.AuthentificationTotp;
 
 import static com.google.android.gms.vision.L.TAG;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,6 +16,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,15 +50,16 @@ import java.util.TimerTask;
 
 import fr.alcyons.phiwms_mobile.AuthentificationV2Activity;
 import fr.alcyons.phiwms_mobile.MainActivity;
+import fr.alcyons.phiwms_mobile.MinuteurView;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.SupportActivity;
 import fr.alcyons.phiwms_mobile.WebView.WebViewActivity;
 import fr.alcyons.phiwms_mobile.WebView.WebViewManager;
 
 public class AuthentificationTotpActivity extends MainActivity {
 
     private static FrameLayout webviewConteneur;
-    private static TextView affichageCode;
     private static String toCompleteTotp = "";
     private boolean vueOuverte = false;
     private boolean mdpOublie;
@@ -67,7 +72,6 @@ public class AuthentificationTotpActivity extends MainActivity {
             toCompleteTotp = toCompleteTotp.substring(1);
         }
         toCompleteTotp += c;
-        affichageCode.setText(toCompleteTotp);
         boolean retour;
         if (toCompleteTotp.length() == 6){
             retour = true;
@@ -83,7 +87,6 @@ public class AuthentificationTotpActivity extends MainActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authentification_totp);
         gestionnaireTotp = GestionTotp.getInstance();
-        affichageCode = (TextView) findViewById(R.id.codeTotp);
         webviewConteneur = (FrameLayout) findViewById(R.id.webview_container);
         webviewConteneur.removeAllViews();
         vueActuelle = WebViewManager.getInstance(this).getOffscreenWebView();
@@ -95,53 +98,32 @@ public class AuthentificationTotpActivity extends MainActivity {
             vueActuelle.evaluateJavascript("window.location ='/demandemotdepasseoublie';", null);
         }
 
+        Runnable updateAffichageTotp = new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 1; i <= 6; i++){
+                    int imageId = getResources().getIdentifier("char" + i, "id", getPackageName());
+                    ImageView image = (ImageView) findViewById(imageId);
+                    if (i <= toCompleteTotp.length()){
+                        image.setImageResource(R.mipmap.ic_cercle_plein);
+                    }
+                    else {
+                        image.setImageResource(R.mipmap.ic_cercle_vide);
+                    }
+                }
+            }
+        };
+
+        MinuteurView leMinuteur = (MinuteurView) findViewById(R.id.minuteur);
+
         String identifiant = monIntention.getStringExtra("identifiant");
         WebViewManager manager = WebViewManager.getInstance(AuthentificationTotpActivity.this);
-
-        Button boutonValider = findViewById(R.id.boutonEnvoi);
-        boutonValider.setOnClickListener(v -> {
-            if (gestionnaireTotp.totpCorrect(toCompleteTotp)){
-                toCompleteTotp = "";
-                affichageCode.setText("");
-                if (!mdpOublie){
-                    manager.authentification(identifiant, monIntention.getStringExtra("mdp"));
-                }
-                else {
-                    Intent laWebview = new Intent(AuthentificationTotpActivity.this, WebViewActivity.class);
-                    webviewConteneur.removeAllViews();
-                    startActivity(laWebview);
-                    finish();
-                }
-            }
-            else {
-                Toast toast = Toast.makeText(AuthentificationTotpActivity.this, "Code invalide !", Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
-            }
-        });
-
-        Button boutonTotp = findViewById(R.id.boutonTotp);
-        boutonTotp.setOnClickListener(v -> {
-            boolean fonctionne = gestionnaireTotp.lancerTotp(identifiant, mdpOublie, monIntention.getStringExtra("token"), AuthentificationTotpActivity.this);
-            if (! fonctionne){
-                Alerte.afficherAlerte(AuthentificationTotpActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete sendTotpCode", "alerte");
-            }
-            else {
-                List<String> charList = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
-                Collections.shuffle(charList);
-                for (int i = 0 ; i < 10 ; i ++){
-                    int buttonId = getResources().getIdentifier("boutonNum" + i, "id", getPackageName());
-                    Button bouton = (Button) findViewById(buttonId);
-                    bouton.setText(charList.get(i));
-                }
-            }
-        });
 
         Runnable onLogin = new Runnable() {
             @Override
             public void run() {
                 vueOuverte = true;
-                affichageCode.setText("");
+                updateAffichageTotp.run();
                 toCompleteTotp = "";
                 gestionnaireTotp.totpDone();
                 Intent laWebview = new Intent(AuthentificationTotpActivity.this, WebViewActivity.class);
@@ -168,7 +150,7 @@ public class AuthentificationTotpActivity extends MainActivity {
         Runnable onLogFailed = new Runnable() {
             @Override
             public void run() {
-                //Alerte.afficherAlerte(AuthentificationTotpActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Erreur differenceMdpMobileWeb", "alerte");
+                Alerte.afficherAlerte(AuthentificationTotpActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Erreur differenceMdpMobileWeb", "alerte");
                 Intent backToAuth = new Intent(AuthentificationTotpActivity.this, AuthentificationV2Activity.class);
                 backToAuth.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(backToAuth);
@@ -180,9 +162,41 @@ public class AuthentificationTotpActivity extends MainActivity {
             }
         };
 
-        manager.addUponLogin(onLogin);
-        manager.addUponLogout(onLogout);
-        manager.addUponLogFailed(onLogFailed);
+        Button boutonValider = findViewById(R.id.boutonEnvoi);
+        boutonValider.setOnClickListener(v -> {
+            if (gestionnaireTotp.totpCorrect(toCompleteTotp)){
+                toCompleteTotp = "";
+                updateAffichageTotp.run();
+                if (!mdpOublie){
+                    manager.authentification(identifiant, monIntention.getStringExtra("mdp"));
+                }
+                manager.addUponLogin(onLogin);
+                manager.addUponLogout(onLogout);
+                manager.addUponLogFailed(onLogFailed);
+            }
+            else {
+                Toast toast = Toast.makeText(AuthentificationTotpActivity.this, "Code invalide !", Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            }
+        });
+
+        Button boutonTotp = findViewById(R.id.boutonTotp);
+        boutonTotp.setOnClickListener(v -> {
+            boolean fonctionne = gestionnaireTotp.lancerTotp(identifiant, mdpOublie, monIntention.getStringExtra("token"), AuthentificationTotpActivity.this, leMinuteur);
+            if (! fonctionne){
+                Alerte.afficherAlerte(AuthentificationTotpActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete sendTotpCode", "alerte");
+            }
+            else {
+                List<String> charList = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
+                Collections.shuffle(charList);
+                for (int i = 0 ; i < 10 ; i ++){
+                    int buttonId = getResources().getIdentifier("boutonNum" + i, "id", getPackageName());
+                    Button bouton = (Button) findViewById(buttonId);
+                    bouton.setText(charList.get(i));
+                }
+            }
+        });
 
         fonctionBouton = new View.OnClickListener() {
             @Override
@@ -190,10 +204,11 @@ public class AuthentificationTotpActivity extends MainActivity {
                 Button boutonCourant = (Button) v;
                 String valeur = boutonCourant.getText().toString();
                 appendToCompleteTotp(valeur.charAt(0));
+                updateAffichageTotp.run();
             }
         };
 
-        boolean fonctionne = gestionnaireTotp.lancerTotp(identifiant, mdpOublie, getIntent().getStringExtra("token"), AuthentificationTotpActivity.this);
+        boolean fonctionne = gestionnaireTotp.lancerTotp(identifiant, mdpOublie, getIntent().getStringExtra("token"), AuthentificationTotpActivity.this, leMinuteur);
         if (! fonctionne){
             Alerte.afficherAlerte(AuthentificationTotpActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete sendTotpCode", "alerte");
         }
@@ -208,6 +223,42 @@ public class AuthentificationTotpActivity extends MainActivity {
             }
         }
 
+        findViewById(R.id.boutonColler).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClipboardManager pressePapier = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipData dernierElement = pressePapier.getPrimaryClip();
+                ClipData.Item item = dernierElement.getItemAt(0);
+                String copiedText = item.getText().toString();
+                Boolean codeCorrect = true;
+                if (copiedText.length() != 6){
+                    codeCorrect = false;
+                }
+                try {
+                    Integer.valueOf(copiedText);
+                } catch (NumberFormatException e) {
+                    codeCorrect = false;
+                }
+                if (!codeCorrect){
+                    Toast toast = Toast.makeText(AuthentificationTotpActivity.this, "Element copié invalide !", Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                }
+                else {
+                    toCompleteTotp = copiedText;
+                    updateAffichageTotp.run();
+                }
+            }
+        });
+
+        findViewById(R.id.boutonAnnuler).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toCompleteTotp = "";
+                updateAffichageTotp.run();
+            }
+        });
+
         getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -221,14 +272,37 @@ public class AuthentificationTotpActivity extends MainActivity {
             }
         });
 
+        findViewById(R.id.imageRetour).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getOnBackPressedDispatcher().onBackPressed();
+            }
+        });
+
+        findViewById(R.id.boutonSupport).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent toSupport = new Intent(AuthentificationTotpActivity.this, SupportActivity.class);
+                startActivity(toSupport);
+            }
+        });
+
     }
 
     @Override
     protected void onPause(){
         super.onPause();
-        gestionnaireTotp.totpDone();
         toCompleteTotp = "";
-        affichageCode.setText("");
+        for (int i = 1; i <= 6; i++){
+            int imageId = getResources().getIdentifier("char" + i, "id", getPackageName());
+            ImageView image = (ImageView) findViewById(imageId);
+            if (i <= toCompleteTotp.length()){
+                image.setImageResource(R.mipmap.ic_cercle_plein);
+            }
+            else {
+                image.setImageResource(R.mipmap.ic_cercle_vide);
+            }
+        }
     }
 
 }

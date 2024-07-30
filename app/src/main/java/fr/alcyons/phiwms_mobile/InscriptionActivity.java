@@ -63,7 +63,7 @@ public class InscriptionActivity extends MainActivity {
             String profil = selecteurProfil.getSelectedItem().toString();
             String etablissement = selecteurEtablissement.getSelectedItem().toString();
             if (email != null && email != "" && profil != null && profil != "" && etablissement != null && etablissement != ""){
-                String urlRequete = "http://" + ipServ + "/demandeInscription";
+                String urlRequete = "http://10.0.2.2:8000" +/* ipServ + */"/demandeInscription";
 
                 JSONObject body = new JSONObject();
                 try {

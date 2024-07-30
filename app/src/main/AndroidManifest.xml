@@ -94,6 +94,13 @@
         android:configChanges="orientation|screenSize">
     </activity>
 
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.SupportActivity"
+        android:exported="true"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize">
+    </activity>
+
     <!-- Paramètre Serveur -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.ParametresServeur.ServiceParametresServeurActivity"

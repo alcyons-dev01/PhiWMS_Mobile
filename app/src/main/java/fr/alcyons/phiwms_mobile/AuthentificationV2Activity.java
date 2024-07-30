@@ -94,7 +94,7 @@ public class AuthentificationV2Activity extends MainActivity {
             JSONObject body = new JSONObject();
             try {
                 body.put("identifiant", idStr);
-                body.put("mdp", "26c7dbc0993cff610de54c4d059333f2");
+                body.put("mdp", mdpStr);
                 body.put("etat_mdp", false);
             } catch (JSONException e) {
                 Log.e(TAG, "JSONException :", e);
@@ -158,7 +158,7 @@ public class AuthentificationV2Activity extends MainActivity {
             Intent toInscription = new Intent(AuthentificationV2Activity.this, InscriptionActivity.class);
 
             // On prépare la requête pour obtenir les informations nécessaires à l'inscription
-            String urlRequete = "http://" + ipServ + "/inscription";
+            String urlRequete = "http://10.0.2.2:8000" +/* ipServ +*/ "/inscription";
 
             JSONObject body = new JSONObject();
             try {

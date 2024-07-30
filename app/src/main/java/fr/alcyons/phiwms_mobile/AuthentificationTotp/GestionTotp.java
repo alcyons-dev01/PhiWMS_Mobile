@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import fr.alcyons.phiwms_mobile.MinuteurView;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 
 public class GestionTotp {
@@ -71,11 +72,11 @@ public class GestionTotp {
         return totp;
     }
 
-    public boolean lancerTotp(String identifiant, Boolean mdpOublie, String token, Context context){
+    public boolean lancerTotp(String identifiant, Boolean mdpOublie, String token, Context context, MinuteurView minuteur){
         totp = "AAAAAA";
         SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context);
         String ipServ = sharedPreferences.getString("ipServeur", "");
-        String urlRequete = "http://" + ipServ + "/sendTotpCode";
+        String urlRequete = "http://10.0.2.2:8000" +/* ipServ +*/ "/sendTotpCode";
         JSONObject body = new JSONObject();
         try {
             body.put("identifiant", identifiant);
@@ -88,20 +89,8 @@ public class GestionTotp {
 
         try {
             totp = calculerTotp();
-            if (timer != null){
-                timer.cancel();
-                timer.purge();
-            }
-            timer = new Timer();
-            TimerTask doAsynchronousTask = new TimerTask() {
-                @Override
-                public void run() {
-                    //Log.d("test", "suppression totp");
-                    totpDone();
-                    timer.cancel();
-                }
-            };
-            timer.schedule(doAsynchronousTask, 300000, 1);
+            minuteur.stopTimer();
+            minuteur.startTimer(5, 0, this::totpDone);
             Log.d("test", totp);
             JsonObjectRequest requeteAuth = new JsonObjectRequest(Request.Method.POST, urlRequete, body, response -> {
                 try {
@@ -147,10 +136,6 @@ public class GestionTotp {
 
     public void totpDone(){
         totp = "AAAAAA";
-    }
-
-    private GestionTotp(){
-
     }
 
     public static GestionTotp getInstance(){
