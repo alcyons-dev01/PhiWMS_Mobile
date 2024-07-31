@@ -28,7 +28,8 @@
         android:orientation="vertical"
         android:weightSum="10"
         android:paddingHorizontal="100dp"
-        android:paddingVertical="50dp">
+        android:paddingVertical="50dp"
+        android:layout_alignParentBottom="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -68,6 +69,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
+                    android:gravity="center"
                     android:text="Saisissez le code de 6 chiffres reçu par email"
                     android:textColor="@color/blanc"
                     android:textSize="22sp"
@@ -76,10 +78,11 @@
                     android:layout_marginBottom="5dp"/>
 
                 <TextView
+                    android:id="@+id/textNbEssais"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:id="@+id/textNbEssais"
+                    android:gravity="center"
                     android:text="Il vous rest 5 essais"
                     android:textSize="18sp"
                     android:textColor="@color/blanc"
@@ -89,6 +92,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
+                    android:gravity="center"
                     android:id="@+id/minuteur"
                     android:text="00:00"
                     android:textSize="27sp"
@@ -347,6 +351,7 @@
 
     </LinearLayout>
 
+    <!-- Nécessaire pour éviter que la Webview ne prenne trop de temps -->
     <FrameLayout
         android:id="@+id/webview_container"
         android:layout_width="match_parent"

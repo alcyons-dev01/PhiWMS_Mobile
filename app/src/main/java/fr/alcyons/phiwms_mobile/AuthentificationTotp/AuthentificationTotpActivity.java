@@ -63,7 +63,7 @@ public class AuthentificationTotpActivity extends MainActivity {
     private static String toCompleteTotp = "";
     private boolean vueOuverte = false;
     private boolean mdpOublie;
-    private View.OnClickListener fonctionBouton;
+    private int nbEssais = 5;
     private WebView vueActuelle;
     private GestionTotp gestionnaireTotp;
 
@@ -98,6 +98,8 @@ public class AuthentificationTotpActivity extends MainActivity {
             vueActuelle.evaluateJavascript("window.location ='/demandemotdepasseoublie';", null);
         }
 
+        MinuteurView leMinuteur = (MinuteurView) findViewById(R.id.minuteur);
+
         Runnable updateAffichageTotp = new Runnable() {
             @Override
             public void run() {
@@ -113,8 +115,6 @@ public class AuthentificationTotpActivity extends MainActivity {
                 }
             }
         };
-
-        MinuteurView leMinuteur = (MinuteurView) findViewById(R.id.minuteur);
 
         String identifiant = monIntention.getStringExtra("identifiant");
         WebViewManager manager = WebViewManager.getInstance(AuthentificationTotpActivity.this);
@@ -175,9 +175,21 @@ public class AuthentificationTotpActivity extends MainActivity {
                 manager.addUponLogFailed(onLogFailed);
             }
             else {
-                Toast toast = Toast.makeText(AuthentificationTotpActivity.this, "Code invalide !", Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
+                if (nbEssais <= 1){
+                    Alerte.afficherAlerte(AuthentificationTotpActivity.this, "Erreur Authentification Forte", "5 essais écoulés, veuillez demander un nouveau code.", "alerte");
+                    toCompleteTotp = "";
+                }
+                else {
+                    Toast toast = Toast.makeText(AuthentificationTotpActivity.this, "Code invalide !", Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                }
+                if (nbEssais > 0){
+                    nbEssais --;
+                    TextView vue = (TextView) findViewById(R.id.textNbEssais);
+                    vue.setText("Il vous reste " + nbEssais + " essais.");
+                }
+                updateAffichageTotp.run();
             }
         });
 
@@ -195,10 +207,13 @@ public class AuthentificationTotpActivity extends MainActivity {
                     Button bouton = (Button) findViewById(buttonId);
                     bouton.setText(charList.get(i));
                 }
+                nbEssais = 5;
+                TextView vue = (TextView) findViewById(R.id.textNbEssais);
+                vue.setText("Il vous reste " + nbEssais + " essais.");
             }
         });
 
-        fonctionBouton = new View.OnClickListener() {
+        View.OnClickListener fonctionBouton = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Button boutonCourant = (Button) v;
@@ -282,27 +297,16 @@ public class AuthentificationTotpActivity extends MainActivity {
         findViewById(R.id.boutonSupport).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /*
                 Intent toSupport = new Intent(AuthentificationTotpActivity.this, SupportActivity.class);
+                toSupport.putExtra("token", monIntention.getStringExtra("token"));
+                gestionnaireTotp.totpDone();
+                leMinuteur.stopTimer();
                 startActivity(toSupport);
+                */
             }
         });
 
-    }
-
-    @Override
-    protected void onPause(){
-        super.onPause();
-        toCompleteTotp = "";
-        for (int i = 1; i <= 6; i++){
-            int imageId = getResources().getIdentifier("char" + i, "id", getPackageName());
-            ImageView image = (ImageView) findViewById(imageId);
-            if (i <= toCompleteTotp.length()){
-                image.setImageResource(R.mipmap.ic_cercle_plein);
-            }
-            else {
-                image.setImageResource(R.mipmap.ic_cercle_vide);
-            }
-        }
     }
 
 }

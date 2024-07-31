@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -102,6 +103,13 @@ public class InscriptionActivity extends MainActivity {
                 };
                 RequestQueue requestQueueUtilisateur = Volley.newRequestQueue(this);
                 requestQueueUtilisateur.add(requeteInscript);
+            }
+        });
+
+        findViewById(R.id.imageRetour).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getOnBackPressedDispatcher().onBackPressed();
             }
         });
     }
