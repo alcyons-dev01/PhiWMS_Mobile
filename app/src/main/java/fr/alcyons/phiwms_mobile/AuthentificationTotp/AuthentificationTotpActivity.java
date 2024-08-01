@@ -138,11 +138,9 @@ public class AuthentificationTotpActivity extends MainActivity {
             public void run() {
                 Intent backToAuth = new Intent(AuthentificationTotpActivity.this, AuthentificationV2Activity.class);
                 backToAuth.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(backToAuth);
-                WebViewCompat.removeWebMessageListener(vueActuelle, "androidMessageHandler");
+                WebViewManager.getInstance(AuthentificationTotpActivity.this).deconnexion();
                 WebViewManager.destroy();
-                vueOuverte = false;
-                webviewConteneur.removeAllViews();
+                startActivity(backToAuth);
                 finish();
             }
         };
@@ -161,37 +159,6 @@ public class AuthentificationTotpActivity extends MainActivity {
                 finish();
             }
         };
-
-        Button boutonValider = findViewById(R.id.boutonEnvoi);
-        boutonValider.setOnClickListener(v -> {
-            if (gestionnaireTotp.totpCorrect(toCompleteTotp)){
-                toCompleteTotp = "";
-                updateAffichageTotp.run();
-                if (!mdpOublie){
-                    manager.authentification(identifiant, monIntention.getStringExtra("mdp"));
-                }
-                manager.addUponLogin(onLogin);
-                manager.addUponLogout(onLogout);
-                manager.addUponLogFailed(onLogFailed);
-            }
-            else {
-                if (nbEssais <= 1){
-                    Alerte.afficherAlerte(AuthentificationTotpActivity.this, "Erreur Authentification Forte", "5 essais écoulés, veuillez demander un nouveau code.", "alerte");
-                    toCompleteTotp = "";
-                }
-                else {
-                    Toast toast = Toast.makeText(AuthentificationTotpActivity.this, "Code invalide !", Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.CENTER, 0, 0);
-                    toast.show();
-                }
-                if (nbEssais > 0){
-                    nbEssais --;
-                    TextView vue = (TextView) findViewById(R.id.textNbEssais);
-                    vue.setText("Il vous reste " + nbEssais + " essais.");
-                }
-                updateAffichageTotp.run();
-            }
-        });
 
         Button boutonTotp = findViewById(R.id.boutonTotp);
         boutonTotp.setOnClickListener(v -> {
@@ -213,6 +180,55 @@ public class AuthentificationTotpActivity extends MainActivity {
             }
         });
 
+
+        manager.addUponLogin(onLogin);
+        manager.addUponLogFailed(onLogFailed);
+
+        Runnable onTotpComplete = new Runnable() {
+            @Override
+            public void run() {
+                if (gestionnaireTotp.totpCorrect(toCompleteTotp)){
+                    toCompleteTotp = "";
+                    updateAffichageTotp.run();
+                    if (!mdpOublie){
+                        manager.authentification(identifiant, monIntention.getStringExtra("mdp"));
+                        manager.addUponLogout(onLogout);
+                    }
+                    else{
+                        // Dans le cas où le mot de passe a été oublié, le lien a été modifié et on part vers la webview
+                        Intent laWebview = new Intent(AuthentificationTotpActivity.this, WebViewActivity.class);
+                        Runnable passwordRecovered = new Runnable() {
+                            @Override
+                            public void run() {
+                                Intent intention = new Intent(AuthentificationTotpActivity.this, AuthentificationV2Activity.class);
+                                startActivity(intention);
+                            }
+                        };
+                        manager.setPasswordRecovered(passwordRecovered);
+                        webviewConteneur.removeAllViews();
+                        startActivity(laWebview);
+                    }
+                }
+                else {
+                    if (nbEssais <= 1){
+                        Alerte.afficherAlerte(AuthentificationTotpActivity.this, "Erreur Authentification Forte", "5 essais écoulés, veuillez demander un nouveau code.", "alerte");
+                    }
+                    else {
+                        Toast toast = Toast.makeText(AuthentificationTotpActivity.this, "Code invalide !", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    }
+                    if (nbEssais > 0){
+                        nbEssais --;
+                        TextView vue = (TextView) findViewById(R.id.textNbEssais);
+                        vue.setText("Il vous reste " + nbEssais + " essais.");
+                    }
+                    toCompleteTotp = "";
+                    updateAffichageTotp.run();
+                }
+            }
+        };
+
         View.OnClickListener fonctionBouton = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -220,6 +236,9 @@ public class AuthentificationTotpActivity extends MainActivity {
                 String valeur = boutonCourant.getText().toString();
                 appendToCompleteTotp(valeur.charAt(0));
                 updateAffichageTotp.run();
+                if (toCompleteTotp.length() == 6){
+                    onTotpComplete.run();
+                }
             }
         };
 
@@ -244,7 +263,7 @@ public class AuthentificationTotpActivity extends MainActivity {
                 ClipboardManager pressePapier = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
                 ClipData dernierElement = pressePapier.getPrimaryClip();
                 ClipData.Item item = dernierElement.getItemAt(0);
-                String copiedText = item.getText().toString();
+                String copiedText = item.getText().toString().replaceAll("\\s", "");
                 Boolean codeCorrect = true;
                 if (copiedText.length() != 6){
                     codeCorrect = false;
@@ -262,6 +281,7 @@ public class AuthentificationTotpActivity extends MainActivity {
                 else {
                     toCompleteTotp = copiedText;
                     updateAffichageTotp.run();
+                    onTotpComplete.run();
                 }
             }
         });

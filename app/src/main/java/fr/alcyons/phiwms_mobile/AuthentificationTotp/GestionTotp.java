@@ -76,7 +76,7 @@ public class GestionTotp {
         totp = "AAAAAA";
         SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context);
         String ipServ = sharedPreferences.getString("ipServeur", "");
-        String urlRequete = "http://10.0.2.2:8000" +/* ipServ +*/ "/sendTotpCode";
+        String urlRequete = "http://" + ipServ + "/sendTotpCode";
         JSONObject body = new JSONObject();
         try {
             body.put("identifiant", identifiant);
@@ -91,7 +91,7 @@ public class GestionTotp {
             totp = calculerTotp();
             minuteur.stopTimer();
             minuteur.startTimer(5, 0, this::totpDone);
-            Log.d("test", totp);
+            //Log.d("test", totp);
             JsonObjectRequest requeteAuth = new JsonObjectRequest(Request.Method.POST, urlRequete, body, response -> {
                 try {
                     boolean success = response.getBoolean("success");

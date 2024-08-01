@@ -28,8 +28,10 @@ public class WebViewManager {
     private List<Runnable> uponLogin;
     private List<Runnable> uponLogout;
     private List<Runnable> uponLogFailed;
+    private Runnable passwordRecovered;
     private static Boolean isWebViewReady;
     private static WebViewManager instance;
+    private WebViewCompat.WebMessageListener myListener;
     private WebView offscreenWebView;
     private Context context;
 
@@ -46,16 +48,17 @@ public class WebViewManager {
         offscreenWebView.getSettings().setJavaScriptEnabled(true);
         SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context);
         String ipServ = sharedPreferences.getString("ipServeur", "");
-        offscreenWebView.loadUrl("http://10.0.2.2:8000" /*+ ipServ*/);
+        offscreenWebView.loadUrl("http://" + ipServ);
 
         Set<String> allowedOrigins = new HashSet<>();
         allowedOrigins.add("http://10.0.2.2:8000");
         allowedOrigins.add("http://phiwms.alcyons.fr");
         allowedOrigins.add("http://" + ipServ);
-        WebViewCompat.WebMessageListener myListener = new WebViewCompat.WebMessageListener() {
+        myListener = new WebViewCompat.WebMessageListener() {
             @Override
             public void onPostMessage(WebView view, WebMessageCompat message, Uri sourceOrigin,
                                       boolean isMainFrame, JavaScriptReplyProxy replyProxy) {
+                Log.d("test", message.getData().toString());
                 if (message.getData().equals("userIsLoggedOut")){
                     for (Runnable fonction: uponLogout)
                     {
@@ -67,17 +70,24 @@ public class WebViewManager {
                         fonction.run();
                     }
                 } else if (message.getData().equals("userIsLogged")) {
-                    Log.d("test", "test");
+                    //Log.d("test", "test");
                     for (Runnable fonction: uponLogin)
                     {
                         fonction.run();
                     }
+                } else if (message.getData().equals("userRecoveryPwd")){
+                    passwordRecovered.run();
                 }
 
             }
         };
 
         WebViewCompat.addWebMessageListener(offscreenWebView, "androidMessageHandler", allowedOrigins, myListener);
+    }
+
+    public void deconnexion(){
+        offscreenWebView.evaluateJavascript("$('#modale_demande_confirmation').find('#modal-validate').click();", null);
+        offscreenWebView.setVisibility(View.GONE);
     }
 
     public void authentification(String username, String password) {
@@ -110,12 +120,19 @@ public class WebViewManager {
         uponLogFailed.add(toRun);
     }
 
+    public void setPasswordRecovered(Runnable passwordRecovered){
+        this.passwordRecovered = passwordRecovered;
+    }
+
     public void removeUponLogFailed(Runnable toRun){
         uponLogFailed.remove(toRun);
     }
 
     public static void destroy(){
-        instance = null;
+        if (instance != null){
+            instance.getOffscreenWebView().destroy();
+            instance = null;
+        }
     }
 
     public static synchronized WebViewManager getInstance(Context context) {

@@ -17,8 +17,6 @@ public class MinuteurView extends AppCompatTextView {
 
     private int minutes;
     private int secondes;
-    private int startMinutes;
-    private int startSecondes;
     private boolean continuer;
     private Runnable onEndOfTimer;
     private Handler handler;
@@ -81,9 +79,7 @@ public class MinuteurView extends AppCompatTextView {
         if (toRunOnEnd != null){
             this.onEndOfTimer = toRunOnEnd;
         }
-        startMinutes = minutes;
         this.minutes = minutes;
-        startSecondes = secondes;
         this.secondes = secondes;
         continuer = true;
         handler.postDelayed(runnable, 1000);
@@ -92,7 +88,6 @@ public class MinuteurView extends AppCompatTextView {
     }
 
     public void stopTimer(){
-        Log.d("test", "stopTimer appelé");
         handler.removeCallbacks(runnable);
         continuer = false;
         setText("00:00");

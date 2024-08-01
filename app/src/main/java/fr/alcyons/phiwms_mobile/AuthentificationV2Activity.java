@@ -46,6 +46,7 @@ public class AuthentificationV2Activity extends MainActivity {
         setContentView(R.layout.activity_authentificationv2);
 
         // On créé l'instance de WebViewManager ici car sinon l'instance ne fonctionne pas
+        WebViewManager.destroy();
         WebViewManager.getInstance(this);
         // On prépare l'intention pour se rendre sur l'activité d'authentification par TOTP
         Intent goToTotp = new Intent(AuthentificationV2Activity.this, AuthentificationTotpActivity.class);
@@ -128,6 +129,7 @@ public class AuthentificationV2Activity extends MainActivity {
                         goToTotp.putExtra("mdp", mdp.getText().toString());
                         goToTotp.putExtra("token", token);
                         startActivity(goToTotp);
+                        finish();
                     }
                 } catch (JSONException exception) {
                     Log.e(TAG, "JSONException :", exception);
@@ -158,7 +160,7 @@ public class AuthentificationV2Activity extends MainActivity {
             Intent toInscription = new Intent(AuthentificationV2Activity.this, InscriptionActivity.class);
 
             // On prépare la requête pour obtenir les informations nécessaires à l'inscription
-            String urlRequete = "http://10.0.2.2:8000" +/* ipServ +*/ "/inscription";
+            String urlRequete = "http://" + ipServ + "/inscription";
 
             JSONObject body = new JSONObject();
             try {
@@ -182,6 +184,7 @@ public class AuthentificationV2Activity extends MainActivity {
                     toInscription.putExtra("profils", listeProfils);
                     toInscription.putExtra("etablissements", listeEtablissements);
                     startActivity(toInscription);
+                    finish();
                 } catch (JSONException exception) {
                     Alerte.afficherAlerte(AuthentificationV2Activity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete obtentionInfosInscription", "alerte");
                     Log.e(TAG, "JSONException :", exception);
@@ -207,6 +210,7 @@ public class AuthentificationV2Activity extends MainActivity {
         findViewById(R.id.versCGU).setOnClickListener(v -> {
             Intent versCGU = new Intent(AuthentificationV2Activity.this, CguActivity.class);
             startActivity(versCGU);
+            finish();
         });
 
         // Mot de passe oublié
@@ -216,6 +220,7 @@ public class AuthentificationV2Activity extends MainActivity {
             goToTotp.putExtra("identifiant", identifiant);
             goToTotp.putExtra("etat_mdp", mdpOublie);
             startActivity(goToTotp);
+            finish();
         });
     }
 
