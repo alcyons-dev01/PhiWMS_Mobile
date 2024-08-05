@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bleu_fonce_alcyons"
+    android:layout_alignParentTop="true"
+    android:layout_alignParentStart="true"
+    android:theme="@style/AppTheme">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layoutDirection="rtl">
+
+        <ImageView
+            android:id="@+id/imageRetour"
+            android:layout_width="wrap_content"
+            android:layout_height="100sp"
+            android:adjustViewBounds="true"
+            android:contentDescription="Retour"
+            android:src="@drawable/ic_croix_blanche" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="10"
+        android:paddingHorizontal="100dp"
+        android:paddingVertical="50dp"
+        android:layout_marginBottom="50dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:weightSum="3">
+
+            <ImageView
+                android:id="@+id/imageLogo"
+                android:layout_width="350dp"
+                android:layout_height="0dp"
+                android:layout_weight="3"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/logophiwms"
+                android:src="@mipmap/ic_logo_phiwms" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="8"
+            android:orientation="vertical"
+            android:weightSum="6">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2"
+                android:layout_marginTop="50dp"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:textColor="@color/blanc"
+                android:textSize="40sp"
+                android:textStyle="bold"
+                android:text="Saisissez un message à destination du support."/>
+
+            <EditText
+                android:id="@+id/textMessageSupport"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="3"
+                android:layout_marginVertical="50dp"
+                android:background="@color/blanc"/>
+
+            <Button
+                android:id="@+id/boutonContactSupport"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/bleu_clair_alcyons"
+                android:text="Envoyer"
+                android:textSize="35sp"
+                android:textColor="@color/blanc"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</RelativeLayout>

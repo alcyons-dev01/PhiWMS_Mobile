@@ -7,113 +7,119 @@
     android:theme="@style/AppTheme"
     tools:context="fr.alcyons.phiwms_mobile.InscriptionActivity">
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        tools:ignore="UselessParent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layoutDirection="rtl">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/formulaireInscription"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:weightSum="3">
+        <ImageView
+            android:id="@+id/imageRetour"
+            android:layout_width="wrap_content"
+            android:layout_height="100sp"
+            android:adjustViewBounds="true"
+            android:contentDescription="Retour"
+            android:src="@drawable/ic_croix_blanche" />
 
-            <ImageView
-                android:id="@+id/imageLogo"
-                android:layout_width="300dp"
-                android:layout_height="0dp"
-                android:layout_weight="2"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/logophiwms"
-                android:src="@mipmap/ic_logo_phiwms" />
-        </LinearLayout>
+    </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/formulaireInscription"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/formulaireInscription"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:weightSum="3">
+
+        <ImageView
+            android:id="@+id/imageLogo"
+            android:layout_width="300dp"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/logophiwms"
+            android:src="@mipmap/ic_logo_phiwms" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/formulaireInscription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:layout_centerVertical="true"
+        android:orientation="vertical"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp">
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerInParent="true"
-            android:layout_centerVertical="true"
-            android:orientation="vertical"
-            android:paddingLeft="40dp"
-            android:paddingRight="40dp">
+            android:layout_gravity="center"
+            android:text="INSCRIPTION"
+            android:textSize="50sp"
+            android:textStyle="bold"
+            android:textColor="@color/blanc"
+            android:textAlignment="center"
+            android:layout_marginBottom="25sp"/>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="match_parent"
+            android:layout_height="78sp"
+            android:backgroundTint="@android:color/white"
+            android:fontFamily="sans-serif"
+            android:hint="you@example.com"
+            android:textSize="25sp"
+            android:inputType="textEmailAddress"
+            android:imeOptions="actionNext"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/white"
+            android:textCursorDrawable="@null"
+            android:autofillHints=""
+            android:layout_marginBottom="25sp"/>
+
+        <Spinner
+            android:id="@+id/etablissement"
+            android:layout_width="match_parent"
+            android:layout_height="78sp"
+            android:background="@color/blanc"
+            android:layout_marginBottom="25sp"/>
+
+        <Spinner
+            android:id="@+id/profil"
+            android:layout_width="match_parent"
+            android:layout_height="78sp"
+            android:background="@color/blanc"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:weightSum="10">
+
+            <Button
+                android:id="@+id/boutonDemande"
+                android:layout_width="0dp"
+                android:layout_height="75sp"
                 android:layout_gravity="center"
-                android:text="INSCRIPTION"
-                android:textSize="50sp"
-                android:textStyle="bold"
-                android:textColor="@color/blanc"
-                android:textAlignment="center"
-                android:layout_marginBottom="25sp"/>
-
-            <EditText
-                android:id="@+id/email"
-                android:layout_width="match_parent"
-                android:layout_height="78sp"
-                android:backgroundTint="@android:color/white"
-                android:fontFamily="sans-serif"
-                android:hint="you@example.com"
-                android:textSize="25sp"
-                android:inputType="textEmailAddress"
-                android:imeOptions="actionNext"
+                android:layout_margin="20dp"
+                android:layout_weight="7"
+                android:background="@color/bleu_clair_alcyons"
+                android:text="FAIRE LA DEMANDE"
                 android:textColor="@android:color/white"
-                android:textColorHint="@android:color/white"
-                android:textCursorDrawable="@null"
-                android:autofillHints=""
-                android:layout_marginBottom="25sp"/>
+                android:textSize="30sp"/>
 
-            <Spinner
-                android:id="@+id/etablissement"
-                android:layout_width="match_parent"
-                android:layout_height="78sp"
-                android:background="@color/blanc"
-                android:layout_marginBottom="25sp"/>
-
-            <Spinner
-                android:id="@+id/profil"
-                android:layout_width="match_parent"
-                android:layout_height="78sp"
-                android:background="@color/blanc"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:weightSum="10">
-
-                <Button
-                    android:id="@+id/boutonDemande"
-                    android:layout_width="0dp"
-                    android:layout_height="75sp"
-                    android:layout_gravity="center"
-                    android:layout_margin="20dp"
-                    android:layout_weight="7"
-                    android:background="@color/bleu_clair_alcyons"
-                    android:text="FAIRE LA DEMANDE"
-                    android:textColor="@android:color/white"
-                    android:textSize="30sp"/>
-
-                <ProgressBar
-                    android:id="@+id/progressBar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:indeterminate="true"
-                    android:visibility="gone"
-                    android:indeterminateTint="@color/bleu_clair_alcyons"/>
-
-            </LinearLayout>
+                android:indeterminate="true"
+                android:visibility="gone"
+                android:indeterminateTint="@color/bleu_clair_alcyons"/>
 
         </LinearLayout>
 
-    </RelativeLayout>
+    </LinearLayout>
 
 </RelativeLayout>

@@ -3,8 +3,10 @@ package fr.alcyons.phiwms_mobile;
 import static com.google.android.gms.vision.L.TAG;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -54,13 +56,15 @@ public class InscriptionActivity extends MainActivity {
         selecteurEtablissement.setAdapter(adapterEtablissement);
 
         Button envoiDemande = (Button) findViewById(R.id.boutonDemande);
+        SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
+        String ipServ = sharedPreferences.getString("ipServeur", "");
 
         envoiDemande.setOnClickListener(v -> {
             String email = inputEmail.getText().toString();
             String profil = selecteurProfil.getSelectedItem().toString();
             String etablissement = selecteurEtablissement.getSelectedItem().toString();
             if (email != null && email != "" && profil != null && profil != "" && etablissement != null && etablissement != ""){
-                String urlRequete = "http://10.0.2.2:8000/demandeInscription";
+                String urlRequete = "http://" + ipServ + "/demandeInscription";
 
                 JSONObject body = new JSONObject();
                 try {
@@ -99,6 +103,13 @@ public class InscriptionActivity extends MainActivity {
                 };
                 RequestQueue requestQueueUtilisateur = Volley.newRequestQueue(this);
                 requestQueueUtilisateur.add(requeteInscript);
+            }
+        });
+
+        findViewById(R.id.imageRetour).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getOnBackPressedDispatcher().onBackPressed();
             }
         });
     }
