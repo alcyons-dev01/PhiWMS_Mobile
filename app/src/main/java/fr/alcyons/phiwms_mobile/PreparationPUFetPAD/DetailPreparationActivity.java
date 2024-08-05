@@ -180,11 +180,16 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         String intitule = "#" + String.valueOf(ph_preparation_Selectionne.getUID());
         ((TextView) findViewById(R.id.intitule)).setText(intitule);
 
-        String textDepot = depot.getNom();
-        if(utilisateurConnecte.getIdentifiant().toLowerCase().contentEquals("alcyons") && depot.getStructure().contentEquals("PAD"))
+        String textDepot = "";
+        if(depot != null)
         {
-            textDepot = "Patient - "+depot.getPAD_IPP();
+            textDepot = depot.getNom();
+            if(utilisateurConnecte.getIdentifiant().toLowerCase().contentEquals("alcyons") && depot.getStructure().contentEquals("PAD"))
+            {
+                textDepot = "Patient - "+depot.getPAD_IPP();
+            }
         }
+
         ((TextView) findViewById(R.id.depot)).setText(textDepot);
 
         ((LinearLayout) findViewById(R.id.lancerScan)).setOnClickListener(view -> onMenuDatamatrixClick());

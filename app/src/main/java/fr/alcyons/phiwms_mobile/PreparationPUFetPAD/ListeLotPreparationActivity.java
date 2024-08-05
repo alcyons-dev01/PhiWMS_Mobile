@@ -852,13 +852,6 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
                             return headers;
                         }
                     };
-                    obreq.setRetryPolicy(retryPolicy);
-                    requestQueue.add(obreq);
-                    try {
-                        Looper.loop();
-                    } catch (RuntimeException e) {
-                        Log.e(TAG, "Error Looper :", e);
-                    }
                 }
             }
 

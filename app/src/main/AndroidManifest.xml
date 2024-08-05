@@ -58,7 +58,11 @@
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"
         android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
 
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
     </activity>
 
     <activity
@@ -66,11 +70,7 @@
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"
         android:exported="true">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
     </activity>
 
     <activity
@@ -318,6 +318,14 @@
     <!-- Barcode Activity -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <!-- Barcode ScannerSearchOnly Activity -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"

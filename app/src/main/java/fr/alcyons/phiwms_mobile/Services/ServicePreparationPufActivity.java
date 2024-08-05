@@ -289,10 +289,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
                                 PH_Preparation ph_preparation = new PH_Preparation(ph_preparation_JSONObject);
 
                                 rowID = PH_PreparationOpenHelper.insererUnPH_PreparationEnBDD(db, ph_preparation);
-                                if(ph_preparation.getUID() == 51570)
-                                {
-                                    ph_preparation.setUID(ph_preparation.getUID());
-                                }
+
                                 if (rowID != -1) {
                                     //gestion de la liste des dépôts
                                     Depot depotDestinataire = DepotOpenHelper.getDepotParReference(db, ph_preparation.getDepotDestinataireReference());

@@ -4,6 +4,7 @@ import android.content.Context;
 
 
 import android.database.sqlite.SQLiteDatabase;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,7 +76,7 @@ public class NavigationAdapter extends ArrayAdapter<Service> implements Filterab
 
         viewHolder.nom.setText(serviceCourant.getNom());
 
-        viewHolder.descriptionService.setText(serviceCourant.getDescription());
+        viewHolder.descriptionService.setText(Html.fromHtml(serviceCourant.getDescription()));
         if(!nomPerimetreFonctionnel.toLowerCase().contentEquals("commun"))
         {
             if(mapServiceIndicateur != null)

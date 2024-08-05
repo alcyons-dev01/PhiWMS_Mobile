@@ -130,7 +130,7 @@ public class Lot_PreparationAdapter extends ArrayAdapter {
                 DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 String datePeremption = lotAdapte.getDatePeremption();
 
-                if (datePeremption != null && !datePeremption.contentEquals("")) {
+                if (datePeremption != null && !datePeremption.equals("null") && !datePeremption.contentEquals("")) {
                     try {
                         dateExp = dateDecodeur.parse(lotAdapte.getDatePeremption().substring(0, 10));
                         viewHolder.dateExpiration.setText(dateFormat.format(dateExp));
