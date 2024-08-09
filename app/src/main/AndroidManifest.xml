@@ -101,6 +101,13 @@
         android:configChanges="orientation|screenSize">
     </activity>
 
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.CGU.CguActivity"
+        android:exported="true"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize">
+    </activity>
+
     <!-- Paramètre Serveur -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.ParametresServeur.ServiceParametresServeurActivity"
@@ -333,6 +340,14 @@
     <!-- Barcode ScannerSearchOnly Activity -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <!-- Barcode Preparation Activity -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
