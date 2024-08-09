@@ -7,6 +7,18 @@ import org.json.JSONObject;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
 public class ObjetPreparationScannee implements Comparable{
+
+    public ObjetPreparationScannee(double qte, String lot, String peremptionDate, String emplacement, String depot_Reference, String zone, int produit_Code, int qtePrep, String numSerie) {
+        this.Qte = qte;
+        this.Lot = lot;
+        this.peremptionDate = peremptionDate;
+        this.Emplacement = emplacement;
+        this.Depot_Reference = depot_Reference;
+        this.Zone = zone;
+        this.Produit_Code = produit_Code;
+        this.Qte_Preparer = qtePrep;
+        this.Serie = numSerie;
+    }
     private double Qte;
     private String Lot;
     private String peremptionDate;

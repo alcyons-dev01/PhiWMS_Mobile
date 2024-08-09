@@ -40,6 +40,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
@@ -55,6 +57,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelp
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
+import fr.alcyons.phiwms_mobile.Classes.ObjetPreparationScannee;
 import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
@@ -315,7 +318,7 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
                 case CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH:
                     if(data != null)
                     {
-                        /*int retourLigneId = data.getExtras().getInt("retourLigneId");
+                        int retourLigneId = data.getExtras().getInt("retourLigneId");
                         String numLot = data.getExtras().getString("numLot");
                         String numSerie = data.getExtras().getString("numSerie");
                         String datePeremption = data.getExtras().getString("datePeremption");
@@ -353,7 +356,7 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
 
                             retourLigneAdapteCourant.getLotAdaptes().add(retourLigneAdapteCourant.new LotAdapte(objetPreparationScannee));
                             retourLigneControleRetourAdapteList.add(retourLigneAdapteCourant);
-                        }*/
+                        }
 
                     }
                     break;
@@ -546,7 +549,7 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
 
     public void lancerScanner()
     {
-        /*premierPassage = false;
+        premierPassage = false;
         Intent controleDesRetour_Intent = null;
         Bundle controleDesRetour_Bundle = super.getBundle();
         controleDesRetour_Bundle.putString("contexte", String.valueOf(R.string.scannerContextMultipleNewControleRetour));
@@ -579,7 +582,7 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
         controleDesRetour_Bundle.putIntegerArrayList("liste_id_retour_ligne", (ArrayList<Integer>) liste_id_retour_ligne);
 
         controleDesRetour_Intent.putExtras(controleDesRetour_Bundle);
-        DetailsControleRetoursActivity.this.startActivityForResult(controleDesRetour_Intent, CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH);*/
+        DetailsControleRetoursActivity.this.startActivityForResult(controleDesRetour_Intent, CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH);
     }
 
     private void onClickTriDesignation()

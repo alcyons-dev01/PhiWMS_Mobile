@@ -277,6 +277,10 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
                             } else if (!erreur.contentEquals("Aucun PH_Preparation trouvé")) {
                                 Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Préparation PUF", "alerte");
                                 ServicePreparationPufActivity.this.finishAffinity();
+                            } else {
+                                arreterSpinner();
+                                Alerte.afficherAlerte(ServicePreparationPufActivity.this, "Alerte", "Aucune préparation UF à traiter", "alerte");
+                                retourNavigation(ServicePreparationPufActivity.this);
                             }
                         } else {
                             JSONArray ph_preparation_JSONArray = response.getJSONArray("PH_Preparations");

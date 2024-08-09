@@ -131,13 +131,13 @@ public class OriginalActivity extends MainActivity {
                 // for ActivityCompat#requestPermissions for more details.
                 return;
             }
-            assert bestProvider != null;
-            location = locationManager.getLastKnownLocation(bestProvider);
-            if (location != null) {
-                utilisateurConnecte.setLocalisation(location);
+            if(bestProvider != null)
+            {
+                location = locationManager.getLastKnownLocation(bestProvider);
+                if (location != null) {
+                    utilisateurConnecte.setLocalisation(location);
+                }
             }
-
-
              footer = new Drawable() {
                 @Override
                 public void draw(@NonNull Canvas canvas) {

@@ -307,9 +307,10 @@ public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
                                 ServiceLivraisonActivity.this.finishAffinity();
                                 Intent intent = new Intent(context, AuthentificationActivity.class);
                                 context.startActivity(intent);
-                            } else if (!erreur.contentEquals("Aucun PH_Preparation trouvé")) {
-                                Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Livraison", "alerte");
-                                ServiceLivraisonActivity.this.finishAffinity();
+                            } else if (erreur.contentEquals("Aucun PH_Preparation trouvé")) {
+                                arreterSpinner();
+                                Alerte.afficherAlerte(ServiceLivraisonActivity.this, "Alerte", "Aucune Livraison à traiter", "alerte");
+                                retourNavigation(ServiceLivraisonActivity.this);
                             }
                         } else {
                             ph_preparation_JSONArray = response.getJSONArray("PH_Preparations");

@@ -480,6 +480,10 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                     }
                 }
             }
+            else
+            {
+                afficherSnackBar(serviceSelectionne.getNom());
+            }
         });
 
         new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);

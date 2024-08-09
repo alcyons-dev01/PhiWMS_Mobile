@@ -234,7 +234,6 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                 response -> {
                     try {
                         int nbResultat = response.getInt("resultCount");
-                        retoursJson = response.getJSONArray("PH_Retours");
                         if (nbResultat == 0) {
                             String string = response.getString("erreur");
                             if (string.equals(getString(R.string.tokenInvalide))) {
@@ -244,9 +243,12 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                                 Intent intent = new Intent(ServiceRetourFournisseurActivity.this, AuthentificationActivity.class);
                                 ServiceRetourFournisseurActivity.this.startActivity(intent);
                             } else {
+                                arreterSpinner();
                                 Alerte.afficherAlerte(ServiceRetourFournisseurActivity.this, "Alerte", "Aucun Retour Fournisseur à traiter", "alerte");
+                                retourNavigation(ServiceRetourFournisseurActivity.this);
                             }
                         } else {
+                            retoursJson = response.getJSONArray("PH_Retours");
                             viderTablesConcernees();
                             for (int i = 0; i < retoursJson.length(); i++) {
                                 JSONObject retourJson = retoursJson.getJSONObject(i);
@@ -304,22 +306,6 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                 return headers;
             }
         };
-        obreq.setRetryPolicy(new RetryPolicy() {
-            @Override
-            public int getCurrentTimeout() {
-                return 50000;
-            }
-
-            @Override
-            public int getCurrentRetryCount() {
-                return 50000;
-            }
-
-            @Override
-            public void retry(VolleyError error) {
-
-            }
-        });
         return obreq;
     }
     @NonNull
