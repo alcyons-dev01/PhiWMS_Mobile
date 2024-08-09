@@ -281,6 +281,10 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
                             } else if (!erreur.contentEquals("Aucun PH_Preparation trouvé")) {
                                 Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Préparation PAD", "alerte");
                                 ServicePreparationPadActivity.this.finishAffinity();
+                            } else {
+                                arreterSpinner();
+                                Alerte.afficherAlerte(ServicePreparationPadActivity.this, "Alerte", "Aucune préparation PAD à traiter", "alerte");
+                                retourNavigation(ServicePreparationPadActivity.this);
                             }
                         } else {
                             JSONArray ph_preparations_JSONArray = response.getJSONArray("PH_Preparations");

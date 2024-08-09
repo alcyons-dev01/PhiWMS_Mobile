@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
@@ -686,8 +688,7 @@ public class ListeLotsControleDesRetoursActivity extends ServiceActivity {
     View.OnClickListener clicBoutonAjoutParScan = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-
-            /*gestionLot();
+            gestionLot();
             Bundle clicBoutonAjoutParScan_Bundle = ListeLotsControleDesRetoursActivity.super.getBundle();
             clicBoutonAjoutParScan_Bundle.putBoolean("doitEtreIdentique", true);
             clicBoutonAjoutParScan_Bundle.putString("Designation", produit.getDesignation_interne());
@@ -715,7 +716,7 @@ public class ListeLotsControleDesRetoursActivity extends ServiceActivity {
             }
             clicBoutonAjoutParScan_intent.putExtras(clicBoutonAjoutParScan_Bundle);
 
-            ListeLotsControleDesRetoursActivity.this.startActivityForResult(clicBoutonAjoutParScan_intent, RETOUR_CODE_GS1);*/
+            ListeLotsControleDesRetoursActivity.this.startActivityForResult(clicBoutonAjoutParScan_intent, RETOUR_CODE_GS1);
         }
     };
 

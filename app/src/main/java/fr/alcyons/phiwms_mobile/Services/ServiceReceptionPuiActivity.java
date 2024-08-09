@@ -297,9 +297,9 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                                 Intent intent = new Intent(ServiceReceptionPuiActivity.this, AuthentificationActivity.class);
                                 ServiceReceptionPuiActivity.this.startActivity(intent);
                             } else if (erreur.contentEquals("Aucun PH_Commande trouvé")) {
-                                Toast toast = Toast.makeText(ServiceReceptionPuiActivity.this, "Aucune Commande trouvé", Toast.LENGTH_SHORT);
-                                toast.setGravity(Gravity.CENTER, 0, 0);
-                                toast.show();
+                                arreterSpinner();
+                                Alerte.afficherAlerte(ServiceReceptionPuiActivity.this, "Alerte", "Aucune réception PUI à traiter", "alerte");
+                                retourNavigation(ServiceReceptionPuiActivity.this);
                             } else {
                                 Alerte.afficherAlerte(ServiceReceptionPuiActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Reception PUI", "alerte");
                             }

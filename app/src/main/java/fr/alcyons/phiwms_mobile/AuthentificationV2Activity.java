@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -71,21 +72,19 @@ public class AuthentificationV2Activity extends MainActivity {
             EditText identifiant = findViewById(R.id.identifiant);
             String idStr = identifiant.getText().toString();
             EditText mdp = findViewById(R.id.motDePasse);
-            String mdpStr = "";
+            StringBuilder mdpStr = new StringBuilder();
             ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
             progressBar.setVisibility(View.VISIBLE);
             // On passe le mot de passe dans l'algorithme de hashage
             try {
                 MessageDigest md = null;
                 md = MessageDigest.getInstance("MD5");
-                byte[] theMD5digest = md.digest(new String(mdp.getText().toString()).getBytes("UTF-8"));
+                byte[] theMD5digest = md.digest(mdp.getText().toString().getBytes(StandardCharsets.UTF_8));
                 for (final byte element : theMD5digest)
                 {
-                    mdpStr += Integer.toString((element & 0xff) + 0x100, 16).substring(1);
+                    mdpStr.append(Integer.toString((element & 0xff) + 0x100, 16).substring(1));
                 }
             } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
 
@@ -95,7 +94,7 @@ public class AuthentificationV2Activity extends MainActivity {
             JSONObject body = new JSONObject();
             try {
                 body.put("identifiant", idStr);
-                body.put("mdp", mdpStr);
+                body.put("mdp", mdpStr.toString());
                 body.put("etat_mdp", false);
             } catch (JSONException e) {
                 Log.e(TAG, "JSONException :", e);

@@ -12,6 +12,7 @@
         <domain includeSubdomains="true">10.81.130.28</domain>
         <domain includeSubdomains="true">192.168.1.206</domain>
         <domain includeSubdomains="true">172.26.159.200</domain>
+        <domain includeSubdomains="true">100.100.100.104</domain>
     </domain-config>
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">10.0.2.2</domain>

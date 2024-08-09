@@ -296,6 +296,7 @@ public class AuthentificationActivity extends MainActivity {
 
                 // Appel de la fonction de connexion
                 identificationUtilisateur(motDePasseHache, identifiant);
+                //identificationUtilisateur("53bfbf997fa54f1b3c4e9ff6637084e6", "jy.aglae");
             } else {
                 Toast toast = Toast.makeText(AuthentificationActivity.this, "Veuillez saisir les informations de connexion", Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
@@ -357,8 +358,8 @@ public class AuthentificationActivity extends MainActivity {
                         TextView textViewIdentifiant = findViewById(R.id.identifiant);
                         TextView textViewMotDePasse = findViewById(R.id.motDePasse);
 
-                        textViewIdentifiant.setText("alcyons");
-                        textViewMotDePasse.setText("65ken64btz");
+                        /*textViewIdentifiant.setText("alcyons");
+                        textViewMotDePasse.setText("65ken64btz");*/
                     }
                 }
 
@@ -369,8 +370,8 @@ public class AuthentificationActivity extends MainActivity {
             TextView textViewIdentifiant = findViewById(R.id.identifiant);
             TextView textViewMotDePasse = findViewById(R.id.motDePasse);
 
-            textViewIdentifiant.setText("alcyons");
-            textViewMotDePasse.setText("65ken64btz");
+            /*textViewIdentifiant.setText("alcyons");
+            textViewMotDePasse.setText("65ken64btz");*/
         }
 
         // create class object

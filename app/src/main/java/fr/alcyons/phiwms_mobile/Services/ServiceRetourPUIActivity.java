@@ -296,6 +296,10 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                                 ServiceRetourPUIActivity.this.startActivity(serviceNotificationsIntent);
                             } else if (!erreur.equals(getString(R.string.aucunRetour))) {
                                 Alerte.afficherAlerte(ServiceRetourPUIActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete service retour pui", "alerte");
+                            } else {
+                                arreterSpinner();
+                                Alerte.afficherAlerte(ServiceRetourPUIActivity.this, "Alerte", "Aucun Retour PUI à traiter", "alerte");
+                                retourNavigation(ServiceRetourPUIActivity.this);
                             }
                         } else {
                             viderTablesConcernees();

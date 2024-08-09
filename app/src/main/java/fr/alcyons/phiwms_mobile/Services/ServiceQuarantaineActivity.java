@@ -283,6 +283,10 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                                 context.startActivity(intent1);
                             } else if (!erreur.contentEquals("Aucun PH_Retour trouvé")) {
                                 Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Quarantaine", "alerte");
+                            } else {
+                                arreterSpinner();
+                                Alerte.afficherAlerte(ServiceQuarantaineActivity.this, "Alerte", "Aucune Quarantaine à traiter", "alerte");
+                                retourNavigation(ServiceQuarantaineActivity.this);
                             }
                         } else {
                             retourJSONArray = response.getJSONArray("PH_Retours");

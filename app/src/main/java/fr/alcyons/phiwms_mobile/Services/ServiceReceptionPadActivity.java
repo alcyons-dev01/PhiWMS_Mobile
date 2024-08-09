@@ -305,7 +305,9 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                                 Intent intent = new Intent(ServiceReceptionPadActivity.this, AuthentificationActivity.class);
                                 ServiceReceptionPadActivity.this.startActivity(intent);
                             }  else {
-                                Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Reception PUI", "alerte");
+                                arreterSpinner();
+                                Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Alerte", "Aucune réception PAD à traiter", "alerte");
+                                retourNavigation(ServiceReceptionPadActivity.this);
                             }
                         } else {
                             commandeJSONArray = response.getJSONArray("PH_Commandes");

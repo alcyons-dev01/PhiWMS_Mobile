@@ -28,6 +28,9 @@ public class OutilsGestionPhraseSnackbar {
             case "Retour fournisseur":
                 phrase = "Aucun retour fournisseur détecté";
                 break;
+            case "Retour Fournisseur":
+                phrase = "Aucun retour fournisseur détecté";
+                break;
             case "Retour PUI":
                 phrase = "Aucun retour PUI détecté";
                 break;
@@ -69,6 +72,9 @@ public class OutilsGestionPhraseSnackbar {
                 break;
             case "NavigationService":
                 phrase = "Service scanné inconnu";
+                break;
+            case "Contrôles des retours":
+                phrase = "Aucun retour à contrôler";
                 break;
             default:
                 phrase = "Aucune ressource détectée";

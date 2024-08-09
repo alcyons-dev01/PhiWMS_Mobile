@@ -186,6 +186,7 @@ public class PH_Preparation_Ligne implements Serializable, Comparable {
         this.Qte_livrer = jsonObject.optInt("Qte_livrer");
         this.Qte_Demander = jsonObject.optInt("Qte_Demander");
         this.Qte_preparer = jsonObject.optInt("Qte_preparer");
+        this.Qte_APreparer = jsonObject.optInt("Qte_APreparer");
         this.produitPoids = jsonObject.optDouble("produitPoids");
         this.PoidsTotal = jsonObject.optDouble("PoidsTotal");
         this.Qte_RAL = jsonObject.optInt("Qte_RAL");

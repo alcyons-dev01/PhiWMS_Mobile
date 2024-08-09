@@ -243,7 +243,6 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
                 response -> {
                     try {
                         int nbResultat = response.getInt("resultCount");
-                        retoursJson = response.getJSONArray("PH_Retours");
                         if (nbResultat == 0) {
                             String string = response.getString("erreur");
                             if (string.equals(getString(R.string.tokenInvalide))) {
@@ -253,9 +252,12 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
                                 Intent intent = new Intent(ServiceDestructionActivity.this, AuthentificationActivity.class);
                                 ServiceDestructionActivity.this.startActivity(intent);
                             } else {
+                                arreterSpinner();
                                 Alerte.afficherAlerte(ServiceDestructionActivity.this, "Alerte", "Aucune Destruction à traiter", "alerte");
+                                retourNavigation(ServiceDestructionActivity.this);
                             }
                         } else {
+                            retoursJson = response.getJSONArray("PH_Retours");
                             viderTablesConcernees();
                             for (int i = 0; i < retoursJson.length(); i++) {
                                 JSONObject retourJson = retoursJson.getJSONObject(i);

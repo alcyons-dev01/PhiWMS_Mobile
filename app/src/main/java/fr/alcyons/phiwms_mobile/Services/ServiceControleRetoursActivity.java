@@ -323,8 +323,8 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                                 Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Contrôle des retours", "alerte");
                                 ServiceControleRetoursActivity.this.finishAffinity();
                             }else {
-                                vide = true;
-                                nomServiceVide = "Contrôle des retours";
+                                arreterSpinner();
+                                Alerte.afficherAlerte(ServiceControleRetoursActivity.this, "Alerte", "Aucun retour à contrôler", "alerte");
                                 retourNavigation(ServiceControleRetoursActivity.this);
                    }
                         } else {

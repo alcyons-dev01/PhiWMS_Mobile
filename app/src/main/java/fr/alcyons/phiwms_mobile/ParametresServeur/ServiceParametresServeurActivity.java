@@ -134,7 +134,7 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
 
 
         //gestion du bouton alcyons
-        if(!Build.MANUFACTURER.contains("Zebra Technologies") && !Build.MANUFACTURER.toLowerCase().contains("honeywell") && !Build.MANUFACTURER.toLowerCase().contains("google")) {
+        if(!Build.MANUFACTURER.contains("Zebra Technologies") && !Build.MANUFACTURER.toLowerCase().contains("lenovo") && !Build.MANUFACTURER.toLowerCase().contains("honeywell") && !Build.MANUFACTURER.toLowerCase().contains("google")) {
             TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
             if (ActivityCompat.checkSelfPermission(ServiceParametresServeurActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
@@ -148,7 +148,7 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
             }
             String device_id = "";
 
-            if (tm != null && !Build.MANUFACTURER.toLowerCase().contains("huawei") && !Build.MANUFACTURER.toLowerCase().contains("samsung")) {
+            if (tm != null && !Build.MANUFACTURER.toLowerCase().contains("huawei") && !Build.MANUFACTURER.toLowerCase().contains("samsung") && !Build.MANUFACTURER.toLowerCase().contains("lenovo")) {
                 device_id = tm.getDeviceId();
             } else {
                 String androidId = Settings.Secure.getString(ServiceParametresServeurActivity.this.getContentResolver(), Settings.Secure.ANDROID_ID);

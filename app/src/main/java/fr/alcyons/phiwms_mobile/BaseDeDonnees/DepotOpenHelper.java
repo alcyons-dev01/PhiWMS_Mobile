@@ -269,7 +269,33 @@ public class DepotOpenHelper extends DBOpenHelper {
                                     JSONArray depotJSONArrayAll = response.getJSONArray("PH_Depots");
                                     int compteurReussite = 0;
 
-                                    for(int j = 0; j < depotJSONArrayAll.length(); j++)
+                                    for (int i = 0; i < depotJSONArrayAll.length(); i++) {
+                                        // Récupération du service courant
+                                        JSONObject depotJSONObject = depotJSONArrayAll.getJSONObject(i);
+
+                                        Depot depot = new Depot(depotJSONObject);
+
+                                        //gestion depot alcyons
+                                        if(utilisateur.getIdentifiant().toLowerCase().contentEquals("alcyons") && depot.getStructure().contentEquals("PAD"))
+                                        {
+                                            depot.setNom("XXX PAD");
+                                            String[] tab_reference = depot.getDepot_Reference().split("-");
+                                            String new_ref = tab_reference[tab_reference.length-1];
+                                            //depot.setDepot_Reference("XXXX - PAD - "+new_ref);
+                                            depot.setAdresse1("50 avenue du lac marion");
+                                            depot.setCP("64200");
+                                            depot.setVille("Biarritz");
+                                            depot.setTel("0559225008");
+                                        }
+
+                                        // insertion du service en bdd
+                                        long rowID = insererUnDepotEnBDD(db, depot);
+                                        if (rowID != -1) {
+                                            compteurReussite++;
+                                        }
+                                    }
+
+                                    /*for(int j = 0; j < depotJSONArrayAll.length(); j++)
                                     {
                                         JSONArray depotJSONArray = depotJSONArrayAll.getJSONArray(j);
                                         for (int i = 0; i < depotJSONArray.length(); i++) {
@@ -297,7 +323,7 @@ public class DepotOpenHelper extends DBOpenHelper {
                                                 compteurReussite++;
                                             }
                                         }
-                                    }
+                                    }*/
                                     if (resultCount != compteurReussite) {
                                         erreur = String.valueOf(resultCount - compteurReussite) + " depots n'ont pas été insérées.";
                                         etat = false;
