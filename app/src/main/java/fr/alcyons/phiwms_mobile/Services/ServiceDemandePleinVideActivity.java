@@ -65,6 +65,7 @@ import fr.alcyons.phiwms_mobile.Classes.Service;
 import fr.alcyons.phiwms_mobile.DemandePleinVide.DetailDotationPleinVideActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.DotationAdapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.PleinVideAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Navigation.WebViewServiceActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
@@ -248,57 +249,74 @@ public class ServiceDemandePleinVideActivity extends ServiceAvecConnexionActivit
                                     Intent intent = new Intent(ServiceDemandePleinVideActivity.this, AuthentificationActivity.class);
                                     ServiceDemandePleinVideActivity.this.startActivity(intent);
                                 }
+                                else
+                                {
+                                    Alerte.afficherAlerte(ServiceDemandePleinVideActivity.this, "Erreur", "Aucune demande plein vide existante pour votre localisation", "alerte");
+                                    Intent intent = new Intent(ServiceDemandePleinVideActivity.this, NavigationActivity.class);
+                                    Bundle extras = new Bundle();
+                                    extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                                    intent.putExtras(extras);
+                                    ServiceDemandePleinVideActivity.this.startActivity(intent);
+                                    ServiceDemandePleinVideActivity.this.finish();
+                                }
                             } else {
 
                                 phPreparationJSONArray = response.getJSONArray("PH_Preparations");
                                 List<Integer> listeUIDPreparationEnInstance = PH_PreparationOpenHelper.getUIDDemandePleinVideEnInstance(db);
                                 //viderTablesConcernees();
-                                for (int i = 0; i < phPreparationJSONArray.length(); i++) {
-                                    JSONObject phPreparationJSONObject = phPreparationJSONArray.getJSONObject(i);
+                                if(phPreparationJSONArray.length() == 0)
+                                {
+                                    Alerte.afficherAlerte(ServiceDemandePleinVideActivity.this, "Erreur", "Aucune demande plein vide existante pour votre localisation", "alerte");
+                                    ServiceDemandePleinVideActivity.this.finish();
+                                }
+                                else {
+                                    for (int i = 0; i < phPreparationJSONArray.length(); i++) {
+                                        JSONObject phPreparationJSONObject = phPreparationJSONArray.getJSONObject(i);
 
-                                    String nomListe = phPreparationJSONObject.getString("Liste");
-                                    int uid = phPreparationJSONObject.getInt("UID");
-                                    int position = listeUIDPreparationEnInstance.indexOf(uid);
-                                    String Statut = phPreparationJSONObject.getString("Statut");
-                                    if(position != -1 && !Statut.contentEquals("En cours de préparation"))
-                                    {
-                                        listeUIDPreparationEnInstance.remove(position);
-                                    }
-
-                                    String DateProchaineLivraison = phPreparationJSONObject.getString("LivraisonPrevueDate");
-                                    PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandePleinVideEnInstance(db, nomListe, DateProchaineLivraison);
-
-                                    if(phPreparationCourante == null)
-                                    {
-                                        phPreparationCourante= new PH_Preparation(phPreparationJSONObject);
-
-                                        PH_PreparationOpenHelper.insererUnPH_PreparationEnBDD(db, phPreparationCourante);
-                                    }
-                                    else
-                                    {
-                                        phPreparationCourante.setStatut(Statut);
-                                        PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, phPreparationCourante);
-                                    }
-
-                                    JSONArray PH_Preparation_LigneArray = phPreparationJSONObject.getJSONArray("ph_preparation_lignes");
-                                    for(int j = 0; j < PH_Preparation_LigneArray.length(); j++)
-                                    {
-                                        JSONObject preparationLigneObject = PH_Preparation_LigneArray.getJSONObject(j);
-                                        int codeProduit = preparationLigneObject.getInt("produitID");
-                                        PH_Preparation_Ligne preparation_ligne = PH_Preparation_LigneOpenHelper.getPHPreparationLignesParPHPreparationAndProduit(db, phPreparationCourante, codeProduit);
-
-                                        if(preparation_ligne == null)
+                                        String nomListe = phPreparationJSONObject.getString("Liste");
+                                        int uid = phPreparationJSONObject.getInt("UID");
+                                        int position = listeUIDPreparationEnInstance.indexOf(uid);
+                                        String Statut = phPreparationJSONObject.getString("Statut");
+                                        if(position != -1 && !Statut.contentEquals("En cours de préparation"))
                                         {
-                                            preparation_ligne = new PH_Preparation_Ligne(preparationLigneObject, phPreparationCourante.getUID());
-                                            PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, preparation_ligne);
+                                            listeUIDPreparationEnInstance.remove(position);
+                                        }
+
+                                        String DateProchaineLivraison = phPreparationJSONObject.getString("LivraisonPrevueDate");
+                                        PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandePleinVideEnInstance(db, nomListe, DateProchaineLivraison);
+
+                                        if(phPreparationCourante == null)
+                                        {
+                                            phPreparationCourante= new PH_Preparation(phPreparationJSONObject);
+
+                                            PH_PreparationOpenHelper.insererUnPH_PreparationEnBDD(db, phPreparationCourante);
                                         }
                                         else
                                         {
-                                            preparation_ligne.setQte_APreparer(preparationLigneObject.getInt("Qte_APreparer"));
-                                            preparation_ligne.setQte_Demander(preparationLigneObject.getInt("Qte_Demander"));
-                                            preparation_ligne.setQte_RAL(preparationLigneObject.getInt("Qte_RAL"));
-                                            preparation_ligne.setQte_StockSaisie(preparationLigneObject.getInt("Qte_StockSaisie"));
-                                            PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db,preparation_ligne);
+                                            phPreparationCourante.setStatut(Statut);
+                                            PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, phPreparationCourante);
+                                        }
+
+                                        JSONArray PH_Preparation_LigneArray = phPreparationJSONObject.getJSONArray("ph_preparation_lignes");
+                                        for(int j = 0; j < PH_Preparation_LigneArray.length(); j++)
+                                        {
+                                            JSONObject preparationLigneObject = PH_Preparation_LigneArray.getJSONObject(j);
+                                            int codeProduit = preparationLigneObject.getInt("produitID");
+                                            PH_Preparation_Ligne preparation_ligne = PH_Preparation_LigneOpenHelper.getPHPreparationLignesParPHPreparationAndProduit(db, phPreparationCourante, codeProduit);
+
+                                            if(preparation_ligne == null)
+                                            {
+                                                preparation_ligne = new PH_Preparation_Ligne(preparationLigneObject, phPreparationCourante.getUID());
+                                                PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, preparation_ligne);
+                                            }
+                                            else
+                                            {
+                                                preparation_ligne.setQte_APreparer(preparationLigneObject.getInt("Qte_APreparer"));
+                                                preparation_ligne.setQte_Demander(preparationLigneObject.getInt("Qte_Demander"));
+                                                preparation_ligne.setQte_RAL(preparationLigneObject.getInt("Qte_RAL"));
+                                                preparation_ligne.setQte_StockSaisie(preparationLigneObject.getInt("Qte_StockSaisie"));
+                                                PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db,preparation_ligne);
+                                            }
                                         }
                                     }
                                 }

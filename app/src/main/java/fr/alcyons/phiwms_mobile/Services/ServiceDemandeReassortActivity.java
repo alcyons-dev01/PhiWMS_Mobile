@@ -58,6 +58,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Reassort_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.DemandeReassort.InformationDemandeReassortActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.ReassortAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
