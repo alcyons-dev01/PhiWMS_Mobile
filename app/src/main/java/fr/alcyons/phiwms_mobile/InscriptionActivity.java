@@ -39,22 +39,25 @@ public class InscriptionActivity extends MainActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inscription);
 
+        // On récupère les liste de profils et d'établissements
         Intent monIntention = getIntent();
         String[] profils = monIntention.getStringArrayExtra("profils");
         String[] etablissements = monIntention.getStringArrayExtra("etablissements");
 
+        // On récupère les éléments qui nous permettront de récupérer les valeurs pour l'inscription
         inputEmail = (EditText) findViewById(R.id.email);
         selecteurProfil = (Spinner) findViewById(R.id.profil);
         selecteurEtablissement = (Spinner) findViewById(R.id.etablissement);
 
+        // On met en place les listes déroulantes
         ArrayAdapter<String> adapterProfil = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, profils);
+                R.layout.inscription_spinner_item, profils);
         ArrayAdapter<String> adapterEtablissement = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, etablissements);
-
+                R.layout.inscription_spinner_item, etablissements);
         selecteurProfil.setAdapter(adapterProfil);
         selecteurEtablissement.setAdapter(adapterEtablissement);
 
+        // On met en place l'envoi de la demande d'inscription
         Button envoiDemande = (Button) findViewById(R.id.boutonDemande);
         SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
         String ipServ = sharedPreferences.getString("ipServeur", "");
@@ -63,6 +66,7 @@ public class InscriptionActivity extends MainActivity {
             String email = inputEmail.getText().toString();
             String profil = selecteurProfil.getSelectedItem().toString();
             String etablissement = selecteurEtablissement.getSelectedItem().toString();
+            // On vérifie que toutes les informations ont été remplies
             if (email != null && email != "" && profil != null && profil != "" && etablissement != null && etablissement != ""){
                 String urlRequete = "http://" + ipServ + "/demandeInscription";
 

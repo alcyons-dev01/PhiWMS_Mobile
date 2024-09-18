@@ -38,6 +38,13 @@ public class GestionTotp {
     private static String totp;
     private Timer timer;
 
+    public static GestionTotp getInstance(){
+        if (instance == null){
+            instance = new GestionTotp();
+        }
+        return instance;
+    }
+
     private String calculerTotp() throws InvalidKeyException, NoSuchAlgorithmException, UnsupportedEncodingException {
         String totp = "";
         int numberOfCodeDigits = 6;
@@ -136,13 +143,6 @@ public class GestionTotp {
 
     public void totpDone(){
         totp = "AAAAAA";
-    }
-
-    public static GestionTotp getInstance(){
-        if (instance == null){
-            instance = new GestionTotp();
-        }
-        return instance;
     }
 
 }
