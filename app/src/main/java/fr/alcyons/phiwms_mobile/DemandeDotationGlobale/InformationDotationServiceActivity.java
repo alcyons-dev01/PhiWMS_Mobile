@@ -427,6 +427,8 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
             }
             else
             {
+                demandeValue = (int) ph_preparation_ligne.Conditionnement_Calcul(demandeValue, (int)ph_preparation_ligne.getProduitCondDistrib());
+
                 ph_preparation_ligne.setQte_APreparer(demandeValue);
                 ph_preparation_ligne.setQte_Demander(demandeValue);
                 ph_preparation_ligne.setSYS_DT_MAJ(dateDuJour);

@@ -35,6 +35,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -405,6 +406,14 @@ public class InformationDemandeReassortActivity  extends ServiceAvecConnexionAct
                 demandeValue = Integer.parseInt(demande_string);
 
             ph_preparation_ligne.setQte_StockSaisie(stockValue);
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            DateFormat heureFormat = new SimpleDateFormat("HH:mm:ss");
+            Date date = new Date();
+            String dateDuJour = dateFormat.format(date);
+            String heureCourante = heureFormat.format(date);
+            ph_preparation_ligne.setSYS_DT_MAJ(dateDuJour);
+            ph_preparation_ligne.setSYS_HEURE_MAJ(heureCourante);
+
             PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparation_ligne.getPhiMR4UUID(), ph_preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
             ElementASynchroniserOpenHelper.toutSynchroniser(InformationDemandeReassortActivity.this, db, utilisateurConnecte, false);
@@ -416,9 +425,12 @@ public class InformationDemandeReassortActivity  extends ServiceAvecConnexionAct
             }
             else
             {
+                demandeValue = (int) ph_preparation_ligne.Conditionnement_Calcul(demandeValue, (int)ph_preparation_ligne.getProduitCondDistrib());
+
                 ph_preparation_ligne.setQte_APreparer(demandeValue);
                 ph_preparation_ligne.setQte_Demander(demandeValue);
-
+                ph_preparation_ligne.setSYS_DT_MAJ(dateDuJour);
+                ph_preparation_ligne.setSYS_HEURE_MAJ(heureCourante);
                 PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
                 ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparation_ligne.getPhiMR4UUID(), ph_preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
                 ElementASynchroniserOpenHelper.toutSynchroniser(InformationDemandeReassortActivity.this, db, utilisateurConnecte, false);
@@ -478,7 +490,14 @@ public class InformationDemandeReassortActivity  extends ServiceAvecConnexionAct
     {
         ph_preparation_ligne.setQte_Demander(quantite);
         ph_preparation_ligne.setQte_APreparer(quantite);
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat heureFormat = new SimpleDateFormat("HH:mm:ss");
+        Date date = new Date();
 
+        String dateDuJour = dateFormat.format(date);
+        String heureCourante = heureFormat.format(date);
+        ph_preparation_ligne.setSYS_DT_MAJ(dateDuJour);
+        ph_preparation_ligne.setSYS_HEURE_MAJ(heureCourante);
         PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
         ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparation_ligne.getPhiMR4UUID(), ph_preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
         ElementASynchroniserOpenHelper.toutSynchroniser(InformationDemandeReassortActivity.this, db, utilisateurConnecte, false);
