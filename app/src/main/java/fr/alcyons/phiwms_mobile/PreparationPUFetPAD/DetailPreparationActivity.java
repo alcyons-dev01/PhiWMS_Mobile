@@ -224,17 +224,6 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
 
             DetailPreparationActivity.this.startActivityForResult(detailPreparation_Intent, CodesEchangesActivites.RETOUR_LISTE_LOTS);
         });
-
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                if (!ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.isEmpty()) {
-                    afficherAlerteConfirmationRetour(DetailPreparationActivity.this, LayoutInflater.from(DetailPreparationActivity.this), DetailPreparationActivity.super.getBundle());
-                } else {
-                    retourService(DetailPreparationActivity.super.getBundle());
-                }
-            }
-        });
     }
 
     @Override
@@ -274,6 +263,17 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                     break;
             }
         }
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.isEmpty()) {
+                    afficherAlerteConfirmationRetour(DetailPreparationActivity.this, LayoutInflater.from(DetailPreparationActivity.this), DetailPreparationActivity.super.getBundle());
+                } else {
+                    retourService(DetailPreparationActivity.super.getBundle());
+                }
+            }
+        });
     }
 
     @NonNull
