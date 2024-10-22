@@ -63,10 +63,13 @@ import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reassort;
+import fr.alcyons.phiwms_mobile.DemandeDotationGlobale.InformationDotationServiceActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.PhReassortAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceDemandeDotationGlobaleActivity;
 import fr.alcyons.phiwms_mobile.Services.ServiceDemandeReassortActivity;
 
 public class InformationDemandeReassortActivity  extends ServiceAvecConnexionActivity {
@@ -552,7 +555,7 @@ public class InformationDemandeReassortActivity  extends ServiceAvecConnexionAct
         @SuppressLint("SimpleDateFormat") SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date =new Date();
         String date_string = parseFormat.format(date);
-        ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", ph_preparation_courante.getUID(), "", "Demande Plein Vide");
+        ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", ph_preparation_courante.getUID(), "", "Demander");
 
         List<PH_Preparation_Ligne> listePhPreparationLigne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, ph_preparation_courante);
 
@@ -581,10 +584,10 @@ public class InformationDemandeReassortActivity  extends ServiceAvecConnexionAct
         }
 
         Toast.makeText(InformationDemandeReassortActivity.this, "Enregistrement en cours", Toast.LENGTH_SHORT).show();
-        Intent detailPleinVideIntent = new Intent(InformationDemandeReassortActivity.this, ServiceDemandeReassortActivity.class);
-        Bundle detailPleinVideBundle = super.getBundle();
-        detailPleinVideIntent.putExtras(detailPleinVideBundle);
-        InformationDemandeReassortActivity.this.startActivity(detailPleinVideIntent);
+        Intent detailReassortIntent = new Intent(InformationDemandeReassortActivity.this, ServiceDemandeReassortActivity.class);
+        Bundle detailReassortBundle = super.getBundle();
+        detailReassortIntent.putExtras(detailReassortBundle);
+        InformationDemandeReassortActivity.this.startActivity(detailReassortIntent);
         InformationDemandeReassortActivity.this.finish();
     }
 
