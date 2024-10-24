@@ -34,6 +34,7 @@ import java.util.Vector;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeGraphic;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
 
 /**
  * A view which renders a series of custom graphics to be overlayed on top of an associated preview
@@ -186,9 +187,13 @@ public class GraphicOverlay<T extends GraphicOverlay.Graphic> extends View {
                     {
                         ((BarcodeCaptureActivity) getContext()).onTap(getMeasuredWidth() / 2, getMeasuredHeight() / 2);
                     }
-                    else
+                    else if(activityName.contentEquals("BarcodePreparationActivity"))
                     {
                         ((BarcodePreparationActivity) getContext()).onTap(getMeasuredWidth() / 2, getMeasuredHeight() / 2);
+                    }
+                    else if(activityName.contentEquals(""))
+                    {
+                        ((BarcodeReceptionActivity) getContext()).onTap(getMeasuredWidth() / 2, getMeasuredHeight() / 2);
                     }
                     //}
                 }

@@ -543,11 +543,14 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
         if (data != null) {
             switch (requestCode) {
                 case CodesEchangesActivites.RETOUR_LISTE_LOTS:
-                    PH_Reliquat_ReceptionPUI_Adapte phReliquatReceptionPUIAdapte = phReliquatReceptionPuiAdapter.phReliquatReceptionPUIAdapteList.get(phReliquatReceptionPuiAdapter.viewHolderList.indexOf(phReliquatReceptionPuiViewHolder));
-                    phReliquatReceptionPUIAdapte.setlotList((List<PH_Reliquat_ReceptionPUI_Adapte.Lot>) data.getExtras().getSerializable("lotList"));
-                    emplacement_precedent = (Depot_Emplacement) data.getExtras().getSerializable("EmplacementPrecedent");
-                    produitPrecedent = (Produit) data.getExtras().getSerializable("ProduitPrecedent");
-                    onResume();
+                    if(phReliquatReceptionPuiAdapter.viewHolderList.contains(phReliquatReceptionPuiViewHolder))
+                    {
+                        PH_Reliquat_ReceptionPUI_Adapte phReliquatReceptionPUIAdapte = phReliquatReceptionPuiAdapter.phReliquatReceptionPUIAdapteList.get(phReliquatReceptionPuiAdapter.viewHolderList.indexOf(phReliquatReceptionPuiViewHolder));
+                        phReliquatReceptionPUIAdapte.setlotList((List<PH_Reliquat_ReceptionPUI_Adapte.Lot>) data.getExtras().getSerializable("lotList"));
+                        emplacement_precedent = (Depot_Emplacement) data.getExtras().getSerializable("EmplacementPrecedent");
+                        produitPrecedent = (Produit) data.getExtras().getSerializable("ProduitPrecedent");
+                        onResume();
+                    }
                     break;
                 case CodesEchangesActivites.RETOUR_PRISE_PHOTO:
                     String photoProduits = Objects.requireNonNull(data.getExtras()).getString("photoProduit");
