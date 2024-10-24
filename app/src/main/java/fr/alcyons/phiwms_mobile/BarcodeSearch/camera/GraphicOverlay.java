@@ -191,7 +191,7 @@ public class GraphicOverlay<T extends GraphicOverlay.Graphic> extends View {
                     {
                         ((BarcodePreparationActivity) getContext()).onTap(getMeasuredWidth() / 2, getMeasuredHeight() / 2);
                     }
-                    else if(activityName.contentEquals(""))
+                    else if(activityName.contentEquals("BarcodeReceptionActivity"))
                     {
                         ((BarcodeReceptionActivity) getContext()).onTap(getMeasuredWidth() / 2, getMeasuredHeight() / 2);
                     }

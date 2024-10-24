@@ -14,6 +14,7 @@ import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.negative.BarcodeCaptureNegativeActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
@@ -474,6 +475,10 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
                         {
                             ((BarcodePreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
                         }
+                        else if(activityName.contentEquals("BarcodeReceptionActivity"))
+                        {
+                            ((BarcodeReceptionActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                        }
                         else
                         {
                             ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
@@ -508,6 +513,10 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
                         else if(activityName.contentEquals("BarcodePreparationActivity"))
                         {
                             ((BarcodePreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                        }
+                        else if(activityName.contentEquals("BarcodeReceptionActivity"))
+                        {
+                            ((BarcodeReceptionActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
                         }
                         else
                         {
@@ -610,13 +619,13 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
 
             if(reliquat_courant != null && reliquat_courant.getQteReliquat_X() ==0)
             {
-                ((BarcodePreparationActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
+                ((BarcodeReceptionActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
                 validation = true;
                 emplacement_courant = null;
             }
             else if(!produit_present)
             {
-                ((BarcodePreparationActivity)context).afficherSnackBar("Mauvais produit scanné");
+                ((BarcodeReceptionActivity)context).afficherSnackBar("Mauvais produit scanné");
                 validation = true;
                 emplacement_courant = null;
                 //lot_courant = null;
@@ -717,6 +726,10 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
                     else if(activityName.contentEquals("BarcodePreparationActivity"))
                     {
                         ((BarcodePreparationActivity) context).afficherSnackBar("Produit inconnu");
+                    }
+                    else if(activityName.contentEquals("BarcodeReceptionActivity"))
+                    {
+                        ((BarcodeReceptionActivity) context).afficherSnackBar("Produit inconnu");
                     }
                     else
                     {

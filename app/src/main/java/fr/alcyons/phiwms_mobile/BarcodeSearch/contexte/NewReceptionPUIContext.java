@@ -14,7 +14,9 @@ import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.negative.BarcodeCaptureNegativeActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
@@ -199,6 +201,10 @@ public class NewReceptionPUIContext extends MainActivity {
                             else if(activityName.contentEquals("ScannerPreparationActivity"))
                             {
                                 ((ScannerPreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                            }
+                            else if(activityName.contentEquals("ScannerReceptionActivity"))
+                            {
+                                ((ScannerReceptionActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
                             }
                             else
                             {
@@ -531,12 +537,12 @@ public class NewReceptionPUIContext extends MainActivity {
         }*/
         else if(s.startsWith("PHITAGPLACE+") && nouveau_lot == null)
         {
-            ((BarcodePreparationActivity) context).afficherSnackBar("Veuillez scanner une référence");
+            ((BarcodeReceptionActivity) context).afficherSnackBar("Veuillez scanner une référence");
             validation = true;
         }
         else if(emplacement_courant == null && nouveau_lot != null)
         {
-            ((BarcodePreparationActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
+            ((BarcodeReceptionActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
             validation = true;
         }
         else
@@ -573,9 +579,9 @@ public class NewReceptionPUIContext extends MainActivity {
                         {
                             ((BarcodeCaptureActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
                         }
-                        else if(activityName.contentEquals("BarcodePreparationActivity"))
+                        else if(activityName.contentEquals("BarcodeReceptionActivity"))
                         {
-                            ((BarcodePreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                            ((BarcodeReceptionActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
                         }
                         else
                         {
@@ -713,13 +719,13 @@ public class NewReceptionPUIContext extends MainActivity {
 
             if(reliquat_courant != null && reliquat_courant.getQteReliquat_X() ==0)
             {
-                ((BarcodePreparationActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
+                ((BarcodeReceptionActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
                 emplacement_courant = null;
                 validation = true;
             }
             else if(!produit_present)
             {
-                ((BarcodePreparationActivity)context).afficherSnackBar("Produit non présent dans la liste");
+                ((BarcodeReceptionActivity)context).afficherSnackBar("Produit non présent dans la liste");
                 emplacement_courant = null;
                 validation = true;
                 //lot_courant = null;
