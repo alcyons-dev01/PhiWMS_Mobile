@@ -178,7 +178,7 @@ public class ReceptionAdapter extends ArrayAdapter implements Filterable {
                     // Vérifie le début du premier mot
                     String commandeProduitDesignation = commande.getChaineFiltreProduit(db, commande.getNumero()).toLowerCase();
 
-                    if (commandeProduitDesignation.startsWith(String.valueOf(constraint))) {
+                    if (commandeProduitDesignation.toLowerCase().contains(String.valueOf(constraint))) {
                         founded.add(commande);
                     } else if (commande.getNumero().toLowerCase().contains(constraint)) {
                         founded.add(commande);

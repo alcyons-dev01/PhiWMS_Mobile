@@ -601,7 +601,7 @@ public class Commande implements Serializable, Comparable {
     }
 
     public String getChaineFiltreProduit(SQLiteDatabase db, String commandeNumero) {
-        String filter = this.toString() + " ";
+        String filter = "";
 
         List<PH_Reliquat> phReliquatList = PH_ReliquatOpenHelper.getPH_ReliquatByCommandeNumero(db, commandeNumero);
         for (int i = 0; i < phReliquatList.size(); i++) {
