@@ -146,6 +146,15 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
                                     Intent intent = new Intent(ServiceDemandeReassortActivity.this, AuthentificationActivity.class);
                                     ServiceDemandeReassortActivity.this.startActivity(intent);
                                 }
+                                else
+                                {
+                                    Intent intent = new Intent(ServiceDemandeReassortActivity.this, NavigationActivity.class);
+                                    Bundle extras = new Bundle();
+                                    extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                                    intent.putExtras(extras);
+                                    ServiceDemandeReassortActivity.this.startActivity(intent);
+                                    ServiceDemandeReassortActivity.this.finish();
+                                }
                             } else {
                                 JSONArray phPreparationJSONArray = response.getJSONArray("PH_Preparations");
                                 List<Integer> listeUIDPreparationEnInstance = PH_PreparationOpenHelper.getUIDDotationGlobaleEnInstance(db);

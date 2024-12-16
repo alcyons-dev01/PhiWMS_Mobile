@@ -83,8 +83,8 @@ public class PH_ReassortOpenHelper extends DBOpenHelper {
                             erreur = "Votre identifiant de connexion est invalide, veuillez vous reconnecter.";
                         } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                             erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
-                        } else if (!erreur.equals("Aucune Dotation trouvée")) {
-                            erreur = "Erreur API Dotations";
+                        } else if (!erreur.equals("Aucun PH_Reassort trouvé")) {
+                            erreur = "Erreur API Réassort";
                         }
                         else{
                             etat = true;
