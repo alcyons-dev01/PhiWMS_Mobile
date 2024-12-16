@@ -284,7 +284,7 @@ public class DotationOpenHelper extends DBOpenHelper {
                     HashMap<String, String> headers = new HashMap<>();
                     headers.put("Authorization", token);
                     headers.put("UserId", String.valueOf(utilisateur.getId()));
-                    headers.put("EtablissementId", String.valueOf(utilisateur.getEtablissementId()));
+                    //headers.put("EtablissementId", String.valueOf(utilisateur.getEtablissementId()));
                     return headers;
                 }
             };
@@ -292,7 +292,7 @@ public class DotationOpenHelper extends DBOpenHelper {
             obreq.setRetryPolicy(new RetryPolicy() {
                 @Override
                 public int getCurrentTimeout() {
-                    return 70000;
+                    return 100000;
                 }
 
                 @Override
