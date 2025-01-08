@@ -274,7 +274,7 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
             }
         }
 
-        phPreparationLigneList.sort(Comparator.comparing(PH_Preparation_Ligne::getProduitDesignation));
+//        phPreparationLigneList.sort(Comparator.comparing(PH_Preparation_Ligne::getProduitCategorie));
 
         // Initialisation de l'adapter puis transfere de l'adapter à la listeView pour l'affichage
         dotationGlobaleAdapter = new DotationGlobaleAdapter(InformationDotationServiceActivity.this, phPreparationLigneList, db, utilisateurConnecte, dotation);

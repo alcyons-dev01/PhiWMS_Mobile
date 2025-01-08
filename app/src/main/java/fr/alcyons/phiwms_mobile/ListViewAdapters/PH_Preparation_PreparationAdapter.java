@@ -109,6 +109,10 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
                     textDepot = depot.getNom();
                 }
             }
+            else
+            {
+                textDepot = phPreparationCourant.getDepotDestinataireReference();
+            }
 
             viewHolder.depotNom.setText(textDepot);
             viewHolder.uidPHPreparation.setText("#"+String.valueOf(phPreparationCourant.getUID()));
