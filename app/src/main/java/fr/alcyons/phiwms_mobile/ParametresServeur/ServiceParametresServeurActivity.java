@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
@@ -58,18 +59,7 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
 
     String messageErreur;
 
-    // Fonction permettant de tester les paramètres de connexion à l'API
-    public void TesteConnexion(View v) {
-        if (checkConnectivity()) {
-            Toast toast = Toast.makeText(ServiceParametresServeurActivity.this, "Succès lors du test de connexion", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
-        } else {
-            Toast toast = Toast.makeText(ServiceParametresServeurActivity.this, messageErreur, Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
-        }
-    }
+    Button testConnexionButton;
 
     // Fonction permettant d'enregistrer les paramètres de connexion à l'API
     public void Connexion(View v) {
@@ -132,6 +122,22 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
         numeroPortEditText.setText(port);
         versionAPIEditText.setText(version.length() > 0 ? version.substring(1) : "");
 
+        testConnexionButton = findViewById(R.id.boutonTestConnexion);
+
+        testConnexionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkConnectivity()) {
+                    Toast toast = Toast.makeText(ServiceParametresServeurActivity.this, "Succès lors du test de connexion", Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                } else {
+                    Toast toast = Toast.makeText(ServiceParametresServeurActivity.this, messageErreur, Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                }
+            }
+        });
 
         //gestion du bouton alcyons
         if(!Build.MANUFACTURER.contains("Zebra Technologies") && !Build.MANUFACTURER.toLowerCase().contains("lenovo") && !Build.MANUFACTURER.toLowerCase().contains("honeywell") && !Build.MANUFACTURER.toLowerCase().contains("google")) {
@@ -239,7 +245,22 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
                     }
                 }
         );
+        obreq.setRetryPolicy(new RetryPolicy() {
+            @Override
+            public int getCurrentTimeout() {
+                return 50000;
+            }
 
+            @Override
+            public int getCurrentRetryCount() {
+                return 50000;
+            }
+
+            @Override
+            public void retry(VolleyError error) throws VolleyError {
+
+            }
+        });
         requestQueue.add(obreq);
         try {
             Looper.loop();

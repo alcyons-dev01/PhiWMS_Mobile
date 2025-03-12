@@ -126,8 +126,7 @@
                     android:layout_marginBottom="20dp"
                     android:background="@android:color/holo_green_light"
                     android:text="@string/tester"
-                    android:textColor="@android:color/white"
-                    android:onClick="TesteConnexion"/>
+                    android:textColor="@android:color/white"/>
 
                 <Button
                     android:id="@+id/boutonValider"

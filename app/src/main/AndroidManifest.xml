@@ -345,6 +345,14 @@
         android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation|keyboardHidden"/>
 
+    <!-- Barcode Negative Activity -->
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.negative.BarcodeCaptureNegativeActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
     <!-- Barcode Preparation Activity -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity"

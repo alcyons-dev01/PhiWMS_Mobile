@@ -267,7 +267,10 @@ public class OutilsDecodage {
         int positionFinDeChaine = longueurChaine;
         boolean separateurTrouve = false;
         for (int i = 0; i < longueurChaine; i++) {
-            int ascii = (int) chaine.charAt(i);
+            int ascii = 0;
+
+            if(i < chaine.length())
+                ascii = (int) chaine.charAt(i);
 
             if(ascii == 29)
             {
