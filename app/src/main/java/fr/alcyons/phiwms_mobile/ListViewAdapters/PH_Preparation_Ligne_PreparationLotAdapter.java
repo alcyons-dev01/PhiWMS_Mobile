@@ -97,7 +97,7 @@ public class PH_Preparation_Ligne_PreparationLotAdapter extends ArrayAdapter {
                 viewHolder.QtePreparer.setText(String.valueOf(ph_preparationLigne.getQte_RAL()-ph_preparationLigne.getQte_APreparer()));
                 viewHolder.QtePreparer.setTextColor(context.getResources().getColor(R.color.orange2));
                 viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
-                viewHolder.emplacementParDefaut.setVisibility(View.GONE);
+                //viewHolder.emplacementParDefaut.setVisibility(View.GONE);
             }
             else if(ph_preparationLigne.getQte_APreparer() == 0)
             {
@@ -105,7 +105,7 @@ public class PH_Preparation_Ligne_PreparationLotAdapter extends ArrayAdapter {
                 viewHolder.QtePreparer.setTextColor(context.getResources().getColor(R.color.vert));
                 viewHolder.QteDemandee.setVisibility(View.GONE);
                 viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_vert));
-                viewHolder.emplacementParDefaut.setVisibility(View.GONE);
+                //viewHolder.emplacementParDefaut.setVisibility(View.GONE);
             }
             else
             {

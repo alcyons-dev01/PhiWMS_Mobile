@@ -161,7 +161,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         tri_choisi = ParametreUtilisateurOpenHelper.getChoixTriPreparation(db);
         if(tri_choisi == null)
         {
-            ParametreUtilisateurOpenHelper.mettreAJourTriPreparation(db, 0, "Designation");
+            ParametreUtilisateurOpenHelper.mettreAJourTriPreparation(db, 0, "Place");
             tri_choisi = ParametreUtilisateurOpenHelper.getChoixTriPreparation(db);
         }
 

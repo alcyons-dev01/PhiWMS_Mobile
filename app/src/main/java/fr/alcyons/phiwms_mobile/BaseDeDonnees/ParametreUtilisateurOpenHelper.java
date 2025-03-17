@@ -73,15 +73,15 @@ public class ParametreUtilisateurOpenHelper extends DBOpenHelper {
 
     public static String getChoixTriPreparation(SQLiteDatabase db)
     {
-        String choixTri = "Designation";
+        String choixTri = "Place";
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PARAMETRES_UTILISATEUR, null);
+        /*Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PARAMETRES_UTILISATEUR, null);
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
             choixTri = cursor.getString(Constantes.NUM_COL_TRIPREPARATION);
         }
         cursor.close();
-        cursor = null;
+        cursor = null;*/
 
         return choixTri;
     }
