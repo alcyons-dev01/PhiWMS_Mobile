@@ -246,6 +246,10 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                 JsonObjectRequest obreq = getJsonObjectRequest(urlRequete);
                 requestQueue.add(obreq);
             }
+            else
+            {
+                ph_preparation_ligne_preparationLotAdapter.notifyDataSetChanged();
+            }
         }
         else
         {
@@ -575,6 +579,8 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                     liste_lot = Objects.requireNonNull(data.getExtras()).getStringArrayList("liste_lot");
                     phPreparationLignePreparationAdapte_List = new ArrayList<>();
                     phPreparationLignePreparationAdapte_List = (List<PH_Preparation_Ligne_Preparation_Adapte>) data.getExtras().getSerializable("lotAdapteList");
+                    ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes = new ArrayList<>();
+                    ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.addAll(phPreparationLignePreparationAdapte_List);
                     premierpassage = false;
                     onResume();
                     break;

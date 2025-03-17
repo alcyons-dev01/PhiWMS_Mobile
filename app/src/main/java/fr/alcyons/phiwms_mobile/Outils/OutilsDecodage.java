@@ -140,9 +140,9 @@ public class OutilsDecodage {
         int UtilisationDate_Lenght_VN = 2+6 ; // AI + n6
         String UtilisationDate_VA = "";
 
-        if (!scanner_VA.startsWith("01")) {
+        if (!scanner_VA.startsWith("01") && !scanner_VA.startsWith("02")) {
             if (scanner_VA.length() > 3) {
-                if (scanner_VA.substring(1, 3).contains("01")) {
+                if (scanner_VA.substring(1, 3).contains("01") || scanner_VA.substring(1, 3).contains("02")) {
                     scanner_VA = scanner_VA.substring(1);
                 }
                 else if(scanner_VA.contains("]C1")){
@@ -176,6 +176,7 @@ public class OutilsDecodage {
 
                 switch (AI_Courant) {
                     case "01":
+                    case "02":
                         GTIN_VA = scanner_VA.substring(0, GTIN_Lenght_VN);
                         GTIN_VA = GTIN_VA.substring(2);
                         scanner_VA = scanner_VA.substring(GTIN_Lenght_VN);

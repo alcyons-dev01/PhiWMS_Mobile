@@ -772,8 +772,9 @@ public class PreparationMultipleContext extends MainActivity {
                     }
                     if(adapte_trouver)
                     {
-                        phPreparationLignePreparationAdapte_List.remove(index_supr);
-                        phPreparationLignePreparationAdapte_List.add(phPreparationLignePreparationAdapte);
+                        //phPreparationLignePreparationAdapte_List.remove(index_supr);
+                        //phPreparationLignePreparationAdapte_List.add(phPreparationLignePreparationAdapte);
+                        phPreparationLignePreparationAdapte_List.get(index_supr).setLotAdaptes(phPreparationLignePreparationAdapte.getLotAdaptes());
                         lot_courant = null;
                         preparation_ligne_id = -1;
                         validation = true;

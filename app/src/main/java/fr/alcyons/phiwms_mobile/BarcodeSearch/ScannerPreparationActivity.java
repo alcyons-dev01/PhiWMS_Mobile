@@ -1623,6 +1623,10 @@ public class ScannerPreparationActivity extends ServiceActivity {
         alertDialog.getWindow().setGravity(Gravity.CENTER);
         alertDialog.show();
 
+        /**
+         * TODO : action utilisateur déplacement de stock
+         */
+
         buttonOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
