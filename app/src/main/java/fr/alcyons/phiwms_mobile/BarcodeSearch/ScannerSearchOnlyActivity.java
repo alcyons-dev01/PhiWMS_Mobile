@@ -1312,7 +1312,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
 
         @Override
         protected Object doInBackground(String... email) {
-            Mail sender = new Mail(ScannerSearchOnlyActivity.this, email[0], true, db);
+            Mail sender = new Mail(ScannerSearchOnlyActivity.this, email[0], true, db, utilisateurConnecte);
             try {
                 sender.sendMailVerification(subject, body);
             } catch (Exception e) {

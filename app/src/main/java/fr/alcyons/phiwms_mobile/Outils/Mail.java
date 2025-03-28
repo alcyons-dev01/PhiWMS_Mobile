@@ -14,18 +14,23 @@ import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
+import javax.mail.AuthenticationFailedException;
 import javax.mail.BodyPart;
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
+import javax.mail.SendFailedException;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 
 public class Mail extends javax.mail.Authenticator {
 
@@ -70,7 +75,7 @@ public class Mail extends javax.mail.Authenticator {
     private boolean externalStorage;
     private SQLiteDatabase db;
 
-    public Mail(Context context, String recipients, boolean externalStorage, SQLiteDatabase db) {
+    public Mail(Context context, String recipients, boolean externalStorage, SQLiteDatabase db, Utilisateur utilisateur) {
         this.context = context;
         this.recipients = recipients;
         this.externalStorage = externalStorage;
@@ -87,7 +92,40 @@ public class Mail extends javax.mail.Authenticator {
             properties.setProperty("mail.host", smtphost);
         }
 
-        /*if(!mailEmetteur.contentEquals("") && !psswordEmetteur.contentEquals(""))
+        if(utilisateur != null && utilisateur.getEtablissement().contentEquals("ADH"))
+        {
+            smtphost = "mail.adh-asso.net";
+            mailEmetteur = "pharmacie@adh-asso.net";
+            psswordEmetteur = "gbx55df1";
+            loginEmetteur = "pharmaadh@adh-asso.local";
+            properties.setProperty("mail.transport.protocol", "smtp");
+            properties.put("mail.smtp.auth", "true");
+            properties.put("mail.smtp.port", "25");
+            properties.put("mail.smtp.socketFactory.port", "25");
+            session = Session.getDefaultInstance(properties, this);
+        }
+        else if(utilisateur.getIdentifiant().toUpperCase().contentEquals("ALCYONS"))
+        {
+            smtphost = "217.70.178.3";
+            loginEmetteur = "noreply@phiwms.com";
+            mailEmetteur = "noreply@phiwms.com";
+            psswordEmetteur = "PACT!automata5zoom";
+            /*properties.setProperty("mail.transport.protocol", "smtp");
+            properties.put("mail.smtp.auth", "true");
+            properties.put("mail.smtp.port", "25");
+            properties.put("mail.smtp.socketFactory.port", "25");*/
+            properties.setProperty("mail.transport.protocol", "smtp");
+            properties.put("mail.smtp.auth", "true");
+            properties.put("mail.smtp.ssl.enable", "true");
+            properties.put("mail.smtp.starttls.enable", "true");
+            properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+            properties.put("mail.smtp.socketFactory.fallback", "false");
+            properties.setProperty("mail.smtp.quitwait", "false");
+            properties.put("mail.smtp.port", "465");
+            properties.put("mail.smtp.socketFactory.port", "465");
+            session = Session.getDefaultInstance(properties, this);
+        }
+        else
         {
             properties.setProperty("mail.transport.protocol", "smtps");
             properties.put("mail.smtp.auth", "true");
@@ -100,33 +138,9 @@ public class Mail extends javax.mail.Authenticator {
             properties.put("mail.smtp.socketFactory.port", "465");
             session = Session.getDefaultInstance(properties, this);
         }
-        else
-        {
-            smtphost = "mail.adh-asso.net";
-            mailEmetteur = "pharmacie@adh-asso.net";
-            psswordEmetteur = "gbx55df1";
-            loginEmetteur = "pharmaadh@adh-asso.local";
-            properties.setProperty("mail.transport.protocol", "smtp");
-            properties.put("mail.smtp.auth", "true");
-            properties.put("mail.smtp.port", "25");
-            properties.put("mail.smtp.socketFactory.port", "25");
-
-            session = Session.getDefaultInstance(properties, this);
-        }*/
-
-        smtphost = "mail.adh-asso.net";
-        mailEmetteur = "pharmacie@adh-asso.net";
-        psswordEmetteur = "gbx55df1";
-        loginEmetteur = "pharmaadh@adh-asso.local";
-        properties.setProperty("mail.transport.protocol", "smtp");
-        properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.port", "25");
-        properties.put("mail.smtp.socketFactory.port", "25");
-
-        session = Session.getDefaultInstance(properties, this);
     }
 
-    public Mail(Context context, String recipients, String cc, boolean externalStorage, SQLiteDatabase db) {
+    public Mail(Context context, String recipients, String cc, boolean externalStorage, SQLiteDatabase db, Utilisateur utilisateur) {
         this.context = context;
         this.recipients = recipients;
         this.externalStorage = externalStorage;
@@ -141,9 +155,29 @@ public class Mail extends javax.mail.Authenticator {
         Properties properties = new Properties();
         properties.setProperty("mail.host", smtphost);
 
-        /*if(!mailEmetteur.contentEquals("") && !psswordEmetteur.contentEquals(""))
+        if(utilisateur != null && utilisateur.getEtablissement().contentEquals("ADH"))
         {
-            properties.setProperty("mail.transport.protocol", "smtps");
+            smtphost = "mail.adh-asso.net";
+            mailEmetteur = "pharmacie@adh-asso.net";
+            psswordEmetteur = "gbx55df1";
+            loginEmetteur = "pharmaadh@adh-asso.local";
+            properties.setProperty("mail.transport.protocol", "smtp");
+            properties.put("mail.smtp.auth", "true");
+            properties.put("mail.smtp.port", "25");
+            properties.put("mail.smtp.socketFactory.port", "25");
+            session = Session.getDefaultInstance(properties, this);
+        }
+        else if(utilisateur.getIdentifiant().toUpperCase().contentEquals("ALCYONS"))
+        {
+            smtphost = "217.70.178.3";
+            loginEmetteur = "noreply@phiwms.com";
+            mailEmetteur = "noreply@phiwms.com";
+            psswordEmetteur = "PACT!automata5zoom";
+            /*properties.setProperty("mail.transport.protocol", "smtp");
+            properties.put("mail.smtp.auth", "true");
+            properties.put("mail.smtp.port", "25");
+            properties.put("mail.smtp.socketFactory.port", "25");*/
+            properties.setProperty("mail.transport.protocol", "smtp");
             properties.put("mail.smtp.auth", "true");
             properties.put("mail.smtp.ssl.enable", "true");
             properties.put("mail.smtp.starttls.enable", "true");
@@ -156,26 +190,17 @@ public class Mail extends javax.mail.Authenticator {
         }
         else
         {
-            smtphost = "mail.adh-asso.net";
-            mailEmetteur = "pharmacie@adh-asso.net";
-            psswordEmetteur = "gbx55df1";
-            loginEmetteur = "pharmaadh@adh-asso.local";
-            properties.setProperty("mail.transport.protocol", "smtp");
+            properties.setProperty("mail.transport.protocol", "smtps");
             properties.put("mail.smtp.auth", "true");
-            properties.put("mail.smtp.port", "25");
-            properties.put("mail.smtp.socketFactory.port", "25");
+            properties.put("mail.smtp.ssl.enable", "true");
+            properties.put("mail.smtp.starttls.enable", "true");
+            properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+            properties.put("mail.smtp.socketFactory.fallback", "false");
+            properties.setProperty("mail.smtp.quitwait", "false");
+            properties.put("mail.smtp.port", "465");
+            properties.put("mail.smtp.socketFactory.port", "465");
             session = Session.getDefaultInstance(properties, this);
-        }*/
-
-        smtphost = "mail.adh-asso.net";
-        mailEmetteur = "pharmacie@adh-asso.net";
-        psswordEmetteur = "gbx55df1";
-        loginEmetteur = "pharmaadh@adh-asso.local";
-        properties.setProperty("mail.transport.protocol", "smtp");
-        properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.port", "25");
-        properties.put("mail.smtp.socketFactory.port", "25");
-        session = Session.getDefaultInstance(properties, this);
+        }
     }
 
     protected PasswordAuthentication getPasswordAuthentication() {
@@ -227,9 +252,15 @@ public class Mail extends javax.mail.Authenticator {
 
             Transport.send(message);
 
+        }
+        catch (AuthenticationFailedException e) {
+            Log.e("EmailError", "Échec de l'authentification: " + e.getMessage());
+        } catch (SendFailedException e) {
+            Log.e("EmailError", "Échec de l'envoi: " + e.getMessage());
+        } catch (MessagingException e) {
+            Log.e("EmailError", "Erreur de messagerie: " + e.getMessage());
         } catch (Exception e) {
             Log.e("SendMail", e.getMessage(), e);
-            Alerte.afficherAlerte(context, "Erreur", e.getMessage(), "alerte");
         }
     }
 
@@ -296,7 +327,14 @@ public class Mail extends javax.mail.Authenticator {
 
             Transport.send(message);
 
-        } catch (Exception e) {
+        }
+        catch (AddressException e) {
+            throw new Error("bad address");
+        }
+        catch (MessagingException e){
+            throw new Error("bad message data");
+        }
+        catch (Exception e) {
             Log.e("SendMail", e.getMessage(), e);
         }
     }
@@ -327,7 +365,14 @@ public class Mail extends javax.mail.Authenticator {
 
             Transport.send(message);
 
-        } catch (Exception e) {
+        }
+        catch (AddressException e) {
+            throw new Error("bad address");
+        }
+        catch (MessagingException e){
+            Log.e("MessagingException", e.getMessage(), e);
+        }
+        catch (Exception e) {
             Log.e("SendMail", e.getMessage(), e);
             Alerte.afficherAlerte(context, "Erreur", e.getMessage(), "alerte");
         }

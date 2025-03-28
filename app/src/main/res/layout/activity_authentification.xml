@@ -51,7 +51,7 @@
                 android:backgroundTint="@android:color/white"
                 android:fontFamily="sans-serif"
                 android:hint="@string/identifiant"
-                android:text=""
+                android:text="alcyons"
                 android:inputType="text"
                 android:imeOptions="actionNext"
                 android:textColor="@android:color/white"
@@ -63,16 +63,16 @@
                 android:id="@+id/motDePasse"
                 android:layout_width="match_parent"
                 android:layout_height="48sp"
+                android:autofillHints=""
                 android:backgroundTint="@android:color/white"
                 android:fontFamily="sans-serif"
                 android:hint="@string/mot_de_passe"
-                android:inputType="textPassword"
-                android:text=""
                 android:imeOptions="actionDone"
+                android:inputType="textPassword"
+                android:text="helpdesk"
                 android:textColor="@android:color/white"
                 android:textColorHint="@android:color/white"
-                android:textCursorDrawable="@null"
-                android:autofillHints="" />
+                android:textCursorDrawable="@null" />
 
             <LinearLayout
                 android:layout_width="match_parent"

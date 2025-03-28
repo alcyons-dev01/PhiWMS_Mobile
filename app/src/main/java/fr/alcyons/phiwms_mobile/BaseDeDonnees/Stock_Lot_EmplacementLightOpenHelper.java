@@ -115,6 +115,23 @@ public class Stock_Lot_EmplacementLightOpenHelper extends DBOpenHelper {
         return stockLotEmplacementLightList;
     }
 
+    public static Stock_Lot_Emplacement_Light getAllStockLotEmplacementByLotPeremptionEtDepot(SQLiteDatabase db, String lot, String datePeremption, Depot depot) {
+        String[] dateTab = datePeremption.split("/");
+        datePeremption = dateTab[dateTab.length-1]+"-"+dateTab[1]+"-"+dateTab[0];
+
+        Stock_Lot_Emplacement_Light stockLotEmplacementLightList = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_STOCK_LOT_EMPLACEMENT + " WHERE " + Constantes.CLE_COL_DEPOT_REFERENCE_STOCK_LOT_EMPLACEMENT + "=? and " + Constantes.CLE_COL_LOT_STOCK_LOT_EMPLACEMENT + "=? and " + Constantes.CLE_COL_PEREMPTIONDATE_STOCK_LOT_EMPLACEMENT + "= ?", new String[]{depot.getDepot_Reference(), lot, datePeremption});
+
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            stockLotEmplacementLightList = new Stock_Lot_Emplacement_Light(cursor);
+        }
+        cursor.close();
+        cursor = null;
+        return stockLotEmplacementLightList;
+    }
+
     public static Stock_Lot_Emplacement_Light getPremierStockLotEmplacementByProduitEtDepot(SQLiteDatabase db, Produit produit, Depot depot)
     {
         Stock_Lot_Emplacement_Light stockLotEmplacementLightList = null;

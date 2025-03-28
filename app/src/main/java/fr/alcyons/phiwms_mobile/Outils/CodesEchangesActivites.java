@@ -1,6 +1,8 @@
 package fr.alcyons.phiwms_mobile.Outils;
 
 public class CodesEchangesActivites {
+    public static final int RESULT_OK = -1;
+
     public static final int RETOUR_CODE_GS1 = 0;
     public static final int RETOUR_ZONE_ET_EMPLACEMENT = 1;
     public static final int RETOUR_EMPLACEMENT = 2;

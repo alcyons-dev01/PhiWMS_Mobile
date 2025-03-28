@@ -10,7 +10,10 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
@@ -41,9 +44,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
@@ -124,7 +130,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
 
 
 
-            subject = "PhiMR4 - "+depot_destinataire+" - "+commandeSelectionne.getFournisseur()+" - Réception PUI N°" + commandeSelectionne.getNumero() + " - " + date;
+            subject = "PhiWMS Mobile - "+depot_destinataire+" - "+commandeSelectionne.getFournisseur()+" - Réception PUI N°" + commandeSelectionne.getNumero() + " - " + date;
             if(bonLivraisonBitmap != null)
             {
                 body = "Madame, Monsieur, \n \n" +
@@ -159,10 +165,10 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
 
             // Récupération Mail Pharmacie
             String email = ParametresServeurOpenHelper.getMailPharmacie(db);
-            if(utilisateurConnecte.getEtablissement().contentEquals("ADH"))
+            /*if(utilisateurConnecte.getEtablissement().contentEquals("ADH"))
             {
                 email = "reception.pui@adh-asso.net";
-            }
+            }*/
             if(utilisateurConnecte.getIdentifiant().toUpperCase().contentEquals("ALCYONS"))
             {
                 email = "dev01@alcyons.fr";
@@ -175,7 +181,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
 
     public void envoyerMail(boolean copieMail, final String email)
     {
-       /* if (copieMail) {
+        if (copieMail) {
             EmailCopie = utilisateurConnecte.getMail();
             if (EmailCopie == null || EmailCopie.contentEquals("")) {
                 envoyerCopie = false;
@@ -183,9 +189,9 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
         }
 
         if (email != null) {
-            //new SendEmailTask().execute(email);
+            new SendEmailTask().execute(email);
 
-            ExecutorService executor = Executors.newSingleThreadExecutor();
+            /*ExecutorService executor = Executors.newSingleThreadExecutor();
             final Handler handler_mail = new Handler(Looper.getMainLooper());
 
             executor.execute(new Runnable() {
@@ -202,8 +208,8 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
                         }
                     });
                 }
-            });
-        }*/
+            });*/
+        }
 
         Toast toast = Toast.makeText(DetailReceptionPuiActivity.this, "Réception effectuée", Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
@@ -345,8 +351,9 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 phReliquatReceptionPUIAdapteSelectionne = (PH_Reliquat_ReceptionPUI_Adapte) phReliquatReceptionPuiAdapter.getItem(position);
+                PH_Reliquat reliquatcourant = PH_ReliquatOpenHelper.getPH_ReliquatById(db, phReliquatReceptionPUIAdapteSelectionne.getPhReliquatUID());
 
-                if (phReliquatReceptionPUIAdapteSelectionne != null) {
+                if (phReliquatReceptionPUIAdapteSelectionne != null && reliquatcourant != null) {
                     phReliquatReceptionPuiViewHolder = phReliquatReceptionPuiAdapter.viewHolderList.get(position);
 
                     List<PH_Reliquat_ReceptionPUI_Adapte.Lot>liste_lot = phReliquatReceptionPUIAdapteSelectionne.getlotList();
@@ -446,9 +453,13 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
             phReliquatReceptionPUIAdapteList = new ArrayList<>();
 
             for (PH_Reliquat phReliquatCourant : phReliquatList) {
-                PH_Reliquat_ReceptionPUI_Adapte phReliquatReceptionPUIAdapte = new PH_Reliquat_ReceptionPUI_Adapte(phReliquatCourant.getReliquat_UID(), phReliquatCourant.getSerie(), phReliquatCourant.isSuiviParSerieActif(), phReliquatCourant.isSerialiserReception());
+                if(phReliquatCourant != null)
+                {
+                    PH_Reliquat_ReceptionPUI_Adapte phReliquatReceptionPUIAdapte = new PH_Reliquat_ReceptionPUI_Adapte(phReliquatCourant.getReliquat_UID(), phReliquatCourant.getSerie(), phReliquatCourant.isSuiviParSerieActif(), phReliquatCourant.isSerialiserReception());
 
-                phReliquatReceptionPUIAdapteList.add(phReliquatReceptionPUIAdapte);
+                    phReliquatReceptionPUIAdapteList.add(phReliquatReceptionPUIAdapte);
+                }
+
             }
 
             //initi du tri
@@ -634,18 +645,18 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
         Mail sender;
         if(!envoyerCopie)
         {
-            sender = new Mail(DetailReceptionPuiActivity.this, email, true, db);
+            sender = new Mail(DetailReceptionPuiActivity.this, email, false, db, utilisateurConnecte);
         }
         else
         {
-            sender = new Mail(DetailReceptionPuiActivity.this, email, EmailCopie, true, db);
+            sender = new Mail(DetailReceptionPuiActivity.this, email, EmailCopie, false, db, utilisateurConnecte);
         }
         try {
             // Envoi du mail avec pdf
             if(bonLivraisonPhotoName.contentEquals(""))
             {
                 try {
-                    sender.sendMailVerification(subject, body);
+                    sender.sendMail(subject, body, "");
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
@@ -659,7 +670,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
                 }
             }
         } catch (Exception e) {
-            Log.e("Exception", Objects.requireNonNull(e.getMessage()));
+            Log.e("Exception", e.getMessage());
         }
 
         return "executed";
@@ -694,7 +705,11 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
             PH_Reliquat oo1 = PH_ReliquatOpenHelper.getPH_ReliquatById(db, o1.getPhReliquatUID());
             PH_Reliquat oo2 = PH_ReliquatOpenHelper.getPH_ReliquatById(db, o2.getPhReliquatUID());
 
-            return oo1.getDesignationCourte().toLowerCase().compareTo(oo2.getDesignationCourte().toLowerCase());
+            if(oo2 == null || oo1 == null)
+                return 1;
+            else
+                return oo1.getDesignationCourte().toLowerCase().compareTo(oo2.getDesignationCourte().toLowerCase());
+
         });
         phReliquatReceptionPuiAdapter = new PH_Reliquat_ReceptionPuiAdapter(DetailReceptionPuiActivity.this, db, phReliquatReceptionPUIAdapteList);
         phReliquatListView.setDivider(footer);
@@ -709,10 +724,17 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
             PH_Reliquat oo1 = PH_ReliquatOpenHelper.getPH_ReliquatById(db, o1.getPhReliquatUID());
             PH_Reliquat oo2 = PH_ReliquatOpenHelper.getPH_ReliquatById(db, o2.getPhReliquatUID());
 
-            Produit produit1 = ProduitOpenHelper.getProduitByID(db, oo1.getProduitID());
-            Produit produit2 = ProduitOpenHelper.getProduitByID(db, oo2.getProduitID());
+            if(oo1 == null || oo2 == null)
+            {
+                return 1;
+            }
+            else
+            {
+                Produit produit1 = ProduitOpenHelper.getProduitByID(db, oo1.getProduitID());
+                Produit produit2 = ProduitOpenHelper.getProduitByID(db, oo2.getProduitID());
 
-            return produit1.getCategorie().toLowerCase().compareTo(produit2.getCategorie().toLowerCase());
+                return produit1.getCategorie().toLowerCase().compareTo(produit2.getCategorie().toLowerCase());
+            }
         });
         phReliquatReceptionPuiAdapter = new PH_Reliquat_ReceptionPuiAdapter(DetailReceptionPuiActivity.this, db, phReliquatReceptionPUIAdapteList);
         phReliquatListView.setDivider(footer);
@@ -726,20 +748,26 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
 
             PH_Reliquat oo1 = PH_ReliquatOpenHelper.getPH_ReliquatById(db, o1.getPhReliquatUID());
             PH_Reliquat oo2 = PH_ReliquatOpenHelper.getPH_ReliquatById(db, o2.getPhReliquatUID());
-            String oo1EmplacementParDefaut = oo1.getEmplacement();
-            String oo2EmplacementParDefaut = oo2.getEmplacement();
 
-            if (oo1EmplacementParDefaut == null || oo1EmplacementParDefaut.contentEquals("")) {
-                Produit produit = ProduitOpenHelper.getProduitByID(db, oo1.getProduitID());
-                oo1EmplacementParDefaut = produit.getEmplacement_PUI_Defaut();
+            if(oo2 == null || oo1 == null)
+                return 1;
+            else
+            {
+                String oo1EmplacementParDefaut = oo1.getEmplacement();
+                String oo2EmplacementParDefaut = oo2.getEmplacement();
 
+                if (oo1EmplacementParDefaut == null || oo1EmplacementParDefaut.contentEquals("")) {
+                    Produit produit = ProduitOpenHelper.getProduitByID(db, oo1.getProduitID());
+                    oo1EmplacementParDefaut = produit.getEmplacement_PUI_Defaut();
+
+                }
+                if (oo2EmplacementParDefaut == null || oo2EmplacementParDefaut.contentEquals("")) {
+                    Produit produit = ProduitOpenHelper.getProduitByID(db, oo2.getProduitID());
+                    oo2EmplacementParDefaut = produit.getEmplacement_PUI_Defaut();
+                }
+
+                return oo1EmplacementParDefaut.compareTo(oo2EmplacementParDefaut);
             }
-            if (oo2EmplacementParDefaut == null || oo2EmplacementParDefaut.contentEquals("")) {
-                Produit produit = ProduitOpenHelper.getProduitByID(db, oo2.getProduitID());
-                oo2EmplacementParDefaut = produit.getEmplacement_PUI_Defaut();
-            }
-
-            return oo1EmplacementParDefaut.compareTo(oo2EmplacementParDefaut);
         });
         phReliquatReceptionPuiAdapter = new PH_Reliquat_ReceptionPuiAdapter(DetailReceptionPuiActivity.this, db, phReliquatReceptionPUIAdapteList);
         phReliquatListView.setDivider(footer);
@@ -828,7 +856,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
             }
         });
 
-        btn_photo.setOnClickListener(v -> {
+        boutonPhoto.setOnClickListener(v -> {
             boutonPhoto.setBackgroundColor(getResources().getColor(R.color.bleu_clair_alcyons, null));
             ViewCompat.setBackgroundTintList(btn_photo, ColorStateList.valueOf(getResources().getColor(R.color.blanc, null)));
             prendrePhotoBL();
@@ -887,5 +915,30 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
         detailReceptionPUIIntent.putExtras(bundle);
         DetailReceptionPuiActivity.this.startActivity(detailReceptionPUIIntent);
         DetailReceptionPuiActivity.this.finish();
+    }
+
+    private class SendEmailTask extends AsyncTask<String, Object, Object> {
+
+        @Override
+        protected Object doInBackground(String... email) {
+
+            Mail sender = new Mail(DetailReceptionPuiActivity.this, "dev01@alcyons.fr", true, db, utilisateurConnecte);
+            try {
+                // Envoi du mail avec pdf
+                //sender.sendMailVerification(subject, body);
+                if(bonLivraisonPhotoName.contentEquals(""))
+                {
+                    sender.sendMailVerification(subject, body);
+                }
+                else
+                {
+                    sender.sendMail(subject, body, "Documents/"+bonLivraisonPhotoName + ".jpeg");
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return "executed";
+        }
     }
 }

@@ -497,7 +497,7 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
         @Override
         protected Object doInBackground(String... email) {
 
-            Mail sender = new Mail(ListeLivraisonDepot.this, email[0], true, db);
+            Mail sender = new Mail(ListeLivraisonDepot.this, email[0], true, db, utilisateurConnecte);
             try {
                 if(filename == null || filename.contentEquals(""))
                 {

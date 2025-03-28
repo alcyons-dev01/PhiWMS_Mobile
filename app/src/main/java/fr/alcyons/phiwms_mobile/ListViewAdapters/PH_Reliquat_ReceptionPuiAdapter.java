@@ -71,47 +71,49 @@ public class PH_Reliquat_ReceptionPuiAdapter extends ArrayAdapter {
 
             phReliquat = PH_ReliquatOpenHelper.getPH_ReliquatById(db, phReliquatReceptionPUIAdapte.getPhReliquatUID());
 
-            Produit produit_courant = ProduitOpenHelper.getProduitByID(db, phReliquat.getProduitID());
-
-            lotList = new ArrayList<>();
-            lotList.addAll(phReliquatReceptionPUIAdapte.getlotList());
-
-            viewHolder.designation.setText(phReliquat.getdesignationCourte());
-            viewHolder.reference.setText(phReliquat.getProduit_Reference());
-            viewHolder.emplacementParDefaut.setText(produit_courant.getEmplacement_PUI_Defaut());
-            viewHolder.nbReliquat.setText(String.valueOf(phReliquat.getQteLivraison()));
-            if(phReliquat.getQteLivraison() == 0)
+            if(phReliquat != null)
             {
-                viewHolder.emplacementParDefaut.setVisibility(View.VISIBLE);
-                viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
-            }
-            else
-            {
-                viewHolder.emplacementParDefaut.setVisibility(View.GONE);
-                viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
-                viewHolder.nbReliquat.setVisibility(View.VISIBLE);
-            }
-            viewHolder.QteDemandee.setText(String.valueOf(phReliquat.getQteCommande()));
+                Produit produit_courant = ProduitOpenHelper.getProduitByID(db, phReliquat.getProduitID());
 
-            if(phReliquat.getQteReliquat_X() == 0)
-            {
-                viewHolder.nbReliquat.setTextColor(context.getResources().getColor(R.color.vert));
-                viewHolder.QteDemandee.setVisibility(View.GONE);
-                viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_vert));
-                viewHolder.emplacementParDefaut.setVisibility(View.GONE);
-            }
+                lotList = new ArrayList<>();
+                lotList.addAll(phReliquatReceptionPUIAdapte.getlotList());
 
-            int nombreColisProduit = recupererNbColis(phReliquat.getProduitID(), phReliquat.getQteReliquat_X());
-            viewHolder.colis.setText(String.valueOf(nombreColisProduit));
+                viewHolder.designation.setText(phReliquat.getdesignationCourte());
+                viewHolder.reference.setText(phReliquat.getProduit_Reference());
+                viewHolder.emplacementParDefaut.setText(produit_courant.getEmplacement_PUI_Defaut());
+                viewHolder.nbReliquat.setText(String.valueOf(phReliquat.getQteLivraison()));
+                if(phReliquat.getQteLivraison() == 0)
+                {
+                    viewHolder.emplacementParDefaut.setVisibility(View.VISIBLE);
+                    viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
+                }
+                else
+                {
+                    viewHolder.emplacementParDefaut.setVisibility(View.GONE);
+                    viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
+                    viewHolder.nbReliquat.setVisibility(View.VISIBLE);
+                }
+                viewHolder.QteDemandee.setText(String.valueOf(phReliquat.getQteCommande()));
 
-            if(nombreColisProduit == 0)
-            {
-            }
-            else
-            {
-                viewHolder.layoutColis.setVisibility(View.VISIBLE);
-            }
+                if(phReliquat.getQteReliquat_X() == 0)
+                {
+                    viewHolder.nbReliquat.setTextColor(context.getResources().getColor(R.color.vert));
+                    viewHolder.QteDemandee.setVisibility(View.GONE);
+                    viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_vert));
+                    viewHolder.emplacementParDefaut.setVisibility(View.GONE);
+                }
 
+                int nombreColisProduit = recupererNbColis(phReliquat.getProduitID(), phReliquat.getQteReliquat_X());
+                viewHolder.colis.setText(String.valueOf(nombreColisProduit));
+
+                if(nombreColisProduit == 0)
+                {
+                }
+                else
+                {
+                    viewHolder.layoutColis.setVisibility(View.VISIBLE);
+                }
+            }
         }
         return convertView;
     }

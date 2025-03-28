@@ -276,7 +276,7 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
 
         @Override
         protected Object doInBackground(String... email) {
-            Mail sender = new Mail(ServiceParametresServeurActivity.this, email[0], true, db);
+            Mail sender = new Mail(ServiceParametresServeurActivity.this, email[0], true, db, null);
             try {
                 sender.sendMailVerification("Test mail", "Test envoi de mail");
             } catch (Exception e) {
