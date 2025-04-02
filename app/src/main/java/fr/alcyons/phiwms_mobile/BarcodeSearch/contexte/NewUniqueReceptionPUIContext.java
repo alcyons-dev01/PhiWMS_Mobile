@@ -429,12 +429,39 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
         }*/
         else if(s.startsWith("PHITAGPLACE") && nouveau_lot == null)
         {
-            ((BarcodePreparationActivity) context).afficherSnackBar("Veuillez scanner une référence");
+            String activityName = context.getClass().getSimpleName();
+
+            if(activityName.contentEquals("BarcodePreparationActivity"))
+            {
+                ((BarcodePreparationActivity) context).afficherSnackBar("Veuillez scanner une référence");
+            }
+            else if(activityName.contentEquals("BarcodeReceptionActivity"))
+            {
+                ((BarcodeReceptionActivity) context).afficherSnackBar("Veuillez scanner une référence");
+            }
+            else
+            {
+                ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Veuillez scanner une référence");
+            }
+
             validation = true;
         }
         else if(emplacement_courant == null && nouveau_lot != null)
         {
-            ((BarcodePreparationActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
+            String activityName = context.getClass().getSimpleName();
+
+            if(activityName.contentEquals("BarcodePreparationActivity"))
+            {
+                ((BarcodePreparationActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
+            }
+            else if(activityName.contentEquals("BarcodeReceptionActivity"))
+            {
+                ((BarcodeReceptionActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
+            }
+            else
+            {
+                ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
+            }
             validation = true;
         }
         else

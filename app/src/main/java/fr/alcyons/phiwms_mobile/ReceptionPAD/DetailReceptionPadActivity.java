@@ -1178,11 +1178,11 @@ public class DetailReceptionPadActivity extends ServiceActivity {
             Mail sender = null;
             if(!envoyerCopie)
             {
-                sender = new Mail(DetailReceptionPadActivity.this, email[0], true, db);
+                sender = new Mail(DetailReceptionPadActivity.this, email[0], true, db, utilisateurConnecte);
             }
             else
             {
-                sender = new Mail(DetailReceptionPadActivity.this, email[0], EmailCopie, true, db);
+                sender = new Mail(DetailReceptionPadActivity.this, email[0], EmailCopie, true, db, utilisateurConnecte);
             }
 
             try {

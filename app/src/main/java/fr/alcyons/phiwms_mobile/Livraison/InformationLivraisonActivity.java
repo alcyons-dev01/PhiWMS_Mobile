@@ -724,7 +724,7 @@ public class InformationLivraisonActivity extends ServiceActivity {
         @Override
         protected Object doInBackground(String... email) {
 
-            Mail sender = new Mail(InformationLivraisonActivity.this, email[0], true, db);
+            Mail sender = new Mail(InformationLivraisonActivity.this, email[0], true, db, utilisateurConnecte);
             try {
                 if(filename == null || filename.contentEquals(""))
                 {

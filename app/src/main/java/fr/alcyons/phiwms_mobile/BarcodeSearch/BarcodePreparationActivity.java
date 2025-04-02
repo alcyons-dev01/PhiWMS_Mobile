@@ -46,10 +46,13 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.camera.CameraSource;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.camera.CameraSourcePreview;
@@ -62,8 +65,11 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.NewUniqueReceptionPUICont
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.PreparationMultipleContext;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.PreparationSimpleContext;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.negative.BarcodeCaptureNegativeActivity;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
@@ -71,6 +77,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
 import fr.alcyons.phiwms_mobile.Classes.Commande;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
@@ -179,6 +186,8 @@ public class BarcodePreparationActivity extends ServiceActivity {
         List<ObjetReceptionScannee> listObjet_scanne;
         List<Integer> liste_id_reliquat;
 
+        boolean erreurEmplacementVisible;
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -222,7 +231,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
         clavierMode.setVisibility(View.GONE);
         imageValidation = ((ImageView) findViewById(R.id.imageValidation));
         changeMode = (FloatingActionButton) findViewById(R.id.changeMode);
-
+        erreurEmplacementVisible = false;
         changeMode.setLabelText("Datamatrix inversé");
 
         if(icicle != null){
@@ -809,7 +818,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
                                 }
                                 else
                                 {
-                                    afficherAlerteErreurEmplacement(BarcodePreparationActivity.this, BarcodePreparationActivity.this.getLayoutInflater(), preparationSimpleContext.emplacementDisponible, preparationSimpleContext.liste_emplacement_disponible);
+                                    afficherAlerteErreurEmplacement(BarcodePreparationActivity.this, BarcodePreparationActivity.this.getLayoutInflater(), preparationSimpleContext.emplacementDisponible, preparationSimpleContext.liste_emplacement_disponible, preparationSimpleContext.emplacement_courant.getAdressage());
                                 }
                             }
                             else
@@ -869,7 +878,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
                                 }
                                 else
                                 {
-                                    afficherAlerteErreurEmplacement(BarcodePreparationActivity.this, BarcodePreparationActivity.this.getLayoutInflater(), preparationMultipleContext.emplacementDisponible, preparationMultipleContext.liste_emplacement_disponible);
+                                    afficherAlerteErreurEmplacement(BarcodePreparationActivity.this, BarcodePreparationActivity.this.getLayoutInflater(), preparationMultipleContext.emplacementDisponible, preparationMultipleContext.liste_emplacement_disponible, preparationMultipleContext.emplacement_courant.getAdressage());
                                 }
                             }
                             else
@@ -1273,7 +1282,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
                             else
                             {
                                 //si l'emplacement scanné est différent de l'emplacement du lot scanné on affiche un message d'erreur
-                                afficherAlerteErreurEmplacement(BarcodePreparationActivity.this, BarcodePreparationActivity.this.getLayoutInflater(), preparationSimpleContext.emplacementDisponible, preparationSimpleContext.liste_emplacement_disponible);
+                                afficherAlerteErreurEmplacement(BarcodePreparationActivity.this, BarcodePreparationActivity.this.getLayoutInflater(), preparationSimpleContext.emplacementDisponible, preparationSimpleContext.liste_emplacement_disponible, preparationSimpleContext.emplacement_courant.getAdressage());
                             }
 
 
@@ -1410,7 +1419,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
                             }
                             else
                             {
-                                afficherAlerteErreurEmplacement(BarcodePreparationActivity.this, BarcodePreparationActivity.this.getLayoutInflater(), preparationMultipleContext.emplacementDisponible, preparationMultipleContext.liste_emplacement_disponible);
+                                afficherAlerteErreurEmplacement(BarcodePreparationActivity.this, BarcodePreparationActivity.this.getLayoutInflater(), preparationMultipleContext.emplacementDisponible, preparationMultipleContext.liste_emplacement_disponible, preparationMultipleContext.emplacement_courant.getAdressage());
                             }
 
 
@@ -2084,28 +2093,98 @@ public class BarcodePreparationActivity extends ServiceActivity {
             mCameraSource.doZoom(detector.getScaleFactor());
         }
     }
-
-    public void afficherAlerteErreurEmplacement(Context context, LayoutInflater inflater, String emplacement, final List<Integer> listeEmplacementLot) {
+    public void afficherAlerteErreurEmplacement(Context context, LayoutInflater inflater, String emplacement, final List<Integer> listeEmplacementLot, String nouvelEmplacement) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View layout = inflater.inflate(R.layout.alerte_confirmation, null);
+        View layout = inflater.inflate(R.layout.alerte_confirmation_validation, null);
 
-        ImageView buttonOk = (ImageView) layout.findViewById(R.id.buttonOk);
+        LinearLayout buttonOk = (LinearLayout) layout.findViewById(R.id.buttonOk);
+        LinearLayout buttonAnnuler = (LinearLayout) layout.findViewById(R.id.buttonAnnuler);
         TextView messageFin = (TextView) layout.findViewById(R.id.messageFin);
         TextView titre = (TextView) layout.findViewById(R.id.titre);
 
         titre.setText("Erreur");
-        messageFin.setText("L'emplacement scanné ne correspond pas au lot scanné (Emplacement du lot : "+emplacement+")");
+        messageFin.setText("L'emplacement scanné ("+nouvelEmplacement+") ne correspond pas au lot scanné (Emplacement du lot : "+emplacement+") \n Souhaitez-vous effectuer un déplacement de stock ?");
         builder.setView(layout);
-
 
         final AlertDialog alertDialog = builder.create();
         alertDialog.getWindow().setGravity(Gravity.CENTER);
-        alertDialog.show();
-
+        if(!erreurEmplacementVisible)
+        {
+            alertDialog.show();
+            erreurEmplacementVisible = true;
+        }
+        /**
+         * TODO : action utilisateur déplacement de stock
+         */
         buttonOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                erreurEmplacementVisible = false;
                 alertDialog.dismiss();
+                //Création action utilisateur
+                String numeroLot = ((TextView) findViewById(R.id.numeroLot)).getText().toString();
+                String datePeremption = ((TextView) findViewById(R.id.datePeremptionLot)).getText().toString();
+                Depot depot = DepotOpenHelper.getDepotPUI(db);
+                Stock_Lot_Emplacement_Light stockCourant = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByLotPeremptionEtDepot(db, numeroLot, datePeremption, depot);
+
+                if (stockCourant != null) {
+                    stockCourant.setEmplacement(nouvelEmplacement);
+                    Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockCourant);
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, stockCourant.getPhiMR4UUID(), stockCourant.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+
+                    Random randomaction = new Random();
+                    int actionId = randomaction.nextInt();
+                    if (actionId > 0)
+                        actionId = actionId * -1;
+                    @SuppressLint("SimpleDateFormat") SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Date dateAction = new Date();
+                    String date_string = parseFormat.format(dateAction);
+                    ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", stockCourant.get_UID(), "", "Deplacement Stock");
+                    ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                    ElementASynchroniserOpenHelper.toutSynchroniser(BarcodePreparationActivity.this, db, utilisateurConnecte, false);
+                }
+
+                if (preparationSimpleContext != null) {
+                    blinkImage();
+                    ((LinearLayout) findViewById(R.id.validationScan)).setVisibility(View.VISIBLE);
+                    ((LinearLayout) findViewById(R.id.validationScan)).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            preparationSimpleContext.ValiderScan(Integer.parseInt(((TextView) findViewById(R.id.qteSaisie)).getText().toString()));
+                            ((TextView) findViewById(R.id.quantiteProduit)).setText("");
+                            ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText("");
+                            ((TextView) findViewById(R.id.numeroLot)).setText("");
+                            ((TextView) findViewById(R.id.datePeremptionLot)).setText("");
+                            ((TextView) findViewById(R.id.qteSaisie)).setText("");
+                            ((LinearLayout) findViewById(R.id.validationScan)).setVisibility(View.GONE);
+                            findViewById(R.id.boutonFermeture).performClick();
+                        }
+                    });
+                }
+                if (preparationMultipleContext != null) {
+                    blinkImage();
+                    ((LinearLayout) findViewById(R.id.validationScan)).setVisibility(View.VISIBLE);
+                    ((LinearLayout) findViewById(R.id.validationScan)).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            preparationMultipleContext.ValiderScan(Integer.parseInt(((TextView) findViewById(R.id.qteSaisie)).getText().toString()));
+                            ((TextView) findViewById(R.id.quantiteProduit)).setText("");
+                            ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText("");
+                            ((TextView) findViewById(R.id.numeroLot)).setText("");
+                            ((TextView) findViewById(R.id.datePeremptionLot)).setText("");
+                            ((TextView) findViewById(R.id.qteSaisie)).setText("");
+                            ((LinearLayout) findViewById(R.id.validationScan)).setVisibility(View.GONE);
+                            findViewById(R.id.boutonFermeture).performClick();
+                        }
+                    });
+                }
+            }
+        });
+
+        buttonAnnuler.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 if(preparationSimpleContext != null)
                     preparationSimpleContext.emplacement_courant = null;
                 if(preparationMultipleContext != null)
@@ -2113,19 +2192,8 @@ public class BarcodePreparationActivity extends ServiceActivity {
 
                 ((TextView) findViewById(R.id.EmplacementLotProduit)).setText("");
                 ((TextView) findViewById(R.id.instruction)).setText("Scannez un emplacement");
-
-                if(listeEmplacementLot.size() == 0)
-                {
-                    ((TextView) findViewById(R.id.EmplacementLotProduit)).performClick();
-                }
-                else
-                {
-                    Intent newIntent = new Intent(BarcodePreparationActivity.this, ListeEmplacementCreationActivity.class);
-                    Bundle extras = BarcodePreparationActivity.super.getBundle();
-                    extras.putIntegerArrayList("listeEmplacement", (ArrayList<Integer>) listeEmplacementLot);
-                    newIntent.putExtras(extras);
-                    BarcodePreparationActivity.this.startActivityForResult(newIntent, CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT);
-                }
+                erreurEmplacementVisible = false;
+                alertDialog.dismiss();
             }
         });
     }

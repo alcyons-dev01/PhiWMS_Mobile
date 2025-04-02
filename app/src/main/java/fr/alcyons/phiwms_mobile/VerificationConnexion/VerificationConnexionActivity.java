@@ -864,7 +864,7 @@ public class VerificationConnexionActivity extends AppCompatActivity {
         @Override
         protected Object doInBackground(String... email) {
 
-            Mail sender = new Mail(VerificationConnexionActivity.this, email[0], true, db);
+            Mail sender = new Mail(VerificationConnexionActivity.this, email[0], true, db, utilisateurConnecte);
             try {
                 // Envoi du mail de vérification
                 sender.sendMailVerification("Verification", "Voici le code de vérification : " + code_verification);

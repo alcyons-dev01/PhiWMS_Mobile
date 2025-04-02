@@ -113,7 +113,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     Intent data = result.getData();
-                    if (result.getResultCode() == CodesEchangesActivites.RETOUR_DOCUMENT) {
+                    if (result.getResultCode() == CodesEchangesActivites.RESULT_OK) {
                         if (data != null) {
                             String code = Objects.requireNonNull(data.getExtras()).getString("code");
                             if (code != null) {
