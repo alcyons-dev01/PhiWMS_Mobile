@@ -487,7 +487,7 @@ public class CreationLotManuelReceptionPUIActivity extends ServiceActivity {
                     {
                         if(depotEmplacement == null)
                         {
-                            if (code_emplacement.startsWith("PHITAGPLACE+")) {
+                            if (code_emplacement.startsWith("PHITAGPLACE")) {
                                 String[] tabchaine = code_emplacement.split(":");
                                 code_emplacement = tabchaine[1];
                                 depotEmplacement = EmplacementOpenHelper.getUnEmplacementByID(db, Integer.parseInt(code_emplacement));

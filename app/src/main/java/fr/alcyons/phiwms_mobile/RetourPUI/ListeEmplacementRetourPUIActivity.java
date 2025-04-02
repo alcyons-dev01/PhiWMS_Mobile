@@ -202,7 +202,7 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
                                 Depot_Emplacement emplacement = null;
                                 if(emplacement_scanne != null && !emplacement_scanne.contentEquals(""))
                                 {
-                                    if(emplacement_scanne.startsWith("PHITAGPLACE+"))
+                                    if(emplacement_scanne.startsWith("PHITAGPLACE"))
                                     {
                                         String[] tab_emplacement = emplacement_scanne.split(":");
                                         emplacement_scanne = tab_emplacement[tab_emplacement.length-1];

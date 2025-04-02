@@ -420,7 +420,7 @@ public class ProduitReceptionScanneeContexte extends MainActivity {
             if (s.toString().endsWith("\n"))
             {
                 String scan = s.toString().substring(0, s.length()-1);
-                if (scan.startsWith("PHITAGPLACE+"))
+                if (scan.startsWith("PHITAGPLACE"))
                 {
                     String[] scan_tab = scan.split(":");
                     int uid = Integer.parseInt(scan_tab[scan_tab.length-1]);

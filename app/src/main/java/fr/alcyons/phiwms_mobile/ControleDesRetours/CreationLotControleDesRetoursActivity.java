@@ -380,7 +380,7 @@ public class CreationLotControleDesRetoursActivity extends ServiceActivity {
                     if(depotEmplacement == null)
                     {
                         String code = data.getStringExtra("code");
-                        if (code.startsWith("PHITAGPLACE+")) {
+                        if (code.startsWith("PHITAGPLACE")) {
                             String[] tabchaine = code.split(":");
                             code = tabchaine[1];
                         }

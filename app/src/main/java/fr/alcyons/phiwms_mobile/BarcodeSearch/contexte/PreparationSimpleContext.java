@@ -108,7 +108,7 @@ public class PreparationSimpleContext extends MainActivity {
                 chaine = chaine.toString().substring(0, chaine.length() - 1);
             }
 
-            if(chaine.startsWith("PHITAGPLACE+"))
+            if(chaine.startsWith("PHITAGPLACE"))
             {
                 String[] tab_emplacement = chaine.split(":");
                 int emplacement_uid = Integer.parseInt(tab_emplacement[tab_emplacement.length-1]);
@@ -416,7 +416,7 @@ public class PreparationSimpleContext extends MainActivity {
                 s = s.toString().substring(0, s.length() - 1);
             }
 
-            if(s.startsWith("PHITAGPLACE+"))
+            if(s.startsWith("PHITAGPLACE"))
             {
                 String[] tab_emplacement = s.split(":");
                 int emplacement_uid = Integer.parseInt(tab_emplacement[tab_emplacement.length-1]);

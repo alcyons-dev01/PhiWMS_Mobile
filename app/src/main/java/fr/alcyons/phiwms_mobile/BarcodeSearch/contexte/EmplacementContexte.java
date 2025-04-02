@@ -70,7 +70,7 @@ public class EmplacementContexte {
                 ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
             }
         }
-        if (chaine.startsWith("PHITAGPLACE+")) {
+        if (chaine.startsWith("PHITAGPLACE")) {
             String[] tabchaine = chaine.split(":");
             chaine = tabchaine[1];
         }

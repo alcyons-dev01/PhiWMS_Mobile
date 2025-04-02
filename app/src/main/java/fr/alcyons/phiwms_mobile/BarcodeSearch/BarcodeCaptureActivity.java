@@ -1256,7 +1256,7 @@ public class BarcodeCaptureActivity extends ServiceActivity {
                     }
                     else if(scannerContexteInt == R.string.scannerContexteProduitReceptionScannee)
                     {
-                        if(s.toString().substring(0, s.length()-1).startsWith("PHITAGPLACE+"))
+                        if(s.toString().substring(0, s.length()-1).startsWith("PHITAGPLACE"))
                         {
                             produitReceptionScanneeContexte.scanEmplacement = true;
                         }

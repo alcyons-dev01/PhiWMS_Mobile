@@ -242,7 +242,7 @@ public class PreparationScanneeScanProduitContext {
                 scan = scan.substring(0, scan.length() - 1);
             }
 
-            if (scan.startsWith("PHITAGPLACE+")) {
+            if (scan.startsWith("PHITAGPLACE")) {
                 String[] scan_tab = scan.split(":");
                 int uid = Integer.parseInt(scan_tab[scan_tab.length-1]);
                 Depot_Emplacement depot_emplacements = EmplacementOpenHelper.getUnEmplacementByID(db, uid);

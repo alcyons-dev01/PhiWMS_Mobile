@@ -100,7 +100,7 @@ public class NewReceptionPUIContext extends MainActivity {
         }
 
 
-        if(chaine.startsWith("PHITAGPLACE+") && nouveau_lot != null)
+        if(chaine.startsWith("PHITAGPLACE") && nouveau_lot != null)
         {
 /*            if(nouveau_lot != null && emplacement_courant != null)
             {
@@ -116,7 +116,7 @@ public class NewReceptionPUIContext extends MainActivity {
             ((BarcodePreparationActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
             validation = true;
         }*/
-        else if(chaine.startsWith("PHITAGPLACE+") && nouveau_lot == null)
+        else if(chaine.startsWith("PHITAGPLACE") && nouveau_lot == null)
         {
             ((ScannerPreparationActivity) context).afficherSnackBar("Veuillez scanner une référence");
             validation = true;
@@ -519,7 +519,7 @@ public class NewReceptionPUIContext extends MainActivity {
             s = s.toString().substring(0, s.length() - 1);
         }
 
-        if(s.startsWith("PHITAGPLACE+") && nouveau_lot != null)
+        if(s.startsWith("PHITAGPLACE") && nouveau_lot != null)
         {
 /*            if(nouveau_lot != null && emplacement_courant != null)
             {
@@ -535,7 +535,7 @@ public class NewReceptionPUIContext extends MainActivity {
             ((BarcodePreparationActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
             validation = true;
         }*/
-        else if(s.startsWith("PHITAGPLACE+") && nouveau_lot == null)
+        else if(s.startsWith("PHITAGPLACE") && nouveau_lot == null)
         {
             ((BarcodeReceptionActivity) context).afficherSnackBar("Veuillez scanner une référence");
             validation = true;

@@ -633,7 +633,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                         else
                         {
                             preparationADHContext.onTextWatcher(s);
-                            if(s.toString().startsWith("PHITAGPLACE+"))
+                            if(s.toString().startsWith("PHITAGPLACE"))
                             {
                                 LayoutResultatScanProduit.setVisibility(View.GONE);
                                 ImageSeparateur.setVisibility(View.GONE);
@@ -717,7 +717,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                         }
                         LinearResultatFranceMVO.setVisibility(View.GONE);
 
-                        if(s.toString().startsWith("PHITAGPLACE+"))
+                        if(s.toString().startsWith("PHITAGPLACE"))
                             produitReceptionScanneeContexte.scanEmplacement = true;
 
                         if(s.toString().startsWith("RecepetionScanneeValider"))
@@ -1006,7 +1006,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                         else
                         {
                             preparationADHContext.onTextWatcher(s);
-                            if(s.toString().startsWith("PHITAGPLACE+"))
+                            if(s.toString().startsWith("PHITAGPLACE"))
                             {
                                 LayoutResultatScanProduit.setVisibility(View.GONE);
                                 ImageSeparateur.setVisibility(View.GONE);
@@ -1091,7 +1091,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                         }
                         LinearResultatFranceMVO.setVisibility(View.GONE);
 
-                        if(s.toString().startsWith("PHITAGPLACE+"))
+                        if(s.toString().startsWith("PHITAGPLACE"))
                             produitReceptionScanneeContexte.scanEmplacement = true;
 
                         if(s.toString().startsWith("RecepetionScanneeValider"))

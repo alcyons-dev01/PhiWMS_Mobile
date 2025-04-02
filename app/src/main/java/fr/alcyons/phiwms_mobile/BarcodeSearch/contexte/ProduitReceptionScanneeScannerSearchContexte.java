@@ -429,7 +429,7 @@ public class ProduitReceptionScanneeScannerSearchContexte extends MainActivity {
                 AjoutDuProduit();
 
                 String scan = s.toString().substring(0, s.length()-1);
-                if (scan.startsWith("PHITAGPLACE+")) {
+                if (scan.startsWith("PHITAGPLACE")) {
                     String[] scan_tab = scan.split(":");
                     int uid = Integer.parseInt(scan_tab[scan_tab.length-1]);
                     Depot_Emplacement depot_emplacements = EmplacementOpenHelper.getUnEmplacementByID(db, uid);

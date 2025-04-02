@@ -132,7 +132,7 @@ public class PreparationScanneeScanProduitScannerSearchContexte {
             chaine = chaine.substring(0, chaine.length() - 1);
         }
         Produit produit_courant = null;
-        if(!chaine.startsWith("PHITAGPLACE+"))
+        if(!chaine.startsWith("PHITAGPLACE"))
         {
             //check si le produit scanné est le meme que le précédent qui n'a pas encore d'emplacement
             boolean continuer = true;
@@ -299,7 +299,7 @@ public class PreparationScanneeScanProduitScannerSearchContexte {
         }
         else
         {
-            if (chaine.startsWith("PHITAGPLACE+")) {
+            if (chaine.startsWith("PHITAGPLACE")) {
                 String[] scan_tab = chaine.split(":");
                 int uid = Integer.parseInt(scan_tab[scan_tab.length-1]);
                 Depot_Emplacement depot_emplacements = EmplacementOpenHelper.getUnEmplacementByID(db, uid);
@@ -362,7 +362,7 @@ public class PreparationScanneeScanProduitScannerSearchContexte {
     public boolean onTap(String chaine) {
         boolean confirmation = true;
 
-        if(!chaine.startsWith("PHITAGPLACE+"))
+        if(!chaine.startsWith("PHITAGPLACE"))
         {
             if(liste_code_scanne.indexOf(chaine) == -1)
             {
@@ -468,7 +468,7 @@ public class PreparationScanneeScanProduitScannerSearchContexte {
                 scan = scan.substring(0, scan.length() - 1);
             }
 
-            if (scan.startsWith("PHITAGPLACE+")) {
+            if (scan.startsWith("PHITAGPLACE")) {
                 String[] scan_tab = scan.split(":");
                 int uid = Integer.parseInt(scan_tab[scan_tab.length-1]);
                 Depot_Emplacement depot_emplacements = EmplacementOpenHelper.getUnEmplacementByID(db, uid);
