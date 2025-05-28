@@ -421,11 +421,12 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
         scanDocumentBundle.putBoolean("isBoutonSuppressionExistant", true);
 
         Intent scanDocumentIntent;
-        if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+        if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell") || Build.MANUFACTURER.toLowerCase().contains("google"))
         {
             scanDocumentIntent = new Intent(ServiceReceptionPuiActivity.this, ScannerDocumentActivity.class);
             scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteDocument);
-            scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'un document");
+            scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'une réception");
+            scanDocumentBundle.putString("Context", "Reception");
         }
         else
         {
@@ -438,7 +439,8 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
             {
                 scanDocumentIntent = new Intent(ServiceReceptionPuiActivity.this, ScannerDocumentActivity.class);
                 scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteDocument);
-                scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'un document");
+                scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'une réception");
+                scanDocumentBundle.putString("Context", "Reception");
             }
         }
 

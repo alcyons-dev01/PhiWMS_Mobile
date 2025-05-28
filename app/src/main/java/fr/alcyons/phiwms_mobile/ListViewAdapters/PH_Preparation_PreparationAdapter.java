@@ -37,17 +37,14 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
     SQLiteDatabase db;
     PH_Preparation_PreparationFilter filter;
 
-    public PH_Preparation_PreparationAdapter(Context context, List<PH_Preparation> phPreparationPreparation, SQLiteDatabase database, Utilisateur utilisateur) {
-        super(context, 0, phPreparationPreparation);
-        this.phPreparationPreparation = phPreparationPreparation;
+    public PH_Preparation_PreparationAdapter(Context context, List<PH_Preparation> listeInitiale, SQLiteDatabase database, Utilisateur utilisateur) {
+        super(context, 0, listeInitiale);
+        this.phPreparationPreparation = listeInitiale;
         this.context = context;
         this.utilisateur = utilisateur;
         db = database;
-        phPreparationPreparationOriginal = new ArrayList<>();
-        for (PH_Preparation phPreparation : phPreparationPreparation
-                ) {
-            phPreparationPreparationOriginal.add(phPreparation);
-        }
+        this.phPreparationPreparationOriginal = new ArrayList<>();
+        this.phPreparationPreparationOriginal.addAll(phPreparationPreparation);
         this.filter = null;
     }
 
@@ -167,11 +164,14 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
                 List<PH_Preparation> founded = new ArrayList<>();
                 for (PH_Preparation item : phPreparationPreparation) {
                     Depot depot = DepotOpenHelper.getDepotParReference(db, item.getDepotDestinataireReference());
-                    // Vérifie le début du premier mot
+
                     String valueText = item.getChaineFiltrePhPreparationLigne(db).toLowerCase();
-                    if (valueText.startsWith(String.valueOf(constraint))) {
+                    if(String.valueOf(item.getUID()).contentEquals(String.valueOf(constraint))){
                         founded.add(item);
-                    } else if (depot.getNom().toLowerCase().contains(constraint)) {
+                    }
+                    else if(valueText.startsWith(String.valueOf(constraint))) {
+                        founded.add(item);
+                    } else if (depot!= null && depot.getNom().toLowerCase().contains(constraint)) {
                         founded.add(item);
                     } else {
                         /* Vérifie le début de chaque mot */
@@ -184,7 +184,6 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
                         }
                     }
                 }
-
                 result.values = founded;
                 result.count = founded.size();
             } else {
@@ -197,11 +196,14 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            phPreparationPreparation.clear();
-            for (PH_Preparation item : (List<PH_Preparation>) results.values) {
-                add(item);
+            if(results != null && results.values != null) {
+                phPreparationPreparation.clear();
+                for (PH_Preparation item : (List<PH_Preparation>) results.values) {
+                    add(item);
+                }
+
+                notifyDataSetChanged();
             }
-            notifyDataSetChanged();
         }
 
     }

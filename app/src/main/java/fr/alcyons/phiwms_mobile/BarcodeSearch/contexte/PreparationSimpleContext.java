@@ -45,7 +45,8 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.EnvoyerMailSurveillance;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
 
-public class PreparationSimpleContext extends MainActivity {
+public class PreparationSimpleContext
+{
     private Context context;
     private SQLiteDatabase db;
 
@@ -78,365 +79,57 @@ public class PreparationSimpleContext extends MainActivity {
     public String emplacementDisponible;
     public List<Integer> liste_emplacement_disponible;
 
-     public List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte> liste_preparation_liste_adapte;
+    public List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte> liste_preparation_liste_adapte;
 
-        public PreparationSimpleContext(final Context context, final SQLiteDatabase db, List<String> ListeGTIN, int userId, int preparation_ligne_id, List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte> liste_preparation_liste_adapte, PH_Preparation_Ligne_Preparation_Adapte phPreparationLignePreparationAdapte, List<String> liste_lot){
-            this.context = context;
-            this.db = db;
-            this.ListeGTIN = ListeGTIN;
-            this.userId = userId;
-            this.liste_preparation_liste_adapte = liste_preparation_liste_adapte;
-            this.preparation_ligne_id = preparation_ligne_id;
-            this.listeSerie = new ArrayList<>();
-            this.liste_lot = liste_lot;
-            if(this.liste_lot == null)
-                this.liste_lot = new ArrayList<>();
-            this.new_lot = false;
-            this.utilisateurConnecte = UtilisateurOpenHelper.getUtilisateurByID(db, userId);
-            this.phPreparationLignePreparationAdapte = phPreparationLignePreparationAdapte;
-            this.peparationLigne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, preparation_ligne_id);
-            serialisationService = new Serialisation(context, db, utilisateurConnecte);
-            this.stringList = new ArrayList<>();
-            validation = true;
+    public PreparationSimpleContext(final Context context, final SQLiteDatabase db, List<String> ListeGTIN, int userId, int preparation_ligne_id, List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte> liste_preparation_liste_adapte, PH_Preparation_Ligne_Preparation_Adapte phPreparationLignePreparationAdapte, List<String> liste_lot){
+        this.context = context;
+        this.db = db;
+        this.ListeGTIN = ListeGTIN;
+        this.userId = userId;
+        this.liste_preparation_liste_adapte = liste_preparation_liste_adapte;
+        this.preparation_ligne_id = preparation_ligne_id;
+        this.listeSerie = new ArrayList<>();
+        this.liste_lot = liste_lot;
+        if(this.liste_lot == null)
+            this.liste_lot = new ArrayList<>();
+        this.new_lot = false;
+        this.utilisateurConnecte = UtilisateurOpenHelper.getUtilisateurByID(db, userId);
+        this.phPreparationLignePreparationAdapte = phPreparationLignePreparationAdapte;
+        this.peparationLigne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, preparation_ligne_id);
+        serialisationService = new Serialisation(context, db, utilisateurConnecte);
+        this.stringList = new ArrayList<>();
+        validation = true;
+    }
+
+    public void onTextWatcher(final Editable s){
+        String chaine = s.toString();
+
+        if (chaine.endsWith("\n"))
+        {
+            chaine = chaine.toString().substring(0, chaine.length() - 1);
         }
 
-        public void onTextWatcher(final Editable s){
-            String chaine = s.toString();
+        if(chaine.startsWith("PHITAGPLACE+"))
+        {
+            String[] tab_emplacement = chaine.split(":");
+            int emplacement_uid = Integer.parseInt(tab_emplacement[tab_emplacement.length-1]);
 
-            if (chaine.endsWith("\n"))
-            {
-                chaine = chaine.toString().substring(0, chaine.length() - 1);
-            }
-
-            if(chaine.startsWith("PHITAGPLACE"))
-            {
-                String[] tab_emplacement = chaine.split(":");
-                int emplacement_uid = Integer.parseInt(tab_emplacement[tab_emplacement.length-1]);
-
-                emplacement_courant = EmplacementOpenHelper.getUnEmplacementByID(db, emplacement_uid);
-            }
-            else if(emplacement_courant == null)
-            {
-                ((ScannerPreparationActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
-            }
-            else
-            {
-                if(lot_courant == null) {
-                    if (!validation) {
-                        validation = false;
-                    } else {
-                        validation = false;
-                    }
-
-                    Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(chaine);
-                    String lot = "";
-                    String serie = "";
-                    String gtin_courant ="";
-                    String conditionnementString ="";
-                    String date_peremption_courant="";
-                    if (gs1Decoupe.size() != 1)
-                    {
-                        List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
-                        if(produits != null)
-                        {
-                            if (produits.size() == 1) {
-                                produit = produits.get(0);
-                            }
-                            else if(produits.size() > 1)
-                            {
-                                String activityName = context.getClass().getSimpleName();
-        /*                          if(activityName.contentEquals("BarcodeCaptureActivity"))
-                                {
-                                    ((BarcodeCaptureActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
-                                }
-                                else
-                                {
-                                    ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
-                                }*/
-
-                                lot_courant = null;
-                                code = "";
-                            }
-                        }
-                        lot = gs1Decoupe.get(OutilsDecodage.numeroLot);
-                        serie = gs1Decoupe.get(OutilsDecodage.numeroSerie);
-                        gtin_courant = gs1Decoupe.get(OutilsDecodage.codeGtin);
-                        conditionnementString = gs1Decoupe.get(OutilsDecodage.conditionnementProduit);
-                        date_peremption_courant = gs1Decoupe.get(OutilsDecodage.dateDePeremption);
-                    }
-                    else
-                    {
-                        List<Produit> produits  = ProduitOpenHelper.getProduitByCodeInconnu(db, chaine);
-                        if(produits != null)
-                        {
-                            if (produits.size() == 1) {
-                                produit = produits.get(0);
-                                codeInconnu = true;
-                            }
-                            else if(produits.size() > 1)
-                            {
-                                String activityName = context.getClass().getSimpleName();
-        /*                            if(activityName.contentEquals("BarcodeCaptureActivity"))
-                                {
-                                    ((BarcodeCaptureActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
-                                }
-                                else
-                                {
-                                    ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
-                                }*/
-                                lot_courant = null;
-
-                                code = "";
-                            }
-                        }
-                    }
-
-                    if(produit == null || produit.getID_produit() != peparationLigne.getProduitID())
-                    {
-                        ((ScannerPreparationActivity)context).afficherSnackBar("Mauvais produit scanné");
-                        lot_courant = null;
-                    }
-                    else if(peparationLigne.getQte_APreparer() == 0)
-                    {
-                        ((ScannerPreparationActivity)context).afficherSnackBar("Produit déjà préparé en intégralité");
-                        lot_courant = null;
-                    }
-                    else if(serie != null && !serie.contentEquals("") && stringList.indexOf(chaine) == -1)
-                    {
-                        if(produit != null)
-                        {
-                            if(codeInconnu)
-                            {
-                                gtin_courant = chaine;
-                            }
-                            PH_Serialisation serialisation_courante = null;
-
-                            if(!codeInconnu)
-                            {
-                                /***Début de la sérialisation***/
-                                if (!serie.contentEquals("") && produit.isSerialiser_Reception_Delivrance() && produit.isSuivi_Serialisation() && listeSerie.indexOf(serie) == -1) {
-                                    listeSerie.add(serie);
-                                    String resultat = "";
-                                    boolean differe = false;
-                                    if (!statutConnexion)
-                                        differe = true;
-
-                                    if (conditionnementString.contentEquals("")) {
-                                        produit = ProduitOpenHelper.getUnProduitParGTIN(db, gtin_courant);
-                                        if (produit == null) {
-                                            produit = ProduitOpenHelper.getUnProduitParGTIN(db, "01" + gtin_courant);
-                                        }
-                                    }
-
-                                    long ph_serialisation_uid = 0;
-                                    String peremptionSerialisation = date_peremption_courant;
-                                    peremptionSerialisation = peremptionSerialisation.substring(2);
-                                    peremptionSerialisation = peremptionSerialisation.replace("-", "");
-                                    ph_serialisation_uid = serialisationService.Serialisation_Verifier(utilisateurConnecte.getId(), false, differe, gtin_courant, "GTIN", lot, peremptionSerialisation, serie, "ActionUtilisateur", String.valueOf(0), "", "");
-
-
-                                    serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, (int) ph_serialisation_uid);
-                                    if (serialisation_courante == null) {
-                                        serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int) ph_serialisation_uid);
-                                    }
-
-                                    resultat = serialisation_courante.getResultat();
-                                    if (resultat.contentEquals("INACTIVE") || resultat.contentEquals("UNKNOWN")) {
-                                        Random SurveillanceReferenceRandom = new Random();
-                                        int id_surveillance = SurveillanceReferenceRandom.nextInt();
-                                        if (id_surveillance > 0) {
-                                            id_surveillance = id_surveillance * -1;
-                                        }
-                                        Calendar calendar = Calendar.getInstance();
-                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                                        String surveillanceDate = sdf.format(calendar.getTime());
-
-                                        SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
-                                        String surveillanceHeure = mdformat.format(calendar.getTime());
-
-                                        int produit_id = serialisation_courante.getProduitUID();
-                                        int serialisationID = serialisation_courante.get_UID();
-                                        String motif = GestionCodeErreurNMVO.getMessage(code);
-                                        String actionAMener = "";
-                                        String statut = "NON LU";
-                                        String traitePar = utilisateurConnecte.getIdentifiant();
-                                        String traiteDate = surveillanceDate;
-                                        String traiteHeure = surveillanceHeure;
-                                        String produitLot = serialisation_courante.getNumeroLot();
-                                        String produitDatePéremption = serialisation_courante.getDatePeremptionAAMMJJ();
-                                        String produitNumeroSerie = serialisation_courante.getNumeroSerie();
-
-                                        SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
-                                    } else {
-                                        String messageTexteFranceMVO = "";
-                                    }
-                                }
-
-                                /***Fin de la sérialisation***/
-                            }
-                            codeInconnu = false;
-                            PH_Preparation_Ligne ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, preparation_ligne_id);
-
-                            for(int i = 0; i < liste_preparation_liste_adapte.size(); i++)
-                            {
-
-                                PH_Preparation_Ligne_Preparation_Adapte.LotAdapte courant = liste_preparation_liste_adapte.get(i);
-                                if(courant.getNumLot().contentEquals(lot))
-                                {
-                                    int qte_restante = ph_preparation_ligne.getQte_Demander()- ph_preparation_ligne.getQte_preparer();
-                                    lot_courant = courant;
-            /*                        if(lot_courant.getQteStock() < qte_restante)
-                                    {
-                                        qte_restante = lot_courant.getQteStock();
-                                    }
-                                    lot_courant.setQteSaisie(qte_restante);*/
-                                    break;
-                                }
-                                else
-                                {
-                                    lot_courant = null;
-                                }
-                            }
-
-                            if(lot_courant == null)
-                            {
-                                PH_Preparation preparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparation_ligne.getPreparationID());
-                                int qte_restante = ph_preparation_ligne.getQte_Demander()- ph_preparation_ligne.getQte_preparer();
-                                int qte_renseigner = qte_restante;
-                                if(produit.getCond_distrib() <= qte_restante)
-                                    qte_renseigner = (int)produit.getCond_distrib();
-                                Depot_Zone zone_courante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
-                                Stock_Lot_Emplacement_Light newStockLotEmplacement = new Stock_Lot_Emplacement_Light(qte_restante, lot, date_peremption_courant, emplacement_courant.getAdressage(), preparation.getDepotOrigineReference(), zone_courante.getZoneName(), produit.getID_produit(), 0, serie);
-                                Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, newStockLotEmplacement);
-                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, newStockLotEmplacement.getPhiMR4UUID(), newStockLotEmplacement.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
-                                lot_courant = phPreparationLignePreparationAdapte.new LotAdapte(newStockLotEmplacement);
-                                liste_preparation_liste_adapte.add(lot_courant);
-                            }
-
-                            if(liste_lot.indexOf(lot_courant.getNumLot()) != -1)
-                            {
-        /*                        ph_preparation_ligne.setQte_preparer(ph_preparation_ligne.getQte_preparer()-lot_courant.getQteSaisie());
-                                PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
-                                lot_courant.setQteSaisie(0);*/
-                            }
-                            else
-                            {
-                                liste_lot.add(lot_courant.getNumLot());
-                            }
-
-                        }
-                        else
-                        {
-                            String activityName = context.getClass().getSimpleName();
-        /*                        if(activityName.contentEquals("BarcodeCaptureActivity"))
-                            {
-                                ((BarcodeCaptureActivity) context).afficherSnackBar("Produit inconnu");
-                            }
-                            else
-                            {
-                                ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Produit inconnu");
-                            }*/
-
-                            lot_courant = null;
-                            code = "";
-                        }
-                    }
-                    else
-                    {
-                        PH_Preparation_Ligne ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, preparation_ligne_id);
-
-                        for(int i = 0; i < liste_preparation_liste_adapte.size(); i++)
-                        {
-
-                            PH_Preparation_Ligne_Preparation_Adapte.LotAdapte courant = liste_preparation_liste_adapte.get(i);
-                            if(courant.getNumLot().contentEquals(lot))
-                            {
-                                int qte_restante = ph_preparation_ligne.getQte_Demander()- ph_preparation_ligne.getQte_preparer();
-                                lot_courant = courant;
-            /*                        if(lot_courant.getQteStock() < qte_restante)
-                                    {
-                                        qte_restante = lot_courant.getQteStock();
-                                    }
-                                    lot_courant.setQteSaisie(qte_restante);*/
-                                break;
-                            }
-                            else
-                            {
-                                lot_courant = null;
-                            }
-                        }
-
-                        if(lot_courant == null)
-                        {
-                            PH_Preparation preparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparation_ligne.getPreparationID());
-                            int qte_restante = ph_preparation_ligne.getQte_Demander()- ph_preparation_ligne.getQte_preparer();
-                            int qte_renseigner = qte_restante;
-                            if(produit.getCond_distrib() <= qte_restante)
-                                qte_renseigner = (int)produit.getCond_distrib();
-                            Depot_Zone zone_courante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
-                            Stock_Lot_Emplacement_Light newStockLotEmplacement = new Stock_Lot_Emplacement_Light(qte_restante, lot, date_peremption_courant, emplacement_courant.getAdressage(), preparation.getDepotOrigineReference(), zone_courante.getZoneName(), produit.getID_produit(), 0, serie);
-                            Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, newStockLotEmplacement);
-                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, newStockLotEmplacement.getPhiMR4UUID(), newStockLotEmplacement.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
-                            lot_courant = phPreparationLignePreparationAdapte.new LotAdapte(newStockLotEmplacement);
-                            liste_preparation_liste_adapte.add(lot_courant);
-                        }
-
-                        if(liste_lot.indexOf(lot_courant.getNumLot()) != -1)
-                        {
-        /*                    ph_preparation_ligne.setQte_preparer(ph_preparation_ligne.getQte_preparer()-lot_courant.getQteSaisie());
-                            PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
-                            lot_courant.setQteSaisie(0);*/
-                        }
-                        else
-                        {
-                            liste_lot.add(lot_courant.getNumLot());
-                        }
-                    }
-                }
-            }
-
+            emplacement_courant = EmplacementOpenHelper.getUnEmplacementByID(db, emplacement_uid);
         }
-
-        public void onActivityResult(int requestCode, Intent data){
-            if (data != null) {
-                switch (requestCode) {
-                    case CodesEchangesActivites.RETOUR_SCANNER:
-                        liste_preparation_liste_adapte = new ArrayList<>();
-                        liste_preparation_liste_adapte = (List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte>) data.getExtras().getSerializable("lotAdapteList");
-                        liste_lot = data.getExtras().getStringArrayList("liste_lot");
-                        break;
-                }
-            }
+        else if(emplacement_courant == null && utilisateurConnecte.getEtablissement().contentEquals("ADH"))
+        {
+            ((ScannerPreparationActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
         }
-
-        public boolean onTap(String s){
-            boolean confirmation = true;
-            if (s.toString().endsWith("\n"))
-            {
-                s = s.toString().substring(0, s.length() - 1);
-            }
-
-            if(s.startsWith("PHITAGPLACE"))
-            {
-                String[] tab_emplacement = s.split(":");
-                int emplacement_uid = Integer.parseInt(tab_emplacement[tab_emplacement.length-1]);
-
-                emplacement_courant = EmplacementOpenHelper.getUnEmplacementByID(db, emplacement_uid);
-            }
-            else if(emplacement_courant == null)
-            {
-                ((BarcodePreparationActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
-            }
-            else {
+        else
+        {
+            if(lot_courant == null) {
                 if (!validation) {
-                    //afficherErreur("Validation");
                     validation = false;
-                    return false;
                 } else {
                     validation = false;
                 }
 
-                Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(s);
+                Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(chaine);
                 String lot = "";
                 String serie = "";
                 String gtin_courant ="";
@@ -444,7 +137,6 @@ public class PreparationSimpleContext extends MainActivity {
                 String date_peremption_courant="";
                 if (gs1Decoupe.size() != 1)
                 {
-
                     List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
                     if(produits != null)
                     {
@@ -454,18 +146,17 @@ public class PreparationSimpleContext extends MainActivity {
                         else if(produits.size() > 1)
                         {
                             String activityName = context.getClass().getSimpleName();
-    /*                          if(activityName.contentEquals("BarcodeCaptureActivity"))
-                            {
-                                ((BarcodeCaptureActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
-                            }
-                            else
-                            {
-                                ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
-                            }*/
+        /*                          if(activityName.contentEquals("BarcodeCaptureActivity"))
+                                {
+                                    ((BarcodeCaptureActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                                }
+                                else
+                                {
+                                    ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                                }*/
 
-                            validation = true;
+                            lot_courant = null;
                             code = "";
-                            return false;
                         }
                     }
                     lot = gs1Decoupe.get(OutilsDecodage.numeroLot);
@@ -476,7 +167,7 @@ public class PreparationSimpleContext extends MainActivity {
                 }
                 else
                 {
-                    List<Produit> produits  = ProduitOpenHelper.getProduitByCodeInconnu(db, s.toString().substring(0, s.length()-1));
+                    List<Produit> produits  = ProduitOpenHelper.getProduitByCodeInconnu(db, chaine);
                     if(produits != null)
                     {
                         if (produits.size() == 1) {
@@ -486,41 +177,38 @@ public class PreparationSimpleContext extends MainActivity {
                         else if(produits.size() > 1)
                         {
                             String activityName = context.getClass().getSimpleName();
-    /*                            if(activityName.contentEquals("BarcodeCaptureActivity"))
-                            {
-                                ((BarcodeCaptureActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
-                            }
-                            else
-                            {
-                                ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
-                            }*/
+        /*                            if(activityName.contentEquals("BarcodeCaptureActivity"))
+                                {
+                                    ((BarcodeCaptureActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                                }
+                                else
+                                {
+                                    ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                                }*/
+                            lot_courant = null;
 
-                            validation = true;
                             code = "";
-                            return false;
                         }
                     }
                 }
 
                 if(produit == null || produit.getID_produit() != peparationLigne.getProduitID())
                 {
-                    ((BarcodePreparationActivity)context).afficherSnackBar("Mauvais produit scanné");
+                    ((ScannerPreparationActivity)context).afficherSnackBar("Mauvais produit scanné");
                     lot_courant = null;
-                    produit = null;
-                    return false;
                 }
                 else if(peparationLigne.getQte_APreparer() == 0)
                 {
-                    ((BarcodePreparationActivity)context).afficherSnackBar("Produit déjà préparé en intégralité");
+                    ((ScannerPreparationActivity)context).afficherSnackBar("Produit déjà préparé en intégralité");
                     lot_courant = null;
                 }
-                else if(serie != null && !serie.contentEquals("") && stringList.indexOf(s.toString().substring(0, s.length()-1)) == -1)
+                else if(serie != null && !serie.contentEquals("") && stringList.indexOf(chaine) == -1)
                 {
                     if(produit != null)
                     {
                         if(codeInconnu)
                         {
-                            gtin_courant = s.toString().substring(0, s.length() - 1);
+                            gtin_courant = chaine;
                         }
                         PH_Serialisation serialisation_courante = null;
 
@@ -531,7 +219,7 @@ public class PreparationSimpleContext extends MainActivity {
                                 listeSerie.add(serie);
                                 String resultat = "";
                                 boolean differe = false;
-                                if (!statutConnexion)
+                                if (!OutilsGestionConnexionReseau.isServerAccessible(context))
                                     differe = true;
 
                                 if (conditionnementString.contentEquals("")) {
@@ -581,6 +269,19 @@ public class PreparationSimpleContext extends MainActivity {
 
                                     SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
 
+                                    /*long rowUID_surveillance = SurveillanceReferenceOpenHelper.insererSurveillanceReferenceEnBDD(db, new_surveillance_reference);
+
+                                    if (rowUID_surveillance != -1) {
+                                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE, new_surveillance_reference.getSerialexpressUUID(), new_surveillance_reference.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+
+                                        try {
+                                            EnvoyerMailSurveillance class_mail = new EnvoyerMailSurveillance();
+                                            class_mail.EnvoyerMailSerialisation(new_surveillance_reference.get_UID(), utilisateurConnecte.getMail(), db);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }*/
+
                                     //((BarcodeCaptureActivity) context).afficherAlerteFranceMVO(produit.getDesignation_interne(), resultat, serie, motif);
 
                                 } else {
@@ -591,8 +292,14 @@ public class PreparationSimpleContext extends MainActivity {
                             /***Fin de la sérialisation***/
                         }
                         codeInconnu = false;
-
                         PH_Preparation_Ligne ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, preparation_ligne_id);
+                        if(emplacement_courant == null)
+                        {
+                            PH_Preparation preparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparation_ligne.getPreparationID());
+                            Depot depotorigine = DepotOpenHelper.getDepotParID(db, preparation.getDepotOrigineID());
+                            Depot_Zone zonepreparationligne = ZoneOpenHelper.getZoneByDepotEtNom(db, depotorigine, ph_preparation_ligne.getZoneDepot());
+                            emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zonepreparationligne, ph_preparation_ligne.getEmplacementParDefaut());
+                        }
 
                         for(int i = 0; i < liste_preparation_liste_adapte.size(); i++)
                         {
@@ -602,11 +309,11 @@ public class PreparationSimpleContext extends MainActivity {
                             {
                                 int qte_restante = ph_preparation_ligne.getQte_Demander()- ph_preparation_ligne.getQte_preparer();
                                 lot_courant = courant;
-        /*                        if(lot_courant.getQteStock() < qte_restante)
-                                {
-                                    qte_restante = lot_courant.getQteStock();
-                                }
-                                lot_courant.setQteSaisie(qte_restante);*/
+            /*                        if(lot_courant.getQteStock() < qte_restante)
+                                    {
+                                        qte_restante = lot_courant.getQteStock();
+                                    }
+                                    lot_courant.setQteSaisie(qte_restante);*/
                                 break;
                             }
                             else
@@ -622,6 +329,15 @@ public class PreparationSimpleContext extends MainActivity {
                             int qte_renseigner = qte_restante;
                             if(produit.getCond_distrib() <= qte_restante)
                                 qte_renseigner = (int)produit.getCond_distrib();
+
+                            if(emplacement_courant == null)
+                            {
+                                Depot depotorigine = DepotOpenHelper.getDepotParID(db, preparation.getDepotOrigineID());
+                                Depot_Zone zonepreparationligne = ZoneOpenHelper.getZoneByDepotEtNom(db, depotorigine, ph_preparation_ligne.getZoneDepot());
+                                emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zonepreparationligne, ph_preparation_ligne.getEmplacementParDefaut());
+                            }
+
+
                             Depot_Zone zone_courante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
                             Stock_Lot_Emplacement_Light newStockLotEmplacement = new Stock_Lot_Emplacement_Light(qte_restante, lot, date_peremption_courant, emplacement_courant.getAdressage(), preparation.getDepotOrigineReference(), zone_courante.getZoneName(), produit.getID_produit(), 0, serie);
                             Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, newStockLotEmplacement);
@@ -632,18 +348,362 @@ public class PreparationSimpleContext extends MainActivity {
 
                         if(liste_lot.indexOf(lot_courant.getNumLot()) != -1)
                         {
-        /*                    ph_preparation_ligne.setQte_preparer(ph_preparation_ligne.getQte_preparer()-lot_courant.getQteSaisie());
-                            PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
-                            lot_courant.setQteSaisie(0);*/
+        /*                        ph_preparation_ligne.setQte_preparer(ph_preparation_ligne.getQte_preparer()-lot_courant.getQteSaisie());
+                                PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
+                                lot_courant.setQteSaisie(0);*/
                         }
                         else
                         {
                             liste_lot.add(lot_courant.getNumLot());
                         }
+
                     }
                     else
                     {
                         String activityName = context.getClass().getSimpleName();
+        /*                        if(activityName.contentEquals("BarcodeCaptureActivity"))
+                            {
+                                ((BarcodeCaptureActivity) context).afficherSnackBar("Produit inconnu");
+                            }
+                            else
+                            {
+                                ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Produit inconnu");
+                            }*/
+
+                        lot_courant = null;
+                        code = "";
+                    }
+                }
+                else
+                {
+                    PH_Preparation_Ligne ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, preparation_ligne_id);
+                    if(emplacement_courant == null)
+                    {
+                        PH_Preparation preparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparation_ligne.getPreparationID());
+                        Depot depotorigine = DepotOpenHelper.getDepotParID(db, preparation.getDepotOrigineID());
+                        Depot_Zone zonepreparationligne = ZoneOpenHelper.getZoneByDepotEtNom(db, depotorigine, ph_preparation_ligne.getZoneDepot());
+                        emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zonepreparationligne, ph_preparation_ligne.getEmplacementParDefaut());
+                    }
+                    for(int i = 0; i < liste_preparation_liste_adapte.size(); i++)
+                    {
+
+                        PH_Preparation_Ligne_Preparation_Adapte.LotAdapte courant = liste_preparation_liste_adapte.get(i);
+                        if(courant.getNumLot().contentEquals(lot))
+                        {
+                            int qte_restante = ph_preparation_ligne.getQte_Demander()- ph_preparation_ligne.getQte_preparer();
+                            lot_courant = courant;
+            /*                        if(lot_courant.getQteStock() < qte_restante)
+                                    {
+                                        qte_restante = lot_courant.getQteStock();
+                                    }
+                                    lot_courant.setQteSaisie(qte_restante);*/
+                            break;
+                        }
+                        else
+                        {
+                            lot_courant = null;
+                        }
+                    }
+
+                    if(lot_courant == null)
+                    {
+                        PH_Preparation preparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparation_ligne.getPreparationID());
+                        int qte_restante = ph_preparation_ligne.getQte_Demander()- ph_preparation_ligne.getQte_preparer();
+                        int qte_renseigner = qte_restante;
+                        if(produit.getCond_distrib() <= qte_restante)
+                            qte_renseigner = (int)produit.getCond_distrib();
+
+                        if(emplacement_courant == null)
+                        {
+                            Depot depotorigine = DepotOpenHelper.getDepotParID(db, preparation.getDepotOrigineID());
+                            Depot_Zone zonepreparationligne = ZoneOpenHelper.getZoneByDepotEtNom(db, depotorigine, ph_preparation_ligne.getZoneDepot());
+                            emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zonepreparationligne, ph_preparation_ligne.getEmplacementParDefaut());
+                        }
+
+                        Depot_Zone zone_courante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
+                        Stock_Lot_Emplacement_Light newStockLotEmplacement = new Stock_Lot_Emplacement_Light(qte_restante, lot, date_peremption_courant, emplacement_courant.getAdressage(), preparation.getDepotOrigineReference(), zone_courante.getZoneName(), produit.getID_produit(), 0, serie);
+                        Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, newStockLotEmplacement);
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, newStockLotEmplacement.getPhiMR4UUID(), newStockLotEmplacement.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                        lot_courant = phPreparationLignePreparationAdapte.new LotAdapte(newStockLotEmplacement);
+                        liste_preparation_liste_adapte.add(lot_courant);
+                    }
+
+                    if(liste_lot.indexOf(lot_courant.getNumLot()) != -1)
+                    {
+        /*                    ph_preparation_ligne.setQte_preparer(ph_preparation_ligne.getQte_preparer()-lot_courant.getQteSaisie());
+                            PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
+                            lot_courant.setQteSaisie(0);*/
+                    }
+                    else
+                    {
+                        liste_lot.add(lot_courant.getNumLot());
+                    }
+                }
+            }
+        }
+
+    }
+
+    public void onActivityResult(int requestCode, Intent data){
+        if (data != null) {
+            switch (requestCode) {
+                case CodesEchangesActivites.RETOUR_SCANNER:
+                    liste_preparation_liste_adapte = new ArrayList<>();
+                    liste_preparation_liste_adapte = (List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte>) data.getExtras().getSerializable("lotAdapteList");
+                    liste_lot = data.getExtras().getStringArrayList("liste_lot");
+                    break;
+            }
+        }
+    }
+
+    public boolean onTap(String s){
+        boolean confirmation = true;
+        if (s.toString().endsWith("\n"))
+        {
+            s = s.toString().substring(0, s.length() - 1);
+        }
+
+        if(s.startsWith("PHITAGPLACE+"))
+        {
+            String[] tab_emplacement = s.split(":");
+            int emplacement_uid = Integer.parseInt(tab_emplacement[tab_emplacement.length-1]);
+
+            emplacement_courant = EmplacementOpenHelper.getUnEmplacementByID(db, emplacement_uid);
+        }
+        else if(emplacement_courant == null)
+        {
+            ((BarcodePreparationActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
+        }
+        else {
+            if (!validation) {
+                //afficherErreur("Validation");
+                validation = false;
+                return false;
+            } else {
+                validation = false;
+            }
+
+            Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(s);
+            String lot = "";
+            String serie = "";
+            String gtin_courant ="";
+            String conditionnementString ="";
+            String date_peremption_courant="";
+            if (gs1Decoupe.size() != 1)
+            {
+
+                List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+                if(produits != null)
+                {
+                    if (produits.size() == 1) {
+                        produit = produits.get(0);
+                    }
+                    else if(produits.size() > 1)
+                    {
+                        String activityName = context.getClass().getSimpleName();
+    /*                          if(activityName.contentEquals("BarcodeCaptureActivity"))
+                            {
+                                ((BarcodeCaptureActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                            }
+                            else
+                            {
+                                ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                            }*/
+
+                        validation = true;
+                        code = "";
+                        return false;
+                    }
+                }
+                lot = gs1Decoupe.get(OutilsDecodage.numeroLot);
+                serie = gs1Decoupe.get(OutilsDecodage.numeroSerie);
+                gtin_courant = gs1Decoupe.get(OutilsDecodage.codeGtin);
+                conditionnementString = gs1Decoupe.get(OutilsDecodage.conditionnementProduit);
+                date_peremption_courant = gs1Decoupe.get(OutilsDecodage.dateDePeremption);
+            }
+            else
+            {
+                List<Produit> produits  = ProduitOpenHelper.getProduitByCodeInconnu(db, s.toString().substring(0, s.length()-1));
+                if(produits != null)
+                {
+                    if (produits.size() == 1) {
+                        produit = produits.get(0);
+                        codeInconnu = true;
+                    }
+                    else if(produits.size() > 1)
+                    {
+                        String activityName = context.getClass().getSimpleName();
+    /*                            if(activityName.contentEquals("BarcodeCaptureActivity"))
+                            {
+                                ((BarcodeCaptureActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                            }
+                            else
+                            {
+                                ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                            }*/
+
+                        validation = true;
+                        code = "";
+                        return false;
+                    }
+                }
+            }
+
+            if(produit == null || produit.getID_produit() != peparationLigne.getProduitID())
+            {
+                ((BarcodePreparationActivity)context).afficherSnackBar("Mauvais produit scanné");
+                lot_courant = null;
+                produit = null;
+                return false;
+            }
+            else if(peparationLigne.getQte_APreparer() == 0)
+            {
+                ((BarcodePreparationActivity)context).afficherSnackBar("Produit déjà préparé en intégralité");
+                lot_courant = null;
+            }
+            else if(serie != null && !serie.contentEquals("") && stringList.indexOf(s.toString().substring(0, s.length()-1)) == -1)
+            {
+                if(produit != null)
+                {
+                    if(codeInconnu)
+                    {
+                        gtin_courant = s.toString().substring(0, s.length() - 1);
+                    }
+                    PH_Serialisation serialisation_courante = null;
+
+                    if(!codeInconnu)
+                    {
+                        /***Début de la sérialisation***/
+                        if (!serie.contentEquals("") && produit.isSerialiser_Reception_Delivrance() && produit.isSuivi_Serialisation() && listeSerie.indexOf(serie) == -1) {
+                            listeSerie.add(serie);
+                            String resultat = "";
+                            boolean differe = false;
+                            if (!OutilsGestionConnexionReseau.isServerAccessible(context))
+                                differe = true;
+
+                            if (conditionnementString.contentEquals("")) {
+                                produit = ProduitOpenHelper.getUnProduitParGTIN(db, gtin_courant);
+                                if (produit == null) {
+                                    produit = ProduitOpenHelper.getUnProduitParGTIN(db, "01" + gtin_courant);
+                                }
+                            }
+
+                            long ph_serialisation_uid = 0;
+                            String peremptionSerialisation = date_peremption_courant;
+                            peremptionSerialisation = peremptionSerialisation.substring(2);
+                            peremptionSerialisation = peremptionSerialisation.replace("-", "");
+                            ph_serialisation_uid = serialisationService.Serialisation_Verifier(utilisateurConnecte.getId(), false, differe, gtin_courant, "GTIN", lot, peremptionSerialisation, serie, "ActionUtilisateur", String.valueOf(0), "", "");
+
+
+                            serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, (int) ph_serialisation_uid);
+                            if (serialisation_courante == null) {
+                                serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int) ph_serialisation_uid);
+                            }
+
+                            resultat = serialisation_courante.getResultat();
+                            if (resultat.contentEquals("INACTIVE") || resultat.contentEquals("UNKNOWN")) {
+                                Random SurveillanceReferenceRandom = new Random();
+                                int id_surveillance = SurveillanceReferenceRandom.nextInt();
+                                if (id_surveillance > 0) {
+                                    id_surveillance = id_surveillance * -1;
+                                }
+                                Calendar calendar = Calendar.getInstance();
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                String surveillanceDate = sdf.format(calendar.getTime());
+
+                                SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
+                                String surveillanceHeure = mdformat.format(calendar.getTime());
+
+                                int produit_id = serialisation_courante.getProduitUID();
+                                int serialisationID = serialisation_courante.get_UID();
+                                String motif = GestionCodeErreurNMVO.getMessage(code);
+                                String actionAMener = "";
+                                String statut = "NON LU";
+                                String traitePar = utilisateurConnecte.getIdentifiant();
+                                String traiteDate = surveillanceDate;
+                                String traiteHeure = surveillanceHeure;
+                                String produitLot = serialisation_courante.getNumeroLot();
+                                String produitDatePéremption = serialisation_courante.getDatePeremptionAAMMJJ();
+                                String produitNumeroSerie = serialisation_courante.getNumeroSerie();
+
+                                SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
+
+                                /*long rowUID_surveillance = SurveillanceReferenceOpenHelper.insererSurveillanceReferenceEnBDD(db, new_surveillance_reference);
+
+                                if (rowUID_surveillance != -1) {
+                                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE, new_surveillance_reference.getSerialexpressUUID(), new_surveillance_reference.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+
+                                    try {
+                                        EnvoyerMailSurveillance class_mail = new EnvoyerMailSurveillance();
+                                        class_mail.EnvoyerMailSerialisation(new_surveillance_reference.get_UID(), utilisateurConnecte.getMail(), db);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }*/
+
+                                //((BarcodeCaptureActivity) context).afficherAlerteFranceMVO(produit.getDesignation_interne(), resultat, serie, motif);
+
+                            } else {
+                                String messageTexteFranceMVO = "";
+                            }
+                        }
+
+                        /***Fin de la sérialisation***/
+                    }
+                    codeInconnu = false;
+
+                    PH_Preparation_Ligne ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, preparation_ligne_id);
+
+                    for(int i = 0; i < liste_preparation_liste_adapte.size(); i++)
+                    {
+
+                        PH_Preparation_Ligne_Preparation_Adapte.LotAdapte courant = liste_preparation_liste_adapte.get(i);
+                        if(courant.getNumLot().contentEquals(lot))
+                        {
+                            int qte_restante = ph_preparation_ligne.getQte_Demander()- ph_preparation_ligne.getQte_preparer();
+                            lot_courant = courant;
+        /*                        if(lot_courant.getQteStock() < qte_restante)
+                                {
+                                    qte_restante = lot_courant.getQteStock();
+                                }
+                                lot_courant.setQteSaisie(qte_restante);*/
+                            break;
+                        }
+                        else
+                        {
+                            lot_courant = null;
+                        }
+                    }
+
+                    if(lot_courant == null)
+                    {
+                        PH_Preparation preparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparation_ligne.getPreparationID());
+                        int qte_restante = ph_preparation_ligne.getQte_Demander()- ph_preparation_ligne.getQte_preparer();
+                        int qte_renseigner = qte_restante;
+                        if(produit.getCond_distrib() <= qte_restante)
+                            qte_renseigner = (int)produit.getCond_distrib();
+                        Depot_Zone zone_courante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
+                        Stock_Lot_Emplacement_Light newStockLotEmplacement = new Stock_Lot_Emplacement_Light(qte_restante, lot, date_peremption_courant, emplacement_courant.getAdressage(), preparation.getDepotOrigineReference(), zone_courante.getZoneName(), produit.getID_produit(), 0, serie);
+                        Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, newStockLotEmplacement);
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, newStockLotEmplacement.getPhiMR4UUID(), newStockLotEmplacement.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                        lot_courant = phPreparationLignePreparationAdapte.new LotAdapte(newStockLotEmplacement);
+                        liste_preparation_liste_adapte.add(lot_courant);
+                    }
+
+                    if(liste_lot.indexOf(lot_courant.getNumLot()) != -1)
+                    {
+        /*                    ph_preparation_ligne.setQte_preparer(ph_preparation_ligne.getQte_preparer()-lot_courant.getQteSaisie());
+                            PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
+                            lot_courant.setQteSaisie(0);*/
+                    }
+                    else
+                    {
+                        liste_lot.add(lot_courant.getNumLot());
+                    }
+                }
+                else
+                {
+                    String activityName = context.getClass().getSimpleName();
     /*                        if(activityName.contentEquals("BarcodeCaptureActivity"))
                         {
                             ((BarcodeCaptureActivity) context).afficherSnackBar("Produit inconnu");
@@ -653,68 +713,68 @@ public class PreparationSimpleContext extends MainActivity {
                             ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Produit inconnu");
                         }*/
 
-                        validation = true;
-                        code = "";
-                    }
+                    validation = true;
+                    code = "";
                 }
-                else
+            }
+            else
+            {
+                PH_Preparation_Ligne ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, preparation_ligne_id);
+
+                for(int i = 0; i < liste_preparation_liste_adapte.size(); i++)
                 {
-                    PH_Preparation_Ligne ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, preparation_ligne_id);
 
-                        for(int i = 0; i < liste_preparation_liste_adapte.size(); i++)
-                        {
-
-                            PH_Preparation_Ligne_Preparation_Adapte.LotAdapte courant = liste_preparation_liste_adapte.get(i);
-                            if(courant.getNumLot().contentEquals(lot))
-                            {
-                                int qte_restante = ph_preparation_ligne.getQte_Demander()- ph_preparation_ligne.getQte_preparer();
-                                lot_courant = courant;
+                    PH_Preparation_Ligne_Preparation_Adapte.LotAdapte courant = liste_preparation_liste_adapte.get(i);
+                    if(courant.getNumLot().contentEquals(lot))
+                    {
+                        int qte_restante = ph_preparation_ligne.getQte_Demander()- ph_preparation_ligne.getQte_preparer();
+                        lot_courant = courant;
         /*                        if(lot_courant.getQteStock() < qte_restante)
                                 {
                                     qte_restante = lot_courant.getQteStock();
                                 }
                                 lot_courant.setQteSaisie(qte_restante);*/
-                                break;
-                            }
-                            else
-                            {
-                                lot_courant = null;
-                            }
-                        }
+                        break;
+                    }
+                    else
+                    {
+                        lot_courant = null;
+                    }
+                }
 
-                        if(lot_courant == null)
-                        {
-                            PH_Preparation preparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparation_ligne.getPreparationID());
-                            int qte_restante = ph_preparation_ligne.getQte_Demander()- ph_preparation_ligne.getQte_preparer();
-                            int qte_renseigner = qte_restante;
-                            if(produit.getCond_distrib() <= qte_restante)
-                                qte_renseigner = (int)produit.getCond_distrib();
-                            Depot_Zone zone_courante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
-                            Stock_Lot_Emplacement_Light newStockLotEmplacement = new Stock_Lot_Emplacement_Light(qte_restante, lot, date_peremption_courant, emplacement_courant.getAdressage(), preparation.getDepotOrigineReference(), zone_courante.getZoneName(), produit.getID_produit(), 0, serie);
-                            Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, newStockLotEmplacement);
-                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, newStockLotEmplacement.getPhiMR4UUID(), newStockLotEmplacement.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
-                            lot_courant = phPreparationLignePreparationAdapte.new LotAdapte(newStockLotEmplacement);
-                            liste_preparation_liste_adapte.add(lot_courant);
-                        }
+                if(lot_courant == null)
+                {
+                    PH_Preparation preparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparation_ligne.getPreparationID());
+                    int qte_restante = ph_preparation_ligne.getQte_Demander()- ph_preparation_ligne.getQte_preparer();
+                    int qte_renseigner = qte_restante;
+                    if(produit.getCond_distrib() <= qte_restante)
+                        qte_renseigner = (int)produit.getCond_distrib();
+                    Depot_Zone zone_courante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
+                    Stock_Lot_Emplacement_Light newStockLotEmplacement = new Stock_Lot_Emplacement_Light(qte_restante, lot, date_peremption_courant, emplacement_courant.getAdressage(), preparation.getDepotOrigineReference(), zone_courante.getZoneName(), produit.getID_produit(), 0, serie);
+                    Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, newStockLotEmplacement);
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, newStockLotEmplacement.getPhiMR4UUID(), newStockLotEmplacement.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                    lot_courant = phPreparationLignePreparationAdapte.new LotAdapte(newStockLotEmplacement);
+                    liste_preparation_liste_adapte.add(lot_courant);
+                }
 
-                        if(liste_lot.indexOf(lot_courant.getNumLot()) != -1)
-                        {
+                if(liste_lot.indexOf(lot_courant.getNumLot()) != -1)
+                {
     /*                        ph_preparation_ligne.setQte_preparer(ph_preparation_ligne.getQte_preparer()-lot_courant.getQteSaisie());
                             PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
                             lot_courant.setQteSaisie(0);*/
-                            //lot_courant.setQteSaisie(lot_courant.getQteSaisie()+(int)produit.getCond_distrib());
-                        }
-                        else
-                        {
-                            liste_lot.add(lot_courant.getNumLot());
-                        }
-
+                    //lot_courant.setQteSaisie(lot_courant.getQteSaisie()+(int)produit.getCond_distrib());
                 }
+                else
+                {
+                    liste_lot.add(lot_courant.getNumLot());
+                }
+
             }
-
-
-            return confirmation;
         }
+
+
+        return confirmation;
+    }
 
     public void ValiderScan(int quantite)
     {
@@ -754,47 +814,56 @@ public class PreparationSimpleContext extends MainActivity {
         }
     }
 
-     public boolean emplacementLotVerifierSimple(String emplacement, String lot)
-     {
-         boolean emplacementok = false;
-         emplacementDisponible = "";
-         liste_emplacement_disponible = new ArrayList<>();
-         int compteur = 0;
+    public boolean emplacementLotVerifierSimple(String emplacement, String lot)
+    {
+        boolean emplacementok = false;
 
-         for(PH_Preparation_Ligne_Preparation_Adapte.LotAdapte courant : liste_preparation_liste_adapte)
-         {
-             String lot_courant = courant.getNumLot();
-             String emplacement_courant = courant.getEmplacement();
-             Stock_Lot_Emplacement_Light stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, courant.getStockLotEmplacementID());
-             if(stock_courant != null)
-             {
-                Depot depot_courant = DepotOpenHelper.getDepotParReference(db, stock_courant.getDepot_Reference());
-                if(depot_courant != null)
+        if(emplacement == null)
+        {
+            emplacementok = false;
+        }
+        else
+        {
+            emplacementDisponible = "";
+            liste_emplacement_disponible = new ArrayList<>();
+            int compteur = 0;
+
+            for(PH_Preparation_Ligne_Preparation_Adapte.LotAdapte courant : liste_preparation_liste_adapte)
+            {
+                String lot_courant = courant.getNumLot();
+                String emplacement_courant = courant.getEmplacement();
+                Stock_Lot_Emplacement_Light stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, courant.getStockLotEmplacementID());
+                if(stock_courant != null)
                 {
-                    Depot_Zone depot_zone = ZoneOpenHelper.getZoneByDepotEtNom(db, depot_courant, stock_courant.getZone());
-                    if(depot_zone != null)
+                    Depot depot_courant = DepotOpenHelper.getDepotParReference(db, stock_courant.getDepot_Reference());
+                    if(depot_courant != null)
                     {
-                        Depot_Emplacement depot_emplacement = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, depot_zone, stock_courant.getEmplacement());
-                        if(depot_emplacement != null)
-                            liste_emplacement_disponible.add(depot_emplacement.get_UID());
+                        Depot_Zone depot_zone = ZoneOpenHelper.getZoneByDepotEtNom(db, depot_courant, stock_courant.getZone());
+                        if(depot_zone != null)
+                        {
+                            Depot_Emplacement depot_emplacement = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, depot_zone, stock_courant.getEmplacement());
+                            if(depot_emplacement != null)
+                                liste_emplacement_disponible.add(depot_emplacement.get_UID());
+                        }
                     }
                 }
-             }
-             emplacementDisponible+=emplacement_courant;
+                emplacementDisponible+=emplacement_courant;
 
-             if(compteur != liste_preparation_liste_adapte.size()-1)
-                 emplacementDisponible+=",";
+                if(compteur != liste_preparation_liste_adapte.size()-1)
+                    emplacementDisponible+=",";
 
-             if(lot.contentEquals(lot_courant) && emplacement.contentEquals(emplacement_courant))
-             {
-                 emplacementok = true;
-                 break;
-             }
+                if(lot.contentEquals(lot_courant) && emplacement.contentEquals(emplacement_courant))
+                {
+                    emplacementok = true;
+                    break;
+                }
 
-             compteur++;
-         }
+                compteur++;
+            }
+        }
 
-         return emplacementok;
-     }
- }
+
+        return emplacementok;
+    }
+}
 

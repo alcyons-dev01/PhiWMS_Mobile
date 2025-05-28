@@ -220,7 +220,17 @@ public class ScannerPreparationActivity extends ServiceActivity {
                 ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText(String.valueOf(qtePreparerProduitCourant));
                 ((TextView) findViewById(R.id.quantiteDejaPreparer)).setVisibility(View.VISIBLE);
                 ((LinearLayout) findViewById(R.id.layoutInformations)).setBackground(ScannerPreparationActivity.this.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
+            }
 
+            if(utilisateurConnecte.getEtablissement().contentEquals("ADH"))
+            {
+                ((TextView) findViewById(R.id.instruction)).setText("Scannez un emplacement");
+                ((ImageView) findViewById(R.id.ImageViewEmplacement)).setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
+                ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.VISIBLE);
             }
 
             ((TextView) findViewById(R.id.EmplacementLotProduit)).setOnClickListener(new View.OnClickListener() {
@@ -234,16 +244,6 @@ public class ScannerPreparationActivity extends ServiceActivity {
                     ScannerPreparationActivity.this.startActivityForResult(newIntent, CodesEchangesActivites.RESULT_ZONE);
                 }
             });
-
-            if(utilisateurConnecte.getIdentifiant().toLowerCase().contentEquals("alcyons"))
-            {
-                ((TextView) findViewById(R.id.instruction)).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        EditTextScanee.setText("010340093567813317230731101129241A\n");
-                    }
-                });
-            }
 
             if (lotAdapteList.size() > 0)
                 lotCourant = lotAdapteList.get(0);
@@ -263,6 +263,17 @@ public class ScannerPreparationActivity extends ServiceActivity {
             referenceProduitCourant = first_ligne.getProduitReference();
             qteDemander = first_ligne.getQte_RAL();
             ((TextView) findViewById(R.id.instruction)).setVisibility(View.VISIBLE);
+
+            if(utilisateurConnecte.getEtablissement().contentEquals("ADH"))
+            {
+                ((TextView) findViewById(R.id.instruction)).setText("Scannez un emplacement");
+                ((ImageView) findViewById(R.id.ImageViewEmplacement)).setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
+                ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.VISIBLE);
+            }
 
             //gestion du clic sur l'emplacement
             ((TextView) findViewById(R.id.EmplacementLotProduit)).setOnClickListener(new View.OnClickListener() {

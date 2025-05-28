@@ -45,7 +45,8 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.EnvoyerMailSurveillance;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
 
-public class PreparationMultipleContext extends MainActivity {
+public class PreparationMultipleContext
+{
     private Context context;
     private SQLiteDatabase db;
 
@@ -109,14 +110,14 @@ public class PreparationMultipleContext extends MainActivity {
             chaine = chaine.toString().substring(0, chaine.length() - 1);
         }
 
-        if(chaine.startsWith("PHITAGPLACE"))
+        if(chaine.startsWith("PHITAGPLACE+"))
         {
             String[] tab_emplacement = chaine.split(":");
             int emplacement_uid = Integer.parseInt(tab_emplacement[tab_emplacement.length-1]);
 
             emplacement_courant = EmplacementOpenHelper.getUnEmplacementByID(db, emplacement_uid);
         }
-        else if(emplacement_courant == null)
+        else if(emplacement_courant == null && utilisateurConnecte.getEtablissement().contentEquals("ADH"))
         {
             ((ScannerPreparationActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
         }
@@ -204,6 +205,14 @@ public class PreparationMultipleContext extends MainActivity {
                             produit_present = true;
                             preparation_ligne_id = courant.get_UID();
                             peparationLigne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, preparation_ligne_id);
+                            if(emplacement_courant == null)
+                            {
+                                PH_Preparation preparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, peparationLigne.getPreparationID());
+                                Depot depotorigine = DepotOpenHelper.getDepotParID(db, preparation.getDepotOrigineID());
+                                Depot_Zone zonepreparationligne = ZoneOpenHelper.getZoneByDepotEtNom(db, depotorigine, peparationLigne.getZoneDepot());
+                                emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zonepreparationligne, peparationLigne.getEmplacementParDefaut());
+                            }
+
                             for(PH_Preparation_Ligne_Preparation_Adapte adapte_courant : phPreparationLignePreparationAdapte_List)
                             {
                                 if(adapte_courant.getPh_preparationLigneID() == peparationLigne.get_UID())
@@ -246,7 +255,7 @@ public class PreparationMultipleContext extends MainActivity {
                                 listeSerie.add(serie);
                                 String resultat = "";
                                 boolean differe = false;
-                                if (!statutConnexion)
+                                if (!OutilsGestionConnexionReseau.isServerAccessible(context))
                                     differe = true;
 
                                 if (conditionnementString.contentEquals("")) {
@@ -296,6 +305,19 @@ public class PreparationMultipleContext extends MainActivity {
 
                                     SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
 
+                                    //long rowUID_surveillance = SurveillanceReferenceOpenHelper.insererSurveillanceReferenceEnBDD(db, new_surveillance_reference);
+                                    long rowUID_surveillance = -1;
+
+                                    if (rowUID_surveillance != -1) {
+                                        //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE, new_surveillance_reference.getSerialexpressUUID(), new_surveillance_reference.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+
+                                        try {
+                                            EnvoyerMailSurveillance class_mail = new EnvoyerMailSurveillance();
+                                            //class_mail.EnvoyerMailSerialisation(new_surveillance_reference.get_UID(), utilisateurConnecte.getMail(), db);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
                                 } else {
                                     String messageTexteFranceMVO = "";
                                 }
@@ -326,6 +348,14 @@ public class PreparationMultipleContext extends MainActivity {
                         {
                             PH_Preparation preparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparation_ligne.getPreparationID());
                             int qte_restante = ph_preparation_ligne.getQte_Demander()- ph_preparation_ligne.getQte_preparer();
+
+                            if(emplacement_courant == null)
+                            {
+                                Depot depotorigine = DepotOpenHelper.getDepotParID(db, preparation.getDepotOrigineID());
+                                Depot_Zone zonepreparationligne = ZoneOpenHelper.getZoneByDepotEtNom(db, depotorigine, ph_preparation_ligne.getZoneDepot());
+                                emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zonepreparationligne, ph_preparation_ligne.getEmplacementParDefaut());
+                            }
+
                             Depot_Zone zone_courante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
                             Stock_Lot_Emplacement_Light newStockLotEmplacement = new Stock_Lot_Emplacement_Light(qte_restante, lot, date_peremption_courant, emplacement_courant.getAdressage(), preparation.getDepotOrigineReference(), zone_courante.getZoneName(), produit.getID_produit(), 0, serie);
                             Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, newStockLotEmplacement);
@@ -376,6 +406,14 @@ public class PreparationMultipleContext extends MainActivity {
                     {
                         PH_Preparation preparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparation_ligne.getPreparationID());
                         int qte_restante = ph_preparation_ligne.getQte_Demander()- ph_preparation_ligne.getQte_preparer();
+
+                        if(emplacement_courant == null)
+                        {
+                            Depot depotorigine = DepotOpenHelper.getDepotParID(db, preparation.getDepotOrigineID());
+                            Depot_Zone zonepreparationligne = ZoneOpenHelper.getZoneByDepotEtNom(db, depotorigine, ph_preparation_ligne.getZoneDepot());
+                            emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zonepreparationligne, ph_preparation_ligne.getEmplacementParDefaut());
+                        }
+
                         Depot_Zone zone_courante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
                         Stock_Lot_Emplacement_Light newStockLotEmplacement = new Stock_Lot_Emplacement_Light(qte_restante, lot, date_peremption_courant, emplacement_courant.getAdressage(), preparation.getDepotOrigineReference(), zone_courante.getZoneName(), produit.getID_produit(), 0, serie);
                         Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, newStockLotEmplacement);
@@ -419,14 +457,14 @@ public class PreparationMultipleContext extends MainActivity {
             s = s.toString().substring(0, s.length() - 1);
         }
 
-        if(s.startsWith("PHITAGPLACE"))
+        if(s.startsWith("PHITAGPLACE+"))
         {
             String[] tab_emplacement = s.split(":");
             int emplacement_uid = Integer.parseInt(tab_emplacement[tab_emplacement.length-1]);
 
             emplacement_courant = EmplacementOpenHelper.getUnEmplacementByID(db, emplacement_uid);
         }
-        else if(emplacement_courant == null)
+        else if(emplacement_courant == null && utilisateurConnecte.getEtablissement().contentEquals("ADH"))
         {
             ((BarcodePreparationActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
         }
@@ -561,7 +599,7 @@ public class PreparationMultipleContext extends MainActivity {
                             listeSerie.add(serie);
                             String resultat = "";
                             boolean differe = false;
-                            if (!statutConnexion)
+                            if (!OutilsGestionConnexionReseau.isServerAccessible(context))
                                 differe = true;
 
                             if (conditionnementString.contentEquals("")) {
@@ -610,6 +648,22 @@ public class PreparationMultipleContext extends MainActivity {
                                 String produitNumeroSerie = serialisation_courante.getNumeroSerie();
 
                                 SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
+
+                                //long rowUID_surveillance = SurveillanceReferenceOpenHelper.insererSurveillanceReferenceEnBDD(db, new_surveillance_reference);
+                                long rowUID_surveillance = -1;
+
+                                if (rowUID_surveillance != -1) {
+                                    //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE, new_surveillance_reference.getSerialexpressUUID(), new_surveillance_reference.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+
+                                    try {
+                                        EnvoyerMailSurveillance class_mail = new EnvoyerMailSurveillance();
+                                        //class_mail.EnvoyerMailSerialisation(new_surveillance_reference.get_UID(), utilisateurConnecte.getMail(), db);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                //((BarcodeCaptureActivity) context).afficherAlerteFranceMVO(produit.getDesignation_interne(), resultat, serie, motif);
 
                             } else {
                                 String messageTexteFranceMVO = "";
@@ -772,9 +826,8 @@ public class PreparationMultipleContext extends MainActivity {
                     }
                     if(adapte_trouver)
                     {
-                        //phPreparationLignePreparationAdapte_List.remove(index_supr);
-                        //phPreparationLignePreparationAdapte_List.add(phPreparationLignePreparationAdapte);
-                        phPreparationLignePreparationAdapte_List.get(index_supr).setLotAdaptes(phPreparationLignePreparationAdapte.getLotAdaptes());
+                        phPreparationLignePreparationAdapte_List.remove(index_supr);
+                        phPreparationLignePreparationAdapte_List.add(phPreparationLignePreparationAdapte);
                         lot_courant = null;
                         preparation_ligne_id = -1;
                         validation = true;
@@ -786,49 +839,56 @@ public class PreparationMultipleContext extends MainActivity {
 
     public boolean emplacementLotVerifier(String emplacement, String lot)
     {
-        if(lot.indexOf("\n") !=-1)
+        if(emplacement == null)
         {
-            lot = lot.substring(0, lot.length()-1);
+            return false;
         }
-
-        boolean emplacementok = false;
-        emplacementDisponible = "";
-        int compteur = 0;
-        liste_emplacement_disponible = new ArrayList<>();
-
-        for(PH_Preparation_Ligne_Preparation_Adapte.LotAdapte courant : liste_preparation_liste_adapte)
+        else
         {
-            String lot_courant = courant.getNumLot();
-            String emplacement_courant = courant.getEmplacement();
-            Stock_Lot_Emplacement_Light stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, courant.getStockLotEmplacementID());
-            if(stock_courant != null)
+            if(lot.indexOf("\n") !=-1)
             {
-                Depot depot_courant = DepotOpenHelper.getDepotParReference(db, stock_courant.getDepot_Reference());
-                if(depot_courant != null)
+                lot = lot.substring(0, lot.length()-1);
+            }
+
+            boolean emplacementok = false;
+            emplacementDisponible = "";
+            int compteur = 0;
+            liste_emplacement_disponible = new ArrayList<>();
+
+            for(PH_Preparation_Ligne_Preparation_Adapte.LotAdapte courant : liste_preparation_liste_adapte)
+            {
+                String lot_courant = courant.getNumLot();
+                String emplacement_courant = courant.getEmplacement();
+                Stock_Lot_Emplacement_Light stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, courant.getStockLotEmplacementID());
+                if(stock_courant != null)
                 {
-                    Depot_Zone depot_zone = ZoneOpenHelper.getZoneByDepotEtNom(db, depot_courant, stock_courant.getZone());
-                    if(depot_zone != null)
+                    Depot depot_courant = DepotOpenHelper.getDepotParReference(db, stock_courant.getDepot_Reference());
+                    if(depot_courant != null)
                     {
-                        Depot_Emplacement depot_emplacement = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, depot_zone, stock_courant.getEmplacement());
-                        if(depot_emplacement != null)
-                            liste_emplacement_disponible.add(depot_emplacement.get_UID());
+                        Depot_Zone depot_zone = ZoneOpenHelper.getZoneByDepotEtNom(db, depot_courant, stock_courant.getZone());
+                        if(depot_zone != null)
+                        {
+                            Depot_Emplacement depot_emplacement = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, depot_zone, stock_courant.getEmplacement());
+                            if(depot_emplacement != null)
+                                liste_emplacement_disponible.add(depot_emplacement.get_UID());
+                        }
                     }
                 }
+                emplacementDisponible+=emplacement_courant;
+
+                if(compteur != liste_preparation_liste_adapte.size()-1)
+                    emplacementDisponible+=",";
+
+                if(lot.contentEquals(lot_courant) && emplacement.contentEquals(emplacement_courant))
+                {
+                    emplacementok = true;
+                    break;
+                }
+
+                compteur++;
             }
-            emplacementDisponible+=emplacement_courant;
 
-            if(compteur != liste_preparation_liste_adapte.size()-1)
-                emplacementDisponible+=",";
-
-            if(lot.contentEquals(lot_courant) && emplacement.contentEquals(emplacement_courant))
-            {
-                emplacementok = true;
-                break;
-            }
-
-            compteur++;
+            return emplacementok;
         }
-
-        return emplacementok;
     }
 }

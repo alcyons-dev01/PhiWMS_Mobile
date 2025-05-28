@@ -46,7 +46,7 @@ public class Lot_PreparationAdapter extends ArrayAdapter {
         viewHolders = new ArrayList<>();
         this.ph_preparation_ligne_preparation_adapte = ph_preparation_ligne_preparation_adapte;
         for (PH_Preparation_Ligne_Preparation_Adapte.LotAdapte lotAdapte : lotPreparationsAdaptes
-                ) {
+        ) {
             viewHolders.add(new Lot_PreparationAdapterViewHolder());
         }
     }
@@ -130,7 +130,7 @@ public class Lot_PreparationAdapter extends ArrayAdapter {
                 DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 String datePeremption = lotAdapte.getDatePeremption();
 
-                if (datePeremption != null && !datePeremption.equals("null") && !datePeremption.contentEquals("")) {
+                if (datePeremption != null && !datePeremption.contentEquals("")) {
                     try {
                         dateExp = dateDecodeur.parse(lotAdapte.getDatePeremption().substring(0, 10));
                         viewHolder.dateExpiration.setText(dateFormat.format(dateExp));

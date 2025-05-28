@@ -251,7 +251,19 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                 ph_preparation_ligne_preparationLotAdapter.notifyDataSetChanged();
             }
         }
-        else
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.isEmpty()) {
+                    afficherAlerteConfirmationRetour(DetailPreparationActivity.this, LayoutInflater.from(DetailPreparationActivity.this), DetailPreparationActivity.super.getBundle());
+                } else {
+                    retourService(DetailPreparationActivity.super.getBundle());
+                }
+            }
+        });
+
+        if(!passageParOnCreate)
         {
             invalidateOptionsMenu();
             switch(tri_choisi)
@@ -267,17 +279,6 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                     break;
             }
         }
-
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                if (!ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.isEmpty()) {
-                    afficherAlerteConfirmationRetour(DetailPreparationActivity.this, LayoutInflater.from(DetailPreparationActivity.this), DetailPreparationActivity.super.getBundle());
-                } else {
-                    retourService(DetailPreparationActivity.super.getBundle());
-                }
-            }
-        });
     }
 
     @NonNull
@@ -360,6 +361,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                                                     ph_preparationLigneAdapte.getLotAdaptes().add(ph_preparationLigneAdapte.new LotAdapte(stockLotEmplacement));
                                                 }
                                             }
+
                                             phPreparationLignePreparationAdapte_List.add(ph_preparationLigneAdapte);
                                         }
                                     }
@@ -576,11 +578,9 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                 }
                 case CodesEchangesActivites.RETOUR_PREPARATION:{
                     liste_lot = new ArrayList<>();
-                    liste_lot = Objects.requireNonNull(data.getExtras()).getStringArrayList("liste_lot");
+                    liste_lot = data.getExtras().getStringArrayList("liste_lot");
                     phPreparationLignePreparationAdapte_List = new ArrayList<>();
                     phPreparationLignePreparationAdapte_List = (List<PH_Preparation_Ligne_Preparation_Adapte>) data.getExtras().getSerializable("lotAdapteList");
-                    ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes = new ArrayList<>();
-                    ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.addAll(phPreparationLignePreparationAdapte_List);
                     premierpassage = false;
                     onResume();
                     break;
@@ -655,27 +655,42 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
 
             PH_Preparation_Ligne oo1 = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, o1.getPh_preparationLigneID());
             PH_Preparation_Ligne oo2 = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, o2.getPh_preparationLigneID());
-            String oo1EmplacementParDefaut = oo1.getEmplacementParDefaut();
-            String oo2EmplacementParDefaut = oo2.getEmplacementParDefaut();
+            if(oo1 != null && oo2 != null)
+            {
+                String oo1EmplacementParDefaut = oo1.getEmplacementParDefaut();
+                String oo2EmplacementParDefaut = oo2.getEmplacementParDefaut();
 
-            if (oo1EmplacementParDefaut.contentEquals("")) {
-                Produit produit = ProduitOpenHelper.getProduitByID(db, oo1.getProduitID());
-                Depot depot = DepotOpenHelper.getDepotParReference(db, ph_preparation_Selectionne.getDepotOrigineReference());
-                List<Stock_Lot_Emplacement_Light> stockLotEmplacementLights = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot);
-                if (!stockLotEmplacementLights.isEmpty()) {
-                    oo1EmplacementParDefaut = stockLotEmplacementLights.get(0).getEmplacement();
+                if (oo1EmplacementParDefaut.contentEquals("")) {
+                    Produit produit = ProduitOpenHelper.getProduitByID(db, oo1.getProduitID());
+                    Depot depot = DepotOpenHelper.getDepotParReference(db, ph_preparation_Selectionne.getDepotOrigineReference());
+                    List<Stock_Lot_Emplacement_Light> stockLotEmplacementLights = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot);
+                    if (!stockLotEmplacementLights.isEmpty()) {
+                        oo1EmplacementParDefaut = stockLotEmplacementLights.get(0).getEmplacement();
+                    }
+                }
+                if (oo2EmplacementParDefaut.contentEquals("")) {
+                    Produit produit = ProduitOpenHelper.getProduitByID(db, oo2.getProduitID());
+                    Depot depot = DepotOpenHelper.getDepotParReference(db, ph_preparation_Selectionne.getDepotOrigineReference());
+                    List<Stock_Lot_Emplacement_Light> stockLotEmplacementLights = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot);
+                    if (!stockLotEmplacementLights.isEmpty()) {
+                        oo2EmplacementParDefaut = stockLotEmplacementLights.get(0).getEmplacement();
+                    }
+                }
+
+                if(oo1EmplacementParDefaut.contentEquals(oo2EmplacementParDefaut))
+                {
+                    return oo1.getProduitDesignation().compareTo(oo2.getProduitDesignation());
+                }
+                else
+                {
+                    return oo1EmplacementParDefaut.compareTo(oo2EmplacementParDefaut);
                 }
             }
-            if (oo2EmplacementParDefaut.contentEquals("")) {
-                Produit produit = ProduitOpenHelper.getProduitByID(db, oo2.getProduitID());
-                Depot depot = DepotOpenHelper.getDepotParReference(db, ph_preparation_Selectionne.getDepotOrigineReference());
-                List<Stock_Lot_Emplacement_Light> stockLotEmplacementLights = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot);
-                if (!stockLotEmplacementLights.isEmpty()) {
-                    oo2EmplacementParDefaut = stockLotEmplacementLights.get(0).getEmplacement();
-                }
+            else
+            {
+                return 1;
             }
 
-            return oo1EmplacementParDefaut.compareTo(oo2EmplacementParDefaut);
         });
         premierpassage = false;
         ph_preparation_ligne_preparationLotAdapter = new PH_Preparation_Ligne_PreparationLotAdapter(DetailPreparationActivity.this, phPreparationLignePreparationAdapte_List, db);
@@ -690,7 +705,14 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
             PH_Preparation_Ligne oo1 = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, o1.getPh_preparationLigneID());
             PH_Preparation_Ligne oo2 = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, o2.getPh_preparationLigneID());
 
-            return Double.compare(oo1.getPoidsTotal(), oo2.getPoidsTotal());
+            if(oo1.getPoidsTotal() == oo2.getPoidsTotal())
+            {
+                return oo1.getProduitDesignation().compareTo(oo2.getProduitDesignation());
+            }
+            else
+            {
+                return Double.compare(oo1.getPoidsTotal(), oo2.getPoidsTotal());
+            }
         });
         premierpassage = false;
         ph_preparation_ligne_preparationLotAdapter = new PH_Preparation_Ligne_PreparationLotAdapter(DetailPreparationActivity.this, phPreparationLignePreparationAdapte_List, db);
@@ -709,7 +731,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         else
         {
             //gestion du zebra
-            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
             {
                 detailPreparation_Intent = new Intent(DetailPreparationActivity.this, ScannerPreparationActivity.class);
             }

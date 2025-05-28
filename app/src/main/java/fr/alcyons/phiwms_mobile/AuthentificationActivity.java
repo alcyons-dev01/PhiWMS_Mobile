@@ -221,7 +221,7 @@ public class AuthentificationActivity extends MainActivity {
                 Intent scanDocumentIntent = new Intent(AuthentificationActivity.this, BarcodeCaptureActivity.class);
                 Bundle scanDocumentBundle = new Bundle();
 
-                if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+                if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell")  || Build.MANUFACTURER.toLowerCase().contains("google"))
                 {
                     scanDocumentIntent = new Intent(AuthentificationActivity.this, ScannerSearchOnlyActivity.class);
                     scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteAuthentification);
@@ -428,14 +428,17 @@ public class AuthentificationActivity extends MainActivity {
 
                     break;
                 case CodesEchangesActivites.RETOUR_AUTHENTIFICATION:
-                    String nom_utilisateur = Objects.requireNonNull(data.getExtras()).getString("username");
+                    String nom_utilisateur = data.getExtras().getString("username");
                     String mot_de_passe = data.getExtras().getString("password");
-                    ((EditText) findViewById(R.id.identifiant)).setText(nom_utilisateur);
-                    ((EditText) findViewById(R.id.motDePasse)).setText(mot_de_passe);
-                    authentification_scan = true;
-                    boutonConnexion.performClick();
-                    boutonConnexion.setVisibility(View.GONE);
-                    progressBar.setVisibility(View.VISIBLE);
+                    if(nom_utilisateur != null && mot_de_passe != null)
+                    {
+                        ((EditText) findViewById(R.id.identifiant)).setText(nom_utilisateur);
+                        ((EditText) findViewById(R.id.motDePasse)).setText(mot_de_passe.trim());
+                        authentification_scan = true;
+                        boutonConnexion.performClick();
+                        boutonConnexion.setVisibility(View.GONE);
+                        progressBar.setVisibility(View.VISIBLE);
+                    }
                     break;
             }
 

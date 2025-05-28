@@ -221,11 +221,9 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
 
                     ph_preparation_List.sort((o1, o2) -> o2.getLivraisonPrevueDate().compareTo(o1.getLivraisonPrevueDate()));
 
-                    ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPufActivity.this, ph_preparation_List, db, utilisateurConnecte);
-
-                    ph_preparation_ListView.setDivider(footer);
-                    ph_preparation_ListView.setAdapter(ph_preparation_preparationAdapter);
-
+                    ph_preparation_preparationAdapter.phPreparationPreparation.clear();
+                    ph_preparation_preparationAdapter.phPreparationPreparation.addAll(ph_preparation_List);
+                    ph_preparation_preparationAdapter.notifyDataSetChanged();
 
                     int taille_liste = ph_preparation_List.size();
 
@@ -462,11 +460,12 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
         scanDocumentBundle.putString("contexte", String.valueOf(R.string.scannerContexteDocument));
         scanDocumentBundle.putBoolean("isBoutonSuppressionExistant", true);
         Intent scanDocumentIntent = null;
-        if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+        if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell") || Build.MANUFACTURER.toLowerCase().contains("google"))
         {
             scanDocumentIntent = new Intent(ServicePreparationPufActivity.this, ScannerDocumentActivity.class);
             scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteDocument);
-            scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'un document");
+            scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'une préparation");
+            scanDocumentBundle.putString("Context", "Preparation");
         }
         else
         {
@@ -479,7 +478,8 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
             {
                 scanDocumentIntent = new Intent(ServicePreparationPufActivity.this, ScannerDocumentActivity.class);
                 scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteDocument);
-                scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'un document");
+                scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'une préparation");
+                scanDocumentBundle.putString("Context", "Preparation");
             }
         }
 

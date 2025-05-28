@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity">
+    tools:context="fr.alcyons.phimr4.BarcodeSearch.ScannerSearchOnlyActivity">
 
 
     <LinearLayout
@@ -19,12 +19,37 @@
             android:layout_height="0dp"
             android:layout_weight="2">
 
-
-            <ImageView
-                android:id="@+id/imageGriseScanManuel"
+            <LinearLayout
+                android:id="@+id/layoutImageScan"
                 android:layout_width="match_parent"
                 android:layout_height="180dp"
-                android:background="@color/grey_color" />
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <ImageView
+                    android:id="@+id/imageGriseScanManuel"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    android:background="@color/grey_color"/>
+
+                <ImageView
+                    android:id="@+id/imageScanPreparation"
+                    android:layout_width="64dp"
+                    android:layout_height="72dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/phitagdocprep"
+                    android:visibility="gone"/>
+
+                <ImageView
+                    android:id="@+id/imageScanReception"
+                    android:layout_width="64dp"
+                    android:layout_height="72dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/phitagdoccom"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
+
 
             <TextView
                 android:id="@+id/designationProduit_Scan"
@@ -35,7 +60,7 @@
                 android:text="Document"
                 android:textSize="20dp"
                 android:textStyle="bold"
-                android:layout_below="@+id/imageGriseScanManuel"/>
+                android:layout_below="@+id/layoutImageScan"/>
 
             <TextView
                 android:id="@+id/textManuelScan"

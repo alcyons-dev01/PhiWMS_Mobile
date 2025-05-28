@@ -121,7 +121,7 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
             if(retourLigne != null)
                 DetailControleRetours_Bundle.putInt("produitID", retourLigne.getCode_produit());
             DetailControleRetours_Bundle.putSerializable("retourLigneAdapte", retourLigneAdapte);
-            DetailControleRetours_Bundle.putInt("depotID", depot.getDepot_UID());
+           // DetailControleRetours_Bundle.putInt("depotID", depot.getDepot_UID());
 
             Intent DetailControleRetours_Intent = new Intent(DetailsControleRetoursActivity.this, ListeLotsControleDesRetoursActivity.class);
             DetailControleRetours_Intent.putExtras(DetailControleRetours_Bundle);

@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -76,6 +77,25 @@ public class ScannerDocumentActivity extends ServiceActivity {
             }
         });
 
+        String contextService = "";
+        if(intent.hasExtra("Context"))
+            contextService = intent.getExtras().getString("Context");
+        switch (contextService)
+        {
+            case "Preparation":
+                ((ImageView) findViewById(R.id.imageGriseScanManuel)).setVisibility(View.GONE);
+                ((ImageView) findViewById(R.id.imageScanPreparation)).setVisibility(View.VISIBLE);
+                ((TextView) findViewById(R.id.designationProduit_Scan)).setText("Préparation");
+                break;
+            case "Reception":
+                ((ImageView) findViewById(R.id.imageGriseScanManuel)).setVisibility(View.GONE);
+                ((ImageView) findViewById(R.id.imageScanReception)).setVisibility(View.VISIBLE);
+                ((TextView) findViewById(R.id.designationProduit_Scan)).setText("Réception");
+                break;
+            default:
+
+                break;
+        }
 
         ((TextView)findViewById(R.id.textManuelScan)).setText(intent.getExtras().getString("TextBannerManuel"));
         if(scannerContexteInt == R.string.scannerContexteAuthentification)

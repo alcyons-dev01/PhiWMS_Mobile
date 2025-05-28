@@ -452,7 +452,8 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
         {
             scanDocumentIntent = new Intent(ServiceReceptionPadActivity.this, ScannerDocumentActivity.class);
             scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteDocument);
-            scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'un document");
+            scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'une réception");
+            scanDocumentBundle.putString("Context", "Reception");
         }
         else
         {
@@ -465,7 +466,8 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
             {
                 scanDocumentIntent = new Intent(ServiceReceptionPadActivity.this, ScannerDocumentActivity.class);
                 scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteDocument);
-                scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'un document");
+                scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'une réception");
+                scanDocumentBundle.putString("Context", "Reception");
             }
 
         }

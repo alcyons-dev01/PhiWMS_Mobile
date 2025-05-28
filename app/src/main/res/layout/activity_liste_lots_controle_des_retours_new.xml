@@ -144,7 +144,6 @@
             android:id="@+id/listeView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/separateur"
             android:layout_below="@+id/firstRow"
             android:descendantFocusability="afterDescendants"
             android:paddingTop="5dp">

@@ -263,6 +263,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
         {
             bannerTexte = authentificationContext.bannerTexte;
             compteurScan.setVisibility(GONE);
+            ((LinearLayout) findViewById(R.id.svgAuthentification)).setVisibility(View.VISIBLE);
         }
         else if(scannerContexteInt == R.string.scannerContexteControleDesRetours)
         {
@@ -1244,7 +1245,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                         code = produitContexte.code;
                     }
 
-                    if(!code.isEmpty()){
+                    if(code != null && !code.isEmpty()){
                         Intent resultIntent = new Intent();
                         if(scannerContexteInt == R.string.scannerContexteProduitReceptionScannee)
                         {
@@ -1264,6 +1265,8 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                         if(scannerContexteInt == R.string.scannerContexteAuthentification)
                         {
                             resultIntent.putExtra("code", authentificationContext.code);
+                            resultIntent.putExtra("username", authentificationContext.username);
+                            resultIntent.putExtra("password", authentificationContext.password);
                         }
 
                         if(scannerContexteInt == R.string.scannerContextePreparationADH)

@@ -1,10 +1,13 @@
 package fr.alcyons.phiwms_mobile.ControleDesRetours;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -34,6 +37,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
+import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
@@ -41,10 +45,12 @@ import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne_ControleRetour_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Lot_ControleDesRetoursAdapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Lot_ControleDesRetoursScanneeAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceControleRetoursActivity;
 
 import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_CODE_GS1;
@@ -52,6 +58,7 @@ import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LIST
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LOT;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AlertDialog;
 
 public class ListeLotsControleDesRetoursActivity extends ServiceActivity {
     public List<Retour_Ligne_ControleRetour_Adapte.LotAdapte> lotAdaptesList;
@@ -69,7 +76,7 @@ public class ListeLotsControleDesRetoursActivity extends ServiceActivity {
     LinearLayout boutonAjouterParScan;
     Retour_Ligne retourLigne;
     PackageManager pm;
-
+    Retour retour_courant;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_liste_lots_controle_des_retours_new);
@@ -80,64 +87,15 @@ public class ListeLotsControleDesRetoursActivity extends ServiceActivity {
         // Récupération des variables globales
         retourLigneAdapteSelectionne = (Retour_Ligne_ControleRetour_Adapte) intent.getExtras().getSerializable("retourLigneAdapte");
         Retour_Ligne retour_ligne_courant = Retour_LigneOpenHelper.getRetourLigneByID(db, retourLigneAdapteSelectionne.getRetourLigneID());
-        Retour retour_courant = RetourOpenHelper.getRetourByID(db, retour_ligne_courant.getRetour_UID());
-        Depot depot_courant = DepotOpenHelper.getDepotParReference(db, retour_courant.getRef_Depot_Origine());
+        retour_courant = RetourOpenHelper.getRetourByID(db, retour_ligne_courant.getRetour_UID());
+        depot = DepotOpenHelper.getDepotParReference(db, retour_courant.getRef_Depot_Origine());
 
         int id_produit = intent.getExtras().getInt("produitID");
         produit = ProduitOpenHelper.getProduitByID(db, id_produit);
-        depot = DepotOpenHelper.getDepotParID(db, intent.getExtras().getInt("depotID"));
+        //depot = DepotOpenHelper.getDepotParID(db, intent.getExtras().getInt("depotID"));
 
         // Récupération du Retour_Ligne sélectionné
         retourLigne = Retour_LigneOpenHelper.getRetourLigneByID(db, retourLigneAdapteSelectionne.getRetourLigneID());
-
-        if (produit == null || depot == null) {
-            Alerte.afficherAlerte(ListeLotsControleDesRetoursActivity.this, "Alerte", "Un problème a été constaté en Base de données, veuillez synchroniser l'application ou contacter la société Alcyons (service Contrôle des retours", "alerte");
-            ListeLotsControleDesRetoursActivity.this.finish();
-            return;
-        }
-
-        // Affichage des informations de base
-        qteDeclaree = (int) retourLigne.getQte_Demander();
-        quantiteRestant = qteDeclaree;
-
-        ((TextView) findViewById(R.id.qteDeclaree)).setText(String.valueOf(qteDeclaree));
-
-        // Récupération des lots du Retour_Ligne
-        lotAdaptesList = new ArrayList<>();
-        lotAdaptesListDeBase = retourLigneAdapteSelectionne.getLotAdaptes();
-
-        if (lotAdaptesListDeBase.size() == 0) {
-            List<Stock_Lot_Emplacement_Light> stockLotEmplacementLights = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot);
-
-            for (Stock_Lot_Emplacement_Light stockLotEmplacement : stockLotEmplacementLights) {
-                lotAdaptesListDeBase.add(retourLigneAdapteSelectionne.new LotAdapte(stockLotEmplacement));
-            }
-        } else {
-            for (Retour_Ligne_ControleRetour_Adapte.LotAdapte lotAdapte : lotAdaptesListDeBase) {
-                if (lotAdapte.getQteSaisie() > 0) {
-                    quantiteRestant -= lotAdapte.getQteSaisie();
-                    quantiteRetournee += lotAdapte.getQteSaisie();
-                    lotAdaptesList.add(lotAdapte);
-                }
-            }
-        }
-
-        lotAdaptesList.add(retourLigneAdapteSelectionne.new LotAdapte("row_ajouter"));
-        lotAdaptesList.add(retourLigneAdapteSelectionne.new LotAdapte("row_annuler"));
-
-
-        ((TextView) findViewById(R.id.designationProduit)).setText(produit.getDesignation_interne());
-        ((TextView) findViewById(R.id.referenceProduit)).setText(produit.getRef_fourni());
-        ((TextView) findViewById(R.id.numeroRetour)).setText("#"+retour_courant.getNumero());
-        ((TextView) findViewById(R.id.nomDepot)).setText(depot_courant.getNom());
-
-        boutonAjouterParScan = (LinearLayout) findViewById(R.id.boutonAddScan);
-        boutonAjouterParScan.setOnClickListener(clicBoutonAjoutParScan);
-
-        // Initialisation de la listView
-        listView = (ListView) findViewById(R.id.listeView);
-        listView.setItemsCanFocus(true);
-        listView.setDivider(footer);
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -151,35 +109,135 @@ public class ListeLotsControleDesRetoursActivity extends ServiceActivity {
     public void onResume()
     {
         super.onResume();
-        invalidateOptionsMenu();
-        // Initialisation de l'adapter puis transfere de l'adapter à la listeView pour l'affichage
-        adapter = new Lot_ControleDesRetoursScanneeAdapter(ListeLotsControleDesRetoursActivity.this, lotAdaptesList, db, retourLigneAdapteSelectionne, depot.getStructure(), quantiteRestant);
-        listView.setDivider(footer);
-        listView.setAdapter(adapter);
-        ((TextView) findViewById(R.id.QteRetourner)).setText(String.valueOf((int)retourLigne.getQte_Retourner()));
-        MAJVisuel();
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(final AdapterView<?> parent, final View view, final int position, long id) {
+        if (produit == null || depot == null) {
+            afficherMessageAlerte(ListeLotsControleDesRetoursActivity.this, ListeLotsControleDesRetoursActivity.this.getLayoutInflater());
+            return;
+        }
+        else
+        {
+            // Affichage des informations de base
+            qteDeclaree = (int) retourLigne.getQte_Demander();
+            quantiteRestant = qteDeclaree;
 
-                Retour_Ligne_ControleRetour_Adapte.LotAdapte courant = lotAdaptesList.get(position);
+            ((TextView) findViewById(R.id.qteDeclaree)).setText(String.valueOf(qteDeclaree));
 
-                if(courant.getNumLot().contentEquals("row_ajouter"))
-                {
-                    gestionLot();
+            // Récupération des lots du Retour_Ligne
+            lotAdaptesList = new ArrayList<>();
+            lotAdaptesListDeBase = retourLigneAdapteSelectionne.getLotAdaptes();
 
-                    clicAjoutManuel();
+            if (lotAdaptesListDeBase.size() == 0) {
+                List<Stock_Lot_Emplacement_Light> stockLotEmplacementLights = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot);
+
+                for (Stock_Lot_Emplacement_Light stockLotEmplacement : stockLotEmplacementLights) {
+                    lotAdaptesListDeBase.add(retourLigneAdapteSelectionne.new LotAdapte(stockLotEmplacement));
                 }
-                else if(courant.getNumLot().contentEquals("row_annuler"))
-                {
-                    ((LinearLayout) findViewById(R.id.firstRow)).setBackground(ListeLotsControleDesRetoursActivity.this.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
+            } else {
+                for (Retour_Ligne_ControleRetour_Adapte.LotAdapte lotAdapte : lotAdaptesListDeBase) {
+                    /*if (lotAdapte.getQteSaisie() > 0) {
+                        quantiteRestant -= lotAdapte.getQteSaisie();
+                        quantiteRetournee += lotAdapte.getQteSaisie();
+                        lotAdaptesList.add(lotAdapte);
+                    }*/
+                    lotAdaptesList.add(lotAdapte);
 
-                    for(int i = 0; i < lotAdaptesList.size()-1; i++)
+                }
+            }
+
+            lotAdaptesList.add(retourLigneAdapteSelectionne.new LotAdapte("row_ajouter"));
+            lotAdaptesList.add(retourLigneAdapteSelectionne.new LotAdapte("row_annuler"));
+
+
+            ((TextView) findViewById(R.id.designationProduit)).setText(produit.getDesignation_interne());
+            ((TextView) findViewById(R.id.referenceProduit)).setText(produit.getRef_fourni());
+            ((TextView) findViewById(R.id.numeroRetour)).setText("#"+retour_courant.getNumero());
+            ((TextView) findViewById(R.id.nomDepot)).setText(depot.getNom());
+
+            boutonAjouterParScan = (LinearLayout) findViewById(R.id.boutonAddScan);
+            boutonAjouterParScan.setOnClickListener(clicBoutonAjoutParScan);
+
+            // Initialisation de la listView
+            listView = (ListView) findViewById(R.id.listeView);
+            listView.setItemsCanFocus(true);
+            listView.setDivider(footer);
+
+
+
+            invalidateOptionsMenu();
+            // Initialisation de l'adapter puis transfere de l'adapter à la listeView pour l'affichage
+            adapter = new Lot_ControleDesRetoursScanneeAdapter(ListeLotsControleDesRetoursActivity.this, lotAdaptesList, db, retourLigneAdapteSelectionne, depot.getStructure(), quantiteRestant);
+            listView.setDivider(footer);
+            listView.setAdapter(adapter);
+            ((TextView) findViewById(R.id.QteRetourner)).setText(String.valueOf((int)retourLigne.getQte_Retourner()));
+            MAJVisuel();
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(final AdapterView<?> parent, final View view, final int position, long id) {
+
+                    Retour_Ligne_ControleRetour_Adapte.LotAdapte courant = lotAdaptesList.get(position);
+
+                    if(courant.getNumLot().contentEquals("row_ajouter"))
                     {
-                        if(!lotAdaptesList.get(i).getNumLot().contentEquals("row_ajouter") && !lotAdaptesList.get(i).getNumLot().contentEquals("row_annuler"))
+                        gestionLot();
+
+                        clicAjoutManuel();
+                    }
+                    else if(courant.getNumLot().contentEquals("row_annuler"))
+                    {
+                        ((LinearLayout) findViewById(R.id.firstRow)).setBackground(ListeLotsControleDesRetoursActivity.this.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
+
+                        for(int i = 0; i < lotAdaptesList.size()-1; i++)
                         {
-                            lotAdaptesList.get(i).setQteSaisie(0);
-                            Stock_Lot_Emplacement_Light stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, lotAdaptesList.get(i).getStockLotEmplacementID());
+                            if(!lotAdaptesList.get(i).getNumLot().contentEquals("row_ajouter") && !lotAdaptesList.get(i).getNumLot().contentEquals("row_annuler"))
+                            {
+                                lotAdaptesList.get(i).setQteSaisie(0);
+                                Stock_Lot_Emplacement_Light stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, lotAdaptesList.get(i).getStockLotEmplacementID());
+                                if(stock_courant != null)
+                                {
+                                    stock_courant.setQte_Preparer(courant.getQteSaisie());
+                                    Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
+                                }
+                                else
+                                {
+                                    if(lotAdaptesList.get(i) != null)
+                                    {
+                                        stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(db, produit, depot, lotAdaptesList.get(i).getNumLot(), lotAdaptesList.get(i).getNumSerie());
+                                        if(stock_courant != null)
+                                        {
+                                            stock_courant.setQte_Preparer(courant.getQteSaisie());
+                                            Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        /*lotAdaptesList = new ArrayList<>();
+                        lotAdaptesList.add(retourLigneAdapteSelectionne.new LotAdapte("row_ajouter"));
+                        lotAdaptesList.add(retourLigneAdapteSelectionne.new LotAdapte("row_annuler"));*/
+                        retourLigne.setQte_Retourner(0);
+                        quantiteRestant = (int)retourLigne.getQte_Demander();
+                        adapter.quantiteARetourner = quantiteRestant;
+                        Retour_LigneOpenHelper.mettreAJourUnRetourLigne(db, retourLigne);
+                        ((TextView) findViewById(R.id.QteRetourner)).setText(String.valueOf((int)retourLigne.getQte_Retourner()));
+                        //((LinearLayout) findViewById(R.id.lancerScan)).setVisibility(View.VISIBLE);
+                        MAJVisuel();
+                        adapter.full = false;
+                        adapter = new Lot_ControleDesRetoursScanneeAdapter(ListeLotsControleDesRetoursActivity.this, lotAdaptesList, db, retourLigneAdapteSelectionne, depot.getStructure(), quantiteRestant);
+                        listView.setDivider(footer);
+                        listView.setAdapter(adapter);
+                    }
+                    else
+                    {
+                        //on check si le lot n'est pas déjà n'est pas déjà sélectionner
+                        if(Integer.parseInt(adapter.viewHolders.get(position).qteSaisie.getText().toString()) == 0)
+                        {
+                            //on récupére la quantité de stock présent dans ce lot
+                            int quantite_stock_selectionne = courant.getQteActuelle();
+                            if(quantite_stock_selectionne > quantiteRestant)
+                                quantite_stock_selectionne = quantiteRestant;
+                            //gestion du visuel
+                            courant.setQteSaisie(quantite_stock_selectionne);
+                            Stock_Lot_Emplacement_Light stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, courant.getStockLotEmplacementID());
                             if(stock_courant != null)
                             {
                                 stock_courant.setQte_Preparer(courant.getQteSaisie());
@@ -187,99 +245,55 @@ public class ListeLotsControleDesRetoursActivity extends ServiceActivity {
                             }
                             else
                             {
-                                if(lotAdaptesList.get(i) != null)
+                                stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(db, produit, depot, courant.getNumLot(), courant.getNumSerie());
+                                if(stock_courant != null)
                                 {
-                                    stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(db, produit, depot, lotAdaptesList.get(i).getNumLot(), lotAdaptesList.get(i).getNumSerie());
-                                    if(stock_courant != null)
-                                    {
-                                        stock_courant.setQte_Preparer(courant.getQteSaisie());
-                                        Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
-                                    }
+                                    stock_courant.setQte_Preparer(courant.getQteSaisie());
+                                    Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
                                 }
                             }
-                        }
-                    }
 
-                    lotAdaptesList = new ArrayList<>();
-                    lotAdaptesList.add(retourLigneAdapteSelectionne.new LotAdapte("row_ajouter"));
-                    lotAdaptesList.add(retourLigneAdapteSelectionne.new LotAdapte("row_annuler"));
-                    retourLigne.setQte_Retourner(0);
-                    quantiteRestant = (int)retourLigne.getQte_Demander();
-                    adapter.quantiteARetourner = quantiteRestant;
-                    Retour_LigneOpenHelper.mettreAJourUnRetourLigne(db, retourLigne);
-                    ((TextView) findViewById(R.id.QteRetourner)).setText(String.valueOf((int)retourLigne.getQte_Retourner()));
-                    //((LinearLayout) findViewById(R.id.lancerScan)).setVisibility(View.VISIBLE);
-                    MAJVisuel();
-                    adapter.full = false;
-                    adapter = new Lot_ControleDesRetoursScanneeAdapter(ListeLotsControleDesRetoursActivity.this, lotAdaptesList, db, retourLigneAdapteSelectionne, depot.getStructure(), quantiteRestant);
-                    listView.setDivider(footer);
-                    listView.setAdapter(adapter);
-                }
-                else
-                {
-                    //on check si le lot n'est pas déjà n'est pas déjà sélectionner
-                    if(Integer.parseInt(adapter.viewHolders.get(position).qteSaisie.getText().toString()) == 0)
-                    {
-                        //on récupére la quantité de stock présent dans ce lot
-                        int quantite_stock_selectionne = courant.getQteActuelle();
-
-                        //gestion du visuel
-                        courant.setQteSaisie(quantite_stock_selectionne);
-                        Stock_Lot_Emplacement_Light stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, courant.getStockLotEmplacementID());
-                        if(stock_courant != null)
-                        {
-                            stock_courant.setQte_Preparer(courant.getQteSaisie());
-                            Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
+                            retourLigne.setQte_Retourner(retourLigne.getQte_Retourner()+quantite_stock_selectionne);
+                            quantiteRestant = quantiteRestant - quantite_stock_selectionne;
+                            adapter.quantiteARetourner = quantiteRestant;
+                            Retour_LigneOpenHelper.mettreAJourUnRetourLigne(db, retourLigne);
+                            ((TextView) findViewById(R.id.QteRetourner)).setText(String.valueOf((int)retourLigne.getQte_Retourner()));
+                            adapter.viewHolders.get(position).qteSaisie.setText(String.valueOf(quantite_stock_selectionne));
                         }
                         else
                         {
-                            stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(db, produit, depot, courant.getNumLot(), courant.getNumSerie());
+                            int qte_Saisie = Integer.parseInt(adapter.viewHolders.get(position).qteSaisie.getText().toString());
+                            retourLigne.setQte_Retourner(retourLigne.getQte_Retourner()-qte_Saisie);
+                            quantiteRestant = quantiteRestant + qte_Saisie;
+                            Retour_LigneOpenHelper.mettreAJourUnRetourLigne(db, retourLigne);
+                            ((TextView) findViewById(R.id.QteRetourner)).setText(String.valueOf((int)retourLigne.getQte_Retourner()));
+                            adapter.viewHolders.get(position).qteSaisie.setText("0");
+                            courant.setQteSaisie(0);
+                            Stock_Lot_Emplacement_Light stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, courant.getStockLotEmplacementID());
                             if(stock_courant != null)
                             {
                                 stock_courant.setQte_Preparer(courant.getQteSaisie());
                                 Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
                             }
-                        }
-
-                        retourLigne.setQte_Retourner(retourLigne.getQte_Retourner()+quantite_stock_selectionne);
-                        quantiteRestant = quantiteRestant - quantite_stock_selectionne;
-                        adapter.quantiteARetourner = quantiteRestant;
-                        Retour_LigneOpenHelper.mettreAJourUnRetourLigne(db, retourLigne);
-                        ((TextView) findViewById(R.id.QteRetourner)).setText(String.valueOf((int)retourLigne.getQte_Retourner()));
-                        adapter.viewHolders.get(position).qteSaisie.setText(String.valueOf(quantite_stock_selectionne));
-                    }
-                    else
-                    {
-                        int qte_Saisie = Integer.parseInt(adapter.viewHolders.get(position).qteSaisie.getText().toString());
-                        retourLigne.setQte_Retourner(retourLigne.getQte_Retourner()-qte_Saisie);
-                        quantiteRestant = quantiteRestant + qte_Saisie;
-                        Retour_LigneOpenHelper.mettreAJourUnRetourLigne(db, retourLigne);
-                        ((TextView) findViewById(R.id.QteRetourner)).setText(String.valueOf((int)retourLigne.getQte_Retourner()));
-                        adapter.viewHolders.get(position).qteSaisie.setText("0");
-                        courant.setQteSaisie(0);
-                        Stock_Lot_Emplacement_Light stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, courant.getStockLotEmplacementID());
-                        if(stock_courant != null)
-                        {
-                            stock_courant.setQte_Preparer(courant.getQteSaisie());
-                            Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
-                        }
-                        else
-                        {
-                            stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(db, produit, depot, courant.getNumLot(), courant.getNumSerie());
-                            if(stock_courant != null)
+                            else
                             {
-                                stock_courant.setQte_Preparer(courant.getQteSaisie());
-                                Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
+                                stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(db, produit, depot, courant.getNumLot(), courant.getNumSerie());
+                                if(stock_courant != null)
+                                {
+                                    stock_courant.setQte_Preparer(courant.getQteSaisie());
+                                    Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
+                                }
                             }
+                            //lotAdaptesList.remove(position);
                         }
-                        lotAdaptesList.remove(position);
-                    }
 
-                    MAJVisuel();
-                    adapter.notifyDataSetChanged();
+                        MAJVisuel();
+                        adapter.notifyDataSetChanged();
+                    }
                 }
-            }
-        });
+            });
+        }
+
     }
 
     // Lorsqu'on lance une nouvelle activity avec " startActivityForResult ", action à réaliser à la fin de l'activity lancé suivant le " CodesEchangesActivites " passé
@@ -699,7 +713,7 @@ public class ListeLotsControleDesRetoursActivity extends ServiceActivity {
 
 
             Intent clicBoutonAjoutParScan_intent = null;
-            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || Build.MANUFACTURER.toLowerCase().contains("google"))
             {
                 clicBoutonAjoutParScan_intent = new Intent(ListeLotsControleDesRetoursActivity.this, ScannerPreparationActivity.class);
             }
@@ -720,4 +734,25 @@ public class ListeLotsControleDesRetoursActivity extends ServiceActivity {
         }
     };
 
+    private void afficherMessageAlerte(Context context, LayoutInflater inflater)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View layout = inflater.inflate(R.layout.alerte, null);
+        TextView text_tv = layout.findViewById(R.id.messageFin);
+        LinearLayout valider_ll = layout.findViewById(R.id.buttonOk);
+        TextView titre_tv = layout.findViewById(R.id.titre);
+
+        titre_tv.setText("Erreur");
+        text_tv.setText("Impossible de récupérer les stocks du dépôt d'origine");
+        builder.setView(layout);
+        final AlertDialog alertDialogErreur = builder.create();
+        valider_ll.setOnClickListener(view -> {
+            alertDialogErreur.dismiss();
+            ListeLotsControleDesRetoursActivity.this.finish();
+        });
+
+        alertDialogErreur.setCanceledOnTouchOutside(false);
+        alertDialogErreur.setCancelable(false);
+        alertDialogErreur.show();
+    }
 }

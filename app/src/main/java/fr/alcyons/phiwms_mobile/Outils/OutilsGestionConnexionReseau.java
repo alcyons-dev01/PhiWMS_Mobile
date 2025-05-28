@@ -106,7 +106,7 @@ public class OutilsGestionConnexionReseau extends OriginalActivity {
         }
     }
 
-    public static boolean isServerAccessibleasda(Context context) {
+    public static boolean isServerAccessible(Context context) {
 
         reponseRecue = false;
 
