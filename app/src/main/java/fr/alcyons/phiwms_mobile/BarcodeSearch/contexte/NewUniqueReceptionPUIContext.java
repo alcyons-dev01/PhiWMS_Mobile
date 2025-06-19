@@ -142,6 +142,9 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
                 {
 
                     List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+                    if(produits.size() == 0)
+                        produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtinSansAi));
+
                     if(produits != null)
                     {
                         if (produits.size() == 1) {
@@ -486,6 +489,8 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
             {
 
                 List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+                if(produits.size() == 0)
+                    produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtinSansAi));
                 if(produits != null)
                 {
                     if (produits.size() == 1) {

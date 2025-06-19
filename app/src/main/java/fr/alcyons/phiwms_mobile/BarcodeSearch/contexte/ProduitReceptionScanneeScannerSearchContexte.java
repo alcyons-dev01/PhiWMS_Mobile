@@ -166,6 +166,8 @@ public class ProduitReceptionScanneeScannerSearchContexte extends MainActivity {
                     }
 
                     List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+                    if(produits.size() == 0)
+                        produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtinSansAi));
                     if (produits.size() == 1) {
                         produit = produits.get(0);
                     }

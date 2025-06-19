@@ -275,89 +275,93 @@ public class PreparationContexte extends MainActivity {
                             serialisation = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int)ph_serialisation_uid);
                         }
 
-                        resultat = serialisation.getResultat();
-                        if(resultat.contentEquals("INACTIVE") || resultat.contentEquals("UNKNOWN"))
+                        if(serialisation != null)
                         {
-                            Alerte.afficherAlerte(context, "Attention", "Le produit scanné est détruit ou inactif", "alerte");
-                            messageTexteFranceMVO = GestionResultatNMVO.getResultat(serialisation.getRaison());
-                            messageColor = Color.RED;
-                            Random SurveillanceReferenceRandom = new Random();
-                            int id_surveillance = SurveillanceReferenceRandom.nextInt();
-                            if (id_surveillance > 0) {
-                                id_surveillance = id_surveillance * -1;
-                            }
-                            Calendar calendar = Calendar.getInstance();
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                            String surveillanceDate = sdf.format(calendar.getTime());
-
-                            SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
-                            String surveillanceHeure = mdformat.format(calendar.getTime());
-
-                            int produit_id = serialisation.getProduitUID();
-                            int serialisationID = serialisation.get_UID();
-                            String motif = GestionCodeErreurNMVO.getMessage(code);
-                            String actionAMener = "";
-                            String statut = "NON LU";
-                            String traitePar = utilisateur.getIdentifiant();
-                            String traiteDate = surveillanceDate;
-                            String traiteHeure = surveillanceHeure;
-                            String produitLot = serialisation.getNumeroLot();
-                            String produitDatePéremption = serialisation.getDatePeremptionAAMMJJ();
-                            String produitNumeroSerie = serialisation.getNumeroSerie();
-                        }
-                        else
-                        {
-                            messageTexteFranceMVO = "";
-                            Stock_Lot_Emplacement_Light nouveau_stock_lot_emplacement = new Stock_Lot_Emplacement_Light(produit_courant.getCond_achat(),lot, gs1Decoupe.get(OutilsDecodage.dateDePeremption), produit_courant.getEmplacement_PUI_Defaut(), preparation_courante.getDepotDestinataireReference(), produit_courant.getZone_PUI_Defaut(),produit_courant.getID_produit(), produit_courant.getCond_achat(), serie);
-
-                            for(int i = 0; i < liste_preparation_liste_adapte.size(); i++)
+                            resultat = serialisation.getResultat();
+                            if(resultat.contentEquals("INACTIVE") || resultat.contentEquals("UNKNOWN"))
                             {
-                                if(liste_preparation_liste_adapte.get(i).getPh_preparationLigneID() == preparation_ligne_courant.get_UID())
+                                Alerte.afficherAlerte(context, "Attention", "Le produit scanné est détruit ou inactif", "alerte");
+                                messageTexteFranceMVO = GestionResultatNMVO.getResultat(serialisation.getRaison());
+                                messageColor = Color.RED;
+                                Random SurveillanceReferenceRandom = new Random();
+                                int id_surveillance = SurveillanceReferenceRandom.nextInt();
+                                if (id_surveillance > 0) {
+                                    id_surveillance = id_surveillance * -1;
+                                }
+                                Calendar calendar = Calendar.getInstance();
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                String surveillanceDate = sdf.format(calendar.getTime());
+
+                                SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
+                                String surveillanceHeure = mdformat.format(calendar.getTime());
+
+                                int produit_id = serialisation.getProduitUID();
+                                int serialisationID = serialisation.get_UID();
+                                String motif = GestionCodeErreurNMVO.getMessage(code);
+                                String actionAMener = "";
+                                String statut = "NON LU";
+                                String traitePar = utilisateur.getIdentifiant();
+                                String traiteDate = surveillanceDate;
+                                String traiteHeure = surveillanceHeure;
+                                String produitLot = serialisation.getNumeroLot();
+                                String produitDatePéremption = serialisation.getDatePeremptionAAMMJJ();
+                                String produitNumeroSerie = serialisation.getNumeroSerie();
+                            }
+                            else
+                            {
+                                messageTexteFranceMVO = "";
+                                Stock_Lot_Emplacement_Light nouveau_stock_lot_emplacement = new Stock_Lot_Emplacement_Light(produit_courant.getCond_achat(),lot, gs1Decoupe.get(OutilsDecodage.dateDePeremption), produit_courant.getEmplacement_PUI_Defaut(), preparation_courante.getDepotDestinataireReference(), produit_courant.getZone_PUI_Defaut(),produit_courant.getID_produit(), produit_courant.getCond_achat(), serie);
+
+                                for(int i = 0; i < liste_preparation_liste_adapte.size(); i++)
                                 {
-                                    List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte>liste = liste_preparation_liste_adapte.get(i).getLotAdaptes();
-                                    PH_Preparation_Ligne_Preparation_Adapte.LotAdapte nouveauLot = liste_preparation_liste_adapte.get(i).new LotAdapte(nouveau_stock_lot_emplacement);
-                                    boolean deja_present = false;
-                                    int quantite_scanne = 0;
-                                    for(int j = 0; j < liste.size(); j++)
+                                    if(liste_preparation_liste_adapte.get(i).getPh_preparationLigneID() == preparation_ligne_courant.get_UID())
                                     {
-                                        PH_Preparation_Ligne_Preparation_Adapte.LotAdapte lot_courant = liste.get(j);
-                                        if(lot_courant.getNumSerie().contentEquals(nouveauLot.getNumSerie()) && lot_courant.getNumLot().contentEquals(nouveauLot.getNumLot()))
+                                        List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte>liste = liste_preparation_liste_adapte.get(i).getLotAdaptes();
+                                        PH_Preparation_Ligne_Preparation_Adapte.LotAdapte nouveauLot = liste_preparation_liste_adapte.get(i).new LotAdapte(nouveau_stock_lot_emplacement);
+                                        boolean deja_present = false;
+                                        int quantite_scanne = 0;
+                                        for(int j = 0; j < liste.size(); j++)
                                         {
-                                            deja_present = true;
+                                            PH_Preparation_Ligne_Preparation_Adapte.LotAdapte lot_courant = liste.get(j);
+                                            if(lot_courant.getNumSerie().contentEquals(nouveauLot.getNumSerie()) && lot_courant.getNumLot().contentEquals(nouveauLot.getNumLot()))
+                                            {
+                                                deja_present = true;
+                                            }
+
+                                            quantite_scanne = quantite_scanne+lot_courant.getQteSaisie();
                                         }
 
-                                        quantite_scanne = quantite_scanne+lot_courant.getQteSaisie();
-                                    }
-
-                                    if(!deja_present)
-                                    {
-                                        if(quantite_scanne >= preparation_ligne_courant.getQte_Demander())
+                                        if(!deja_present)
                                         {
-                                            messageTexteFranceMVO = "Quantité demandée atteinte";
+                                            if(quantite_scanne >= preparation_ligne_courant.getQte_Demander())
+                                            {
+                                                messageTexteFranceMVO = "Quantité demandée atteinte";
+                                            }
+                                            else
+                                            {
+                                                if(nouveauLot.getQteSaisie() > preparation_ligne_courant.getQte_Demander())
+                                                {
+                                                    nouveauLot.setQteSaisie(preparation_ligne_courant.getQte_Demander());
+                                                }
+                                                liste_preparation_liste_adapte.get(i).getLotAdaptes().add(nouveauLot);
+                                                nb_produit_scanne++;
+                                                messageTexte = "Produit ajouté";
+                                                messageColor = Color.GREEN;
+                                                toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
+                                                messageTexteFranceMVO = "";
+                                            }
                                         }
                                         else
                                         {
-                                            if(nouveauLot.getQteSaisie() > preparation_ligne_courant.getQte_Demander())
-                                            {
-                                                nouveauLot.setQteSaisie(preparation_ligne_courant.getQte_Demander());
-                                            }
-                                            liste_preparation_liste_adapte.get(i).getLotAdaptes().add(nouveauLot);
-                                            nb_produit_scanne++;
-                                            messageTexte = "Produit ajouté";
-                                            messageColor = Color.GREEN;
-                                            toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
-                                            messageTexteFranceMVO = "";
+                                            messageTexte = "Produit déjà scanné";
+                                            messageColor = Color.RED;
                                         }
+                                        break;
                                     }
-                                    else
-                                    {
-                                        messageTexte = "Produit déjà scanné";
-                                        messageColor = Color.RED;
-                                    }
-                                    break;
                                 }
                             }
                         }
+
                     }
                 }
                 else

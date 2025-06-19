@@ -62,6 +62,9 @@ public class ProduitContexte {
             Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(s.toString().substring(0, s.length() - 1));
             if (gs1Decoupe.size() != 1) {
                 List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+                if(produits.size() == 0)
+                    produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtinSansAi));
+
                 if (produits.size() == 1) {
                     produit = produits.get(0);
                 }

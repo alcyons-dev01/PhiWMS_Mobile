@@ -136,12 +136,15 @@ public class PreparationMultipleContext
                 String lot = "";
                 String serie = "";
                 String gtin_courant ="";
+                String gtin_courant_sans_ai ="";
                 String conditionnementString ="";
                 String date_peremption_courant="";
                 if (gs1Decoupe.size() != 1)
                 {
 
                     List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+                    if(produits.size() == 0)
+                        produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtinSansAi));
                     if(produits != null)
                     {
                         if (produits.size() == 1) {
@@ -165,6 +168,7 @@ public class PreparationMultipleContext
                     lot = gs1Decoupe.get(OutilsDecodage.numeroLot);
                     serie = gs1Decoupe.get(OutilsDecodage.numeroSerie);
                     gtin_courant = gs1Decoupe.get(OutilsDecodage.codeGtin);
+                    gtin_courant_sans_ai = gs1Decoupe.get(OutilsDecodage.codeGtinSansAi);
                     conditionnementString = gs1Decoupe.get(OutilsDecodage.conditionnementProduit);
                     date_peremption_courant = gs1Decoupe.get(OutilsDecodage.dateDePeremption);
                 }
@@ -263,6 +267,9 @@ public class PreparationMultipleContext
                                     if (produit == null) {
                                         produit = ProduitOpenHelper.getUnProduitParGTIN(db, "01" + gtin_courant);
                                     }
+
+                                    if(produit == null)
+                                        produit = ProduitOpenHelper.getUnProduitParGTIN(db, gtin_courant_sans_ai);
                                 }
 
                                 long ph_serialisation_uid = 0;
@@ -277,52 +284,55 @@ public class PreparationMultipleContext
                                     serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int) ph_serialisation_uid);
                                 }
 
-                                resultat = serialisation_courante.getResultat();
-                                if (resultat.contentEquals("INACTIVE") || resultat.contentEquals("UNKNOWN")) {
-                                    Random SurveillanceReferenceRandom = new Random();
-                                    int id_surveillance = SurveillanceReferenceRandom.nextInt();
-                                    if (id_surveillance > 0) {
-                                        id_surveillance = id_surveillance * -1;
-                                    }
-                                    Calendar calendar = Calendar.getInstance();
-                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                                    String surveillanceDate = sdf.format(calendar.getTime());
-
-                                    SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
-                                    String surveillanceHeure = mdformat.format(calendar.getTime());
-
-                                    int produit_id = serialisation_courante.getProduitUID();
-                                    int serialisationID = serialisation_courante.get_UID();
-                                    String motif = GestionCodeErreurNMVO.getMessage(code);
-                                    String actionAMener = "";
-                                    String statut = "NON LU";
-                                    String traitePar = utilisateurConnecte.getIdentifiant();
-                                    String traiteDate = surveillanceDate;
-                                    String traiteHeure = surveillanceHeure;
-                                    String produitLot = serialisation_courante.getNumeroLot();
-                                    String produitDatePéremption = serialisation_courante.getDatePeremptionAAMMJJ();
-                                    String produitNumeroSerie = serialisation_courante.getNumeroSerie();
-
-                                    SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
-
-                                    //long rowUID_surveillance = SurveillanceReferenceOpenHelper.insererSurveillanceReferenceEnBDD(db, new_surveillance_reference);
-                                    long rowUID_surveillance = -1;
-
-                                    if (rowUID_surveillance != -1) {
-                                        //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE, new_surveillance_reference.getSerialexpressUUID(), new_surveillance_reference.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
-
-                                        try {
-                                            EnvoyerMailSurveillance class_mail = new EnvoyerMailSurveillance();
-                                            //class_mail.EnvoyerMailSerialisation(new_surveillance_reference.get_UID(), utilisateurConnecte.getMail(), db);
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
+                                if(serialisation_courante != null)
+                                {
+                                    resultat = serialisation_courante.getResultat();
+                                    if (resultat.contentEquals("INACTIVE") || resultat.contentEquals("UNKNOWN")) {
+                                        Random SurveillanceReferenceRandom = new Random();
+                                        int id_surveillance = SurveillanceReferenceRandom.nextInt();
+                                        if (id_surveillance > 0) {
+                                            id_surveillance = id_surveillance * -1;
                                         }
-                                    }
-                                } else {
-                                    String messageTexteFranceMVO = "";
-                                }
-                            }
+                                        Calendar calendar = Calendar.getInstance();
+                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                        String surveillanceDate = sdf.format(calendar.getTime());
 
+                                        SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
+                                        String surveillanceHeure = mdformat.format(calendar.getTime());
+
+                                        int produit_id = serialisation_courante.getProduitUID();
+                                        int serialisationID = serialisation_courante.get_UID();
+                                        String motif = GestionCodeErreurNMVO.getMessage(code);
+                                        String actionAMener = "";
+                                        String statut = "NON LU";
+                                        String traitePar = utilisateurConnecte.getIdentifiant();
+                                        String traiteDate = surveillanceDate;
+                                        String traiteHeure = surveillanceHeure;
+                                        String produitLot = serialisation_courante.getNumeroLot();
+                                        String produitDatePéremption = serialisation_courante.getDatePeremptionAAMMJJ();
+                                        String produitNumeroSerie = serialisation_courante.getNumeroSerie();
+
+                                        SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
+
+                                        //long rowUID_surveillance = SurveillanceReferenceOpenHelper.insererSurveillanceReferenceEnBDD(db, new_surveillance_reference);
+                                        long rowUID_surveillance = -1;
+
+                                        if (rowUID_surveillance != -1) {
+                                            //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE, new_surveillance_reference.getSerialexpressUUID(), new_surveillance_reference.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+
+                                            try {
+                                                EnvoyerMailSurveillance class_mail = new EnvoyerMailSurveillance();
+                                                //class_mail.EnvoyerMailSerialisation(new_surveillance_reference.get_UID(), utilisateurConnecte.getMail(), db);
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    } else {
+                                        String messageTexteFranceMVO = "";
+                                    }
+                                }
+
+                            }
                             /***Fin de la sérialisation***/
                         }
                         codeInconnu = false;
@@ -484,12 +494,15 @@ public class PreparationMultipleContext
             String lot = "";
             String serie = "";
             String gtin_courant ="";
+            String gtin_courant_sans_ai ="";
             String conditionnementString ="";
             String date_peremption_courant="";
             if (gs1Decoupe.size() != 1)
             {
 
                 List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+                if(produits.size() == 0)
+                    produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtinSansAi));
                 if(produits != null)
                 {
                     if (produits.size() == 1) {
@@ -515,6 +528,7 @@ public class PreparationMultipleContext
                 lot = gs1Decoupe.get(OutilsDecodage.numeroLot);
                 serie = gs1Decoupe.get(OutilsDecodage.numeroSerie);
                 gtin_courant = gs1Decoupe.get(OutilsDecodage.codeGtin);
+                gtin_courant_sans_ai = gs1Decoupe.get(OutilsDecodage.codeGtinSansAi);
                 conditionnementString = gs1Decoupe.get(OutilsDecodage.conditionnementProduit);
                 date_peremption_courant = gs1Decoupe.get(OutilsDecodage.dateDePeremption);
             }
@@ -607,6 +621,9 @@ public class PreparationMultipleContext
                                 if (produit == null) {
                                     produit = ProduitOpenHelper.getUnProduitParGTIN(db, "01" + gtin_courant);
                                 }
+
+                                if(produit == null)
+                                    produit = ProduitOpenHelper.getUnProduitParGTIN(db, gtin_courant_sans_ai);
                             }
 
                             long ph_serialisation_uid = 0;
@@ -621,53 +638,58 @@ public class PreparationMultipleContext
                                 serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int) ph_serialisation_uid);
                             }
 
-                            resultat = serialisation_courante.getResultat();
-                            if (resultat.contentEquals("INACTIVE") || resultat.contentEquals("UNKNOWN")) {
-                                Random SurveillanceReferenceRandom = new Random();
-                                int id_surveillance = SurveillanceReferenceRandom.nextInt();
-                                if (id_surveillance > 0) {
-                                    id_surveillance = id_surveillance * -1;
-                                }
-                                Calendar calendar = Calendar.getInstance();
-                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                                String surveillanceDate = sdf.format(calendar.getTime());
+                            if(serialisation_courante != null)
+                            {
+                                resultat = serialisation_courante.getResultat();
 
-                                SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
-                                String surveillanceHeure = mdformat.format(calendar.getTime());
-
-                                int produit_id = serialisation_courante.getProduitUID();
-                                int serialisationID = serialisation_courante.get_UID();
-                                String motif = GestionCodeErreurNMVO.getMessage(code);
-                                String actionAMener = "";
-                                String statut = "NON LU";
-                                String traitePar = utilisateurConnecte.getIdentifiant();
-                                String traiteDate = surveillanceDate;
-                                String traiteHeure = surveillanceHeure;
-                                String produitLot = serialisation_courante.getNumeroLot();
-                                String produitDatePéremption = serialisation_courante.getDatePeremptionAAMMJJ();
-                                String produitNumeroSerie = serialisation_courante.getNumeroSerie();
-
-                                SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
-
-                                //long rowUID_surveillance = SurveillanceReferenceOpenHelper.insererSurveillanceReferenceEnBDD(db, new_surveillance_reference);
-                                long rowUID_surveillance = -1;
-
-                                if (rowUID_surveillance != -1) {
-                                    //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE, new_surveillance_reference.getSerialexpressUUID(), new_surveillance_reference.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
-
-                                    try {
-                                        EnvoyerMailSurveillance class_mail = new EnvoyerMailSurveillance();
-                                        //class_mail.EnvoyerMailSerialisation(new_surveillance_reference.get_UID(), utilisateurConnecte.getMail(), db);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
+                                if (resultat.contentEquals("INACTIVE") || resultat.contentEquals("UNKNOWN")) {
+                                    Random SurveillanceReferenceRandom = new Random();
+                                    int id_surveillance = SurveillanceReferenceRandom.nextInt();
+                                    if (id_surveillance > 0) {
+                                        id_surveillance = id_surveillance * -1;
                                     }
+                                    Calendar calendar = Calendar.getInstance();
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                    String surveillanceDate = sdf.format(calendar.getTime());
+
+                                    SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
+                                    String surveillanceHeure = mdformat.format(calendar.getTime());
+
+                                    int produit_id = serialisation_courante.getProduitUID();
+                                    int serialisationID = serialisation_courante.get_UID();
+                                    String motif = GestionCodeErreurNMVO.getMessage(code);
+                                    String actionAMener = "";
+                                    String statut = "NON LU";
+                                    String traitePar = utilisateurConnecte.getIdentifiant();
+                                    String traiteDate = surveillanceDate;
+                                    String traiteHeure = surveillanceHeure;
+                                    String produitLot = serialisation_courante.getNumeroLot();
+                                    String produitDatePéremption = serialisation_courante.getDatePeremptionAAMMJJ();
+                                    String produitNumeroSerie = serialisation_courante.getNumeroSerie();
+
+                                    SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
+
+                                    //long rowUID_surveillance = SurveillanceReferenceOpenHelper.insererSurveillanceReferenceEnBDD(db, new_surveillance_reference);
+                                    long rowUID_surveillance = -1;
+
+                                    if (rowUID_surveillance != -1) {
+                                        //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, SurveillanceReferenceOpenHelper.Constantes.TABLE_SURVEILLANCEREFERENCE, new_surveillance_reference.getSerialexpressUUID(), new_surveillance_reference.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+
+                                        try {
+                                            EnvoyerMailSurveillance class_mail = new EnvoyerMailSurveillance();
+                                            //class_mail.EnvoyerMailSerialisation(new_surveillance_reference.get_UID(), utilisateurConnecte.getMail(), db);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+
+                                    //((BarcodeCaptureActivity) context).afficherAlerteFranceMVO(produit.getDesignation_interne(), resultat, serie, motif);
+
+                                } else {
+                                    String messageTexteFranceMVO = "";
                                 }
-
-                                //((BarcodeCaptureActivity) context).afficherAlerteFranceMVO(produit.getDesignation_interne(), resultat, serie, motif);
-
-                            } else {
-                                String messageTexteFranceMVO = "";
                             }
+
                         }
 
                         /***Fin de la sérialisation***/

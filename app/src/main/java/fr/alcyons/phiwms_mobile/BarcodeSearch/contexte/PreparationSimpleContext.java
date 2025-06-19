@@ -138,6 +138,8 @@ public class PreparationSimpleContext
                 if (gs1Decoupe.size() != 1)
                 {
                     List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+                    if(produits.isEmpty())
+                        produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtinSansAi));
                     if(produits != null)
                     {
                         if (produits.size() == 1) {
@@ -493,6 +495,8 @@ public class PreparationSimpleContext
             {
 
                 List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+                if(produits.isEmpty())
+                    produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtinSansAi));
                 if(produits != null)
                 {
                     if (produits.size() == 1) {

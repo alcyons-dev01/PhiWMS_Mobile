@@ -13,6 +13,7 @@ import java.util.Map;
 public class OutilsDecodage {
 
     public static String codeGtin = "codeGtin";
+    public static String codeGtinSansAi = "codeGtinSansAi";
     public static String numeroLot = "numLot";
     public static String dateDePeremption = "datePeremption";
     public static String conditionnementProduit = "conditionnement";
@@ -109,6 +110,7 @@ public class OutilsDecodage {
         String GTIN_AI_VA = "01";
         int GTIN_Lenght_VN = 2+14;  // AI + n14
         String GTIN_VA = "";
+        String GTIN_VA_SANS_AI = "";
 
         // Taille variable
         String SerieNumero_AI_VA = "21";
@@ -166,8 +168,6 @@ public class OutilsDecodage {
         }
 
         if (scanner_VA.length() > 16) {
-
-
             int i=0;
             while (i<7) {
                 String AI_Courant = "";
@@ -180,6 +180,7 @@ public class OutilsDecodage {
                         GTIN_VA = scanner_VA.substring(0, GTIN_Lenght_VN);
                         GTIN_VA = GTIN_VA.substring(2);
                         scanner_VA = scanner_VA.substring(GTIN_Lenght_VN);
+                        GTIN_VA_SANS_AI = GTIN_VA;
                         GTIN_VA = GTIN_AI_VA + GTIN_VA;
                         break;
                     case "21":
@@ -246,6 +247,7 @@ public class OutilsDecodage {
 
         if (GTIN_VA.length() == 16) {
             map.put(codeGtin, GTIN_VA);
+            map.put(codeGtinSansAi, GTIN_VA_SANS_AI);
             map.put(numeroSerie, SerieNumero_VA);
             map.put(numeroLot, Lot_VA);
             map.put(dateDePeremption, PeremptionDate_VA);

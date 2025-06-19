@@ -84,6 +84,8 @@ public class NewControleRetourMultipleContext  {
         if (gs1Decoupe.size() != 1)
         {
             List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+            if(produits.size() == 0)
+                produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtinSansAi));
 
             if (produits.size() == 1) {
                 produitCourant = produits.get(0);
@@ -226,6 +228,8 @@ public class NewControleRetourMultipleContext  {
         if (gs1Decoupe.size() != 1)
         {
             List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+            if(produits.size() == 0)
+                produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtinSansAi));
 
             if (produits.size() == 1) {
                 produitCourant = produits.get(0);

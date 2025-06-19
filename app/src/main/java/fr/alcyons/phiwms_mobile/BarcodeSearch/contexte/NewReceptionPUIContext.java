@@ -148,6 +148,12 @@ public class NewReceptionPUIContext extends MainActivity {
                 {
 
                     List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+
+                    if(produits.size() == 0)
+                    {
+                        produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtinSansAi));
+                    }
+
                     if(produits != null)
                     {
                         if (produits.size() == 1) {
@@ -311,13 +317,47 @@ public class NewReceptionPUIContext extends MainActivity {
                 }
                 if(reliquat_courant != null && reliquat_courant.getQteReliquat_X() ==0)
                 {
-                    ((ScannerPreparationActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
+                    String activityName = context.getClass().getSimpleName();
+
+                    if(activityName.contentEquals("BarcodeCaptureActivity"))
+                    {
+                        ((BarcodeCaptureActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                    }
+                    else if(activityName.contentEquals("ScannerPreparationActivity"))
+                    {
+                        ((ScannerPreparationActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                    }
+                    else if(activityName.contentEquals("ScannerReceptionActivity"))
+                    {
+                        ((ScannerReceptionActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                    }
+                    else
+                    {
+                        ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                    }
                     emplacement_courant = null;
                     validation = true;
                 }
                 else if(!produit_present)
                 {
-                    ((ScannerPreparationActivity)context).afficherSnackBar("Produit non présent dans la liste");
+                    String activityName = context.getClass().getSimpleName();
+
+                    if(activityName.contentEquals("BarcodeCaptureActivity"))
+                    {
+                        ((BarcodeCaptureActivity) context).afficherSnackBar("Produit non présent dans la liste");
+                    }
+                    else if(activityName.contentEquals("ScannerPreparationActivity"))
+                    {
+                        ((ScannerPreparationActivity) context).afficherSnackBar("Produit non présent dans la liste");
+                    }
+                    else if(activityName.contentEquals("ScannerReceptionActivity"))
+                    {
+                        ((ScannerReceptionActivity) context).afficherSnackBar("Produit non présent dans la liste");
+                    }
+                    else
+                    {
+                        ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Produit non présent dans la liste");
+                    }
                     nouveau_lot = null;
                     qte_lot_courant = 0;
                     emplacement_courant = null;
@@ -567,6 +607,10 @@ public class NewReceptionPUIContext extends MainActivity {
             {
 
                 List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+
+                if(produits.size() == 0)
+                    produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtinSansAi));
+
                 if(produits != null)
                 {
                     if (produits.size() == 1) {
