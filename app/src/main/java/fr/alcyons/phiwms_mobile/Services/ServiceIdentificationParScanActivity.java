@@ -99,7 +99,7 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
                         // Si le code est valide, on lance l'activité de liste des produits correspondants à ce code
                         Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
                         Bundle extras = super.getBundle();
-                        extras.putString("codeGS1", codeComplet);
+                        extras.putString("codeGS1", gs1Decoupe.get("codeGtin"));
                         newIntent.putExtras(extras);
                         ServiceIdentificationParScanActivity.this.startActivity(newIntent);
                         ServiceIdentificationParScanActivity.this.finish();

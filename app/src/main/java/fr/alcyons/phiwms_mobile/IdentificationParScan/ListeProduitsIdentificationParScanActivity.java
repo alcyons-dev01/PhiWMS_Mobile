@@ -23,11 +23,13 @@ import java.util.Objects;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Produit_IdentificationParScanAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 import fr.alcyons.phiwms_mobile.Services.ServiceIdentificationParScanActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceReceptionPuiActivity;
 
 public class ListeProduitsIdentificationParScanActivity extends ServiceActivity {
 
@@ -45,29 +47,14 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
         imm = (InputMethodManager) ListeProduitsIdentificationParScanActivity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
         // Récupération de la liste_view à remplir
         listViewProduits = findViewById(R.id.listeView);
-        codeInconnue = Objects.requireNonNull(intent.getExtras()).getString("codeInconnue");
-        if(codeInconnue == null)
-        {
-            codeInconnue = "";
-        }
-
         listeAAfficher = new ArrayList<>();
 
         if (intent.getExtras().getString("codeGS1") != null) {
             final String codeGS1 = intent.getExtras().getString("codeGS1");
-            assert codeGS1 != null;
-            Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeGS1);
-            // Récupération et gestion de la liste des produits correspondants en fonction de la longueur de cette liste
-            if(gs1Decoupe.size() > 1)
-            {
-                listeAAfficher = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
-            }
-            else
-            {
-                listeAAfficher = ProduitOpenHelper.getProduitsParCodeInconnue(db, codeGS1);
-            }
+            listeAAfficher = ProduitOpenHelper.getProduitsParGTIN(db, codeGS1);
+
         } else if(codeInconnue != null && !codeInconnue.contentEquals("")){
-            // Récupération et gestion de la liste des produits correspondants en fonction de la longueur de cette liste
+            codeInconnue = intent.getExtras().getString("codeInconnue");
             listeAAfficher = ProduitOpenHelper.getProduitsParCodeInconnue(db, codeInconnue);
         }
 
@@ -89,6 +76,12 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
+                //ListeProduitsIdentificationParScanActivity.this.finish();
+                Intent intent = new Intent(ListeProduitsIdentificationParScanActivity.this, NavigationActivity.class);
+                Bundle extras = new Bundle();
+                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                intent.putExtras(extras);
+                ListeProduitsIdentificationParScanActivity.this.startActivity(intent);
                 ListeProduitsIdentificationParScanActivity.this.finish();
             }
         });

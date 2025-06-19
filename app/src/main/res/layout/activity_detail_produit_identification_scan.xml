@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/white"
     tools:context="fr.alcyons.phiwms_mobile.IdentificationParScan.DetailProduitIdentificationParScanActivity">
 
@@ -77,13 +78,12 @@
 
                     <ImageView
                         android:id="@+id/boutonEditCode"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:layout_gravity="center_horizontal"
-                        android:layout_marginBottom="25dp"
                         android:clickable="true"
-                        android:src="@drawable/ic_bouton_modif"
-                        android:tint="@android:color/black" />
+                        android:src="@drawable/ic_datamatrix"
+                        android:tint="@color/bleu_clair_alcyons" />
 
                     <ImageView
                         android:id="@+id/boutonSuppressionCode"
@@ -92,7 +92,8 @@
                         android:layout_gravity="center_horizontal"
                         android:clickable="true"
                         android:src="@drawable/ic_delete"
-                        android:tint="@android:color/black" />
+                        android:tint="@android:color/black"
+                        android:visibility="gone"/>
                 </LinearLayout>
 
             </LinearLayout>
@@ -117,7 +118,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="gone">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -144,7 +146,8 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:layout_below="@id/zoneGtin"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="gone">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -171,7 +174,8 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/zoneSerie"
                     android:layout_margin="10dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="gone">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -204,7 +208,60 @@
                     android:text="ATTENTION : Produit périmé"
                     android:textColor="@android:color/white"
                     android:textSize="17sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:visibility="gone"/>
+
+                <LinearLayout
+                    android:id="@+id/layoutIdentification"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_below="@id/zoneGtin">
+
+                    <TextView
+                        android:id="@+id/warningNonIdentifie"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:background="@android:color/holo_red_light"
+                        android:gravity="center_horizontal"
+                        android:padding="15dp"
+                        android:text="RÉFÉRENCE NON IDENTIFIÉE"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"/>
+
+                    <TextView
+                        android:id="@+id/referenceIdentifie"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:background="@color/vert"
+                        android:gravity="center_horizontal"
+                        android:padding="15dp"
+                        android:text="RÉFÉRENCE IDENTIFIÉE"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"/>
+
+                    <TextView
+                        android:id="@+id/referenceEnCoursIdentification"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:background="@color/bleu_clair_alcyons"
+                        android:gravity="center_horizontal"
+                        android:padding="15dp"
+                        android:text="RÉFÉRENCE EN COURS D'IDENTIFICATION"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"/>
+
+                </LinearLayout>
+
 
                 <LinearLayout
                     android:id="@+id/zonePeremption"
@@ -212,7 +269,8 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/warningPeremption"
                     android:layout_margin="10dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="gone">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -239,7 +297,8 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/zonePeremption"
                     android:layout_margin="10dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="gone">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -264,7 +323,7 @@
                     android:id="@+id/separateur2"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_below="@id/zoneConditionnement"
+                    android:layout_below="@id/layoutIdentification"
                     android:layout_margin="15dp"
                     android:background="@android:color/darker_gray" />
 
@@ -362,6 +421,33 @@
 
                     <TextView
                         android:id="@+id/condAchat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/zoneCondDistrib"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/zoneCondAchat"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Conditionnement d'achat Phi : "
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/condDistrib"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=""

@@ -1,34 +1,51 @@
 package fr.alcyons.phiwms_mobile.IdentificationParScan;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
+import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.MedicalObjective;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparationActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceIdentificationParScanActivity;
+import fr.alcyons.phiwms_mobile.Services.ServicePreparationPadActivity;
+import fr.alcyons.phiwms_mobile.Services.ServicePreparationPufActivity;
 
 public class DetailProduitIdentificationParScanActivity extends ServiceActivity {
 
@@ -36,6 +53,7 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
 
     String codeComplet;
     String messageAlerte;
+    String ancienGTIN;
     Boolean estCodeGS1;
     boolean confirmation;
 
@@ -52,15 +70,31 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
         photo = (ImageView) findViewById(R.id.photo);
 
         messageAlerte = "";
+        codeComplet = "";
+        estCodeGS1 = false;
         // Récupération des variables globales et du produit selectionné
         produitSelectionne = ProduitOpenHelper.getProduitByID(db, Objects.requireNonNull(intent.getExtras()).getInt("produitSelectionneID"));
+        ancienGTIN = produitSelectionne.getGTIN();
         if (intent.getExtras().getString("codeGS1") != null) {
             codeComplet = intent.getExtras().getString("codeGS1");
             estCodeGS1 = true;
-        } else {
+        } else if(intent.getExtras().getString("codeInconnue") != null){
             codeComplet = intent.getExtras().getString("codeInconnue");
             messageAlerte = "Code scanné inconnue";
             estCodeGS1 = false;
+        }
+
+        if(!codeComplet.contentEquals(""))
+        {
+            ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.VISIBLE);
+        }
+        else if(produitSelectionne.getGTIN().contentEquals("") && produitSelectionne.getCodeInconnue().contentEquals(""))
+        {
+            ((TextView) findViewById(R.id.warningNonIdentifie)).setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            ((TextView) findViewById(R.id.referenceIdentifie)).setVisibility(View.VISIBLE);
         }
 
         //récupération photo
@@ -112,49 +146,20 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
                 } else {
                     produitSelectionne.setCodeInconnue("");
                 }
-
-                long rowId = ProduitOpenHelper.mettreAJourProduit(db, produitSelectionne);
-                if (rowId != -1) {
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitSelectionne.getPhiMR4UUID(), produitSelectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
-                }
                 codeComplet = "";
                 messageAlerte = "";
                 onResume();
             }
         });
 
-    }
-
-    @SuppressLint("SimpleDateFormat")
-    @Override
-    public void onResume() {
-        super.onResume();
-        invalidateOptionsMenu();
-        String conditionnement = "";
-        String numLot = "";
-        String dateP = "";
-        String numeroSerie = "";
-
         // On gère l'affichage en fonction de si codeComplet a déjà une valeur ou non
         if (estCodeGS1) {
-            Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeComplet);
-            if (gs1Decoupe.size() != 1) {
-                dateP = gs1Decoupe.get(OutilsDecodage.dateDePeremption);
-                conditionnement = gs1Decoupe.get(OutilsDecodage.conditionnementProduit);
-                numLot = gs1Decoupe.get(OutilsDecodage.numeroLot);
-                numeroSerie = gs1Decoupe.get(OutilsDecodage.numeroSerie);
-                if (!produitSelectionne.getGTIN().equals(gs1Decoupe.get(OutilsDecodage.codeGtin))) {
-                    produitSelectionne.setGTIN(Objects.requireNonNull(gs1Decoupe.get(OutilsDecodage.codeGtin)).trim());
-
-                    long rowId = ProduitOpenHelper.mettreAJourProduit(db, produitSelectionne);
-                    if (rowId != -1) {
-                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitSelectionne.getPhiMR4UUID(), produitSelectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
-                    }
-                }
+            if (produitSelectionne.getGTIN().equals("") || produitSelectionne.getGTIN() == null) {
+                produitSelectionne.setGTIN(codeComplet);
             }
-        } else {
-            ((TextView) findViewById(R.id.warningPeremption)).setText(messageAlerte.trim());
-
+        }
+        else
+        {
             boolean produitAModifier = false;
             if (produitSelectionne.getCodeInconnue() == null) {
                 produitAModifier = true;
@@ -164,29 +169,39 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
 
             if (produitAModifier) {
                 produitSelectionne.setCodeInconnue(codeComplet.trim());
-
-                long rowId = ProduitOpenHelper.mettreAJourProduit(db, produitSelectionne);
-                if (rowId != -1) {
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitSelectionne.getPhiMR4UUID(), produitSelectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
-                }
             }
         }
 
+
+        String identification = produitSelectionne.getGTIN();
+        if(identification.contentEquals(""))
+            identification = produitSelectionne.getCodeInconnue();
+
+        if(!identification.contentEquals(""))
+            ((ImageView) findViewById(R.id.boutonEditCode)).setVisibility(View.GONE);
         // Affichage des valeurs
         ((TextView) findViewById(R.id.nomProduit)).setText(produitSelectionne.getDesignation_interne().trim());
-        ((TextView) findViewById(R.id.codeGS1)).setText(codeComplet.trim());
-        ((TextView) findViewById(R.id.gtin)).setText(produitSelectionne.getGTIN().trim());
+        ((TextView) findViewById(R.id.codeGS1)).setText(identification);
         ((TextView) findViewById(R.id.nomFournisseur)).setText(produitSelectionne.getFournisseur().trim());
         ((TextView) findViewById(R.id.referenceFournisseur)).setText(produitSelectionne.getRef_fourni().trim());
         ((TextView) findViewById(R.id.categorie)).setText(produitSelectionne.getCategorie().trim());
         ((TextView) findViewById(R.id.condAchat)).setText(String.valueOf(produitSelectionne.getCond_achat()).trim());
-        ((TextView) findViewById(R.id.numLot)).setText(numLot.trim());
-        ((TextView) findViewById(R.id.conditionnement)).setText(conditionnement.trim());
-        assert numeroSerie != null;
-        ((TextView) findViewById(R.id.numSerie)).setText(numeroSerie.trim());
+        ((TextView) findViewById(R.id.condDistrib)).setText(String.valueOf(produitSelectionne.getCond_distrib()).trim());
+
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    @Override
+    public void onResume() {
+        super.onResume();
+        invalidateOptionsMenu();
+
+        //((TextView) findViewById(R.id.numLot)).setText(numLot.trim());
+       // ((TextView) findViewById(R.id.conditionnement)).setText(conditionnement.trim());
+        //((TextView) findViewById(R.id.numSerie)).setText(numeroSerie.trim());
 
         // Gestion de la date de péremption
-        if (!Objects.equals(dateP, "")) {
+        /*if (!Objects.equals(dateP, "")) {
             DateFormat dateFormat;
             assert dateP != null;
             if (dateP.length() == 5) {
@@ -214,24 +229,6 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
                 String dateAAfficher = newDateFormat.format(datePeremption);
                 ((TextView) findViewById(R.id.datePeremption)).setText(dateAAfficher);
             }
-        }
-
-        /*if(!numeroSerie.contentEquals("") && !produitSelectionne.isSuivi_Serialisation())
-        {
-            boolean activer_serialisation = Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Information", "Ce produit est sérialisé, voulez-vous mettre sa fiche à jour ?", "OuiNon");
-            if(activer_serialisation)
-            {
-                boolean reception = Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Information", "A quel moment souhaitez-vous sérialiser ?", "serialisation");
-                if(reception)
-                {
-                    produitSelectionne.setSerialiser_Reception_Delivrance(true);
-                }
-
-                produitSelectionne.setSuivi_Serialisation(true);
-
-                ProduitOpenHelper.mettreAJourProduit(db, produitSelectionne);
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitSelectionne.getPhiMR4UUID(), produitSelectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
-            }
         }*/
     }
 
@@ -250,33 +247,65 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
                         if (gs1Decoupe.size() != 1) {
                             // Si le code fourni est valide, on recharge l'activité actuelle avec le nouveau code
                             // Vérification utilisateur
-                            confirmation = Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Verification", "Etes vous sûrs de vouloir changer la référence GTIN ?", "OuiNon");
+                            //confirmation = Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Verification", "Etes vous sûrs de vouloir changer la référence GTIN ?", "OuiNon");
                             estCodeGS1 = true;
                         } else {
                             // Si le code fourni n'est pas un code GS1, on affiche un message d'erreur
-                            confirmation = Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Verification", "Etes vous sûrs de vouloir changer la référence Inconnue ?", "OuiNon");
+                            //confirmation = Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Verification", "Etes vous sûrs de vouloir changer la référence Inconnue ?", "OuiNon");
                             estCodeGS1 = false;
                         }
-
+                        confirmation = true;
                         if (confirmation) {
-                            Intent newIntent = new Intent(DetailProduitIdentificationParScanActivity.this, DetailProduitIdentificationParScanActivity.class);
-                            Bundle extras = super.getBundle();
-                            extras.putInt("produitSelectionneID", produitSelectionne.getID_produit());
                             if (estCodeGS1) {
-                                extras.putString("codeGS1", codeRecu);
-                                extras.putString("codeInconnue", null);
+                                List<Produit> listeProduitRecherche = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get("codeGtin"));
+                                boolean modifiable = true;
+                                for(Produit produitCourant : listeProduitRecherche)
+                                {
+                                    if(produitCourant.getID_produit() != produitSelectionne.getID_produit())
+                                    {
+                                        modifiable = false;
+                                        break;
+                                    }
+                                }
+                                if(modifiable)
+                                {
+                                    produitSelectionne.setGTIN(gs1Decoupe.get("codeGtin"));
+                                    ((TextView) findViewById(R.id.codeGS1)).setText(gs1Decoupe.get("codeGtin"));
+                                    ((TextView) findViewById(R.id.referenceIdentifie)).setVisibility(View.GONE);
+                                    ((TextView) findViewById(R.id.warningNonIdentifie)).setVisibility(View.GONE);
+                                    ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.VISIBLE);
+                                }
+                                else
+                                {
+                                    Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Erreur", "Code GTIN déjà utilisé pour une autre référence", "alerte");
+                                }
                             } else {
-                                extras.putString("codeGS1", null);
-                                extras.putString("codeInconnue", codeRecu);
+                                List<Produit> listeProduitRecherche = ProduitOpenHelper.getProduitByCodeInconnu(db, codeRecu);
+                                boolean modifiable = true;
+                                for(Produit produitCourant : listeProduitRecherche)
+                                {
+                                    if(produitCourant.getID_produit() != produitSelectionne.getID_produit())
+                                    {
+                                        modifiable = false;
+                                        break;
+                                    }
+                                }
+                                if(modifiable)
+                                {
+                                    produitSelectionne.setCodeInconnue(codeRecu);
+                                    ((TextView) findViewById(R.id.codeGS1)).setText(codeRecu);
+                                    ((TextView) findViewById(R.id.referenceIdentifie)).setVisibility(View.GONE);
+                                    ((TextView) findViewById(R.id.warningNonIdentifie)).setVisibility(View.GONE);
+                                    ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.VISIBLE);
+                                }
+                                else
+                                {
+                                    Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Erreur", "Code d'identification déjà utilisé pour une autre référence", "alerte");
+                                }
+
                             }
-
-                            newIntent.putExtras(extras);
-
-                            DetailProduitIdentificationParScanActivity.this.startActivity(newIntent);
-                            DetailProduitIdentificationParScanActivity.this.finish();
                         }
                     }
-
                     break;
                 }
             }
@@ -285,8 +314,112 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        //Récupération du menu
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_action, menu);
+
+        menu.findItem(R.id.menuSaveCircle).setVisible(true);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem itemSave = menu.findItem(R.id.menuSaveCircle);
+
+        itemSave.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                if(ancienGTIN.contentEquals(produitSelectionne.getGTIN()))
+                {
+                    retourService(DetailProduitIdentificationParScanActivity.this.getBundle());
+                }
+                else
+                {
+                    onMenuSaveClick();
+                }
+                return true;
+            }
+        });
+
+        return true;
+    }
+
+    private void onMenuSaveClick()
+    {
+        afficherAlerteConfirmationRetour(DetailProduitIdentificationParScanActivity.this, LayoutInflater.from(DetailProduitIdentificationParScanActivity.this), DetailProduitIdentificationParScanActivity.super.getBundle());
+    }
+
+    public void afficherAlerteConfirmationRetour(Context context, LayoutInflater inflater, final Bundle bundle) {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
+        View layout = inflater.inflate(R.layout.alerte_confirmation_mail, null);
+
+        LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
+        LinearLayout buttonAnnuler = (LinearLayout) layout.findViewById(R.id.buttonAnnuler);
+        TextView messageTextView = (TextView) layout.findViewById(R.id.messageFin);
+        messageTextView.setText("Souhaitez vous enregistrer les modifications ?");
+        builder.setView(layout);
+
+        final androidx.appcompat.app.AlertDialog alertDialog = builder.create();
+        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
+        alertDialog.show();
+
+        zoneok.setOnClickListener(v -> {
+            long rowId = ProduitOpenHelper.mettreAJourProduit(db, produitSelectionne);
+            if (rowId != -1) {
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitSelectionne.getPhiMR4UUID(), produitSelectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
+                Random randomaction = new Random();
+                int actionId = randomaction.nextInt();
+                if(actionId > 0)
+                    actionId= actionId*-1;
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date dateAction =new Date();
+                String date_string = parseFormat.format(dateAction);
+                ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", produitSelectionne.getID_produit(), "", "Identification Par Scan");
+                ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+
+                Random randomactionligne = new Random();
+                int actionligneId = randomactionligne.nextInt();
+                if(actionligneId > 0)
+                    actionligneId= actionligneId*-1;
+
+                ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.getId(), "PH_Produit", produitSelectionne.getID_produit(), produitSelectionne.getGTIN(), 0, 0, produitSelectionne.getDesignation_interne());
+                ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, actionUtilisateur_ligne.getPhiMR4UUID(), actionUtilisateur_ligne.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                ElementASynchroniserOpenHelper.toutSynchroniser(DetailProduitIdentificationParScanActivity.this, db, utilisateurConnecte, false);
+            }
+            alertDialog.dismiss();
+            retourService(bundle);
+        });
+
+        buttonAnnuler.setOnClickListener(v -> {
+            alertDialog.dismiss();
+            retourService(bundle);
+        });
+    }
+
+    private void retourService(final Bundle bundle)
+    {
+        Intent detailPreparationIntent = null;
+        detailPreparationIntent = new Intent(DetailProduitIdentificationParScanActivity.this, ServiceIdentificationParScanActivity.class);
+
+        Bundle detailPreparationBundle = super.getBundle();
+        detailPreparationIntent.putExtras(detailPreparationBundle);
+        DetailProduitIdentificationParScanActivity.this.startActivity(detailPreparationIntent);
+        DetailProduitIdentificationParScanActivity.this.finish();
+    }
+
+    @Override
     public void onBackPressed()
     {
-        DetailProduitIdentificationParScanActivity.this.finish();
+        if(ancienGTIN.contentEquals(produitSelectionne.getGTIN())) {
+            retourService(DetailProduitIdentificationParScanActivity.this.getBundle());
+        }
+        else
+        {
+            onMenuSaveClick();
+        }
     }
 }

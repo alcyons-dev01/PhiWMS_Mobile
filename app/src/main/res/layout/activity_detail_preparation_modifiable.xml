@@ -90,23 +90,15 @@
         </LinearLayout>
 
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipeRefreshLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/separateur"
+        <ListView
+            android:id="@+id/listeView"
             android:layout_below="@id/barreDeTitre"
-            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:descendantFocusability="afterDescendants"
             android:paddingLeft="10dp"
-            android:paddingRight="10dp">
+            android:paddingRight="10dp"/>
 
-            <ListView
-                android:id="@+id/listeView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:descendantFocusability="afterDescendants"/>
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     </RelativeLayout>
 

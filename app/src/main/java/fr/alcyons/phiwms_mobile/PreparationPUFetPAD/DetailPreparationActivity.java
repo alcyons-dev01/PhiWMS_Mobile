@@ -235,11 +235,6 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         {
             if (statutConnexion && passageParOnCreate)
             {
-
-                if (!swipeRefreshLayout.isRefreshing()) {
-                    afficherSpinner(DetailPreparationActivity.this, LayoutInflater.from(DetailPreparationActivity.this));
-                }
-
                 RequestQueue requestQueue = Volley.newRequestQueue(DetailPreparationActivity.this);
                 String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequetePreparationDetail+ph_preparation_Selectionne.getUID();
 
@@ -1222,12 +1217,9 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
     private void retourService(final Bundle bundle)
     {
         Intent detailPreparationIntent = null;
-        if(genre_preparation.contentEquals("PUF"))
-        {
+        if (genre_preparation.contentEquals("PUF")) {
             detailPreparationIntent = new Intent(DetailPreparationActivity.this, ServicePreparationPufActivity.class);
-        }
-        else
-        {
+        } else {
             detailPreparationIntent = new Intent(DetailPreparationActivity.this, ServicePreparationPadActivity.class);
         }
         Bundle detailPreparationBundle = super.getBundle();

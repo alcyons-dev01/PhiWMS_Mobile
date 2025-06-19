@@ -61,7 +61,7 @@
                         android:id="@+id/layoutStock"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="2"
+                        android:layout_weight="1"
                         android:layout_gravity="center"
                         android:layout_marginTop="2dp"
                         android:orientation="vertical">
@@ -89,7 +89,7 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="4"
+                        android:layout_weight="5"
                         android:layout_margin="2dp"
                         android:orientation="vertical"
                         android:paddingLeft="10dp">
@@ -102,7 +102,7 @@
 
                             <TextView
                                 android:id="@+id/labelLot"
-                                android:layout_width="30dp"
+                                android:layout_width="45dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginRight="10dp"
                                 android:text="Lot"
@@ -128,7 +128,7 @@
 
                             <TextView
                                 android:id="@+id/labelDate"
-                                android:layout_width="30dp"
+                                android:layout_width="45dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginRight="10dp"
                                 android:text="Date"

@@ -61,7 +61,10 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_Preparation_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne_ControleRetour_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.CreationLotControleDesRetoursActivity;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeLotsControleDesRetoursActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Lot_PreparationAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
@@ -211,6 +214,7 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
             }
         }
 
+        lotAdapteList.add(phPreparationLignePreparationAdapte.new LotAdapte("row_ajouter"));
         lotAdapteList.add(phPreparationLignePreparationAdapte.new LotAdapte("row_annuler"));
 
         // Initialisation de quantiteDemandee, quantitePreparee, restantAPre
@@ -298,6 +302,11 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
                     MAJVisuel();
                     lotPreparationAdapter.quantiteAPreparer = ph_preparation_ligne_courant.getQte_APreparer();
                     lotPreparationAdapter.full = false;
+                }
+                else if(courant.getNumLot().contentEquals("row_ajouter"))
+                {
+                    MAJListeLot();
+                    clicAjoutManuel();
                 }
                 else
                 {
@@ -725,6 +734,18 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
         int index = -1;
         for(int i = 0; i < lotAdapteList.size(); i++)
         {
+            if(lotAdapteList.get(i).getNumLot().contentEquals("row_ajouter"))
+            {
+                index = i;
+                break;
+            }
+        }
+        if(index != -1)
+            lotAdapteList.remove(index);
+
+        index = -1;
+        for(int i = 0; i < lotAdapteList.size(); i++)
+        {
             if(lotAdapteList.get(i).getNumLot().contentEquals("row_annuler"))
             {
                 index = i;
@@ -893,5 +914,18 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
         }
 
         return disponible[0];
+    }
+
+    private void clicAjoutManuel()
+    {
+        Bundle clicBoutonAjouterManuellement_Bundle = ListeLotPreparationActivity.super.getBundle();
+        clicBoutonAjouterManuellement_Bundle.putInt("produitID", produit.getID_produit());
+        clicBoutonAjouterManuellement_Bundle.putInt("depotID", depot.getDepot_UID());
+        clicBoutonAjouterManuellement_Bundle.putInt("PreparationID", ph_preparation_ligne_courant.getPreparationID());
+        clicBoutonAjouterManuellement_Bundle.putInt("PreparationLigneID", ph_preparation_ligne_courant.get_UID());
+
+        Intent clicBoutonAjouterManuellement_Intent = new Intent(ListeLotPreparationActivity.this, CreationLotActivity.class);
+        clicBoutonAjouterManuellement_Intent.putExtras(clicBoutonAjouterManuellement_Bundle);
+        ListeLotPreparationActivity.this.startActivityForResult(clicBoutonAjouterManuellement_Intent, RETOUR_LOT);
     }
 }
