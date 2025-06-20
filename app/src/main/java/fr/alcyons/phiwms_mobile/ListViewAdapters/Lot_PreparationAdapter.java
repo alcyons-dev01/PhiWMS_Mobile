@@ -132,8 +132,11 @@ public class Lot_PreparationAdapter extends ArrayAdapter {
 
                 if (datePeremption != null && !datePeremption.contentEquals("")) {
                     try {
-                        dateExp = dateDecodeur.parse(lotAdapte.getDatePeremption().substring(0, 10));
-                        viewHolder.dateExpiration.setText(dateFormat.format(dateExp));
+                        if(lotAdapte.getDatePeremption().length() == 10)
+                        {
+                            dateExp = dateDecodeur.parse(lotAdapte.getDatePeremption().substring(0, 10));
+                            viewHolder.dateExpiration.setText(dateFormat.format(dateExp));
+                        }
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }

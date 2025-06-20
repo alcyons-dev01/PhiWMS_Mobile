@@ -827,7 +827,8 @@ public class ScannerPreparationActivity extends ServiceActivity {
                                         //gestion de l'affichage de la date de péremption
                                         String dateDePeremption = lotCourant.getDatePeremption();
                                         String[] dateDePeremtpionTab = dateDePeremption.split("-");
-                                        dateDePeremption = dateDePeremtpionTab[2] + "/" + dateDePeremtpionTab[1] + "/" + dateDePeremtpionTab[0];
+                                        if(dateDePeremtpionTab.length == 3)
+                                            dateDePeremption = dateDePeremtpionTab[2] + "/" + dateDePeremtpionTab[1] + "/" + dateDePeremtpionTab[0];
 
 
                                         ((TextView) findViewById(R.id.datePeremptionLot)).setText(dateDePeremption);

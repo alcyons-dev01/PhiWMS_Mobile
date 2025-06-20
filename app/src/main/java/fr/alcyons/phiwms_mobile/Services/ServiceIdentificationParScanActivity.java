@@ -12,6 +12,7 @@ import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.IdentificationParScan.ListeProduitsIdentificationParScanActivity;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
@@ -50,7 +51,7 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
         super.onResume();
         invalidateOptionsMenu();
         if (firstPassage) {
-            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
             {
                 // Si on passe pour la première fois, on lance l'activité de décodage.
                 Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ScannerSearchOnlyActivity.class);
@@ -94,28 +95,49 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
             if (requestCode == CodesEchangesActivites.RETOUR_CODE_GS1) {
                 String codeComplet = data.getStringExtra("code");
                 if (codeComplet != null && !codeComplet.contentEquals("")) {
-                    Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeComplet);
-                    if (gs1Decoupe.size() != 1) {
-                        // Si le code est valide, on lance l'activité de liste des produits correspondants à ce code
+                    if(codeComplet.startsWith("PHITAGTIN:"))
+                    {
+                        String gtin = "";
+                        String[] tabCode = codeComplet.toString().split(":");
+                        if(tabCode.length == 2)
+                        {
+                            gtin = tabCode[1];
+                        }
                         Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
                         Bundle extras = super.getBundle();
-                        extras.putString("codeGS1", gs1Decoupe.get("codeGtin"));
-                        newIntent.putExtras(extras);
-                        ServiceIdentificationParScanActivity.this.startActivity(newIntent);
-                        ServiceIdentificationParScanActivity.this.finish();
-                    } else {
-                        // Si le code fourni n'est pas valide, on affiche un message d'erreur et on redémarre l'activité pour réinitialiser le booléen firstPassage
-                        Toast toast = Toast.makeText(ServiceIdentificationParScanActivity.this, "Le code fourni n'est pas un code GS1, c'est un code inconnu.", Toast.LENGTH_SHORT);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
-
-                        Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
-                        Bundle extras = super.getBundle();
-                        extras.putString("codeInconnue", codeComplet);
+                        extras.putString("codeGS1", gtin);
                         newIntent.putExtras(extras);
                         ServiceIdentificationParScanActivity.this.startActivity(newIntent);
                         ServiceIdentificationParScanActivity.this.finish();
                     }
+                    else
+                    {
+                        Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeComplet);
+                        if (gs1Decoupe.size() != 1) {
+                            // Si le code est valide, on lance l'activité de liste des produits correspondants à ce code
+                            Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
+                            Bundle extras = super.getBundle();
+                            extras.putString("codeGS1", gs1Decoupe.get("codeGtin"));
+                            newIntent.putExtras(extras);
+                            ServiceIdentificationParScanActivity.this.startActivity(newIntent);
+                            ServiceIdentificationParScanActivity.this.finish();
+                        }
+                        else
+                        {
+                            // Si le code fourni n'est pas valide, on affiche un message d'erreur et on redémarre l'activité pour réinitialiser le booléen firstPassage
+                            Toast toast = Toast.makeText(ServiceIdentificationParScanActivity.this, "Le code fourni n'est pas un code GS1, c'est un code inconnu.", Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+
+                            Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
+                            Bundle extras = super.getBundle();
+                            extras.putString("codeInconnue", codeComplet);
+                            newIntent.putExtras(extras);
+                            ServiceIdentificationParScanActivity.this.startActivity(newIntent);
+                            ServiceIdentificationParScanActivity.this.finish();
+                        }
+                    }
+
                 } else {
                     Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
                     Bundle extras = super.getBundle();

@@ -107,7 +107,7 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
         findViewById(R.id.boutonEditCode).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+                if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
                 {
                     Intent newIntent = new Intent(DetailProduitIdentificationParScanActivity.this, ScannerSearchOnlyActivity.class);
                     Bundle bundle = DetailProduitIdentificationParScanActivity.super.getBundle();
@@ -243,21 +243,36 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
                     String codeRecu = data.getStringExtra("code");
                     if(codeRecu != null)
                     {
-                        Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeRecu);
-                        if (gs1Decoupe.size() != 1) {
-                            // Si le code fourni est valide, on recharge l'activité actuelle avec le nouveau code
-                            // Vérification utilisateur
-                            //confirmation = Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Verification", "Etes vous sûrs de vouloir changer la référence GTIN ?", "OuiNon");
-                            estCodeGS1 = true;
-                        } else {
-                            // Si le code fourni n'est pas un code GS1, on affiche un message d'erreur
-                            //confirmation = Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Verification", "Etes vous sûrs de vouloir changer la référence Inconnue ?", "OuiNon");
-                            estCodeGS1 = false;
+                        String codeGtin = "";
+                        if(codeRecu.startsWith("PHITAGTIN:"))
+                        {
+                            String[] tabCode = codeRecu.toString().split(":");
+                            if(tabCode.length == 2)
+                            {
+                                estCodeGS1 = true;
+                                codeGtin = tabCode[1];
+                            }
                         }
+                        else
+                        {
+                            Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeRecu);
+                            if (gs1Decoupe.size() != 1) {
+                                // Si le code fourni est valide, on recharge l'activité actuelle avec le nouveau code
+                                // Vérification utilisateur
+                                //confirmation = Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Verification", "Etes vous sûrs de vouloir changer la référence GTIN ?", "OuiNon");
+                                estCodeGS1 = true;
+                                codeGtin = gs1Decoupe.get("codeGtin");
+                            } else {
+                                // Si le code fourni n'est pas un code GS1, on affiche un message d'erreur
+                                //confirmation = Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Verification", "Etes vous sûrs de vouloir changer la référence Inconnue ?", "OuiNon");
+                                estCodeGS1 = false;
+                            }
+                        }
+
                         confirmation = true;
                         if (confirmation) {
                             if (estCodeGS1) {
-                                List<Produit> listeProduitRecherche = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get("codeGtin"));
+                                List<Produit> listeProduitRecherche = ProduitOpenHelper.getProduitsParGTIN(db, codeGtin);
                                 boolean modifiable = true;
                                 for(Produit produitCourant : listeProduitRecherche)
                                 {
@@ -269,8 +284,8 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
                                 }
                                 if(modifiable)
                                 {
-                                    produitSelectionne.setGTIN(gs1Decoupe.get("codeGtin"));
-                                    ((TextView) findViewById(R.id.codeGS1)).setText(gs1Decoupe.get("codeGtin"));
+                                    produitSelectionne.setGTIN(codeGtin);
+                                    ((TextView) findViewById(R.id.codeGS1)).setText(codeGtin);
                                     ((TextView) findViewById(R.id.referenceIdentifie)).setVisibility(View.GONE);
                                     ((TextView) findViewById(R.id.warningNonIdentifie)).setVisibility(View.GONE);
                                     ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.VISIBLE);

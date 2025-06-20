@@ -59,23 +59,35 @@ public class ProduitContexte {
     public void onTextWatcher(final Editable s){
         if (s.toString().endsWith("\n")) {
             Produit produit = null;
-            Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(s.toString().substring(0, s.length() - 1));
-            if (gs1Decoupe.size() != 1) {
-                List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
-                if(produits.size() == 0)
-                    produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtinSansAi));
-
-                if (produits.size() == 1) {
-                    produit = produits.get(0);
+            if(s.toString().startsWith("PHITAGTIN:"))
+            {
+                String[] tabCode = s.toString().split(":");
+                if(tabCode.length == 2)
+                {
+                    produit = ProduitOpenHelper.getUnProduitParGTIN(db, tabCode[1]);
                 }
             }
             else
             {
-                List<Produit> produits = ProduitOpenHelper.getProduitByCodeInconnu(db, s.toString().substring(0, s.length() - 1));
-                if (produits.size() == 1) {
-                    produit = produits.get(0);
+                Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(s.toString().substring(0, s.length() - 1));
+                if (gs1Decoupe.size() != 1) {
+                    List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+                    if(produits.size() == 0)
+                        produits = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtinSansAi));
+
+                    if (produits.size() == 1) {
+                        produit = produits.get(0);
+                    }
+                }
+                else
+                {
+                    List<Produit> produits = ProduitOpenHelper.getProduitByCodeInconnu(db, s.toString().substring(0, s.length() - 1));
+                    if (produits.size() == 1) {
+                        produit = produits.get(0);
+                    }
                 }
             }
+
             if (modePhoto && actualPicture != null) {
                 if (!stringList.contains(s.toString().substring(0, s.length() - 1))) {
                     final ProgressDialog progressDialog = ProgressDialog.show(context, "Veuillez patienter", "Enregistrement de la photo en cours");

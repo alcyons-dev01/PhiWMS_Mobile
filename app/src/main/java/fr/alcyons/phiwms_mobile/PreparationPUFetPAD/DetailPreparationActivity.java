@@ -243,6 +243,8 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
             }
             else
             {
+                ph_preparation_ligne_preparationLotAdapter = new PH_Preparation_Ligne_PreparationLotAdapter(DetailPreparationActivity.this, phPreparationLignePreparationAdapte_List, db);
+                phPreparationLigne_ListView.setAdapter(ph_preparation_ligne_preparationLotAdapter);
                 ph_preparation_ligne_preparationLotAdapter.notifyDataSetChanged();
             }
         }

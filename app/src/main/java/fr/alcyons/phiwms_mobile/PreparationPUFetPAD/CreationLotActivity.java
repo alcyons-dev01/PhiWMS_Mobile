@@ -204,7 +204,7 @@ public class CreationLotActivity extends ServiceActivity {
 
         //clic sur le datamtrix permettant de récupérer le numéro de lot et la date de péremption
         datamatrix2ImageView.setOnClickListener(view -> {
-            if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+            if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell") || Build.MANUFACTURER.toLowerCase().contains("google"))
             {
                 Bundle detailProduitPlanDePlacementBundle = CreationLotActivity.super.getBundle();
                 detailProduitPlanDePlacementBundle.putBoolean("doitEtreIdentique", true);

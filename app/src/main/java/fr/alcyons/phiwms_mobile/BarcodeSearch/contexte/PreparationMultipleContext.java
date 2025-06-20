@@ -774,12 +774,15 @@ public class PreparationMultipleContext
                 {
                     PH_Preparation preparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparation_ligne.getPreparationID());
                     int qte_restante = ph_preparation_ligne.getQte_APreparer();
-                    Depot_Zone zone_courante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
-                    Stock_Lot_Emplacement_Light newStockLotEmplacement = new Stock_Lot_Emplacement_Light(qte_restante, lot, date_peremption_courant, emplacement_courant.getAdressage(), preparation.getDepotOrigineReference(), zone_courante.getZoneName(), produit.getID_produit(), 0, serie);
-                    Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, newStockLotEmplacement);
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, newStockLotEmplacement.getPhiMR4UUID(), newStockLotEmplacement.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
-                    lot_courant = phPreparationLignePreparationAdapte.new LotAdapte(newStockLotEmplacement);
-                    liste_preparation_liste_adapte.add(lot_courant);
+                    if(emplacement_courant != null)
+                    {
+                        Depot_Zone zone_courante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
+                        Stock_Lot_Emplacement_Light newStockLotEmplacement = new Stock_Lot_Emplacement_Light(qte_restante, lot, date_peremption_courant, emplacement_courant.getAdressage(), preparation.getDepotOrigineReference(), zone_courante.getZoneName(), produit.getID_produit(), 0, serie);
+                        Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, newStockLotEmplacement);
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, newStockLotEmplacement.getPhiMR4UUID(), newStockLotEmplacement.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                        lot_courant = phPreparationLignePreparationAdapte.new LotAdapte(newStockLotEmplacement);
+                        liste_preparation_liste_adapte.add(lot_courant);
+                    }
                 }
 
                 if(liste_lot.indexOf(lot_courant.getNumLot()) != -1)

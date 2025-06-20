@@ -1275,7 +1275,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
                                         ((TextView) findViewById(R.id.datePeremptionLot)).setText("");
                                         ((TextView) findViewById(R.id.qteSaisie)).setText("");
                                         ((LinearLayout) findViewById(R.id.validationScan)).setVisibility(View.GONE);
-                                        boutonSuppression.performClick();
+                                        //boutonSuppression.performClick();
                                     }
                                 });
                             }
@@ -1413,7 +1413,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
                                         ((TextView) findViewById(R.id.datePeremptionLot)).setText("");
                                         ((TextView) findViewById(R.id.qteSaisie)).setText("");
                                         ((LinearLayout) findViewById(R.id.validationScan)).setVisibility(View.GONE);
-                                        boutonSuppression.performClick();
+                                        //boutonSuppression.performClick();
                                     }
                                 });
                             }
@@ -1441,7 +1441,8 @@ public class BarcodePreparationActivity extends ServiceActivity {
                             //gestion de l'affichage de la date de péremption
                             String dateDePeremption = lotCourant.getDatePeremption();
                             String[] dateDePeremtpionTab = dateDePeremption.split("-");
-                            dateDePeremption = dateDePeremtpionTab[2]+"/"+dateDePeremtpionTab[1]+"/"+dateDePeremtpionTab[0];
+                            if(dateDePeremtpionTab.length == 3)
+                                dateDePeremption = dateDePeremtpionTab[2]+"/"+dateDePeremtpionTab[1]+"/"+dateDePeremtpionTab[0];
 
 
                             ((TextView) findViewById(R.id.datePeremptionLot)).setText(dateDePeremption);

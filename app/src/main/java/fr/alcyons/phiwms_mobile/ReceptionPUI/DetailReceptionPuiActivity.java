@@ -509,7 +509,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
         lancerScan.setOnClickListener(view -> {
             Intent listeLotReceptionPui_Intent;
             Bundle listeLotReceptionPui_Bundle = new Bundle();
-            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies")  || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies")  || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
             {
                 listeLotReceptionPui_Intent = new Intent(DetailReceptionPuiActivity.this, ScannerReceptionActivity.class);
             }

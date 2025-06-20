@@ -120,6 +120,12 @@
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
 
+        <activity
+        android:name="fr.alcyons.phiwms_mobile.Navigation.WebViewServiceActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
     <!-- Service Réception PUI -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.Services.ServiceReceptionPuiActivity"

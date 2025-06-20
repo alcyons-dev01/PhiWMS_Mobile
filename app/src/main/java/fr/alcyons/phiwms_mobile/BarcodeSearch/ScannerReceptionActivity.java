@@ -484,7 +484,19 @@ public class ScannerReceptionActivity extends ServiceActivity {
                                 public void onClick(View v) {
                                     newReceptionPUIContext.ValiderScan();
                                     yourCountDownTimer.cancel();
-                                    findViewById(R.id.boutonFermeture).performClick();
+                                    ((LinearLayout) findViewById(R.id.LinearLayoutBoutonBarcode)).setVisibility(View.VISIBLE);
+                                    ((TextView) findViewById(R.id.instruction)).setVisibility(View.VISIBLE);
+                                    ((TextView) findViewById(R.id.designationProduit)).setText("");
+                                    ((TextView) findViewById(R.id.referenceProduit)).setText("");
+                                    ((TextView) findViewById(R.id.quantiteProduit)).setText("");
+                                    ((TextView) findViewById(R.id.numeroLot)).setText("");
+                                    ((TextView) findViewById(R.id.datePeremptionLot)).setText("");
+                                    ((TextView) findViewById(R.id.qteSaisie)).setText("");
+                                    ((TextView) findViewById(R.id.EmplacementLotProduit)).setText("");
+                                    ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText("");
+                                    ((TextView) findViewById(R.id.textViewCountDown)).setVisibility(View.GONE);
+                                    ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.GONE);
+                                    //findViewById(R.id.boutonFermeture).performClick();
                                 }
                             });
                         }
