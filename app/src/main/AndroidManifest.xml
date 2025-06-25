@@ -371,6 +371,12 @@
         android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation|keyboardHidden"/>
 
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.PrisePhoto.PrisePhotoV3"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
     <!-- Barcode ScannerSearchOnly Activity -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity"

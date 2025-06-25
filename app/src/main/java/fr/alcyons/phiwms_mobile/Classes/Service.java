@@ -41,6 +41,21 @@ public class Service implements Serializable, Comparable {
         this.score = score;
     }
 
+    public Service(int id, String nom, int ordre, int idPerimetreFonctionnel, String nomPerimetrefonctionnel, String statut, int indicateur, String description, String lien_video, String whitePaper, int score, String activiteMobile) {
+        this.id = id;
+        this.nom = nom.trim();
+        this.ordre = ordre;
+        this.idPerimetreFonctionnel = idPerimetreFonctionnel;
+        this.nomPerimetrefonctionnel = nomPerimetrefonctionnel;
+        this.statut = statut;
+        this.indicateur = indicateur;
+        this.lien_video = lien_video;
+        this.description = description;
+        this.whitePaper = whitePaper;
+        this.score = score;
+        this.activiteMobile= activiteMobile;
+    }
+
     public Service(int id, String nom, int ordre, int idPerimetreFonctionnel, String nomPerimetrefonctionnel, String statut, int indicateur, String description, String lien_video, String whitePaper, int score, int phiwms_mobileUUID, String activiteMobile) {
         this.id = id;
         this.nom = nom.trim();
@@ -70,6 +85,8 @@ public class Service implements Serializable, Comparable {
         this.whitePaper = cursor.getString(ServiceOpenHelper.Constantes.NUM_COL_WHITEPAPER_SERVICE);
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
         this.score = cursor.getInt(ServiceOpenHelper.Constantes.NUM_COL_SCORE);
+        this.activiteMobile = cursor.getString(ServiceOpenHelper.Constantes.NUM_COL_ACTIVITE_MOBILE);
+
     }
 
     public int getPhiMR4UUID() {

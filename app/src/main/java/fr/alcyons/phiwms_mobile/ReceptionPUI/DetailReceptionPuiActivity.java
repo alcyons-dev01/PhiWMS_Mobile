@@ -74,6 +74,7 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.Mail;
 import fr.alcyons.phiwms_mobile.PrisePhoto.PrisePhoto;
+import fr.alcyons.phiwms_mobile.PrisePhoto.PrisePhotoV3;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 import fr.alcyons.phiwms_mobile.Services.ServiceReceptionPuiActivity;
@@ -365,7 +366,7 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
                         }
                     }
 
-                    if(phReliquatReceptionPUIAdapteSelectionne.isSuiviParSerieActif() && phReliquatReceptionPUIAdapteSelectionne.isSerialiserReception() && !check_lot_present)
+                    /*if(phReliquatReceptionPUIAdapteSelectionne.isSuiviParSerieActif() && phReliquatReceptionPUIAdapteSelectionne.isSerialiserReception() && !check_lot_present)
                     {
                         if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
                         {
@@ -433,7 +434,18 @@ public class DetailReceptionPuiActivity extends ServiceActivity {
                         detailReceptionPui_Intent.putExtras(detailReceptionPui_Bundle);
 
                         DetailReceptionPuiActivity.this.startActivityForResult(detailReceptionPui_Intent, CodesEchangesActivites.RETOUR_LISTE_LOTS);
-                    }
+                    }*/
+                    Intent detailReceptionPui_Intent = new Intent(DetailReceptionPuiActivity.this, ListeLotReceptionPuiActivity.class);
+                    Bundle detailReceptionPui_Bundle = DetailReceptionPuiActivity.super.getBundle();
+                    detailReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
+                    detailReceptionPui_Bundle.putSerializable("phReliquatReceptionPUIAdapte", phReliquatReceptionPUIAdapteSelectionne);
+                    detailReceptionPui_Bundle.putSerializable("EmplacementPrecedent", emplacement_precedent);
+                    detailReceptionPui_Bundle.putSerializable("ProduitPrecedent", produitPrecedent);
+                    detailReceptionPui_Bundle.putInt("serviceSelectionneID", Objects.requireNonNull(intent.getExtras()).getInt("serviceSelectionneID"));
+
+                    detailReceptionPui_Intent.putExtras(detailReceptionPui_Bundle);
+
+                    DetailReceptionPuiActivity.this.startActivityForResult(detailReceptionPui_Intent, CodesEchangesActivites.RETOUR_LISTE_LOTS);
                 }
             }
         });

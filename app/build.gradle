@@ -75,6 +75,9 @@ dependencies {
     implementation files('src/main/libs/mail.jar')
     implementation files('src/main/libs/activation.jar')
     implementation files('src/main/libs/additionnal.jar')
+    implementation 'androidx.camera:camera-core:1.4.2'
+    implementation 'androidx.camera:camera-view:1.4.2'
+    implementation 'androidx.camera:camera-lifecycle:1.4.2'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'

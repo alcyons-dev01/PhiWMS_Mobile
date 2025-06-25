@@ -8,10 +8,11 @@
         android:id="@+id/linear_principal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
         android:background="@drawable/background_detail_preparation_bleu"
         android:padding="6dp"
         android:orientation="horizontal"
+        android:layout_marginHorizontal="5dp"
+        android:layout_marginTop="2dp"
         android:weightSum="7">
 
         <LinearLayout
@@ -23,21 +24,22 @@
             android:layout_gravity="center_vertical"
             android:gravity="center_vertical">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/colis"
-                android:background="@drawable/ic_colis" />
-
             <TextView
                 android:id="@+id/colis"
                 android:layout_width="24dp"
                 android:layout_height="wrap_content"
                 android:textColor="@color/rouge2"
                 android:textSize="14sp"
-                android:gravity="center"
+                android:gravity="left"
+                android:layout_gravity="left"
                 android:text="100" />
 
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:contentDescription="@string/colis"
+                android:layout_gravity="left"
+                android:background="@drawable/ic_colis" />
 
         </LinearLayout>
 

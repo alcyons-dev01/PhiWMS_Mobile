@@ -74,6 +74,7 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.AlertePreparationAdapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Preparation_Ligne_PreparationLotAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Preparation_Ligne_PreparationLotAdapter2025;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.Chronometer;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
@@ -94,7 +95,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
     List<String> listeGTIN;
     public List<PH_Preparation_Ligne_Preparation_Adapte> phPreparationLignePreparationAdapte_List;
     public ListView phPreparationLigne_ListView;
-    PH_Preparation_Ligne_PreparationLotAdapter ph_preparation_ligne_preparationLotAdapter;
+    PH_Preparation_Ligne_PreparationLotAdapter2025 ph_preparation_ligne_preparationLotAdapter;
     boolean premierpassage;
     int nb_produit_scanne;
     Integer nbLotPreparer;
@@ -110,6 +111,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
     Context context;
     String tri_choisi;
     PackageManager pm;
+    int position_selectionne;
 
     public void enregistrerPhPreparation()
     {
@@ -150,6 +152,9 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_preparation_modifiable);
+
+        //déclaration de la position selectionné
+        position_selectionne = 0;
 
         //gestion du package manager
         pm = DetailPreparationActivity.this.getPackageManager();
@@ -207,10 +212,10 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
 
         phPreparationLigne_ListView.setOnItemClickListener((parent, view, position, id) -> {
             utilisation_scan = false;
+            position_selectionne = position;
             PH_Preparation_Ligne_Preparation_Adapte ph_preparationLigneAdapte = ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.get(position);
             PH_Preparation_Ligne ph_preparationLigne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, ph_preparationLigneAdapte.getPh_preparationLigneID());
 
-            ph_preparationLigneViewHolder = ph_preparation_ligne_preparationLotAdapter.ph_preparation_ligneViewHolderList.get(position);
             Intent detailPreparation_Intent = new Intent(DetailPreparationActivity.this, ListeLotPreparationActivity.class);
             Bundle detailPreparation_Bundle = DetailPreparationActivity.super.getBundle();
             detailPreparation_Bundle.putInt("produitID", ph_preparationLigne.getProduitID());
@@ -243,8 +248,27 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
             }
             else
             {
-                ph_preparation_ligne_preparationLotAdapter = new PH_Preparation_Ligne_PreparationLotAdapter(DetailPreparationActivity.this, phPreparationLignePreparationAdapte_List, db);
+                ph_preparation_ligne_preparationLotAdapter = new PH_Preparation_Ligne_PreparationLotAdapter2025(DetailPreparationActivity.this, db, utilisateurConnecte);
+
+                List<String> listeZoneEmplacement = new ArrayList<>();
+                for(PH_Preparation_Ligne_Preparation_Adapte courant : phPreparationLignePreparationAdapte_List)
+                {
+                    PH_Preparation_Ligne ph_preparationLigne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, courant.getPh_preparationLigneID());
+                    Produit produit = ProduitOpenHelper.getProduitByID(db, ph_preparationLigne.getProduitID());
+                    String zone = produit.getZone_PUI_Defaut();
+                    String emplacement = produit.getEmplacement_PUI_Defaut();
+                    String zoneemplacement = zone + "-" + emplacement;
+
+                    if(!listeZoneEmplacement.contains(zoneemplacement)) {
+                        listeZoneEmplacement.add(zoneemplacement);
+                        ph_preparation_ligne_preparationLotAdapter.addSectionHeaderItem(courant);
+                    }
+
+                    ph_preparation_ligne_preparationLotAdapter.addItem(courant);
+                }
+
                 phPreparationLigne_ListView.setAdapter(ph_preparation_ligne_preparationLotAdapter);
+                phPreparationLigne_ListView.setDivider(null);
                 ph_preparation_ligne_preparationLotAdapter.notifyDataSetChanged();
             }
         }
@@ -418,10 +442,10 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                     {
                         if(ph_preparationLigneViewHolder != null)
                         {
-                            int position = ph_preparation_ligne_preparationLotAdapter.ph_preparation_ligneViewHolderList.indexOf(ph_preparationLigneViewHolder);
+                            /*int position = ph_preparation_ligne_preparationLotAdapter.ph_preparation_ligneViewHolderList.indexOf(ph_preparationLigneViewHolder);
                             if(position != -1) {
                                 ph_preparationLigneAdapteRetourListeLot = ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.get(position);
-                            }
+                            }*/
                         }
                     }
 
@@ -598,6 +622,8 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        super.prepareOptionsMenu(menu, null, null, "Désignation référence");
+
         MenuItem valider = menu.findItem(R.id.boutonValider);
         valider.setOnMenuItemClickListener(menuItem -> {
             //vérification de la saisie d'au moins une ligne
@@ -641,8 +667,28 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
             return oo1.getProduitDesignation().compareTo(oo2.getProduitDesignation());
         });
         premierpassage = false;
-        ph_preparation_ligne_preparationLotAdapter = new PH_Preparation_Ligne_PreparationLotAdapter(DetailPreparationActivity.this, phPreparationLignePreparationAdapte_List, db);
+        ph_preparation_ligne_preparationLotAdapter = new PH_Preparation_Ligne_PreparationLotAdapter2025(DetailPreparationActivity.this, db, utilisateurConnecte);
+
+        List<String> listeZoneEmplacement = new ArrayList<>();
+        for(PH_Preparation_Ligne_Preparation_Adapte courant : phPreparationLignePreparationAdapte_List)
+        {
+            PH_Preparation_Ligne ph_preparationLigne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, courant.getPh_preparationLigneID());
+            Produit produit = ProduitOpenHelper.getProduitByID(db, ph_preparationLigne.getProduitID());
+            String zone = produit.getZone_PUI_Defaut();
+            String emplacement = produit.getEmplacement_PUI_Defaut();
+            String zoneemplacement = zone + "-" + emplacement;
+
+            if(!listeZoneEmplacement.contains(zoneemplacement)) {
+                listeZoneEmplacement.add(zoneemplacement);
+                ph_preparation_ligne_preparationLotAdapter.addSectionHeaderItem(courant);
+            }
+
+            ph_preparation_ligne_preparationLotAdapter.addItem(courant);
+        }
+
         phPreparationLigne_ListView.setAdapter(ph_preparation_ligne_preparationLotAdapter);
+        phPreparationLigne_ListView.setDivider(null);
+        phPreparationLigne_ListView.setSelection(position_selectionne);
     }
 
     private void onTriParPlace()
@@ -656,31 +702,29 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
             {
                 String oo1EmplacementParDefaut = oo1.getEmplacementParDefaut();
                 String oo2EmplacementParDefaut = oo2.getEmplacementParDefaut();
+                Produit produit001 = ProduitOpenHelper.getProduitByID(db, oo1.getProduitID());
+                Produit produit002 = ProduitOpenHelper.getProduitByID(db, oo2.getProduitID());
 
-                if (oo1EmplacementParDefaut.contentEquals("")) {
-                    Produit produit = ProduitOpenHelper.getProduitByID(db, oo1.getProduitID());
-                    Depot depot = DepotOpenHelper.getDepotParReference(db, ph_preparation_Selectionne.getDepotOrigineReference());
-                    List<Stock_Lot_Emplacement_Light> stockLotEmplacementLights = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot);
-                    if (!stockLotEmplacementLights.isEmpty()) {
-                        oo1EmplacementParDefaut = stockLotEmplacementLights.get(0).getEmplacement();
-                    }
-                }
-                if (oo2EmplacementParDefaut.contentEquals("")) {
-                    Produit produit = ProduitOpenHelper.getProduitByID(db, oo2.getProduitID());
-                    Depot depot = DepotOpenHelper.getDepotParReference(db, ph_preparation_Selectionne.getDepotOrigineReference());
-                    List<Stock_Lot_Emplacement_Light> stockLotEmplacementLights = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot);
-                    if (!stockLotEmplacementLights.isEmpty()) {
-                        oo2EmplacementParDefaut = stockLotEmplacementLights.get(0).getEmplacement();
-                    }
-                }
+                oo1EmplacementParDefaut = produit001.getEmplacement_PUI_Defaut();
+                oo2EmplacementParDefaut = produit002.getEmplacement_PUI_Defaut();
 
-                if(oo1EmplacementParDefaut.contentEquals(oo2EmplacementParDefaut))
+                String zone001 = produit001.getZone_PUI_Defaut();
+                String zone002 = produit002.getZone_PUI_Defaut();
+
+                if(zone001.contentEquals(zone002))
                 {
-                    return oo1.getProduitDesignation().compareTo(oo2.getProduitDesignation());
+                    if(oo1EmplacementParDefaut.contentEquals(oo2EmplacementParDefaut))
+                    {
+                        return oo1.getProduitDesignation().compareTo(oo2.getProduitDesignation());
+                    }
+                    else
+                    {
+                        return oo1EmplacementParDefaut.compareTo(oo2EmplacementParDefaut);
+                    }
                 }
                 else
                 {
-                    return oo1EmplacementParDefaut.compareTo(oo2EmplacementParDefaut);
+                    return zone001.compareTo(zone002);
                 }
             }
             else
@@ -690,8 +734,28 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
 
         });
         premierpassage = false;
-        ph_preparation_ligne_preparationLotAdapter = new PH_Preparation_Ligne_PreparationLotAdapter(DetailPreparationActivity.this, phPreparationLignePreparationAdapte_List, db);
+        ph_preparation_ligne_preparationLotAdapter = new PH_Preparation_Ligne_PreparationLotAdapter2025(DetailPreparationActivity.this, db, utilisateurConnecte);
+
+        List<String> listeZoneEmplacement = new ArrayList<>();
+        for(PH_Preparation_Ligne_Preparation_Adapte courant : phPreparationLignePreparationAdapte_List)
+        {
+            PH_Preparation_Ligne ph_preparationLigne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, courant.getPh_preparationLigneID());
+            Produit produit = ProduitOpenHelper.getProduitByID(db, ph_preparationLigne.getProduitID());
+            String zone = produit.getZone_PUI_Defaut();
+            String emplacement = produit.getEmplacement_PUI_Defaut();
+            String zoneemplacement = zone + "-" + emplacement;
+
+            if(!listeZoneEmplacement.contains(zoneemplacement)) {
+                listeZoneEmplacement.add(zoneemplacement);
+                ph_preparation_ligne_preparationLotAdapter.addSectionHeaderItem(courant);
+            }
+
+            ph_preparation_ligne_preparationLotAdapter.addItem(courant);
+        }
+
         phPreparationLigne_ListView.setAdapter(ph_preparation_ligne_preparationLotAdapter);
+        phPreparationLigne_ListView.setDivider(null);
+        phPreparationLigne_ListView.setSelection(position_selectionne);
     }
 
     private void onTriParPoids()
@@ -712,8 +776,28 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
             }
         });
         premierpassage = false;
-        ph_preparation_ligne_preparationLotAdapter = new PH_Preparation_Ligne_PreparationLotAdapter(DetailPreparationActivity.this, phPreparationLignePreparationAdapte_List, db);
+        ph_preparation_ligne_preparationLotAdapter = new PH_Preparation_Ligne_PreparationLotAdapter2025(DetailPreparationActivity.this, db, utilisateurConnecte);
+
+        List<String> listeZoneEmplacement = new ArrayList<>();
+        for(PH_Preparation_Ligne_Preparation_Adapte courant : phPreparationLignePreparationAdapte_List)
+        {
+            PH_Preparation_Ligne ph_preparationLigne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, courant.getPh_preparationLigneID());
+            Produit produit = ProduitOpenHelper.getProduitByID(db, ph_preparationLigne.getProduitID());
+            String zone = produit.getZone_PUI_Defaut();
+            String emplacement = produit.getEmplacement_PUI_Defaut();
+            String zoneemplacement = zone + "-" + emplacement;
+
+            if(!listeZoneEmplacement.contains(zoneemplacement)) {
+                listeZoneEmplacement.add(zoneemplacement);
+                ph_preparation_ligne_preparationLotAdapter.addSectionHeaderItem(courant);
+            }
+
+            ph_preparation_ligne_preparationLotAdapter.addItem(courant);
+        }
+
         phPreparationLigne_ListView.setAdapter(ph_preparation_ligne_preparationLotAdapter);
+        phPreparationLigne_ListView.setDivider(null);
+        phPreparationLigne_ListView.setSelection(position_selectionne);
     }
 
     private void onMenuDatamatrixClick() {

@@ -183,6 +183,8 @@ public class ServiceActivity extends MenuActivity {
                 @Override
                 public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                     Service  serviceSelectionne = (Service) navigationExpandableListAdapter.getChild(groupPosition, childPosition);
+
+                    Service serviceCourant = ServiceOpenHelper.getServiceByID(db, serviceSelectionne.getId());
                     if (serviceSelectionne != null) {
 
                         Class classe_demande = null;

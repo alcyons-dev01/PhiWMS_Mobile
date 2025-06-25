@@ -39,7 +39,7 @@ public class PH_Demande_MotifOpenHelper extends DBOpenHelper {
     public static List<String> getDemandeMotif(SQLiteDatabase db) {
         List<String> motifList = new ArrayList<>();
         motifList.add("Sélectionnez un motif");
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_DEMANDE_MOTIF+" ORDER BY "+ Constantes.CLE_COL_MOTIF_DEMANDE_MOTIF, new String[]{});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_DEMANDE_MOTIF+" ORDER BY "+ Constantes.CLE_COL_MOTIF_DEMANDE_MOTIF+"  COLLATE NOCASE", new String[]{});
 
         while (cursor.moveToNext()) {
             PH_Demande_Motif motif = new PH_Demande_Motif(cursor);

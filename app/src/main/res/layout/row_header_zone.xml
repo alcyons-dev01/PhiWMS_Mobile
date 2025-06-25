@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content" android:clickable="false">
+
+
+    <LinearLayout
+        android:id="@+id/zoneZoneEmplacement"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:clickable="false"
+        android:layout_marginVertical="3dp"
+        android:background="@drawable/background_etiquette_gris">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:background="@drawable/ic_location_grey"/>
+
+        <TextView
+            android:id="@+id/textZoneEmplacement"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:text="Zone - EMPLACEMENT"
+            android:layout_marginVertical="5dp"
+            android:textSize="16sp"
+            android:clickable="false"
+            android:textColor="@color/grey_color_fonce"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:visibility="visible" />
+
+    </LinearLayout>
+
+</LinearLayout>

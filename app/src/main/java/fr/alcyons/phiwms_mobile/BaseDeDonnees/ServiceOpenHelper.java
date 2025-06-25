@@ -163,6 +163,7 @@ public class ServiceOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_WHITEPAPER_SERVICE, service.getWhitePaper());
         contentValues.put(Constantes.CLE_COL_VIDEO_SERVICE, service.getLien_video());
         contentValues.put(Constantes.CLE_COL_SCORE, service.getScore());
+        contentValues.put(Constantes.CLE_COL_ACTIVITE_MOBILE, service.getActiviteMobile());
 
         // Insertion du service en BDD
         long rowID = db.insert(Constantes.TABLE_SERVICE, null, contentValues);
@@ -186,6 +187,7 @@ public class ServiceOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_WHITEPAPER_SERVICE, service.getWhitePaper());
         contentValues.put(Constantes.CLE_COL_VIDEO_SERVICE, service.getLien_video());
         contentValues.put(Constantes.CLE_COL_SCORE, service.getScore());
+        contentValues.put(Constantes.CLE_COL_ACTIVITE_MOBILE, service.getActiviteMobile());
 
         // Insertion du service en BDD
         return db.update(Constantes.TABLE_SERVICE, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + service.getPhiMR4UUID(), null);
@@ -252,9 +254,15 @@ public class ServiceOpenHelper extends DBOpenHelper {
                                         String videoServiceCourant = serviceJSONObject.getString("video");
                                         String whitePaperServiceCourant= serviceJSONObject.getString("whitePaper");
                                         int score = serviceJSONObject.getInt("score");
-
+                                        String activiteMobile = serviceJSONObject.getString("activiteMobile");
+                                        int phiwms_mobileuuid = 0;
+                                        Service serviceBDD = ServiceOpenHelper.getServiceByID(db, idServiceCourant);
+                                        if(serviceBDD != null)
+                                        {
+                                            phiwms_mobileuuid = serviceBDD.getPhiMR4UUID();
+                                        }
                                         // Création du service
-                                        Service service = new Service(idServiceCourant, nomServiceCourant, ordreServiceCourant, idPerimetreFonctionnelServiceCourant, nomPerimetreFonctionnelServiceCourant, statutServiceCourant, indicateurServiceCourant,descriptionServiceCourant, videoServiceCourant, whitePaperServiceCourant, score);
+                                        Service service = new Service(idServiceCourant, nomServiceCourant, ordreServiceCourant, idPerimetreFonctionnelServiceCourant, nomPerimetreFonctionnelServiceCourant, statutServiceCourant, indicateurServiceCourant,descriptionServiceCourant, videoServiceCourant, whitePaperServiceCourant, score, phiwms_mobileuuid, activiteMobile);
 
                                         // insertion du service en bdd
                                         long rowID = insererUnServiceEnBD(db, service);
@@ -360,6 +368,10 @@ public class ServiceOpenHelper extends DBOpenHelper {
         public static final int NUM_COL_SCORE = 11;
         public static final String TYPE_COL_SCORE = "INTEGER";
 
+        public static final String CLE_COL_ACTIVITE_MOBILE = "activiteMobile";
+        public static final int NUM_COL_ACTIVITE_MOBILE = 12;
+        public static final String TYPE_COL_ACTIVITE_MOBILE = "TEXT";
+
 
         public static final String CREATION_TABLE_SERVICE = "CREATE TABLE "
                 + Constantes.TABLE_SERVICE + "("
@@ -374,7 +386,8 @@ public class ServiceOpenHelper extends DBOpenHelper {
                 + Constantes.CLE_COL_DESCRIPTION_SERVICE + " " + Constantes.TYPE_COL_DESCRIPTION_SERVICE + ","
                 + Constantes.CLE_COL_VIDEO_SERVICE + " " + Constantes.TYPE_COL_VIDEO_SERVICE + ","
                 + Constantes.CLE_COL_WHITEPAPER_SERVICE + " " + Constantes.TYPE_COL_WHITEPAPER_SERVICE + ","
-                + Constantes.CLE_COL_SCORE + " " + Constantes.TYPE_COL_SCORE
+                + Constantes.CLE_COL_SCORE + " " + Constantes.TYPE_COL_SCORE + ","
+                + Constantes.CLE_COL_ACTIVITE_MOBILE + " " + Constantes.TYPE_COL_ACTIVITE_MOBILE
                 + ");";
 
     }

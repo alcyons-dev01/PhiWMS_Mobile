@@ -97,7 +97,9 @@
             android:layout_height="match_parent"
             android:descendantFocusability="afterDescendants"
             android:paddingLeft="10dp"
-            android:paddingRight="10dp"/>
+            android:paddingRight="10dp"
+            android:transcriptMode="alwaysScroll"
+            android:layout_marginBottom="10dp"/>
 
 
     </RelativeLayout>

@@ -1,4 +1,3 @@
-
 package fr.alcyons.phiwms_mobile.PrisePhoto;
 
 import android.Manifest;
@@ -18,18 +17,20 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import androidx.annotation.NonNull;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.core.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.LifecycleOwner;
+
 import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -41,13 +42,15 @@ import java.util.Date;
 import fr.alcyons.phiwms_mobile.OriginalActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
-import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.PrisePhoto.camera.CameraSource;
 import fr.alcyons.phiwms_mobile.PrisePhoto.camera.CameraSourcePreview;
+import fr.alcyons.phiwms_mobile.PrisePhoto.camera.CameraXSource;
+import fr.alcyons.phiwms_mobile.PrisePhoto.camera.CameraXSourcePreview;
 import fr.alcyons.phiwms_mobile.PrisePhoto.camera.GraphicOverlay;
 import fr.alcyons.phiwms_mobile.R;
 
-public class PrisePhoto extends OriginalActivity {
+public class PrisePhotoV3 extends OriginalActivity {
+
     // constants used to pass extra data in the intent
     public static final String AutoFocus = "AutoFocus";
     public static final String UseFlash = "UseFlash";
@@ -60,8 +63,8 @@ public class PrisePhoto extends OriginalActivity {
     protected static final int RC_HANDLE_CAMERA_PERM = 2;
 
     // Liste utilisée dans le cas de scan en chaine
-    protected CameraSource mCameraSource;
-    protected CameraSourcePreview mPreview;
+    protected CameraXSource mCameraSource;
+    protected CameraXSourcePreview mPreview;
     protected GraphicOverlay<PrisePhotoGraphic> mGraphicOverlay;
 
     Intent intent;
@@ -86,10 +89,10 @@ public class PrisePhoto extends OriginalActivity {
         super.onCreate(icicle);
 
         // Récupération du Layout utilisé pour cette activité
-        setContentView(R.layout.activity_prise_photo);
+        setContentView(R.layout.activity_prise_photo_v3);
 
         // Récupération de l'intent
-        intent = PrisePhoto.this.getIntent();
+        intent = PrisePhotoV3.this.getIntent();
 
         priseDePhotoContexte = intent.getExtras().getString("contexte");
         if (priseDePhotoContexte == null) {
@@ -117,7 +120,7 @@ public class PrisePhoto extends OriginalActivity {
                 Bundle extras = new Bundle();
                 resultIntent.putExtras(extras);
                 setResult(CodesEchangesActivites.RETOUR_PRISE_PHOTO, resultIntent);
-                PrisePhoto.this.finish();
+                PrisePhotoV3.this.finish();
             }
         });
 
@@ -125,11 +128,11 @@ public class PrisePhoto extends OriginalActivity {
         boutonFlash.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mCameraSource.getFlashMode().equals(Camera.Parameters.FLASH_MODE_OFF)) {
+                /*if (mCameraSource.getFlashMode().equals(Camera.Parameters.FLASH_MODE_OFF)) {
                     mCameraSource.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
                 } else {
                     mCameraSource.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                }
+                }*/
             }
         });
 
@@ -138,13 +141,8 @@ public class PrisePhoto extends OriginalActivity {
             @Override
             public void onClick(View v) {
                 if (mGraphicOverlay.getGraphics().size() == 0) {
-                    boutonPhoto.setVisibility(View.GONE);
                     //prendre une photo
-                    mCameraSource.takePicture(new CameraSource.ShutterCallback() {
-                        @Override
-                        public void onShutter() {
-                        }
-                    }, new CameraSource.PictureCallback() {
+                    mCameraSource.takePicture( new CameraXSource.PictureCallback() {
                         @Override
                         public void onPictureTaken(byte[] data) {
                             String name = null;
@@ -162,7 +160,7 @@ public class PrisePhoto extends OriginalActivity {
 
                                 // Sauvegarde de l'image
                                 String root = Environment.getExternalStorageDirectory().toString();
-                                root = getFilesDir().getAbsolutePath()+File.separator;
+                                root = getFilesDir().getAbsolutePath()+ File.separator;
                                 Bitmap pictureTaken = BitmapFactory.decodeByteArray(data, 0, data.length);
 
                                 File dir = null;
@@ -197,7 +195,7 @@ public class PrisePhoto extends OriginalActivity {
                                     pictureTaken = getRotatedBitmap(dir + "/" + name, pictureTaken);
 
                                     pictureTaken.compress(Bitmap.CompressFormat.JPEG, 90, out);
-                                    // Toast.makeText(PrisePhoto.this, "Image sauvegardée", Toast.LENGTH_SHORT).show();
+                                    // Toast.makeText(PrisePhotoV3.this, "Image sauvegardée", Toast.LENGTH_SHORT).show();
                                     out.flush();
                                     out.close();
 
@@ -212,11 +210,11 @@ public class PrisePhoto extends OriginalActivity {
                                 mediaScanIntent.putExtra("nomPhoto", name);
                                 getApplicationContext().sendBroadcast(mediaScanIntent);
                                 setResult(RESULT_OK, mediaScanIntent);
-                                PrisePhoto.this.finish();
+                                PrisePhotoV3.this.finish();
                             }
                             else if(!priseDePhotoContexte.contentEquals("priseDePhotoContexteBonDeLivraison") && !priseDePhotoContexte.contentEquals("priseDePhotoLivraison") && !priseDePhotoContexte.contentEquals("photoAction"))
                             {
-                                boolean validation = Alerte.afficherAlerte(PrisePhoto.this, "Validation", "Souhaitez-vous publier la photo sur MédicalObjective ?", "OuiNon");
+                                boolean validation = Alerte.afficherAlerte(PrisePhotoV3.this, "Validation", "Souhaitez-vous publier la photo sur MédicalObjective ?", "OuiNon");
 
                                 if(validation)
                                 {
@@ -270,7 +268,7 @@ public class PrisePhoto extends OriginalActivity {
                                         pictureTaken = getRotatedBitmap(dir + "/" + name, pictureTaken);
 
                                         pictureTaken.compress(Bitmap.CompressFormat.JPEG, 90, out);
-                                       // Toast.makeText(PrisePhoto.this, "Image sauvegardée", Toast.LENGTH_SHORT).show();
+                                        // Toast.makeText(PrisePhotoV3.this, "Image sauvegardée", Toast.LENGTH_SHORT).show();
                                         out.flush();
                                         out.close();
 
@@ -285,7 +283,7 @@ public class PrisePhoto extends OriginalActivity {
                                     mediaScanIntent.putExtra("nomPhoto", name);
                                     getApplicationContext().sendBroadcast(mediaScanIntent);
                                     setResult(CodesEchangesActivites.RETOUR_PRISE_PHOTO, mediaScanIntent);
-                                    PrisePhoto.this.finish();
+                                    PrisePhotoV3.this.finish();
                                 }
                                 else
                                 {
@@ -388,7 +386,7 @@ public class PrisePhoto extends OriginalActivity {
                                     pictureTaken = getRotatedBitmap(dir + "/" + name, pictureTaken);
 
                                     pictureTaken.compress(Bitmap.CompressFormat.JPEG, 90, out);
-                                    Toast.makeText(PrisePhoto.this, "Image sauvegardée", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(PrisePhotoV3.this, "Image sauvegardée", Toast.LENGTH_SHORT).show();
                                     out.flush();
                                     out.close();
 
@@ -403,7 +401,7 @@ public class PrisePhoto extends OriginalActivity {
                                 mediaScanIntent.putExtra("nomPhoto", name);
                                 getApplicationContext().sendBroadcast(mediaScanIntent);
                                 setResult(CodesEchangesActivites.RETOUR_PRISE_PHOTO, mediaScanIntent);
-                                PrisePhoto.this.finish();
+                                PrisePhotoV3.this.finish();
                             }
 
                         }
@@ -413,7 +411,7 @@ public class PrisePhoto extends OriginalActivity {
         }));
 
         // Récupération de la preview de la caméra
-        mPreview = (CameraSourcePreview) findViewById(R.id.preview);
+        mPreview = (CameraXSourcePreview) findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay<PrisePhotoGraphic>) findViewById(R.id.graphicOverlay);
 
         // Récupération dans l'intent du boolean UseFlash
@@ -454,7 +452,7 @@ public class PrisePhoto extends OriginalActivity {
 
         findViewById(R.id.topLayout).setOnClickListener(listener);
         Snackbar.make(mGraphicOverlay, R.string.permission_camera_rationale,
-                Snackbar.LENGTH_INDEFINITE)
+                        Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.ok, listener)
                 .show();
     }
@@ -465,28 +463,15 @@ public class PrisePhoto extends OriginalActivity {
      */
     @SuppressLint("InlinedApi")
     protected void createCameraSource(boolean autoFocus, boolean useFlash) {
-        Context context = getApplicationContext();
+        LifecycleOwner lifecycleOwner = this; // ou getViewLifecycleOwner() dans un Fragment
 
-        // Création de la caméra
-        // Utilisation de la caméra de derrière
-        // Spécification de la taille de la preview
-        // spécification de la fréquence d'image démandée par seconde
-        CameraSource.Builder builder = new CameraSource.Builder(context)
-                .setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setRequestedPreviewSize(1600, 1024)
-                .setRequestedFps(15.0f);
+        mCameraSource = new CameraXSource(this, mPreview, lifecycleOwner);
 
+// Démarre la caméra
+        mCameraSource.startCamera();
 
-        // Vérification que l'auto focus est une option disponible
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            builder = builder.setFocusMode(
-                    autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null);
-        }
-
-        // Lancement de la caméra
-        mCameraSource = builder
-                .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
-                .build(mGraphicOverlay);
+// Option : activer le mode négatif
+        mCameraSource.setNegativeEffect(true);
 
     }
 
@@ -592,7 +577,7 @@ public class PrisePhoto extends OriginalActivity {
                 mPreview.start(mCameraSource, mGraphicOverlay);
             } catch (IOException e) {
                 Log.e(TAG, "Unable to start camera source.", e);
-                mCameraSource.release();
+                //mCameraSource.release();
                 mCameraSource = null;
             }
         }
@@ -619,4 +604,5 @@ public class PrisePhoto extends OriginalActivity {
 
         return rotatedBitmap;
     }
+    
 }

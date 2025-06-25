@@ -84,6 +84,7 @@ public class CameraSource {
     private SurfaceTexture mDummySurfaceTexture;
     private Thread mProcessingThread;
     private Map<byte[], ByteBuffer> mBytesToByteBuffer = new HashMap<>();
+    private boolean isCapturing = false; // Champ de classe
 
     /**
      * Only allow creation via the builder class.
@@ -399,12 +400,19 @@ public class CameraSource {
 
     public void takePicture(ShutterCallback shutter, PictureCallback jpeg) {
         synchronized (mCameraLock) {
-            if (mCamera != null) {
+
+            if (mCamera != null && !isCapturing) {
+                isCapturing = true;
                 PictureStartCallback startCallback = new PictureStartCallback();
                 startCallback.mDelegate = shutter;
                 PictureDoneCallback doneCallback = new PictureDoneCallback();
                 doneCallback.mDelegate = jpeg;
-                mCamera.takePicture(startCallback, null, null, doneCallback);
+                try {
+                    mCamera.takePicture(startCallback, null, null, doneCallback);
+                } catch (RuntimeException e) {
+                    Log.e("Camera", "takePicture failed", e);
+                    isCapturing = false;
+                }
             }
         }
     }
@@ -957,6 +965,7 @@ public class CameraSource {
         public void onPictureTaken(byte[] data, Camera camera) {
             if (mDelegate != null) {
                 mDelegate.onPictureTaken(data);
+                isCapturing = false;
             }
             synchronized (mCameraLock) {
                 if (mCamera != null) {

@@ -121,17 +121,15 @@ public class PH_Preparation_Ligne_PreparationLotAdapter extends ArrayAdapter {
 
         Produit produitCorrespondant = null;
 
-        int conditionnementAchat = 0;
+        int conditionnementDistrib = 0;
 
         if (produitID != 0) {
             produitCorrespondant = ProduitOpenHelper.getProduitByID(db, produitID);
-            conditionnementAchat = produitCorrespondant.getCond_achat();
-            if (conditionnementAchat == 0) {
-                conditionnementAchat = (int) produitCorrespondant.getCond_distrib();
-            }
+            conditionnementDistrib = (int) produitCorrespondant.getCond_distrib();
+
         }
-        if (qte != 0 && conditionnementAchat != 0) {
-            nbColis = (int) (qte / conditionnementAchat);
+        if (qte != 0 && conditionnementDistrib != 0) {
+            nbColis = (int) (qte / conditionnementDistrib);
             nbColis = (int) Math.ceil(nbColis);
         }
         if (qte != 0) {

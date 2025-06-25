@@ -205,6 +205,7 @@ public class ServiceConnexionDirecteActivity extends ServiceAvecConnexionActivit
                                     String videoServiceCourant = planHabilitationJSONObject.getString("video");
                                     String whitePaperServiceCourant= planHabilitationJSONObject.getString("whitepaper");
                                     int score = planHabilitationJSONObject.getInt("score");
+                                    String activiteMobile = planHabilitationJSONObject.getString("activiteMobile");
 
                                     Service service = new Service(idServiceCourant, nomServiceCourant, ordreServiceCourant, idPerimetreFonctionnelServiceCourant, nomPerimetreFonctionnelServiceCourant, statutServiceCourant, indicateurServiceCourant, descriptionServiceCourant, videoServiceCourant, whitePaperServiceCourant, score);
                                     serviceList.add(service);
