@@ -45,7 +45,10 @@ public class PH_Preparation_Ligne_PreparationLotAdapter2025 extends BaseAdapter 
     private LayoutInflater mInflater;
     Utilisateur utilisateur;
     public List<PH_Preparation_Ligne_Preparation_Adapte> ph_preparation_lignes_Adaptes;
-    public List<PH_Preparation> listePhPreparation;
+    public int compteurItem;
+    public List<PH_PreparationLigneViewHolder> ph_preparation_ligneViewHolderList;
+    public PH_Preparation_Ligne_PreparationLotAdapter.PH_PreparationLigneViewHolder viewHolder;
+
 
     public PH_Preparation_Ligne_PreparationLotAdapter2025(Context context, SQLiteDatabase database, Utilisateur utilisateur) {
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -53,6 +56,8 @@ public class PH_Preparation_Ligne_PreparationLotAdapter2025 extends BaseAdapter 
         this.context = context;
         this.utilisateur = utilisateur;
         this.ph_preparation_lignes_Adaptes = new ArrayList<>();
+        this.compteurItem = 0;
+        this.ph_preparation_ligneViewHolderList = new ArrayList<>();
     }
 
     @Override
@@ -62,6 +67,7 @@ public class PH_Preparation_Ligne_PreparationLotAdapter2025 extends BaseAdapter 
 
     public void addItem(final PH_Preparation_Ligne_Preparation_Adapte item) {
         ph_preparation_lignes_Adaptes.add(item);
+        compteurItem ++;
         notifyDataSetChanged();
     }
 
@@ -128,6 +134,8 @@ public class PH_Preparation_Ligne_PreparationLotAdapter2025 extends BaseAdapter 
                     viewHolder.textZoneEmplacement = (TextView) convertView.findViewById(R.id.textZoneEmplacement);
                     break;
             }
+
+            ph_preparation_ligneViewHolderList.add(viewHolder);
             convertView.setTag(viewHolder);
         }
 

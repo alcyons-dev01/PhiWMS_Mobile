@@ -111,6 +111,12 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w("DBOpenHelper", "Mise à jour de la version " + oldVersion + " vers la version " + newVersion + ", les anciennes données seront détruites");
+
+        Cursor serviceActiviteMobileExisteCursor = db.rawQuery("SELECT * FROM " + ServiceOpenHelper.Constantes.TABLE_SERVICE, null);
+        int serviceActiviteMobileColumn = serviceActiviteMobileExisteCursor.getColumnIndex("activiteMobile");
+        if (serviceActiviteMobileColumn < 0) {
+            db.execSQL("ALTER TABLE " + ServiceOpenHelper.Constantes.TABLE_SERVICE + " ADD COLUMN activiteMobile TEXT");
+        }
     }
 
     public SQLiteDatabase

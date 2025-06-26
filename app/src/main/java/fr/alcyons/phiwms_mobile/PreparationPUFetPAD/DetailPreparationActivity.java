@@ -119,22 +119,26 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
 
         int nbLigneSansValeur = 0;
         List<String> produitNonRenseigne = new ArrayList<>();
-
+        List<Integer> listeIdPreparationLigne = new ArrayList<>();
         // On vérifie que toutes les ph_preparations_lignes ont une quantité pour au moins un lot
         for (PH_Preparation_Ligne_Preparation_Adapte ph_preparationLigneAdapte : ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes) {
-            int nbLignesAvecValeur = 0;
-
-            for (PH_Preparation_Ligne_Preparation_Adapte.LotAdapte lot : ph_preparationLigneAdapte.getLotAdaptes())
+            if(!listeIdPreparationLigne.contains(ph_preparationLigneAdapte.getPh_preparationLigneID()))
             {
-                if (lot.getQteSaisie() != 0) {
-                    nbLignesAvecValeur++;
-                    nbTotalLotsAvecValeurSaisie++;
+                listeIdPreparationLigne.add(ph_preparationLigneAdapte.getPh_preparationLigneID());
+                int nbLignesAvecValeur = 0;
+
+                for (PH_Preparation_Ligne_Preparation_Adapte.LotAdapte lot : ph_preparationLigneAdapte.getLotAdaptes())
+                {
+                    if (lot.getQteSaisie() != 0) {
+                        nbLignesAvecValeur++;
+                        nbTotalLotsAvecValeurSaisie++;
+                    }
                 }
-            }
-            if (nbLignesAvecValeur == 0) {
-                nbLigneSansValeur ++;
-                PH_Preparation_Ligne ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, ph_preparationLigneAdapte.getPh_preparationLigneID());
-                produitNonRenseigne.add(ph_preparation_ligne.getProduitDesignation());
+                if (nbLignesAvecValeur == 0) {
+                    nbLigneSansValeur ++;
+                    PH_Preparation_Ligne ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, ph_preparationLigneAdapte.getPh_preparationLigneID());
+                    produitNonRenseigne.add(ph_preparation_ligne.getProduitDesignation());
+                }
             }
         }
 
@@ -440,13 +444,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
 
                     if(!utilisation_scan)
                     {
-                        if(ph_preparationLigneViewHolder != null)
-                        {
-                            /*int position = ph_preparation_ligne_preparationLotAdapter.ph_preparation_ligneViewHolderList.indexOf(ph_preparationLigneViewHolder);
-                            if(position != -1) {
-                                ph_preparationLigneAdapteRetourListeLot = ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.get(position);
-                            }*/
-                        }
+                        ph_preparationLigneAdapteRetourListeLot = ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.get(position_selectionne);
                     }
 
                     if(ph_preparationLigneAdapteRetourListeLot != null)
@@ -1240,11 +1238,20 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
             compteurReussiteGlobale = 0;
         }
 
-        if (compteurReussiteGlobale != ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.size()) {
+        if (compteurReussiteGlobale != ph_preparation_ligne_preparationLotAdapter.compteurItem) {
             // Si une erreur est survenue, on annule les modifications en vidant la table ElementASynchroniser
             Alerte.afficherAlerte(DetailPreparationActivity.this, "Alerte", "Une erreur est survenue, aucun traitement ne sera effectué.", "alerte");
             ElementASynchroniserOpenHelper.viderTableElementASynchroniser(db);
 
+            Intent retourListeIntent = new Intent(DetailPreparationActivity.this, ServicePreparationPufActivity.class);
+            if(ph_preparation_Selectionne.getDepotDestinataireReference().contains("-PAD-"))
+                retourListeIntent = new Intent(DetailPreparationActivity.this, ServicePreparationPadActivity.class);
+
+            Bundle extras = new Bundle();
+            extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+            extras.putInt("serviceSelectionneID", serviceActuel.getId());
+            retourListeIntent.putExtras(extras);
+            DetailPreparationActivity.this.startActivity(retourListeIntent);
             DetailPreparationActivity.this.finish();
             return;
         }
