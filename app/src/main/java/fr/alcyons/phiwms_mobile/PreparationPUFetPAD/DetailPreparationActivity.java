@@ -1121,92 +1121,96 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         //fin de la création de l'action utilisateur
 
         // Enregistrement des PH_Preparation_Ligne
+        List<Integer> listeIdPreparationLigne = new ArrayList<>();
         for (PH_Preparation_Ligne_Preparation_Adapte ph_preparationLigneAdapte : ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes) {
-
-            ph_preparationLigneCorrespondant = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, ph_preparationLigneAdapte.getPh_preparationLigneID());
-
-            if(ph_preparationLigneCorrespondant != null)
+            if(!listeIdPreparationLigne.contains(ph_preparationLigneAdapte.getPh_preparationLigneID()))
             {
-                lotsSaisis = new ArrayList<>();
-                for (PH_Preparation_Ligne_Preparation_Adapte.LotAdapte lot : ph_preparationLigneAdapte.getLotAdaptes() ) {
-                    if (lot.getQteSaisie() != 0) {
-                        lotsSaisis.add(lot);
-                    }
-                }
+                listeIdPreparationLigne.add(ph_preparationLigneAdapte.getPh_preparationLigneID());
+                ph_preparationLigneCorrespondant = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, ph_preparationLigneAdapte.getPh_preparationLigneID());
 
-                int GlobalAPreparer = ph_preparationLigneCorrespondant.getQte_Demander();
-                boolean origine = true;
-                PH_Preparation_Ligne ph_preparationLigneCourant = null;
-
-                for (PH_Preparation_Ligne_Preparation_Adapte.LotAdapte lot : lotsSaisis) {
-
-                    if(origine)
-                    {
-                        ph_preparationLigneCourant = new PH_Preparation_Ligne(ph_preparationLigneCorrespondant);
-                        Random random = new Random();
-                        int new_id = random.nextInt();
-                        if(new_id > 0)
-                        {
-                            new_id= new_id*-1;
-                        }
-                        ph_preparationLigneCourant.set_UID(new_id);
-                        origine = false;
-                    }
-                    else
-                    {
-                        ph_preparationLigneCourant = new PH_Preparation_Ligne(ph_preparationLigneCourant);
-                        Random random = new Random();
-                        int new_id = random.nextInt();
-                        if(new_id > 0)
-                        {
-                            new_id= new_id*-1;
-                        }
-                        ph_preparationLigneCourant.set_UID(new_id);
-                    }
-
-                    ph_preparationLigneCourant.setQte_Demander(GlobalAPreparer);
-                    GlobalAPreparer = GlobalAPreparer - lot.getQteSaisie();
-                    ph_preparationLigneCourant.setQte_RAL(GlobalAPreparer);
-                    ph_preparationLigneCourant.setQte_preparer(lot.getQteSaisie());
-                    ph_preparationLigneCourant.setLotNumero(lot.getNumLot().trim());
-                    ph_preparationLigneCourant.setPeremptionDate(lot.getDatePeremption());
-                    ph_preparationLigneCourant.setZoneDepot(lot.getZone().trim());
-                    ph_preparationLigneCourant.setEmplacementParDefaut(lot.getEmplacement().trim());
-                    ph_preparationLigneCourant.setSerieNumero(lot.getNumSerie().trim());
-                    ph_preparationLigneCourant.set_UID_4D(ph_preparationLigneCorrespondant.get_UID_4D());
-
-                    long rowID = PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, ph_preparationLigneCourant);
-                    if (rowID != -1) {
-                        compteurReussiteParLotAvecValeur++;
-                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparationLigneCourant.getPhiMR4UUID(), ph_preparationLigneCourant.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
-                        //gestion des actions lignes
-                        Random randomactionligne = new Random();
-                        int actionligneId = randomactionligne.nextInt();
-                        if(actionligneId > 0)
-                            actionligneId= actionligneId*-1;
-
-                        ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.getId(), "PH_Preparation_Ligne", ph_preparationLigneCourant.get_UID(), "", 0, (int)ph_preparationLigneCourant.getQte_preparer(), ph_preparationLigneCourant.getProduitDesignation());
-                        ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne);
-
-                        //gestion de la mise à jour des PH_Stock_Lot_Emplacement
-                        Stock_Lot_Emplacement_Light stock_lot_emplacement = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, lot.getStockLotEmplacementID());
-                        if(stock_lot_emplacement != null)
-                        {
-                            stock_lot_emplacement.setQte(stock_lot_emplacement.getQte()-stock_lot_emplacement.getQte_Preparer());
-                            Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_lot_emplacement);
-                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, stock_lot_emplacement.getPhiMR4UUID(), stock_lot_emplacement.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
+                if(ph_preparationLigneCorrespondant != null)
+                {
+                    lotsSaisis = new ArrayList<>();
+                    for (PH_Preparation_Ligne_Preparation_Adapte.LotAdapte lot : ph_preparationLigneAdapte.getLotAdaptes() ) {
+                        if (lot.getQteSaisie() != 0) {
+                            lotsSaisis.add(lot);
                         }
                     }
-                }
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparationLigneCorrespondant.getPhiMR4UUID(), ph_preparationLigneCorrespondant.get_UID(), DBOpenHelper.ActionsEAS.SUPPR);
-                PH_Preparation_LigneOpenHelper.supprimerUnPhPreparationLigne(db, ph_preparationLigneCorrespondant);
-                compteurReussiteGlobale++;
-                if (GlobalAPreparer > 0) {
-                    PH_Preparation_Ligne ph_preparation_reliquat = new PH_Preparation_Ligne(ph_preparationLigneCorrespondant);
-                    ph_preparation_reliquat.setQte_Demander(GlobalAPreparer);
-                    ph_preparation_reliquat.setQte_RAL(GlobalAPreparer);
-                    ph_preparation_reliquat.setQte_preparer(0);
-                    PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, ph_preparation_reliquat);
+
+                    int GlobalAPreparer = ph_preparationLigneCorrespondant.getQte_Demander();
+                    boolean origine = true;
+                    PH_Preparation_Ligne ph_preparationLigneCourant = null;
+
+                    for (PH_Preparation_Ligne_Preparation_Adapte.LotAdapte lot : lotsSaisis) {
+
+                        if(origine)
+                        {
+                            ph_preparationLigneCourant = new PH_Preparation_Ligne(ph_preparationLigneCorrespondant);
+                            Random random = new Random();
+                            int new_id = random.nextInt();
+                            if(new_id > 0)
+                            {
+                                new_id= new_id*-1;
+                            }
+                            ph_preparationLigneCourant.set_UID(new_id);
+                            origine = false;
+                        }
+                        else
+                        {
+                            ph_preparationLigneCourant = new PH_Preparation_Ligne(ph_preparationLigneCourant);
+                            Random random = new Random();
+                            int new_id = random.nextInt();
+                            if(new_id > 0)
+                            {
+                                new_id= new_id*-1;
+                            }
+                            ph_preparationLigneCourant.set_UID(new_id);
+                        }
+
+                        ph_preparationLigneCourant.setQte_Demander(GlobalAPreparer);
+                        GlobalAPreparer = GlobalAPreparer - lot.getQteSaisie();
+                        ph_preparationLigneCourant.setQte_RAL(GlobalAPreparer);
+                        ph_preparationLigneCourant.setQte_preparer(lot.getQteSaisie());
+                        ph_preparationLigneCourant.setLotNumero(lot.getNumLot().trim());
+                        ph_preparationLigneCourant.setPeremptionDate(lot.getDatePeremption());
+                        ph_preparationLigneCourant.setZoneDepot(lot.getZone().trim());
+                        ph_preparationLigneCourant.setEmplacementParDefaut(lot.getEmplacement().trim());
+                        ph_preparationLigneCourant.setSerieNumero(lot.getNumSerie().trim());
+                        ph_preparationLigneCourant.set_UID_4D(ph_preparationLigneCorrespondant.get_UID_4D());
+
+                        long rowID = PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, ph_preparationLigneCourant);
+                        if (rowID != -1) {
+                            compteurReussiteParLotAvecValeur++;
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparationLigneCourant.getPhiMR4UUID(), ph_preparationLigneCourant.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                            //gestion des actions lignes
+                            Random randomactionligne = new Random();
+                            int actionligneId = randomactionligne.nextInt();
+                            if(actionligneId > 0)
+                                actionligneId= actionligneId*-1;
+
+                            ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.getId(), "PH_Preparation_Ligne", ph_preparationLigneCourant.get_UID(), "", 0, (int)ph_preparationLigneCourant.getQte_preparer(), ph_preparationLigneCourant.getProduitDesignation());
+                            ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne);
+
+                            //gestion de la mise à jour des PH_Stock_Lot_Emplacement
+                            Stock_Lot_Emplacement_Light stock_lot_emplacement = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, lot.getStockLotEmplacementID());
+                            if(stock_lot_emplacement != null)
+                            {
+                                stock_lot_emplacement.setQte(stock_lot_emplacement.getQte()-stock_lot_emplacement.getQte_Preparer());
+                                Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_lot_emplacement);
+                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, stock_lot_emplacement.getPhiMR4UUID(), stock_lot_emplacement.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
+                            }
+                        }
+                    }
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparationLigneCorrespondant.getPhiMR4UUID(), ph_preparationLigneCorrespondant.get_UID(), DBOpenHelper.ActionsEAS.SUPPR);
+                    PH_Preparation_LigneOpenHelper.supprimerUnPhPreparationLigne(db, ph_preparationLigneCorrespondant);
+                    compteurReussiteGlobale++;
+                    if (GlobalAPreparer > 0) {
+                        PH_Preparation_Ligne ph_preparation_reliquat = new PH_Preparation_Ligne(ph_preparationLigneCorrespondant);
+                        ph_preparation_reliquat.setQte_Demander(GlobalAPreparer);
+                        ph_preparation_reliquat.setQte_RAL(GlobalAPreparer);
+                        ph_preparation_reliquat.setQte_preparer(0);
+                        PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, ph_preparation_reliquat);
+                    }
                 }
             }
         }

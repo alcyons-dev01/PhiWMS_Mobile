@@ -6,27 +6,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.EVENTOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
-import fr.alcyons.phiwms_mobile.Classes.Dotation;
+
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_Preparation_Adapte;
@@ -47,8 +40,6 @@ public class PH_Preparation_Ligne_PreparationLotAdapter2025 extends BaseAdapter 
     public List<PH_Preparation_Ligne_Preparation_Adapte> ph_preparation_lignes_Adaptes;
     public int compteurItem;
     public List<PH_PreparationLigneViewHolder> ph_preparation_ligneViewHolderList;
-    public PH_Preparation_Ligne_PreparationLotAdapter.PH_PreparationLigneViewHolder viewHolder;
-
 
     public PH_Preparation_Ligne_PreparationLotAdapter2025(Context context, SQLiteDatabase database, Utilisateur utilisateur) {
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
