@@ -16,6 +16,7 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.negative.BarcodeCaptureNegativeActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
@@ -113,12 +114,52 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
         }*/
         else if(chaine.startsWith("PHITAGPLACE") && nouveau_lot == null)
         {
-            ((ScannerPreparationActivity) context).afficherSnackBar("Veuillez scanner une référence");
+            String activityName = context.getClass().getSimpleName();
+            if(activityName.contentEquals("BarcodeCaptureActivity"))
+            {
+                ((BarcodeCaptureActivity) context).afficherSnackBar("Veuillez scanner une référence");
+            }
+            else if(activityName.contentEquals("BarcodePreparationActivity"))
+            {
+                ((BarcodePreparationActivity) context).afficherSnackBar("Veuillez scanner une référence");
+            }
+            else if(activityName.contentEquals("ScannerPreparationActivity"))
+            {
+                ((ScannerPreparationActivity)context).afficherSnackBar("Veuillez scanner une référence");
+            }
+            else if(activityName.contentEquals("ScannerReceptionActivity"))
+            {
+                ((ScannerReceptionActivity)context).afficherSnackBar("Veuillez scanner une référence");
+            }
+            else
+            {
+                ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Veuillez scanner une référence");
+            }
             validation = true;
         }
         else if(emplacement_courant == null && nouveau_lot != null)
         {
-            ((ScannerPreparationActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
+            String activityName = context.getClass().getSimpleName();
+            if(activityName.contentEquals("BarcodeCaptureActivity"))
+            {
+                ((BarcodeCaptureActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
+            }
+            else if(activityName.contentEquals("BarcodePreparationActivity"))
+            {
+                ((BarcodePreparationActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
+            }
+            else if(activityName.contentEquals("ScannerPreparationActivity"))
+            {
+                ((ScannerPreparationActivity)context).afficherSnackBar("Veuillez scanner un emplacement");
+            }
+            else if(activityName.contentEquals("ScannerReceptionActivity"))
+            {
+                ((ScannerReceptionActivity)context).afficherSnackBar("Veuillez scanner un emplacement");
+            }
+            else
+            {
+                ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
+            }
             validation = true;
         }
         else
@@ -153,7 +194,26 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
                         else if(produits.size() > 1)
                         {
                             String activityName = context.getClass().getSimpleName();
-                            ((BarcodePreparationActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
+                            if(activityName.contentEquals("BarcodeCaptureActivity"))
+                            {
+                                ((BarcodeCaptureActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                            }
+                            else if(activityName.contentEquals("BarcodePreparationActivity"))
+                            {
+                                ((BarcodePreparationActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                            }
+                            else if(activityName.contentEquals("ScannerPreparationActivity"))
+                            {
+                                ((ScannerPreparationActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
+                            }
+                            else if(activityName.contentEquals("ScannerReceptionActivity"))
+                            {
+                                ((ScannerReceptionActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
+                            }
+                            else
+                            {
+                                ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                            }
                             nouveau_lot = null;
                             qte_lot_courant = 0;
                             validation = true;
@@ -178,7 +238,26 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
                         else if(produits.size() > 1)
                         {
                             String activityName = context.getClass().getSimpleName();
-                            ((BarcodePreparationActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
+                            if(activityName.contentEquals("BarcodeCaptureActivity"))
+                            {
+                                ((BarcodeCaptureActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                            }
+                            else if(activityName.contentEquals("BarcodePreparationActivity"))
+                            {
+                                ((BarcodePreparationActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                            }
+                            else if(activityName.contentEquals("ScannerPreparationActivity"))
+                            {
+                                ((ScannerPreparationActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
+                            }
+                            else if(activityName.contentEquals("ScannerReceptionActivity"))
+                            {
+                                ((ScannerReceptionActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
+                            }
+                            else
+                            {
+                                ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                            }
                             nouveau_lot = null;
                             qte_lot_courant = 0;
                             validation = true;
@@ -278,7 +357,27 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
 
                 if(reliquat_courant != null && reliquat_courant.getQteReliquat_X() ==0)
                 {
-                    ((ScannerPreparationActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
+                    String activityName = context.getClass().getSimpleName();
+                    if(activityName.contentEquals("BarcodeCaptureActivity"))
+                    {
+                        ((BarcodeCaptureActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                    }
+                    else if(activityName.contentEquals("BarcodePreparationActivity"))
+                    {
+                        ((BarcodePreparationActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                    }
+                    else if(activityName.contentEquals("ScannerPreparationActivity"))
+                    {
+                        ((ScannerPreparationActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
+                    }
+                    else if(activityName.contentEquals("ScannerReceptionActivity"))
+                    {
+                        ((ScannerReceptionActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
+                    }
+                    else
+                    {
+                        ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                    }
                     nouveau_lot = null;
                     qte_lot_courant = 0;
                     emplacement_courant = null;
@@ -286,7 +385,27 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
                 }
                 else if(!produit_present)
                 {
-                    ((ScannerPreparationActivity)context).afficherSnackBar("Mauvais produit scanné");
+                    String activityName = context.getClass().getSimpleName();
+                    if(activityName.contentEquals("BarcodeCaptureActivity"))
+                    {
+                        ((BarcodeCaptureActivity) context).afficherSnackBar("Mauvais produit scanné");
+                    }
+                    else if(activityName.contentEquals("BarcodePreparationActivity"))
+                    {
+                        ((BarcodePreparationActivity) context).afficherSnackBar("Mauvais produit scanné");
+                    }
+                    else if(activityName.contentEquals("ScannerPreparationActivity"))
+                    {
+                        ((ScannerPreparationActivity)context).afficherSnackBar("Mauvais produit scanné");
+                    }
+                    else if(activityName.contentEquals("ScannerReceptionActivity"))
+                    {
+                        ((ScannerReceptionActivity)context).afficherSnackBar("Mauvais produit scanné");
+                    }
+                    else
+                    {
+                        ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Mauvais produit scanné");
+                    }
                     nouveau_lot = null;
                     qte_lot_courant = 0;
                     emplacement_courant = null;
@@ -332,36 +451,39 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
                                     serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int) ph_serialisation_uid);
                                 }
 
-                                resultat = serialisation_courante.getResultat();
-                                if (resultat.contentEquals("INACTIVE") || resultat.contentEquals("UNKNOWN")) {
-                                    Random SurveillanceReferenceRandom = new Random();
-                                    int id_surveillance = SurveillanceReferenceRandom.nextInt();
-                                    if (id_surveillance > 0) {
-                                        id_surveillance = id_surveillance * -1;
+                                if (serialisation_courante != null) {
+                                    resultat = serialisation_courante.getResultat();
+                                    if (resultat.contentEquals("INACTIVE") || resultat.contentEquals("UNKNOWN")) {
+                                        Random SurveillanceReferenceRandom = new Random();
+                                        int id_surveillance = SurveillanceReferenceRandom.nextInt();
+                                        if (id_surveillance > 0) {
+                                            id_surveillance = id_surveillance * -1;
+                                        }
+                                        Calendar calendar = Calendar.getInstance();
+                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                        String surveillanceDate = sdf.format(calendar.getTime());
+
+                                        SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
+                                        String surveillanceHeure = mdformat.format(calendar.getTime());
+
+                                        int produit_id = serialisation_courante.getProduitUID();
+                                        int serialisationID = serialisation_courante.get_UID();
+                                        String motif = GestionCodeErreurNMVO.getMessage(code);
+                                        String actionAMener = "";
+                                        String statut = "NON LU";
+                                        String traitePar = utilisateurConnecte.getIdentifiant();
+                                        String traiteDate = surveillanceDate;
+                                        String traiteHeure = surveillanceHeure;
+                                        String produitLot = serialisation_courante.getNumeroLot();
+                                        String produitDatePéremption = serialisation_courante.getDatePeremptionAAMMJJ();
+                                        String produitNumeroSerie = serialisation_courante.getNumeroSerie();
+
+                                        SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
+                                    } else {
+                                        String messageTexteFranceMVO = "";
                                     }
-                                    Calendar calendar = Calendar.getInstance();
-                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                                    String surveillanceDate = sdf.format(calendar.getTime());
-
-                                    SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
-                                    String surveillanceHeure = mdformat.format(calendar.getTime());
-
-                                    int produit_id = serialisation_courante.getProduitUID();
-                                    int serialisationID = serialisation_courante.get_UID();
-                                    String motif = GestionCodeErreurNMVO.getMessage(code);
-                                    String actionAMener = "";
-                                    String statut = "NON LU";
-                                    String traitePar = utilisateurConnecte.getIdentifiant();
-                                    String traiteDate = surveillanceDate;
-                                    String traiteHeure = surveillanceHeure;
-                                    String produitLot = serialisation_courante.getNumeroLot();
-                                    String produitDatePéremption = serialisation_courante.getDatePeremptionAAMMJJ();
-                                    String produitNumeroSerie = serialisation_courante.getNumeroSerie();
-
-                                    SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
-                                } else {
-                                    String messageTexteFranceMVO = "";
                                 }
+
                             }
 
                             /***Fin de la sérialisation***/
@@ -375,7 +497,27 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
                     }
                     else
                     {
-                        ((ScannerPreparationActivity) context).afficherSnackBar("Produit inconnu");
+                        String activityName = context.getClass().getSimpleName();
+                        if(activityName.contentEquals("BarcodeCaptureActivity"))
+                        {
+                            ((BarcodeCaptureActivity) context).afficherSnackBar("Produit inconnu");
+                        }
+                        else if(activityName.contentEquals("BarcodePreparationActivity"))
+                        {
+                            ((BarcodePreparationActivity) context).afficherSnackBar("Produit inconnu");
+                        }
+                        else if(activityName.contentEquals("ScannerPreparationActivity"))
+                        {
+                            ((ScannerPreparationActivity)context).afficherSnackBar("Produit inconnu");
+                        }
+                        else if(activityName.contentEquals("ScannerReceptionActivity"))
+                        {
+                            ((ScannerReceptionActivity)context).afficherSnackBar("Produit inconnu");
+                        }
+                        else
+                        {
+                            ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Produit inconnu");
+                        }
                         nouveau_lot = null;
                         qte_lot_courant = 0;
                         phReliquatReceptionPUIAdapte_courant = null;
@@ -433,14 +575,21 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
         else if(s.startsWith("PHITAGPLACE") && nouveau_lot == null)
         {
             String activityName = context.getClass().getSimpleName();
-
-            if(activityName.contentEquals("BarcodePreparationActivity"))
+            if(activityName.contentEquals("BarcodeCaptureActivity"))
+            {
+                ((BarcodeCaptureActivity) context).afficherSnackBar("Veuillez scanner une référence");
+            }
+            else if(activityName.contentEquals("BarcodePreparationActivity"))
             {
                 ((BarcodePreparationActivity) context).afficherSnackBar("Veuillez scanner une référence");
             }
-            else if(activityName.contentEquals("BarcodeReceptionActivity"))
+            else if(activityName.contentEquals("ScannerPreparationActivity"))
             {
-                ((BarcodeReceptionActivity) context).afficherSnackBar("Veuillez scanner une référence");
+                ((ScannerPreparationActivity)context).afficherSnackBar("Veuillez scanner une référence");
+            }
+            else if(activityName.contentEquals("ScannerReceptionActivity"))
+            {
+                ((ScannerReceptionActivity)context).afficherSnackBar("Veuillez scanner une référence");
             }
             else
             {
@@ -452,14 +601,21 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
         else if(emplacement_courant == null && nouveau_lot != null)
         {
             String activityName = context.getClass().getSimpleName();
-
-            if(activityName.contentEquals("BarcodePreparationActivity"))
+            if(activityName.contentEquals("BarcodeCaptureActivity"))
+            {
+                ((BarcodeCaptureActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
+            }
+            else if(activityName.contentEquals("BarcodePreparationActivity"))
             {
                 ((BarcodePreparationActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
             }
-            else if(activityName.contentEquals("BarcodeReceptionActivity"))
+            else if(activityName.contentEquals("ScannerPreparationActivity"))
             {
-                ((BarcodeReceptionActivity) context).afficherSnackBar("Veuillez scanner un emplacement");
+                ((ScannerPreparationActivity)context).afficherSnackBar("Veuillez scanner un emplacement");
+            }
+            else if(activityName.contentEquals("ScannerReceptionActivity"))
+            {
+                ((ScannerReceptionActivity)context).afficherSnackBar("Veuillez scanner un emplacement");
             }
             else
             {
@@ -507,14 +663,19 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
                         {
                             ((BarcodePreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
                         }
-                        else if(activityName.contentEquals("BarcodeReceptionActivity"))
+                        else if(activityName.contentEquals("ScannerPreparationActivity"))
                         {
-                            ((BarcodeReceptionActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                            ((ScannerPreparationActivity)context).afficherSnackBar("Le code concerne plusieurs produits");
+                        }
+                        else if(activityName.contentEquals("ScannerReceptionActivity"))
+                        {
+                            ((ScannerReceptionActivity)context).afficherSnackBar("Le code concerne plusieurs produits");
                         }
                         else
                         {
                             ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
                         }
+
                         validation = true;
                         code = "";
                         return false;
@@ -546,14 +707,19 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
                         {
                             ((BarcodePreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
                         }
-                        else if(activityName.contentEquals("BarcodeReceptionActivity"))
+                        else if(activityName.contentEquals("ScannerPreparationActivity"))
                         {
-                            ((BarcodeReceptionActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                            ((ScannerPreparationActivity)context).afficherSnackBar("Le code concerne plusieurs produits");
+                        }
+                        else if(activityName.contentEquals("ScannerReceptionActivity"))
+                        {
+                            ((ScannerReceptionActivity)context).afficherSnackBar("Le code concerne plusieurs produits");
                         }
                         else
                         {
                             ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
                         }
+
                         validation = true;
                         code = "";
                         return false;
@@ -651,13 +817,61 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
 
             if(reliquat_courant != null && reliquat_courant.getQteReliquat_X() ==0)
             {
-                ((BarcodeReceptionActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
+                String activityName = context.getClass().getSimpleName();
+                if(activityName.contentEquals("BarcodeCaptureActivity"))
+                {
+                    ((BarcodeCaptureActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                }
+                else if(activityName.contentEquals("BarcodePreparationActivity"))
+                {
+                    ((BarcodePreparationActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                }
+                else if(activityName.contentEquals("BarcodeReceptionActivity"))
+                {
+                    ((BarcodeReceptionActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
+                }
+                else if(activityName.contentEquals("ScannerPreparationActivity"))
+                {
+                    ((ScannerPreparationActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
+                }
+                else if(activityName.contentEquals("ScannerReceptionActivity"))
+                {
+                    ((ScannerReceptionActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
+                }
+                else
+                {
+                    ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                }
                 validation = true;
                 emplacement_courant = null;
             }
             else if(!produit_present)
             {
-                ((BarcodeReceptionActivity)context).afficherSnackBar("Mauvais produit scanné");
+                String activityName = context.getClass().getSimpleName();
+                if(activityName.contentEquals("BarcodeCaptureActivity"))
+                {
+                    ((BarcodeCaptureActivity) context).afficherSnackBar("Mauvais produit scanné");
+                }
+                else if(activityName.contentEquals("BarcodePreparationActivity"))
+                {
+                    ((BarcodePreparationActivity) context).afficherSnackBar("Mauvais produit scanné");
+                }
+                else if(activityName.contentEquals("BarcodeReceptionActivity"))
+                {
+                    ((BarcodeReceptionActivity)context).afficherSnackBar("Mauvais produit scanné");
+                }
+                else if(activityName.contentEquals("ScannerPreparationActivity"))
+                {
+                    ((ScannerPreparationActivity)context).afficherSnackBar("Mauvais produit scanné");
+                }
+                else if(activityName.contentEquals("ScannerReceptionActivity"))
+                {
+                    ((ScannerReceptionActivity)context).afficherSnackBar("Mauvais produit scanné");
+                }
+                else
+                {
+                    ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Mauvais produit scanné");
+                }
                 validation = true;
                 emplacement_courant = null;
                 //lot_courant = null;
@@ -703,40 +917,44 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
                                 serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int) ph_serialisation_uid);
                             }
 
-                            resultat = serialisation_courante.getResultat();
-                            if (resultat.contentEquals("INACTIVE") || resultat.contentEquals("UNKNOWN")) {
-                                Random SurveillanceReferenceRandom = new Random();
-                                int id_surveillance = SurveillanceReferenceRandom.nextInt();
-                                if (id_surveillance > 0) {
-                                    id_surveillance = id_surveillance * -1;
+                            if(serialisation_courante != null)
+                            {
+                                resultat = serialisation_courante.getResultat();
+                                if (resultat.contentEquals("INACTIVE") || resultat.contentEquals("UNKNOWN")) {
+                                    Random SurveillanceReferenceRandom = new Random();
+                                    int id_surveillance = SurveillanceReferenceRandom.nextInt();
+                                    if (id_surveillance > 0) {
+                                        id_surveillance = id_surveillance * -1;
+                                    }
+                                    Calendar calendar = Calendar.getInstance();
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                    String surveillanceDate = sdf.format(calendar.getTime());
+
+                                    SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
+                                    String surveillanceHeure = mdformat.format(calendar.getTime());
+
+                                    int produit_id = serialisation_courante.getProduitUID();
+                                    int serialisationID = serialisation_courante.get_UID();
+                                    String motif = GestionCodeErreurNMVO.getMessage(code);
+                                    String actionAMener = "";
+                                    String statut = "NON LU";
+                                    String traitePar = utilisateurConnecte.getIdentifiant();
+                                    String traiteDate = surveillanceDate;
+                                    String traiteHeure = surveillanceHeure;
+                                    String produitLot = serialisation_courante.getNumeroLot();
+                                    String produitDatePéremption = serialisation_courante.getDatePeremptionAAMMJJ();
+                                    String produitNumeroSerie = serialisation_courante.getNumeroSerie();
+
+                                    SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
+
+
+                                    //((BarcodeCaptureActivity) context).afficherAlerteFranceMVO(produit.getDesignation_interne(), resultat, serie, motif);
+
+                                } else {
+                                    String messageTexteFranceMVO = "";
                                 }
-                                Calendar calendar = Calendar.getInstance();
-                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                                String surveillanceDate = sdf.format(calendar.getTime());
-
-                                SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
-                                String surveillanceHeure = mdformat.format(calendar.getTime());
-
-                                int produit_id = serialisation_courante.getProduitUID();
-                                int serialisationID = serialisation_courante.get_UID();
-                                String motif = GestionCodeErreurNMVO.getMessage(code);
-                                String actionAMener = "";
-                                String statut = "NON LU";
-                                String traitePar = utilisateurConnecte.getIdentifiant();
-                                String traiteDate = surveillanceDate;
-                                String traiteHeure = surveillanceHeure;
-                                String produitLot = serialisation_courante.getNumeroLot();
-                                String produitDatePéremption = serialisation_courante.getDatePeremptionAAMMJJ();
-                                String produitNumeroSerie = serialisation_courante.getNumeroSerie();
-
-                                SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
-
-
-                                //((BarcodeCaptureActivity) context).afficherAlerteFranceMVO(produit.getDesignation_interne(), resultat, serie, motif);
-
-                            } else {
-                                String messageTexteFranceMVO = "";
                             }
+
                         }
 
                         /***Fin de la sérialisation***/
@@ -761,12 +979,21 @@ public class NewUniqueReceptionPUIContext extends MainActivity {
                     }
                     else if(activityName.contentEquals("BarcodeReceptionActivity"))
                     {
-                        ((BarcodeReceptionActivity) context).afficherSnackBar("Produit inconnu");
+                        ((BarcodeReceptionActivity)context).afficherSnackBar("Produit inconnu");
+                    }
+                    else if(activityName.contentEquals("ScannerPreparationActivity"))
+                    {
+                        ((ScannerPreparationActivity)context).afficherSnackBar("Produit inconnu");
+                    }
+                    else if(activityName.contentEquals("ScannerReceptionActivity"))
+                    {
+                        ((ScannerReceptionActivity)context).afficherSnackBar("Produit inconnu");
                     }
                     else
                     {
                         ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Produit inconnu");
                     }
+
                     validation = true;
                     code = "";
                 }

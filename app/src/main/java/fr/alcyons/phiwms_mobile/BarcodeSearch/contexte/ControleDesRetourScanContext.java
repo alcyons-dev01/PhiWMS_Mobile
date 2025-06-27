@@ -207,39 +207,43 @@ public class ControleDesRetourScanContext extends MainActivity {
                                         serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int) ph_serialisation_uid);
                                     }
 
-                                    resultat = serialisation_courante.getResultat();
-                                    if (resultat.contentEquals("INACTIVE") || resultat.contentEquals("UNKNOWN")) {
-                                        Random SurveillanceReferenceRandom = new Random();
-                                        int id_surveillance = SurveillanceReferenceRandom.nextInt();
-                                        if (id_surveillance > 0) {
-                                            id_surveillance = id_surveillance * -1;
+                                    if(serialisation_courante != null)
+                                    {
+                                        resultat = serialisation_courante.getResultat();
+                                        if (resultat.contentEquals("INACTIVE") || resultat.contentEquals("UNKNOWN")) {
+                                            Random SurveillanceReferenceRandom = new Random();
+                                            int id_surveillance = SurveillanceReferenceRandom.nextInt();
+                                            if (id_surveillance > 0) {
+                                                id_surveillance = id_surveillance * -1;
+                                            }
+                                            Calendar calendar = Calendar.getInstance();
+                                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                            String surveillanceDate = sdf.format(calendar.getTime());
+
+                                            SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
+                                            String surveillanceHeure = mdformat.format(calendar.getTime());
+
+                                            int produit_id = serialisation_courante.getProduitUID();
+                                            int serialisationID = serialisation_courante.get_UID();
+                                            String motif = GestionCodeErreurNMVO.getMessage(code);
+                                            String actionAMener = "";
+                                            String statut = "NON LU";
+                                            String traitePar = utilisateurConnecte.getIdentifiant();
+                                            String traiteDate = surveillanceDate;
+                                            String traiteHeure = surveillanceHeure;
+                                            String produitLot = serialisation_courante.getNumeroLot();
+                                            String produitDatePéremption = serialisation_courante.getDatePeremptionAAMMJJ();
+                                            String produitNumeroSerie = serialisation_courante.getNumeroSerie();
+
+                                            SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
+
+                                            ((BarcodeCaptureActivity) context).afficherAlerteFranceMVO(produit.getDesignation_interne(), resultat, serie, motif);
+
+                                        } else {
+                                            String messageTexteFranceMVO = "";
                                         }
-                                        Calendar calendar = Calendar.getInstance();
-                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                                        String surveillanceDate = sdf.format(calendar.getTime());
-
-                                        SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
-                                        String surveillanceHeure = mdformat.format(calendar.getTime());
-
-                                        int produit_id = serialisation_courante.getProduitUID();
-                                        int serialisationID = serialisation_courante.get_UID();
-                                        String motif = GestionCodeErreurNMVO.getMessage(code);
-                                        String actionAMener = "";
-                                        String statut = "NON LU";
-                                        String traitePar = utilisateurConnecte.getIdentifiant();
-                                        String traiteDate = surveillanceDate;
-                                        String traiteHeure = surveillanceHeure;
-                                        String produitLot = serialisation_courante.getNumeroLot();
-                                        String produitDatePéremption = serialisation_courante.getDatePeremptionAAMMJJ();
-                                        String produitNumeroSerie = serialisation_courante.getNumeroSerie();
-
-                                        SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
-
-                                        ((BarcodeCaptureActivity) context).afficherAlerteFranceMVO(produit.getDesignation_interne(), resultat, serie, motif);
-
-                                    } else {
-                                        String messageTexteFranceMVO = "";
                                     }
+
                                 }
 
                                 /***Fin de la sérialisation***/

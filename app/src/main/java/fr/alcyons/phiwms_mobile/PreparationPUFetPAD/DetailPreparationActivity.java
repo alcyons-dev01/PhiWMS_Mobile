@@ -444,7 +444,8 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
 
                     if(!utilisation_scan)
                     {
-                        ph_preparationLigneAdapteRetourListeLot = ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.get(position_selectionne);
+                        if(ph_preparation_ligne_preparationLotAdapter != null)
+                            ph_preparationLigneAdapteRetourListeLot = ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.get(position_selectionne);
                     }
 
                     if(ph_preparationLigneAdapteRetourListeLot != null)
