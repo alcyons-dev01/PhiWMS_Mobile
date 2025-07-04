@@ -171,8 +171,9 @@ public class OutilsDecodage {
             int i=0;
             while (i<7) {
                 String AI_Courant = "";
-                if(scanner_VA.length() > 0)
-                    AI_Courant = scanner_VA.substring(0,2);
+                if(!scanner_VA.isEmpty())
+                    if(scanner_VA.length()>2)
+                        AI_Courant = scanner_VA.substring(0,2);
 
                 switch (AI_Courant) {
                     case "01":

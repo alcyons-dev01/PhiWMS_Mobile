@@ -526,7 +526,8 @@ public class ScannerReceptionActivity extends ServiceActivity {
 
                             String dateDePeremption = newUniqueReceptionPUIContext.nouveau_lot.getDatePeremption();
                             String[] dateDePeremtpionTab = dateDePeremption.split("-");
-                            dateDePeremption = dateDePeremtpionTab[2] + "/" + dateDePeremtpionTab[1] + "/" + dateDePeremtpionTab[0];
+                            if(dateDePeremtpionTab.length > 1 )
+                                dateDePeremption = dateDePeremtpionTab[2] + "/" + dateDePeremtpionTab[1] + "/" + dateDePeremtpionTab[0];
 
                             ((TextView) findViewById(R.id.datePeremptionLot)).setText(dateDePeremption);
 

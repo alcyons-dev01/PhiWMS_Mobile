@@ -337,14 +337,23 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
         MenuItem itemInformation = menu.findItem(R.id.menuInformation);
         itemInformation.setOnMenuItemClickListener(item -> {
             actionListView = (ListView) findViewById(R.id.listeView);
-            if(!navigationAdapter.afficherInfo)
+            if(navigationAdapter != null)
             {
-                navigationAdapter = new NavigationAdapter(NavigationActivity.this, utilisateurConnecte, db, liste_service, mapServiceIndicateur, perimetreFonctionnelCourant.getNom(), true);
+                if(!navigationAdapter.afficherInfo)
+                {
+                    navigationAdapter = new NavigationAdapter(NavigationActivity.this, utilisateurConnecte, db, liste_service, mapServiceIndicateur, perimetreFonctionnelCourant.getNom(), true);
+                }
+                else
+                {
+                    navigationAdapter = new NavigationAdapter(NavigationActivity.this, utilisateurConnecte, db, liste_service, mapServiceIndicateur, perimetreFonctionnelCourant.getNom(), false);
+                }
             }
             else
             {
                 navigationAdapter = new NavigationAdapter(NavigationActivity.this, utilisateurConnecte, db, liste_service, mapServiceIndicateur, perimetreFonctionnelCourant.getNom(), false);
+
             }
+
             actionListView.setAdapter(navigationAdapter);
             actionListView.setDivider(footer);
             return true;
