@@ -154,8 +154,14 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
                 else
                 {
                     removeSearch.setVisibility(View.GONE);
-                    dotationGlobaleAdapter.phPreparationLigneList.clear();
-                    dotationGlobaleAdapter.phPreparationLigneList.addAll(dotationGlobaleAdapter.phPreparationLigneOriginalList);
+                    if(dotationGlobaleAdapter != null)
+                    {
+                        if(dotationGlobaleAdapter.phPreparationLigneOriginalList != null)
+                        {
+                            dotationGlobaleAdapter.phPreparationLigneList.clear();
+                            dotationGlobaleAdapter.phPreparationLigneList.addAll(dotationGlobaleAdapter.phPreparationLigneOriginalList);
+                        }
+                    }
                 }
                 dotationGlobaleAdapter.notifyDataSetChanged();
             }
