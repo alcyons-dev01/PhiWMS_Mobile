@@ -150,7 +150,7 @@
                 android:layout_weight="1"
                 android:textSize="18dp"
                 android:textColor="@color/bleu_clair_alcyons"
-                android:text="Dotation"
+                android:text="Besoin"
                 android:gravity="center"
                 android:layout_gravity="center"/>
 
