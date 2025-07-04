@@ -707,7 +707,7 @@ public class ScannerPreparationActivity extends ServiceActivity {
                                     //((TextView) findViewById(R.id.EmplacementLotProduit)).setText(lotCourant.getEmplacement());
 
 
-                                    if (preparationSimpleContext.produit.getCond_distrib() < qte_restante)
+                                    if (preparationSimpleContext.produit != null && preparationSimpleContext.produit.getCond_distrib() < qte_restante)
                                         qte_restante = (int) preparationSimpleContext.produit.getCond_distrib();
                                     ((TextView) findViewById(R.id.numeroLot)).setText(lotCourant.getNumLot());
                                     if (lotCourant.getNumSerie() != null && !lotCourant.getNumSerie().contentEquals("")) {

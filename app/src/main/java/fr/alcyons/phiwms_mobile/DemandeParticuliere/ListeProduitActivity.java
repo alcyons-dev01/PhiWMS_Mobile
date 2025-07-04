@@ -151,17 +151,17 @@ public class ListeProduitActivity extends ServiceActivity implements DemandePart
                         removeSearch.performClick();
                         String codeComplet = data.getStringExtra("code");
                         if (codeComplet != null && !codeComplet.contentEquals("")) {
-                            if(codeComplet.toLowerCase().startsWith("phitagtin:"))
+                            if(codeComplet.toLowerCase().startsWith("phitagtin"))
                             {
-                                String[] tabProduit = codeComplet.toLowerCase().split("phitagtin:");
+                                String[] tabProduit = codeComplet.toLowerCase().split("phitagtin");
                                 if (tabProduit.length > 1) {
                                     String gtin = tabProduit[tabProduit.length - 1];
                                     produit = ProduitOpenHelper.getUnProduitParGTIN(db, gtin);
                                 }
                             }
-                            else if(codeComplet.toLowerCase().startsWith("phitagref:"))
+                            else if(codeComplet.toLowerCase().startsWith("phitagref"))
                             {
-                                String[] tabProduit = codeComplet.toLowerCase().split("phitagref:");
+                                String[] tabProduit = codeComplet.toLowerCase().split("phitagref");
                                 if (tabProduit.length > 1) {
                                     int id = Integer.parseInt(tabProduit[tabProduit.length - 1]);
                                     produit = ProduitOpenHelper.getProduitByID(db, id);

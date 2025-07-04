@@ -755,6 +755,9 @@ public class PreparationMultipleContext
             {
                 PH_Preparation_Ligne ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, preparation_ligne_id);
 
+                if(liste_preparation_liste_adapte == null)
+                    liste_preparation_liste_adapte = new ArrayList<>();
+
                 for(int i = 0; i < liste_preparation_liste_adapte.size(); i++)
                 {
 
