@@ -14,21 +14,21 @@ import java.util.List;
 import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
-import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_ReceptionPUI_Adapte;
+import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_Reception_Adapte;
 import fr.alcyons.phiwms_mobile.R;
 
 public class ZonetEtEmplacementExpandableAdapter extends BaseExpandableListAdapter {
 
-    Map<Depot_Zone, List<PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement>> ParentListItemsTemp;
-    List<PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement> tempListeEmplacement;
+    Map<Depot_Zone, List<PH_Reliquat_Reception_Adapte.ZoneEtEmplacement>> ParentListItemsTemp;
+    List<PH_Reliquat_Reception_Adapte.ZoneEtEmplacement> tempListeEmplacement;
     int quantiteLivree;
     int quantiteReliquat;
     private Activity context;
-    private Map<Depot_Zone, List<PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement>> ParentListItems;
-    private Map<Depot_Zone, List<PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement>> OriginalParentListItems;
+    private Map<Depot_Zone, List<PH_Reliquat_Reception_Adapte.ZoneEtEmplacement>> ParentListItems;
+    private Map<Depot_Zone, List<PH_Reliquat_Reception_Adapte.ZoneEtEmplacement>> OriginalParentListItems;
     private List<Depot_Zone> Items;
 
-    public ZonetEtEmplacementExpandableAdapter(Activity context, List<Depot_Zone> Items, Map<Depot_Zone, List<PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement>> ParentListItems, int quantiteLivree, int quantiteReliquat) {
+    public ZonetEtEmplacementExpandableAdapter(Activity context, List<Depot_Zone> Items, Map<Depot_Zone, List<PH_Reliquat_Reception_Adapte.ZoneEtEmplacement>> ParentListItems, int quantiteLivree, int quantiteReliquat) {
         this.context = context;
         this.Items = Items;
         this.ParentListItems = new LinkedHashMap<>();
@@ -51,7 +51,7 @@ public class ZonetEtEmplacementExpandableAdapter extends BaseExpandableListAdapt
 
     public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View ListView, ViewGroup parent) {
 
-        final PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement zoneEtEmplacement = (PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement) getChild(groupPosition, childPosition);
+        final PH_Reliquat_Reception_Adapte.ZoneEtEmplacement zoneEtEmplacement = (PH_Reliquat_Reception_Adapte.ZoneEtEmplacement) getChild(groupPosition, childPosition);
 
         if (ListView == null) {
             LayoutInflater inflater = context.getLayoutInflater();
@@ -119,11 +119,11 @@ public class ZonetEtEmplacementExpandableAdapter extends BaseExpandableListAdapt
         } else {
             ParentListItemsTemp = new LinkedHashMap<>();
 
-            for (Map.Entry<Depot_Zone, List<PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement>> entry : OriginalParentListItems.entrySet()) {
+            for (Map.Entry<Depot_Zone, List<PH_Reliquat_Reception_Adapte.ZoneEtEmplacement>> entry : OriginalParentListItems.entrySet()) {
 
                 tempListeEmplacement = new ArrayList<>();
                 Depot_Zone depotZone = entry.getKey();
-                List<PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement> emplacementList = entry.getValue();
+                List<PH_Reliquat_Reception_Adapte.ZoneEtEmplacement> emplacementList = entry.getValue();
                 for (int j = 0; j < emplacementList.size(); j++) {
                     if (emplacementList.get(j).getEmplacementName().toLowerCase().contains(query)) {
                         tempListeEmplacement.add(emplacementList.get(j));
@@ -132,7 +132,7 @@ public class ZonetEtEmplacementExpandableAdapter extends BaseExpandableListAdapt
                 if (tempListeEmplacement.size() > 0) {
                     ParentListItemsTemp.put(depotZone, tempListeEmplacement);
                 } else {
-                    ParentListItemsTemp.put(depotZone, new ArrayList<PH_Reliquat_ReceptionPUI_Adapte.ZoneEtEmplacement>());
+                    ParentListItemsTemp.put(depotZone, new ArrayList<PH_Reliquat_Reception_Adapte.ZoneEtEmplacement>());
                 }
             }
             if (ParentListItemsTemp.size() > 0) {

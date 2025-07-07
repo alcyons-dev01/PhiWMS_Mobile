@@ -49,6 +49,7 @@ import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
@@ -622,7 +623,7 @@ public class DetailReceptionPadActivity extends ServiceActivity {
         Bundle listeLotReceptionPui_Bundle = super.getBundle();
         if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
         {
-            listeLotReceptionPui_Intent = new Intent(DetailReceptionPadActivity.this, ScannerPreparationActivity.class);
+            listeLotReceptionPui_Intent = new Intent(DetailReceptionPadActivity.this, ScannerReceptionActivity.class);
             listeLotReceptionPui_Bundle.putInt("scannerContexteInt", R.string.scannerContexteReceptionPAD);
         }
         else
@@ -634,7 +635,7 @@ public class DetailReceptionPadActivity extends ServiceActivity {
             }
             else
             {
-                listeLotReceptionPui_Intent = new Intent(DetailReceptionPadActivity.this, ScannerPreparationActivity.class);
+                listeLotReceptionPui_Intent = new Intent(DetailReceptionPadActivity.this, ScannerReceptionActivity.class);
                 listeLotReceptionPui_Bundle.putInt("scannerContexteInt", R.string.scannerContexteReceptionPAD);
             }
         }

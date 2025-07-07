@@ -117,8 +117,8 @@
     <string name="scannerContexteZoneEtEmplacement">scannerContexteZoneEtEmplacement</string>
     <string name="scannerContextPreparationSimple">scannerContextPreparationSimple</string>
     <string name="scannerContextPreparationMultiple">scannerContextPreparationMultiple</string>
-    <string name="scannerContextNewReceptionPUI">scannerContextNewReceptionPUI</string>
-    <string name="scannerContextUniqueNewReceptionPUI">scannerContextUniqueNewReceptionPUI</string>
+    <string name="scannerContextReceptionListe">scannerContextReceptionListe</string>
+    <string name="scannerContextReceptionUnique">scannerContextReceptionUnique</string>
     <string name="scannerContextNewReceptionPAD">scannerContextNewReceptionPAD</string>
     <string name="scannerContextUniqueNewReceptionPAD">scannerContextUniqueNewReceptionPAD</string>
     <string name="scannerContextUniqueNewControleRetour">scannerContextUniqueNewControleRetour</string>

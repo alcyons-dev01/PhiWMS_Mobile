@@ -129,17 +129,21 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
 
         // Affichage des informations de base
         PH_Preparation ph_preparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparation_ligne_courant.getPreparationID());
+        String depotText = ph_preparation.getDepotDestinataireReference();
+
         Depot depot_destinataire = DepotOpenHelper.getDepotParReference(db, ph_preparation.getDepotDestinataireReference());
-
-        ((TextView) findViewById(R.id.intitule)).setText("#"+ph_preparation.getUID());
-
-        String depotText = depot_destinataire.getNom();
-        if(utilisateurConnecte.getIdentifiant().toLowerCase().contentEquals("alcyons") && depot_destinataire.getStructure().contentEquals("PAD"))
+        if(depot_destinataire != null)
         {
-            depotText = "Patient - "+depot_destinataire.getPAD_IPP();
+            depotText = depot_destinataire.getNom();
+
+            if(utilisateurConnecte.getIdentifiant().toLowerCase().contentEquals("alcyons") && depot_destinataire.getStructure().contentEquals("PAD"))
+            {
+                depotText = "Patient - "+depot_destinataire.getPAD_IPP();
+            }
         }
 
         ((TextView) findViewById(R.id.depot)).setText(depotText);
+        ((TextView) findViewById(R.id.intitule)).setText("#"+ph_preparation.getUID());
         ((LinearLayout) findViewById(R.id.lancerScan)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -174,7 +174,7 @@ public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
 
         Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION_LIGNE + " WHERE " + Constantes.CLE_COL__UID_PH_PREPARATION_LIGNE + "=?", new String[]{String.valueOf(id)});
 
-        if (cursor.getCount() == 1) {
+        if (cursor.getCount() >= 1) {
             cursor.moveToFirst();
             phPreparationLigne = new PH_Preparation_Ligne(cursor);
         }

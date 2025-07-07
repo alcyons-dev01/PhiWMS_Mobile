@@ -13,7 +13,7 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.negative.BarcodeCaptureNegativeActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
-import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_ReceptionPUI_Adapte;
+import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_Reception_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne_ControleRetour_Adapte;
@@ -30,7 +30,7 @@ public class NewControleRetourUniqueContext  {
     public boolean codeInconnu;
     public Retour_Ligne retour_ligne_courant;
     private Utilisateur utilisateurConnecte;
-    public PH_Reliquat_ReceptionPUI_Adapte.Lot nouveau_lot;
+    public PH_Reliquat_Reception_Adapte.Lot nouveau_lot;
     public Produit produitCourant;
     public int qte_lot_courant = 0;
     public boolean validation;

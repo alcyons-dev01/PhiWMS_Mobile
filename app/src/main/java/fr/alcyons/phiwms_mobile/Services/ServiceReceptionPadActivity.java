@@ -62,6 +62,7 @@ import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.Reception.DetailReceptionActivity;
 import fr.alcyons.phiwms_mobile.ReceptionPAD.DetailReceptionPadActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
@@ -101,7 +102,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                 Commande commandeSelectionne = (Commande) commandeReceptionPUIAdapter.getItem(position);
 
                 if (commandeSelectionne != null) {
-                    Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPadActivity.this, DetailReceptionPadActivity.class);
+                    Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPadActivity.this, DetailReceptionActivity.class);
 
                     Bundle serviceReceptionPui_Bundle = ServiceReceptionPadActivity.super.getBundle();
                     serviceReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
@@ -144,6 +145,11 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                                     if (commandeList.isEmpty()) {
                                         vide = true;
                                         nomServiceVide = "Réception PAD";
+                                        Intent intent = new Intent(ServiceReceptionPadActivity.this, NavigationActivity.class);
+                                        Bundle extras = new Bundle();
+                                        extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                                        intent.putExtras(extras);
+                                        ServiceReceptionPadActivity.this.startActivity(intent);
                                         ServiceReceptionPadActivity.this.finish();
                                     }
 
@@ -170,6 +176,11 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                                 if (commandeList.isEmpty()) {
                                     vide = true;
                                     nomServiceVide = "Réception PAD";
+                                    Intent intent = new Intent(ServiceReceptionPadActivity.this, NavigationActivity.class);
+                                    Bundle extras = new Bundle();
+                                    extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                                    intent.putExtras(extras);
+                                    ServiceReceptionPadActivity.this.startActivity(intent);
                                     ServiceReceptionPadActivity.this.finish();
                                 }
 
@@ -188,6 +199,11 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                             if (commandeList.isEmpty()) {
                                 vide = true;
                                 nomServiceVide = "Réception PAD";
+                                Intent intent = new Intent(ServiceReceptionPadActivity.this, NavigationActivity.class);
+                                Bundle extras = new Bundle();
+                                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                                intent.putExtras(extras);
+                                ServiceReceptionPadActivity.this.startActivity(intent);
                                 ServiceReceptionPadActivity.this.finish();
                             }
 
@@ -337,7 +353,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                                 if (phReliquatPresent) {
                                     long rowID = CommandeOpenHelper.insererUneCommandeEnBDD(db, commandeCourant);
                                     if (rowID != -1) {
-                                        if(commandeCourant.getRef_Depot_Dest().contains("-PUI-PAD"))
+                                        if(commandeCourant.getRef_Depot_Dest().contains("-PAD"))
                                         {
                                             commandeList.add(commandeCourant);
                                         }
@@ -358,6 +374,11 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                             {
                                 vide = true;
                                 nomServiceVide = "Réception PAD";
+                                Intent intent = new Intent(ServiceReceptionPadActivity.this, NavigationActivity.class);
+                                Bundle extras = new Bundle();
+                                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                                intent.putExtras(extras);
+                                ServiceReceptionPadActivity.this.startActivity(intent);
                                 ServiceReceptionPadActivity.this.finish();
                             }
 

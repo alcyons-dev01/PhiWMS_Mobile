@@ -13,14 +13,12 @@ import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -56,7 +54,7 @@ import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
-import fr.alcyons.phiwms_mobile.ReceptionPUI.DetailReceptionPuiActivity;
+import fr.alcyons.phiwms_mobile.Reception.DetailReceptionActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 import static fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper.viderTableCommandes;
@@ -112,7 +110,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
             Commande commandeSelectionne = (Commande) commandeReceptionPUIAdapter.getItem(position);
 
             if (commandeSelectionne != null) {
-                Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPuiActivity.this, DetailReceptionPuiActivity.class);
+                Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPuiActivity.this, DetailReceptionActivity.class);
                 Bundle serviceReceptionPui_Bundle = ServiceReceptionPuiActivity.super.getBundle();
                 serviceReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
                 serviceReceptionPui_Intent.putExtras(serviceReceptionPui_Bundle);
@@ -144,12 +142,17 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                                         if (commandeList.isEmpty()) {
                                             vide = true;
                                             nomServiceVide = "Réception PUI";
+                                            Intent intent = new Intent(ServiceReceptionPuiActivity.this, NavigationActivity.class);
+                                            Bundle extras = new Bundle();
+                                            extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                                            intent.putExtras(extras);
+                                            ServiceReceptionPuiActivity.this.startActivity(intent);
                                             ServiceReceptionPuiActivity.this.finish();
                                         }
 
                                         invalidateOptionsMenu();
                                     } else {
-                                        Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPuiActivity.this, DetailReceptionPuiActivity.class);
+                                        Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPuiActivity.this, DetailReceptionActivity.class);
                                         Bundle serviceReceptionPui_Bundle = ServiceReceptionPuiActivity.super.getBundle();
                                         serviceReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
                                         serviceReceptionPui_Intent.putExtras(serviceReceptionPui_Bundle);
@@ -167,6 +170,11 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                                     if (commandeList.isEmpty()) {
                                         vide = true;
                                         nomServiceVide = "Réception PUI";
+                                        Intent intent = new Intent(ServiceReceptionPuiActivity.this, NavigationActivity.class);
+                                        Bundle extras = new Bundle();
+                                        extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                                        intent.putExtras(extras);
+                                        ServiceReceptionPuiActivity.this.startActivity(intent);
                                         ServiceReceptionPuiActivity.this.finish();
                                     }
 
@@ -183,6 +191,11 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                                 if (commandeList.isEmpty()) {
                                     vide = true;
                                     nomServiceVide = "Réception PUI";
+                                    Intent intent = new Intent(ServiceReceptionPuiActivity.this, NavigationActivity.class);
+                                    Bundle extras = new Bundle();
+                                    extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                                    intent.putExtras(extras);
+                                    ServiceReceptionPuiActivity.this.startActivity(intent);
                                     ServiceReceptionPuiActivity.this.finish();
                                 }
 

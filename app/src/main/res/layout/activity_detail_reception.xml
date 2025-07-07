@@ -34,7 +34,7 @@
                 <Spinner
                     android:id="@+id/optionTri"
                     android:background="@drawable/ic_sort_white"
-                    android:entries="@array/option_tri_retour_ligne"
+                    android:entries="@array/option_tri_preparation"
                     android:layout_height="30dp"
                     android:layout_width="30dp"/>
 
@@ -47,7 +47,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/numero"
+                    android:id="@+id/numCommande"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text=""
@@ -58,7 +58,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/intitule"
+                    android:id="@+id/nomFournisseur"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text=""
@@ -78,12 +78,14 @@
                 android:orientation="horizontal"
                 android:gravity="center"
                 android:layout_gravity="right"
-                android:background="@color/bleu_clair_alcyons">
+                android:background="@color/bleu_clair_alcyons"
+                tools:ignore="RtlHardcoded">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/ic_datamatrix"/>
+                    android:background="@drawable/ic_datamatrix"
+                    android:contentDescription="@string/imagedatamatrix" />
 
             </LinearLayout>
 
@@ -99,25 +101,13 @@
             android:background="@android:color/darker_gray" />
 
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipeRefreshLayout"
+        <ListView
+            android:id="@+id/liste_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/separateur"
-            android:layout_below="@id/barreDeTitre"
-            android:orientation="vertical"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp">
+            android:layout_below="@+id/separateur2"
+            android:descendantFocusability="afterDescendants">
 
-            <ListView
-                android:id="@+id/listeView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:descendantFocusability="afterDescendants"/>
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-
-
+        </ListView>
     </RelativeLayout>
 </RelativeLayout>

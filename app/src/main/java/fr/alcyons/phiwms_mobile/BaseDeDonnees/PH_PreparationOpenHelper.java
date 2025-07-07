@@ -570,7 +570,7 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
 
             Depot depot = DepotOpenHelper.getDepotParID(db, phPreparation.getDepotDestinataireID());
 
-            if (depot != null) {
+            //if (depot != null) {
                 if (!phPreparation.getListe().contains("nominative")) {
                     if (phPreparation.getStatut().contains("A Préparer") || phPreparation.getStatut().contains("En Reliquat") || phPreparation.getStatut().contains("A préparer") || phPreparation.getStatut().contains("En reliquat")) {
                         if (phPreparation.getDepotDestinataireReference().contains("-PAD-") || phPreparation.getListe().contentEquals("ALCYONS_LISTE")) {
@@ -580,7 +580,7 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
                         }
                     }
                 }
-            }
+            //}
         }
         cursor.close();
         cursor = null;
@@ -630,7 +630,7 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
 
             Depot depot = DepotOpenHelper.getDepotParID(db, phPreparation.getDepotDestinataireID());
 
-            if (depot != null) {
+            //if (depot != null) {
                 if (!phPreparation.getListe().contains("nominative")) {
                     if (phPreparation.getStatut().contains("A Préparer") || phPreparation.getStatut().contains("En Reliquat") || phPreparation.getStatut().contains("A préparer") || phPreparation.getStatut().contains("En reliquat")) {
                         if (phPreparation.getDepotDestinataireReference().contains("-PUF-") || phPreparation.getListe().contentEquals("ALCYONS_LISTE")) {
@@ -640,7 +640,7 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
                         }
                     }
                 }
-            }
+            //}
         }
         cursor.close();
         cursor = null;

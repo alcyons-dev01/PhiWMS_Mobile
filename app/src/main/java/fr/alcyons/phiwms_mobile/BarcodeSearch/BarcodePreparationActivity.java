@@ -60,8 +60,8 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.camera.GraphicOverlay;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.NewControleRetourMultipleContext;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.NewControleRetourUniqueContext;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.NewReceptionPADContext;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.NewReceptionPUIContext;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.NewUniqueReceptionPUIContext;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.ReceptionListeContext;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.ReceptionUniqueContext;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.PreparationMultipleContext;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.PreparationSimpleContext;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.negative.BarcodeCaptureNegativeActivity;
@@ -87,7 +87,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_Preparation_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
-import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_ReceptionPUI_Adapte;
+import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_Reception_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne_ControleRetour_Adapte;
@@ -125,15 +125,15 @@ public class BarcodePreparationActivity extends ServiceActivity {
     // CONTEXTE
     PreparationSimpleContext preparationSimpleContext;
     PreparationMultipleContext preparationMultipleContext;
-    NewReceptionPUIContext newReceptionPUIContext;
-    NewUniqueReceptionPUIContext newUniqueReceptionPUIContext;
+    ReceptionListeContext receptionListeContext;
+    ReceptionUniqueContext receptionUniqueContext;
     NewReceptionPADContext newReceptionPADContext;
     NewControleRetourUniqueContext newControleRetourUniqueContext;
     NewControleRetourMultipleContext newControleRetourMultipleContext;
     String scannerContextPreparationSimple = String.valueOf(R.string.scannerContextPreparationSimple);
     String scannerContextPreparationMultiple = String.valueOf(R.string.scannerContextPreparationMultiple);
-    String scannerContextNewReceptionPUI = String.valueOf(R.string.scannerContextNewReceptionPUI);
-    String scannerContextUniqueNewReceptionPUI = String.valueOf(R.string.scannerContextUniqueNewReceptionPUI);
+    String scannerContextReceptionListe = String.valueOf(R.string.scannerContextReceptionListe);
+    String scannerContextReceptionUnique = String.valueOf(R.string.scannerContextReceptionUnique);
     String scannerContextNewReceptionPAD = String.valueOf(R.string.scannerContextNewReceptionPAD);
     String scannerContextUniqueNewControleRetour = String.valueOf(R.string.scannerContextUniqueNewControleRetour);
     String scannerContextMultipleNewControleRetour = String.valueOf(R.string.scannerContextMultipleNewControleRetour);
@@ -177,9 +177,9 @@ public class BarcodePreparationActivity extends ServiceActivity {
     int receptionID;
     Commande commandeCourante;
     //pour un scan multiple
-        List<PH_Reliquat_ReceptionPUI_Adapte> list_reliquat_receptionPuiAdapte;
+        List<PH_Reliquat_Reception_Adapte> list_reliquat_receptionPuiAdapte;
     //pour un scan unitaire
-        PH_Reliquat_ReceptionPUI_Adapte uniqueReceptionPUIAdapte;
+        PH_Reliquat_Reception_Adapte uniqueReceptionPUIAdapte;
         PH_Reliquat reliquatCourant;
 
     //Gestion des réception PAD
@@ -214,8 +214,8 @@ public class BarcodePreparationActivity extends ServiceActivity {
         liste_lot = intent.getExtras().getStringArrayList("liste_lot");
         ordreTri = intent.getExtras().getString("ordreTri");
         receptionID = intent.getExtras().getInt("ReceptionID");
-        list_reliquat_receptionPuiAdapte = (List<PH_Reliquat_ReceptionPUI_Adapte>) intent.getExtras().getSerializable("ReceptionPUIAdapte");
-        uniqueReceptionPUIAdapte = (PH_Reliquat_ReceptionPUI_Adapte) intent.getExtras().getSerializable("UniqueReceptionPUIAdapte");
+        list_reliquat_receptionPuiAdapte = (List<PH_Reliquat_Reception_Adapte>) intent.getExtras().getSerializable("ReceptionPUIAdapte");
+        uniqueReceptionPUIAdapte = (PH_Reliquat_Reception_Adapte) intent.getExtras().getSerializable("UniqueReceptionPUIAdapte");
         reliquatCourant = (PH_Reliquat) intent.getExtras().getSerializable("ReliquatCourant");
         listObjet_scanne = (List<ObjetReceptionScannee>) intent.getExtras().getSerializable("ListeObjetScannee");
         liste_id_reliquat = (List<Integer>) intent.getExtras().getIntegerArrayList("liste_id_reliquat");
@@ -258,7 +258,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
             depot.setText(depotText);
             numPreparation.setText("#"+preparationID);
         }
-        else if(scannerContexteInt == R.string.scannerContextNewReceptionPUI || scannerContexteInt == R.string.scannerContextUniqueNewReceptionPUI || scannerContexteInt == R.string.scannerContextNewReceptionPAD)
+        else if(scannerContexteInt == R.string.scannerContextReceptionListe || scannerContexteInt == R.string.scannerContextReceptionUnique || scannerContexteInt == R.string.scannerContextNewReceptionPAD)
         {
             commandeCourante = CommandeOpenHelper.getCommandeByID(db, receptionID);
             numPreparation.setText("#"+commandeCourante.getNumero());
@@ -329,7 +329,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
                     }
                 });
             }
-            else if(scannerContexteInt == R.string.scannerContextNewReceptionPUI)
+            else if(scannerContexteInt == R.string.scannerContextReceptionListe)
             {
                 //Récupération du dernier emplacement saisie
                 Depot_Emplacement emplacement_precedent = (Depot_Emplacement) intent.getExtras().getSerializable("EmplacementPrecedent");
@@ -354,7 +354,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
                 });
 
                 //initialisation du context
-                newReceptionPUIContext = new NewReceptionPUIContext(this, db, utilisateurConnecte, listGtinScannee, utilisateurConnecte.getId(), commandeCourante.getID_commande(), liste_reliquat_commande_courante, list_reliquat_receptionPuiAdapte, emplacement_precedent, produit_precedent);
+                receptionListeContext = new ReceptionListeContext(this, db, utilisateurConnecte, listGtinScannee, utilisateurConnecte.getId(), commandeCourante.getID_commande(), liste_reliquat_commande_courante, list_reliquat_receptionPuiAdapte, emplacement_precedent, produit_precedent);
 
                 ((TextView) findViewById(R.id.EmplacementLotProduit)).setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -373,13 +373,13 @@ public class BarcodePreparationActivity extends ServiceActivity {
 
                 ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
             }
-            else if(scannerContexteInt ==  R.string.scannerContextUniqueNewReceptionPUI)
+            else if(scannerContexteInt ==  R.string.scannerContextReceptionUnique)
             {
                 ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
                 Depot_Emplacement emplacement_precedent_unique = (Depot_Emplacement) intent.getExtras().getSerializable("EmplacementPrecedent");
                 Produit produit_precedent_unique = (Produit) intent.getExtras().getSerializable("ProduitPrecedent");
                 ((TextView) findViewById(R.id.instruction)).setVisibility(View.VISIBLE);
-                newUniqueReceptionPUIContext = new NewUniqueReceptionPUIContext(this, db, utilisateurConnecte, listGtinScannee, utilisateurConnecte.getId(), commandeCourante.getID_commande(), reliquatCourant, uniqueReceptionPUIAdapte, emplacement_precedent_unique, produit_precedent_unique);
+                receptionUniqueContext = new ReceptionUniqueContext(this, db, utilisateurConnecte, listGtinScannee, utilisateurConnecte.getId(), commandeCourante.getID_commande(), reliquatCourant, uniqueReceptionPUIAdapte, emplacement_precedent_unique, produit_precedent_unique);
                 //affichage des premieres informations
                 designationProduitCourant = reliquatCourant.getDesignationCourte();
                 referenceProduitCourant = reliquatCourant.getProduit_Reference();
@@ -406,7 +406,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
 
                     if(zone_courante!=null && emplacemement_pui_defaut != null && !emplacemement_pui_defaut.contentEquals(""))
                     {
-                        newUniqueReceptionPUIContext.emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zone_courante, emplacemement_pui_defaut);
+                        receptionUniqueContext.emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zone_courante, emplacemement_pui_defaut);
                         ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(produitCourant.getEmplacement_PUI_Defaut());
                         ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
                     }
@@ -506,14 +506,14 @@ public class BarcodePreparationActivity extends ServiceActivity {
                     extras.putSerializable("lotAdapteList", (Serializable) preparationMultipleContext.phPreparationLignePreparationAdapte_List);
                     extras.putStringArrayList("liste_lot", (ArrayList<String>) preparationMultipleContext.liste_lot);
                 }
-                else if(scannerContexteInt == R.string.scannerContextNewReceptionPUI)
+                else if(scannerContexteInt == R.string.scannerContextReceptionListe)
                 {
-                    if(newReceptionPUIContext.nouveau_lot != null && newReceptionPUIContext.emplacement_courant != null)
+                    if(receptionListeContext.nouveau_lot != null && receptionListeContext.emplacement_courant != null)
                     {
                         boolean confirmation = Alerte.afficherAlerte(BarcodePreparationActivity.this, "Attention", "Valider le dernier lot scanné ?", "OuiNon");
                         if(confirmation)
                         {
-                            newReceptionPUIContext.ValiderScan();
+                            receptionListeContext.ValiderScan();
                         }
                         else
                         {
@@ -527,18 +527,18 @@ public class BarcodePreparationActivity extends ServiceActivity {
                         }
                     }
 
-                    extras.putSerializable("EmplacementPrecedent", newReceptionPUIContext.emplacementPrecedent);
-                    extras.putSerializable("ProduitPrecedent", newReceptionPUIContext.produitPrecedent);
-                    extras.putSerializable("reliquatAdapteList", (Serializable) newReceptionPUIContext.list_reliquat_receptionPuiAdapte);
+                    extras.putSerializable("EmplacementPrecedent", receptionListeContext.emplacementPrecedent);
+                    extras.putSerializable("ProduitPrecedent", receptionListeContext.produitPrecedent);
+                    extras.putSerializable("reliquatAdapteList", (Serializable) receptionListeContext.list_reliquat_receptionPuiAdapte);
                 }
-                else if(scannerContexteInt == R.string.scannerContextUniqueNewReceptionPUI)
+                else if(scannerContexteInt == R.string.scannerContextReceptionUnique)
                 {
-                    if(newUniqueReceptionPUIContext.nouveau_lot != null && newUniqueReceptionPUIContext.emplacement_courant != null)
+                    if(receptionUniqueContext.nouveau_lot != null && receptionUniqueContext.emplacement_courant != null)
                     {
                         boolean confirmation = Alerte.afficherAlerte(BarcodePreparationActivity.this, "Attention", "Valider le dernier lot scanné ?", "OuiNon");
                         if(confirmation)
                         {
-                            newUniqueReceptionPUIContext.ValiderScan();
+                            receptionUniqueContext.ValiderScan();
                         }
                         else
                         {
@@ -551,9 +551,9 @@ public class BarcodePreparationActivity extends ServiceActivity {
                             ((LinearLayout) findViewById(R.id.validationScan)).setVisibility(View.GONE);
                         }
                     }
-                    extras.putSerializable("EmplacementPrecedent", newUniqueReceptionPUIContext.emplacementPrecedent);
-                    extras.putSerializable("ProduitPrecedent", newUniqueReceptionPUIContext.produitPrecedent);
-                    extras.putSerializable("reliquatAdapte", (Serializable) newUniqueReceptionPUIContext.phReliquatReceptionPUIAdapte_courant);
+                    extras.putSerializable("EmplacementPrecedent", receptionUniqueContext.emplacementPrecedent);
+                    extras.putSerializable("ProduitPrecedent", receptionUniqueContext.produitPrecedent);
+                    extras.putSerializable("reliquatAdapte", (Serializable) receptionUniqueContext.phReliquatReceptionPUIAdapte_courant);
                 }
                 else if(scannerContexteInt == R.string.scannerContextNewReceptionPAD)
                 {
@@ -655,10 +655,10 @@ public class BarcodePreparationActivity extends ServiceActivity {
                 {
 
                 }
-                else if(scannerContexteInt == R.string.scannerContextNewReceptionPUI)
+                else if(scannerContexteInt == R.string.scannerContextReceptionListe)
                 {
-                    extras.putSerializable("EmplacementPrecedent", newReceptionPUIContext.emplacementPrecedent);
-                    extras.putSerializable("ProduitPrecedent", newReceptionPUIContext.produitPrecedent);
+                    extras.putSerializable("EmplacementPrecedent", receptionListeContext.emplacementPrecedent);
+                    extras.putSerializable("ProduitPrecedent", receptionListeContext.produitPrecedent);
                 }
 
                 //extras.putStringArrayList("stringList", (ArrayList<String>) stringList);
@@ -692,7 +692,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
                     extras.putStringArrayList("liste_lot", (ArrayList<String>) liste_lot);
                 }
 
-                if(scannerContexteInt == R.string.scannerContextUniqueNewReceptionPUI || scannerContexteInt == R.string.scannerContextNewReceptionPUI)
+                if(scannerContexteInt == R.string.scannerContextReceptionUnique || scannerContexteInt == R.string.scannerContextReceptionListe)
                 {
                     extras.putInt("ReceptionID", receptionID);
                     extras.putString("ordreTri", ordreTri);
@@ -700,16 +700,16 @@ public class BarcodePreparationActivity extends ServiceActivity {
                     extras.putSerializable("UniqueReceptionPUIAdapte", (Serializable) uniqueReceptionPUIAdapte);
                     extras.putSerializable("ReliquatCourant", (Serializable) reliquatCourant);
 
-                    if(scannerContexteInt == R.string.scannerContextNewReceptionPUI)
+                    if(scannerContexteInt == R.string.scannerContextReceptionListe)
                     {
-                        extras.putSerializable("EmplacementPrecedent", newReceptionPUIContext.emplacementPrecedent);
-                        extras.putSerializable("ProduitPrecedent", newReceptionPUIContext.produitPrecedent);
+                        extras.putSerializable("EmplacementPrecedent", receptionListeContext.emplacementPrecedent);
+                        extras.putSerializable("ProduitPrecedent", receptionListeContext.produitPrecedent);
                     }
 
-                    if(scannerContexteInt == R.string.scannerContextUniqueNewReceptionPUI)
+                    if(scannerContexteInt == R.string.scannerContextReceptionUnique)
                     {
-                        extras.putSerializable("EmplacementPrecedent", newUniqueReceptionPUIContext.emplacementPrecedent);
-                        extras.putSerializable("ProduitPrecedent", newUniqueReceptionPUIContext.produitPrecedent);
+                        extras.putSerializable("EmplacementPrecedent", receptionUniqueContext.emplacementPrecedent);
+                        extras.putSerializable("ProduitPrecedent", receptionUniqueContext.produitPrecedent);
                     }
                 }
 
@@ -893,7 +893,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
                         break;
                 }
             }
-            else if(scannerContexteInt == R.string.scannerContextUniqueNewReceptionPUI)
+            else if(scannerContexteInt == R.string.scannerContextReceptionUnique)
             {
                 switch (requestCode)
                 {
@@ -915,17 +915,17 @@ public class BarcodePreparationActivity extends ServiceActivity {
                         {
                             Depot_Emplacement emplacementSelectionner = EmplacementOpenHelper.getUnEmplacementByID(db, emplacementid);
                             ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacementSelectionner.getAdressage().trim());
-                            newUniqueReceptionPUIContext.emplacement_courant = emplacementSelectionner;
+                            receptionUniqueContext.emplacement_courant = emplacementSelectionner;
                             ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
                         }
                         break;
                     case CodesEchangesActivites.RETOUR_SCANNER:
-                        newUniqueReceptionPUIContext.onActivityResult(requestCode, data);
+                        receptionUniqueContext.onActivityResult(requestCode, data);
                         boutonSuppression.performClick();
                         break;
                 }
             }
-            else if(scannerContexteInt == R.string.scannerContextNewReceptionPUI)
+            else if(scannerContexteInt == R.string.scannerContextReceptionListe)
             {
                 switch (requestCode)
                 {
@@ -946,12 +946,12 @@ public class BarcodePreparationActivity extends ServiceActivity {
                         {
                             Depot_Emplacement emplacementSelectionner = EmplacementOpenHelper.getUnEmplacementByID(db, emplacementid);
                             ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacementSelectionner.getAdressage().trim());
-                            newReceptionPUIContext.emplacement_courant = emplacementSelectionner;
+                            receptionListeContext.emplacement_courant = emplacementSelectionner;
                             ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
                         }
                         break;
                     case CodesEchangesActivites.RETOUR_SCANNER:
-                        newReceptionPUIContext.onActivityResult(requestCode, data);
+                        receptionListeContext.onActivityResult(requestCode, data);
                         boutonSuppression.performClick();
                         break;
                 }
@@ -1544,40 +1544,40 @@ public class BarcodePreparationActivity extends ServiceActivity {
                        }
                     }
             }
-            if (scannerContexte.contentEquals(scannerContextNewReceptionPUI)) {
-                if (newReceptionPUIContext.onTap(best.rawValue)) {
-                    if(newReceptionPUIContext.nouveau_lot != null && ((TextView) findViewById(R.id.EmplacementLotProduit)).getText().toString().contentEquals(""))
+            if (scannerContexte.contentEquals(scannerContextReceptionListe)) {
+                if (receptionListeContext.onTap(best.rawValue)) {
+                    if(receptionListeContext.nouveau_lot != null && ((TextView) findViewById(R.id.EmplacementLotProduit)).getText().toString().contentEquals(""))
                     {
                         ((TextView) findViewById(R.id.instruction)).setText("Scannez un emplacement");
-                        designationProduitCourant = newReceptionPUIContext.reliquat_courant.getDesignationCourte();
-                        referenceProduitCourant = newReceptionPUIContext.reliquat_courant.getProduit_Reference();
-                        qteDemander = newReceptionPUIContext.reliquat_courant.getQteCommande();
-                        if(newReceptionPUIContext.reliquat_courant.getQteLivraison() > 0)
+                        designationProduitCourant = receptionListeContext.reliquat_courant.getDesignationCourte();
+                        referenceProduitCourant = receptionListeContext.reliquat_courant.getProduit_Reference();
+                        qteDemander = receptionListeContext.reliquat_courant.getQteCommande();
+                        if(receptionListeContext.reliquat_courant.getQteLivraison() > 0)
                         {
-                            ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText(String.valueOf(newReceptionPUIContext.reliquat_courant.getQteLivraison()));
+                            ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText(String.valueOf(receptionListeContext.reliquat_courant.getQteLivraison()));
                             ((TextView) findViewById(R.id.quantiteDejaPreparer)).setVisibility(View.VISIBLE);
                             ((LinearLayout) findViewById(R.id.layoutInformations)).setBackground(BarcodePreparationActivity.this.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
                         }
                         ((TextView) findViewById(R.id.designationProduit)).setText(designationProduitCourant);
                         ((TextView) findViewById(R.id.referenceProduit)).setText(referenceProduitCourant);
                         ((TextView) findViewById(R.id.quantiteProduit)).setText(String.valueOf(qteDemander));
-                        ((TextView) findViewById(R.id.numeroLot)).setText(newReceptionPUIContext.nouveau_lot.getNumeroLot());
-                        if(newReceptionPUIContext.nouveau_lot.getNumero_serie() != null && !newReceptionPUIContext.nouveau_lot.getNumero_serie().contentEquals(""))
+                        ((TextView) findViewById(R.id.numeroLot)).setText(receptionListeContext.nouveau_lot.getNumeroLot());
+                        if(receptionListeContext.nouveau_lot.getNumero_serie() != null && !receptionListeContext.nouveau_lot.getNumero_serie().contentEquals(""))
                         {
-                            ((TextView) findViewById(R.id.numeroSerie)).setText(newReceptionPUIContext.nouveau_lot.getNumero_serie());
+                            ((TextView) findViewById(R.id.numeroSerie)).setText(receptionListeContext.nouveau_lot.getNumero_serie());
                         }
                         else
                         {
                             ((LinearLayout) findViewById(R.id.layoutSerie)).setVisibility(View.GONE);
                         }
 
-                        String dateDePeremption = newReceptionPUIContext.nouveau_lot.getDatePeremption();
+                        String dateDePeremption = receptionListeContext.nouveau_lot.getDatePeremption();
                         String[] dateDePeremtpionTab = dateDePeremption.split("-");
                         dateDePeremption = dateDePeremtpionTab[2]+"/"+dateDePeremtpionTab[1]+"/"+dateDePeremtpionTab[0];
 
                         ((TextView) findViewById(R.id.datePeremptionLot)).setText(dateDePeremption);
 
-                        ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(newReceptionPUIContext.qte_lot_courant));
+                        ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(receptionListeContext.qte_lot_courant));
 
                         //gestion du numberPicker pour changer la quantité lors d'un scan
                         ((LinearLayout) findViewById(R.id.layout_qte_saisie_lot_preparation)).setOnClickListener(new View.OnClickListener() {
@@ -1585,28 +1585,28 @@ public class BarcodePreparationActivity extends ServiceActivity {
                             public void onClick(View view) {
                                 Context context = BarcodePreparationActivity.this;
 
-                                if(newReceptionPUIContext.emplacement_courant != null)
+                                if(receptionListeContext.emplacement_courant != null)
                                 {
                                     yourCountDownTimer.cancel();
                                     ((TextView) findViewById(R.id.textViewCountDown)).setVisibility(View.GONE);
                                     ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.GONE);
                                 }
 
-                                String title = newReceptionPUIContext.nouveau_lot.getNumeroLot();
+                                String title = receptionListeContext.nouveau_lot.getNumeroLot();
                                 String message = "Quantité réceptionnée : ";
-                                int value_max = (int)newReceptionPUIContext.reliquat_courant.getQteReliquat_X();
+                                int value_max = (int) receptionListeContext.reliquat_courant.getQteReliquat_X();
                                 int maxValue = value_max;
                                 int value = maxValue;
 
                                 DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                        int qteAprès = Alerte.aNumberPicker.getValue()*newReceptionPUIContext.conditionnement_achat;
-                                        newReceptionPUIContext.qte_lot_courant = qteAprès;
+                                        int qteAprès = Alerte.aNumberPicker.getValue()* receptionListeContext.conditionnement_achat;
+                                        receptionListeContext.qte_lot_courant = qteAprès;
                                         ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteAprès));
 
                                         dialog.dismiss();
 
-                                        if(newReceptionPUIContext.emplacement_courant != null)
+                                        if(receptionListeContext.emplacement_courant != null)
                                         {
                                             ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.VISIBLE);
                                             ((LinearLayout) findViewById(R.id.validationScan)).performClick();
@@ -1614,14 +1614,14 @@ public class BarcodePreparationActivity extends ServiceActivity {
                                     }
                                 };
 
-                                Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, newReceptionPUIContext.conditionnement_achat);
+                                Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, receptionListeContext.conditionnement_achat);
                             }
                         });
                     }
 
-                    if (newReceptionPUIContext.emplacement_courant != null && ((TextView) findViewById(R.id.EmplacementLotProduit)).getText().toString().contentEquals("")) {
+                    if (receptionListeContext.emplacement_courant != null && ((TextView) findViewById(R.id.EmplacementLotProduit)).getText().toString().contentEquals("")) {
                         ((TextView) findViewById(R.id.instruction)).setText("");
-                        ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(newReceptionPUIContext.emplacement_courant.getAdressage());
+                        ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(receptionListeContext.emplacement_courant.getAdressage());
                         blinkImage();
 
                         //initilisation du compteur
@@ -1635,7 +1635,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
                         ((LinearLayout) findViewById(R.id.validationScan)).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                newReceptionPUIContext.ValiderScan();
+                                receptionListeContext.ValiderScan();
                                 yourCountDownTimer.cancel();
                                 boutonSuppression.performClick();
                             }
@@ -1643,41 +1643,41 @@ public class BarcodePreparationActivity extends ServiceActivity {
                     }
                 }
             }
-            if (scannerContexte.contentEquals(scannerContextUniqueNewReceptionPUI)) {
-                if (newUniqueReceptionPUIContext.onTap(best.rawValue)) {
-                    if(newUniqueReceptionPUIContext.nouveau_lot != null)
+            if (scannerContexte.contentEquals(scannerContextReceptionUnique)) {
+                if (receptionUniqueContext.onTap(best.rawValue)) {
+                    if(receptionUniqueContext.nouveau_lot != null)
                     {
                         ((TextView) findViewById(R.id.instruction)).setText("Scannez un emplacement");
 
-                        designationProduitCourant = newUniqueReceptionPUIContext.reliquat_courant.getDesignationCourte();
-                        referenceProduitCourant = newUniqueReceptionPUIContext.reliquat_courant.getProduit_Reference();
-                        qteDemander = newUniqueReceptionPUIContext.reliquat_courant.getQteCommande();
-                        if(newUniqueReceptionPUIContext.reliquat_courant.getQteLivraison() > 0)
+                        designationProduitCourant = receptionUniqueContext.reliquat_courant.getDesignationCourte();
+                        referenceProduitCourant = receptionUniqueContext.reliquat_courant.getProduit_Reference();
+                        qteDemander = receptionUniqueContext.reliquat_courant.getQteCommande();
+                        if(receptionUniqueContext.reliquat_courant.getQteLivraison() > 0)
                         {
-                            ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText(String.valueOf(newUniqueReceptionPUIContext.reliquat_courant.getQteLivraison()));
+                            ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText(String.valueOf(receptionUniqueContext.reliquat_courant.getQteLivraison()));
                             ((TextView) findViewById(R.id.quantiteDejaPreparer)).setVisibility(View.VISIBLE);
                             ((LinearLayout) findViewById(R.id.layoutInformations)).setBackground(BarcodePreparationActivity.this.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
                         }
                         ((TextView) findViewById(R.id.designationProduit)).setText(designationProduitCourant);
                         ((TextView) findViewById(R.id.referenceProduit)).setText(referenceProduitCourant);
                         ((TextView) findViewById(R.id.quantiteProduit)).setText(String.valueOf(qteDemander));
-                        ((TextView) findViewById(R.id.numeroLot)).setText(newUniqueReceptionPUIContext.nouveau_lot.getNumeroLot());
-                        if(newUniqueReceptionPUIContext.nouveau_lot.getNumero_serie() != null && !newUniqueReceptionPUIContext.nouveau_lot.getNumero_serie().contentEquals(""))
+                        ((TextView) findViewById(R.id.numeroLot)).setText(receptionUniqueContext.nouveau_lot.getNumeroLot());
+                        if(receptionUniqueContext.nouveau_lot.getNumero_serie() != null && !receptionUniqueContext.nouveau_lot.getNumero_serie().contentEquals(""))
                         {
-                            ((TextView) findViewById(R.id.numeroSerie)).setText(newUniqueReceptionPUIContext.nouveau_lot.getNumero_serie());
+                            ((TextView) findViewById(R.id.numeroSerie)).setText(receptionUniqueContext.nouveau_lot.getNumero_serie());
                         }
                         else
                         {
                             ((LinearLayout) findViewById(R.id.layoutSerie)).setVisibility(View.GONE);
                         }
 
-                        String dateDePeremption = newUniqueReceptionPUIContext.nouveau_lot.getDatePeremption();
+                        String dateDePeremption = receptionUniqueContext.nouveau_lot.getDatePeremption();
                         String[] dateDePeremtpionTab = dateDePeremption.split("-");
                         dateDePeremption = dateDePeremtpionTab[2]+"/"+dateDePeremtpionTab[1]+"/"+dateDePeremtpionTab[0];
 
                         ((TextView) findViewById(R.id.datePeremptionLot)).setText(dateDePeremption);
 
-                        ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(newUniqueReceptionPUIContext.qte_lot_courant));
+                        ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(receptionUniqueContext.qte_lot_courant));
 
                         //gestion du numberPicker pour changer la quantité lors d'un scan
                         ((LinearLayout) findViewById(R.id.layout_qte_saisie_lot_preparation)).setOnClickListener(new View.OnClickListener() {
@@ -1685,7 +1685,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
                             public void onClick(View view) {
                                 Context context = BarcodePreparationActivity.this;
 
-                                if(newUniqueReceptionPUIContext.emplacement_courant != null)
+                                if(receptionUniqueContext.emplacement_courant != null)
                                 {
                                     yourCountDownTimer.cancel();
                                     ((TextView) findViewById(R.id.textViewCountDown)).setVisibility(View.GONE);
@@ -1693,21 +1693,21 @@ public class BarcodePreparationActivity extends ServiceActivity {
                                 }
 
 
-                                String title = newUniqueReceptionPUIContext.nouveau_lot.getNumeroLot();
+                                String title = receptionUniqueContext.nouveau_lot.getNumeroLot();
                                 String message = "Quantité réceptionnée : ";
-                                int value_max = (int)newUniqueReceptionPUIContext.reliquat_courant.getQteReliquat_X();
+                                int value_max = (int) receptionUniqueContext.reliquat_courant.getQteReliquat_X();
                                 int maxValue = value_max;
                                 int value = maxValue;
 
                                 DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                        int qteAprès = Alerte.aNumberPicker.getValue()*newUniqueReceptionPUIContext.conditionnement_achat;
-                                        newUniqueReceptionPUIContext.qte_lot_courant = qteAprès;
+                                        int qteAprès = Alerte.aNumberPicker.getValue()* receptionUniqueContext.conditionnement_achat;
+                                        receptionUniqueContext.qte_lot_courant = qteAprès;
                                         ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteAprès));
 
                                         dialog.dismiss();
 
-                                        if(newUniqueReceptionPUIContext.emplacement_courant != null)
+                                        if(receptionUniqueContext.emplacement_courant != null)
                                         {
                                             ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.VISIBLE);
                                             ((LinearLayout) findViewById(R.id.validationScan)).performClick();
@@ -1715,16 +1715,16 @@ public class BarcodePreparationActivity extends ServiceActivity {
                                     }
                                 };
 
-                                Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, newUniqueReceptionPUIContext.conditionnement_achat);
+                                Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, receptionUniqueContext.conditionnement_achat);
                             }
                         });
 
                     }
 
 
-                    if (newUniqueReceptionPUIContext.emplacement_courant != null) {
+                    if (receptionUniqueContext.emplacement_courant != null) {
                         ((TextView) findViewById(R.id.instruction)).setText("");
-                        ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(newUniqueReceptionPUIContext.emplacement_courant.getAdressage());
+                        ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(receptionUniqueContext.emplacement_courant.getAdressage());
                         blinkImage();
 
                         //initilisation du compteur
@@ -1738,7 +1738,7 @@ public class BarcodePreparationActivity extends ServiceActivity {
                         ((LinearLayout) findViewById(R.id.validationScan)).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                newUniqueReceptionPUIContext.ValiderScan();
+                                receptionUniqueContext.ValiderScan();
                                 yourCountDownTimer.cancel();
                                 boutonSuppression.performClick();
                             }

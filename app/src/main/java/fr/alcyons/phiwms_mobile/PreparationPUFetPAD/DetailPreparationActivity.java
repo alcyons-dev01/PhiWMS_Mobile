@@ -739,17 +739,20 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         for(PH_Preparation_Ligne_Preparation_Adapte courant : phPreparationLignePreparationAdapte_List)
         {
             PH_Preparation_Ligne ph_preparationLigne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, courant.getPh_preparationLigneID());
-            Produit produit = ProduitOpenHelper.getProduitByID(db, ph_preparationLigne.getProduitID());
-            String zone = produit.getZone_PUI_Defaut();
-            String emplacement = produit.getEmplacement_PUI_Defaut();
-            String zoneemplacement = zone + "-" + emplacement;
+            if(ph_preparationLigne != null)
+            {
+                Produit produit = ProduitOpenHelper.getProduitByID(db, ph_preparationLigne.getProduitID());
+                String zone = produit.getZone_PUI_Defaut();
+                String emplacement = produit.getEmplacement_PUI_Defaut();
+                String zoneemplacement = zone + "-" + emplacement;
 
-            if(!listeZoneEmplacement.contains(zoneemplacement)) {
-                listeZoneEmplacement.add(zoneemplacement);
-                ph_preparation_ligne_preparationLotAdapter.addSectionHeaderItem(courant);
+                if(!listeZoneEmplacement.contains(zoneemplacement)) {
+                    listeZoneEmplacement.add(zoneemplacement);
+                    ph_preparation_ligne_preparationLotAdapter.addSectionHeaderItem(courant);
+                }
+
+                ph_preparation_ligne_preparationLotAdapter.addItem(courant);
             }
-
-            ph_preparation_ligne_preparationLotAdapter.addItem(courant);
         }
 
         phPreparationLigne_ListView.setAdapter(ph_preparation_ligne_preparationLotAdapter);
