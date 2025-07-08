@@ -63,13 +63,12 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.Reception.DetailReceptionActivity;
-import fr.alcyons.phiwms_mobile.ReceptionPAD.DetailReceptionPadActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
 
     Depot depotPUIPAD;
     ListView commandeListView;
-    ReceptionAdapter commandeReceptionPUIAdapter;
+    ReceptionAdapter commandeReceptionPADAdapter;
     JSONArray commandeJSONArray;
     JSONArray phReliquatJSONArray;
     List<Commande> commandeList;
@@ -99,7 +98,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
         commandeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Commande commandeSelectionne = (Commande) commandeReceptionPUIAdapter.getItem(position);
+                Commande commandeSelectionne = (Commande) commandeReceptionPADAdapter.getItem(position);
 
                 if (commandeSelectionne != null) {
                     Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPadActivity.this, DetailReceptionActivity.class);
@@ -138,9 +137,9 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                                     }
                                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
 
-                                    commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPadActivity.this, db, commandeList);
+                                    commandeReceptionPADAdapter = new ReceptionAdapter(ServiceReceptionPadActivity.this, db, commandeList);
                                     commandeListView.setDivider(footer);
-                                    commandeListView.setAdapter(commandeReceptionPUIAdapter);
+                                    commandeListView.setAdapter(commandeReceptionPADAdapter);
 
                                     if (commandeList.isEmpty()) {
                                         vide = true;
@@ -155,7 +154,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
 
                                     invalidateOptionsMenu();
                                 } else {
-                                    Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPadActivity.this, DetailReceptionPadActivity.class);
+                                    Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPadActivity.this, DetailReceptionActivity.class);
                                     Bundle serviceReceptionPui_Bundle = ServiceReceptionPadActivity.super.getBundle();
                                     serviceReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
                                     serviceReceptionPui_Intent.putExtras(serviceReceptionPui_Bundle);
@@ -169,9 +168,9 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                                 }
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
 
-                                commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPadActivity.this, db, commandeList);
+                                commandeReceptionPADAdapter = new ReceptionAdapter(ServiceReceptionPadActivity.this, db, commandeList);
                                 commandeListView.setDivider(footer);
-                                commandeListView.setAdapter(commandeReceptionPUIAdapter);
+                                commandeListView.setAdapter(commandeReceptionPADAdapter);
 
                                 if (commandeList.isEmpty()) {
                                     vide = true;
@@ -192,9 +191,9 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                             /* Code nécessaire à l'affichage de la liste */
                             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
 
-                            commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPadActivity.this, db, commandeList);
+                            commandeReceptionPADAdapter = new ReceptionAdapter(ServiceReceptionPadActivity.this, db, commandeList);
                             commandeListView.setDivider(footer);
-                            commandeListView.setAdapter(commandeReceptionPUIAdapter);
+                            commandeListView.setAdapter(commandeReceptionPADAdapter);
 
                             if (commandeList.isEmpty()) {
                                 vide = true;
@@ -366,9 +365,9 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                                 //lancerScan();
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
                                 ((TextView) findViewById(R.id.titre)).setText("Réceptions");
-                                commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPadActivity.this, db, commandeList);
+                                commandeReceptionPADAdapter = new ReceptionAdapter(ServiceReceptionPadActivity.this, db, commandeList);
                                 commandeListView.setDivider(footer);
-                                commandeListView.setAdapter(commandeReceptionPUIAdapter);
+                                commandeListView.setAdapter(commandeReceptionPADAdapter);
                             }
                             else if(commandeList.isEmpty())
                             {
@@ -438,7 +437,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
     // Nécessaire afin d'avoir l'item Search
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        super.prepareOptionsMenu(menu, commandeReceptionPUIAdapter, null, "Rechercher...");
+        super.prepareOptionsMenu(menu, commandeReceptionPADAdapter, null, "Rechercher...");
         MenuItem item = menu.findItem(R.id.menuDatamatrix);
         item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
@@ -510,7 +509,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
     public void onClickTriNumero()
     {
         tri_choisi = "Numéro de commande";
-        commandeReceptionPUIAdapter.commandeList.sort(new Comparator<Commande>() {
+        commandeReceptionPADAdapter.commandeList.sort(new Comparator<Commande>() {
             @Override
             public int compare(Commande o1, Commande o2) {
                 return o1.getNumero().compareTo(o2.getNumero());
@@ -518,32 +517,32 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
         });
 
 
-        commandeReceptionPUIAdapter.notifyDataSetChanged();
+        commandeReceptionPADAdapter.notifyDataSetChanged();
     }
 
     public void onClickTriDate()
     {
         tri_choisi = "Date de livraison";
-        commandeReceptionPUIAdapter.commandeList.sort(new Comparator<Commande>() {
+        commandeReceptionPADAdapter.commandeList.sort(new Comparator<Commande>() {
             @Override
             public int compare(Commande o1, Commande o2) {
                 return o2.getDate_Liv().compareTo(o1.getDate_Liv());
             }
         });
 
-        commandeReceptionPUIAdapter.notifyDataSetChanged();
+        commandeReceptionPADAdapter.notifyDataSetChanged();
     }
 
     public void onClickTriFournisseur()
     {
         tri_choisi = "Fournisseur";
-        commandeReceptionPUIAdapter.commandeList.sort(new Comparator<Commande>() {
+        commandeReceptionPADAdapter.commandeList.sort(new Comparator<Commande>() {
             @Override
             public int compare(Commande o1, Commande o2) {
                 return o1.getFournisseur().compareTo(o2.getFournisseur());
             }
         });
 
-        commandeReceptionPUIAdapter.notifyDataSetChanged();
+        commandeReceptionPADAdapter.notifyDataSetChanged();
     }
 }

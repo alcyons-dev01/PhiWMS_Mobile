@@ -267,8 +267,17 @@ public class DetailReceptionActivity extends ServiceActivity {
                         phReliquatCourant.setLot(numeroLot.trim());
                         phReliquatCourant.setSerie(numero_Serie.trim());
                         phReliquatCourant.setPeremptionDate(datePeremption.trim());
-                        phReliquatCourant.setZone(zoneName.trim());
-                        phReliquatCourant.setEmplacement(emplacementName.trim());
+
+                        if(commandeSelectionne.getRef_Depot_Dest().contains("-PAD"))
+                        {
+                            phReliquatCourant.setZone("RECEPTION");
+                            phReliquatCourant.setEmplacement("RECEPTION-"+commandeSelectionne.getNumero()+"-"+commandeSelectionne.getPatient_identite());
+                        }
+                        else
+                        {
+                            phReliquatCourant.setZone(zoneName.trim());
+                            phReliquatCourant.setEmplacement(emplacementName.trim());
+                        }
                         phReliquatCourant.setQteLivraison(quantite);
                         phReliquatCourant.setBL_Numero(bonLivraison);
                         phReliquatCourant.setScanValue("");

@@ -94,7 +94,7 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
     RelativeLayout relativeQte;
     Commande commandecourante;
     PH_Reliquat reliquat_courant;
-    PH_Reliquat_Reception_Adapte phReliquatReceptionPUIAdapte;
+    PH_Reliquat_Reception_Adapte phReliquatReceptionAdapte;
 
     PackageManager pm;
     @SuppressLint("SetTextI18n")
@@ -110,7 +110,7 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
         produitSelectionne = ProduitOpenHelper.getProduitByID(db, Objects.requireNonNull(intent.getExtras()).getInt("produitID"));
         depotSelectionne = DepotOpenHelper.getDepotParID(db, intent.getExtras().getInt("depotID"));
         reliquat_courant = PH_ReliquatOpenHelper.getPH_ReliquatById(db, intent.getExtras().getInt("ReliquatID"));
-        phReliquatReceptionPUIAdapte = (PH_Reliquat_Reception_Adapte) intent.getExtras().getSerializable("phReliquatReceptionPUIAdapte");
+        phReliquatReceptionAdapte = (PH_Reliquat_Reception_Adapte) intent.getExtras().getSerializable("phReliquatReceptionAdapte");
         commandecourante = CommandeOpenHelper.getCommandeByNumero(db, reliquat_courant.getCommandeNumero());
 
         // Récupération des objets graphiques

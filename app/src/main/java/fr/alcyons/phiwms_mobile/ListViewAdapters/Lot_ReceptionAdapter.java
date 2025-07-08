@@ -71,7 +71,7 @@ public class Lot_ReceptionAdapter extends ArrayAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_lot_reception_pui, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_lot_reception, parent, false);
         }
 
         viewHolder = (Lot_ReceptionViewHolder) convertView.getTag();
