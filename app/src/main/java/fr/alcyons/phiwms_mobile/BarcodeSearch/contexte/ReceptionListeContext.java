@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity;
@@ -242,20 +243,60 @@ public class ReceptionListeContext extends MainActivity {
                     }
                 }
 
-                //on vérifie que le produit fait bien partie de la préparation
-                boolean produit_present = false;
-                if(produitCourant != null)
+                if(lot == null || lot.contentEquals(""))
                 {
-                    //gestion de l'emplacement précédent si c'est le même produit qui est scanné
-                    if(produitPrecedent != null)
+                    String activityName = context.getClass().getSimpleName();
+
+                    if(activityName.contentEquals("BarcodeCaptureActivity"))
                     {
-                        if(produitCourant.getID_produit() == produitPrecedent.getID_produit())
+                        ((BarcodeCaptureActivity) context).afficherSnackBar("Aucun lot scanné");
+                    }
+                    else if(activityName.contentEquals("ScannerPreparationActivity"))
+                    {
+                        ((ScannerPreparationActivity) context).afficherSnackBar("Aucun lot scanné");
+                    }
+                    else if(activityName.contentEquals("ScannerReceptionActivity"))
+                    {
+                        ((ScannerReceptionActivity) context).afficherSnackBar("Aucun lot scanné");
+                    }
+                    else
+                    {
+                        ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Aucun lot scanné");
+                    }
+                }
+                else
+                {
+                    //on vérifie que le produit fait bien partie de la préparation
+                    boolean produit_present = false;
+                    if(produitCourant != null)
+                    {
+                        //gestion de l'emplacement précédent si c'est le même produit qui est scanné
+                        if(produitPrecedent != null)
                         {
-                            if(produitCourant.getEmplacement_PUI_Defaut().contentEquals("") || produitCourant.getEmplacement_PUI_Defaut() == null)
+                            if(produitCourant.getID_produit() == produitPrecedent.getID_produit())
                             {
-                                if(emplacementPrecedent != null)
+                                if(produitCourant.getEmplacement_PUI_Defaut().contentEquals("") || produitCourant.getEmplacement_PUI_Defaut() == null)
                                 {
-                                    emplacement_courant = emplacementPrecedent;
+                                    if(emplacementPrecedent != null)
+                                    {
+                                        emplacement_courant = emplacementPrecedent;
+                                    }
+                                }
+                                else
+                                {
+                                    Depot depot_pui = DepotOpenHelper.getDepotPUI(db);
+                                    String zone_pui_defaut = produitCourant.getZone_PUI_Defaut();
+                                    String emplacemement_pui_defaut = produitCourant.getEmplacement_PUI_Defaut();
+
+                                    if(zone_pui_defaut != null && !zone_pui_defaut.contentEquals("") && depot_pui != null)
+                                    {
+                                        Depot_Zone zone_courante = ZoneOpenHelper.getZoneByDepotEtNom(db, depot_pui, zone_pui_defaut);
+
+                                        if(zone_courante!=null && emplacemement_pui_defaut != null && !emplacemement_pui_defaut.contentEquals(""))
+                                        {
+                                            emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zone_courante, emplacemement_pui_defaut);
+                                        }
+                                    }
                                 }
                             }
                             else
@@ -291,174 +332,187 @@ public class ReceptionListeContext extends MainActivity {
                                 }
                             }
                         }
-                    }
-                    else
-                    {
-                        Depot depot_pui = DepotOpenHelper.getDepotPUI(db);
-                        String zone_pui_defaut = produitCourant.getZone_PUI_Defaut();
-                        String emplacemement_pui_defaut = produitCourant.getEmplacement_PUI_Defaut();
 
-                        if(zone_pui_defaut != null && !zone_pui_defaut.contentEquals("") && depot_pui != null)
+                        for(PH_Reliquat courant : liste_phreliquat)
                         {
-                            Depot_Zone zone_courante = ZoneOpenHelper.getZoneByDepotEtNom(db, depot_pui, zone_pui_defaut);
-
-                            if(zone_courante!=null && emplacemement_pui_defaut != null && !emplacemement_pui_defaut.contentEquals(""))
+                            if(courant.getProduitID() == produitCourant.getID_produit())
                             {
-                                emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zone_courante, emplacemement_pui_defaut);
-                            }
-                        }
-                    }
-
-                    for(PH_Reliquat courant : liste_phreliquat)
-                    {
-                        if(courant.getProduitID() == produitCourant.getID_produit())
-                        {
-                            produit_present = true;
-                            reliquat_id_courant = courant.getReliquat_UID();
-                            reliquat_courant = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquat_id_courant);
-                            if(produitCourant.getCond_Achat_Gros_volume() != 0 && produitCourant.getCond_Achat_Gros_volume() <= reliquat_courant.getQteReliquat_X())
-                            {
-                                qte_lot_courant = (int)produitCourant.getCond_Achat_Gros_volume();
-                            }
-                            else if(produitCourant.getCond_achat() != 0 && produitCourant.getCond_achat() <= reliquat_courant.getQteReliquat_X())
-                            {
-                                qte_lot_courant = (int) produitCourant.getCond_achat();
-                            }
-                            else
-                            {
-                                qte_lot_courant = reliquat_courant.getQteReliquat_X();
-                            }
-                        }
-                    }
-                }
-                if(reliquat_courant != null && reliquat_courant.getQteReliquat_X() ==0)
-                {
-                    String activityName = context.getClass().getSimpleName();
-
-                    if(activityName.contentEquals("BarcodeCaptureActivity"))
-                    {
-                        ((BarcodeCaptureActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
-                    }
-                    else if(activityName.contentEquals("ScannerPreparationActivity"))
-                    {
-                        ((ScannerPreparationActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
-                    }
-                    else if(activityName.contentEquals("ScannerReceptionActivity"))
-                    {
-                        ((ScannerReceptionActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
-                    }
-                    else
-                    {
-                        ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
-                    }
-                    emplacement_courant = null;
-                    validation = true;
-                }
-                else if(!produit_present)
-                {
-                    String activityName = context.getClass().getSimpleName();
-
-                    if(activityName.contentEquals("BarcodeCaptureActivity"))
-                    {
-                        ((BarcodeCaptureActivity) context).afficherSnackBar("Produit non présent dans la liste");
-                    }
-                    else if(activityName.contentEquals("ScannerPreparationActivity"))
-                    {
-                        ((ScannerPreparationActivity) context).afficherSnackBar("Produit non présent dans la liste");
-                    }
-                    else if(activityName.contentEquals("ScannerReceptionActivity"))
-                    {
-                        ((ScannerReceptionActivity) context).afficherSnackBar("Produit non présent dans la liste");
-                    }
-                    else
-                    {
-                        ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Produit non présent dans la liste");
-                    }
-                    nouveau_lot = null;
-                    qte_lot_courant = 0;
-                    emplacement_courant = null;
-                    phReliquatReceptionPUIAdapte_courant = null;
-                    validation = true;
-                }
-                else if(serie != null && !serie.contentEquals("") && produitCourant.isSerialiser_Reception_Delivrance() && produitCourant.isSuivi_Serialisation() && stringList.indexOf(chaine) == -1)
-                {
-                    if(produit != null)
-                    {
-                        if(codeInconnu)
-                        {
-                            gtin_courant = chaine;
-                        }
-                        PH_Serialisation serialisation_courante = null;
-
-                        if(!codeInconnu)
-                        {
-                            /***Début de la sérialisation***/
-                            if (!serie.contentEquals("") && produit.isSerialiser_Reception_Delivrance() && produit.isSuivi_Serialisation() && listeSerie.indexOf(serie) == -1) {
-                                listeSerie.add(serie);
-                                String resultat = "";
-                                boolean differe = false;
-                                if (!statutConnexion)
-                                    differe = true;
-
-                                if (conditionnementString.contentEquals("")) {
-                                    produit = ProduitOpenHelper.getUnProduitParGTIN(db, gtin_courant);
-                                    if (produit == null) {
-                                        produit = ProduitOpenHelper.getUnProduitParGTIN(db, "01" + gtin_courant);
-                                    }
-                                }
-
-                                long ph_serialisation_uid = 0;
-                                String peremptionSerialisation = date_peremption_courant;
-                                peremptionSerialisation = peremptionSerialisation.substring(2);
-                                peremptionSerialisation = peremptionSerialisation.replace("-", "");
-                                ph_serialisation_uid = serialisationService.Serialisation_Verifier(utilisateurConnecte.getId(), false, differe, gtin_courant, "GTIN", lot, peremptionSerialisation, serie, "ActionUtilisateur", String.valueOf(0), "", "");
-
-
-                                serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, (int) ph_serialisation_uid);
-                                if (serialisation_courante == null) {
-                                    serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int) ph_serialisation_uid);
-                                }
-
-                                if(serialisation_courante != null)
+                                produit_present = true;
+                                reliquat_id_courant = courant.getReliquat_UID();
+                                reliquat_courant = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquat_id_courant);
+                                if(produitCourant.getCond_Achat_Gros_volume() != 0 && produitCourant.getCond_Achat_Gros_volume() <= reliquat_courant.getQteReliquat_X())
                                 {
-                                    resultat = serialisation_courante.getResultat();
-                                    if (resultat.contentEquals("INACTIVE") || resultat.contentEquals("UNKNOWN")) {
-                                        Random SurveillanceReferenceRandom = new Random();
-                                        int id_surveillance = SurveillanceReferenceRandom.nextInt();
-                                        if (id_surveillance > 0) {
-                                            id_surveillance = id_surveillance * -1;
+                                    qte_lot_courant = (int)produitCourant.getCond_Achat_Gros_volume();
+                                }
+                                else if(produitCourant.getCond_achat() != 0 && produitCourant.getCond_achat() <= reliquat_courant.getQteReliquat_X())
+                                {
+                                    qte_lot_courant = (int) produitCourant.getCond_achat();
+                                }
+                                else
+                                {
+                                    qte_lot_courant = reliquat_courant.getQteReliquat_X();
+                                }
+                            }
+                        }
+                    }
+                    if(reliquat_courant != null && reliquat_courant.getQteReliquat_X() ==0)
+                    {
+                        String activityName = context.getClass().getSimpleName();
+
+                        if(activityName.contentEquals("BarcodeCaptureActivity"))
+                        {
+                            ((BarcodeCaptureActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                        }
+                        else if(activityName.contentEquals("ScannerPreparationActivity"))
+                        {
+                            ((ScannerPreparationActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                        }
+                        else if(activityName.contentEquals("ScannerReceptionActivity"))
+                        {
+                            ((ScannerReceptionActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                        }
+                        else
+                        {
+                            ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Produit déjà préparer en intégralité");
+                        }
+                        emplacement_courant = null;
+                        validation = true;
+                    }
+                    else if(!produit_present)
+                    {
+                        String activityName = context.getClass().getSimpleName();
+
+                        if(activityName.contentEquals("BarcodeCaptureActivity"))
+                        {
+                            ((BarcodeCaptureActivity) context).afficherSnackBar("Produit non présent dans la liste");
+                        }
+                        else if(activityName.contentEquals("ScannerPreparationActivity"))
+                        {
+                            ((ScannerPreparationActivity) context).afficherSnackBar("Produit non présent dans la liste");
+                        }
+                        else if(activityName.contentEquals("ScannerReceptionActivity"))
+                        {
+                            ((ScannerReceptionActivity) context).afficherSnackBar("Produit non présent dans la liste");
+                        }
+                        else
+                        {
+                            ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Produit non présent dans la liste");
+                        }
+                        nouveau_lot = null;
+                        qte_lot_courant = 0;
+                        emplacement_courant = null;
+                        phReliquatReceptionPUIAdapte_courant = null;
+                        validation = true;
+                    }
+                    else if(serie != null && !serie.contentEquals("") && produitCourant.isSerialiser_Reception_Delivrance() && produitCourant.isSuivi_Serialisation() && stringList.indexOf(chaine) == -1)
+                    {
+                        if(produitCourant != null)
+                        {
+                            if(codeInconnu)
+                            {
+                                gtin_courant = chaine;
+                            }
+                            PH_Serialisation serialisation_courante = null;
+
+                            if(!codeInconnu)
+                            {
+                                /***Début de la sérialisation***/
+                                if (!serie.contentEquals("") && produitCourant.isSerialiser_Reception_Delivrance() && produitCourant.isSuivi_Serialisation() && listeSerie.indexOf(serie) == -1) {
+                                    listeSerie.add(serie);
+                                    String resultat = "";
+                                    boolean differe = false;
+                                    if (!statutConnexion)
+                                        differe = true;
+
+                                    if (conditionnementString.contentEquals("")) {
+                                        produitCourant = ProduitOpenHelper.getUnProduitParGTIN(db, gtin_courant);
+                                        if (produitCourant == null) {
+                                            produitCourant = ProduitOpenHelper.getUnProduitParGTIN(db, "01" + gtin_courant);
                                         }
-                                        Calendar calendar = Calendar.getInstance();
-                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                                        String surveillanceDate = sdf.format(calendar.getTime());
-
-                                        SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
-                                        String surveillanceHeure = mdformat.format(calendar.getTime());
-
-                                        int produit_id = serialisation_courante.getProduitUID();
-                                        int serialisationID = serialisation_courante.get_UID();
-                                        String motif = GestionCodeErreurNMVO.getMessage(code);
-                                        String actionAMener = "";
-                                        String statut = "NON LU";
-                                        String traitePar = utilisateurConnecte.getIdentifiant();
-                                        String traiteDate = surveillanceDate;
-                                        String traiteHeure = surveillanceHeure;
-                                        String produitLot = serialisation_courante.getNumeroLot();
-                                        String produitDatePéremption = serialisation_courante.getDatePeremptionAAMMJJ();
-                                        String produitNumeroSerie = serialisation_courante.getNumeroSerie();
-
-                                        SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
-                                    } else {
-                                        String messageTexteFranceMVO = "";
                                     }
+
+                                    long ph_serialisation_uid = 0;
+                                    String peremptionSerialisation = date_peremption_courant;
+                                    peremptionSerialisation = peremptionSerialisation.substring(2);
+                                    peremptionSerialisation = peremptionSerialisation.replace("-", "");
+                                    ph_serialisation_uid = serialisationService.Serialisation_Verifier(utilisateurConnecte.getId(), false, differe, gtin_courant, "GTIN", lot, peremptionSerialisation, serie, "ActionUtilisateur", String.valueOf(0), "", "");
+
+
+                                    serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, (int) ph_serialisation_uid);
+                                    if (serialisation_courante == null) {
+                                        serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int) ph_serialisation_uid);
+                                    }
+
+                                    if(serialisation_courante != null)
+                                    {
+                                        resultat = serialisation_courante.getResultat();
+                                        if (resultat.contentEquals("INACTIVE") || resultat.contentEquals("UNKNOWN")) {
+                                            Random SurveillanceReferenceRandom = new Random();
+                                            int id_surveillance = SurveillanceReferenceRandom.nextInt();
+                                            if (id_surveillance > 0) {
+                                                id_surveillance = id_surveillance * -1;
+                                            }
+                                            Calendar calendar = Calendar.getInstance();
+                                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                            String surveillanceDate = sdf.format(calendar.getTime());
+
+                                            SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
+                                            String surveillanceHeure = mdformat.format(calendar.getTime());
+
+                                            int produit_id = serialisation_courante.getProduitUID();
+                                            int serialisationID = serialisation_courante.get_UID();
+                                            String motif = GestionCodeErreurNMVO.getMessage(code);
+                                            String actionAMener = "";
+                                            String statut = "NON LU";
+                                            String traitePar = utilisateurConnecte.getIdentifiant();
+                                            String traiteDate = surveillanceDate;
+                                            String traiteHeure = surveillanceHeure;
+                                            String produitLot = serialisation_courante.getNumeroLot();
+                                            String produitDatePéremption = serialisation_courante.getDatePeremptionAAMMJJ();
+                                            String produitNumeroSerie = serialisation_courante.getNumeroSerie();
+
+                                            SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
+                                        } else {
+                                            String messageTexteFranceMVO = "";
+                                        }
+                                    }
+
                                 }
 
+                                /***Fin de la sérialisation***/
+                            }
+                            codeInconnu = false;
+                            codeInconnu = false;
+                            PH_Reliquat ph_reliquat = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquat_id_courant);
+
+                            for(PH_Reliquat_Reception_Adapte courant: list_reliquat_receptionPuiAdapte)
+                            {
+                                if(courant.getPhReliquatUID() == ph_reliquat.getReliquat_UID())
+                                {
+                                    phReliquatReceptionPUIAdapte_courant = courant;
+                                    break;
+                                }
                             }
 
-                            /***Fin de la sérialisation***/
+                            if(phReliquatReceptionPUIAdapte_courant!=null)
+                            {
+                                nouveau_lot = phReliquatReceptionPUIAdapte_courant.new Lot(lot, date_peremption_courant, "", "");
+                                conditionnement_achat = produitCourant.getCond_achat();
+                            }
                         }
-                        codeInconnu = false;
-                        codeInconnu = false;
+                        else
+                        {
+                            String activityName = context.getClass().getSimpleName();
+
+                            nouveau_lot = null;
+                            qte_lot_courant = 0;
+                            phReliquatReceptionPUIAdapte_courant = null;
+                            validation = true;
+                            code = "";
+                        }
+                    }
+                    else
+                    {
                         PH_Reliquat ph_reliquat = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquat_id_courant);
 
                         for(PH_Reliquat_Reception_Adapte courant: list_reliquat_receptionPuiAdapte)
@@ -475,86 +529,58 @@ public class ReceptionListeContext extends MainActivity {
                             nouveau_lot = phReliquatReceptionPUIAdapte_courant.new Lot(lot, date_peremption_courant, "", "");
                             conditionnement_achat = produitCourant.getCond_achat();
                         }
-                    }
-                    else
-                    {
-                        String activityName = context.getClass().getSimpleName();
 
-                        nouveau_lot = null;
-                        qte_lot_courant = 0;
-                        phReliquatReceptionPUIAdapte_courant = null;
-                        validation = true;
-                        code = "";
-                    }
-                }
-                else
-                {
-                    PH_Reliquat ph_reliquat = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquat_id_courant);
-
-                    for(PH_Reliquat_Reception_Adapte courant: list_reliquat_receptionPuiAdapte)
-                    {
-                        if(courant.getPhReliquatUID() == ph_reliquat.getReliquat_UID())
+    /*                    if(serie != null && !serie.contentEquals("") && !listeSerie.contains(serie))
                         {
-                            phReliquatReceptionPUIAdapte_courant = courant;
-                            break;
-                        }
-                    }
+                            listeSerie.add(serie);
+                            PH_Reliquat ph_reliquat = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquat_id_courant);
 
-                    if(phReliquatReceptionPUIAdapte_courant!=null)
-                    {
-                        nouveau_lot = phReliquatReceptionPUIAdapte_courant.new Lot(lot, date_peremption_courant, "", "");
-                        conditionnement_achat = produitCourant.getCond_achat();
-                    }
-
-/*                    if(serie != null && !serie.contentEquals("") && !listeSerie.contains(serie))
-                    {
-                        listeSerie.add(serie);
-                        PH_Reliquat ph_reliquat = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquat_id_courant);
-
-                        for(PH_Reliquat_ReceptionPUI_Adapte courant: list_reliquat_receptionPuiAdapte)
-                        {
-                            if(courant.getPhReliquatUID() == ph_reliquat.getReliquat_UID())
+                            for(PH_Reliquat_ReceptionPUI_Adapte courant: list_reliquat_receptionPuiAdapte)
                             {
-                                phReliquatReceptionPUIAdapte_courant = courant;
-                                break;
+                                if(courant.getPhReliquatUID() == ph_reliquat.getReliquat_UID())
+                                {
+                                    phReliquatReceptionPUIAdapte_courant = courant;
+                                    break;
+                                }
+                            }
+
+                            if(phReliquatReceptionPUIAdapte_courant!=null)
+                            {
+                                nouveau_lot = phReliquatReceptionPUIAdapte_courant.new Lot(lot, date_peremption_courant, "", "");
+                                conditionnement_achat = produitCourant.getCond_achat();
                             }
                         }
-
-                        if(phReliquatReceptionPUIAdapte_courant!=null)
+                        else if(serie != null && !serie.contentEquals("") && listeSerie.contains(serie))
                         {
-                            nouveau_lot = phReliquatReceptionPUIAdapte_courant.new Lot(lot, date_peremption_courant, "", "");
-                            conditionnement_achat = produitCourant.getCond_achat();
+                            ((ScannerPreparationActivity) context).afficherSnackBar("Le numéro de série à déjà était scanné");
+                            nouveau_lot = null;
+                            qte_lot_courant = 0;
+                            phReliquatReceptionPUIAdapte_courant = null;
+                            validation = true;
+                            code = "";
                         }
-                    }
-                    else if(serie != null && !serie.contentEquals("") && listeSerie.contains(serie))
-                    {
-                        ((ScannerPreparationActivity) context).afficherSnackBar("Le numéro de série à déjà était scanné");
-                        nouveau_lot = null;
-                        qte_lot_courant = 0;
-                        phReliquatReceptionPUIAdapte_courant = null;
-                        validation = true;
-                        code = "";
-                    }
-                    else
-                    {
-                        PH_Reliquat ph_reliquat = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquat_id_courant);
-
-                        for(PH_Reliquat_ReceptionPUI_Adapte courant: list_reliquat_receptionPuiAdapte)
+                        else
                         {
-                            if(courant.getPhReliquatUID() == ph_reliquat.getReliquat_UID())
+                            PH_Reliquat ph_reliquat = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquat_id_courant);
+
+                            for(PH_Reliquat_ReceptionPUI_Adapte courant: list_reliquat_receptionPuiAdapte)
                             {
-                                phReliquatReceptionPUIAdapte_courant = courant;
-                                break;
+                                if(courant.getPhReliquatUID() == ph_reliquat.getReliquat_UID())
+                                {
+                                    phReliquatReceptionPUIAdapte_courant = courant;
+                                    break;
+                                }
                             }
-                        }
 
-                        if(phReliquatReceptionPUIAdapte_courant!=null)
-                        {
-                            nouveau_lot = phReliquatReceptionPUIAdapte_courant.new Lot(lot, date_peremption_courant, "", "");
-                            conditionnement_achat = produitCourant.getCond_achat();
-                        }
-                    }*/
+                            if(phReliquatReceptionPUIAdapte_courant!=null)
+                            {
+                                nouveau_lot = phReliquatReceptionPUIAdapte_courant.new Lot(lot, date_peremption_courant, "", "");
+                                conditionnement_achat = produitCourant.getCond_achat();
+                            }
+                        }*/
+                    }
                 }
+
             }
         }
     }
@@ -693,18 +719,61 @@ public class ReceptionListeContext extends MainActivity {
 
             //on vérifie que le produit fait bien partie de la préparation
             boolean produit_present = false;
-            if(produitCourant != null)
+            if(lot == null || lot.contentEquals(""))
             {
-                //on vérifie que le produit soit le même que le précédent
-                if(produitPrecedent != null)
+                String activityName = context.getClass().getSimpleName();
+                if(activityName.contentEquals("BarcodeCaptureActivity"))
                 {
-                    if(produitCourant.getID_produit() == produitPrecedent.getID_produit())
+                    ((BarcodeCaptureActivity) context).afficherSnackBar("Aucun lot scanné");
+                }
+                else if(activityName.contentEquals("BarcodePreparationActivity"))
+                {
+                    ((BarcodePreparationActivity) context).afficherSnackBar("Aucun lot scanné");
+                }
+                else if(activityName.contentEquals("ScannerPreparationActivity"))
+                {
+                    ((ScannerPreparationActivity)context).afficherSnackBar("Aucun lot scanné");
+                }
+                else if(activityName.contentEquals("ScannerReceptionActivity"))
+                {
+                    ((ScannerReceptionActivity)context).afficherSnackBar("Aucun lot scanné");
+                }
+                else
+                {
+                    ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Aucun lot scanné");
+                }
+            }
+            else
+            {
+                if(produitCourant != null)
+                {
+                    //on vérifie que le produit soit le même que le précédent
+                    if(produitPrecedent != null)
                     {
-                        if(produitCourant.getEmplacement_PUI_Defaut().contentEquals("") || produitCourant.getEmplacement_PUI_Defaut() == null)
+                        if(produitCourant.getID_produit() == produitPrecedent.getID_produit())
                         {
-                            if(emplacementPrecedent != null)
+                            if(produitCourant.getEmplacement_PUI_Defaut().contentEquals("") || produitCourant.getEmplacement_PUI_Defaut() == null)
                             {
-                                emplacement_courant = emplacementPrecedent;
+                                if(emplacementPrecedent != null)
+                                {
+                                    emplacement_courant = emplacementPrecedent;
+                                }
+                            }
+                            else
+                            {
+                                Depot depot_pui = DepotOpenHelper.getDepotPUI(db);
+                                String zone_pui_defaut = produitCourant.getZone_PUI_Defaut();
+                                String emplacemement_pui_defaut = produitCourant.getEmplacement_PUI_Defaut();
+
+                                if(zone_pui_defaut != null && !zone_pui_defaut.contentEquals("") && depot_pui != null)
+                                {
+                                    Depot_Zone zone_courante = ZoneOpenHelper.getZoneByDepotEtNom(db, depot_pui, zone_pui_defaut);
+
+                                    if(zone_courante!=null && emplacemement_pui_defaut != null && !emplacemement_pui_defaut.contentEquals(""))
+                                    {
+                                        emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zone_courante, emplacemement_pui_defaut);
+                                    }
+                                }
                             }
                         }
                         else
@@ -740,144 +809,163 @@ public class ReceptionListeContext extends MainActivity {
                             }
                         }
                     }
-                }
-                else
-                {
-                    Depot depot_pui = DepotOpenHelper.getDepotPUI(db);
-                    String zone_pui_defaut = produitCourant.getZone_PUI_Defaut();
-                    String emplacemement_pui_defaut = produitCourant.getEmplacement_PUI_Defaut();
 
-                    if(zone_pui_defaut != null && !zone_pui_defaut.contentEquals("") && depot_pui != null)
+                    for(PH_Reliquat courant : liste_phreliquat)
                     {
-                        Depot_Zone zone_courante = ZoneOpenHelper.getZoneByDepotEtNom(db, depot_pui, zone_pui_defaut);
-
-                        if(zone_courante!=null && emplacemement_pui_defaut != null && !emplacemement_pui_defaut.contentEquals(""))
+                        if(courant.getProduitID() == produitCourant.getID_produit())
                         {
-                            emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zone_courante, emplacemement_pui_defaut);
+                            produit_present = true;
+                            reliquat_id_courant = courant.getReliquat_UID();
+                            reliquat_courant = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquat_id_courant);
+                            if(produitCourant.getCond_Achat_Gros_volume() != 0 && produitCourant.getCond_Achat_Gros_volume() <= reliquat_courant.getQteReliquat_X())
+                            {
+                                qte_lot_courant = (int)produitCourant.getCond_Achat_Gros_volume();
+                            }
+                            else if(produitCourant.getCond_achat() != 0 && produitCourant.getCond_achat() <= reliquat_courant.getQteReliquat_X())
+                            {
+                                qte_lot_courant = (int) produitCourant.getCond_achat();
+                            }
+                            else
+                            {
+                                qte_lot_courant = reliquat_courant.getQteReliquat_X();
+                            }
                         }
                     }
                 }
 
-                for(PH_Reliquat courant : liste_phreliquat)
+                if(reliquat_courant != null && reliquat_courant.getQteReliquat_X() ==0)
                 {
-                    if(courant.getProduitID() == produitCourant.getID_produit())
+                    ((BarcodeReceptionActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
+                    emplacement_courant = null;
+                    validation = true;
+                }
+                else if(!produit_present)
+                {
+                    ((BarcodeReceptionActivity)context).afficherSnackBar("Produit non présent dans la liste");
+                    emplacement_courant = null;
+                    validation = true;
+                    //lot_courant = null;
+                }
+                else if(serie != null && !serie.contentEquals("") && stringList.indexOf(s.toString().substring(0, s.length()-1)) == -1)
+                {
+                    if(produitCourant != null)
                     {
-                        produit_present = true;
-                        reliquat_id_courant = courant.getReliquat_UID();
-                        reliquat_courant = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquat_id_courant);
-                        if(produitCourant.getCond_Achat_Gros_volume() != 0 && produitCourant.getCond_Achat_Gros_volume() <= reliquat_courant.getQteReliquat_X())
+                        if(codeInconnu)
                         {
-                            qte_lot_courant = (int)produitCourant.getCond_Achat_Gros_volume();
+                            gtin_courant = s.toString().substring(0, s.length() - 1);
                         }
-                        else if(produitCourant.getCond_achat() != 0 && produitCourant.getCond_achat() <= reliquat_courant.getQteReliquat_X())
+                        PH_Serialisation serialisation_courante = null;
+
+                        if(!codeInconnu)
                         {
-                            qte_lot_courant = (int) produitCourant.getCond_achat();
+
+                            /***Début de la sérialisation***/
+
+                            if (!serie.contentEquals("") && produitCourant.isSerialiser_Reception_Delivrance() && produitCourant.isSuivi_Serialisation() && listeSerie.indexOf(serie) == -1) {
+                                listeSerie.add(serie);
+                                String resultat = "";
+                                boolean differe = false;
+                                if (!statutConnexion)
+                                    differe = true;
+
+                                if (conditionnementString.contentEquals("")) {
+                                    produitCourant = ProduitOpenHelper.getUnProduitParGTIN(db, gtin_courant);
+                                    if (produitCourant == null) {
+                                        produitCourant = ProduitOpenHelper.getUnProduitParGTIN(db, "01" + gtin_courant);
+                                    }
+                                }
+
+                                long ph_serialisation_uid = 0;
+                                String peremptionSerialisation = date_peremption_courant;
+                                peremptionSerialisation = peremptionSerialisation.substring(2);
+                                peremptionSerialisation = peremptionSerialisation.replace("-", "");
+                                ph_serialisation_uid = serialisationService.Serialisation_Verifier(utilisateurConnecte.getId(), false, differe, gtin_courant, "GTIN", lot, peremptionSerialisation, serie, "ActionUtilisateur", String.valueOf(0), "", "");
+
+
+                                serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, (int) ph_serialisation_uid);
+                                if (serialisation_courante == null) {
+                                    serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int) ph_serialisation_uid);
+                                }
+
+                                if(serialisation_courante != null)
+                                {
+                                    resultat = serialisation_courante.getResultat();
+                                    if (resultat.contentEquals("INACTIVE") || resultat.contentEquals("UNKNOWN")) {
+                                        Random SurveillanceReferenceRandom = new Random();
+                                        int id_surveillance = SurveillanceReferenceRandom.nextInt();
+                                        if (id_surveillance > 0) {
+                                            id_surveillance = id_surveillance * -1;
+                                        }
+                                        Calendar calendar = Calendar.getInstance();
+                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                        String surveillanceDate = sdf.format(calendar.getTime());
+
+                                        SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
+                                        String surveillanceHeure = mdformat.format(calendar.getTime());
+
+                                        int produit_id = serialisation_courante.getProduitUID();
+                                        int serialisationID = serialisation_courante.get_UID();
+                                        String motif = GestionCodeErreurNMVO.getMessage(code);
+                                        String actionAMener = "";
+                                        String statut = "NON LU";
+                                        String traitePar = utilisateurConnecte.getIdentifiant();
+                                        String traiteDate = surveillanceDate;
+                                        String traiteHeure = surveillanceHeure;
+                                        String produitLot = serialisation_courante.getNumeroLot();
+                                        String produitDatePéremption = serialisation_courante.getDatePeremptionAAMMJJ();
+                                        String produitNumeroSerie = serialisation_courante.getNumeroSerie();
+
+                                        SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
+
+
+                                        //((BarcodeCaptureActivity) context).afficherAlerteFranceMVO(produit.getDesignation_interne(), resultat, serie, motif);
+
+                                    } else {
+                                        String messageTexteFranceMVO = "";
+                                    }
+                                }
+
+                            }
+
+                            /***Fin de la sérialisation***/
+                        }
+                        codeInconnu = false;
+                        PH_Reliquat ph_reliquat = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquat_id_courant);
+
+                        for(PH_Reliquat_Reception_Adapte courant: list_reliquat_receptionPuiAdapte)
+                        {
+                            if(courant.getPhReliquatUID() == ph_reliquat.getReliquat_UID())
+                            {
+                                phReliquatReceptionPUIAdapte_courant = courant;
+                                break;
+                            }
+                        }
+
+                        if(phReliquatReceptionPUIAdapte_courant!=null)
+                        {
+                            nouveau_lot = phReliquatReceptionPUIAdapte_courant.new Lot(lot, date_peremption_courant, "", "");
+                        }
+
+                        conditionnement_achat = produitCourant.getCond_achat();
+                    }
+                    else
+                    {
+                        String activityName = context.getClass().getSimpleName();
+                        if(activityName.contentEquals("BarcodeCaptureActivity"))
+                        {
+                            ((BarcodeCaptureActivity) context).afficherSnackBar("Produit inconnu");
                         }
                         else
                         {
-                            qte_lot_courant = reliquat_courant.getQteReliquat_X();
+                            ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Produit inconnu");
                         }
+
+                        validation = true;
+                        code = "";
                     }
                 }
-            }
-
-            if(reliquat_courant != null && reliquat_courant.getQteReliquat_X() ==0)
-            {
-                ((BarcodeReceptionActivity)context).afficherSnackBar("Produit déjà préparer en intégralité");
-                emplacement_courant = null;
-                validation = true;
-            }
-            else if(!produit_present)
-            {
-                ((BarcodeReceptionActivity)context).afficherSnackBar("Produit non présent dans la liste");
-                emplacement_courant = null;
-                validation = true;
-                //lot_courant = null;
-            }
-            else if(serie != null && !serie.contentEquals("") && stringList.indexOf(s.toString().substring(0, s.length()-1)) == -1)
-            {
-                if(produitCourant != null)
+                else
                 {
-                    if(codeInconnu)
-                    {
-                        gtin_courant = s.toString().substring(0, s.length() - 1);
-                    }
-                    PH_Serialisation serialisation_courante = null;
-
-                    if(!codeInconnu)
-                    {
-
-                        /***Début de la sérialisation***/
-
-                        if (!serie.contentEquals("") && produitCourant.isSerialiser_Reception_Delivrance() && produitCourant.isSuivi_Serialisation() && listeSerie.indexOf(serie) == -1) {
-                            listeSerie.add(serie);
-                            String resultat = "";
-                            boolean differe = false;
-                            if (!statutConnexion)
-                                differe = true;
-
-                            if (conditionnementString.contentEquals("")) {
-                                produitCourant = ProduitOpenHelper.getUnProduitParGTIN(db, gtin_courant);
-                                if (produitCourant == null) {
-                                    produitCourant = ProduitOpenHelper.getUnProduitParGTIN(db, "01" + gtin_courant);
-                                }
-                            }
-
-                            long ph_serialisation_uid = 0;
-                            String peremptionSerialisation = date_peremption_courant;
-                            peremptionSerialisation = peremptionSerialisation.substring(2);
-                            peremptionSerialisation = peremptionSerialisation.replace("-", "");
-                            ph_serialisation_uid = serialisationService.Serialisation_Verifier(utilisateurConnecte.getId(), false, differe, gtin_courant, "GTIN", lot, peremptionSerialisation, serie, "ActionUtilisateur", String.valueOf(0), "", "");
-
-
-                            serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, (int) ph_serialisation_uid);
-                            if (serialisation_courante == null) {
-                                serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByPhiMR4UUID(db, (int) ph_serialisation_uid);
-                            }
-
-                            if(serialisation_courante != null)
-                            {
-                                resultat = serialisation_courante.getResultat();
-                                if (resultat.contentEquals("INACTIVE") || resultat.contentEquals("UNKNOWN")) {
-                                    Random SurveillanceReferenceRandom = new Random();
-                                    int id_surveillance = SurveillanceReferenceRandom.nextInt();
-                                    if (id_surveillance > 0) {
-                                        id_surveillance = id_surveillance * -1;
-                                    }
-                                    Calendar calendar = Calendar.getInstance();
-                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                                    String surveillanceDate = sdf.format(calendar.getTime());
-
-                                    SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm:ss");
-                                    String surveillanceHeure = mdformat.format(calendar.getTime());
-
-                                    int produit_id = serialisation_courante.getProduitUID();
-                                    int serialisationID = serialisation_courante.get_UID();
-                                    String motif = GestionCodeErreurNMVO.getMessage(code);
-                                    String actionAMener = "";
-                                    String statut = "NON LU";
-                                    String traitePar = utilisateurConnecte.getIdentifiant();
-                                    String traiteDate = surveillanceDate;
-                                    String traiteHeure = surveillanceHeure;
-                                    String produitLot = serialisation_courante.getNumeroLot();
-                                    String produitDatePéremption = serialisation_courante.getDatePeremptionAAMMJJ();
-                                    String produitNumeroSerie = serialisation_courante.getNumeroSerie();
-
-                                    SurveillanceReference new_surveillance_reference = new SurveillanceReference(id_surveillance, surveillanceDate, surveillanceHeure, produit_id, serialisationID, motif, actionAMener, statut, traitePar, traiteDate, traiteHeure, produitLot, produitDatePéremption, produitNumeroSerie);
-
-
-                                    //((BarcodeCaptureActivity) context).afficherAlerteFranceMVO(produit.getDesignation_interne(), resultat, serie, motif);
-
-                                } else {
-                                    String messageTexteFranceMVO = "";
-                                }
-                            }
-
-                        }
-
-                        /***Fin de la sérialisation***/
-                    }
-                    codeInconnu = false;
                     PH_Reliquat ph_reliquat = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquat_id_courant);
 
                     for(PH_Reliquat_Reception_Adapte courant: list_reliquat_receptionPuiAdapte)
@@ -892,43 +980,8 @@ public class ReceptionListeContext extends MainActivity {
                     if(phReliquatReceptionPUIAdapte_courant!=null)
                     {
                         nouveau_lot = phReliquatReceptionPUIAdapte_courant.new Lot(lot, date_peremption_courant, "", "");
+                        conditionnement_achat = produitCourant.getCond_achat();
                     }
-
-                    conditionnement_achat = produitCourant.getCond_achat();
-                }
-                else
-                {
-                    String activityName = context.getClass().getSimpleName();
-                    if(activityName.contentEquals("BarcodeCaptureActivity"))
-                    {
-                        ((BarcodeCaptureActivity) context).afficherSnackBar("Produit inconnu");
-                    }
-                    else
-                    {
-                        ((BarcodeCaptureNegativeActivity) context).afficherSnackBar("Produit inconnu");
-                    }
-
-                    validation = true;
-                    code = "";
-                }
-            }
-            else
-            {
-                PH_Reliquat ph_reliquat = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquat_id_courant);
-
-                for(PH_Reliquat_Reception_Adapte courant: list_reliquat_receptionPuiAdapte)
-                {
-                    if(courant.getPhReliquatUID() == ph_reliquat.getReliquat_UID())
-                    {
-                        phReliquatReceptionPUIAdapte_courant = courant;
-                        break;
-                    }
-                }
-
-                if(phReliquatReceptionPUIAdapte_courant!=null)
-                {
-                    nouveau_lot = phReliquatReceptionPUIAdapte_courant.new Lot(lot, date_peremption_courant, "", "");
-                    conditionnement_achat = produitCourant.getCond_achat();
                 }
             }
         }

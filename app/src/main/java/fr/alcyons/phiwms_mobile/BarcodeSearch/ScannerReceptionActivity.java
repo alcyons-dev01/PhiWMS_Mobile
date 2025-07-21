@@ -437,34 +437,37 @@ public class ScannerReceptionActivity extends ServiceActivity {
                             ((LinearLayout) findViewById(R.id.layout_qte_saisie_lot_preparation)).setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    Context context = ScannerReceptionActivity.this;
-                                    if (receptionListeContext.emplacement_courant != null) {
-                                        yourCountDownTimer.cancel();
-                                        ((TextView) findViewById(R.id.textViewCountDown)).setVisibility(View.GONE);
-                                        ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.GONE);
-                                    }
-                                    String title = receptionListeContext.nouveau_lot.getNumeroLot();
-                                    String message = "Quantité réceptionnée : ";
-                                    int value_max = (int) receptionListeContext.reliquat_courant.getQteReliquat_X();
-                                    int maxValue = value_max;
-                                    int value = maxValue;
-
-                                    DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            int qteAprès = Alerte.aNumberPicker.getValue() * receptionListeContext.conditionnement_achat;
-                                            receptionListeContext.qte_lot_courant = qteAprès;
-                                            ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteAprès));
-
-                                            dialog.dismiss();
-
-                                            if (receptionListeContext.emplacement_courant != null) {
-                                                ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.VISIBLE);
-                                                ((LinearLayout) findViewById(R.id.validationScan)).performClick();
-                                            }
+                                    if(receptionListeContext.nouveau_lot != null)
+                                    {
+                                        Context context = ScannerReceptionActivity.this;
+                                        if (receptionListeContext.emplacement_courant != null) {
+                                            yourCountDownTimer.cancel();
+                                            ((TextView) findViewById(R.id.textViewCountDown)).setVisibility(View.GONE);
+                                            ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.GONE);
                                         }
-                                    };
+                                        String title = receptionListeContext.nouveau_lot.getNumeroLot();
+                                        String message = "Quantité réceptionnée : ";
+                                        int value_max = (int) receptionListeContext.reliquat_courant.getQteReliquat_X();
+                                        int maxValue = value_max;
+                                        int value = maxValue;
 
-                                    Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, receptionListeContext.conditionnement_achat);
+                                        DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                int qteAprès = Alerte.aNumberPicker.getValue() * receptionListeContext.conditionnement_achat;
+                                                receptionListeContext.qte_lot_courant = qteAprès;
+                                                ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteAprès));
+
+                                                dialog.dismiss();
+
+                                                if (receptionListeContext.emplacement_courant != null) {
+                                                    ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.VISIBLE);
+                                                    ((LinearLayout) findViewById(R.id.validationScan)).performClick();
+                                                }
+                                            }
+                                        };
+
+                                        Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, receptionListeContext.conditionnement_achat);
+                                    }
                                 }
                             });
 
@@ -479,7 +482,7 @@ public class ScannerReceptionActivity extends ServiceActivity {
                             ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.VISIBLE);
                             ((LinearLayout) findViewById(R.id.LinearLayoutBoutonBarcode)).setVisibility(View.GONE);
                             ((TextView) findViewById(R.id.instruction)).setVisibility(View.GONE);
-                            counter = 3;
+                            counter = 5;
                             Counter();
 
                             ((LinearLayout) findViewById(R.id.validationScan)).setVisibility(View.INVISIBLE);
@@ -541,36 +544,39 @@ public class ScannerReceptionActivity extends ServiceActivity {
                             ((LinearLayout) findViewById(R.id.layout_qte_saisie_lot_preparation)).setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    Context context = ScannerReceptionActivity.this;
-                                    if (receptionUniqueContext.emplacement_courant != null) {
-                                        yourCountDownTimer.cancel();
-                                        ((TextView) findViewById(R.id.textViewCountDown)).setVisibility(View.GONE);
-                                        ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.GONE);
-                                    }
-                                    String title = receptionUniqueContext.nouveau_lot.getNumeroLot();
-                                    String message = "Quantité réceptionnée : ";
-                                    int value_max = (int) receptionUniqueContext.reliquat_courant.getQteReliquat_X();
-                                    int maxValue = value_max;
-                                    int value = maxValue;
-
-                                    DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            int qteAprès = Alerte.aNumberPicker.getValue() * receptionUniqueContext.conditionnement_achat;
-                                            receptionUniqueContext.qte_lot_courant = qteAprès;
-                                            ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteAprès));
-
-                                            dialog.dismiss();
-
-                                            if (receptionUniqueContext.emplacement_courant != null) {
-                                                ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.VISIBLE);
-                                                ((LinearLayout) findViewById(R.id.validationScan)).performClick();
-                                            }
-
-
+                                    if(receptionUniqueContext.nouveau_lot != null)
+                                    {
+                                        Context context = ScannerReceptionActivity.this;
+                                        if (receptionUniqueContext.emplacement_courant != null) {
+                                            yourCountDownTimer.cancel();
+                                            ((TextView) findViewById(R.id.textViewCountDown)).setVisibility(View.GONE);
+                                            ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.GONE);
                                         }
-                                    };
+                                        String title = receptionUniqueContext.nouveau_lot.getNumeroLot();
+                                        String message = "Quantité réceptionnée : ";
+                                        int value_max = (int) receptionUniqueContext.reliquat_courant.getQteReliquat_X();
+                                        int maxValue = value_max;
+                                        int value = maxValue;
 
-                                    Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, receptionUniqueContext.conditionnement_achat);
+                                        DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                int qteAprès = Alerte.aNumberPicker.getValue() * receptionUniqueContext.conditionnement_achat;
+                                                receptionUniqueContext.qte_lot_courant = qteAprès;
+                                                ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteAprès));
+
+                                                dialog.dismiss();
+
+                                                if (receptionUniqueContext.emplacement_courant != null) {
+                                                    ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.VISIBLE);
+                                                    ((LinearLayout) findViewById(R.id.validationScan)).performClick();
+                                                }
+
+
+                                            }
+                                        };
+
+                                        Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, receptionUniqueContext.conditionnement_achat);
+                                    }
                                 }
                             });
 
@@ -638,34 +644,37 @@ public class ScannerReceptionActivity extends ServiceActivity {
                         ((LinearLayout) findViewById(R.id.layout_qte_saisie_lot_preparation)).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                Context context = ScannerReceptionActivity.this;
-                                if (newReceptionPADContext.emplacement_courant != null) {
-                                    yourCountDownTimer.cancel();
-                                    ((TextView) findViewById(R.id.textViewCountDown)).setVisibility(View.GONE);
-                                    ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.GONE);
-                                }
-                                String title = newReceptionPADContext.nouveau_lot.getNumeroLot();
-                                String message = "Quantité réceptionnée : ";
-                                int value_max = (int) newReceptionPADContext.reliquat_courant.getQteReliquat_X();
-                                int maxValue = value_max;
-                                int value = maxValue;
-
-                                DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        int qteAprès = Alerte.aNumberPicker.getValue() * newReceptionPADContext.conditionnement_achat;
-                                        newReceptionPADContext.qte_lot_courant = qteAprès;
-                                        ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteAprès));
-
-                                        dialog.dismiss();
-
-                                        if (newReceptionPADContext.emplacement_courant != null) {
-                                            ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.VISIBLE);
-                                            ((LinearLayout) findViewById(R.id.validationScan)).performClick();
-                                        }
+                                if(newReceptionPADContext.nouveau_lot != null)
+                                {
+                                    Context context = ScannerReceptionActivity.this;
+                                    if (newReceptionPADContext.emplacement_courant != null) {
+                                        yourCountDownTimer.cancel();
+                                        ((TextView) findViewById(R.id.textViewCountDown)).setVisibility(View.GONE);
+                                        ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.GONE);
                                     }
-                                };
+                                    String title = newReceptionPADContext.nouveau_lot.getNumeroLot();
+                                    String message = "Quantité réceptionnée : ";
+                                    int value_max = (int) newReceptionPADContext.reliquat_courant.getQteReliquat_X();
+                                    int maxValue = value_max;
+                                    int value = maxValue;
 
-                                Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, newReceptionPADContext.conditionnement_achat);
+                                    DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            int qteAprès = Alerte.aNumberPicker.getValue() * newReceptionPADContext.conditionnement_achat;
+                                            newReceptionPADContext.qte_lot_courant = qteAprès;
+                                            ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteAprès));
+
+                                            dialog.dismiss();
+
+                                            if (newReceptionPADContext.emplacement_courant != null) {
+                                                ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.VISIBLE);
+                                                ((LinearLayout) findViewById(R.id.validationScan)).performClick();
+                                            }
+                                        }
+                                    };
+
+                                    Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, newReceptionPADContext.conditionnement_achat);
+                                }
                             }
                         });
 
@@ -816,7 +825,7 @@ public class ScannerReceptionActivity extends ServiceActivity {
             }
             public  void onFinish(){
                 yourCountDownTimer.cancel();
-                counter = 3;
+                counter = 5;
                 ((LinearLayout) findViewById(R.id.validationScan)).performClick();
             }
 

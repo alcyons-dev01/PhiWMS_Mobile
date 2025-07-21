@@ -3,17 +3,45 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/titre"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Validation"
-        android:textSize="20sp"
-        android:gravity="center"
-        android:textColor="@android:color/white"
-        android:textStyle="bold"
+        android:orientation="horizontal"
         android:background="@color/bleu_fonce_alcyons"
-        android:padding="10dp" />
+        android:weightSum="10">
+
+        <TextView
+            android:id="@+id/titre"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="9"
+            android:text="Validation Réception"
+            android:textSize="20sp"
+            android:gravity="left"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:padding="10dp"
+            android:layout_gravity="left"/>
+
+        <LinearLayout
+            android:id="@+id/fermer_alerte_reception"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal|center_vertical">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical|center_horizontal"
+                android:background="@drawable/ic_clear"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
 
    <LinearLayout
        android:layout_width="match_parent"
@@ -35,7 +63,7 @@
             android:textStyle="bold"
             android:padding="10dp"
             android:background="@color/jaune"
-            android:minLines="10"
+            android:minLines="5"
             android:textColorHint="@color/noir"/>
 
             <LinearLayout

@@ -327,6 +327,18 @@
         android:configChanges="orientation|screenSize"/>
 
     <activity
+        android:name="fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparation2025Activity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparation2025Activity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
         android:name="fr.alcyons.phiwms_mobile.PreparationPUFetPAD.CreationLotActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"

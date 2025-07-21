@@ -525,6 +525,10 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
                             {
                                 Produit produitScanne = null;
                                 List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, DecoupeMap.get(OutilsDecodage.codeGtin));
+
+                                if(produits.size() == 0)
+                                    produits = ProduitOpenHelper.getProduitsParGTIN(db, DecoupeMap.get(OutilsDecodage.codeGtinSansAi));
+
                                 if (produits.size() == 1) {
                                     produitScanne = produits.get(0);
                                 }

@@ -117,7 +117,8 @@ public class Stock_Lot_EmplacementLightOpenHelper extends DBOpenHelper {
 
     public static Stock_Lot_Emplacement_Light getAllStockLotEmplacementByLotPeremptionEtDepot(SQLiteDatabase db, String lot, String datePeremption, Depot depot) {
         String[] dateTab = datePeremption.split("/");
-        datePeremption = dateTab[dateTab.length-1]+"-"+dateTab[1]+"-"+dateTab[0];
+        if(dateTab.length == 3)
+            datePeremption = dateTab[dateTab.length-1]+"-"+dateTab[1]+"-"+dateTab[0];
 
         Stock_Lot_Emplacement_Light stockLotEmplacementLightList = null;
 

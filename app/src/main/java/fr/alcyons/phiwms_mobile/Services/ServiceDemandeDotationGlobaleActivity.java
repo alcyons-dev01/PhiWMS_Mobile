@@ -62,6 +62,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.DemandeDotationGlobale.InformationDotationServiceActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.DotationAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
@@ -180,6 +181,15 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
                                     ServiceDemandeDotationGlobaleActivity.this.finishAffinity();
                                     Intent intent = new Intent(ServiceDemandeDotationGlobaleActivity.this, AuthentificationActivity.class);
                                     ServiceDemandeDotationGlobaleActivity.this.startActivity(intent);
+                                }
+                                else
+                                {
+                                    Intent intent = new Intent(ServiceDemandeDotationGlobaleActivity.this, NavigationActivity.class);
+                                    Bundle extras = new Bundle();
+                                    extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                                    intent.putExtras(extras);
+                                    ServiceDemandeDotationGlobaleActivity.this.startActivity(intent);
+                                    ServiceDemandeDotationGlobaleActivity.this.finish();
                                 }
                             } else {
                                 JSONArray phPreparationJSONArray = response.getJSONArray("PH_Preparations");
@@ -525,6 +535,5 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
 
         invalidateOptionsMenu();
         new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
-
     }
 }

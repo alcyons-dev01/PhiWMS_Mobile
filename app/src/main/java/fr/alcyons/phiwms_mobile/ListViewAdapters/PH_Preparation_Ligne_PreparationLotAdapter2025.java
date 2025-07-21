@@ -153,19 +153,25 @@ public class PH_Preparation_Ligne_PreparationLotAdapter2025 extends BaseAdapter 
 
             viewHolder.emplacementParDefaut.setText(emplacementpardefaut);
 
-            if (ph_preparationLigne.getQte_APreparer() != 0) {
-                viewHolder.QtePreparer.setText(String.valueOf(ph_preparationLigne.getQte_RAL() - ph_preparationLigne.getQte_APreparer()));
+            PH_Preparation phPreparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparationLigne.getPreparationID());
+            List<PH_Preparation_Ligne> listPhPreparationLigne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparationAndProduitNeg(db, phPreparation, ph_preparationLigne.getProduitID());
+            int qtePreparer = 0;
+            for(PH_Preparation_Ligne lignecourant : listPhPreparationLigne)
+            {
+                qtePreparer = qtePreparer + lignecourant.getQte_preparer();
+            }
+
+            if (ph_preparationLigne.getQte_Demander() != qtePreparer) {
+                viewHolder.QtePreparer.setText(String.valueOf(qtePreparer));
                 viewHolder.QtePreparer.setTextColor(context.getResources().getColor(R.color.orange2));
                 viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
                 viewHolder.emplacementParDefaut.setVisibility(View.GONE);
-            } else if (ph_preparationLigne.getQte_APreparer() == 0) {
+            } else {
                 viewHolder.QtePreparer.setText(String.valueOf(ph_preparationLigne.getQte_RAL()));
                 viewHolder.QtePreparer.setTextColor(context.getResources().getColor(R.color.vert));
                 viewHolder.QteDemandee.setVisibility(View.GONE);
                 viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_vert));
                 viewHolder.emplacementParDefaut.setVisibility(View.GONE);
-            } else {
-                viewHolder.QtePreparer.setVisibility(View.GONE);
             }
 
             int nombreColisProduit = recupererNbColis(ph_preparationLigne.getProduitID(), ph_preparationLigne.getQte_APreparer());

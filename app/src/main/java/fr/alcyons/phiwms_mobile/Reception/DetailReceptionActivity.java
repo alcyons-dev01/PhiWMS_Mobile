@@ -74,6 +74,9 @@ import fr.alcyons.phiwms_mobile.Services.ServiceReceptionPadActivity;
 import fr.alcyons.phiwms_mobile.Services.ServiceReceptionPuiActivity;
 
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotos.verifyStoragePermissions;
+
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+
 public class DetailReceptionActivity extends ServiceActivity {
     Commande commandeSelectionne;
     List<PH_Reliquat> phReliquatList;
@@ -100,7 +103,7 @@ public class DetailReceptionActivity extends ServiceActivity {
     LinearLayout lancerScan;
     Depot_Emplacement emplacement_precedent;
     Produit produitPrecedent;
-
+    MenuItem item;
     @SuppressLint("SimpleDateFormat")
     public void valider_reception()
     {
@@ -207,7 +210,11 @@ public class DetailReceptionActivity extends ServiceActivity {
                 }
             });*/
         }
-
+        if(utilisateurConnecte.getEtablissement().toUpperCase().contentEquals("ARAUCO"))
+        {
+            FirebaseCrashlytics.getInstance().log("Validation réception ARAUCO");
+            FirebaseCrashlytics.getInstance().recordException(new Exception("Exception déclencher à la validation réception"));
+        }
         Toast toast = Toast.makeText(DetailReceptionActivity.this, "Réception effectuée", Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
@@ -559,9 +566,10 @@ public class DetailReceptionActivity extends ServiceActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem item = menu.findItem(R.id.menuSave);
+        item = menu.findItem(R.id.menuSave);
         item.setOnMenuItemClickListener(item1 -> {
             onMenuSaveClick();
+            item.setVisible(false);
             return true;
         });
 
@@ -729,6 +737,7 @@ public class DetailReceptionActivity extends ServiceActivity {
         View layout = inflater.inflate(R.layout.alerte_reception_pui, null);
 
         final LinearLayout buttonOk = (LinearLayout) layout.findViewById(R.id.buttonOk);
+        LinearLayout zonefermer = (LinearLayout) layout.findViewById(R.id.fermer_alerte_reception);
         final EditText numeroBLEdit = (EditText) layout.findViewById(R.id.numeroBL);
         final ImageView btn_photo = (ImageView) layout.findViewById(R.id.btnPhoto);
         final ImageView iconValidation = (ImageView) layout.findViewById(R.id.iconValidation);
@@ -736,15 +745,28 @@ public class DetailReceptionActivity extends ServiceActivity {
 
         Rect displayRectangle = new Rect();
         Window window = DetailReceptionActivity.this.getWindow();
-        window.getDecorView().getWindowVisibleDisplayFrame(displayRectangle);
-        layout.setMinimumWidth((int)(displayRectangle.width() * 0.9f));
-        layout.setMinimumHeight((int)(displayRectangle.height() * 0.6f));
         builder.setView(layout);
         final AlertDialog alertDialog = builder.create();
         Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
+        alertDialog.setCancelable(false);
         alertDialog.show();
 
+        zonefermer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+                item.setVisible(true);
+            }
+        });
+
         buttonOk.setOnClickListener(v -> {
+
+            if(utilisateurConnecte.getEtablissement().toUpperCase().contentEquals("ARAUCO"))
+            {
+                FirebaseCrashlytics.getInstance().log("Bouton validation réception par l'utilisateur ARAUCO");
+                FirebaseCrashlytics.getInstance().recordException(new Exception("Exception simulée après clic validation réception"));
+            }
+
             buttonOk.setBackgroundColor(getResources().getColor(R.color.vert, null));
             ViewCompat.setBackgroundTintList(iconValidation, ColorStateList.valueOf(getResources().getColor(R.color.blanc, null)));
             String numeroBL = numeroBLEdit.getText().toString();

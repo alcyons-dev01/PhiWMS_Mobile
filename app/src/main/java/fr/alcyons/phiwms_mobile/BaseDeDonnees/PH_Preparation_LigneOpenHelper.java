@@ -213,6 +213,20 @@ public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
         return phPreparationLigneList;
     }
 
+    public static List<PH_Preparation_Ligne> getAllPHPreparationLignesBaseParPHPreparation(SQLiteDatabase db, PH_Preparation phPreparation) {
+        List<PH_Preparation_Ligne> phPreparationLigneList = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION_LIGNE + " WHERE " + Constantes.CLE_COL_PREPARATIONID_PH_PREPARATION_LIGNE + "=? AND "+Constantes.CLE_COL__UID_PH_PREPARATION_LIGNE+" > 0 ORDER BY "+Constantes.CLE_COL_PRODUITCATEGORIE_PH_PREPARATION_LIGNE+","+Constantes.CLE_COL_PRODUITDESIGNATION_PH_PREPARATION_LIGNE, new String[]{String.valueOf(phPreparation.getUID())});
+
+        while (cursor.moveToNext()) {
+            phPreparationLigneList.add(new PH_Preparation_Ligne(cursor));
+        }
+
+        cursor.close();
+        cursor = null;
+        return phPreparationLigneList;
+    }
+
     public static List<PH_Preparation_Ligne> getAllPHPreparationLignesParPHPreparationOrderDesignation(SQLiteDatabase db, PH_Preparation phPreparation) {
         List<PH_Preparation_Ligne> phPreparationLigneList = new ArrayList<>();
 
@@ -240,6 +254,19 @@ public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
         cursor.close();
         cursor = null;
         return phPreparationLigne;
+    }
+
+    public static List<PH_Preparation_Ligne> getAllPHPreparationLignesParPHPreparationAndProduitNeg(SQLiteDatabase db, PH_Preparation phPreparation, int produitCode) {
+        List<PH_Preparation_Ligne> phPreparationLigneList = new ArrayList<>();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION_LIGNE + " WHERE " + Constantes.CLE_COL_PREPARATIONID_PH_PREPARATION_LIGNE + "=? AND "+Constantes.CLE_COL_PRODUITID_PH_PREPARATION_LIGNE +"=? AND "+Constantes.CLE_COL__UID_PH_PREPARATION_LIGNE +" < 0", new String[]{String.valueOf(phPreparation.getUID()), String.valueOf(produitCode)});
+
+        while (cursor.moveToNext()) {
+            phPreparationLigneList.add(new PH_Preparation_Ligne(cursor));
+        }
+
+        cursor.close();
+        cursor = null;
+        return phPreparationLigneList;
     }
 
     public static List<PH_Preparation_Ligne> getAllPHPreparationLignesParPHPreparationLivraison(SQLiteDatabase db, PH_Preparation phPreparation) {

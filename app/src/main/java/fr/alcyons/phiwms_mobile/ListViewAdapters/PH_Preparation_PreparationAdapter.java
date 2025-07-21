@@ -81,7 +81,7 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
         PH_Preparation phPreparationCourant = (PH_Preparation) getItem(position);
         Depot depot = DepotOpenHelper.getDepotParReference(db, phPreparationCourant.getDepotDestinataireReference());
 
-        List<PH_Preparation_Ligne> ph_preparation_ligne_List = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, phPreparationCourant);
+        List<PH_Preparation_Ligne> ph_preparation_ligne_List = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesBaseParPHPreparation(db, phPreparationCourant);
         int nbApreparer = 0;
         for (PH_Preparation_Ligne phPreparationLigne : ph_preparation_ligne_List) {
             if (phPreparationLigne.getQte_Demander() > 0 && phPreparationLigne.getQte_APreparer() >0) {
