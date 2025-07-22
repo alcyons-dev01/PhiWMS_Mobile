@@ -332,7 +332,11 @@ public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
 
         while (cursor.moveToNext()) {
             PH_Preparation_Ligne phPreparationLigneCourant = new PH_Preparation_Ligne(cursor);
-            if(phPreparationLigneCourant.getQte_preparer() == 0 && phPreparationLigneCourant.getQte_RAL() != 0)
+            /*if(phPreparationLigneCourant.getQte_preparer() == 0 && phPreparationLigneCourant.getQte_RAL() != 0)
+            {
+                phPreparationLigneList.add(phPreparationLigneCourant);
+            }*/
+            if(phPreparationLigneCourant.getQte_RAL() != 0)
             {
                 phPreparationLigneList.add(phPreparationLigneCourant);
             }

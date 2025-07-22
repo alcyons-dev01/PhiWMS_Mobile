@@ -148,7 +148,7 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
         }
         else
         {
-            EnregistrerPreparation(nbTotalLotsAvecValeurSaisie);
+            EnregistrerPreparation();
         }
     }
 
@@ -1122,16 +1122,14 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
         annuler.setOnClickListener(view1 -> alertDialog.dismiss());
 
         valider.setOnClickListener(view12 -> {
-            EnregistrerPreparation(nbTotalLotsAvecValeurSaisie);
+            EnregistrerPreparation();
             alertDialog.dismiss();
         });
     }
 
-    public void EnregistrerPreparation(int nbTotalLotsAvecValeurSaisie)
+    public void EnregistrerPreparation()
     {
         List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte> listeLot = new ArrayList<>();
-        int compteurReussiteGlobale = 0;
-        int compteurReussiteParLotAvecValeur = 0;
         //Création de l'action utilisateur
         Random randomaction = new Random();
         int actionId = randomaction.nextInt();
@@ -1145,51 +1143,43 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
         ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
         //fin de la création de l'action utilisateur
 
-        // Si tout est ok alors on met à jour le PH_Preparation
-        if (compteurReussiteParLotAvecValeur == nbTotalLotsAvecValeurSaisie) {
-
-            Date dateJour = new Date();
-            @SuppressLint("SimpleDateFormat") DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
-
-            //différence
-            Chronometer.FinChrono();
-            Chronometer.getChrono();
-            String TempsPreparation = Chronometer.heure+":"+Chronometer.minute+":"+Chronometer.seconde;
-
-            ph_preparation_Selectionne.setTempsPreparation(TempsPreparation);
-            ph_preparation_Selectionne.setPreparationDate(format.format(dateJour));
-            ph_preparation_Selectionne.setStatut(getString(R.string.PreparationEffectuee));
-
-
-            long rowID = PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, ph_preparation_Selectionne);
-            if (rowID != -1) {
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation_Selectionne.getPhiMR4UUID(), ph_preparation_Selectionne.getUID(), DBOpenHelper.ActionsEAS.MAJ);
-            } else {
-                // Si le retour n'est pas mis à jour, on remet le compteur à 0
-                compteurReussiteGlobale = 0;
-            }
-        } else {
-            compteurReussiteGlobale = 0;
+        //on supprime les lignes de préparation de base
+        List<PH_Preparation_Ligne> listeLigneBase = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesBaseParPHPreparation(db, ph_preparation_Selectionne);
+        for(PH_Preparation_Ligne ligneBase : listeLigneBase)
+        {
+            PH_Preparation_LigneOpenHelper.supprimerUnPhPreparationLigne(db, ligneBase);
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ligneBase.getPhiMR4UUID(), ligneBase.get_UID(), DBOpenHelper.ActionsEAS.SUPPR);
         }
 
-        if (compteurReussiteGlobale != ph_preparation_ligne_preparationLotAdapter.compteurItem) {
-            // Si une erreur est survenue, on annule les modifications en vidant la table ElementASynchroniser
-            Alerte.afficherAlerte(DetailPreparation2025Activity.this, "Alerte", "Une erreur est survenue, aucun traitement ne sera effectué.", "alerte");
-            ElementASynchroniserOpenHelper.viderTableElementASynchroniser(db);
+        List<PH_Preparation_Ligne> listeLigne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, ph_preparation_Selectionne);
+        for(PH_Preparation_Ligne lignecourante : listeLigne)
+        {
+            Random randomactionligne = new Random();
+            int actionligneId = randomactionligne.nextInt();
+            if(actionligneId > 0)
+                actionligneId= actionligneId*-1;
+            ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.getId(), "PH_Preparation_Ligne", lignecourante.get_UID(), "", 0, (int)lignecourante.getQte_preparer(), lignecourante.getProduitDesignation());
+            ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne);
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, actionUtilisateur_ligne.getPhiMR4UUID(), actionUtilisateur_ligne.getId(), DBOpenHelper.ActionsEAS.AJOUT);
 
-            Intent retourListeIntent = new Intent(DetailPreparation2025Activity.this, ServicePreparationPufActivity.class);
-            if(ph_preparation_Selectionne.getDepotDestinataireReference().contains("-PAD-"))
-                retourListeIntent = new Intent(DetailPreparation2025Activity.this, ServicePreparationPadActivity.class);
-
-            Bundle extras = new Bundle();
-            extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-            extras.putInt("serviceSelectionneID", serviceActuel.getId());
-            retourListeIntent.putExtras(extras);
-            DetailPreparation2025Activity.this.startActivity(retourListeIntent);
-            DetailPreparation2025Activity.this.finish();
-            return;
         }
 
+        Date dateJour = new Date();
+        @SuppressLint("SimpleDateFormat") DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+
+        //différence
+        Chronometer.FinChrono();
+        Chronometer.getChrono();
+        String TempsPreparation = Chronometer.heure+":"+Chronometer.minute+":"+Chronometer.seconde;
+
+        ph_preparation_Selectionne.setTempsPreparation(TempsPreparation);
+        ph_preparation_Selectionne.setPreparationDate(format.format(dateJour));
+        ph_preparation_Selectionne.setStatut(getString(R.string.PreparationEffectuee));
+
+
+        long rowID = PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, ph_preparation_Selectionne);
+        if (rowID != -1)
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation_Selectionne.getPhiMR4UUID(), ph_preparation_Selectionne.getUID(), DBOpenHelper.ActionsEAS.MAJ);
 
         //véfication de la totalité de la préparation
         List<PH_Preparation_Ligne> listePhPreparationRALListe;
