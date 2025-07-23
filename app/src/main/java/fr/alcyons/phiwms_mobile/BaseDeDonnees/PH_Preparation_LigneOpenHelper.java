@@ -184,6 +184,21 @@ public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
         return phPreparationLigne;
     }
 
+    public static PH_Preparation_Ligne getPH_Preparation_LigneByProduitLotPreparation(SQLiteDatabase db, int produitid, int prepartionid, String lotnumero) {
+        PH_Preparation_Ligne phPreparationLigne = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION_LIGNE + " WHERE " + Constantes.CLE_COL_PRODUITID_PH_PREPARATION_LIGNE + "=? AND "+Constantes.CLE_COL_PREPARATIONID_PH_PREPARATION_LIGNE+"=? AND "+Constantes.CLE_COL_LOTNUMERO_PH_PREPARATION_LIGNE+"=?", new String[]{String.valueOf(produitid), String.valueOf(prepartionid), String.valueOf(lotnumero)});
+
+        if (cursor.getCount() >= 1) {
+            cursor.moveToFirst();
+            phPreparationLigne = new PH_Preparation_Ligne(cursor);
+        }
+
+        cursor.close();
+        cursor = null;
+        return phPreparationLigne;
+    }
+
     public static PH_Preparation_Ligne getPH_Preparation_LigneByphiwms_mobileUUID(SQLiteDatabase db, int id) {
         PH_Preparation_Ligne phPreparationLigne = null;
 

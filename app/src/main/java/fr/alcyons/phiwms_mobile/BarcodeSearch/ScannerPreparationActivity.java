@@ -745,15 +745,15 @@ public class ScannerPreparationActivity extends ServiceActivity {
 
                                             DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
-                                                    int qteAprès = (int) (Alerte.aNumberPicker.getValue() * preparationSimpleContext.produit.getCond_distrib());
-                                                    //lotCourant.setQteSaisie(qteAprès);
+                                                    int qteApres = (int) (Alerte.aNumberPicker.getValue() * preparationSimpleContext.produit.getCond_distrib());
+                                                    //lotCourant.setQteSaisie(qteApres);
                                                     //((TextView) findViewById(R.id.QteDemandee)).setText(String.valueOf(ligne_courante.getQte_preparer()));
 
                                                     if (stock_courant != null) {
                                                         stock_courant.setQte_Preparer(lotCourant.getQteSaisie());
                                                         Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
                                                     }
-                                                    ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteAprès));
+                                                    ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteApres));
 
                                                     dialog.dismiss();
                                                 }
@@ -782,6 +782,17 @@ public class ScannerPreparationActivity extends ServiceActivity {
                                 final PH_Preparation_Ligne ligne_courante = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, ph_preparation_ligne_id);
                                 //affichage des premieres informations
                                 if (ligne_courante != null) {
+                                    //récupération de toutes les lignes correspondante
+                                    PH_Preparation ph_preparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, ligne_courante.getPreparationID());
+                                    List<PH_Preparation_Ligne> listecourante = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparationAndProduitNeg(db, ph_preparation, ligne_courante.getProduitID());
+                                    int qte_restante = ligne_courante.getQte_APreparer();
+                                    int qte_preparer = 0;
+                                    for(PH_Preparation_Ligne ligne_temp : listecourante)
+                                    {
+                                        qte_restante = qte_restante - ligne_temp.getQte_preparer();
+                                        qte_preparer = qte_preparer + ligne_temp.getQte_preparer();
+                                    }
+
                                     designationProduitCourant = ligne_courante.getProduitDesignation();
                                     referenceProduitCourant = ligne_courante.getProduitReference();
                                     qteDemander = ligne_courante.getQte_RAL();
@@ -789,132 +800,136 @@ public class ScannerPreparationActivity extends ServiceActivity {
                                     ((TextView) findViewById(R.id.referenceProduit)).setText(referenceProduitCourant);
                                     ((TextView) findViewById(R.id.quantiteProduit)).setText(String.valueOf(qteDemander));
 
-                                    if (preparationMultipleContext.emplacement_courant != null) {
-                                        ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(preparationMultipleContext.emplacement_courant.getAdressage());
-                                    }
-
-                                    if (preparationMultipleContext.lot_courant != null) {
-                                        if(preparationMultipleContext.emplacementLotVerifier(preparationMultipleContext.emplacement_courant.getAdressage(), preparationMultipleContext.lot_courant.getNumLot()))
-                                        {
-                                            blinkImageValidation();
-                                            ((LinearLayout) findViewById(R.id.validationScan)).setVisibility(View.VISIBLE);
-                                            ((LinearLayout) findViewById(R.id.validationScan)).setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    preparationMultipleContext.ValiderScan(Integer.parseInt(((TextView) findViewById(R.id.qteSaisie)).getText().toString()));
-                                                    ((TextView) findViewById(R.id.designationProduit)).setText("");
-                                                    ((TextView) findViewById(R.id.referenceProduit)).setText("");
-                                                    ((TextView) findViewById(R.id.quantiteProduit)).setText("");
-                                                    ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText("");
-                                                    ((TextView) findViewById(R.id.numeroLot)).setText("");
-                                                    ((TextView) findViewById(R.id.datePeremptionLot)).setText("");
-                                                    ((TextView) findViewById(R.id.qteSaisie)).setText("");
-                                                    ((LinearLayout) findViewById(R.id.validationScan)).setVisibility(View.GONE);
-                                                    findViewById(R.id.boutonFermeture).performClick();
-                                                }
-                                            });
-                                        }
-                                        else
-                                        {
-                                            afficherAlerteErreurEmplacement(ScannerPreparationActivity.this, ScannerPreparationActivity.this.getLayoutInflater(), preparationMultipleContext.emplacementDisponible, preparationMultipleContext.liste_emplacement_disponible);
-                                            preparationMultipleContext.emplacement_courant = null;
-                                            //preparationMultipleContext.lot_courant.setEmplacement(null);
-                                            ((TextView) findViewById(R.id.EmplacementLotProduit)).setText("");
-                                            ((TextView) findViewById(R.id.instruction)).setText("Scannez un emplacement");
-                                        }
-
-
-                                        int qte_restante = ligne_courante.getQte_APreparer();
-                                        lotCourant = preparationMultipleContext.lot_courant;
-                                        if (preparationMultipleContext.produit.getCond_distrib() <= qte_restante)
-                                            qte_restante = (int) preparationMultipleContext.produit.getCond_distrib();
-                                        ((TextView) findViewById(R.id.numeroLot)).setText(lotCourant.getNumLot());
-
-
-                                        //gestion de l'affichage de la date de péremption
-                                        String dateDePeremption = lotCourant.getDatePeremption();
-                                        String[] dateDePeremtpionTab = dateDePeremption.split("-");
-                                        if(dateDePeremtpionTab.length == 3)
-                                            dateDePeremption = dateDePeremtpionTab[2] + "/" + dateDePeremtpionTab[1] + "/" + dateDePeremtpionTab[0];
-
-
-                                        ((TextView) findViewById(R.id.datePeremptionLot)).setText(dateDePeremption);
-                                        //((TextView) findViewById(R.id.EmplacementLotProduit)).setText(lotCourant.getEmplacement());
-
-                                        ((TextView) findViewById(R.id.numeroLot)).setText(lotCourant.getNumLot());
-
-                                        if (lotCourant.getNumSerie() != null && !lotCourant.getNumSerie().contentEquals("")) {
-                                            ((TextView) findViewById(R.id.numeroSerie)).setText(lotCourant.getNumSerie());
-                                        } else {
-                                            ((LinearLayout) findViewById(R.id.layoutSerie)).setVisibility(View.GONE);
-                                        }
-
-
-                                        ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qte_restante));
-
-                                        if (qte_restante == 0) {
-                                            ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText(String.valueOf(qtePreparerProduitCourant));
-                                            ((TextView) findViewById(R.id.quantiteDejaPreparer)).setVisibility(View.GONE);
-                                            ((TextView) findViewById(R.id.quantiteProduit)).setText(String.valueOf(ligne_courante.getQte_RAL() - ligne_courante.getQte_APreparer()));
-                                            ((TextView) findViewById(R.id.quantiteProduit)).setTextColor(ScannerPreparationActivity.this.getResources().getColor(R.color.vert));
-                                            ((TextView) findViewById(R.id.quantiteProduit)).setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25);
-
-                                            ((LinearLayout) findViewById(R.id.layoutInformations)).setBackground(ScannerPreparationActivity.this.getResources().getDrawable(R.drawable.background_detail_preparation_vert));
-                                            ((TextView) findViewById(R.id.numeroLot)).setText("");
-                                            ((TextView) findViewById(R.id.datePeremptionLot)).setText("");
-                                            ((TextView) findViewById(R.id.qteSaisie)).setText("");
-
-                                            afficherSnackBar("Produit déjà préparé en intégralité");
-                                        } else {
-                                            int qtePreparerProduitCourant = ligne_courante.getQte_RAL() - ligne_courante.getQte_APreparer();
-                                            ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText(String.valueOf(qtePreparerProduitCourant));
-                                            ((TextView) findViewById(R.id.quantiteDejaPreparer)).setVisibility(View.VISIBLE);
-                                            ((LinearLayout) findViewById(R.id.layoutInformations)).setBackground(ScannerPreparationActivity.this.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
-                                        }
-
-
-                                        //gestion du clic sur le numberPicker
-                                        final int finalQte_restante = qte_restante;
-                                        ((LinearLayout) findViewById(R.id.layout_qte_saisie_lot_preparation)).setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                Context context = ScannerPreparationActivity.this;
-                                                final Stock_Lot_Emplacement_Light stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, lotCourant.getStockLotEmplacementID());
-
-                                                String title = lotCourant.getNumLot();
-                                                String message = "Quantité placée : ";
-                                                int value_max = ligne_courante.getQte_APreparer();
-
-                                                int maxValue = value_max;
-                                                int value = finalQte_restante;
-
-                                                DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int id) {
-                                                        int qteAprès = (int) (Alerte.aNumberPicker.getValue() * preparationMultipleContext.produit.getCond_distrib());
-                                                        //lotCourant.setQteSaisie(qteAprès);
-                                                        //((TextView) findViewById(R.id.QteDemandee)).setText(String.valueOf(ligne_courante.getQte_preparer()));
-
-                                                        if (stock_courant != null) {
-                                                            stock_courant.setQte_Preparer(lotCourant.getQteSaisie());
-                                                            Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
-                                                        }
-                                                        ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteAprès));
-
-                                                        dialog.dismiss();
-                                                    }
-                                                };
-
-                                                if(preparationMultipleContext.produit != null)
-                                                    Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, (int) preparationMultipleContext.produit.getCond_distrib());
-                                            }
-                                        });
-
-                                    } else {
-                                        lotCourant = null;
+                                    if (qte_restante == 0)
+                                    {
+                                        ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText(String.valueOf(qte_preparer));
+                                        ((TextView) findViewById(R.id.quantiteProduit)).setText(String.valueOf(qte_preparer));
+                                        ((TextView) findViewById(R.id.quantiteProduit)).setTextColor(ScannerPreparationActivity.this.getResources().getColor(R.color.vert));
+                                        ((LinearLayout) findViewById(R.id.layout_info_scan_preparation)).setVisibility(View.INVISIBLE);
+                                        ((LinearLayout) findViewById(R.id.validationScan)).setVisibility(View.GONE);
+                                        ((LinearLayout) findViewById(R.id.layoutInformations)).setBackground(ScannerPreparationActivity.this.getResources().getDrawable(R.drawable.background_detail_preparation_vert));
                                         ((TextView) findViewById(R.id.numeroLot)).setText("");
                                         ((TextView) findViewById(R.id.datePeremptionLot)).setText("");
                                         ((TextView) findViewById(R.id.qteSaisie)).setText("");
-                                        EditTextScanee.setBackground(ScannerPreparationActivity.this.getResources().getDrawable(R.drawable.background_scanner_inside_preparation));
+
+                                        afficherSnackBar("Produit déjà préparé en intégralité");
+                                    }
+                                    else
+                                    {
+                                        int qtePreparerProduitCourant = ligne_courante.getQte_RAL() - ligne_courante.getQte_APreparer();
+                                        ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText(String.valueOf(qte_preparer));
+                                        ((TextView) findViewById(R.id.quantiteDejaPreparer)).setVisibility(View.VISIBLE);
+                                        ((LinearLayout) findViewById(R.id.layoutInformations)).setBackground(ScannerPreparationActivity.this.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
+                                        ((LinearLayout) findViewById(R.id.layout_info_scan_preparation)).setVisibility(View.VISIBLE);
+
+                                        if (preparationMultipleContext.emplacement_courant != null) {
+                                            ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(preparationMultipleContext.emplacement_courant.getAdressage());
+                                        }
+
+                                        if (preparationMultipleContext.lot_courant != null)
+                                        {
+                                            String adressage = "";
+                                            if(preparationMultipleContext.emplacement_courant != null)
+                                                adressage = preparationMultipleContext.emplacement_courant.getAdressage();
+
+                                            if(preparationMultipleContext.emplacementLotVerifier(adressage, preparationMultipleContext.lot_courant.getNumLot()))
+                                            {
+                                                blinkImageValidation();
+                                                ((LinearLayout) findViewById(R.id.validationScan)).setVisibility(View.VISIBLE);
+                                                ((LinearLayout) findViewById(R.id.validationScan)).setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View v) {
+                                                        preparationMultipleContext.ValiderScan(Integer.parseInt(((TextView) findViewById(R.id.qteSaisie)).getText().toString()));
+                                                        ((TextView) findViewById(R.id.designationProduit)).setText("");
+                                                        ((TextView) findViewById(R.id.referenceProduit)).setText("");
+                                                        ((TextView) findViewById(R.id.quantiteProduit)).setText("");
+                                                        ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText("");
+                                                        ((TextView) findViewById(R.id.numeroLot)).setText("");
+                                                        ((TextView) findViewById(R.id.datePeremptionLot)).setText("");
+                                                        ((TextView) findViewById(R.id.qteSaisie)).setText("");
+                                                        ((LinearLayout) findViewById(R.id.validationScan)).setVisibility(View.GONE);
+                                                        findViewById(R.id.boutonFermeture).performClick();
+                                                    }
+                                                });
+                                            }
+                                            else
+                                            {
+                                                afficherAlerteErreurEmplacement(ScannerPreparationActivity.this, ScannerPreparationActivity.this.getLayoutInflater(), preparationMultipleContext.emplacementDisponible, preparationMultipleContext.liste_emplacement_disponible);
+                                                preparationMultipleContext.emplacement_courant = null;
+                                                //preparationMultipleContext.lot_courant.setEmplacement(null);
+                                                ((TextView) findViewById(R.id.EmplacementLotProduit)).setText("");
+                                                ((TextView) findViewById(R.id.instruction)).setText("Scannez un emplacement");
+                                            }
+
+                                            lotCourant = preparationMultipleContext.lot_courant;
+                                            if (preparationMultipleContext.produit.getCond_distrib() <= qte_restante)
+                                                qte_restante = (int) preparationMultipleContext.produit.getCond_distrib();
+                                            ((TextView) findViewById(R.id.numeroLot)).setText(lotCourant.getNumLot());
+
+                                            //gestion de l'affichage de la date de péremption
+                                            String dateDePeremption = lotCourant.getDatePeremption();
+                                            String[] dateDePeremtpionTab = dateDePeremption.split("-");
+                                            if(dateDePeremtpionTab.length == 3)
+                                                dateDePeremption = dateDePeremtpionTab[2] + "/" + dateDePeremtpionTab[1] + "/" + dateDePeremtpionTab[0];
+
+                                            ((TextView) findViewById(R.id.datePeremptionLot)).setText(dateDePeremption);
+                                            ((TextView) findViewById(R.id.numeroLot)).setText(lotCourant.getNumLot());
+                                            if (lotCourant.getNumSerie() != null && !lotCourant.getNumSerie().contentEquals("")) {
+                                                ((TextView) findViewById(R.id.numeroSerie)).setText(lotCourant.getNumSerie());
+                                            } else {
+                                                ((LinearLayout) findViewById(R.id.layoutSerie)).setVisibility(View.GONE);
+                                            }
+
+                                            ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qte_restante));
+
+
+
+                                            //gestion du clic sur le numberPicker
+                                            final int finalQte_restante = qte_restante;
+                                            int finalQte_restante1 = qte_restante;
+                                            ((LinearLayout) findViewById(R.id.layout_qte_saisie_lot_preparation)).setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    Context context = ScannerPreparationActivity.this;
+                                                    final Stock_Lot_Emplacement_Light stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, lotCourant.getStockLotEmplacementID());
+
+                                                    String title = lotCourant.getNumLot();
+                                                    String message = "Quantité placée : ";
+                                                    int value_max = finalQte_restante1;
+
+                                                    int maxValue = value_max;
+                                                    int value = finalQte_restante;
+
+                                                    DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog, int id) {
+                                                            int qteApres = (int) (Alerte.aNumberPicker.getValue() * preparationMultipleContext.produit.getCond_distrib());
+                                                            //lotCourant.setQteSaisie(qteApres);
+                                                            //((TextView) findViewById(R.id.QteDemandee)).setText(String.valueOf(ligne_courante.getQte_preparer()));
+
+                                                            if (stock_courant != null) {
+                                                                stock_courant.setQte_Preparer(lotCourant.getQteSaisie());
+                                                                Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
+                                                            }
+                                                            ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteApres));
+
+                                                            dialog.dismiss();
+                                                        }
+                                                    };
+
+                                                    if(preparationMultipleContext.produit != null)
+                                                        Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, (int) preparationMultipleContext.produit.getCond_distrib());
+                                                }
+                                            });
+
+                                        }
+                                        else
+                                        {
+                                            lotCourant = null;
+                                            ((TextView) findViewById(R.id.numeroLot)).setText("");
+                                            ((TextView) findViewById(R.id.datePeremptionLot)).setText("");
+                                            ((TextView) findViewById(R.id.qteSaisie)).setText("");
+                                            EditTextScanee.setBackground(ScannerPreparationActivity.this.getResources().getDrawable(R.drawable.background_scanner_inside_preparation));
+                                        }
                                     }
                                 } else if (preparationMultipleContext.emplacement_courant != null) {
                                     ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(preparationMultipleContext.emplacement_courant.getAdressage());
@@ -983,9 +998,9 @@ public class ScannerPreparationActivity extends ServiceActivity {
 
                                             DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
-                                                    int qteAprès = Alerte.aNumberPicker.getValue() * receptionListeContext.conditionnement_achat;
-                                                    receptionListeContext.qte_lot_courant = qteAprès;
-                                                    ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteAprès));
+                                                    int qteApres = Alerte.aNumberPicker.getValue() * receptionListeContext.conditionnement_achat;
+                                                    receptionListeContext.qte_lot_courant = qteApres;
+                                                    ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteApres));
 
                                                     dialog.dismiss();
 
@@ -1075,9 +1090,9 @@ public class ScannerPreparationActivity extends ServiceActivity {
 
                                             DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
-                                                    int qteAprès = Alerte.aNumberPicker.getValue() * receptionUniqueContext.conditionnement_achat;
-                                                    receptionUniqueContext.qte_lot_courant = qteAprès;
-                                                    ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteAprès));
+                                                    int qteApres = Alerte.aNumberPicker.getValue() * receptionUniqueContext.conditionnement_achat;
+                                                    receptionUniqueContext.qte_lot_courant = qteApres;
+                                                    ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteApres));
 
                                                     dialog.dismiss();
 
@@ -1177,11 +1192,11 @@ public class ScannerPreparationActivity extends ServiceActivity {
 
                                             DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
-                                                    int qteAprès = Alerte.aNumberPicker.getValue() * newReceptionPADContext.conditionnementAchat;
-                                                    //newReceptionPADContext.objetReceptionScanneeCourant.setQuantiteScannee(qteAprès);
-                                                    newReceptionPADContext.quantite_a_afficher = qteAprès;
+                                                    int qteApres = Alerte.aNumberPicker.getValue() * newReceptionPADContext.conditionnementAchat;
+                                                    //newReceptionPADContext.objetReceptionScanneeCourant.setQuantiteScannee(qteApres);
+                                                    newReceptionPADContext.quantite_a_afficher = qteApres;
                                                     //newReceptionPADContext.ModificationDuProduit();
-                                                    ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteAprès));
+                                                    ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteApres));
 
                                                     dialog.dismiss();
                                                 }
@@ -1238,9 +1253,9 @@ public class ScannerPreparationActivity extends ServiceActivity {
 
                                             DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
-                                                    int qteAprès = Alerte.aNumberPicker.getValue() * newControleRetourUniqueContext.conditionnementDistribution;
-                                                    newControleRetourUniqueContext.quantiteAAfficher = qteAprès;
-                                                    ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteAprès));
+                                                    int qteApres = Alerte.aNumberPicker.getValue() * newControleRetourUniqueContext.conditionnementDistribution;
+                                                    newControleRetourUniqueContext.quantiteAAfficher = qteApres;
+                                                    ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteApres));
 
                                                     dialog.dismiss();
                                                 }
@@ -1294,9 +1309,9 @@ public class ScannerPreparationActivity extends ServiceActivity {
 
                                             DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
-                                                    int qteAprès = Alerte.aNumberPicker.getValue() * newControleRetourMultipleContext.conditionnementDistribution;
-                                                    newControleRetourMultipleContext.quantiteAAfficher = qteAprès;
-                                                    ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteAprès));
+                                                    int qteApres = Alerte.aNumberPicker.getValue() * newControleRetourMultipleContext.conditionnementDistribution;
+                                                    newControleRetourMultipleContext.quantiteAAfficher = qteApres;
+                                                    ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteApres));
 
                                                     dialog.dismiss();
                                                 }
@@ -1718,8 +1733,8 @@ public class ScannerPreparationActivity extends ServiceActivity {
                 }
 
 
-                /*alertDialog.dismiss();
-                if(preparationSimpleContext != null)
+                alertDialog.dismiss();
+                /*if(preparationSimpleContext != null)
                     preparationSimpleContext.emplacement_courant = null;
                 if(preparationMultipleContext != null)
                     preparationMultipleContext.emplacement_courant = null;

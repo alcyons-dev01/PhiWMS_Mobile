@@ -45,8 +45,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparation2025Activity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
@@ -97,7 +99,7 @@ public class ListeLotPreparation2025Activity  extends ServiceAvecConnexionActivi
     Integer qteDejaPreparer;
     List<PH_Preparation_Ligne> phPreparationLignesPreparer;
     PH_Preparation ph_preparation;
-
+    List<PH_Preparation_Ligne_Preparation_Adapte> listePhPreparationLigneAdapte;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -535,9 +537,45 @@ public class ListeLotPreparation2025Activity  extends ServiceAvecConnexionActivi
                         list_lot = new ArrayList<>();
                         list_lot = data.getExtras().getStringArrayList("liste_lot");
                         lotAdapteList = new ArrayList<>();
-                        lotAdapteList = (List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte>) data.getExtras().getSerializable("lotAdapteList");
+                        listePhPreparationLigneAdapte = (List<PH_Preparation_Ligne_Preparation_Adapte>) data.getExtras().getSerializable("lotAdapteList");
                         //lotAdapteList.add(phPreparationLignePreparationAdapte.new LotAdapte("row_ajouter"));
                         //lotAdapteList.add(phPreparationLignePreparationAdapte.new LotAdapte("row_annuler"));
+
+                        for(PH_Preparation_Ligne_Preparation_Adapte adapte : listePhPreparationLigneAdapte)
+                        {
+                            if(adapte.getPh_preparationLigneID() == ph_preparation_ligne_base.get_UID())
+                            {
+                                lotAdapteList = adapte.getLotAdaptes();
+                                qteDejaPreparer = 0;
+                                for(PH_Preparation_Ligne_Preparation_Adapte.LotAdapte lotcourant : lotAdapteList)
+                                {
+                                    qteDejaPreparer = qteDejaPreparer + lotcourant.getQteSaisie();
+                                    PH_Preparation_Ligne lignecourante = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByProduitLotPreparation(db, ph_preparation_ligne_base.getProduitID(), ph_preparation.getUID(), lotcourant.getNumLot());
+                                    if(lignecourante != null)
+                                    {
+                                        lignecourante.setQte_preparer(lotcourant.getQteSaisie());
+                                        PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, lignecourante);
+                                    }
+                                    else
+                                    {
+                                        Random random = new Random();
+                                        int new_id = random.nextInt();
+                                        if(new_id > 0)
+                                        {
+                                            new_id= new_id*-1;
+                                        }
+                                        lignecourante = new PH_Preparation_Ligne(ph_preparation_ligne_base);
+                                        lignecourante.set_UID(new_id);
+                                        lignecourante.setLotNumero(lotcourant.getNumLot());
+                                        lignecourante.setPeremptionDate(lotcourant.getDatePeremption());
+                                        lignecourante.setQte_StockSaisie(lotcourant.getQteSaisie());
+                                        PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, lignecourante);
+                                    }
+                                }
+                                break;
+                            }
+                        }
+
                         phPreparationLignePreparationAdapte.setLotAdaptes(lotAdapteList);
                         ph_preparation_ligne_base = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, phPreparationLignePreparationAdapte.getPh_preparationLigneID());
                         MAJVisuel();
@@ -723,8 +761,14 @@ public class ListeLotPreparation2025Activity  extends ServiceAvecConnexionActivi
         //gestion du zebra
         if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
         {
-            listeLotPreparation_Intent = new Intent(ListeLotPreparation2025Activity.this, ScannerPreparationActivity.class);
+            listeLotPreparation_Intent = new Intent(ListeLotPreparation2025Activity.this, ScannerPreparation2025Activity.class);
         }
+
+        List<PH_Preparation_Ligne> listePhPreparationLigne = new ArrayList<>();
+        listePhPreparationLigneAdapte = new ArrayList<>();
+        listePhPreparationLigne.add(ph_preparation_ligne_base);
+        listePhPreparationLigneAdapte.add(phPreparationLignePreparationAdapte);
+
         Bundle listeLotPreparation_Bundle = super.getBundle();
         String designation = produit.getDesignation_interne();
         listeLotPreparation_Bundle.putBoolean("doitEtreIdentique", true);
@@ -736,8 +780,9 @@ public class ListeLotPreparation2025Activity  extends ServiceAvecConnexionActivi
         listeLotPreparation_Bundle.putString("GTIN_courant", produit.getGTIN());
         listeLotPreparation_Bundle.putInt("preparationId", ph_preparation_ligne_base.getPreparationID());
         listeLotPreparation_Bundle.putInt("preparationLigneId", ph_preparation_ligne_base.get_UID());
-        listeLotPreparation_Bundle.putSerializable("lotAdapteList", (Serializable) phPreparationLignePreparationAdapte.getLotAdaptes());
+        listeLotPreparation_Bundle.putSerializable("lotAdapteList", (Serializable) listePhPreparationLigneAdapte);
         listeLotPreparation_Bundle.putSerializable("ph_preparationLigneAdapte", (Serializable) phPreparationLignePreparationAdapte);
+        listeLotPreparation_Bundle.putSerializable("liste_ph_preparation_ligne", (Serializable) listePhPreparationLigne);
         listeLotPreparation_Bundle.putStringArrayList("liste_lot", (ArrayList<String>) list_lot);
 
         listeLotPreparation_Intent.putExtras(listeLotPreparation_Bundle);
@@ -814,6 +859,12 @@ public class ListeLotPreparation2025Activity  extends ServiceAvecConnexionActivi
                         }
                     }
                    // lotPreparationAdapter.quantiteAPreparer = restantAPrepaper;
+                    RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
+                    if (viewHolder != null && viewHolder instanceof LotAdapter.LotViewHolder) {
+                        LotAdapter.LotViewHolder monViewHolder = (LotAdapter.LotViewHolder) viewHolder;
+                        monViewHolder.qteSaisie.setText((String.valueOf(qteApres)));
+                        adapter.notifyItemChanged(position);
+                    }
                     MAJVisuel();
                    // lotPreparationAdapter.notifyDataSetChanged();
                     InputMethodManager imm = (InputMethodManager) ListeLotPreparation2025Activity.this.getSystemService(Context.INPUT_METHOD_SERVICE);

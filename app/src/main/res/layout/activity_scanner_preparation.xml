@@ -128,6 +128,7 @@
 
 
             <LinearLayout
+                android:id="@+id/layout_info_scan_preparation"
                 android:layout_width="match_parent"
                 android:layout_height="75dp"
                 android:layout_marginRight="15dp"
