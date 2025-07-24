@@ -226,7 +226,7 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
             {
                 for(PH_Preparation_Ligne_Preparation_Adapte.LotAdapte lotAdapte : ph_preparationLigneAdapte.getLotAdaptes())
                 {
-                    if(lotAdapte.getNumLot().contentEquals(courant.getLotNumero()))
+                    if(lotAdapte.getNumLot().contentEquals(courant.getLotNumero()) && lotAdapte.getEmplacement().contentEquals(courant.getEmplacementParDefaut()))
                     {
                         lotAdapte.setQteSaisie(courant.getQte_preparer());
                     }

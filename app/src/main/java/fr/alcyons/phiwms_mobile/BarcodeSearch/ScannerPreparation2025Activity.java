@@ -32,13 +32,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
+import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
+import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_Preparation_Adapte;
@@ -67,8 +73,9 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
     List<String> liste_lot;
     String ordreTri;
     Produit produitCourant = null;
-
-    // GRAPHIQUE
+    Depot_Emplacement emplacement_courant = null;
+    Stock_Lot_Emplacement_Light stock_courant = null;
+            // GRAPHIQUE
     EditText EditTextScanee;
 
     @Override
@@ -146,6 +153,10 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                     int quantiteSaisie = Integer.parseInt(((TextView) findViewById(R.id.qteSaisie)).getText().toString());
                     if(lotCourant != null)
                         lotCourant.setQteSaisie(lotCourant.getQteSaisie() + quantiteSaisie);
+
+                    produitCourant = null;
+                    emplacement_courant = null;
+                    stock_courant = null;
                 }
 
                 scannerSearchOnlyBundle.putSerializable("lotAdapteList", (Serializable) phPreparationLignePreparationAdapte_List);
@@ -187,11 +198,24 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                     String gtin_courant_sans_ai = "";
                     String date_peremption_courant = "";
                     PH_Preparation_Ligne ligne_base = null;
-                    lotCourant = null;
-                    reinitialisationInterface();
                     if(codeScanne.startsWith("PHITAGPLACE+"))
                     {
+                        String[] tab_emplacement = codeScanne.split(":");
+                        int emplacement_uid = Integer.parseInt(tab_emplacement[tab_emplacement.length-1]);
 
+                        emplacement_courant = EmplacementOpenHelper.getUnEmplacementByID(db, emplacement_uid);
+
+                        if(emplacement_courant != null)
+                            ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacement_courant.getAdressage().trim());
+
+                        if(emplacement_courant != null && produitCourant != null)
+                        {
+                            verificationEmplacementProduit(emplacement_courant, produitCourant, stock_courant.getEmplacement());
+                        }
+
+                        ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
+                        ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.VISIBLE);
+                        ((ImageView) findViewById(R.id.ImageViewEmplacement)).setVisibility(View.GONE);
                     }
                     else
                     {
@@ -264,7 +288,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                             else
                             {
                                 List<PH_Preparation_Ligne> preparationLignesPreparer = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparationAndProduitNeg(db, ph_preparation_courante, ligne_base.getProduitID());
-                                int qte_demander = ligne_base.getQte_Demander();
+                                int qte_demander = ligne_base.getQte_APreparer();
                                 int qte_preparer = 0;
                                 int qte_restante = 0;
                                 for(PH_Preparation_Ligne ligne_temp : preparationLignesPreparer)
@@ -298,6 +322,20 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                                     }
                                     else
                                     {
+                                        stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, lotCourant.getStockLotEmplacementID());
+
+                                        if(emplacement_courant != null)
+                                        {
+                                            verificationEmplacementProduit(emplacement_courant, produitCourant, stock_courant.getEmplacement());
+                                        }
+                                        else
+                                        {
+                                            ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
+                                            ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.GONE);
+                                            ((ImageView) findViewById(R.id.ImageViewEmplacement)).setVisibility(View.VISIBLE);
+                                            ((TextView) findViewById(R.id.instruction)).setText("Scannez un emplacment");
+                                        }
+
                                         ((TextView) findViewById(R.id.designationProduit)).setText(designationProduit);
                                         ((TextView) findViewById(R.id.referenceProduit)).setText(referenceProduit);
                                         ((TextView) findViewById(R.id.quantiteProduit)).setText(String.valueOf(qte_demander));
@@ -318,7 +356,6 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                                         int finalQte_restante = qte_restante;
                                         findViewById(R.id.layout_qte_saisie_lot_preparation).setOnClickListener(view -> {
                                             Context context = ScannerPreparation2025Activity.this;
-                                            final Stock_Lot_Emplacement_Light stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, lotCourant.getStockLotEmplacementID());
 
                                             String title = lotCourant.getNumLot();
                                             String message = "Quantité placée : ";
@@ -348,6 +385,10 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                                             //gestion enregistrement du lot scannee
                                             int quantiteSaisie = Integer.parseInt(((TextView) findViewById(R.id.qteSaisie)).getText().toString());
                                             lotCourant.setQteSaisie(lotCourant.getQteSaisie() + quantiteSaisie);
+                                            produitCourant = null;
+                                            emplacement_courant = null;
+                                            stock_courant = null;
+                                            lotCourant = null;
                                             reinitialisationInterface();
                                             findViewById(R.id.boutonFermeture).performClick();
                                         });
@@ -481,7 +522,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
         ((TextView) findViewById(R.id.qteSaisie)).setText("");
         ((TextView) findViewById(R.id.numeroLot)).setText("");
         ((TextView) findViewById(R.id.datePeremptionLot)).setText("");
-        ((TextView) findViewById(R.id.numeroLot)).setText("");
+        ((TextView) findViewById(R.id.numeroSerie)).setText("");
         ((LinearLayout) findViewById(R.id.validationScan)).setVisibility(View.GONE);
     }
 
@@ -500,7 +541,22 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
         frameAnimation.start();
     }
 
-    public void afficherAlerteErreurEmplacement(Context context, LayoutInflater inflater, String emplacement, final List<Integer> listeEmplacementLot) {
+    private void verificationEmplacementProduit(Depot_Emplacement emplacement_courant, Produit produitCourant, String stockEmplacement)
+    {
+        if(stockEmplacement.contentEquals(""))
+        {
+            if(!emplacement_courant.getAdressage().contentEquals(produitCourant.getEmplacement_PUI_Defaut()))
+            {
+                afficherAlerteErreurEmplacement(ScannerPreparation2025Activity.this, ScannerPreparation2025Activity.this.getLayoutInflater(), emplacement_courant.getAdressage(), stock_courant, emplacement_courant);
+            }
+        }
+        else if(!stockEmplacement.contentEquals(emplacement_courant.getAdressage()))
+        {
+            afficherAlerteErreurEmplacement(ScannerPreparation2025Activity.this, ScannerPreparation2025Activity.this.getLayoutInflater(), emplacement_courant.getAdressage(), stock_courant, emplacement_courant);
+        }
+    }
+
+    public void afficherAlerteErreurEmplacement(Context context, LayoutInflater inflater, String emplacement, Stock_Lot_Emplacement_Light stock_courant, Depot_Emplacement depotEmplacement) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         View layout = inflater.inflate(R.layout.alerte_confirmation_validation, null);
 
@@ -527,10 +583,16 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                 String numeroLot = ((TextView) findViewById(R.id.numeroLot)).getText().toString();
                 String datePeremption = ((TextView) findViewById(R.id.datePeremptionLot)).getText().toString();
                 Depot depot = DepotOpenHelper.getDepotPUI(db);
-                Stock_Lot_Emplacement_Light stockCourant = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByLotPeremptionEtDepot(db, numeroLot, datePeremption, depot);
+                //Stock_Lot_Emplacement_Light stockCourant = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByLotPeremptionEtDepot(db, numeroLot, datePeremption, depot);
 
-                if(stockCourant != null)
+                if(stock_courant != null)
                 {
+                    stock_courant.setEmplacement(depotEmplacement.getAdressage());
+                    Depot_Zone zone = ZoneOpenHelper.getUneZoneByID(db, depotEmplacement.getZoneID());
+                    stock_courant.setZone(zone.getZoneName());
+                    Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
+                    if(lotCourant != null)
+                        lotCourant.setEmplacement(depotEmplacement.getAdressage());
                     Random randomaction = new Random();
                     int actionId = randomaction.nextInt();
                     if(actionId > 0)
@@ -538,21 +600,11 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                     @SuppressLint("SimpleDateFormat") SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     Date dateAction =new Date();
                     String date_string = parseFormat.format(dateAction);
-                    ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", stockCourant.get_UID(), "", "Deplacement Stock");
+                    ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", stock_courant.get_UID(), "", "Deplacement Stock");
                     ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getId(), new_action_utilisateur.getPhiMR4UUID(), DBOpenHelper.ActionsEAS.AJOUT);
+                    ElementASynchroniserOpenHelper.toutSynchroniser(ScannerPreparation2025Activity.this, db, utilisateurConnecte, false);
                 }
-                blinkImageValidation();
-                ((LinearLayout) findViewById(R.id.validationScan)).setVisibility(View.VISIBLE);
-                ((LinearLayout) findViewById(R.id.validationScan)).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //preparationMultipleContext.ValiderScan(Integer.parseInt(((TextView) findViewById(R.id.qteSaisie)).getText().toString()));
-                        reinitialisationInterface();
-                        findViewById(R.id.boutonFermeture).performClick();
-                    }
-                });
-
-
                 alertDialog.dismiss();
             }
         });
@@ -563,6 +615,9 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                 //preparationMultipleContext.emplacement_courant = null;
                 ((TextView) findViewById(R.id.EmplacementLotProduit)).setText("");
                 ((TextView) findViewById(R.id.instruction)).setText("Scannez un emplacement");
+                ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.GONE);
+                ((ImageView) findViewById(R.id.ImageViewEmplacement)).setVisibility(View.VISIBLE);
+                emplacement_courant = null;
                 alertDialog.dismiss();
             }
         });

@@ -161,7 +161,7 @@ public class PH_Preparation_Ligne_PreparationLotAdapter2025 extends BaseAdapter 
                 qtePreparer = qtePreparer + lignecourant.getQte_preparer();
             }
 
-            if (ph_preparationLigne.getQte_Demander() != qtePreparer) {
+            if (ph_preparationLigne.getQte_APreparer() != qtePreparer) {
                 viewHolder.QtePreparer.setText(String.valueOf(qtePreparer));
                 viewHolder.QtePreparer.setTextColor(context.getResources().getColor(R.color.orange2));
                 viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_orange));

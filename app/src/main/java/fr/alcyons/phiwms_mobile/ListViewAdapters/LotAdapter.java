@@ -1,9 +1,11 @@
 package fr.alcyons.phiwms_mobile.ListViewAdapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -21,6 +23,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_Preparation_Adapte;
 import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparation2025Activity;
 import fr.alcyons.phiwms_mobile.R;
@@ -46,7 +50,7 @@ public class LotAdapter extends RecyclerView.Adapter<LotAdapter.LotViewHolder> {
     @Override
     public LotViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_lot_preparation, parent, false);
-        return new LotViewHolder(view);
+        return new LotViewHolder(view, this);
     }
 
     @Override
@@ -79,6 +83,11 @@ public class LotAdapter extends RecyclerView.Adapter<LotAdapter.LotViewHolder> {
             }
 
             holder.lot.setText(lotAdapte.getNumLot());
+            if(!lotAdapte.getNumSerie().contentEquals(""))
+            {
+                holder.zoneSerie.setVisibility(View.VISIBLE);
+                holder.serie.setText(lotAdapte.getNumSerie());
+            }
             holder.qteSaisie.setText(String.valueOf(lotAdapte.getQteSaisie()));
             holder.qteStock.setText(String.valueOf(lotAdapte.getQteStock()));
 
@@ -124,21 +133,20 @@ public class LotAdapter extends RecyclerView.Adapter<LotAdapter.LotViewHolder> {
             }
 
             holder.btnDelete.setOnClickListener(v -> {
-                Log.d("DELETE", "CLICK reçu ! position = " + holder.getAdapterPosition());
-                Toast.makeText(context, "Delete click position " + holder.getAdapterPosition(), Toast.LENGTH_SHORT).show();
-
-                // 1. Action personnalisée
                 deleteClickListener.onDeleteClick(holder.getAdapterPosition());
 
-                // 2. Animation fluide pour recentrer la ligne
                 holder.contentLayout.animate()
-                        .translationX(0)
+                        .translationX(0f)
                         .setDuration(200)
                         .start();
+
+                // Réinitialiser les états swipe
                 holder.isSwipedOpen = false;
+                holder.btnDelete.setClickable(false);
+                swipedPosition = -1;
             });
 
-            holder.layoutPrincipal.setOnClickListener(v -> {
+            /*holder.layoutPrincipal.setOnClickListener(v -> {
                 if (holder.contentLayout.getTranslationX() >= 100f) {
                     // Ligne swipée → recentrage
                     holder.contentLayout.animate().translationX(0).setDuration(200).start();
@@ -148,20 +156,40 @@ public class LotAdapter extends RecyclerView.Adapter<LotAdapter.LotViewHolder> {
                         ((ListeLotPreparation2025Activity) context).ClickLigneLot(position);
                     }
                 }
-            });
+            });*/
+
+            if (lotAdapte.getQteSaisie() == 0) {
+                holder.layoutPrincipal.setClickable(true);
+                holder.layoutPrincipal.setOnClickListener(v -> {
+                    ((ListeLotPreparation2025Activity) context).ClickLigneLot(position);
+                });
+                holder.contentLayout.setOnClickListener(null);
+
+            } else {
+                holder.layoutPrincipal.setOnClickListener(null); // désactive le clic
+                holder.layoutPrincipal.setClickable(false);
+                holder.contentLayout.setOnClickListener(v -> {
+                    if (holder.contentLayout.getTranslationX() > 0f) {
+                        // Recentrer la ligne
+                        holder.contentLayout.animate().translationX(0f).setDuration(200).start();
+                        holder.btnDelete.setClickable(false);
+                        holder.isSwipedOpen = false;
+                        swipedPosition = -1;
+                    }
+                });
+            }
         }
 
-        if (holder.isSwipedOpen) {
-            holder.contentLayout.setTranslationX(150f);
-            holder.contentLayout.setClickable(false);
+        if (position == swipedPosition) {
+            holder.contentLayout.setTranslationX(200f);
             holder.btnDelete.setClickable(true);
-            holder.isSwipedOpen = false;
+            holder.isSwipedOpen = true;
         } else {
             holder.contentLayout.setTranslationX(0);
-            holder.contentLayout.setClickable(true);
             holder.btnDelete.setClickable(false);
-            holder.isSwipedOpen = true;
+            holder.isSwipedOpen = false;
         }
+        holder.enableSwipeIfQteNotZero();
     }
 
     @Override
@@ -173,25 +201,103 @@ public class LotAdapter extends RecyclerView.Adapter<LotAdapter.LotViewHolder> {
         notifyItemChanged(position);
     }
 
-    public static class LotViewHolder extends RecyclerView.ViewHolder {
+    public class LotViewHolder extends RecyclerView.ViewHolder {
         public TextView nomEmplacement;
         public TextView lot;
         public TextView dateExpiration;
         public TextView qteSaisie;
         public TextView labelLot;
         public TextView qteStock;
+        public TextView serie;
         public LinearLayout layoutPrincipal;
         public LinearLayout layout_qte_saisie_lot_preparation;
         public LinearLayout layout_ajouter_lot;
         public LinearLayout layout_annuler_lot;
         public LinearLayout layoutStock;
         public LinearLayout deleteLayout;
+        public LinearLayout zoneSerie;
         public ImageView separateur;
         public ImageView btnDelete;
         public RelativeLayout contentLayout;
         public boolean isSwipedOpen = false;
-        public void setDatePeremptionColor(Date date) {
 
+        private float downX;
+        private final int SWIPE_THRESHOLD = 100;
+        private final LotAdapter adapter;
+
+        public LotViewHolder(@NonNull View itemView, LotAdapter adapter) {
+            super(itemView);
+            this.adapter = adapter;
+
+            btnDelete = itemView.findViewById(R.id.btn_delete);
+            contentLayout = itemView.findViewById(R.id.contentLayout);
+            nomEmplacement = itemView.findViewById(R.id.nomEmplacement);
+            lot = itemView.findViewById(R.id.lot);
+            dateExpiration = itemView.findViewById(R.id.datePeremption);
+            qteSaisie = itemView.findViewById(R.id.qteSaisie);
+            labelLot = itemView.findViewById(R.id.labelLot);
+            qteStock = itemView.findViewById(R.id.qteStock);
+            layoutPrincipal = itemView.findViewById(R.id.layoutPrincipal);
+            layout_qte_saisie_lot_preparation = itemView.findViewById(R.id.layout_qte_saisie_lot_preparation);
+            layout_ajouter_lot = itemView.findViewById(R.id.layout_ajouter_lot);
+            layout_annuler_lot = itemView.findViewById(R.id.layout_annuler_lot);
+            deleteLayout = itemView.findViewById(R.id.deleteLayout);
+            layoutStock = itemView.findViewById(R.id.layoutStock);
+            separateur = itemView.findViewById(R.id.separateur);
+            zoneSerie = itemView.findViewById(R.id.zoneSerie);
+            serie = itemView.findViewById(R.id.serie);
+        }
+
+        public void enableSwipeIfQteNotZero() {
+            contentLayout.setOnTouchListener(null); // désactive tout swipe par défaut
+
+            PH_Preparation_Ligne_Preparation_Adapte.LotAdapte courant = adapter.getLotAt(getAdapterPosition());
+            int qte = courant.getQteSaisie();
+
+            if (qte > 0) {
+                setupSwipeTouch();
+            }
+        }
+
+        @SuppressLint("ClickableViewAccessibility")
+        private void setupSwipeTouch() {
+            contentLayout.setClickable(true);
+            contentLayout.setFocusable(true);
+            contentLayout.setOnTouchListener((v, event) -> {
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        downX = event.getX();
+                        return true;
+
+                    case MotionEvent.ACTION_MOVE:
+                        float deltaX = event.getX() - downX;
+                        if (deltaX >= 0 && deltaX <= 200) {
+                            contentLayout.setTranslationX(deltaX);
+                        }
+                        return true;
+
+                    case MotionEvent.ACTION_UP:
+                        float totalDeltaX = event.getX() - downX;
+                        if (totalDeltaX > SWIPE_THRESHOLD) {
+                            contentLayout.animate().translationX(200f).setDuration(200).start();
+                            isSwipedOpen = true;
+                            btnDelete.setClickable(true);
+                            adapter.swipedPosition = getAdapterPosition();
+                            adapter.notifyDataSetChanged();
+                        } else {
+                            contentLayout.animate().translationX(0).setDuration(200).start();
+                            isSwipedOpen = false;
+                            btnDelete.setClickable(false);
+                        }
+                        return true;
+                }
+                return false;
+            });
+        }
+
+        public void setDatePeremptionColor(Date date) {
             /*if (date != null) {
 
                 Date dateDuJour = new Date();
@@ -212,24 +318,10 @@ public class LotAdapter extends RecyclerView.Adapter<LotAdapter.LotViewHolder> {
                 dateExpiration.setTextColor(Color.BLACK);
             }*/
         }
-        public LotViewHolder(@NonNull View itemView) {
-            super(itemView);
-            btnDelete = itemView.findViewById(R.id.btn_delete);
-            contentLayout = itemView.findViewById(R.id.contentLayout);
-            nomEmplacement = (TextView) itemView.findViewById(R.id.nomEmplacement);
-            lot = (TextView) itemView.findViewById(R.id.lot);
-            dateExpiration = (TextView) itemView.findViewById(R.id.datePeremption);
-            qteSaisie = (TextView) itemView.findViewById(R.id.qteSaisie);
-            labelLot = (TextView) itemView.findViewById(R.id.labelLot);
-            qteStock = (TextView) itemView.findViewById(R.id.qteStock);
-            layoutPrincipal = (LinearLayout) itemView.findViewById(R.id.layoutPrincipal);
-            layout_qte_saisie_lot_preparation = (LinearLayout) itemView.findViewById(R.id.layout_qte_saisie_lot_preparation);
-            layout_ajouter_lot = (LinearLayout) itemView.findViewById(R.id.layout_ajouter_lot);
-            layout_annuler_lot = (LinearLayout) itemView.findViewById(R.id.layout_annuler_lot);
-            deleteLayout = (LinearLayout) itemView.findViewById(R.id.deleteLayout);
-            layoutStock = (LinearLayout) itemView.findViewById(R.id.layoutStock);
-            separateur = (ImageView) itemView.findViewById(R.id.separateur);
-        }
+    }
+
+    public PH_Preparation_Ligne_Preparation_Adapte.LotAdapte getLotAt(int position) {
+        return lots.get(position);
     }
 }
 

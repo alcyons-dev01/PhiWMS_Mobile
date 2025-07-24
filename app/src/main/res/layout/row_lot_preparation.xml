@@ -284,8 +284,9 @@
         android:id="@+id/contentLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clickable="false"
-        android:focusable="false"
+        android:clickable="true"
+        android:focusable="true"
+        android:descendantFocusability="blocksDescendants"
         android:background="@android:color/white">
 
         <LinearLayout
@@ -425,6 +426,33 @@
 
                     </LinearLayout>
 
+                    <LinearLayout
+                        android:id="@+id/zoneSerie"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/labelSerie"
+                            android:layout_width="45dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"
+                            android:text="Série"
+                            android:textColor="@color/noir"/>
+
+                        <TextView
+                            android:id="@+id/serie"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"
+                            android:paddingRight="10dp"
+                            android:textColor="@color/noir"
+                            android:textStyle="bold"
+                            android:text=""/>
+
+                    </LinearLayout>
+
 
                 </LinearLayout>
 
@@ -434,6 +462,8 @@
                     android:layout_height="match_parent"
                     android:background="@drawable/background_qte_lot_phpreparationligne"
                     android:orientation="vertical"
+                    android:clickable="false"
+                    android:focusable="false"
                     android:layout_marginRight="15dp"
                     android:layout_marginTop="5dp">
 
