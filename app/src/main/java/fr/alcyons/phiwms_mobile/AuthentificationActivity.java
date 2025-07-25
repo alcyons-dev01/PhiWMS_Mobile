@@ -377,7 +377,7 @@ public class AuthentificationActivity extends MainActivity {
         // create class object
         gps = new GPSTracker(AuthentificationActivity.this);
         if (!gps.canGetLocation()) {
-            gps.showSettingsAlert();
+            //gps.showSettingsAlert();
         }
 
     }

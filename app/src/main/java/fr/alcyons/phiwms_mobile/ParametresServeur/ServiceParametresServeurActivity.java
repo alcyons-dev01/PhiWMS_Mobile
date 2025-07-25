@@ -127,14 +127,17 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
         testConnexionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                testConnexionButton.setBackground(getResources().getDrawable(R.color.gris));
                 if (checkConnectivity()) {
                     Toast toast = Toast.makeText(ServiceParametresServeurActivity.this, "Succès lors du test de connexion", Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
+                    testConnexionButton.setBackground(getResources().getDrawable(R.color.vert));
                 } else {
                     Toast toast = Toast.makeText(ServiceParametresServeurActivity.this, messageErreur, Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
+                    testConnexionButton.setBackground(getResources().getDrawable(R.color.vert));
                 }
             }
         });
@@ -233,6 +236,7 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                             handler.sendMessage(handler.obtainMessage());
+                            messageErreur = "Erreur lors de la récupération des données";
                         }
                     }
                 },
@@ -241,14 +245,14 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         Log.e("Volley", "Error");
                         handler.sendMessage(handler.obtainMessage());
-                        messageErreur = error.getMessage();
+                        messageErreur = "Erreur lors de la connexion du serveur";
                     }
                 }
         );
         obreq.setRetryPolicy(new RetryPolicy() {
             @Override
             public int getCurrentTimeout() {
-                return 50000;
+                return 10000;
             }
 
             @Override
@@ -258,7 +262,11 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
 
             @Override
             public void retry(VolleyError error) throws VolleyError {
-
+                handler.sendMessage(handler.obtainMessage());
+                messageErreur = "Impossible d'atteindre le serveur";
+                Toast toast = Toast.makeText(ServiceParametresServeurActivity.this, messageErreur, Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
             }
         });
         requestQueue.add(obreq);

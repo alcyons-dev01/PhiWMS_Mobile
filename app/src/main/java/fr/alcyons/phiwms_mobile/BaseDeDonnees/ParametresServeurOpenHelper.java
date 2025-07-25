@@ -300,6 +300,23 @@ public class ParametresServeurOpenHelper extends DBOpenHelper {
         return urlARetourner;
     }
 
+    public static String getUrlsWeb(SQLiteDatabase db) {
+        String urlARetourner = null;
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PARAMETRES_SERVEUR, null);
+
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+
+            String base = "http://";
+            String ipServeur = cursor.getString(Constantes.NUM_COL_IP_SERVEUR_PARAMETRES_SERVEUR);
+
+            urlARetourner = base + ipServeur + "/";
+        }
+        cursor.close();
+        cursor = null;
+        return urlARetourner;
+    }
+
     public static class Constantes implements BaseColumns {
         public static final String TABLE_PARAMETRES_SERVEUR = "ParametresServeur";
 

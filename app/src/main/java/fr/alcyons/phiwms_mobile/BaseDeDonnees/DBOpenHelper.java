@@ -215,6 +215,7 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         public static final String uriRequeteDotationGlobaleCourant = "ph_preparations/dotationglobale";
         public static final String uriRequeteDemandeReassortCourant = "ph_preparations/phreassort";
         public static final String uriRequeteDemandeMotif = "ph_demande_motif/";
+        public static final String uriZebraImprimer = "zebrawebservice/imprimer";
 
     }
 

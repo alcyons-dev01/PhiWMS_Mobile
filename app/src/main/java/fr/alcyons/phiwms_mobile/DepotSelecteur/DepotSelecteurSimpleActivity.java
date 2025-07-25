@@ -116,7 +116,7 @@ public class DepotSelecteurSimpleActivity extends ServiceActivity {
 
                 Toast.makeText(getApplicationContext(), "Votre localisation est - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
             } else {
-                gps.showSettingsAlert();
+                //gps.showSettingsAlert();
             }
 
             ArrayList<DepotOpenHelper.CustomObject> depotLesPlusProche = gestionnaireDepot.getDepotLesPlusProche(latitude, longitude, depotList);

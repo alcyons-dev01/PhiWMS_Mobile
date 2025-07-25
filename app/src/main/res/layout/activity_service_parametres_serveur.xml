@@ -124,7 +124,7 @@
                     android:layout_marginEnd="10dp"
                     android:layout_marginTop="20dp"
                     android:layout_marginBottom="20dp"
-                    android:background="@android:color/holo_green_light"
+                    android:background="@color/vert"
                     android:text="@string/tester"
                     android:textColor="@android:color/white"/>
 

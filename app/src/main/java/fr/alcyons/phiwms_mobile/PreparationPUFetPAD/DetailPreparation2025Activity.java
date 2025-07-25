@@ -1,5 +1,6 @@
 package fr.alcyons.phiwms_mobile.PreparationPUFetPAD;
 
+import static com.google.android.gms.vision.L.TAG;
 import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 
 import android.annotation.SuppressLint;
@@ -34,6 +35,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,6 +54,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
+import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparation2025Activity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
@@ -85,6 +88,7 @@ import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 import fr.alcyons.phiwms_mobile.Services.ServicePreparationPadActivity;
 import fr.alcyons.phiwms_mobile.Services.ServicePreparationPufActivity;
+import java.util.Calendar;
 
 public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity {
     public PH_Preparation ph_preparation_Selectionne;
@@ -113,8 +117,7 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
     int position_selectionne;
     Depot depotOrigine;
 
-    public void enregistrerPhPreparation()
-    {
+    public void enregistrerPhPreparation() throws JSONException {
         int nbTotalLotsAvecValeurSaisie = 0;
 
         int nbLigneSansValeur = 0;
@@ -1018,7 +1021,11 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
             ph_preparation_Selectionne.setNumero_scelle(numero_scelle);
             PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, ph_preparation_Selectionne);
             alertDialog.dismiss();
-            enregistrerPhPreparation();
+            try {
+                enregistrerPhPreparation();
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
         });
 
         annuler.setOnClickListener(view1 -> alertDialog.dismiss());
@@ -1060,13 +1067,16 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
         annuler.setOnClickListener(view1 -> alertDialog.dismiss());
 
         valider.setOnClickListener(view12 -> {
-            EnregistrerPreparation();
+            try {
+                EnregistrerPreparation();
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
             alertDialog.dismiss();
         });
     }
 
-    public void EnregistrerPreparation()
-    {
+    public void EnregistrerPreparation() throws JSONException {
         List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte> listeLot = new ArrayList<>();
         //Création de l'action utilisateur
         Random randomaction = new Random();
@@ -1137,13 +1147,22 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
         if(ph_preparation_Selectionne.getDepotDestinataireReference().contains("-PAD-"))
             retourListeIntent = new Intent(DetailPreparation2025Activity.this, ServicePreparationPadActivity.class);
 
-        Bundle extras = new Bundle();
-        extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-        extras.putInt("serviceSelectionneID", serviceActuel.getId());
-        retourListeIntent.putExtras(extras);
-        DetailPreparation2025Activity.this.startActivity(retourListeIntent);
-        DetailPreparation2025Activity.this.finish();
-        return;
+        if(utilisateurConnecte.getEtablissement().toUpperCase().contentEquals("ADH") || utilisateurConnecte.getEtablissement().toUpperCase().contentEquals("ALCYONS"))
+        {
+            envoyerImpressionZebra(ph_preparation_Selectionne);
+        }
+        else
+        {
+            Bundle extras = new Bundle();
+            extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+            extras.putInt("serviceSelectionneID", serviceActuel.getId());
+            retourListeIntent.putExtras(extras);
+            DetailPreparation2025Activity.this.startActivity(retourListeIntent);
+            DetailPreparation2025Activity.this.finish();
+            return;
+        }
+
+
     }
 
     @SuppressLint("SetTextI18n")
@@ -1293,5 +1312,158 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
         //}
 
         ElementASynchroniserOpenHelper.toutSynchroniser(DetailPreparation2025Activity.this, db, utilisateurConnecte, false);
+    }
+
+    private void envoyerImpressionZebra(PH_Preparation ph_preparation) throws JSONException {
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        String strDate = sdf.format(cal.getTime());
+
+        JSONArray Etiquette_TO = new JSONArray();
+
+        Depot depotOrigine = DepotOpenHelper.getDepotParID(db, ph_preparation.getDepotOrigineID());
+        String DepotOrigineNom_VT = depotOrigine.getNom();
+
+        Depot depotDestinataire = DepotOpenHelper.getDepotParID(db, ph_preparation.getDepotDestinataireID());
+        String CPDestinataire_VT = depotDestinataire.getCP();
+        String VilleDestinataire_VT = depotDestinataire.getVille();
+        String nomDestinataire_VT = depotDestinataire.getNom();
+
+        String preparerPar_VT= "";
+        String validerPar_VT = "";
+        if(!ph_preparation.getPreparateur().isEmpty())
+        {
+            String[] tabPreparateur = ph_preparation.getPreparateur().split("(");
+            if(tabPreparateur.length > 1)
+            {
+                preparerPar_VT = tabPreparateur[0];
+                validerPar_VT = tabPreparateur[1].substring(0,tabPreparateur[1].length()-1);
+            }
+            else
+            {
+                preparerPar_VT = ph_preparation.getPreparateur();
+            }
+        }
+
+        JSONObject codeBarre_JO = new JSONObject();
+        codeBarre_JO.put("type", "Datamatrix");
+        codeBarre_JO.put("phitag", "DDS:"+ph_preparation.getPHIE_Tag());
+
+        JSONObject etiquette_v1_JO = new JSONObject();
+        etiquette_v1_JO.put("codeBarre", codeBarre_JO);
+        etiquette_v1_JO.put("phiTag", String.valueOf(ph_preparation.getUID()));
+        etiquette_v1_JO.put("titre", ph_preparation.getListe());
+        etiquette_v1_JO.put("CPDestinataire", CPDestinataire_VT);
+        etiquette_v1_JO.put("villeDestinataire", VilleDestinataire_VT);
+        etiquette_v1_JO.put("destinataire", nomDestinataire_VT);
+        etiquette_v1_JO.put("nbCartons", String.valueOf(ph_preparation.getColisNB()));
+        etiquette_v1_JO.put("nbPalette", String.valueOf(ph_preparation.getPaletteNB()));
+        etiquette_v1_JO.put("nbConteneur", String.valueOf(ph_preparation.getConteneur_NB()));
+        etiquette_v1_JO.put("poids", String.valueOf(ph_preparation.getPoids()));
+        etiquette_v1_JO.put("date", strDate);
+        etiquette_v1_JO.put("etablissement", DepotOrigineNom_VT);
+        etiquette_v1_JO.put("preparationvaliderpar", validerPar_VT);
+        etiquette_v1_JO.put("preparationpreparerpar", preparerPar_VT);
+        etiquette_v1_JO.put("numContenant", 1);
+        etiquette_v1_JO.put("nbContenant", 1);
+
+        List<PH_Preparation_Ligne> listeph_preparation_ligne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, ph_preparation);
+        int compteur = 1;
+        String tempAmbiante_VS = "false";
+        String fragile_VS = "false";
+        String abriLumiere_VS = "false";
+        String medicamentARisque = "false";
+        String numeroScelle = "";
+        int tempMax_VN = 0;
+        int tempMin_VN = 0;
+
+        for(PH_Preparation_Ligne ligne_courante : listeph_preparation_ligne)
+        {
+            Produit produitcourant = ProduitOpenHelper.getProduitByID(db, ligne_courante.getProduitID());
+
+            if(produitcourant.isTemperature_Ambiante())
+                tempAmbiante_VS = "true";
+
+            if(produitcourant.isConservation_abri())
+                abriLumiere_VS = "true";
+
+            if(tempMax_VN < produitcourant.getConservation_temperature_Max())
+                tempMax_VN = (int) produitcourant.getConservation_temperature_Max();
+
+            if(tempMin_VN > produitcourant.getConservation_temperature_min())
+                tempMin_VN = (int) produitcourant.getConservation_temperature_min();
+
+            if(produitcourant.isMedicament_Risque())
+                medicamentARisque = "MEDICAMENT À RISQUE";
+
+            compteur ++;
+        }
+
+        JSONObject refrigere_JO = new JSONObject();
+        refrigere_JO.put("tempMin", String.valueOf(tempMin_VN));
+        refrigere_JO.put("tempMax", String.valueOf(tempMax_VN));
+
+        JSONObject symbole_JO = new JSONObject();
+        symbole_JO.put("scelle", numeroScelle);
+        symbole_JO.put("ambiante", tempAmbiante_VS);
+        symbole_JO.put("fragile", fragile_VS);
+        symbole_JO.put("abriLumiere", abriLumiere_VS);
+        symbole_JO.put("refrigere", refrigere_JO);
+        etiquette_v1_JO.put("symboles", symbole_JO);
+
+        etiquette_v1_JO.put("medicamentrisque", medicamentARisque);
+
+        Etiquette_TO.put(etiquette_v1_JO);
+
+        String imprimante_VT = "Zebra";
+        String aImprimer = "true";
+        String format = "Préparation";
+
+        JSONObject body = new JSONObject();
+        try {
+            body.put("Imprimante", imprimante_VT);
+            body.put("aImprimer", aImprimer);
+            body.put("format", format);
+            body.put("etiquettes", Etiquette_TO);
+        } catch (JSONException e) {
+            Log.e(TAG, "JSONException :", e);
+        }
+        String urlRequete = ParametresServeurOpenHelper.getUrlsWeb(db) + DBOpenHelper.Urls.uriZebraImprimer;
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.POST, urlRequete, body, response -> {
+            Toast.makeText(DetailPreparation2025Activity.this, "Etiquette envoyée", Toast.LENGTH_SHORT).show();
+            Intent retourListeIntent = new Intent(DetailPreparation2025Activity.this, ServicePreparationPufActivity.class);
+            if(ph_preparation_Selectionne.getDepotDestinataireReference().contains("-PAD-"))
+                retourListeIntent = new Intent(DetailPreparation2025Activity.this, ServicePreparationPadActivity.class);
+            Bundle extras = new Bundle();
+            extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+            extras.putInt("serviceSelectionneID", serviceActuel.getId());
+            retourListeIntent.putExtras(extras);
+            DetailPreparation2025Activity.this.startActivity(retourListeIntent);
+            DetailPreparation2025Activity.this.finish();
+        },
+                error -> {
+                    Log.e("Etiquette Volley", error.toString());
+                    Alerte.afficherAlerte(DetailPreparation2025Activity.this, "Erreur HTTP", "Erreur lors de l\'impression de l\'étiquette", "alerte");
+                    Intent retourListeIntent = new Intent(DetailPreparation2025Activity.this, ServicePreparationPufActivity.class);
+                    if(ph_preparation_Selectionne.getDepotDestinataireReference().contains("-PAD-"))
+                        retourListeIntent = new Intent(DetailPreparation2025Activity.this, ServicePreparationPadActivity.class);
+                    Bundle extras = new Bundle();
+                    extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                    extras.putInt("serviceSelectionneID", serviceActuel.getId());
+                    retourListeIntent.putExtras(extras);
+                    DetailPreparation2025Activity.this.startActivity(retourListeIntent);
+                    DetailPreparation2025Activity.this.finish();
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> params = new HashMap<>();
+                params.put("Content-Type", "application/json;charset=utf-8");
+                return params;
+            }
+        };
+        RequestQueue requestQueueUtilisateur = Volley.newRequestQueue(this);
+        requestQueueUtilisateur.add(obreq);
+
     }
 }
