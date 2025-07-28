@@ -44,6 +44,7 @@ import java.util.Objects;
 import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReception2025Activity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
@@ -506,7 +507,7 @@ public class DetailReceptionActivity extends ServiceActivity {
             Bundle listeLotReception_Bundle = new Bundle();
             if(android.os.Build.MANUFACTURER.contains("Zebra Technologies")  || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
             {
-                listeLotReception_Intent = new Intent(DetailReceptionActivity.this, ScannerReceptionActivity.class);
+                listeLotReception_Intent = new Intent(DetailReceptionActivity.this, ScannerReception2025Activity.class);
             }
             else
             {
@@ -962,14 +963,15 @@ public class DetailReceptionActivity extends ServiceActivity {
     private void enregistrerPhReliquat(PH_Reliquat_Reception_Adapte reliquatReceptionAdapte)
     {
         listeProduitRAL = new ArrayList<>();
-        List<PH_Reliquat> listeReliquatAjouter = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumero(db, commandeSelectionne.getNumero());
+        PH_Reliquat ph_reliquat_base = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquatReceptionAdapte.getPhReliquatUID());
+
+        List<PH_Reliquat> listeReliquatAjouter = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, commandeSelectionne.getNumero(), ph_reliquat_base.getProduitID());
         for(PH_Reliquat reliquatcourant : listeReliquatAjouter)
         {
             PH_ReliquatOpenHelper.supprimerUnPHReliquat(db, reliquatcourant);
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, reliquatcourant.getPhiMR4UUID(), reliquatcourant.getReliquat_UID(), DBOpenHelper.ActionsEAS.SUPPR);
         }
 
-        PH_Reliquat ph_reliquat_base = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquatReceptionAdapte.getPhReliquatUID());
         for(PH_Reliquat_Reception_Adapte.Lot lot : reliquatReceptionAdapte.getlotList()) {
             for (PH_Reliquat_Reception_Adapte.ZoneEtEmplacement zoneEtEmplacement : lot.getZoneEtEmplacementList()) {
                 Random randomreliquat = new Random();

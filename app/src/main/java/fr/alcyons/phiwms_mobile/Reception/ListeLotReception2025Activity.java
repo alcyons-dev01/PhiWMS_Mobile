@@ -41,6 +41,7 @@ import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReception2025Activity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
@@ -237,7 +238,7 @@ public class ListeLotReception2025Activity  extends ServiceActivity {
 
                 if(android.os.Build.MANUFACTURER.contains("Zebra Technologies")  || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") )
                 {
-                    listeLotReception_Intent = new Intent(ListeLotReception2025Activity.this, ScannerReceptionActivity.class);
+                    listeLotReception_Intent = new Intent(ListeLotReception2025Activity.this, ScannerReception2025Activity.class);
                     listeLotReception_Bundle.putString("contexte", String.valueOf(R.string.scannerContextReceptionUnique));
                 }
                 else
@@ -245,14 +246,26 @@ public class ListeLotReception2025Activity  extends ServiceActivity {
                     listeLotReception_Intent = new Intent(ListeLotReception2025Activity.this, BarcodeReceptionActivity.class);
                     listeLotReception_Bundle.putString("contexte", String.valueOf(R.string.scannerContextReceptionUnique));
                 }
-                listeLotReception_Bundle.putInt("ReceptionID", commandeSelectionne.getID_commande());
+                /*listeLotReception_Bundle.putInt("ReceptionID", commandeSelectionne.getID_commande());
                 listeLotReception_Bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
                 listeLotReception_Bundle.putSerializable("UniqueReceptionPUIAdapte", (Serializable) phReliquatReceptionAdapte);
                 listeLotReception_Bundle.putSerializable("ReliquatCourant", (Serializable) phReliquat);
 
                 listeLotReception_Bundle.putInt("serviceSelectionneID", intent.getExtras().getInt("serviceSelectionneID"));
                 listeLotReception_Bundle.putSerializable("EmplacementPrecedent", emplacement_precedent);
-                listeLotReception_Bundle.putSerializable("ProduitPrecedent", produit_precedent);
+                listeLotReception_Bundle.putSerializable("ProduitPrecedent", produit_precedent);*/
+
+                List<PH_Reliquat_Reception_Adapte> phReliquatReceptionAdapteList = new ArrayList<>();
+                phReliquatReceptionAdapteList.add(phReliquatReceptionAdapte);
+                listeLotReception_Bundle.putString("contexte", String.valueOf(R.string.scannerContextReceptionListe));
+                listeLotReception_Bundle.putInt("ReceptionID", commandeSelectionne.getID_commande());
+                listeLotReception_Bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                listeLotReception_Bundle.putString("ordreTri", "");
+                listeLotReception_Bundle.putInt("serviceSelectionneID", Objects.requireNonNull(intent.getExtras()).getInt("serviceSelectionneID"));
+                listeLotReception_Bundle.putSerializable("ReceptionPUIAdapte", (Serializable) phReliquatReceptionAdapteList);
+                listeLotReception_Bundle.putSerializable("EmplacementPrecedent", (Serializable) emplacement_precedent);
+                listeLotReception_Bundle.putSerializable("ProduitPrecedent", (Serializable) produit_precedent);
+
                 listeLotReception_Intent.putExtras(listeLotReception_Bundle);
                 ListeLotReception2025Activity.this.startActivityForResult(listeLotReception_Intent, CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH);
             });
@@ -358,6 +371,9 @@ public class ListeLotReception2025Activity  extends ServiceActivity {
             recyclerView.setAdapter(lotReceptionAdapter);
             invalidateOptionsMenu();
         }
+
+        calculQuantiteReception();
+        checkEtatReception();
 
         int nbColis = recupererNbColis(produit.getID_produit(), phReliquat.getQteReliquat_X());
         ((TextView) findViewById(R.id.colis)).setText(String.valueOf(nbColis));
@@ -536,7 +552,10 @@ public class ListeLotReception2025Activity  extends ServiceActivity {
                 case CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH:
                     //on recupere à nouveau le ph_reliquat courant pour capter les changements en bdd
                     phReliquatReceptionAdapte = null;
-                    phReliquatReceptionAdapte = (PH_Reliquat_Reception_Adapte) Objects.requireNonNull(data.getExtras()).getSerializable("reliquatAdapte");
+
+                    List<PH_Reliquat_Reception_Adapte> temp_list = new ArrayList<>();
+                    temp_list = (List<PH_Reliquat_Reception_Adapte>) data.getExtras().getSerializable("reliquatAdapteList");
+                    phReliquatReceptionAdapte = temp_list.get(0);
                     assert phReliquatReceptionAdapte != null;
                     phReliquat = PH_ReliquatOpenHelper.getPH_ReliquatById(db, phReliquatReceptionAdapte.getPhReliquatUID());
 
@@ -696,6 +715,7 @@ public class ListeLotReception2025Activity  extends ServiceActivity {
             QteDemandeeTextView.setTextColor(ListeLotReception2025Activity.this.getResources().getColor(R.color.vert, null));
             lancerScanLinearLayout.setVisibility(View.GONE);
             QtePreparerTextView.setVisibility(View.INVISIBLE);
+            MAJListeLot();
         }
         else
         {
@@ -705,6 +725,19 @@ public class ListeLotReception2025Activity  extends ServiceActivity {
             //QtePreparerTextView.setText(String.valueOf(phReliquat.getQteLivraison()));
             QtePreparerTextView.setVisibility(View.VISIBLE);
             QteDemandeeTextView.setTextColor(ListeLotReception2025Activity.this.getResources().getColor(R.color.noir, null));
+
+            boolean ajoutRowAjouter = true;
+            for(PH_Reliquat_Reception_Adapte.Lot lotCourant : phReliquatReceptionAdapte.getlotList())
+            {
+                if(lotCourant.getNumeroLot().contentEquals("row_ajouter"))
+                {
+                    ajoutRowAjouter = false;
+                    break;
+                }
+            }
+
+            if(ajoutRowAjouter)
+                phReliquatReceptionAdapte.getlotList().add(phReliquatReceptionAdapte.new Lot("row_ajouter", "00/00/0000", "", ""));
         }
     }
 
