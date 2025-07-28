@@ -380,11 +380,16 @@ public class ScannerReception2025Activity extends ServiceActivity {
                                 }
                                 else
                                 {
-                                    if(emplacement_courant != null)
+                                    if(emplacement_courant != null || commandeCourante.getRef_Depot_Dest().contains("-PAD"))
                                     {
                                         ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
                                         ((TextView) findViewById(R.id.instruction)).setText("");
-                                        ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacement_courant.getAdressage());
+
+                                        if (commandeCourante.getRef_Depot_Dest().contains("-PAD")) {
+                                            ((TextView) findViewById(R.id.EmplacementLotProduit)).setText("RECEPTION-" + commandeCourante.getNumero() + "-" + commandeCourante.getPatient_identite());
+                                        } else {
+                                            ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacement_courant.getAdressage());
+                                        }
                                         blinkImageValidation();
 
                                         //initilisation du compteur
@@ -459,14 +464,26 @@ public class ScannerReception2025Activity extends ServiceActivity {
                                     findViewById(R.id.validationScan).setOnClickListener(v -> {
                                         //gestion enregistrement du lot scannee
                                         int quantiteSaisie = Integer.parseInt(((TextView) findViewById(R.id.qteSaisie)).getText().toString());
-                                        Depot_Zone zoneCourante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
 
-
+                                        String zone_string = "";
+                                        int zoneId = 0;
+                                        String emplacement_string = "";
+                                        int emplacementId = 0;
+                                        if (commandeCourante.getRef_Depot_Dest().contains("-PAD")) {
+                                            zone_string = "RECEPTION";
+                                            emplacement_string = "RECEPTION-" + commandeCourante.getNumero() + "-" + commandeCourante.getPatient_identite();
+                                        } else {
+                                            Depot_Zone zoneCourante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
+                                            zone_string = zoneCourante.getZoneName();
+                                            zoneId = zoneCourante.getZoneID();
+                                            emplacement_string = emplacement_courant.getAdressage();
+                                            emplacementId = emplacement_courant.get_UID();
+                                        }
 
                                         boolean emplacementexiste = false;
                                         for(PH_Reliquat_Reception_Adapte.ZoneEtEmplacement zoneEtEmplacement : nouveau_lot.getZoneEtEmplacementList())
                                         {
-                                            if(zoneEtEmplacement.getZoneName().contentEquals(zoneCourante.getZoneName()) && emplacement_courant.get_UID() == zoneEtEmplacement.getEmplacementId())
+                                            if(zoneEtEmplacement.getZoneName().contentEquals(zone_string) && emplacement_string.contentEquals(zoneEtEmplacement.getEmplacementName()))
                                             {
                                                 zoneEtEmplacement.setQuantite(zoneEtEmplacement.getQuantite()+quantiteSaisie);
                                                 emplacementexiste = true;
@@ -474,7 +491,7 @@ public class ScannerReception2025Activity extends ServiceActivity {
                                             }
                                         }
                                         if(!emplacementexiste)
-                                            nouveau_lot.getZoneEtEmplacementList().add(uniqueReceptionPUIAdapte.new ZoneEtEmplacement(emplacement_courant.getZoneID(), zoneCourante.getZoneName(), emplacement_courant.get_UID(), emplacement_courant.getAdressage(), quantiteSaisie));
+                                            nouveau_lot.getZoneEtEmplacementList().add(uniqueReceptionPUIAdapte.new ZoneEtEmplacement(zoneId, zone_string, emplacementId, emplacement_string, quantiteSaisie));
 
                                         boolean lotPresent = false;
                                         for(PH_Reliquat_Reception_Adapte.Lot lotcourant : uniqueReceptionPUIAdapte.getlotList())
