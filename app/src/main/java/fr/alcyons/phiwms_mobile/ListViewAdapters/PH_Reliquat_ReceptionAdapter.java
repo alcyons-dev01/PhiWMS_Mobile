@@ -73,6 +73,15 @@ public class PH_Reliquat_ReceptionAdapter extends ArrayAdapter {
 
             if(phReliquat != null)
             {
+                //on récupère les reliquats réceptionnés en base de données
+                int qte_attendu = phReliquat.getQteCommande();
+                int qte_receptionne = 0;
+                List<PH_Reliquat> reliquat_receptionne = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, phReliquat.getcommandeNumero(), phReliquat.getProduitID());
+                for(PH_Reliquat reliquat : reliquat_receptionne)
+                {
+                    qte_receptionne += reliquat.getQteLivraison();
+                }
+
                 Produit produit_courant = ProduitOpenHelper.getProduitByID(db, phReliquat.getProduitID());
 
                 lotList = new ArrayList<>();
@@ -81,8 +90,8 @@ public class PH_Reliquat_ReceptionAdapter extends ArrayAdapter {
                 viewHolder.designation.setText(phReliquat.getdesignationCourte());
                 viewHolder.reference.setText(phReliquat.getProduit_Reference());
                 viewHolder.emplacementParDefaut.setText(produit_courant.getEmplacement_PUI_Defaut());
-                viewHolder.nbReliquat.setText(String.valueOf(phReliquat.getQteLivraison()));
-                if(phReliquat.getQteLivraison() == 0)
+                viewHolder.nbReliquat.setText(String.valueOf(qte_receptionne));
+                if(qte_receptionne == 0)
                 {
                     viewHolder.emplacementParDefaut.setVisibility(View.VISIBLE);
                     viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
@@ -93,9 +102,9 @@ public class PH_Reliquat_ReceptionAdapter extends ArrayAdapter {
                     viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
                     viewHolder.nbReliquat.setVisibility(View.VISIBLE);
                 }
-                viewHolder.QteDemandee.setText(String.valueOf(phReliquat.getQteCommande()));
+                viewHolder.QteDemandee.setText(String.valueOf(qte_attendu));
 
-                if(phReliquat.getQteReliquat_X() == 0)
+                if(qte_receptionne == qte_attendu)
                 {
                     viewHolder.nbReliquat.setTextColor(context.getResources().getColor(R.color.vert));
                     viewHolder.QteDemandee.setVisibility(View.GONE);

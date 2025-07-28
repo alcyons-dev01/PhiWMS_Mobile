@@ -1,5 +1,8 @@
 package fr.alcyons.phiwms_mobile.Reception;
 
+import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
+import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LOT;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,6 +24,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -31,41 +37,44 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Commande;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
+import fr.alcyons.phiwms_mobile.Classes.ElementASynchroniser;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_Reception_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.LotAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.LotReceptionAdapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Lot_ReceptionAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparation2025Activity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
-import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
-import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LOT;
-
-import androidx.activity.OnBackPressedCallback;
-
-public class ListeLotReceptionActivity extends ServiceActivity {
+public class ListeLotReception2025Activity  extends ServiceActivity {
 
     //gestion des variables
     Commande commandeSelectionne;
     PH_Reliquat_Reception_Adapte phReliquatReceptionAdapte;
-    Lot_ReceptionAdapter lotReceptionAdapter;
+    LotReceptionAdapter lotReceptionAdapter;
     Depot depot;
     PH_Reliquat phReliquat;
     Produit produit;
@@ -75,10 +84,9 @@ public class ListeLotReceptionActivity extends ServiceActivity {
     int quantiteLivree = 0;
     boolean numero_serie;
     boolean lotmanuel;
-    ListView lotReceptionListView;
     EditText numLotEditText;
     TextView datePeremptionTextView;
-    Lot_ReceptionAdapter.Lot_ReceptionViewHolder viewHolderAModifier;
+    LotReceptionAdapter.LotViewHolder viewHolderAModifier;
     TextView numeroReceptionTextView;
     TextView nomFournisseurTextView;
     TextView designationProduitTextView;
@@ -90,6 +98,7 @@ public class ListeLotReceptionActivity extends ServiceActivity {
     PackageManager pm;
     Depot_Emplacement emplacement_precedent;
     Produit produit_precedent;
+    RecyclerView recyclerView;
 
     private void initObjetGraphique()
     {
@@ -101,8 +110,8 @@ public class ListeLotReceptionActivity extends ServiceActivity {
         QtePreparerTextView = ((TextView) findViewById(R.id.QtePreparer));
         lancerScanLinearLayout = ((LinearLayout) findViewById(R.id.lancerScan));
         firstRowLinearLayout = ((LinearLayout) findViewById(R.id.firstRow));
-        lotReceptionListView = (ListView) findViewById(R.id.liste_view_reception);
-
+        recyclerView = (RecyclerView) findViewById(R.id.liste_view_reception);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @SuppressLint("SetTextI18n")
@@ -115,7 +124,7 @@ public class ListeLotReceptionActivity extends ServiceActivity {
         initObjetGraphique();
 
         //gestion du package manager
-        pm = ListeLotReceptionActivity.this.getPackageManager();
+        pm = ListeLotReception2025Activity.this.getPackageManager();
 
         depot = DepotOpenHelper.getPUICourant(db);
         scanProduit = false;
@@ -133,9 +142,6 @@ public class ListeLotReceptionActivity extends ServiceActivity {
         //on créé deux lot fictif pour la gestion du bouton d'ajout manuel de lot et d'annulation
         PH_Reliquat_Reception_Adapte.Lot lot_temp;
         lot_temp = phReliquatReceptionAdapte.new Lot("row_ajouter", "00/00/0000", "", "");
-        phReliquatReceptionAdapte.getlotList().add(lot_temp);
-
-        lot_temp = phReliquatReceptionAdapte.new Lot("row_annuler", "00/00/0000", "", "");
         phReliquatReceptionAdapte.getlotList().add(lot_temp);
 
         //gestion de l'entête
@@ -156,13 +162,7 @@ public class ListeLotReceptionActivity extends ServiceActivity {
                 quantiteReliquat = phReliquat.getQteCommande() - phReliquat.getQteLivraison();
                 QteDemandeeTextView.setText(String.valueOf(phReliquat.getQteCommande()));
 
-                List<PH_Reliquat> reliquatReceptionne = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, commandeSelectionne.getNumero(), produit.getID_produit());
-                int qte_receptionne = 0;
-                for(PH_Reliquat ph_reliquat : reliquatReceptionne)
-                {
-                    qte_receptionne += ph_reliquat.getQteLivraison();
-                }
-                QtePreparerTextView.setText(String.valueOf(qte_receptionne));
+                calculQuantiteReception();
             }
 
             if(intent.hasExtra("ListeResultat"))
@@ -199,7 +199,7 @@ public class ListeLotReceptionActivity extends ServiceActivity {
                         }
                         assert date != null;
                         String dateFinale = dateFormat1.format(date);
-                        
+
                         PH_Reliquat_Reception_Adapte.Lot lot_courant = phReliquatReceptionAdapte.new Lot(lot, dateFinale, num_serie, resultat);
                         PH_Reliquat reliquat = PH_ReliquatOpenHelper.getPH_ReliquatById(db, phReliquatReceptionAdapte.getPhReliquatUID());
                         Produit produit = ProduitOpenHelper.getProduitByID(db, reliquat.getProduitID());
@@ -237,12 +237,12 @@ public class ListeLotReceptionActivity extends ServiceActivity {
 
                 if(android.os.Build.MANUFACTURER.contains("Zebra Technologies")  || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") )
                 {
-                    listeLotReception_Intent = new Intent(ListeLotReceptionActivity.this, ScannerReceptionActivity.class);
+                    listeLotReception_Intent = new Intent(ListeLotReception2025Activity.this, ScannerReceptionActivity.class);
                     listeLotReception_Bundle.putString("contexte", String.valueOf(R.string.scannerContextReceptionUnique));
                 }
                 else
                 {
-                    listeLotReception_Intent = new Intent(ListeLotReceptionActivity.this, BarcodeReceptionActivity.class);
+                    listeLotReception_Intent = new Intent(ListeLotReception2025Activity.this, BarcodeReceptionActivity.class);
                     listeLotReception_Bundle.putString("contexte", String.valueOf(R.string.scannerContextReceptionUnique));
                 }
                 listeLotReception_Bundle.putInt("ReceptionID", commandeSelectionne.getID_commande());
@@ -254,11 +254,11 @@ public class ListeLotReceptionActivity extends ServiceActivity {
                 listeLotReception_Bundle.putSerializable("EmplacementPrecedent", emplacement_precedent);
                 listeLotReception_Bundle.putSerializable("ProduitPrecedent", produit_precedent);
                 listeLotReception_Intent.putExtras(listeLotReception_Bundle);
-                ListeLotReceptionActivity.this.startActivityForResult(listeLotReception_Intent, CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH);
+                ListeLotReception2025Activity.this.startActivityForResult(listeLotReception_Intent, CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH);
             });
 
         } else {
-            ListeLotReceptionActivity.this.finish();
+            ListeLotReception2025Activity.this.finish();
         }
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -274,55 +274,30 @@ public class ListeLotReceptionActivity extends ServiceActivity {
         super.onResume();
 
         //gestion du click sur une row
-        lotReceptionListView.setOnItemClickListener((parent, view, position, id) -> {
+        /*lotReceptionListView.setOnItemClickListener((parent, view, position, id) -> {
             //on check la row cliquer
             PH_Reliquat_Reception_Adapte.Lot courant = phReliquatReceptionAdapte.getlotList().get(position);
 
             if(position == phReliquatReceptionAdapte.getlotList().size()-2)
             {
-                Bundle clicBoutonAjouterManuellement_Bundle = ListeLotReceptionActivity.super.getBundle();
+                Bundle clicBoutonAjouterManuellement_Bundle = ListeLotReception2025Activity.super.getBundle();
                 clicBoutonAjouterManuellement_Bundle.putInt("produitID", produit.getID_produit());
                 clicBoutonAjouterManuellement_Bundle.putInt("depotID", depot.getDepot_UID());
                 clicBoutonAjouterManuellement_Bundle.putInt("ReliquatID", phReliquat.getReliquat_UID());
                 clicBoutonAjouterManuellement_Bundle.putSerializable("phReliquatReceptionAdapte", phReliquatReceptionAdapte);
 
-                Intent clicBoutonAjouterManuellement_Intent = new Intent(ListeLotReceptionActivity.this, CreationLotManuelReceptionActivity.class);
+                Intent clicBoutonAjouterManuellement_Intent = new Intent(ListeLotReception2025Activity.this, CreationLotManuelReceptionActivity.class);
                 clicBoutonAjouterManuellement_Intent.putExtras(clicBoutonAjouterManuellement_Bundle);
-                ListeLotReceptionActivity.this.startActivityForResult(clicBoutonAjouterManuellement_Intent, RETOUR_LOT);
+                ListeLotReception2025Activity.this.startActivityForResult(clicBoutonAjouterManuellement_Intent, RETOUR_LOT);
             }
             else if(position == phReliquatReceptionAdapte.getlotList().size()-1)
             {
-                /*boolean confirmation = Alerte.afficherAlerte(ListeLotReceptionActivity.this, "Confirmation", "Attention, tous les lots saisis seront supprimés, souhaitez-vous continuez ?", "OuiNon");
 
-                if(confirmation)
-                {
-                    //si c'est le cas on cache les autres lignes
-                    firstRowLinearLayout.setBackground(ListeLotReceptionActivity.this.getResources().getDrawable(R.drawable.background_detail_preparation_orange, null));
-
-                    //reinitialisation de la liste des lots
-                    phReliquatReceptionAdapte.setlotList(new ArrayList<>());
-                    phReliquatReceptionAdapte.getlotList().add(phReliquatReceptionAdapte.new Lot("row_ajouter", "00/00/0000", "", ""));
-                    phReliquatReceptionAdapte.getlotList().add(phReliquatReceptionAdapte.new Lot("row_annuler", "00/00/0000", "", ""));
-                    phReliquat.setQteReliquat_X(phReliquat.getQteReliquat_X()+phReliquat.getQteLivraison());
-                    phReliquat.setQteLivraison(0);
-                    PH_ReliquatOpenHelper.mettreAJourUnPHReliquat(db, phReliquat);
-                    QteDemandeeTextView.setTextColor(ListeLotReceptionActivity.this.getResources().getColor(R.color.noir, null));
-                    lancerScanLinearLayout.setVisibility(View.VISIBLE);
-
-                    lotReceptionAdapter.full = false;
-
-                    lotReceptionAdapter = new Lot_ReceptionAdapter(ListeLotReceptionActivity.this, db, phReliquatReceptionAdapte.getlotList(), phReliquatReceptionAdapte.getPhReliquatUID(), numero_serie, false);
-                    lotReceptionListView.setDivider(footer);
-                    lotReceptionListView.setAdapter(lotReceptionAdapter);
-                    invalidateOptionsMenu();
-                }*/
-
-                afficherAlerteConfirmationSuppression(ListeLotReceptionActivity.this, ListeLotReceptionActivity.this.getLayoutInflater());
             }
             else
             {
                 //on check si le lot n'est pas déjà n'est pas déjà sélectionner
-                Drawable couleur_valider = ListeLotReceptionActivity.this.getResources().getDrawable(R.drawable.background_qte_lot_phpreparationligne_valider, null);
+                Drawable couleur_valider = ListeLotReception2025Activity.this.getResources().getDrawable(R.drawable.background_qte_lot_phpreparationligne_valider, null);
                 if(courant.getZoneEtEmplacementList().get(0).getQuantite() != 0 && !Objects.equals(lotReceptionAdapter.viewHolderList.get(position).layout_qte_saisie_lot_preparation.getBackground().getConstantState(), couleur_valider.getConstantState()) || lotmanuel )
                 {
                     int quantite_stock_selectionne = getQuantiteStockSelectionne(courant);
@@ -338,34 +313,13 @@ public class ListeLotReceptionActivity extends ServiceActivity {
                 }
                 else
                 {
-                    /*boolean confirmation = Alerte.afficherAlerte(ListeLotReceptionActivity.this, "Confirmation", "Attention, le lot sélectionné sera définitivement supprimé, souhaitez-vous continuez ?", "OuiNon");
-                    if(confirmation)
-                    {
-                        //si c'est le cas on cache les autres lignes
-                        firstRowLinearLayout.setBackground(ListeLotReceptionActivity.this.getResources().getDrawable(R.drawable.background_detail_preparation_orange, null));
-
-                        //reinitialisation de la liste des lots
-                        PH_Reliquat_Reception_Adapte.Lot lot_A_Supprimer = phReliquatReceptionAdapte.getlotList().get(position);
-                        phReliquat.setQteReliquat_X(phReliquat.getQteReliquat_X()+lot_A_Supprimer.getZoneEtEmplacementList().get(0).getQuantite());
-                        phReliquat.setQteLivraison(phReliquat.getQteLivraison()-lot_A_Supprimer.getZoneEtEmplacementList().get(0).getQuantite());
-                        PH_ReliquatOpenHelper.mettreAJourUnPHReliquat(db, phReliquat);
-                        phReliquatReceptionAdapte.getlotList().remove(position);
-                        QteDemandeeTextView.setTextColor(ListeLotReceptionActivity.this.getResources().getColor(R.color.noir, null));
-                        lancerScanLinearLayout.setVisibility(View.VISIBLE);
-
-                        lotReceptionAdapter = new Lot_ReceptionAdapter(ListeLotReceptionActivity.this, db, phReliquatReceptionAdapte.getlotList(), phReliquatReceptionAdapte.getPhReliquatUID(), numero_serie, false);
-                        lotReceptionListView.setDivider(footer);
-                        lotReceptionListView.setAdapter(lotReceptionAdapter);
-                    }*/
-                    afficherAlerteConfirmationSuppression(ListeLotReceptionActivity.this, ListeLotReceptionActivity.this.getLayoutInflater());
-
                 }
                 //on regarde si toute la quantité est préparer
                 checkEtatReception();
             }
 
-        });
-        
+        });*/
+
         if(!scanProduit)
         {
             quantiteLivree = 0;
@@ -377,9 +331,31 @@ public class ListeLotReceptionActivity extends ServiceActivity {
             numero_serie = phReliquatReceptionAdapte.isSuiviParSerieActif() && phReliquatReceptionAdapte.isSerialiserReception();
 
             quantiteReliquat = phReliquat.getQteCommande() - phReliquat.getQteLivraison();
-            lotReceptionAdapter = new Lot_ReceptionAdapter(ListeLotReceptionActivity.this, db, phReliquatReceptionAdapte.getlotList(), phReliquatReceptionAdapte.getPhReliquatUID(), numero_serie, false);
-            lotReceptionListView.setDivider(footer);
-            lotReceptionListView.setAdapter(lotReceptionAdapter);
+
+            lotReceptionAdapter = new LotReceptionAdapter(phReliquatReceptionAdapte.getlotList(), position -> {
+                Toast.makeText(this, "Supprimer " + phReliquatReceptionAdapte.getlotList().get(position), Toast.LENGTH_SHORT).show();
+                RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
+                if (viewHolder != null && viewHolder instanceof LotReceptionAdapter.LotViewHolder) {
+                    String lot = phReliquatReceptionAdapte.getlotList().get(position).getNumeroLot();
+                    String datePeremption = phReliquatReceptionAdapte.getlotList().get(position).getDatePeremption();
+                    String zone = phReliquatReceptionAdapte.getlotList().get(position).getZoneEtEmplacementList().get(0).getZoneName();
+                    String emplacement = phReliquatReceptionAdapte.getlotList().get(position).getZoneEtEmplacementList().get(0).getEmplacementName();
+                    PH_Reliquat courantasupprimer = PH_ReliquatOpenHelper.getPH_ReliquatByUnIdProduitetNumeroEtLotEtPeremptionEtZoneEtEmplacement(db, phReliquat.getProduitID(), phReliquat.getCommandeNumero(), lot, datePeremption, zone, emplacement);
+
+                    if(courantasupprimer != null)
+                    {
+                        PH_ReliquatOpenHelper.supprimerUnPHReliquat(db, courantasupprimer);
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, courantasupprimer.getPhiMR4UUID(), courantasupprimer.getReliquat_UID(), DBOpenHelper.ActionsEAS.SUPPR);
+                        ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotReception2025Activity.this, db, utilisateurConnecte, true);
+                        phReliquatReceptionAdapte.getlotList().remove(position);
+                        lotReceptionAdapter.notifyItemRemoved(position);
+                        calculQuantiteReception();
+                        checkEtatReception();
+                    }
+                }
+            }, ListeLotReception2025Activity.this);
+
+            recyclerView.setAdapter(lotReceptionAdapter);
             invalidateOptionsMenu();
         }
 
@@ -401,15 +377,15 @@ public class ListeLotReceptionActivity extends ServiceActivity {
         }
         return quantite_stock_selectionne;
     }
-    
-    public void decoderCodeBarre(EditText numLotEditText, TextView datePeremptionTextView, Lot_ReceptionAdapter.Lot_ReceptionViewHolder viewHolder, String contexte) {
+
+    public void decoderCodeBarre(EditText numLotEditText, TextView datePeremptionTextView, LotReceptionAdapter.LotViewHolder viewHolder, String contexte) {
         this.numLotEditText = numLotEditText;
         this.datePeremptionTextView = datePeremptionTextView;
         viewHolderAModifier = viewHolder;
 
         if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY) && !android.os.Build.MANUFACTURER.contains("Zebra Technologies") && !android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
         {
-            Intent listeLotReception_Intent = new Intent(ListeLotReceptionActivity.this, BarcodeCaptureActivity.class);
+            Intent listeLotReception_Intent = new Intent(ListeLotReception2025Activity.this, BarcodeCaptureActivity.class);
             Bundle listeLotReception_Bundle = super.getBundle();
             if (contexte.contentEquals("emplacement")) {
                 listeLotReception_Bundle.putString("bannerText", "Scanner un emplacement");
@@ -417,7 +393,7 @@ public class ListeLotReceptionActivity extends ServiceActivity {
                 if(scanProduit)
                     listeLotReception_Bundle.putBoolean("isBoutonSuppressionExistant", true);
                 listeLotReception_Intent.putExtras(listeLotReception_Bundle);
-                ListeLotReceptionActivity.this.startActivityForResult(listeLotReception_Intent, CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT);
+                ListeLotReception2025Activity.this.startActivityForResult(listeLotReception_Intent, CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT);
             } else {
                 String designation = phReliquat.getdesignationCourte();
                 Produit produit = ProduitOpenHelper.getProduitByID(db, phReliquat.getProduitID());
@@ -432,7 +408,7 @@ public class ListeLotReceptionActivity extends ServiceActivity {
                 listeLotReception_Bundle.putString("GTIN_courant", produit.getGTIN());
 
                 listeLotReception_Intent.putExtras(listeLotReception_Bundle);
-                ListeLotReceptionActivity.this.startActivityForResult(listeLotReception_Intent, CodesEchangesActivites.RETOUR_CODE_GS1);
+                ListeLotReception2025Activity.this.startActivityForResult(listeLotReception_Intent, CodesEchangesActivites.RETOUR_CODE_GS1);
             }
         }
     }
@@ -462,7 +438,8 @@ public class ListeLotReceptionActivity extends ServiceActivity {
                                 assert date != null;
                                 String dateFinale = dateFormat2.format(date);
 
-                                PH_Reliquat_Reception_Adapte.Lot phReliquatLotReception = lotReceptionAdapter.lotList.get(lotReceptionAdapter.viewHolderList.indexOf(viewHolderAModifier));
+                                //PH_Reliquat_Reception_Adapte.Lot phReliquatLotReception = lotReceptionAdapter.lotList.get(lotReceptionAdapter.viewHolderList.indexOf(viewHolderAModifier));
+                                PH_Reliquat_Reception_Adapte.Lot phReliquatLotReception = null;
 
                                 @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                                 @SuppressLint("SimpleDateFormat") DateFormat dateDecodeur = new SimpleDateFormat("dd/MM/yyyy");
@@ -486,12 +463,12 @@ public class ListeLotReceptionActivity extends ServiceActivity {
                                 last_char = lot.substring(lot.length()-1);
                                 if(last_char.contentEquals("@"))
                                     lot = lot.substring(0, lot.length()-1);
-                                
+
                                 phReliquatLotReception.setNumeroLot(lot);
                                 phReliquatLotReception.setNumero_serie(serie);
                             }
                         } else {
-                            Toast toast = Toast.makeText(ListeLotReceptionActivity.this, "Le code fourni n'est pas un code GS1, veuillez réessayer.", Toast.LENGTH_SHORT);
+                            Toast toast = Toast.makeText(ListeLotReception2025Activity.this, "Le code fourni n'est pas un code GS1, veuillez réessayer.", Toast.LENGTH_SHORT);
                             toast.setGravity(Gravity.CENTER, 0, 0);
                             toast.show();
                         }
@@ -514,10 +491,10 @@ public class ListeLotReceptionActivity extends ServiceActivity {
                             Depot_Zone zoneEmplacementRetourne = ZoneOpenHelper.getUneZoneByID(db, emplacementRetourne.getZoneID());
                             PH_Reliquat_Reception_Adapte.Lot lot;
 
-                            int index = lotReceptionAdapter.viewHolderList.indexOf(viewHolderAModifier);
+                            /*int index = lotReceptionAdapter.viewHolderList.indexOf(viewHolderAModifier);
 
-                            lot = lotReceptionAdapter.lotList.get(index);
-
+                            lot = lotReceptionAdapter.lotList.get(index);*/
+                            lot = phReliquatReceptionAdapte.getlotList().get(0);
                             List<PH_Reliquat_Reception_Adapte.ZoneEtEmplacement> zoneEtEmplacementList = lot.getZoneEtEmplacementList();
                             if(zoneEtEmplacementList.size() == 1)
                             {
@@ -541,7 +518,7 @@ public class ListeLotReceptionActivity extends ServiceActivity {
                             }
                         }
                         else{
-                            Toast toast = Toast.makeText(ListeLotReceptionActivity.this, "Le code fourni n'est pas un code Emplacement, veuillez réessayer.", Toast.LENGTH_SHORT);
+                            Toast toast = Toast.makeText(ListeLotReception2025Activity.this, "Le code fourni n'est pas un code Emplacement, veuillez réessayer.", Toast.LENGTH_SHORT);
                             toast.setGravity(Gravity.CENTER, 0, 0);
                             toast.show();
                         }
@@ -551,9 +528,9 @@ public class ListeLotReceptionActivity extends ServiceActivity {
                     break;
                 case CodesEchangesActivites.RETOUR_LISTE_EMPLACEMENTS:
                     PH_Reliquat_Reception_Adapte.Lot phReliquatLotReceptionRecu = (PH_Reliquat_Reception_Adapte.Lot) Objects.requireNonNull(data.getExtras()).getSerializable("lotZoneEtEmplacement");
-                    PH_Reliquat_Reception_Adapte.Lot phReliquatLotReception = phReliquatReceptionAdapte.getlotList().get(lotReceptionAdapter.viewHolderList.indexOf(viewHolderAModifier));
+                   // PH_Reliquat_Reception_Adapte.Lot phReliquatLotReception = phReliquatReceptionAdapte.getlotList().get(lotReceptionAdapter.viewHolderList.indexOf(viewHolderAModifier));
                     assert phReliquatLotReceptionRecu != null;
-                    phReliquatLotReception.setZoneEtEmplacementList(phReliquatLotReceptionRecu.getZoneEtEmplacementList());
+                    //phReliquatLotReception.setZoneEtEmplacementList(phReliquatLotReceptionRecu.getZoneEtEmplacementList());
                     break;
 
                 case CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH:
@@ -565,7 +542,6 @@ public class ListeLotReceptionActivity extends ServiceActivity {
 
                     //on remet les lignes d'ajout de lot et d'annulation
                     phReliquatReceptionAdapte.getlotList().add(phReliquatReceptionAdapte.new Lot("row_ajouter", "00/00/0000", "", ""));
-                    phReliquatReceptionAdapte.getlotList().add(phReliquatReceptionAdapte.new Lot("row_annuler", "00/00/0000", "", ""));
                     lotReceptionAdapter.notifyDataSetChanged();
 
                     //gestion de l'emplacement scanné
@@ -617,10 +593,11 @@ public class ListeLotReceptionActivity extends ServiceActivity {
                     nouveau_lot.getZoneEtEmplacementList().add(zoneEtEmplacement);
                     phReliquatReceptionAdapte.getlotList().add(nouveau_lot);
                     phReliquatReceptionAdapte.getlotList().add(phReliquatReceptionAdapte.new Lot("row_ajouter", "00/00/0000", "", ""));
-                    phReliquatReceptionAdapte.getlotList().add(phReliquatReceptionAdapte.new Lot("row_annuler", "00/00/0000", "", ""));
-
+                    gestionPhReliquatBDD(phReliquatReceptionAdapte.getlotList());
+                    calculQuantiteReception();
+                    checkEtatReception();
                     lotReceptionAdapter.notifyDataSetChanged();
-                    lotReceptionListView.performItemClick(lotReceptionListView.getAdapter().getView(phReliquatReceptionAdapte.getlotList().size()-3, null, null), phReliquatReceptionAdapte.getlotList().size()-3, lotReceptionListView.getAdapter().getItemId(phReliquatReceptionAdapte.getlotList().size()-3));
+                    //lotReceptionListView.performItemClick(lotReceptionListView.getAdapter().getView(phReliquatReceptionAdapte.getlotList().size()-3, null, null), phReliquatReceptionAdapte.getlotList().size()-3, lotReceptionListView.getAdapter().getItemId(phReliquatReceptionAdapte.getlotList().size()-3));
                     break;
             }
         }
@@ -652,13 +629,13 @@ public class ListeLotReceptionActivity extends ServiceActivity {
         if(phReliquatReceptionAdapte.getlotList().isEmpty())
         {
             Intent resultIntent = new Intent();
-            Bundle extras = ListeLotReceptionActivity.super.getBundle();
+            Bundle extras = ListeLotReception2025Activity.super.getBundle();
             extras.putSerializable("lotList", (Serializable) phReliquatReceptionAdapte.getlotList());
             extras.putSerializable("EmplacementPrecedent", emplacement_precedent);
             extras.putSerializable("ProduitPrecedent", produit_precedent);
             resultIntent.putExtras(extras);
-            ListeLotReceptionActivity.this.setResult(CodesEchangesActivites.RETOUR_LISTE_LOTS, resultIntent);
-            ListeLotReceptionActivity.this.finish();
+            ListeLotReception2025Activity.this.setResult(CodesEchangesActivites.RETOUR_LISTE_LOTS, resultIntent);
+            ListeLotReception2025Activity.this.finish();
         }
         else
         {
@@ -669,7 +646,7 @@ public class ListeLotReceptionActivity extends ServiceActivity {
             if (!phReliquatReceptionAdapte.getlotList().isEmpty()) {
                 for (PH_Reliquat_Reception_Adapte.Lot phReliquatLot : phReliquatReceptionAdapte.getlotList()) {
                     if (phReliquatLot.getNumeroLot().contentEquals("")) {
-                        Alerte.afficherAlerte(ListeLotReceptionActivity.this, "Alerte", "Veuillez saisir ou scanner un numéro de lot s'il vous plaît", "alerte");
+                        Alerte.afficherAlerte(ListeLotReception2025Activity.this, "Alerte", "Veuillez saisir ou scanner un numéro de lot s'il vous plaît", "alerte");
                         manqueLot = true;
                         break;
                     }
@@ -691,18 +668,18 @@ public class ListeLotReceptionActivity extends ServiceActivity {
             {
                 if (!manqueLot) {
                     Intent resultIntent = new Intent();
-                    Bundle extras = ListeLotReceptionActivity.super.getBundle();
+                    Bundle extras = ListeLotReception2025Activity.super.getBundle();
                     extras.putSerializable("lotList", (Serializable) phReliquatReceptionAdapte.getlotList());
                     extras.putSerializable("EmplacementPrecedent", emplacement_precedent);
                     extras.putSerializable("ProduitPrecedent", produit_precedent);
                     resultIntent.putExtras(extras);
-                    ListeLotReceptionActivity.this.setResult(CodesEchangesActivites.RETOUR_LISTE_LOTS, resultIntent);
-                    ListeLotReceptionActivity.this.finish();
+                    ListeLotReception2025Activity.this.setResult(CodesEchangesActivites.RETOUR_LISTE_LOTS, resultIntent);
+                    ListeLotReception2025Activity.this.finish();
                 }
             }
             else
             {
-                Alerte.afficherAlerte(ListeLotReceptionActivity.this, "Alerte", "La quantité saisie est supérieur à la quantité attendu", "alerte");
+                Alerte.afficherAlerte(ListeLotReception2025Activity.this, "Alerte", "La quantité saisie est supérieur à la quantité attendu", "alerte");
             }
         }
 
@@ -711,36 +688,37 @@ public class ListeLotReceptionActivity extends ServiceActivity {
     @SuppressLint("UseCompatLoadingForDrawables")
     private void checkEtatReception()
     {
-        if(phReliquat.getQteReliquat_X() == 0)
+        int qteReceptionne = Integer.parseInt(QtePreparerTextView.getText().toString());
+        if(phReliquat.getQteCommande() == qteReceptionne)
         {
             //si c'est le cas on cache les autres lignes
-            firstRowLinearLayout.setBackground(ListeLotReceptionActivity.this.getResources().getDrawable(R.drawable.background_detail_preparation_vert, null));
-            QteDemandeeTextView.setTextColor(ListeLotReceptionActivity.this.getResources().getColor(R.color.vert, null));
+            firstRowLinearLayout.setBackground(ListeLotReception2025Activity.this.getResources().getDrawable(R.drawable.background_detail_preparation_vert, null));
+            QteDemandeeTextView.setTextColor(ListeLotReception2025Activity.this.getResources().getColor(R.color.vert, null));
             lancerScanLinearLayout.setVisibility(View.GONE);
             QtePreparerTextView.setVisibility(View.INVISIBLE);
-
-            lotReceptionAdapter.full = true;
         }
         else
         {
             //si c'est le cas on cache les autres lignes
-            firstRowLinearLayout.setBackground(ListeLotReceptionActivity.this.getResources().getDrawable(R.drawable.background_detail_preparation_orange, null));
+            firstRowLinearLayout.setBackground(ListeLotReception2025Activity.this.getResources().getDrawable(R.drawable.background_detail_preparation_orange, null));
             lancerScanLinearLayout.setVisibility(View.VISIBLE);
-            QtePreparerTextView.setText(String.valueOf(phReliquat.getQteLivraison()));
+            //QtePreparerTextView.setText(String.valueOf(phReliquat.getQteLivraison()));
             QtePreparerTextView.setVisibility(View.VISIBLE);
-            QteDemandeeTextView.setTextColor(ListeLotReceptionActivity.this.getResources().getColor(R.color.noir, null));
-
-            lotReceptionAdapter.full = false;
+            QteDemandeeTextView.setTextColor(ListeLotReception2025Activity.this.getResources().getColor(R.color.noir, null));
         }
     }
 
-
     public void ClickNumberPicker(final int position)
     {
-        Context context = ListeLotReceptionActivity.this;
+        RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
+
+        Context context = ListeLotReception2025Activity.this;
         PH_Reliquat_Reception_Adapte.Lot courant = phReliquatReceptionAdapte.getlotList().get(position);
 
-        String title = lotReceptionAdapter.viewHolderList.get(position).lot.getText().toString();
+        String title = "";
+        if (viewHolder != null && viewHolder instanceof LotReceptionAdapter.LotViewHolder) {
+            title = ((LotReceptionAdapter.LotViewHolder) viewHolder).lot.getText().toString();
+        }
         String message = "Quantité placée : ";
 
         //gestion d'un stock déjà saisie
@@ -765,11 +743,13 @@ public class ListeLotReceptionActivity extends ServiceActivity {
             PH_ReliquatOpenHelper.mettreAJourUnPHReliquat(db, phReliquat);
             QtePreparerTextView.setText(String.valueOf(phReliquat.getQteLivraison()));
 
-            lotReceptionAdapter.viewHolderList.get(position).qteSaisie.setText(String.valueOf(qteApres));
+            if (viewHolder != null && viewHolder instanceof LotReceptionAdapter.LotViewHolder) {
+                ((LotReceptionAdapter.LotViewHolder) viewHolder).qteSaisie.setText(String.valueOf(qteApres));
+            }
             courant1.getZoneEtEmplacementList().get(0).setQuantite(qteApres);
             checkEtatReception();
             lotReceptionAdapter.notifyDataSetChanged();
-            InputMethodManager imm = (InputMethodManager) ListeLotReceptionActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) ListeLotReception2025Activity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
             dialog.dismiss();
         };
@@ -780,19 +760,9 @@ public class ListeLotReceptionActivity extends ServiceActivity {
     private void MAJListeLot()
     {
         int index = -1;
-        for(int i = 0; i < phReliquatReceptionAdapte.getlotList().size()-1; i++)
+        for(int i = 0; i < phReliquatReceptionAdapte.getlotList().size(); i++)
         {
             if(phReliquatReceptionAdapte.getlotList().get(i).getNumeroLot().contentEquals("row_ajouter"))
-            {
-                index = i;
-                break;
-            }
-        }
-        if(index != -1)
-            phReliquatReceptionAdapte.getlotList().remove(index);
-        for(int i = 0; i < phReliquatReceptionAdapte.getlotList().size()-1; i++)
-        {
-            if(phReliquatReceptionAdapte.getlotList().get(i).getNumeroLot().contentEquals("row_annuler"))
             {
                 index = i;
                 break;
@@ -828,44 +798,79 @@ public class ListeLotReceptionActivity extends ServiceActivity {
         return nbColis;
     }
 
-    @SuppressLint("SetTextI18n")
-    public void afficherAlerteConfirmationSuppression(Context context, LayoutInflater inflater) {
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
-        View layout = inflater.inflate(R.layout.alerte_confirmation_mail, null);
+    public void ajoutLotManuelReception()
+    {
+        Bundle clicBoutonAjouterManuellement_Bundle = ListeLotReception2025Activity.super.getBundle();
+        clicBoutonAjouterManuellement_Bundle.putInt("produitID", produit.getID_produit());
+        clicBoutonAjouterManuellement_Bundle.putInt("depotID", depot.getDepot_UID());
+        clicBoutonAjouterManuellement_Bundle.putInt("ReliquatID", phReliquat.getReliquat_UID());
+        clicBoutonAjouterManuellement_Bundle.putSerializable("phReliquatReceptionAdapte", phReliquatReceptionAdapte);
 
-        LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
-        LinearLayout buttonAnnuler = (LinearLayout) layout.findViewById(R.id.buttonAnnuler);
-        TextView messageTextView = (TextView) layout.findViewById(R.id.messageFin);
-        messageTextView.setText("Attention, tous les lots saisis seront supprimés, souhaitez-vous continuez ?");
-        builder.setView(layout);
-
-        final androidx.appcompat.app.AlertDialog alertDialog = builder.create();
-        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
-        alertDialog.show();
-
-        zoneok.setOnClickListener(v -> {
-            alertDialog.dismiss();
-            firstRowLinearLayout.setBackground(ListeLotReceptionActivity.this.getResources().getDrawable(R.drawable.background_detail_preparation_orange, null));
-
-            //reinitialisation de la liste des lots
-            phReliquatReceptionAdapte.setlotList(new ArrayList<>());
-            phReliquatReceptionAdapte.getlotList().add(phReliquatReceptionAdapte.new Lot("row_ajouter", "00/00/0000", "", ""));
-            phReliquatReceptionAdapte.getlotList().add(phReliquatReceptionAdapte.new Lot("row_annuler", "00/00/0000", "", ""));
-            phReliquat.setQteReliquat_X(phReliquat.getQteReliquat_X()+phReliquat.getQteLivraison());
-            phReliquat.setQteLivraison(0);
-            PH_ReliquatOpenHelper.mettreAJourUnPHReliquat(db, phReliquat);
-            QteDemandeeTextView.setTextColor(ListeLotReceptionActivity.this.getResources().getColor(R.color.noir, null));
-            lancerScanLinearLayout.setVisibility(View.VISIBLE);
-
-            lotReceptionAdapter.full = false;
-
-            lotReceptionAdapter = new Lot_ReceptionAdapter(ListeLotReceptionActivity.this, db, phReliquatReceptionAdapte.getlotList(), phReliquatReceptionAdapte.getPhReliquatUID(), numero_serie, false);
-            lotReceptionListView.setDivider(footer);
-            lotReceptionListView.setAdapter(lotReceptionAdapter);
-            invalidateOptionsMenu();
-        });
-
-        buttonAnnuler.setOnClickListener(v -> alertDialog.dismiss());
+        Intent clicBoutonAjouterManuellement_Intent = new Intent(ListeLotReception2025Activity.this, CreationLotManuelReceptionActivity.class);
+        clicBoutonAjouterManuellement_Intent.putExtras(clicBoutonAjouterManuellement_Bundle);
+        ListeLotReception2025Activity.this.startActivityForResult(clicBoutonAjouterManuellement_Intent, RETOUR_LOT);
     }
 
+    private void calculQuantiteReception()
+    {
+        List<PH_Reliquat> reliquatReceptionne = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, commandeSelectionne.getNumero(), produit.getID_produit());
+        int qte_receptionne = 0;
+        for(PH_Reliquat ph_reliquat : reliquatReceptionne)
+        {
+            qte_receptionne += ph_reliquat.getQteLivraison();
+        }
+        QtePreparerTextView.setText(String.valueOf(qte_receptionne));
+    }
+
+    private void gestionPhReliquatBDD(List<PH_Reliquat_Reception_Adapte.Lot> listeLot)
+    {
+        List<PH_Reliquat> listeReliquatAjouter = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, commandeSelectionne.getNumero(), phReliquat.getProduitID());
+        for(PH_Reliquat reliquatcourant : listeReliquatAjouter)
+        {
+            PH_ReliquatOpenHelper.supprimerUnPHReliquat(db, reliquatcourant);
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, reliquatcourant.getPhiMR4UUID(), reliquatcourant.getReliquat_UID(), DBOpenHelper.ActionsEAS.SUPPR);
+        }
+
+        PH_Reliquat ph_reliquat_base = PH_ReliquatOpenHelper.getPH_ReliquatById(db, phReliquatReceptionAdapte.getPhReliquatUID());
+        for(PH_Reliquat_Reception_Adapte.Lot lot : listeLot) {
+            for (PH_Reliquat_Reception_Adapte.ZoneEtEmplacement zoneEtEmplacement : lot.getZoneEtEmplacementList()) {
+                Random randomreliquat = new Random();
+                int reliquatId = randomreliquat.nextInt();
+                if (reliquatId > 0)
+                    reliquatId = reliquatId * -1;
+
+                PH_Reliquat phReliquatCourant = ph_reliquat_base;
+                phReliquatCourant.setReliquat_UID(reliquatId);
+                String numeroLot = lot.getNumeroLot();
+                String datePeremption = lot.getDatePeremption();
+                String zoneName = zoneEtEmplacement.getZoneName();
+                String emplacementName = zoneEtEmplacement.getEmplacementName();
+                String numero_Serie = lot.getNumero_serie();
+                int quantite = zoneEtEmplacement.getQuantite();
+
+                phReliquatCourant.setLot(numeroLot.trim());
+                phReliquatCourant.setSerie(numero_Serie.trim());
+                phReliquatCourant.setPeremptionDate(datePeremption.trim());
+
+                if (commandeSelectionne.getRef_Depot_Dest().contains("-PAD")) {
+                    phReliquatCourant.setZone("RECEPTION");
+                    phReliquatCourant.setEmplacement("RECEPTION-" + commandeSelectionne.getNumero() + "-" + commandeSelectionne.getPatient_identite());
+                } else {
+                    phReliquatCourant.setZone(zoneName.trim());
+                    phReliquatCourant.setEmplacement(emplacementName.trim());
+                }
+                phReliquatCourant.setQteLivraison(quantite);
+                phReliquatCourant.setBL_Numero("");
+                phReliquatCourant.setScanValue("");
+
+                long rowID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, phReliquatCourant);
+                if(rowID != -1)
+                {
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, phReliquatCourant.getPhiMR4UUID(), phReliquatCourant.getReliquat_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                }
+            }
+        }
+
+        ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotReception2025Activity.this, db, utilisateurConnecte, false);
+    }
 }

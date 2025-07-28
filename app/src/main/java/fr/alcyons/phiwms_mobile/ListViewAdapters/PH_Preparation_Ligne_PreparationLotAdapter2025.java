@@ -133,50 +133,52 @@ public class PH_Preparation_Ligne_PreparationLotAdapter2025 extends BaseAdapter 
         if (rowType == TYPE_ITEM) {
             PH_Preparation_Ligne_Preparation_Adapte ph_preparationLigne_adapte = (PH_Preparation_Ligne_Preparation_Adapte) getItem(position);
             PH_Preparation_Ligne ph_preparationLigne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, ph_preparationLigne_adapte.getPh_preparationLigneID());
-            viewHolder.designationProduit.setText(ph_preparationLigne.getProduitDesignation());
-            viewHolder.referenceProduit.setText(ph_preparationLigne.getProduitReference());
-            viewHolder.QteDemandee.setText(String.valueOf((int) ph_preparationLigne.getQte_RAL()));
-            int nbDetail = 0;
+            if(ph_preparationLigne != null)
+            {
+                viewHolder.designationProduit.setText(ph_preparationLigne.getProduitDesignation());
+                viewHolder.referenceProduit.setText(ph_preparationLigne.getProduitReference());
+                viewHolder.QteDemandee.setText(String.valueOf((int) ph_preparationLigne.getQte_RAL()));
+                int nbDetail = 0;
 
-            Produit produit = ProduitOpenHelper.getProduitByID(db, ph_preparationLigne.getProduitID());
-            String emplacementpardefaut = produit.getEmplacement_PUI_Defaut();
-            if (emplacementpardefaut == null || emplacementpardefaut.contentEquals("")) {
-                PH_Preparation preparation_courante = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparationLigne.getPreparationID());
-                Depot depot = DepotOpenHelper.getDepotParReference(db, preparation_courante.getDepotOrigineReference());
-                List<Stock_Lot_Emplacement_Light> stockLotEmplacementLights = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot);
-                if (stockLotEmplacementLights.size() > 0) {
-                    emplacementpardefaut = stockLotEmplacementLights.get(0).getEmplacement();
+                Produit produit = ProduitOpenHelper.getProduitByID(db, ph_preparationLigne.getProduitID());
+                String emplacementpardefaut = produit.getEmplacement_PUI_Defaut();
+                if (emplacementpardefaut == null || emplacementpardefaut.contentEquals("")) {
+                    PH_Preparation preparation_courante = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparationLigne.getPreparationID());
+                    Depot depot = DepotOpenHelper.getDepotParReference(db, preparation_courante.getDepotOrigineReference());
+                    List<Stock_Lot_Emplacement_Light> stockLotEmplacementLights = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot);
+                    if (stockLotEmplacementLights.size() > 0) {
+                        emplacementpardefaut = stockLotEmplacementLights.get(0).getEmplacement();
+                    } else {
+                        viewHolder.emplacementParDefaut.setVisibility(View.GONE);
+                    }
+                }
+
+                viewHolder.emplacementParDefaut.setText(emplacementpardefaut);
+
+                PH_Preparation phPreparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparationLigne.getPreparationID());
+                List<PH_Preparation_Ligne> listPhPreparationLigne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparationAndProduitNeg(db, phPreparation, ph_preparationLigne.getProduitID());
+                int qtePreparer = 0;
+                for(PH_Preparation_Ligne lignecourant : listPhPreparationLigne)
+                {
+                    qtePreparer = qtePreparer + lignecourant.getQte_preparer();
+                }
+
+                if (ph_preparationLigne.getQte_APreparer() != qtePreparer) {
+                    viewHolder.QtePreparer.setText(String.valueOf(qtePreparer));
+                    viewHolder.QtePreparer.setTextColor(context.getResources().getColor(R.color.orange2));
+                    viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
+                    viewHolder.emplacementParDefaut.setVisibility(View.GONE);
                 } else {
+                    viewHolder.QtePreparer.setText(String.valueOf(ph_preparationLigne.getQte_RAL()));
+                    viewHolder.QtePreparer.setTextColor(context.getResources().getColor(R.color.vert));
+                    viewHolder.QteDemandee.setVisibility(View.GONE);
+                    viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_vert));
                     viewHolder.emplacementParDefaut.setVisibility(View.GONE);
                 }
+
+                int nombreColisProduit = recupererNbColis(ph_preparationLigne.getProduitID(), ph_preparationLigne.getQte_APreparer());
+                viewHolder.colis.setText(String.valueOf(nombreColisProduit));
             }
-
-            viewHolder.emplacementParDefaut.setText(emplacementpardefaut);
-
-            PH_Preparation phPreparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparationLigne.getPreparationID());
-            List<PH_Preparation_Ligne> listPhPreparationLigne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparationAndProduitNeg(db, phPreparation, ph_preparationLigne.getProduitID());
-            int qtePreparer = 0;
-            for(PH_Preparation_Ligne lignecourant : listPhPreparationLigne)
-            {
-                qtePreparer = qtePreparer + lignecourant.getQte_preparer();
-            }
-
-            if (ph_preparationLigne.getQte_APreparer() != qtePreparer) {
-                viewHolder.QtePreparer.setText(String.valueOf(qtePreparer));
-                viewHolder.QtePreparer.setTextColor(context.getResources().getColor(R.color.orange2));
-                viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
-                viewHolder.emplacementParDefaut.setVisibility(View.GONE);
-            } else {
-                viewHolder.QtePreparer.setText(String.valueOf(ph_preparationLigne.getQte_RAL()));
-                viewHolder.QtePreparer.setTextColor(context.getResources().getColor(R.color.vert));
-                viewHolder.QteDemandee.setVisibility(View.GONE);
-                viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_vert));
-                viewHolder.emplacementParDefaut.setVisibility(View.GONE);
-            }
-
-            int nombreColisProduit = recupererNbColis(ph_preparationLigne.getProduitID(), ph_preparationLigne.getQte_APreparer());
-            viewHolder.colis.setText(String.valueOf(nombreColisProduit));
-
         } else if (rowType == TYPE_HEADER) {
             // Gestion des dates
             PH_Preparation_Ligne_Preparation_Adapte ph_preparationLigne_adapte = (PH_Preparation_Ligne_Preparation_Adapte) getItem(position);

@@ -51,15 +51,18 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Commande;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
+import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_Reception_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
@@ -380,7 +383,7 @@ public class DetailReceptionActivity extends ServiceActivity {
                         }
                     }
                     
-                    Intent detailReception_Intent = new Intent(DetailReceptionActivity.this, ListeLotReceptionActivity.class);
+                    Intent detailReception_Intent = new Intent(DetailReceptionActivity.this, ListeLotReception2025Activity.class);
                     Bundle detailReception_Bundle = DetailReceptionActivity.super.getBundle();
                     detailReception_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
                     detailReception_Bundle.putSerializable("phReliquatReceptionAdapte", phReliquatReceptionAdapteSelectionne);
@@ -401,7 +404,7 @@ public class DetailReceptionActivity extends ServiceActivity {
             ((TextView) findViewById(R.id.nomFournisseur)).setText(commandeSelectionne.getFournisseur());
             ((TextView) findViewById(R.id.numCommande)).setText("#" + commandeSelectionne.getNumero());
 
-            phReliquatList = PH_ReliquatOpenHelper.getPH_ReliquatByCommandeNumero(db, commandeSelectionne.getNumero());
+            phReliquatList = PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(db, commandeSelectionne.getNumero());
 
             phReliquatList.sort(Comparator.comparing(PH_Reliquat::getdesignationCourte));
 
@@ -413,10 +416,45 @@ public class DetailReceptionActivity extends ServiceActivity {
                 if(phReliquatCourant != null)
                 {
                     PH_Reliquat_Reception_Adapte phReliquatReceptionAdapte = new PH_Reliquat_Reception_Adapte(phReliquatCourant.getReliquat_UID(), phReliquatCourant.getSerie(), phReliquatCourant.isSuiviParSerieActif(), phReliquatCourant.isSerialiserReception());
+                    List<PH_Reliquat_Reception_Adapte.Lot> listeLot = new ArrayList<>();
 
+                    List<PH_Reliquat> listeReliquatReceptionner = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, commandeSelectionne.getNumero(), phReliquatCourant.getProduitID());
+
+                    if(!listeReliquatReceptionner.isEmpty())
+                    {
+                        for(PH_Reliquat phReliquat : listeReliquatReceptionner)
+                        {
+                            PH_Reliquat_Reception_Adapte.Lot lotCourant = phReliquatReceptionAdapte.new Lot(phReliquat.getLot(), phReliquat.getPeremptionDate(), phReliquat.getSerie(), "true");
+                            List<PH_Reliquat_Reception_Adapte.ZoneEtEmplacement> listeZoneEtEmplacement = new ArrayList<>();
+                            String zone_string = null;
+                            String emplacement_string = null;
+                            int zoneID = 0;
+                            int emplacementID = 0;
+                            if(commandeSelectionne.getRef_Depot_Dest().contains("-PAD"))
+                            {
+                                phReliquatCourant.setZone("RECEPTION");
+                                zone_string = "RECEPTION";
+                                emplacement_string = "RECEPTION-" + commandeSelectionne.getNumero() + "-" + commandeSelectionne.getPatient_identite();
+                            }
+                            else
+                            {
+                                Depot_Zone zone = ZoneOpenHelper.getZoneByDepotEtNom(db, depotPUI, phReliquat.getZone());
+                                Depot_Emplacement emplacement = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zone, phReliquat.getEmplacement());
+                                zone_string = zone.getZoneName();
+                                emplacement_string = emplacement.getAdressage();
+                                zoneID = zone.getZoneID();
+                                emplacementID = emplacement.get_UID();
+                            }
+
+                            listeZoneEtEmplacement.add(phReliquatReceptionAdapte.new ZoneEtEmplacement(zoneID, zone_string, emplacementID, emplacement_string, phReliquat.getQteLivraison()));
+                            lotCourant.setZoneEtEmplacementList(listeZoneEtEmplacement);
+                            listeLot.add(lotCourant);
+                        }
+                    }
+
+                    phReliquatReceptionAdapte.setlotList(listeLot);
                     phReliquatReceptionAdapteList.add(phReliquatReceptionAdapte);
                 }
-
             }
 
             //initi du tri
@@ -517,6 +555,7 @@ public class DetailReceptionActivity extends ServiceActivity {
                         phReliquatReceptionAdapte.setlotList((List<PH_Reliquat_Reception_Adapte.Lot>) data.getExtras().getSerializable("lotList"));
                         emplacement_precedent = (Depot_Emplacement) data.getExtras().getSerializable("EmplacementPrecedent");
                         produitPrecedent = (Produit) data.getExtras().getSerializable("ProduitPrecedent");
+                        enregistrerPhReliquat(phReliquatReceptionAdapte);
                         onResume();
                     }
                     break;
@@ -547,6 +586,10 @@ public class DetailReceptionActivity extends ServiceActivity {
                     emplacement_precedent = (Depot_Emplacement) Objects.requireNonNull(data.getExtras()).getSerializable("EmplacementPrecedent");
                     produitPrecedent = (Produit) data.getExtras().getSerializable("ProduitPrecedent");
                     phReliquatReceptionAdapteList = (List<PH_Reliquat_Reception_Adapte>) data.getExtras().getSerializable("reliquatAdapteList");
+                    for(PH_Reliquat_Reception_Adapte phReliquatReceptionAdapte : phReliquatReceptionAdapteList)
+                    {
+                        enregistrerPhReliquat(phReliquatReceptionAdapte);
+                    }
                     onResume();
                     break;
             }
@@ -914,5 +957,71 @@ public class DetailReceptionActivity extends ServiceActivity {
             }
             return "executed";
         }
+    }
+
+    private void enregistrerPhReliquat(PH_Reliquat_Reception_Adapte reliquatReceptionAdapte)
+    {
+        listeProduitRAL = new ArrayList<>();
+        List<PH_Reliquat> listeReliquatAjouter = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumero(db, commandeSelectionne.getNumero());
+        for(PH_Reliquat reliquatcourant : listeReliquatAjouter)
+        {
+            PH_ReliquatOpenHelper.supprimerUnPHReliquat(db, reliquatcourant);
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, reliquatcourant.getPhiMR4UUID(), reliquatcourant.getReliquat_UID(), DBOpenHelper.ActionsEAS.SUPPR);
+        }
+
+        PH_Reliquat ph_reliquat_base = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquatReceptionAdapte.getPhReliquatUID());
+        for(PH_Reliquat_Reception_Adapte.Lot lot : reliquatReceptionAdapte.getlotList()) {
+            for (PH_Reliquat_Reception_Adapte.ZoneEtEmplacement zoneEtEmplacement : lot.getZoneEtEmplacementList()) {
+                Random randomreliquat = new Random();
+                int reliquatId = randomreliquat.nextInt();
+                if (reliquatId > 0)
+                    reliquatId = reliquatId * -1;
+
+                PH_Reliquat phReliquatCourant = ph_reliquat_base;
+                phReliquatCourant.setReliquat_UID(reliquatId);
+                String numeroLot = lot.getNumeroLot();
+                String datePeremption = lot.getDatePeremption();
+                String zoneName = zoneEtEmplacement.getZoneName();
+                String emplacementName = zoneEtEmplacement.getEmplacementName();
+                String numero_Serie = lot.getNumero_serie();
+                int quantite = zoneEtEmplacement.getQuantite();
+
+                if (quantite == 0) {
+                    erreur = "Quantité";
+                    listeProduitRAL.add(phReliquatCourant.getDesignationCourte() + " - " + phReliquatCourant.getQteCommande());
+                }
+
+                if (numeroLot.contentEquals("")) {
+                    erreur = "Lot";
+                    int index = listeProduitRAL.indexOf(phReliquatCourant.getDesignationCourte() + " - " + phReliquatCourant.getQteCommande());
+                    if (index == -1)
+                        listeProduitRAL.add(phReliquatCourant.getDesignationCourte() + " - " + phReliquatCourant.getQteCommande());
+                }
+
+                phReliquatCourant.setLot(numeroLot.trim());
+                phReliquatCourant.setSerie(numero_Serie.trim());
+                phReliquatCourant.setPeremptionDate(datePeremption.trim());
+
+                if (commandeSelectionne.getRef_Depot_Dest().contains("-PAD")) {
+                    phReliquatCourant.setZone("RECEPTION");
+                    phReliquatCourant.setEmplacement("RECEPTION-" + commandeSelectionne.getNumero() + "-" + commandeSelectionne.getPatient_identite());
+                } else {
+                    phReliquatCourant.setZone(zoneName.trim());
+                    phReliquatCourant.setEmplacement(emplacementName.trim());
+                }
+                phReliquatCourant.setQteLivraison(quantite);
+                phReliquatCourant.setBL_Numero(bonLivraison);
+                phReliquatCourant.setScanValue("");
+
+                long rowID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, phReliquatCourant);
+                if(rowID != -1)
+                {
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, phReliquatCourant.getPhiMR4UUID(), phReliquatCourant.getReliquat_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                }
+            }
+        }
+
+
+        ElementASynchroniserOpenHelper.toutSynchroniser(DetailReceptionActivity.this, db, utilisateurConnecte, false);
     }
 }

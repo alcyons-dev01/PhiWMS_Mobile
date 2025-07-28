@@ -111,6 +111,9 @@ public class PH_Reliquat implements Serializable, Comparable {
         this.SerialiserReception = OutilsGestionClasses.recupererBooleen(jsonObject, "SerialiserReception");
         this.Serie = jsonObject.optString("Serie");
         this.BL_Numero = jsonObject.optString("BL_Numero");
+        this.lot = jsonObject.optString("lot");
+        this.Zone = jsonObject.optString("Zone");
+        this.Emplacement = jsonObject.optString("Emplacement");
     }
 
     public PH_Reliquat(Cursor cursor) {

@@ -1333,7 +1333,7 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
         String validerPar_VT = "";
         if(!ph_preparation.getPreparateur().isEmpty())
         {
-            String[] tabPreparateur = ph_preparation.getPreparateur().split("(");
+            String[] tabPreparateur = ph_preparation.getPreparateur().split("\\(");
             if(tabPreparateur.length > 1)
             {
                 preparerPar_VT = tabPreparateur[0];
@@ -1407,7 +1407,7 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
         symbole_JO.put("scelle", numeroScelle);
         symbole_JO.put("ambiante", tempAmbiante_VS);
         symbole_JO.put("fragile", fragile_VS);
-        symbole_JO.put("abriLumiere", abriLumiere_VS);
+        symbole_JO.put("abrilumiere", abriLumiere_VS);
         symbole_JO.put("refrigere", refrigere_JO);
         etiquette_v1_JO.put("symboles", symbole_JO);
 
@@ -1443,7 +1443,14 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
         },
                 error -> {
                     Log.e("Etiquette Volley", error.toString());
-                    Alerte.afficherAlerte(DetailPreparation2025Activity.this, "Erreur HTTP", "Erreur lors de l\'impression de l\'étiquette", "alerte");
+                    if(!error.toString().contains("\"isOk\":true"))
+                    {
+                        Alerte.afficherAlerte(DetailPreparation2025Activity.this, "Erreur HTTP", "Erreur lors de l\'impression de l\'étiquette : "+error.toString(), "alerte");
+                    }
+                    else
+                    {
+                        Toast.makeText(DetailPreparation2025Activity.this, "Etiquette envoyée", Toast.LENGTH_SHORT).show();
+                    }
                     Intent retourListeIntent = new Intent(DetailPreparation2025Activity.this, ServicePreparationPufActivity.class);
                     if(ph_preparation_Selectionne.getDepotDestinataireReference().contains("-PAD-"))
                         retourListeIntent = new Intent(DetailPreparation2025Activity.this, ServicePreparationPadActivity.class);

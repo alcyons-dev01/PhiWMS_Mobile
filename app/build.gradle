@@ -12,10 +12,10 @@ android {
 
     defaultConfig {
         applicationId "fr.alcyons.phiwms_mobile"
-        minSdk 29
+        minSdk 28
         targetSdk 34
         versionCode getVersionCode()
-        versionName "2.07.25"
+        versionName "2.07.25.06"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true

@@ -140,6 +140,12 @@
         android:configChanges="orientation|screenSize"/>
 
     <activity
+        android:name="fr.alcyons.phiwms_mobile.Reception.ListeLotReception2025Activity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
         android:name="fr.alcyons.phiwms_mobile.Reception.DetailReceptionActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"

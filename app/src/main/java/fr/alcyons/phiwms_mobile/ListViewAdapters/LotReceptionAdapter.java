@@ -1,0 +1,299 @@
+package fr.alcyons.phiwms_mobile.ListViewAdapters;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_Preparation_Adapte;
+import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
+import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_Reception_Adapte;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparation2025Activity;
+import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.Reception.ListeLotReception2025Activity;
+import fr.alcyons.phiwms_mobile.Reception.ListeLotReceptionActivity;
+
+public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapter.LotViewHolder> {
+
+    public Context context;
+    private List<PH_Reliquat_Reception_Adapte.Lot> lots;
+    private LotAdapter.OnDeleteClickListener deleteClickListener;
+
+    public interface OnDeleteClickListener {
+        void onDeleteClick(int position);
+    }
+    public int swipedPosition = -1;
+
+    public LotReceptionAdapter(List<PH_Reliquat_Reception_Adapte.Lot> lots, LotAdapter.OnDeleteClickListener listener, Context context) {
+        this.lots = lots;
+        this.deleteClickListener = listener;
+        this.context = context;
+    }
+
+    @NonNull
+    @Override
+    public LotReceptionAdapter.LotViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_lot_reception, parent, false);
+        return new LotReceptionAdapter.LotViewHolder(view, this);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull LotReceptionAdapter.LotViewHolder viewHolder, int position) {
+        PH_Reliquat_Reception_Adapte.Lot lot = (PH_Reliquat_Reception_Adapte.Lot) lots.get(position);
+
+        if(lot.getNumeroLot().contentEquals("row_ajouter"))
+        {
+            viewHolder.layout_ajouter_lot.setVisibility(VISIBLE);
+            viewHolder.layout_ajouter_lot.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((ListeLotReception2025Activity) context).ajoutLotManuelReception();
+                }
+            });
+        }
+        else
+        {
+            //on cache tous les layout
+            viewHolder.layout_ajouter_lot.setVisibility(GONE);
+            viewHolder.layoutPrincipal.setVisibility(GONE);
+
+            if (lot != null) {
+                viewHolder.layoutPrincipal.setVisibility(VISIBLE);
+                viewHolder.nomEmplacement.setText(lot.getZoneEtEmplacementList().get(0).getEmplacementName());
+                viewHolder.lot.setText(lot.getNumeroLot());
+                viewHolder.qteSaisie.setText(String.valueOf(lot.getZoneEtEmplacementList().get(0).getQuantite()));
+                viewHolder.qteSaisie.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((ListeLotReception2025Activity) context).ClickNumberPicker(viewHolder.getAdapterPosition());
+                    }
+                });
+
+                Date peremption_Date = null;
+
+                DateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
+                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                try {
+                    String datePeremption = lot.getDatePeremption();
+
+                    if (!datePeremption.contentEquals("0000-00-00")  && !datePeremption.contentEquals("")) {
+                        peremption_Date = dateDecodeur.parse(datePeremption);
+                        viewHolder.datePeremption.setText(dateFormat.format(peremption_Date));
+                    } else {
+                        viewHolder.datePeremption.setText("00/00/0000");
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                viewHolder.setDatePeremptionColor(peremption_Date);
+
+
+                if(Integer.parseInt(viewHolder.qteSaisie.getText().toString()) == 0)
+                {
+                    viewHolder.layout_qte_saisie_lot_preparation.setBackground(context.getResources().getDrawable(R.drawable.background_qte_lot_phpreparationligne));
+                    viewHolder.layoutPrincipal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
+                    viewHolder.layout_emplacement_lot.setBackground(context.getResources().getDrawable(R.drawable.background_preparation_emplacement_orange));
+                }
+                else
+                {
+                    viewHolder.layout_qte_saisie_lot_preparation.setBackground(context.getResources().getDrawable(R.drawable.background_qte_lot_phpreparationligne_valider));
+                    viewHolder.layoutPrincipal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_vert));
+                    viewHolder.layout_emplacement_lot.setBackground(context.getResources().getDrawable(R.drawable.background_preparation_emplacement_vert));
+                }
+            }
+            viewHolder.btnDelete.setOnClickListener(v -> {
+                deleteClickListener.onDeleteClick(viewHolder.getAdapterPosition());
+
+                viewHolder.contentLayout.animate()
+                        .translationX(0f)
+                        .setDuration(200)
+                        .start();
+
+                // Réinitialiser les états swipe
+                viewHolder.isSwipedOpen = false;
+                viewHolder.btnDelete.setClickable(false);
+                swipedPosition = -1;
+            });
+
+            if (lot.getZoneEtEmplacementList().get(0).getQuantite() == 0) {
+                viewHolder.layoutPrincipal.setClickable(true);
+                viewHolder.layoutPrincipal.setOnClickListener(v -> {
+                    ((ListeLotPreparation2025Activity) context).ClickLigneLot(position);
+                });
+                viewHolder.contentLayout.setOnClickListener(null);
+
+            } else {
+                viewHolder.layoutPrincipal.setOnClickListener(null); // désactive le clic
+                viewHolder.layoutPrincipal.setClickable(false);
+                viewHolder.contentLayout.setOnClickListener(v -> {
+                    if (viewHolder.contentLayout.getTranslationX() > 0f) {
+                        // Recentrer la ligne
+                        viewHolder.contentLayout.animate().translationX(0f).setDuration(200).start();
+                        viewHolder.btnDelete.setClickable(false);
+                        viewHolder.isSwipedOpen = false;
+                        swipedPosition = -1;
+                    }
+                });
+            }
+        }
+
+        if (position == swipedPosition) {
+            viewHolder.contentLayout.setTranslationX(200f);
+            viewHolder.btnDelete.setClickable(true);
+            viewHolder.isSwipedOpen = true;
+        } else {
+            viewHolder.contentLayout.setTranslationX(0);
+            viewHolder.btnDelete.setClickable(false);
+            viewHolder.isSwipedOpen = false;
+        }
+        viewHolder.enableSwipeIfQteNotZero();
+    }
+
+    @Override
+    public int getItemCount() {
+        return lots.size();
+    }
+
+    public void resetItem(int position) {
+        notifyItemChanged(position);
+    }
+
+    public class LotViewHolder extends RecyclerView.ViewHolder {
+        public TextView nomEmplacement;
+        public TextView lot;
+        public TextView datePeremption;
+        public TextView qteSaisie;
+        public LinearLayout layout_ajouter_lot;
+        public LinearLayout layoutPrincipal;
+        public LinearLayout layout_qte_saisie_lot_preparation;
+        public LinearLayout layout_emplacement_lot;
+        public LinearLayout deleteLayout;
+        public LinearLayout zoneSerie;
+        public ImageView separateur;
+        public ImageView btnDelete;
+        public RelativeLayout contentLayout;
+        public boolean isSwipedOpen = false;
+
+        private float downX;
+        private final int SWIPE_THRESHOLD = 100;
+        private final LotReceptionAdapter adapter;
+
+        public LotViewHolder(@NonNull View itemView, LotReceptionAdapter adapter) {
+            super(itemView);
+            this.adapter = adapter;
+
+            btnDelete = itemView.findViewById(R.id.btn_delete);
+            contentLayout = itemView.findViewById(R.id.contentLayout);
+            nomEmplacement = itemView.findViewById(R.id.nomEmplacement);
+            lot = itemView.findViewById(R.id.lot);
+            datePeremption = itemView.findViewById(R.id.datePeremption);
+            qteSaisie = itemView.findViewById(R.id.qteSaisie);
+            layoutPrincipal = itemView.findViewById(R.id.layoutPrincipal);
+            layout_qte_saisie_lot_preparation = itemView.findViewById(R.id.layout_qte_saisie_lot_preparation);
+            layout_ajouter_lot = itemView.findViewById(R.id.layout_ajouter_lot);
+            layout_emplacement_lot = itemView.findViewById(R.id.layout_emplacement_lot);
+            deleteLayout = itemView.findViewById(R.id.deleteLayout);
+            separateur = itemView.findViewById(R.id.separateur);
+            zoneSerie = itemView.findViewById(R.id.zoneSerie);
+        }
+
+        public void enableSwipeIfQteNotZero() {
+            contentLayout.setOnTouchListener(null); // désactive tout swipe par défaut
+
+            PH_Reliquat_Reception_Adapte.Lot courant = adapter.getLotAt(getAdapterPosition());
+            if(courant != null && !courant.getNumeroLot().contentEquals("row_ajouter"))
+            {
+                int qte = courant.getZoneEtEmplacementList().get(0).getQuantite();
+
+                if (qte > 0) {
+                    setupSwipeTouch();
+                }
+            }
+        }
+
+        @SuppressLint("ClickableViewAccessibility")
+        private void setupSwipeTouch() {
+            contentLayout.setClickable(true);
+            contentLayout.setFocusable(true);
+            contentLayout.setOnTouchListener((v, event) -> {
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        downX = event.getX();
+                        return true;
+
+                    case MotionEvent.ACTION_MOVE:
+                        float deltaX = event.getX() - downX;
+                        if (deltaX >= 0 && deltaX <= 200) {
+                            contentLayout.setTranslationX(deltaX);
+                        }
+                        return true;
+
+                    case MotionEvent.ACTION_UP:
+                        float totalDeltaX = event.getX() - downX;
+                        if (totalDeltaX > SWIPE_THRESHOLD) {
+                            contentLayout.animate().translationX(200f).setDuration(200).start();
+                            isSwipedOpen = true;
+                            btnDelete.setClickable(true);
+                            adapter.swipedPosition = getAdapterPosition();
+                            adapter.notifyDataSetChanged();
+                        } else {
+                            contentLayout.animate().translationX(0).setDuration(200).start();
+                            isSwipedOpen = false;
+                            btnDelete.setClickable(false);
+                        }
+                        return true;
+                }
+                return false;
+            });
+        }
+
+        public void setDatePeremptionColor(Date date) {
+            /*if (date != null) {
+
+                Date dateDuJour = new Date();
+                long diff = dateDuJour.getTime() - date.getTime();
+                int delai = (int) (diff / (1000 * 60 * 60 * 24));
+
+                int delai30jours = -30;
+                int delai60jours = -60;
+
+                if (delai >= delai30jours) {
+                    dateExpiration.setTextColor(context.getResources().getColor(R.color.rouge2));
+                } else if (delai >= delai60jours) {
+                    dateExpiration.setTextColor(context.getResources().getColor(R.color.orange2));
+                } else {
+                    dateExpiration.setTextColor(context.getResources().getColor(R.color.vert));
+                }
+            } else {
+                dateExpiration.setTextColor(Color.BLACK);
+            }*/
+        }
+    }
+
+    public PH_Reliquat_Reception_Adapte.Lot getLotAt(int position) {
+        return lots.get(position);
+    }
+}
+

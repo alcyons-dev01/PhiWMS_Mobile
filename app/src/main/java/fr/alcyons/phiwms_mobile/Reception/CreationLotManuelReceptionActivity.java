@@ -159,63 +159,86 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
             newFragment.show((CreationLotManuelReceptionActivity.this).getSupportFragmentManager(), "timePicker");
         });
 
-        //affichage de la liste des zones
-        zoneTextView.setOnClickListener(view -> {
-            depotZoneList = new ArrayList<>();
-            depotZoneList = ZoneOpenHelper.getZonesEtEmplacementsParDepot(db, depotSelectionne);
+        if(!commandecourante.getRef_Depot_Dest().contains("-PAD"))
+        {
+            //affichage de la liste des zones
+            zoneTextView.setOnClickListener(view -> {
+                depotZoneList = new ArrayList<>();
+                depotZoneList = ZoneOpenHelper.getZonesEtEmplacementsParDepot(db, depotSelectionne);
 
-            if (!depotZoneList.isEmpty()) {
-                Intent newIntent = new Intent(CreationLotManuelReceptionActivity.this, ListeZoneCreationActivity.class);
-                Bundle extras = CreationLotManuelReceptionActivity.super.getBundle();
-                extras.putInt("depotID", depotSelectionne.getDepot_UID());
-                newIntent.putExtras(extras);
-                CreationLotManuelReceptionActivity.this.startActivityForResult(newIntent, RESULT_ZONE);
-            }
+                if (!depotZoneList.isEmpty()) {
+                    Intent newIntent = new Intent(CreationLotManuelReceptionActivity.this, ListeZoneCreationActivity.class);
+                    Bundle extras = CreationLotManuelReceptionActivity.super.getBundle();
+                    extras.putInt("depotID", depotSelectionne.getDepot_UID());
+                    newIntent.putExtras(extras);
+                    CreationLotManuelReceptionActivity.this.startActivityForResult(newIntent, RESULT_ZONE);
+                }
 
-        });
+            });
 
-        //affichage des emplacements
-        emplacementTextView.setOnClickListener(view -> {
-            emplacementList = new ArrayList<>();
-            if (zoneSelectionner != null) {
-                emplacementList = EmplacementOpenHelper.getEmplacementsParZone(db, zoneSelectionner);
-            }
-            if (!emplacementList.isEmpty()) {
-                Intent newIntent = new Intent(CreationLotManuelReceptionActivity.this, ListeEmplacementCreationActivity.class);
-                Bundle extras = CreationLotManuelReceptionActivity.super.getBundle();
-                extras.putInt("zoneid", zoneSelectionner.getZoneID());
-                newIntent.putExtras(extras);
-                CreationLotManuelReceptionActivity.this.startActivityForResult(newIntent, RETOUR_CODE_EMPLACEMENT);
-            }
+            //affichage des emplacements
+            emplacementTextView.setOnClickListener(view -> {
+                emplacementList = new ArrayList<>();
+                if (zoneSelectionner != null) {
+                    emplacementList = EmplacementOpenHelper.getEmplacementsParZone(db, zoneSelectionner);
+                }
+                if (!emplacementList.isEmpty()) {
+                    Intent newIntent = new Intent(CreationLotManuelReceptionActivity.this, ListeEmplacementCreationActivity.class);
+                    Bundle extras = CreationLotManuelReceptionActivity.super.getBundle();
+                    extras.putInt("zoneid", zoneSelectionner.getZoneID());
+                    newIntent.putExtras(extras);
+                    CreationLotManuelReceptionActivity.this.startActivityForResult(newIntent, RETOUR_CODE_EMPLACEMENT);
+                }
 
-        });
+            });
 
-        //clic sur le datamatrix de la zone et de l'emplacement
-        datamatrix1ImageView.setOnClickListener(view -> {
-            if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
-            {
-                Intent detailProduitPlanDePlacementIntent = getDetailProduitPlanDePlacementIntent();
-                CreationLotManuelReceptionActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT);
-            }
-            else
-            {
-                if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
+            //clic sur le datamatrix de la zone et de l'emplacement
+            datamatrix1ImageView.setOnClickListener(view -> {
+                if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
                 {
-                    Bundle detailProduitPlanDePlacementBundle = CreationLotManuelReceptionActivity.super.getBundle();
-                    detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un emplacement");
-                    detailProduitPlanDePlacementBundle.putString("contexte", String.valueOf(R.string.scannerContexteEmplacement));
-                    detailProduitPlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
-                    Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotManuelReceptionActivity.this, BarcodeCaptureActivity.class);
-                    detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
+                    Intent detailProduitPlanDePlacementIntent = getDetailProduitPlanDePlacementIntent();
                     CreationLotManuelReceptionActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT);
                 }
                 else
                 {
-                    Intent detailProduitPlanDePlacementIntent = getProduitPlanDePlacementIntent();
-                    CreationLotManuelReceptionActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT);
+                    if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
+                    {
+                        Bundle detailProduitPlanDePlacementBundle = CreationLotManuelReceptionActivity.super.getBundle();
+                        detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un emplacement");
+                        detailProduitPlanDePlacementBundle.putString("contexte", String.valueOf(R.string.scannerContexteEmplacement));
+                        detailProduitPlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
+                        Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotManuelReceptionActivity.this, BarcodeCaptureActivity.class);
+                        detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
+                        CreationLotManuelReceptionActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT);
+                    }
+                    else
+                    {
+                        Intent detailProduitPlanDePlacementIntent = getProduitPlanDePlacementIntent();
+                        CreationLotManuelReceptionActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT);
+                    }
                 }
+            });
+
+            if (depotSelectionne.getStructure().contains("PAD")) {
+                zoneTextView.setText(produitSelectionne.getZone_PAD_Defaut());
+                emplacementTextView.setText(produitSelectionne.getEmplacement_PAD_Defaut());
+                zoneSelectionner = ZoneOpenHelper.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_PAD_Defaut());
+            } else if (depotSelectionne.getStructure().contains("PUF")) {
+                zoneTextView.setText(produitSelectionne.getZone_UF_Defaut());
+                emplacementTextView.setText(produitSelectionne.getEmplacement_UF_Defaut());
+                zoneSelectionner = ZoneOpenHelper.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_UF_Defaut());
+            } else {
+                zoneTextView.setText(produitSelectionne.getZone_PUI_Defaut());
+                emplacementTextView.setText(produitSelectionne.getEmplacement_PUI_Defaut());
+                zoneSelectionner = ZoneOpenHelper.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_PUI_Defaut());
             }
-        });
+        }
+        else
+        {
+            ((LinearLayout) findViewById(R.id.zonePlacementLot)).setVisibility(View.GONE);
+            zoneTextView.setText("RECEPTION");
+            emplacementTextView.setText("RECEPTION-" + commandecourante.getNumero() + "-" + commandecourante.getPatient_identite());
+        }
 
         //clic sur le datamtrix permettant de récupérer le numéro de lot et la date de péremption
         datamatrix2ImageView.setOnClickListener(view -> {
@@ -269,20 +292,6 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
         // Hydratation des objets graphiques
         ((TextView) findViewById(R.id.nomProduit)).setText(produitSelectionne.getDesignation_interne());
         referenceProduit.setText(produitSelectionne.getRef_fourni());
-        if (depotSelectionne.getStructure().contains("PAD")) {
-            zoneTextView.setText(produitSelectionne.getZone_PAD_Defaut());
-            emplacementTextView.setText(produitSelectionne.getEmplacement_PAD_Defaut());
-            zoneSelectionner = ZoneOpenHelper.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_PAD_Defaut());
-        } else if (depotSelectionne.getStructure().contains("PUF")) {
-            zoneTextView.setText(produitSelectionne.getZone_UF_Defaut());
-            emplacementTextView.setText(produitSelectionne.getEmplacement_UF_Defaut());
-            zoneSelectionner = ZoneOpenHelper.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_UF_Defaut());
-        } else {
-            zoneTextView.setText(produitSelectionne.getZone_PUI_Defaut());
-            emplacementTextView.setText(produitSelectionne.getEmplacement_PUI_Defaut());
-            zoneSelectionner = ZoneOpenHelper.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_PUI_Defaut());
-        }
-
         String numLot = intent.getExtras().getString("numLot");
         if (numLot != null) {
             lotEditText.setText(numLot);

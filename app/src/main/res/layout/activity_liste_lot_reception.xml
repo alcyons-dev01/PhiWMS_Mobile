@@ -166,16 +166,13 @@
 
         </LinearLayout>
 
-        <ListView
+        <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/liste_view_reception"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/separateur"
             android:layout_below="@+id/firstRow"
             android:descendantFocusability="afterDescendants"
-            android:paddingTop="5dp">
-
-        </ListView>
+            android:paddingTop="5dp"/>
 
 
     </RelativeLayout>

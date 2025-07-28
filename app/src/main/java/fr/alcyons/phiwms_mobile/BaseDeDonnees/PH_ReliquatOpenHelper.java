@@ -197,6 +197,21 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
         return phReliquat;
     }
 
+    public static PH_Reliquat getPH_ReliquatByUnIdProduitetNumeroEtLotEtPeremptionEtZoneEtEmplacement(SQLiteDatabase db, Integer id_produit, String NumeroCommande, String numLot, String datePeremption, String zone, String emplacement) {
+        PH_Reliquat phReliquat = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_RELIQUAT + " WHERE " + Constantes.CLE_COL_PRODUITID_PH_RELIQUAT + "=? AND "+Constantes.CLE_COL_COMMANDENUMERO_PH_RELIQUAT+"=? AND "+Constantes.CLE_COL_LOT_PH_RELIQUAT+"=? AND "+Constantes.CLE_COL_PEREMPTIONDATE_PH_RELIQUAT +"=? AND "+Constantes.CLE_COL_ZONE_PH_RELIQUAT+"=? AND "+Constantes.CLE_COL_EMPLACEMENT_PH_RELIQUAT+"=?" , new String[]{String.valueOf(id_produit), NumeroCommande, numLot, datePeremption, zone, emplacement});
+
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+            phReliquat = new PH_Reliquat(cursor);
+        }
+        cursor.close();
+        cursor = null;
+
+        return phReliquat;
+    }
+
     public static List<PH_Reliquat> getPH_ReliquatByCommandeNumero(SQLiteDatabase db, String num) {
         List<PH_Reliquat> phReliquatList = new ArrayList<>();
 
@@ -206,6 +221,57 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
             PH_Reliquat phReliquat = new PH_Reliquat(cursor);
 
             if (phReliquat.getcommandeNumero().contentEquals(num)) {
+                phReliquatList.add(phReliquat);
+            }
+        }
+        cursor.close();
+        cursor = null;
+        return phReliquatList;
+    }
+
+    public static List<PH_Reliquat> getPH_ReliquatBaseByCommandeNumero(SQLiteDatabase db, String num) {
+        List<PH_Reliquat> phReliquatList = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_RELIQUAT, null);
+
+        while (cursor.moveToNext()) {
+            PH_Reliquat phReliquat = new PH_Reliquat(cursor);
+
+            if (phReliquat.getcommandeNumero().contentEquals(num) && phReliquat.getReliquat_UID() > 0) {
+                phReliquatList.add(phReliquat);
+            }
+        }
+        cursor.close();
+        cursor = null;
+        return phReliquatList;
+    }
+
+    public static List<PH_Reliquat> getPH_ReliquatNegByCommandeNumero(SQLiteDatabase db, String num) {
+        List<PH_Reliquat> phReliquatList = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_RELIQUAT, null);
+
+        while (cursor.moveToNext()) {
+            PH_Reliquat phReliquat = new PH_Reliquat(cursor);
+
+            if (phReliquat.getcommandeNumero().contentEquals(num) && phReliquat.getReliquat_UID() < 0) {
+                phReliquatList.add(phReliquat);
+            }
+        }
+        cursor.close();
+        cursor = null;
+        return phReliquatList;
+    }
+
+    public static List<PH_Reliquat> getPH_ReliquatNegByCommandeNumeroAndProduit(SQLiteDatabase db, String num, int produitId) {
+        List<PH_Reliquat> phReliquatList = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_RELIQUAT, null);
+
+        while (cursor.moveToNext()) {
+            PH_Reliquat phReliquat = new PH_Reliquat(cursor);
+
+            if (phReliquat.getcommandeNumero().contentEquals(num) && phReliquat.getReliquat_UID() < 0 && phReliquat.getProduitID() == produitId) {
                 phReliquatList.add(phReliquat);
             }
         }

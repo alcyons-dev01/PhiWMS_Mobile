@@ -107,6 +107,7 @@
             android:text="LOT AJOUTER"/>
 
         <LinearLayout
+            android:id="@+id/zonePlacementLot"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:weightSum="3"
