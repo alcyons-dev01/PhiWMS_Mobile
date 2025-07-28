@@ -346,7 +346,6 @@ public class ListeLotReception2025Activity  extends ServiceActivity {
             quantiteReliquat = phReliquat.getQteCommande() - phReliquat.getQteLivraison();
 
             lotReceptionAdapter = new LotReceptionAdapter(phReliquatReceptionAdapte.getlotList(), position -> {
-                Toast.makeText(this, "Supprimer " + phReliquatReceptionAdapte.getlotList().get(position), Toast.LENGTH_SHORT).show();
                 RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
                 if (viewHolder != null && viewHolder instanceof LotReceptionAdapter.LotViewHolder) {
                     String lot = phReliquatReceptionAdapte.getlotList().get(position).getNumeroLot();
@@ -604,13 +603,46 @@ public class ListeLotReception2025Activity  extends ServiceActivity {
 
                     MAJListeLot();
 
-                    PH_Reliquat_Reception_Adapte.Lot nouveau_lot = phReliquatReceptionAdapte.new Lot(numLot, datePeremption, "", "");
+                    PH_Reliquat_Reception_Adapte.Lot nouveau_lot = null;
 
-                    PH_Reliquat_Reception_Adapte.ZoneEtEmplacement zoneEtEmplacement = phReliquatReceptionAdapte.new ZoneEtEmplacement(0, Zone, 0, Emplacement, (int)Qte);
+                    for(PH_Reliquat_Reception_Adapte.Lot lot : phReliquatReceptionAdapte.getlotList())
+                    {
+                        if(lot.getNumeroLot().contentEquals(numLot) && lot.getDatePeremption().contentEquals(datePeremption))
+                            nouveau_lot = lot;
+                    }
+
+                    boolean ajoutLot = false;
+                    if(nouveau_lot == null)
+                    {
+                        nouveau_lot = phReliquatReceptionAdapte.new Lot(numLot, datePeremption, "", "");
+                        ajoutLot = true;
+                    }
+
+                    PH_Reliquat_Reception_Adapte.ZoneEtEmplacement zoneEtEmplacement = null;
+
+                    for(PH_Reliquat_Reception_Adapte.ZoneEtEmplacement zoneEtEmplacementCourant : nouveau_lot.getZoneEtEmplacementList())
+                    {
+                        if(zoneEtEmplacementCourant.getEmplacementName().contentEquals(Emplacement) && zoneEtEmplacementCourant.getZoneName().contentEquals(Zone))
+                        {
+                            zoneEtEmplacement = zoneEtEmplacementCourant;
+                            zoneEtEmplacementCourant.setQuantite(zoneEtEmplacement.getQuantite() + (int)Qte);
+                        }
+                    }
+
+                    boolean ajoutZone = false;
+                    if(zoneEtEmplacement == null)
+                    {
+                        zoneEtEmplacement = phReliquatReceptionAdapte.new ZoneEtEmplacement(0, Zone, 0, Emplacement, (int)Qte);
+                        ajoutZone = true;
+                        nouveau_lot = phReliquatReceptionAdapte.new Lot(numLot, datePeremption, "", "");
+                        ajoutLot = true;
+                    }
 
                     // Insertion dans les objets
-                    nouveau_lot.getZoneEtEmplacementList().add(zoneEtEmplacement);
-                    phReliquatReceptionAdapte.getlotList().add(nouveau_lot);
+                    if(ajoutZone)
+                        nouveau_lot.getZoneEtEmplacementList().add(zoneEtEmplacement);
+                    if(ajoutLot)
+                        phReliquatReceptionAdapte.getlotList().add(nouveau_lot);
                     phReliquatReceptionAdapte.getlotList().add(phReliquatReceptionAdapte.new Lot("row_ajouter", "00/00/0000", "", ""));
                     gestionPhReliquatBDD(phReliquatReceptionAdapte.getlotList());
                     calculQuantiteReception();

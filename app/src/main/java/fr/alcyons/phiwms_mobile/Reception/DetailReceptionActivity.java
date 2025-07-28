@@ -227,7 +227,28 @@ public class DetailReceptionActivity extends ServiceActivity {
 
 
     public void onMenuSaveClick() {
-        afficherAlerteConfirmation(DetailReceptionActivity.this, LayoutInflater.from(DetailReceptionActivity.this));
+        boolean validationPossible = false;
+        List<PH_Reliquat> listePHReliquat = new ArrayList<>();
+        listePHReliquat = PH_ReliquatOpenHelper.getPH_ReliquatByCommandeNumero(db, commandeSelectionne.getNumero());
+        for(PH_Reliquat courant : listePHReliquat)
+        {
+            if(courant.getQteLivraison() > 0)
+            {
+                validationPossible = true;
+                break;
+            }
+        }
+
+        if(validationPossible)
+        {
+            afficherAlerteConfirmation(DetailReceptionActivity.this, LayoutInflater.from(DetailReceptionActivity.this));
+            item.setVisible(false);
+        }
+        else
+        {
+            Toast.makeText(DetailReceptionActivity.this, "Aucune ligne à valider", Toast.LENGTH_SHORT).show();
+            item.setVisible(true);
+        }
     }
 
     private Boolean receptionner(Commande commande, List<PH_Reliquat_Reception_Adapte> phReliquatReceptionAdapteList) {
@@ -613,7 +634,6 @@ public class DetailReceptionActivity extends ServiceActivity {
         item = menu.findItem(R.id.menuSave);
         item.setOnMenuItemClickListener(item1 -> {
             onMenuSaveClick();
-            item.setVisible(false);
             return true;
         });
 

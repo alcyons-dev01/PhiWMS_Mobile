@@ -267,12 +267,13 @@ public class ScannerReception2025Activity extends ServiceActivity {
                 if (s.toString().endsWith("\n")) {
                     String codeScanne = s.toString().substring(0, s.length() - 1);
                     String lot;
-                    String serie = "";
+                    String serie;
                     String gtin_courant = "";
                     String gtin_courant_sans_ai = "";
                     String date_peremption_courant = "";
                     if(codeScanne.startsWith("PHITAGPLACE+"))
                     {
+                        serie = "";
                         lot = "";
                         String[] tab_emplacement = codeScanne.split(":");
                         int emplacement_uid = Integer.parseInt(tab_emplacement[tab_emplacement.length-1]);
@@ -329,6 +330,7 @@ public class ScannerReception2025Activity extends ServiceActivity {
                         }
                         else
                         {
+                            serie = "";
                             lot = "";
                             //on essaye de récupérer via le code inconnu
                             List<Produit> produits  = ProduitOpenHelper.getProduitByCodeInconnu(db, s.toString().substring(0, s.length()-1));
@@ -461,6 +463,7 @@ public class ScannerReception2025Activity extends ServiceActivity {
 
                                     //gestion de la validation du scan
                                     blinkImageValidation();
+                                    String finalDate_peremption_courant = date_peremption_courant;
                                     findViewById(R.id.validationScan).setOnClickListener(v -> {
                                         //gestion enregistrement du lot scannee
                                         int quantiteSaisie = Integer.parseInt(((TextView) findViewById(R.id.qteSaisie)).getText().toString());
@@ -480,6 +483,7 @@ public class ScannerReception2025Activity extends ServiceActivity {
                                             emplacementId = emplacement_courant.get_UID();
                                         }
 
+                                        boolean lotPresent = false;
                                         boolean emplacementexiste = false;
                                         for(PH_Reliquat_Reception_Adapte.ZoneEtEmplacement zoneEtEmplacement : nouveau_lot.getZoneEtEmplacementList())
                                         {
@@ -490,14 +494,20 @@ public class ScannerReception2025Activity extends ServiceActivity {
                                                 break;
                                             }
                                         }
-                                        if(!emplacementexiste)
-                                            nouveau_lot.getZoneEtEmplacementList().add(uniqueReceptionPUIAdapte.new ZoneEtEmplacement(zoneId, zone_string, emplacementId, emplacement_string, quantiteSaisie));
 
-                                        boolean lotPresent = false;
-                                        for(PH_Reliquat_Reception_Adapte.Lot lotcourant : uniqueReceptionPUIAdapte.getlotList())
+                                        if(!emplacementexiste)
                                         {
-                                            if(lotcourant.getNumeroLot().contentEquals(nouveau_lot.getNumeroLot()))
-                                                lotPresent = true;
+                                            nouveau_lot = uniqueReceptionPUIAdapte.new Lot(lot, finalDate_peremption_courant, serie, "");
+                                            nouveau_lot.setZoneEtEmplacementList(new ArrayList<>());
+                                            nouveau_lot.getZoneEtEmplacementList().add(uniqueReceptionPUIAdapte.new ZoneEtEmplacement(zoneId, zone_string, emplacementId, emplacement_string, quantiteSaisie));
+                                        }
+                                        else
+                                        {
+                                            for(PH_Reliquat_Reception_Adapte.Lot lotcourant : uniqueReceptionPUIAdapte.getlotList())
+                                            {
+                                                if(lotcourant.getNumeroLot().contentEquals(nouveau_lot.getNumeroLot()))
+                                                    lotPresent = true;
+                                            }
                                         }
 
                                         if(!lotPresent)
