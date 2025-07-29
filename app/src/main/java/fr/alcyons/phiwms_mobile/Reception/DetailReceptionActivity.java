@@ -1,5 +1,7 @@
 package fr.alcyons.phiwms_mobile.Reception;
 
+import static com.google.android.gms.vision.L.TAG;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -37,9 +39,12 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
@@ -53,6 +58,8 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.FournisseurOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
@@ -64,6 +71,9 @@ import fr.alcyons.phiwms_mobile.Classes.Commande;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
+import fr.alcyons.phiwms_mobile.Classes.Fournisseur;
+import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
+import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_Reception_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
@@ -71,15 +81,26 @@ import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Reliquat_ReceptionAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.Mail;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparation2025Activity;
 import fr.alcyons.phiwms_mobile.PrisePhoto.PrisePhoto;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
+import fr.alcyons.phiwms_mobile.Services.ServicePreparationPadActivity;
+import fr.alcyons.phiwms_mobile.Services.ServicePreparationPufActivity;
 import fr.alcyons.phiwms_mobile.Services.ServiceReceptionPadActivity;
 import fr.alcyons.phiwms_mobile.Services.ServiceReceptionPuiActivity;
 
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotos.verifyStoragePermissions;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class DetailReceptionActivity extends ServiceActivity {
     Commande commandeSelectionne;
@@ -183,8 +204,7 @@ public class DetailReceptionActivity extends ServiceActivity {
 
     }
 
-    public void envoyerMail(boolean copieMail, final String email)
-    {
+    public void envoyerMail(boolean copieMail, final String email) throws JSONException {
         if (copieMail) {
             EmailCopie = utilisateurConnecte.getMail();
             if (EmailCopie == null || EmailCopie.contentEquals("")) {
@@ -222,6 +242,19 @@ public class DetailReceptionActivity extends ServiceActivity {
         Toast toast = Toast.makeText(DetailReceptionActivity.this, "Réception effectuée", Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
+
+        if(utilisateurConnecte.getEtablissement().toUpperCase().contentEquals("ADH") || utilisateurConnecte.getEtablissement().toUpperCase().contentEquals("ALCYONS"))
+        {
+            List<PH_Reliquat> listeReliquatReceptionnee = PH_ReliquatOpenHelper.getPH_ReliquatByCommandeNumero(db, commandeSelectionne.getNumero());
+
+            for(PH_Reliquat reliquat : listeReliquatReceptionnee)
+            {
+                if(reliquat.getQteLivraison() > 0)
+                {
+                    envoyerImpressionZebra(reliquat);
+                }
+            }
+        }
         retourService(super.getBundle());
     }
 
@@ -272,7 +305,25 @@ public class DetailReceptionActivity extends ServiceActivity {
                 ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, phReliquatCourant.getPhiMR4UUID(), phReliquatCourant.getReliquat_UID(), DBOpenHelper.ActionsEAS.SUPPR);
                 PH_ReliquatOpenHelper.supprimerUnPhReliquat(db, phReliquatCourant);
 
-                for (PH_Reliquat_Reception_Adapte.Lot lot : phReliquatReceptionAdapte.getlotList()) {
+                List<PH_Reliquat> listePHReliquatReceptionne = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, phReliquatCourant.getcommandeNumero(), phReliquatCourant.getProduitID());
+
+                for(PH_Reliquat reliquat_temp : listePHReliquatReceptionne)
+                {
+                    reliquat_temp.setBL_Numero(bonLivraison);
+                    PH_ReliquatOpenHelper.mettreAJourUnPHReliquat(db, reliquat_temp);
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, reliquat_temp.getPhiMR4UUID(), reliquat_temp.getReliquat_UID(), DBOpenHelper.ActionsEAS.MAJ);
+
+                    Random randomactionligne = new Random();
+                    int actionligneId = randomactionligne.nextInt();
+                    if(actionligneId > 0)
+                        actionligneId= actionligneId*-1;
+
+                    ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.getId(), "PH_Reliquat", reliquat_temp.getcommandeLigneID(), "", 0, (int)phReliquatCourant.getQteLivraison(), phReliquatCourant.getDesignationCourte());
+                    ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne);
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, actionUtilisateur_ligne.getPhiMR4UUID(), actionUtilisateur_ligne.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                }
+
+                /*for (PH_Reliquat_Reception_Adapte.Lot lot : phReliquatReceptionAdapte.getlotList()) {
                     for (PH_Reliquat_Reception_Adapte.ZoneEtEmplacement zoneEtEmplacement : lot.getZoneEtEmplacementList()) {
 
                         String numeroLot = lot.getNumeroLot();
@@ -329,7 +380,7 @@ public class DetailReceptionActivity extends ServiceActivity {
                             return false;
                         }
                     }
-                }
+                }*/
             } else {
                 return false;
             }
@@ -913,12 +964,20 @@ public class DetailReceptionActivity extends ServiceActivity {
 
         zoneok.setOnClickListener(v -> {
             alertDialog.dismiss();
-            envoyerMail(true, email);
+            try {
+                envoyerMail(true, email);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
         });
 
         buttonAnnuler.setOnClickListener(v -> {
             alertDialog.dismiss();
-            envoyerMail(false, email);
+            try {
+                envoyerMail(false, email);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 
@@ -1043,7 +1102,77 @@ public class DetailReceptionActivity extends ServiceActivity {
             }
         }
 
-
         ElementASynchroniserOpenHelper.toutSynchroniser(DetailReceptionActivity.this, db, utilisateurConnecte, false);
+    }
+
+    private void envoyerImpressionZebra(PH_Reliquat reliquatCourant) throws JSONException {
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        String strDate = sdf.format(cal.getTime());
+
+        JSONArray Etiquette_TO = new JSONArray();
+
+        String designationProduit = reliquatCourant.getDesignationCourte();
+        String numeroLot = reliquatCourant.getLot();
+        String numeroSerie = reliquatCourant.getSerie();
+        String datePeremption = reliquatCourant.getPeremptionDate();
+
+        if(designationProduit.length() > 30)
+            designationProduit = designationProduit.substring(0, 30);
+
+        JSONObject codeBarrJO = new JSONObject();
+        codeBarrJO.put("type", "Datamatrix");
+        codeBarrJO.put("phitag", "PHIBCF:"+commandeSelectionne.getNumero());
+
+        JSONObject etiquette_v1_JO = new JSONObject();
+        etiquette_v1_JO.put("codeBarre", codeBarrJO);
+        etiquette_v1_JO.put("nomfournisseur", commandeSelectionne.getFournisseur());
+        etiquette_v1_JO.put("phiTag", commandeSelectionne.getNumero());
+        etiquette_v1_JO.put("date", strDate);
+        etiquette_v1_JO.put("designation", designationProduit);
+        etiquette_v1_JO.put("qtereceptionne",reliquatCourant.getQteLivraison());
+        etiquette_v1_JO.put("numlot", numeroLot);
+        etiquette_v1_JO.put("dateperemption", datePeremption);
+
+        Etiquette_TO.put(etiquette_v1_JO);
+
+        String imprimante_VT = "Zebra";
+        String aImprimer = "true";
+        String format = "Réception";
+
+        JSONObject body = new JSONObject();
+        try {
+            body.put("Imprimante", imprimante_VT);
+            body.put("aImprimer", aImprimer);
+            body.put("format", format);
+            body.put("etiquettes", Etiquette_TO);
+        } catch (JSONException e) {
+            Log.e(TAG, "JSONException :", e);
+        }
+        String urlRequete = ParametresServeurOpenHelper.getUrlsWeb(db) + DBOpenHelper.Urls.uriZebraImprimer;
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.POST, urlRequete, body, response -> {
+            Toast.makeText(DetailReceptionActivity.this, "Etiquette envoyée", Toast.LENGTH_SHORT).show();
+        },
+                error -> {
+                    Log.e("Etiquette Volley", error.toString());
+                    if(!error.toString().contains("\"isOk\":true"))
+                    {
+                        Alerte.afficherAlerte(DetailReceptionActivity.this, "Erreur HTTP", "Erreur lors de l\'impression de l\'étiquette : "+error.toString(), "alerte");
+                    }
+                    else
+                    {
+                        Toast.makeText(DetailReceptionActivity.this, "Etiquette envoyée", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> params = new HashMap<>();
+                params.put("Content-Type", "application/json;charset=utf-8");
+                return params;
+            }
+        };
+        RequestQueue requestQueueUtilisateur = Volley.newRequestQueue(this);
+        requestQueueUtilisateur.add(obreq);
     }
 }

@@ -387,7 +387,7 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
                                                 if (stockLotEmplacement.getQte() >= 0) {
                                                     stockLotEmplacement.setQte_Preparer(0);
                                                     for (PH_Preparation_Ligne ligne_courante : lignes_preparer) {
-                                                        if (ligne_courante.getLotNumero().contentEquals(stockLotEmplacement.getLot())) {
+                                                        if (ligne_courante.getLotNumero().contentEquals(stockLotEmplacement.getLot()) && ligne_courante.getEmplacementParDefaut().contentEquals(stockLotEmplacement.getEmplacement())) {
                                                             stockLotEmplacement.setQte_Preparer((int) ligne_courante.getQte_preparer());
                                                             Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockLotEmplacement);
                                                             break;

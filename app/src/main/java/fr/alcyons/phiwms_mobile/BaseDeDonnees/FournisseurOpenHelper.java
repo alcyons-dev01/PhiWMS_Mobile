@@ -2,10 +2,15 @@ package fr.alcyons.phiwms_mobile.BaseDeDonnees;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import fr.alcyons.phiwms_mobile.Classes.Fournisseur;
+import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 
 public class FournisseurOpenHelper extends DBOpenHelper {
 
@@ -16,6 +21,36 @@ public class FournisseurOpenHelper extends DBOpenHelper {
     public static long supprimerDonneesTest(SQLiteDatabase db)
     {
         return db.delete(Constantes.TABLE_FOURNISSEUR, Constantes.CLE_COL_RAISONSOCIALE_FOURNISSEUR + "=?", new String[]{"ALCYONS_Fournisseur"});
+    }
+
+    public static Fournisseur getFournisseurByNom(SQLiteDatabase db, String nom) {
+        Fournisseur fournisseur = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_FOURNISSEUR +" WHERE "+Constantes.CLE_COL_RAISONSOCIALE_FOURNISSEUR+"=?", new String[]{nom});
+
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+            fournisseur = new Fournisseur(cursor);
+        }
+        cursor.close();
+        cursor = null;
+
+        return fournisseur;
+    }
+
+    public static Fournisseur getFournisseurById(SQLiteDatabase db, int idFrs) {
+        Fournisseur fournisseur = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_FOURNISSEUR +" WHERE "+Constantes.CLE_COL__UID_FOURNISSEUR+"=?", new String[]{String.valueOf(idFrs)});
+
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+            fournisseur = new Fournisseur(cursor);
+        }
+        cursor.close();
+        cursor = null;
+
+        return fournisseur;
     }
 
     public static long insererUnFournisseurEnBDD(SQLiteDatabase db, Fournisseur fournisseur) {
