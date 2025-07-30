@@ -95,7 +95,9 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
     Commande commandecourante;
     PH_Reliquat reliquat_courant;
     PH_Reliquat_Reception_Adapte phReliquatReceptionAdapte;
-
+    int qte_commande;
+    int qte_receptionne;
+    int qte_restante;
     PackageManager pm;
     @SuppressLint("SetTextI18n")
     @Override
@@ -112,6 +114,18 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
         reliquat_courant = PH_ReliquatOpenHelper.getPH_ReliquatById(db, intent.getExtras().getInt("ReliquatID"));
         phReliquatReceptionAdapte = (PH_Reliquat_Reception_Adapte) intent.getExtras().getSerializable("phReliquatReceptionAdapte");
         commandecourante = CommandeOpenHelper.getCommandeByNumero(db, reliquat_courant.getCommandeNumero());
+
+        /**
+         * Gestion quantité restant à réceptionner
+         */
+        qte_commande = reliquat_courant.getQteCommande() - reliquat_courant.getQteLivraison();
+
+        List<PH_Reliquat> listeReliquatReceptionne = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, reliquat_courant.getcommandeNumero(), reliquat_courant.getProduitID());
+        for(PH_Reliquat reliquat : listeReliquatReceptionne)
+        {
+            qte_receptionne = qte_receptionne + reliquat.getQteLivraison();
+        }
+        qte_restante = qte_commande - qte_receptionne;
 
         // Récupération des objets graphiques
         zoneTextView = (TextView) findViewById(R.id.zoneName);
@@ -338,34 +352,32 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
         });
 
         //affichage de la quantité de base
-        if(produitSelectionne.getCond_Achat_Gros_volume() != 0 && produitSelectionne.getCond_Achat_Gros_volume() <= reliquat_courant.getQteReliquat_X())
-        {
-            qteActuelleEditText.setText(String.valueOf((int)produitSelectionne.getCond_Achat_Gros_volume()));
-        }
-        else if(produitSelectionne.getCond_achat() != 0 && produitSelectionne.getCond_achat() <= reliquat_courant.getQteReliquat_X())
-        {
-            qteActuelleEditText.setText(String.valueOf((int)produitSelectionne.getCond_achat()));
-        }
-        else
-        {
-            qteActuelleEditText.setText(String.valueOf((int)reliquat_courant.getQteReliquat_X()));
-        }
+        qteActuelleEditText.setText(String.valueOf(qte_restante));
+
 
         relativeQte.setOnClickListener(view -> {
             String title = produitSelectionne.getDesignation_interne();
             String message = "Choisir une quantité: ";
-            int maxValue = reliquat_courant.getQteReliquat_X();
-            int value = reliquat_courant.getQteReliquat_X();
+            int maxValue = qte_restante;
+            int value = qte_restante;
+            int conditionnement = (int)produitSelectionne.getCond_Achat_Gros_volume();
 
+            if(conditionnement == 0 || conditionnement > qte_restante)
+                conditionnement = (int)produitSelectionne.getCond_achat();
+
+            if(conditionnement == 0 || conditionnement > qte_restante)
+                conditionnement = 1;
+
+            int finalConditionnement = conditionnement;
             DialogInterface.OnClickListener onClickListener = (dialog, id) -> {
 
-                int qteApres = aNumberPicker.getValue()*reliquat_courant.getConditionnementAchat();
+                int qteApres = aNumberPicker.getValue()* finalConditionnement;
                 qteActuelleEditText.setText(String.valueOf(qteApres).trim());
                 dialog.dismiss();
                 apparitionValider();
             };
 
-            Alerte.afficherAlerteNumberPickerAvecPas(CreationLotManuelReceptionActivity.this, title, message, value, maxValue, onClickListener, reliquat_courant.getConditionnementAchat());
+            Alerte.afficherAlerteNumberPickerAvecPas(CreationLotManuelReceptionActivity.this, title, message, value, maxValue, onClickListener, conditionnement);
         });
 
         //on affiche des valeurs fictive si c'est alcyons qui est connecté

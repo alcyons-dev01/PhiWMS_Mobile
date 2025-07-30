@@ -1062,6 +1062,9 @@ public class DetailReceptionActivity extends ServiceActivity {
                 phReliquatCourant.setReliquat_UID(reliquatId);
                 String numeroLot = lot.getNumeroLot();
                 String datePeremption = lot.getDatePeremption();
+                String[] datePeremptionTab = datePeremption.split("/");
+                if(datePeremptionTab.length == 3)
+                    datePeremption = datePeremptionTab[2] + "-" + datePeremptionTab[1] + "-" + datePeremptionTab[0];
                 String zoneName = zoneEtEmplacement.getZoneName();
                 String emplacementName = zoneEtEmplacement.getEmplacementName();
                 String numero_Serie = lot.getNumero_serie();

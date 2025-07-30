@@ -38,6 +38,7 @@ public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapte
     public Context context;
     private List<PH_Reliquat_Reception_Adapte.Lot> lots;
     private LotAdapter.OnDeleteClickListener deleteClickListener;
+    public boolean receptionComplete;
 
     public interface OnDeleteClickListener {
         void onDeleteClick(int position);
@@ -48,6 +49,7 @@ public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapte
         this.lots = lots;
         this.deleteClickListener = listener;
         this.context = context;
+        this.receptionComplete = false;
     }
 
     @NonNull
@@ -63,13 +65,16 @@ public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapte
 
         if(lot.getNumeroLot().contentEquals("row_ajouter"))
         {
-            viewHolder.layout_ajouter_lot.setVisibility(VISIBLE);
-            viewHolder.layout_ajouter_lot.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ((ListeLotReception2025Activity) context).ajoutLotManuelReception();
-                }
-            });
+            if(!receptionComplete)
+            {
+                viewHolder.layout_ajouter_lot.setVisibility(VISIBLE);
+                viewHolder.layout_ajouter_lot.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ((ListeLotReception2025Activity) context).ajoutLotManuelReception();
+                    }
+                });
+            }
         }
         else
         {
@@ -89,23 +94,12 @@ public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapte
                     }
                 });
 
-                Date peremption_Date = null;
-
-                DateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
-                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                try {
-                    String datePeremption = lot.getDatePeremption();
-
-                    if (!datePeremption.contentEquals("0000-00-00")  && !datePeremption.contentEquals("")) {
-                        peremption_Date = dateDecodeur.parse(datePeremption);
-                        viewHolder.datePeremption.setText(dateFormat.format(peremption_Date));
-                    } else {
-                        viewHolder.datePeremption.setText("00/00/0000");
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                viewHolder.setDatePeremptionColor(peremption_Date);
+                String datePeremption = lot.getDatePeremption();
+                String[] datePeremptionTab = datePeremption.split("-");
+                if(datePeremptionTab.length == 3)
+                    datePeremption = datePeremptionTab[2] + "/" + datePeremptionTab[1] + "/" + datePeremptionTab[0];
+                viewHolder.datePeremption.setText(datePeremption);
+                //viewHolder.setDatePeremptionColor(peremption_Date);
 
 
                 if(Integer.parseInt(viewHolder.qteSaisie.getText().toString()) == 0)
@@ -235,37 +229,58 @@ public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapte
         private void setupSwipeTouch() {
             contentLayout.setClickable(true);
             contentLayout.setFocusable(true);
-            contentLayout.setOnTouchListener((v, event) -> {
-                v.getParent().requestDisallowInterceptTouchEvent(true);
+            contentLayout.setOnTouchListener(new View.OnTouchListener() {
+                float downX = 0f;
+                float downY = 0f;
+                boolean isSwiping = false;
 
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        downX = event.getX();
-                        return true;
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    switch (event.getActionMasked()) {
+                        case MotionEvent.ACTION_DOWN:
+                            downX = event.getX();
+                            downY = event.getY();
+                            isSwiping = false;
+                            v.getParent().requestDisallowInterceptTouchEvent(false);
+                            return false; // laisser passer pour maintenant
 
-                    case MotionEvent.ACTION_MOVE:
-                        float deltaX = event.getX() - downX;
-                        if (deltaX >= 0 && deltaX <= 200) {
-                            contentLayout.setTranslationX(deltaX);
-                        }
-                        return true;
+                        case MotionEvent.ACTION_MOVE:
+                            float deltaX = event.getX() - downX;
+                            float deltaY = event.getY() - downY;
 
-                    case MotionEvent.ACTION_UP:
-                        float totalDeltaX = event.getX() - downX;
-                        if (totalDeltaX > SWIPE_THRESHOLD) {
-                            contentLayout.animate().translationX(200f).setDuration(200).start();
-                            isSwipedOpen = true;
-                            btnDelete.setClickable(true);
-                            adapter.swipedPosition = getAdapterPosition();
-                            adapter.notifyDataSetChanged();
-                        } else {
-                            contentLayout.animate().translationX(0).setDuration(200).start();
-                            isSwipedOpen = false;
-                            btnDelete.setClickable(false);
-                        }
-                        return true;
+                            if (!isSwiping && Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 20) {
+                                isSwiping = true;
+                                v.getParent().requestDisallowInterceptTouchEvent(true); // bloquer le scroll
+                            }
+
+                            if (isSwiping) {
+                                if (deltaX >= 0 && deltaX <= 200) {
+                                    contentLayout.setTranslationX(deltaX);
+                                }
+                                return true;
+                            }
+                            break;
+
+                        case MotionEvent.ACTION_UP:
+                            if (isSwiping) {
+                                float totalDeltaX = event.getX() - downX;
+                                if (totalDeltaX > SWIPE_THRESHOLD) {
+                                    contentLayout.animate().translationX(200f).setDuration(200).start();
+                                    isSwipedOpen = true;
+                                    btnDelete.setClickable(true);
+                                    adapter.swipedPosition = getAdapterPosition();
+                                    adapter.notifyDataSetChanged();
+                                } else {
+                                    contentLayout.animate().translationX(0).setDuration(200).start();
+                                    isSwipedOpen = false;
+                                    btnDelete.setClickable(false);
+                                }
+                                return true;
+                            }
+                            break;
+                    }
+                    return false; // laisser le RecyclerView gérer les scrolls
                 }
-                return false;
             });
         }
 

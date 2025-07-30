@@ -164,7 +164,7 @@ public class ScannerReception2025Activity extends ServiceActivity {
 
             ((TextView) findViewById(R.id.designationProduit)).setText(reliquatCourant.getdesignationCourte());
             ((TextView) findViewById(R.id.referenceProduit)).setText(reliquatCourant.getProduit_Reference());
-            ((TextView) findViewById(R.id.quantiteProduit)).setText(String.valueOf(reliquatCourant.getQteCommande()));
+            ((TextView) findViewById(R.id.quantiteProduit)).setText(String.valueOf(reliquatCourant.getQteCommande() - reliquatCourant.getQteLivraison()));
             ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText(String.valueOf(qte_receptionne));
         }
 
@@ -363,7 +363,7 @@ public class ScannerReception2025Activity extends ServiceActivity {
                             else
                             {
                                 List<PH_Reliquat> reliquatPreparer = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, reliquatCourant.getcommandeNumero(), reliquatCourant.getProduitID());
-                                int qte_demander = reliquatCourant.getQteCommande();
+                                int qte_demander = reliquatCourant.getQteCommande() - reliquatCourant.getQteLivraison();
                                 int qte_receptionne = 0;
                                 int qte_restante = 0;
                                 for(PH_Reliquat ligne_temp : reliquatPreparer)
@@ -677,6 +677,10 @@ public class ScannerReception2025Activity extends ServiceActivity {
                 phReliquatCourant.setReliquat_UID(reliquatId);
                 String numeroLot = lot.getNumeroLot();
                 String datePeremption = lot.getDatePeremption();
+                String[] datePeremptionTab = datePeremption.split("/");
+                if(datePeremptionTab.length == 3)
+                    datePeremption = datePeremptionTab[2] + "-" + datePeremptionTab[1] + "-" + datePeremptionTab[0];
+
                 String zoneName = zoneEtEmplacement.getZoneName();
                 String emplacementName = zoneEtEmplacement.getEmplacementName();
                 String numero_Serie = lot.getNumero_serie();

@@ -91,6 +91,10 @@ public class PH_Demande_MotifOpenHelper extends DBOpenHelper {
                                 } else if (!erreur.equals("Aucun PH_Depots trouvé")) {
                                     erreur = "Erreur API Dépots";
                                 }
+                                else
+                                {
+                                    etat = true;
+                                }
                             } else {
                                 viderTablePHDemande(db);
                                 int compteurReussite = 0;

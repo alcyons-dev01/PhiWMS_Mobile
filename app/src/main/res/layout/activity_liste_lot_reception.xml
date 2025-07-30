@@ -6,10 +6,6 @@
     android:orientation="vertical">
 
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-
         <LinearLayout
             android:id="@+id/barreDeTitre"
             android:layout_width="match_parent"
@@ -169,13 +165,10 @@
         <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/liste_view_reception"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/firstRow"
-            android:descendantFocusability="afterDescendants"
-            android:paddingTop="5dp"/>
-
-
-    </RelativeLayout>
-
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_below="@id/firstRow"
+            android:layout_alignParentBottom="true"
+            android:scrollbars="vertical"/>
 
 </LinearLayout>

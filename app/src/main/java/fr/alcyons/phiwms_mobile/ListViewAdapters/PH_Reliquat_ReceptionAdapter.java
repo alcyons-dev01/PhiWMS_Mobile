@@ -74,7 +74,7 @@ public class PH_Reliquat_ReceptionAdapter extends ArrayAdapter {
             if(phReliquat != null)
             {
                 //on récupère les reliquats réceptionnés en base de données
-                int qte_attendu = phReliquat.getQteCommande();
+                int qte_attendu = phReliquat.getQteCommande() - phReliquat.getQteLivraison();
                 int qte_receptionne = 0;
                 List<PH_Reliquat> reliquat_receptionne = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, phReliquat.getcommandeNumero(), phReliquat.getProduitID());
                 for(PH_Reliquat reliquat : reliquat_receptionne)

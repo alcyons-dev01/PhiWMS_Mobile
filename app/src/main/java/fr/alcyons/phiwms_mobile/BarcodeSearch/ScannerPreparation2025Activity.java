@@ -210,7 +210,8 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
 
                         if(emplacement_courant != null && produitCourant != null)
                         {
-                            verificationEmplacementProduit(emplacement_courant, produitCourant, stock_courant.getEmplacement());
+                            if(stock_courant != null)
+                                verificationEmplacementProduit(emplacement_courant, produitCourant, stock_courant.getEmplacement());
                         }
 
                         ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
