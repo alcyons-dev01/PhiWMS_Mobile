@@ -476,7 +476,8 @@ public class ListeLotPreparation2025Activity  extends ServiceAvecConnexionActivi
 
     private void onMenuSaveClick() {
         MAJListeLot();
-        String erreur = verificationDisponibilite();
+        //String erreur = verificationDisponibilite();
+        String erreur = "";
 
         if(erreur.contentEquals(""))
         {
@@ -641,7 +642,7 @@ public class ListeLotPreparation2025Activity  extends ServiceAvecConnexionActivi
 
                     //lotPreparationAdapter.viewHolders.get(position).qteSaisie.setText(String.valueOf(qteApres));
                     courant.setQteSaisie(qteApres);
-                    if(stock_courant[0] != null)
+                    /*if(stock_courant[0] != null)
                     {
                         stock_courant[0].setQte_Preparer(courant.getQteSaisie());
                         Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant[0]);
@@ -654,7 +655,7 @@ public class ListeLotPreparation2025Activity  extends ServiceAvecConnexionActivi
                             stock_courant[0].setQte_Preparer(courant.getQteSaisie());
                             Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant[0]);
                         }
-                    }
+                    }*/
                    // lotPreparationAdapter.quantiteAPreparer = restantAPrepaper;
                     RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
                     if (viewHolder != null && viewHolder instanceof LotAdapter.LotViewHolder) {
