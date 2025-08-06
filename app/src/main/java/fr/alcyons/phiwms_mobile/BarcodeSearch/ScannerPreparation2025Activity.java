@@ -284,6 +284,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                                 }
                             }
 
+
                             if(!produit_present)
                             {
                                 afficherSnackBar("Produit non présent dans la liste");
@@ -340,6 +341,26 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                                             }
 
                                             break;
+                                        }
+                                    }
+
+                                    if(produitCourant.isSuivi_Serialisation() && !produitCourant.isSerialiser_Reception_Delivrance())
+                                    {
+                                        for(String lot_temp : liste_lot)
+                                        {
+                                            if(lot_temp.contentEquals(lot))
+                                            {
+                                                lotCourant = phPreparationLignePreparationAdapte.new LotAdapte(lot);
+                                                lotCourant.setEmplacement(produitCourant.getEmplacement_PUI_Defaut());
+                                                lotCourant.setZone(produitCourant.getZone_PUI_Defaut());
+                                                String[] tabDatePeremption = date_peremption_courant.split("/");
+                                                String peremption = date_peremption_courant;
+                                                if(tabDatePeremption.length == 3)
+                                                    peremption = tabDatePeremption[2] + "-" + tabDatePeremption[1] + "-" + tabDatePeremption[0];
+                                                lotCourant.setDatePeremption(peremption);
+                                                lotCourant.setNumSerie(serie);
+                                                phPreparationLignePreparationAdapte.getLotAdaptes().add(lotCourant);
+                                            }
                                         }
                                     }
 
@@ -415,7 +436,6 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                                             //gestion enregistrement du lot scannee
                                             int quantiteSaisie = Integer.parseInt(((TextView) findViewById(R.id.qteSaisie)).getText().toString());
                                             lotCourant.setQteSaisie(lotCourant.getQteSaisie() + quantiteSaisie);
-                                            lotCourant.setNumSerie(serie);
                                             produitCourant = null;
                                             emplacement_courant = null;
                                             stock_courant = null;

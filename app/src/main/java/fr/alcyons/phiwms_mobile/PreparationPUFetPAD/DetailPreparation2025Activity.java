@@ -64,6 +64,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
@@ -74,6 +75,7 @@ import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_Preparation_Adapte;
+import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.AlertePreparationAdapter;
@@ -224,7 +226,6 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
             PH_Preparation_Ligne_Preparation_Adapte ph_preparationLigneAdapte = ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.get(position);
             PH_Preparation_Ligne ph_preparationLigne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, ph_preparationLigneAdapte.getPh_preparationLigneID());
             List<PH_Preparation_Ligne> listPhPreparationLigne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparationAndProduitNeg(db, ph_preparation_Selectionne, ph_preparationLigne.getProduitID());
-            liste_lot = new ArrayList<>();
             for(PH_Preparation_Ligne courant : listPhPreparationLigne)
             {
                 for(PH_Preparation_Ligne_Preparation_Adapte.LotAdapte lotAdapte : ph_preparationLigneAdapte.getLotAdaptes())
@@ -400,7 +401,20 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
                                                             break;
                                                         }
                                                     }
-                                                    ph_preparationLigneAdapte.getLotAdaptes().add(ph_preparationLigneAdapte.new LotAdapte(stockLotEmplacement));
+
+                                                    if(produit.isSuivi_Serialisation() && !produit.isSerialiser_Reception_Delivrance())
+                                                    {
+                                                        if(!stockLotEmplacement.getSerie().contentEquals(""))
+                                                        {
+                                                            ph_preparationLigneAdapte.getLotAdaptes().add(ph_preparationLigneAdapte.new LotAdapte(stockLotEmplacement));
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        ph_preparationLigneAdapte.getLotAdaptes().add(ph_preparationLigneAdapte.new LotAdapte(stockLotEmplacement));
+                                                    }
+
+                                                    liste_lot.add(stockLotEmplacement.getLot());
                                                 }
                                             }
 
@@ -1111,6 +1125,35 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
         {
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, lignecourante.getPhiMR4UUID(), lignecourante.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
 
+            Produit produit_temp = ProduitOpenHelper.getProduitByID(db, lignecourante.getProduitID());
+            if(produit_temp.isSuivi_Serialisation() && !produit_temp.isSerialiser_Reception_Delivrance())
+            {
+                Random randomserialisation = new Random();
+                int serialisationId = randomserialisation.nextInt();
+                if(serialisationId > 0)
+                    serialisationId= serialisationId*-1;
+
+                String[] datePeremptionTab = lignecourante.getPeremptionDate().split("-");
+                String peremptionDate = lignecourante.getPeremptionDate();
+                if(datePeremptionTab.length == 3)
+                    peremptionDate = datePeremptionTab[0].substring(2)+datePeremptionTab[1]+datePeremptionTab[2];
+
+                PH_Serialisation serialisation = new PH_Serialisation(serialisationId, utilisateurConnecte.getId(), "G110", "", produit_temp.getGTIN(), "GTIN", lignecourante.getLotNumero(), peremptionDate, lignecourante.getSerieNumero(), "DELIVRANCE", String.valueOf(lignecourante.getPreparationID()), produit_temp.getID_produit());
+                serialisation.setStatut("En attente");
+                serialisation.setRaison("");
+                serialisation.setResultat("");
+                PH_SerialisationOpenHelper.insererPH_SerialisationEnBDD(db, serialisation);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisation.getPhiMR4UUID(), serialisation.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+
+                Random randomAUSeri = new Random();
+                int actionSerId = randomAUSeri.nextInt();
+                if(actionSerId > 0)
+                    actionSerId= actionSerId*-1;
+                ActionUtilisateur new_action_utilisateur_serialisation = new ActionUtilisateur(actionSerId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", serialisation.get_UID(), "", "Serialisation");
+                ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur_serialisation);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur_serialisation.getPhiMR4UUID(), new_action_utilisateur_serialisation.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+            }
+
             Random randomactionligne = new Random();
             int actionligneId = randomactionligne.nextInt();
             if(actionligneId > 0)
@@ -1156,7 +1199,7 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
         if(ph_preparation_Selectionne.getDepotDestinataireReference().contains("-PAD-"))
             retourListeIntent = new Intent(DetailPreparation2025Activity.this, ServicePreparationPadActivity.class);
 
-        if(utilisateurConnecte.getEtablissement().toUpperCase().contentEquals("ADH") || utilisateurConnecte.getEtablissement().toUpperCase().contentEquals("ALCYONS"))
+        if(utilisateurConnecte.getEtablissement().toUpperCase().contentEquals("ADH"))
         {
             envoyerImpressionZebra(ph_preparation_Selectionne);
         }
