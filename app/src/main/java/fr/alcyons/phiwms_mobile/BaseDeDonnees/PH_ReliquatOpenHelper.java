@@ -197,10 +197,14 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
         return phReliquat;
     }
 
-    public static PH_Reliquat getPH_ReliquatByUnIdProduitetNumeroEtLotEtPeremptionEtZoneEtEmplacement(SQLiteDatabase db, Integer id_produit, String NumeroCommande, String numLot, String datePeremption, String zone, String emplacement) {
+    public static PH_Reliquat getPH_ReliquatByUnIdProduitetNumeroEtLotEtPeremptionEtSerieEtZoneEtEmplacement(SQLiteDatabase db, Integer id_produit, String NumeroCommande, String numLot, String datePeremption, String serie, String zone, String emplacement) {
         PH_Reliquat phReliquat = null;
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_RELIQUAT + " WHERE " + Constantes.CLE_COL_PRODUITID_PH_RELIQUAT + "=? AND "+Constantes.CLE_COL_COMMANDENUMERO_PH_RELIQUAT+"=? AND "+Constantes.CLE_COL_LOT_PH_RELIQUAT+"=? AND "+Constantes.CLE_COL_PEREMPTIONDATE_PH_RELIQUAT +"=? AND "+Constantes.CLE_COL_ZONE_PH_RELIQUAT+"=? AND "+Constantes.CLE_COL_EMPLACEMENT_PH_RELIQUAT+"=?" , new String[]{String.valueOf(id_produit), NumeroCommande, numLot, datePeremption, zone, emplacement});
+        String[] dateperemptiontab = datePeremption.split("/");
+        if(dateperemptiontab.length == 3)
+            datePeremption = dateperemptiontab[2]+"-"+dateperemptiontab[1]+"-"+dateperemptiontab[0];
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_RELIQUAT + " WHERE " + Constantes.CLE_COL_PRODUITID_PH_RELIQUAT + "=? AND "+Constantes.CLE_COL_COMMANDENUMERO_PH_RELIQUAT+"=? AND "+Constantes.CLE_COL_LOT_PH_RELIQUAT+"=? AND "+Constantes.CLE_COL_PEREMPTIONDATE_PH_RELIQUAT +"=? AND "+Constantes.CLE_COL_ZONE_PH_RELIQUAT+"=? AND "+Constantes.CLE_COL_EMPLACEMENT_PH_RELIQUAT+"=?  AND "+Constantes.CLE_COL_SERIE+"=?" , new String[]{String.valueOf(id_produit), NumeroCommande, numLot, datePeremption, zone, emplacement, serie});
 
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
@@ -238,6 +242,23 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
             PH_Reliquat phReliquat = new PH_Reliquat(cursor);
 
             if (phReliquat.getcommandeNumero().contentEquals(num) && phReliquat.getReliquat_UID() > 0) {
+                phReliquatList.add(phReliquat);
+            }
+        }
+        cursor.close();
+        cursor = null;
+        return phReliquatList;
+    }
+
+    public static List<PH_Reliquat> getPH_ReliquatBase(SQLiteDatabase db) {
+        List<PH_Reliquat> phReliquatList = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_RELIQUAT, null);
+
+        while (cursor.moveToNext()) {
+            PH_Reliquat phReliquat = new PH_Reliquat(cursor);
+
+            if (phReliquat.getReliquat_UID() > 0) {
                 phReliquatList.add(phReliquat);
             }
         }

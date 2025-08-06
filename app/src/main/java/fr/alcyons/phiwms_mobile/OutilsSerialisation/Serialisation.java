@@ -91,7 +91,7 @@ public class Serialisation {
 
         PH_Serialisation phSerialisation = new PH_Serialisation(phSerialisationID, UserID, reqType, ClientTrxId, ProductCode_VALUE_VA, ProductCode_SHEME_VA, Batch_ID_VA, Batch_EXPDATE_VA, Pack_SN_VA, MVT_Type, MVT_UID, ProduitUID);
         serialisationUID = PH_SerialisationOpenHelper.insererPH_SerialisationEnBDD(db, phSerialisation);
-        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, phSerialisation.getSerialexpressUUID(), phSerialisation.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, phSerialisation.getPhiMR4UUID(), phSerialisation.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
 
         return serialisationUID;
     }

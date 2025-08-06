@@ -307,7 +307,7 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
 
                     <TextView
                         android:id="@+id/labelLot"
-                        android:layout_width="30dp"
+                        android:layout_width="40dp"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
                         android:text="Lot"
@@ -333,7 +333,7 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
 
                     <TextView
                         android:id="@+id/labelDate"
-                        android:layout_width="30dp"
+                        android:layout_width="40dp"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
                         android:text="Date"
@@ -341,6 +341,30 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
 
                     <TextView
                         android:id="@+id/datePeremption"
+                        android:layout_marginRight="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="00/00/0000"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/zoneSerie"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/labelSerie"
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:text="Série"
+                        android:textColor="@color/noir"/>
+
+                    <TextView
+                        android:id="@+id/numeroserie"
                         android:layout_marginRight="5dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

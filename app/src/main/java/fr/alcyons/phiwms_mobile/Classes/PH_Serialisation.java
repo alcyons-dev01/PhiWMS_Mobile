@@ -61,7 +61,7 @@ public class PH_Serialisation implements Serializable, Comparable {
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat simpleDateFormatDate = new SimpleDateFormat("yyyy-MM-dd");
         this.demandeDate = simpleDateFormatDate.format(c);
-        SimpleDateFormat simpleDateFormatHeure = new SimpleDateFormat("hh:mm:ss");
+        SimpleDateFormat simpleDateFormatHeure = new SimpleDateFormat("HH:mm:ss");
         this.demandeHeure = simpleDateFormatHeure.format(c);
         this.mvtType = MVT_Type;
         this.mvtUID = MVT_UID;
@@ -296,7 +296,7 @@ public class PH_Serialisation implements Serializable, Comparable {
         this.raison = raison;
     }
 
-    public int getSerialexpressUUID() {
+    public int getPhiMR4UUID() {
         return serialexpressUUID;
     }
 

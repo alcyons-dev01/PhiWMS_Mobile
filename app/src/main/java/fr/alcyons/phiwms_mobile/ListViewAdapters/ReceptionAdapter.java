@@ -106,7 +106,7 @@ public class ReceptionAdapter extends ArrayAdapter implements Filterable {
             viewHolder.relative_principal.setBackground(ContextCompat.getDrawable(context, R.drawable.background_preparation_bleu));
         }
 
-        List<PH_Reliquat> phReliquatList = PH_ReliquatOpenHelper.getPH_ReliquatByCommandeNumero(db, commandeCourant.getNumero());
+        List<PH_Reliquat> phReliquatList = PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(db, commandeCourant.getNumero());
         int nbColis = 0;
 
         String situation = getSituation(commandeCourant.getSituation());

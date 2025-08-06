@@ -83,6 +83,15 @@ public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapte
             viewHolder.layoutPrincipal.setVisibility(GONE);
 
             if (lot != null) {
+                if(!lot.getNumero_serie().contentEquals("") && lot.getNumero_serie() != null)
+                {
+                    viewHolder.zoneSerie.setVisibility(VISIBLE);
+                    viewHolder.serie.setText(lot.getNumero_serie());
+                }
+                else
+                {
+                    viewHolder.zoneSerie.setVisibility(GONE);
+                }
                 viewHolder.layoutPrincipal.setVisibility(VISIBLE);
                 viewHolder.nomEmplacement.setText(lot.getZoneEtEmplacementList().get(0).getEmplacementName());
                 viewHolder.lot.setText(lot.getNumeroLot());
@@ -175,6 +184,7 @@ public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapte
     public class LotViewHolder extends RecyclerView.ViewHolder {
         public TextView nomEmplacement;
         public TextView lot;
+        public TextView serie;
         public TextView datePeremption;
         public TextView qteSaisie;
         public LinearLayout layout_ajouter_lot;
@@ -200,6 +210,7 @@ public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapte
             contentLayout = itemView.findViewById(R.id.contentLayout);
             nomEmplacement = itemView.findViewById(R.id.nomEmplacement);
             lot = itemView.findViewById(R.id.lot);
+            serie = itemView.findViewById(R.id.numeroserie);
             datePeremption = itemView.findViewById(R.id.datePeremption);
             qteSaisie = itemView.findViewById(R.id.qteSaisie);
             layoutPrincipal = itemView.findViewById(R.id.layoutPrincipal);

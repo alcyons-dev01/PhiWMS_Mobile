@@ -589,148 +589,153 @@ public class ListeLotPreparation2025Activity  extends ServiceAvecConnexionActivi
 
     public void ClickNumberPicker(final int position) {
         Context context = ListeLotPreparation2025Activity.this;
-        PH_Preparation_Ligne_Preparation_Adapte.LotAdapte courant = lotAdapteList.get(position);
-        if(courant.getNumLot().contentEquals(""))
+        if(!produit.isSuivi_Serialisation() || produit.isSerialiser_Reception_Delivrance())
         {
-            Alerte.afficherAlerte(ListeLotPreparation2025Activity.this, "Erreur", "Vous ne pouvez pas préparer un lot vide.", "alerte");
-        }
-        else
-        {
-            final Stock_Lot_Emplacement_Light[] stock_courant = {Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, courant.getStockLotEmplacementID())};
-
-            if(stock_courant[0] == null)
+            PH_Preparation_Ligne_Preparation_Adapte.LotAdapte courant = lotAdapteList.get(position);
+            if(courant.getNumLot().contentEquals(""))
             {
-                stock_courant[0] = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(db, produit, depot, courant.getNumLot(), courant.getNumSerie());
-                if(stock_courant[0] != null)
+                Alerte.afficherAlerte(ListeLotPreparation2025Activity.this, "Erreur", "Vous ne pouvez pas préparer un lot vide.", "alerte");
+            }
+            else
+            {
+                final Stock_Lot_Emplacement_Light[] stock_courant = {Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, courant.getStockLotEmplacementID())};
+
+                if(stock_courant[0] == null)
                 {
-                    stock_courant[0].setQte_Preparer(courant.getQteSaisie());
-                    Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant[0]);
-                }
-            }
-
-            String title = lotAdapteList.get(position).getNumLot();
-            String message = "Quantité placée : ";
-
-            //gestion d'un stock déjà saisie
-            if(courant.getQteSaisie() > 0)
-            {
-                int qte_avant = courant.getQteSaisie();
-                courant.setQteSaisie(0);
-                stock_courant[0].setQte_Preparer(courant.getQteSaisie());
-                Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant[0]);
-
-                MAJVisuel();
-                MAJValues(false, qte_avant);
-                //lotPreparationAdapter.quantiteAPreparer = restantAPrepaper;
-            }
-
-            int value_max = (int) stock_courant[0].getQte();
-            int reste = quantiteDemandeeBase - qteDejaPreparer;
-            if(value_max > reste)
-                value_max = reste;
-
-            int maxValue = value_max;
-            int value = maxValue;
-
-            DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    PH_Preparation_Ligne_Preparation_Adapte.LotAdapte courant = lotAdapteList.get(position);
-                    int qteApres = aNumberPicker.getValue();
-                    qteApres = qteApres * (int)ph_preparation_ligne_base.getProduitCondDistrib();
-                    MAJValues(true, qteApres);
-                    lotAdapteList.get(position).setQteSaisie(qteApres);
-
-                    //lotPreparationAdapter.viewHolders.get(position).qteSaisie.setText(String.valueOf(qteApres));
-                    courant.setQteSaisie(qteApres);
-                    /*if(stock_courant[0] != null)
+                    stock_courant[0] = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(db, produit, depot, courant.getNumLot(), courant.getNumSerie());
+                    if(stock_courant[0] != null)
                     {
                         stock_courant[0].setQte_Preparer(courant.getQteSaisie());
                         Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant[0]);
                     }
-                    else
-                    {
-                        stock_courant[0] = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(db, produit, depot, courant.getNumLot(), courant.getNumSerie());
-                        if(stock_courant[0] != null)
+                }
+
+                String title = lotAdapteList.get(position).getNumLot();
+                String message = "Quantité placée : ";
+
+                //gestion d'un stock déjà saisie
+                if(courant.getQteSaisie() > 0)
+                {
+                    int qte_avant = courant.getQteSaisie();
+                    courant.setQteSaisie(0);
+                    stock_courant[0].setQte_Preparer(courant.getQteSaisie());
+                    Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant[0]);
+
+                    MAJVisuel();
+                    MAJValues(false, qte_avant);
+                    //lotPreparationAdapter.quantiteAPreparer = restantAPrepaper;
+                }
+
+                int value_max = (int) stock_courant[0].getQte();
+                int reste = quantiteDemandeeBase - qteDejaPreparer;
+                if(value_max > reste)
+                    value_max = reste;
+
+                int maxValue = value_max;
+                int value = maxValue;
+
+                DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        PH_Preparation_Ligne_Preparation_Adapte.LotAdapte courant = lotAdapteList.get(position);
+                        int qteApres = aNumberPicker.getValue();
+                        qteApres = qteApres * (int)ph_preparation_ligne_base.getProduitCondDistrib();
+                        MAJValues(true, qteApres);
+                        lotAdapteList.get(position).setQteSaisie(qteApres);
+
+                        //lotPreparationAdapter.viewHolders.get(position).qteSaisie.setText(String.valueOf(qteApres));
+                        courant.setQteSaisie(qteApres);
+                        /*if(stock_courant[0] != null)
                         {
                             stock_courant[0].setQte_Preparer(courant.getQteSaisie());
                             Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant[0]);
                         }
-                    }*/
-                   // lotPreparationAdapter.quantiteAPreparer = restantAPrepaper;
-                    RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
-                    if (viewHolder != null && viewHolder instanceof LotAdapter.LotViewHolder) {
-                        LotAdapter.LotViewHolder monViewHolder = (LotAdapter.LotViewHolder) viewHolder;
-                        monViewHolder.qteSaisie.setText((String.valueOf(qteApres)));
-                        adapter.notifyItemChanged(position);
+                        else
+                        {
+                            stock_courant[0] = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(db, produit, depot, courant.getNumLot(), courant.getNumSerie());
+                            if(stock_courant[0] != null)
+                            {
+                                stock_courant[0].setQte_Preparer(courant.getQteSaisie());
+                                Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant[0]);
+                            }
+                        }*/
+                        // lotPreparationAdapter.quantiteAPreparer = restantAPrepaper;
+                        RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
+                        if (viewHolder != null && viewHolder instanceof LotAdapter.LotViewHolder) {
+                            LotAdapter.LotViewHolder monViewHolder = (LotAdapter.LotViewHolder) viewHolder;
+                            monViewHolder.qteSaisie.setText((String.valueOf(qteApres)));
+                            adapter.notifyItemChanged(position);
+                        }
+                        MAJVisuel();
+                        // lotPreparationAdapter.notifyDataSetChanged();
+                        InputMethodManager imm = (InputMethodManager) ListeLotPreparation2025Activity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                        dialog.dismiss();
                     }
-                    MAJVisuel();
-                   // lotPreparationAdapter.notifyDataSetChanged();
-                    InputMethodManager imm = (InputMethodManager) ListeLotPreparation2025Activity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                    dialog.dismiss();
-                }
-            };
+                };
 
-            //Alerte.afficherAlerteNumberPicker(context, title, message, value, maxValue, onClickListener);
-            Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, (int)ph_preparation_ligne_base.getProduitCondDistrib());
+                //Alerte.afficherAlerteNumberPicker(context, title, message, value, maxValue, onClickListener);
+                Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, (int)ph_preparation_ligne_base.getProduitCondDistrib());
+            }
         }
-
     };
 
     public void ClickLigneLot(int position)
     {
-        Context context = ListeLotPreparation2025Activity.this;
-        PH_Preparation_Ligne_Preparation_Adapte.LotAdapte courant = lotAdapteList.get(position);
-        if(courant.getNumLot().contentEquals(""))
+        if(!produit.isSuivi_Serialisation() || produit.isSerialiser_Reception_Delivrance())
         {
-            Alerte.afficherAlerte(ListeLotPreparation2025Activity.this, "Erreur", "Vous ne pouvez pas préparer un lot vide.", "alerte");
-        }
-        else
-        {
-            int quantite_stock_selectionne = courant.getQteStock();
-
-            if(quantite_stock_selectionne > restantAPrepaper)
+            Context context = ListeLotPreparation2025Activity.this;
+            PH_Preparation_Ligne_Preparation_Adapte.LotAdapte courant = lotAdapteList.get(position);
+            if(courant.getNumLot().contentEquals(""))
             {
-                quantite_stock_selectionne = restantAPrepaper;
-            }
-
-            //gestion du visuel
-            courant.setQteSaisie(quantite_stock_selectionne);
-            courant.setQteStock(courant.getQteStock()-quantite_stock_selectionne);
-            stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, courant.getStockLotEmplacementID());
-            if(stock_courant != null)
-            {
-                stock_courant.setQte_Preparer(courant.getQteSaisie());
-                Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
+                Alerte.afficherAlerte(ListeLotPreparation2025Activity.this, "Erreur", "Vous ne pouvez pas préparer un lot vide.", "alerte");
             }
             else
             {
-                stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(db, produit, depot, courant.getNumLot(), courant.getNumSerie());
+                int quantite_stock_selectionne = courant.getQteStock();
+
+                if(quantite_stock_selectionne > restantAPrepaper)
+                {
+                    quantite_stock_selectionne = restantAPrepaper;
+                }
+
+                //gestion du visuel
+                courant.setQteSaisie(quantite_stock_selectionne);
+                courant.setQteStock(courant.getQteStock()-quantite_stock_selectionne);
+                stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, courant.getStockLotEmplacementID());
                 if(stock_courant != null)
                 {
                     stock_courant.setQte_Preparer(courant.getQteSaisie());
                     Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
                 }
-            }
+                else
+                {
+                    stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(db, produit, depot, courant.getNumLot(), courant.getNumSerie());
+                    if(stock_courant != null)
+                    {
+                        stock_courant.setQte_Preparer(courant.getQteSaisie());
+                        Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
+                    }
+                }
 
-            MAJValues(true, quantite_stock_selectionne);
-            RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
-            if (viewHolder != null && viewHolder instanceof LotAdapter.LotViewHolder) {
-                LotAdapter.LotViewHolder monViewHolder = (LotAdapter.LotViewHolder) viewHolder;
-                monViewHolder.qteSaisie.setText((String.valueOf(quantite_stock_selectionne)));
-                adapter.notifyItemChanged(position);
-            }
-            if(stock_courant.getEmplacement().contentEquals(""))
-            {
-                Intent listeZonesIntent = new Intent(ListeLotPreparation2025Activity.this, ListeZonesActivity.class);
-                Bundle listeZonesBundle = ListeLotPreparation2025Activity.super.getBundle();
-                Depot depotpui = DepotOpenHelper.getDepotPUI(db);
-                listeZonesBundle.putInt("depotSelectionneID", depotpui.getDepot_UID());
-                listeZonesIntent.putExtras(listeZonesBundle);
-                ListeLotPreparation2025Activity.this.startActivityForResult(listeZonesIntent, CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT);
-            }
+                MAJValues(true, quantite_stock_selectionne);
+                RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
+                if (viewHolder != null && viewHolder instanceof LotAdapter.LotViewHolder) {
+                    LotAdapter.LotViewHolder monViewHolder = (LotAdapter.LotViewHolder) viewHolder;
+                    monViewHolder.qteSaisie.setText((String.valueOf(quantite_stock_selectionne)));
+                    adapter.notifyItemChanged(position);
+                }
+                if(stock_courant.getEmplacement().contentEquals(""))
+                {
+                    Intent listeZonesIntent = new Intent(ListeLotPreparation2025Activity.this, ListeZonesActivity.class);
+                    Bundle listeZonesBundle = ListeLotPreparation2025Activity.super.getBundle();
+                    Depot depotpui = DepotOpenHelper.getDepotPUI(db);
+                    listeZonesBundle.putInt("depotSelectionneID", depotpui.getDepot_UID());
+                    listeZonesIntent.putExtras(listeZonesBundle);
+                    ListeLotPreparation2025Activity.this.startActivityForResult(listeZonesIntent, CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT);
+                }
 
-            MAJVisuel();
+                MAJVisuel();
+            }
         }
     }
 

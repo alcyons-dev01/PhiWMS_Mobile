@@ -193,13 +193,14 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                 if (s.toString().endsWith("\n")) {
                     String codeScanne = s.toString().substring(0, s.length() - 1);
                     String lot = "";
-                    String serie = "";
+                    String serie;
                     String gtin_courant = "";
                     String gtin_courant_sans_ai = "";
                     String date_peremption_courant = "";
                     PH_Preparation_Ligne ligne_base = null;
                     if(codeScanne.startsWith("PHITAGPLACE+"))
                     {
+                        serie = "";
                         String[] tab_emplacement = codeScanne.split(":");
                         int emplacement_uid = Integer.parseInt(tab_emplacement[tab_emplacement.length-1]);
 
@@ -251,6 +252,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                         }
                         else
                         {
+                            serie = "";
                             //on essaye de récupérer via le code inconnu
                             List<Produit> produits  = ProduitOpenHelper.getProduitByCodeInconnu(db, s.toString().substring(0, s.length()-1));
                             if (produits.size() == 1) {
@@ -308,11 +310,35 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                                 }
                                 else
                                 {
+                                    PH_Preparation_Ligne temp_ligne = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, phPreparationLignePreparationAdapte.getPh_preparationLigneID());
+
                                     for(PH_Preparation_Ligne_Preparation_Adapte.LotAdapte adapteCourant : phPreparationLignePreparationAdapte.getLotAdaptes())
                                     {
                                         if(adapteCourant.getNumLot().contentEquals(lot))
                                         {
                                             lotCourant = adapteCourant;
+                                            if(!temp_ligne.isSerialiser_Reception() && temp_ligne.isSuivi_Par_Serie()) {
+                                                /**
+                                                 * TODO : vérification du statut du numéro de série lors du scan
+                                                 * */
+                                                if(!lotCourant.getNumSerie().contentEquals(serie))
+                                                {
+                                                    String emplacementCourant = lotCourant.getEmplacement();
+                                                    String zone = lotCourant.getZone();
+                                                    lotCourant = phPreparationLignePreparationAdapte.new LotAdapte(lot);
+                                                    lotCourant.setEmplacement(emplacementCourant);
+                                                    lotCourant.setZone(zone);
+
+                                                    //formatage de la date en format base de données
+                                                    String[] datePeremptionTab = date_peremption_courant.split("/");
+                                                    if(datePeremptionTab.length == 3)
+                                                        date_peremption_courant = datePeremptionTab[2] + "-" + datePeremptionTab[1] + "-" + datePeremptionTab[0];
+
+                                                    lotCourant.setDatePeremption(date_peremption_courant);
+                                                    phPreparationLignePreparationAdapte.getLotAdaptes().add(lotCourant);
+                                                }
+                                            }
+
                                             break;
                                         }
                                     }
@@ -356,28 +382,31 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                                         //gestion du clic sur le compteur
                                         int finalQte_restante = qte_restante;
                                         findViewById(R.id.layout_qte_saisie_lot_preparation).setOnClickListener(view -> {
-                                            Context context = ScannerPreparation2025Activity.this;
+                                            if(!produitCourant.isSuivi_Serialisation() || produitCourant.isSerialiser_Reception_Delivrance())
+                                            {
+                                                Context context = ScannerPreparation2025Activity.this;
 
-                                            String title = lotCourant.getNumLot();
-                                            String message = "Quantité placée : ";
-                                            int value_max = finalQte_restante;
+                                                String title = lotCourant.getNumLot();
+                                                String message = "Quantité placée : ";
+                                                int value_max = finalQte_restante;
 
-                                            int maxValue = value_max;
-                                            int value = finalQte_restante;
+                                                int maxValue = value_max;
+                                                int value = finalQte_restante;
 
-                                            DialogInterface.OnClickListener onClickListener = (dialog, id) -> {
-                                                int qteApres = Alerte.aNumberPicker.getValue() * Integer.parseInt(conditionnement);
+                                                DialogInterface.OnClickListener onClickListener = (dialog, id) -> {
+                                                    int qteApres = Alerte.aNumberPicker.getValue() * Integer.parseInt(conditionnement);
 
-                                                if (stock_courant != null) {
-                                                    stock_courant.setQte_Preparer(lotCourant.getQteSaisie());
-                                                    Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
-                                                }
-                                                ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteApres));
+                                                    if (stock_courant != null) {
+                                                        stock_courant.setQte_Preparer(lotCourant.getQteSaisie());
+                                                        Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
+                                                    }
+                                                    ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteApres));
 
-                                                dialog.dismiss();
-                                            };
+                                                    dialog.dismiss();
+                                                };
 
-                                            Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, Integer.parseInt(conditionnement));
+                                                Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, Integer.parseInt(conditionnement));
+                                            }
                                         });
 
                                         //gestion de la validation du scan
@@ -386,6 +415,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                                             //gestion enregistrement du lot scannee
                                             int quantiteSaisie = Integer.parseInt(((TextView) findViewById(R.id.qteSaisie)).getText().toString());
                                             lotCourant.setQteSaisie(lotCourant.getQteSaisie() + quantiteSaisie);
+                                            lotCourant.setNumSerie(serie);
                                             produitCourant = null;
                                             emplacement_courant = null;
                                             stock_courant = null;

@@ -24,7 +24,7 @@ public class PH_SerialisationOpenHelper extends DBOpenHelper {
     public static PH_Serialisation getPH_SerialisationByPhiMR4UUID(SQLiteDatabase db, int id) {
         PH_Serialisation objet = null;
         Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_SERIALISATION + "      WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=? ", new String[]{String.valueOf(id)});
-        if (cursor.getCount() == 1) {
+        if (cursor.getCount() > 0) {
             cursor.moveToFirst();
             objet = new PH_Serialisation(cursor);
         }
@@ -191,9 +191,9 @@ public class PH_SerialisationOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_MVTTYPE_PH_SERIALISATION, objet.getMvtType());
         contentValues.put(Constantes.CLE_COL_MVTUID_PH_SERIALISATION, objet.getMvtUID());
         contentValues.put(Constantes.CLE_COL_RAISON_PH_SERIALISATION, objet.getRaison());
-        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID    , objet.getSerialexpressUUID());
+        contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID    , objet.getPhiMR4UUID());
 
-        long rowID = db.update(Constantes.TABLE_PH_SERIALISATION, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + objet.getSerialexpressUUID(), null);
+        long rowID = db.update(Constantes.TABLE_PH_SERIALISATION, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + objet.getPhiMR4UUID(), null);
 
         return rowID;
     }

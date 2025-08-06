@@ -233,12 +233,12 @@
 
                     <TextView
                         android:id="@+id/labelSerie"
-                        android:layout_width="50dp"
+                        android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:text="Série"
                         android:textColor="@color/noir"
                         android:textStyle="bold"
-                        android:textSize="24dp"/>
+                        android:textSize="20dp"/>
 
                     <TextView
                         android:id="@+id/numSerie"
@@ -257,10 +257,10 @@
                     android:layout_marginBottom="10dp">
 
                     <TextView
-                        android:layout_width="50dp"
+                        android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:text="Lot"
-                        android:textSize="24dp"
+                        android:textSize="20dp"
                         android:textStyle="bold"
                         android:textColor="@color/noir"/>
 
@@ -280,12 +280,12 @@
 
 
                     <TextView
-                        android:layout_width="50dp"
+                        android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:text="Exp. "
                         android:textColor="@color/noir"
                         android:textStyle="bold"
-                        android:textSize="24dp"/>
+                        android:textSize="20dp"/>
 
                     <TextView
                         android:id="@+id/datePeremption"

@@ -425,7 +425,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
         {
             if(!commande.getNumero().contentEquals("RECALCYONS01"))
             {
-                for (PH_Reliquat ph_reliquat : PH_ReliquatOpenHelper.getPH_ReliquatByCommandeNumero(db, commande.getNumero()))
+                for (PH_Reliquat ph_reliquat : PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(db, commande.getNumero()))
                 {
                     PH_ReliquatOpenHelper.supprimerUnPHReliquat(db, ph_reliquat);
                 }

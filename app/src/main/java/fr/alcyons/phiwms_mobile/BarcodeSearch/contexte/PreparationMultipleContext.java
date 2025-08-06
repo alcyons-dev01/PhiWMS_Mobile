@@ -787,15 +787,18 @@ public class PreparationMultipleContext
                     }
                 }
 
-                if(liste_lot.indexOf(lot_courant.getNumLot()) != -1)
+                if(lot_courant != null)
                 {
-    /*                ph_preparation_ligne.setQte_preparer(ph_preparation_ligne.getQte_preparer()-lot_courant.getQteSaisie());
-                    PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
-                    lot_courant.setQteSaisie(0);*/
-                }
-                else
-                {
-                    liste_lot.add(lot_courant.getNumLot());
+                    if(liste_lot.contains(lot_courant.getNumLot()))
+                    {
+        /*                ph_preparation_ligne.setQte_preparer(ph_preparation_ligne.getQte_preparer()-lot_courant.getQteSaisie());
+                        PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
+                        lot_courant.setQteSaisie(0);*/
+                    }
+                    else
+                    {
+                        liste_lot.add(lot_courant.getNumLot());
+                    }
                 }
             }
         }

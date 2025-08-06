@@ -61,6 +61,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.FournisseurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
@@ -76,6 +77,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_Reception_Adapte;
+import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Reliquat_ReceptionAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
@@ -311,7 +313,41 @@ public class DetailReceptionActivity extends ServiceActivity {
                 {
                     reliquat_temp.setBL_Numero(bonLivraison);
                     PH_ReliquatOpenHelper.mettreAJourUnPHReliquat(db, reliquat_temp);
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, reliquat_temp.getPhiMR4UUID(), reliquat_temp.getReliquat_UID(), DBOpenHelper.ActionsEAS.MAJ);
+
+                    /**
+                     * TODO : action utilisateur PH_Serialisation
+                     * */
+                    //    public PH_Serialisation(int _UID, int UserID, String reqType, String ClientTrxId, String ProductCode_VALUE_VA, String ProductCode_SHEME_VA, String Batch_ID_VA, String Batch_EXPDATE_VA, String Pack_SN_VA, String MVT_Type, String MVT_UID, int ProduitUID) {
+                    Produit produitCourant = ProduitOpenHelper.getProduitByID(db, reliquat_temp.getProduitID());
+                    if(produitCourant.isSuivi_Serialisation() && produitCourant.isSerialiser_Reception_Delivrance())
+                    {
+                        Random randomserialisation = new Random();
+                        int serialisationId = randomserialisation.nextInt();
+                        if(serialisationId > 0)
+                            serialisationId= serialisationId*-1;
+
+                        String[] datePeremptionTab = reliquat_temp.getPeremptionDate().split("-");
+                        String peremptionDate = reliquat_temp.getPeremptionDate();
+                        if(datePeremptionTab.length == 3)
+                            peremptionDate = datePeremptionTab[0].substring(2)+datePeremptionTab[1]+datePeremptionTab[2];
+
+                        PH_Serialisation serialisation = new PH_Serialisation(serialisationId, utilisateurConnecte.getId(), "G110", "", produitCourant.getGTIN(), "GTIN", reliquat_temp.getLot(), peremptionDate, reliquat_temp.getSerie(), "CDE", phReliquatCourant.getCommandeNumero(), produitCourant.getID_produit());
+                        serialisation.setStatut("En attente");
+                        serialisation.setRaison("");
+                        serialisation.setResultat("");
+                        PH_SerialisationOpenHelper.insererPH_SerialisationEnBDD(db, serialisation);
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisation.getPhiMR4UUID(), serialisation.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+
+                        Random randomAUSeri = new Random();
+                        int actionSerId = randomAUSeri.nextInt();
+                        if(actionSerId > 0)
+                            actionSerId= actionSerId*-1;
+                        ActionUtilisateur new_action_utilisateur_serialisation = new ActionUtilisateur(actionSerId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", serialisation.get_UID(), "", "Serialisation");
+                        ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur_serialisation);
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur_serialisation.getPhiMR4UUID(), new_action_utilisateur_serialisation.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+
+                    }
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, reliquat_temp.getPhiMR4UUID(), reliquat_temp.getReliquat_UID(), DBOpenHelper.ActionsEAS.AJOUT);
 
                     Random randomactionligne = new Random();
                     int actionligneId = randomactionligne.nextInt();
@@ -499,8 +535,8 @@ public class DetailReceptionActivity extends ServiceActivity {
                         {
                             PH_Reliquat_Reception_Adapte.Lot lotCourant = phReliquatReceptionAdapte.new Lot(phReliquat.getLot(), phReliquat.getPeremptionDate(), phReliquat.getSerie(), "true");
                             List<PH_Reliquat_Reception_Adapte.ZoneEtEmplacement> listeZoneEtEmplacement = new ArrayList<>();
-                            String zone_string = null;
-                            String emplacement_string = null;
+                            String zone_string = "";
+                            String emplacement_string = "";
                             int zoneID = 0;
                             int emplacementID = 0;
                             if(commandeSelectionne.getRef_Depot_Dest().contains("-PAD"))
@@ -513,10 +549,17 @@ public class DetailReceptionActivity extends ServiceActivity {
                             {
                                 Depot_Zone zone = ZoneOpenHelper.getZoneByDepotEtNom(db, depotPUI, phReliquat.getZone());
                                 Depot_Emplacement emplacement = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zone, phReliquat.getEmplacement());
-                                zone_string = zone.getZoneName();
-                                emplacement_string = emplacement.getAdressage();
-                                zoneID = zone.getZoneID();
-                                emplacementID = emplacement.get_UID();
+                                if(zone != null)
+                                {
+                                    zone_string = zone.getZoneName();
+                                    zoneID = zone.getZoneID();
+                                }
+
+                                if(emplacement != null)
+                                {
+                                    emplacement_string = emplacement.getAdressage();
+                                    emplacementID = emplacement.get_UID();
+                                }
                             }
 
                             listeZoneEtEmplacement.add(phReliquatReceptionAdapte.new ZoneEtEmplacement(zoneID, zone_string, emplacementID, emplacement_string, phReliquat.getQteLivraison()));
@@ -1048,7 +1091,7 @@ public class DetailReceptionActivity extends ServiceActivity {
         for(PH_Reliquat reliquatcourant : listeReliquatAjouter)
         {
             PH_ReliquatOpenHelper.supprimerUnPHReliquat(db, reliquatcourant);
-            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, reliquatcourant.getPhiMR4UUID(), reliquatcourant.getReliquat_UID(), DBOpenHelper.ActionsEAS.SUPPR);
+            //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, reliquatcourant.getPhiMR4UUID(), reliquatcourant.getReliquat_UID(), DBOpenHelper.ActionsEAS.SUPPR);
         }
 
         for(PH_Reliquat_Reception_Adapte.Lot lot : reliquatReceptionAdapte.getlotList()) {
@@ -1100,12 +1143,12 @@ public class DetailReceptionActivity extends ServiceActivity {
                 long rowID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, phReliquatCourant);
                 if(rowID != -1)
                 {
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, phReliquatCourant.getPhiMR4UUID(), phReliquatCourant.getReliquat_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                    //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, phReliquatCourant.getPhiMR4UUID(), phReliquatCourant.getReliquat_UID(), DBOpenHelper.ActionsEAS.AJOUT);
                 }
             }
         }
 
-        ElementASynchroniserOpenHelper.toutSynchroniser(DetailReceptionActivity.this, db, utilisateurConnecte, false);
+        //ElementASynchroniserOpenHelper.toutSynchroniser(DetailReceptionActivity.this, db, utilisateurConnecte, false);
     }
 
     private void envoyerImpressionZebra(PH_Reliquat reliquatCourant) throws JSONException {

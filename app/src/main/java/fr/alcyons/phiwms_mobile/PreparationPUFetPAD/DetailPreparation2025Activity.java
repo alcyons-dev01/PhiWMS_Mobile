@@ -296,9 +296,16 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (!ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.isEmpty()) {
-                    afficherAlerteConfirmationRetour(DetailPreparation2025Activity.this, LayoutInflater.from(DetailPreparation2025Activity.this), DetailPreparation2025Activity.super.getBundle());
-                } else {
+                if(ph_preparation_ligne_preparationLotAdapter != null)
+                {
+                    if (!ph_preparation_ligne_preparationLotAdapter.ph_preparation_lignes_Adaptes.isEmpty()) {
+                        afficherAlerteConfirmationRetour(DetailPreparation2025Activity.this, LayoutInflater.from(DetailPreparation2025Activity.this), DetailPreparation2025Activity.super.getBundle());
+                    } else {
+                        retourService(DetailPreparation2025Activity.super.getBundle());
+                    }
+                }
+                else
+                {
                     retourService(DetailPreparation2025Activity.super.getBundle());
                 }
             }
@@ -1102,6 +1109,8 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
         List<PH_Preparation_Ligne> listeLigne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, ph_preparation_Selectionne);
         for(PH_Preparation_Ligne lignecourante : listeLigne)
         {
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, lignecourante.getPhiMR4UUID(), lignecourante.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+
             Random randomactionligne = new Random();
             int actionligneId = randomactionligne.nextInt();
             if(actionligneId > 0)
@@ -1216,18 +1225,11 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
         List<PH_Preparation_Ligne> listePHPreparationLigne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparationAndProduitNeg(db, ph_preparationCorrespondant,ph_preparationLigneCorrespondant.getProduitID());
         for(PH_Preparation_Ligne courante : listePHPreparationLigne)
         {
-            //on recrédite les stocks
-            Stock_Lot_Emplacement_Light stockCourant = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByLotPeremptionEtDepot(db, courante.getLotNumero(), courante.getPeremptionDate(), depotOrigine);
-            if(stockCourant != null)
-            {
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, stockCourant.getPhiMR4UUID(), stockCourant.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
-            }
-
             //on supprime le PH_Preparation_Ligne
             PH_Preparation_LigneOpenHelper.supprimerUnPhPreparationLigne(db, courante);
-            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, courante.getPhiMR4UUID(), courante.get_UID(), DBOpenHelper.ActionsEAS.SUPPR);
+            //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, courante.getPhiMR4UUID(), courante.get_UID(), DBOpenHelper.ActionsEAS.SUPPR);
         }
-        ElementASynchroniserOpenHelper.toutSynchroniser(DetailPreparation2025Activity.this, db, utilisateurConnecte, true);
+        //ElementASynchroniserOpenHelper.toutSynchroniser(DetailPreparation2025Activity.this, db, utilisateurConnecte, true);
 
         lotsSaisis = new ArrayList<>();
         for (PH_Preparation_Ligne_Preparation_Adapte.LotAdapte lot : ph_preparationLigneAdapte.getLotAdaptes() ) {
@@ -1280,7 +1282,7 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
             long rowID = PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, ph_preparationLigneCourant);
             if (rowID != -1) {
                 //compteurReussiteParLotAvecValeur++;
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparationLigneCourant.getPhiMR4UUID(), ph_preparationLigneCourant.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparationLigneCourant.getPhiMR4UUID(), ph_preparationLigneCourant.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
                 //gestion des actions lignes
                 //Random randomactionligne = new Random();
                 //int actionligneId = randomactionligne.nextInt();
@@ -1296,7 +1298,7 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
                 {
                     stock_lot_emplacement.setQte(stock_lot_emplacement.getQte()-stock_lot_emplacement.getQte_Preparer());
                     Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_lot_emplacement);
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, stock_lot_emplacement.getPhiMR4UUID(), stock_lot_emplacement.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
+                    //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, stock_lot_emplacement.getPhiMR4UUID(), stock_lot_emplacement.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
                 }
             }
         }
@@ -1311,7 +1313,7 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
         //    PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, ph_preparation_reliquat);
         //}
 
-        ElementASynchroniserOpenHelper.toutSynchroniser(DetailPreparation2025Activity.this, db, utilisateurConnecte, false);
+        //ElementASynchroniserOpenHelper.toutSynchroniser(DetailPreparation2025Activity.this, db, utilisateurConnecte, false);
     }
 
     private void envoyerImpressionZebra(PH_Preparation ph_preparation) throws JSONException {

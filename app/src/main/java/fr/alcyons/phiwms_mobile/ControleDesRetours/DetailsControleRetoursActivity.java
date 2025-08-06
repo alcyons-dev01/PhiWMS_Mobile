@@ -482,7 +482,7 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
                     PH_Serialisation serialisation_courante = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, (int)uid_serialisation);
                     if(serialisation_courante != null)
                     {
-                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisation_courante.getSerialexpressUUID(), serialisation_courante.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisation_courante.getPhiMR4UUID(), serialisation_courante.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
                     }
                 }
 

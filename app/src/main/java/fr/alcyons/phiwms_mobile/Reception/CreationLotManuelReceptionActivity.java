@@ -339,7 +339,7 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
             datePeremptionTextView.setText(dateAAfficher);
         }
 
-        if(!produitSelectionne.isSuivi_Serialisation())
+        if(!produitSelectionne.isSuivi_Serialisation() || !produitSelectionne.isSerialiser_Reception_Delivrance())
         {
             numSerieEditText.setVisibility(View.GONE);
             labelSerie.setVisibility(View.GONE);

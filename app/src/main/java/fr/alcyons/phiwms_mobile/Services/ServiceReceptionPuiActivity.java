@@ -319,7 +319,10 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                         } else {
                             commandeJSONArray = response.getJSONArray("PH_Commandes");
                             viderTableCommandes(db);
-                            viderTablePH_Reliquat(db);
+                            List<PH_Reliquat> listeReliquatASupprimer= PH_ReliquatOpenHelper.getPH_ReliquatBase(db);
+                            for (PH_Reliquat reliquat : listeReliquatASupprimer) {
+                                PH_ReliquatOpenHelper.supprimerUnPHReliquat(db, reliquat);
+                            }
 
                             for (int i = 0; i < commandeJSONArray.length(); i++) {
                                 JSONObject commandeJSONObject = commandeJSONArray.getJSONObject(i);
