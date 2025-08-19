@@ -121,8 +121,8 @@ public class EmplacementOpenHelper extends DBOpenHelper {
                                     erreur = response.getString("erreur");
                                     etat = false;
                                     if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                        viderBasesDeDonnees(db);
-                                        erreur = "Votre identifiant de connexion est invalide, veuillez vous reconnecter.";
+                                        //viderBasesDeDonnees(db);
+                                        erreur = "Votre session a expirée, veuillez vous reconnecter.";
                                     } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                         erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
                                     } else if (!erreur.equals("Aucun Depot_Emplacement trouvé")) {

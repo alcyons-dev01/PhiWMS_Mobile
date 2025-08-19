@@ -138,8 +138,8 @@ public class RetourOpenHelper extends DBOpenHelper {
                             if (resultCount == 0) {
                                 erreur = response.getString("erreur");
                                 if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                    viderBasesDeDonnees(db);
-                                    erreur = "Votre identifiant de connexion est invalide, veuillez vous reconnecter.";
+                                    //viderBasesDeDonnees(db);
+                                    erreur = "Votre session a expirée, veuillez vous reconnecter.";
                                     etat = false;
                                 } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                     erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
@@ -265,8 +265,8 @@ public class RetourOpenHelper extends DBOpenHelper {
                             if (resultCount == 0) {
                                 erreur = response.getString("erreur");
                                 if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                    viderBasesDeDonnees(db);
-                                    erreur = "Votre identifiant de connexion est invalide, veuillez vous reconnecter.";
+                                    //viderBasesDeDonnees(db);
+                                    erreur = "Votre session a expirée, veuillez vous reconnecter.";
                                     etat = false;
                                 } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                     erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
@@ -389,8 +389,8 @@ public class RetourOpenHelper extends DBOpenHelper {
                             if (resultCount == 0) {
                                 erreur = response.getString("erreur");
                                 if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                    viderBasesDeDonnees(db);
-                                    erreur = "Votre identifiant de connexion est invalide, veuillez vous reconnecter.";
+                                    //viderBasesDeDonnees(db);
+                                    erreur = "Votre session a expirée, veuillez vous reconnecter.";
                                     etat = false;
                                 } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                     erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
@@ -501,8 +501,8 @@ public class RetourOpenHelper extends DBOpenHelper {
                             if (resultCount == 0) {
                                 erreur = response.getString("erreur");
                                 if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                    viderBasesDeDonnees(db);
-                                    erreur = "Votre identifiant de connexion est invalide, veuillez vous reconnecter.";
+                                    //viderBasesDeDonnees(db);
+                                    erreur = "Votre session a expirée, veuillez vous reconnecter.";
                                     etat = false;
                                 } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                     erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
@@ -610,8 +610,8 @@ public class RetourOpenHelper extends DBOpenHelper {
                             if (resultCount == 0) {
                                 erreur = response.getString("erreur");
                                 if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                    viderBasesDeDonnees(db);
-                                    erreur = "Votre identifiant de connexion est invalide, veuillez vous reconnecter.";
+                                    //viderBasesDeDonnees(db);
+                                    erreur = "Votre session a expirée, veuillez vous reconnecter.";
                                     etat = false;
                                 } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                     erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";

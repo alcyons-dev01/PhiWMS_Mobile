@@ -164,7 +164,7 @@ public class ServiceConnexionDirecteActivity extends ServiceAvecConnexionActivit
                             if (resultCount == 0) {
                                 String erreur = response.getString("erreur");
                                 if (erreur.equals(ServiceConnexionDirecteActivity.this.getString(R.string.tokenInvalide))) {
-                                    Alerte.afficherAlerte(ServiceConnexionDirecteActivity.this, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter.", "alerte");
+                                    Alerte.afficherAlerte(ServiceConnexionDirecteActivity.this, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
                                     DBOpenHelper.viderBasesDeDonnees(db);
                                     ServiceConnexionDirecteActivity.this.finishAffinity();
                                     Intent intent = new Intent(ServiceConnexionDirecteActivity.this, AuthentificationActivity.class);

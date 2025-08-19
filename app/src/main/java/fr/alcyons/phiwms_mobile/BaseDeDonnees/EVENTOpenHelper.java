@@ -105,8 +105,8 @@ public class EVENTOpenHelper extends DBOpenHelper {
                     etat = false;
                     erreur = response.getString("erreur");
                     if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                        DBOpenHelper.viderBasesDeDonnees(db);
-                        erreur = "Votre identifiant de connexion est invalide, veuillez vous reconnecter.";
+                        //DBOpenHelper.viderBasesDeDonnees(db);
+                        erreur = "Votre session a expirée, veuillez vous reconnecter.";
                     } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                         erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
                     } else if (!erreur.equals("Aucun Events trouvé")) {

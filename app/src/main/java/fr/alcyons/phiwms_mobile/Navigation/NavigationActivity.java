@@ -149,7 +149,7 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                     if (resultCount == 0) {
                         String erreur = response.getString("erreur");
                         if (erreur.equals(NavigationActivity.this.getString(R.string.tokenInvalide))) {
-                            Alerte.afficherAlerte(NavigationActivity.this, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter.", "alerte");
+                            Alerte.afficherAlerte(NavigationActivity.this, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
                             DBOpenHelper.viderBasesDeDonnees(db);
                             NavigationActivity.this.finishAffinity();
                             Intent intent = new Intent(NavigationActivity.this, AuthentificationActivity.class);

@@ -508,7 +508,7 @@ public class ProduitOpenHelper extends DBOpenHelper {
                                     erreur = response.getString("erreur");
                                     etat = false;
                                     if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                        viderBasesDeDonnees(db);
+                                        //viderBasesDeDonnees(db);
                                         erreur = " Votre identifiant de connexion est invalide, veuillez vous reconnecter.";
                                     } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                         erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";

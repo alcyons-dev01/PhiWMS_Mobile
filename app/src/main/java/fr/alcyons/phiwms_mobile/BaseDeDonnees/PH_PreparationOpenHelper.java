@@ -672,8 +672,8 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
                             if (resultCount == 0) {
                                 String erreur = response.getString("erreur");
                                 if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                    Alerte.afficherAlerte(context, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter.", "alerte");
-                                    viderBasesDeDonnees(db);
+                                    Alerte.afficherAlerte(context, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
+                                    //viderBasesDeDonnees(db);
                                     ((Activity) context).finishAffinity();
                                     Intent intent = new Intent(context, AuthentificationActivity.class);
                                     context.startActivity(intent);
@@ -792,8 +792,8 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
                             if (resultCount == 0) {
                                 String erreur = response.getString("erreur");
                                 if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                    Alerte.afficherAlerte(context, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter.", "alerte");
-                                    viderBasesDeDonnees(db);
+                                    Alerte.afficherAlerte(context, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
+                                    //viderBasesDeDonnees(db);
                                     ((Activity) context).finishAffinity();
                                     Intent intent = new Intent(context, AuthentificationActivity.class);
                                     context.startActivity(intent);
@@ -924,8 +924,8 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
                             if (resultCount == 0) {
                                 String erreur = response.getString("erreur");
                                 if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                    Alerte.afficherAlerte(context, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter.", "alerte");
-                                    viderBasesDeDonnees(db);
+                                    Alerte.afficherAlerte(context, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
+                                    //viderBasesDeDonnees(db);
                                     ((Activity) context).finishAffinity();
                                     Intent intent = new Intent(context, AuthentificationActivity.class);
                                     context.startActivity(intent);
@@ -1051,8 +1051,8 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
                             if (resultCount == 0) {
                                 String erreur = response.getString("erreur");
                                 if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                    Alerte.afficherAlerte(context, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter.", "alerte");
-                                    viderBasesDeDonnees(db);
+                                    Alerte.afficherAlerte(context, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
+                                    //viderBasesDeDonnees(db);
                                     ((Activity) context).finishAffinity();
                                     Intent intent = new Intent(context, AuthentificationActivity.class);
                                     context.startActivity(intent);

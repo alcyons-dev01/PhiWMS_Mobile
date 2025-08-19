@@ -84,8 +84,8 @@ public class PH_Demande_MotifOpenHelper extends DBOpenHelper {
                                 erreur = response.getString("erreur");
                                 etat = false;
                                 if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                    DBOpenHelper.viderBasesDeDonnees(db);
-                                    erreur = "Votre identifiant de connexion est invalide, veuillez vous reconnecter.";
+                                    //DBOpenHelper.viderBasesDeDonnees(db);
+                                    erreur = "Votre session a expirée, veuillez vous reconnecter.";
                                 } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                     erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
                                 } else if (!erreur.equals("Aucun PH_Depots trouvé")) {

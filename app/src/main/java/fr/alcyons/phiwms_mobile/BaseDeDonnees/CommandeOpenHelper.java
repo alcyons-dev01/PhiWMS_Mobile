@@ -218,7 +218,7 @@ public class CommandeOpenHelper extends DBOpenHelper {
                             if (resultCount == 0) {
                                 erreur = response.getString("erreur");
                                 if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                    erreur = "Votre identifiant de connexion est invalide, veuillez vous reconnecter.";
+                                    erreur = "Votre session a expirée, veuillez vous reconnecter.";
                                     etat = false;
                                 } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                     erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
@@ -319,7 +319,7 @@ public class CommandeOpenHelper extends DBOpenHelper {
                             if (resultCount == 0) {
                                 erreur = response.getString("erreur");
                                 if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                    erreur = "Votre identifiant de connexion est invalide, veuillez vous reconnecter.";
+                                    erreur = "Votre session a expirée, veuillez vous reconnecter.";
                                     etat = false;
                                 } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                     erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
@@ -420,7 +420,7 @@ public class CommandeOpenHelper extends DBOpenHelper {
                             if (resultCount == 0) {
                                 erreur = response.getString("erreur");
                                 if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                    erreur = "Votre identifiant de connexion est invalide, veuillez vous reconnecter.";
+                                    erreur = "Votre session a expirée, veuillez vous reconnecter.";
                                     etat = false;
                                 } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                     erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";

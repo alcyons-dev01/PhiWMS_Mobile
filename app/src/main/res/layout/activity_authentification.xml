@@ -51,7 +51,7 @@
                 android:backgroundTint="@android:color/white"
                 android:fontFamily="sans-serif"
                 android:hint="@string/identifiant"
-                android:text="alcyons"
+                android:text=""
                 android:inputType="text"
                 android:imeOptions="actionNext"
                 android:textColor="@android:color/white"
@@ -69,7 +69,7 @@
                 android:hint="@string/mot_de_passe"
                 android:imeOptions="actionDone"
                 android:inputType="textPassword"
-                android:text="65ken64btz"
+                android:text=""
                 android:textColor="@android:color/white"
                 android:textColorHint="@android:color/white"
                 android:textCursorDrawable="@null" />

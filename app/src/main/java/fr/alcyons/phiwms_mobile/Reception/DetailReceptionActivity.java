@@ -548,17 +548,17 @@ public class DetailReceptionActivity extends ServiceActivity {
                             else
                             {
                                 Depot_Zone zone = ZoneOpenHelper.getZoneByDepotEtNom(db, depotPUI, phReliquat.getZone());
-                                Depot_Emplacement emplacement = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zone, phReliquat.getEmplacement());
                                 if(zone != null)
                                 {
+                                    Depot_Emplacement emplacement = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zone, phReliquat.getEmplacement());
+                                    if(emplacement != null)
+                                    {
+                                        emplacement_string = emplacement.getAdressage();
+                                        emplacementID = emplacement.get_UID();
+                                    }
+
                                     zone_string = zone.getZoneName();
                                     zoneID = zone.getZoneID();
-                                }
-
-                                if(emplacement != null)
-                                {
-                                    emplacement_string = emplacement.getAdressage();
-                                    emplacementID = emplacement.get_UID();
                                 }
                             }
 

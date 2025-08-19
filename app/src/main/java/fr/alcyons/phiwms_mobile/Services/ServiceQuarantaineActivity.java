@@ -271,8 +271,8 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                         if (resultCount == 0) {
                             String erreur = response.getString("erreur");
                             if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerte(context, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter.", "alerte");
-                                DBOpenHelper.viderBasesDeDonnees(db);
+                                Alerte.afficherAlerte(context, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
+                                //DBOpenHelper.viderBasesDeDonnees(db);
                                 ServiceQuarantaineActivity.this.finishAffinity();
                                 Intent intent1 = new Intent(context, AuthentificationActivity.class);
                                 context.startActivity(intent1);

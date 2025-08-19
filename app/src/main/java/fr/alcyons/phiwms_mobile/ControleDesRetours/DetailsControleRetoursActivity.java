@@ -184,7 +184,7 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
                                 if (nbResultat == 0) {
                                     String erreur = response.getString("erreur");
                                     if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                        Alerte.afficherAlerte(context, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter.", "alerte");
+                                        Alerte.afficherAlerte(context, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
                                     } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                         Alerte.afficherAlerte(context, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", "alerte");
                                     } else if (!erreur.contentEquals("Aucun PH_Retour trouvé")) {
