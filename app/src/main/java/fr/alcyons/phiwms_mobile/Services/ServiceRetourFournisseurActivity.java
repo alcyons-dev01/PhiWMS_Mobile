@@ -237,8 +237,8 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                         if (nbResultat == 0) {
                             String string = response.getString("erreur");
                             if (string.equals(getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerte(ServiceRetourFournisseurActivity.this, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter", "alerte");
-                                DBOpenHelper.viderBasesDeDonnees(db);
+                                Alerte.afficherAlerte(ServiceRetourFournisseurActivity.this, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
+                                //DBOpenHelper.viderBasesDeDonnees(db);
                                 ServiceRetourFournisseurActivity.this.finishAffinity();
                                 Intent intent = new Intent(ServiceRetourFournisseurActivity.this, AuthentificationActivity.class);
                                 ServiceRetourFournisseurActivity.this.startActivity(intent);

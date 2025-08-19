@@ -159,7 +159,7 @@ public class DetailStockActivity extends ServiceAvecConnexionActivity {
                             if (resultCount == 0) {
                                 String erreur = response.getString("erreur");
                                 if (erreur.equals(getString(R.string.tokenInvalide))) {
-                                    Alerte.afficherAlerte(DetailStockActivity.this, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter", "alerte");
+                                    Alerte.afficherAlerte(DetailStockActivity.this, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
                                     DBOpenHelper.viderBasesDeDonnees(db);
                                     DetailStockActivity.this.finishAffinity();
                                     listeStockIntent = new Intent(DetailStockActivity.this, AuthentificationActivity.class);

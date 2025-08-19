@@ -228,8 +228,8 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
                             if (nbResultat == 0) {
                                 String string = response.getString("erreur");
                                 if (string.equals(getString(R.string.tokenInvalide))) {
-                                    Alerte.afficherAlerte(InformationDotationServiceActivity.this, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter", "alerte");
-                                    DBOpenHelper.viderBasesDeDonnees(db);
+                                    Alerte.afficherAlerte(InformationDotationServiceActivity.this, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
+                                    //DBOpenHelper.viderBasesDeDonnees(db);
                                     InformationDotationServiceActivity.this.finishAffinity();
                                     Intent intent = new Intent(InformationDotationServiceActivity.this, AuthentificationActivity.class);
                                     InformationDotationServiceActivity.this.startActivity(intent);

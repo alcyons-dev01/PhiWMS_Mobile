@@ -118,9 +118,9 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
             version = gestionnaireParametresServeur.getAPIVersion(db);
         }
 
-        ipServeurEditText.setText(ip);
+        /*ipServeurEditText.setText(ip);
         numeroPortEditText.setText(port);
-        versionAPIEditText.setText(version.length() > 0 ? version.substring(1) : "");
+        versionAPIEditText.setText(version.length() > 0 ? version.substring(1) : "");*/
 
         testConnexionButton = findViewById(R.id.boutonTestConnexion);
 

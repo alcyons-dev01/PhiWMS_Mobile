@@ -243,8 +243,8 @@ public class ServiceDemandePleinVideActivity extends ServiceAvecConnexionActivit
                             if (nbResultat == 0) {
                                 String string = response.getString("erreur");
                                 if (string.equals(getString(R.string.tokenInvalide))) {
-                                    Alerte.afficherAlerte(ServiceDemandePleinVideActivity.this, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter", "alerte");
-                                    DBOpenHelper.viderBasesDeDonnees(db);
+                                    Alerte.afficherAlerte(ServiceDemandePleinVideActivity.this, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
+                                    //DBOpenHelper.viderBasesDeDonnees(db);
                                     ServiceDemandePleinVideActivity.this.finishAffinity();
                                     Intent intent = new Intent(ServiceDemandePleinVideActivity.this, AuthentificationActivity.class);
                                     ServiceDemandePleinVideActivity.this.startActivity(intent);

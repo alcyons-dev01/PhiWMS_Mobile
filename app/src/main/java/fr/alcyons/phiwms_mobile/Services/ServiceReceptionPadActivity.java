@@ -309,7 +309,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                         if (resultCount == 0) {
                             String erreur = response.getString("erreur");
                             if (erreur.equals(getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter", "alerte");
+                                Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
                                 DBOpenHelper.viderBasesDeDonnees(db);
                                 ServiceReceptionPadActivity.this.finishAffinity();
                                 Intent intent = new Intent(ServiceReceptionPadActivity.this, AuthentificationActivity.class);

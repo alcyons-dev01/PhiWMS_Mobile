@@ -74,7 +74,8 @@
                 android:maxLines="1"
                 android:textColor="@android:color/black"
                 android:textColorHint="@android:color/black"
-                android:textCursorDrawable="@null" />
+                android:textCursorDrawable="@null"
+                android:text="192.81.222.83"/>
 
             <EditText
                 android:id="@+id/numeroPort"
@@ -86,7 +87,8 @@
                 android:inputType="number"
                 android:textColor="@android:color/black"
                 android:textColorHint="@android:color/black"
-                android:textCursorDrawable="@null" />
+                android:textCursorDrawable="@null"
+                android:text="89"/>
 
             <EditText
                 android:id="@+id/versionAPI"
@@ -98,7 +100,8 @@
                 android:inputType="number"
                 android:textColor="@android:color/black"
                 android:textColorHint="@android:color/black"
-                android:textCursorDrawable="@null" />
+                android:textCursorDrawable="@null"
+                android:text="1"/>
 
             <Button
                 android:id="@+id/boutonAlcyonsParametre"

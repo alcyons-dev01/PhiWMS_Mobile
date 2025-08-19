@@ -1,19 +1,24 @@
 package fr.alcyons.phiwms_mobile.Services;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -78,6 +83,15 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
     LinearLayout lancerScan;
     TextView textLancerScan;
     ImageView iconLancerScan;
+
+    TextView textViewPrincipal;
+    SeekBar seekBarPrincipal;
+    TextView textViewSecondaire;
+    SeekBar seekBarSecondaire;
+    int nbPreparationSynchroniser;
+    ArrayList<Dotation> dotationsListe;
+    public AlertDialog alertDialogProgression;
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,8 +190,8 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
                             if (nbResultat == 0) {
                                 String string = response.getString("erreur");
                                 if (string.equals(getString(R.string.tokenInvalide))) {
-                                    Alerte.afficherAlerte(ServiceDemandeDotationGlobaleActivity.this, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter", "alerte");
-                                    DBOpenHelper.viderBasesDeDonnees(db);
+                                    Alerte.afficherAlerte(ServiceDemandeDotationGlobaleActivity.this, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
+                                    //DBOpenHelper.viderBasesDeDonnees(db);
                                     ServiceDemandeDotationGlobaleActivity.this.finishAffinity();
                                     Intent intent = new Intent(ServiceDemandeDotationGlobaleActivity.this, AuthentificationActivity.class);
                                     ServiceDemandeDotationGlobaleActivity.this.startActivity(intent);
@@ -364,12 +378,14 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
         PH_Preparation ph_preparation = new PH_Preparation(UID, Service, Erreur_Valid, PHIE_Tag, Saisie_Le, A_tel_heure, produitID, produitDesignation, Qte_demandee, Livree, Validee, Origine, Liste, depotDestinataireID, depotDestinataireReference, SYS_DT_MAJ, SYS_HEURE_MAJ, SYS_USER_MAJ, PrescripteurReference, Prescription_date, PrescripteurNom, depotOrigineReference, depotOrigineID, Commentaires, PreparationDate, LivraisonPrevueDate, DN_Groupe, Montant_HT, Montant_TTC, Poids, Commande_ID, Preparateur, Statut, PHIE_SYNCHRO, receptionUFNonComforme, livraisonDate, Frequence, previsionDateDebut, previsionDateFin, URGENT, Motif, preparateur_userID, pharmacien_userID, Volume, PaletteNB, CaisseNB,Conteneur_NB, numero_scelle);
         int ph_preparationphiwms_mobileuid = (int) PH_PreparationOpenHelper.insererUnPH_PreparationEnBDD(db, ph_preparation);
 
-        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparationphiwms_mobileuid, ph_preparation.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.AJOUT);
+        //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparationphiwms_mobileuid, ph_preparation.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.AJOUT);
 
         List<Detail_Dot> listDetailDot = Detail_DotOpenHelper.getAllDetailDotParDotation(db, dotation);
-
+        int compteurDetailDot = 0;
         for(Detail_Dot detail_dot : listDetailDot)
         {
+            compteurDetailDot ++;
+            majProgressSecondaire(compteurDetailDot, listDetailDot.size());
             CreatePhPreparationLigneDetail(detail_dot, dotation);
         }
 
@@ -451,7 +467,9 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
                 PH_Preparation_Ligne ph_preparation_ligne = new PH_Preparation_Ligne(PreparationID, _UID, produitID, produitDesignation, Qte_APreparer, Qte_livrer, Livrer, Valider, ValidationDate, produitReference, ZoneDepot, produitCategorie, Qte_RAL, SYS_DT_MAJ, SYS_HEURE_MAJ, SYS_USER_MAJ, produitCondDistrib, produitPUHT, Suivi_Par_Lot, patientID, PatientNom, PrescripteurNom, prescripteurReference, Ordre_Impression, Prescription_ID, LotNumero, PeremptionDate, produitPoids, produitTVA, Montant_HT, Montant_TTC, PoidsTotal, depot_Destinataire_Reference, utilisation_Date_Prevue, Qte_besoin, Qte_StockSaisie, Qte_Demander, EmplacementParDefaut, Qte_preparer, accepter, phPreparationCourante.getUID());
                 PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, ph_preparation_ligne);
 
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparation_ligne.getPhiMR4UUID(), ph_preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.AJOUT);
+                //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparation_ligne.getPhiMR4UUID(), ph_preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.AJOUT);
+                //ElementASynchroniserOpenHelper.toutSynchroniser(ServiceDemandeDotationGlobaleActivity.this, db, utilisateurConnecte, false);
+
             }
         }
     }
@@ -468,10 +486,12 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
     private void gestionAdapter()
     {
         List<String>listeDate = new ArrayList<>();
-        ArrayList<Dotation> dotationsListe;
         dotationsListe = DotationOpenHelper.getDotationGlobale(db);
         /* Code nécessaire à l'affichage de la liste */
         dotationAdapter = new DotationAdapter(ServiceDemandeDotationGlobaleActivity.this, db, utilisateurConnecte);
+
+        //gestion alerte de progression
+        affichageAlertePogression(ServiceDemandeDotationGlobaleActivity.this, LayoutInflater.from(ServiceDemandeDotationGlobaleActivity.this), dotationsListe.size());
 
         for (Dotation dotationCourante : dotationsListe) {
             String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, dotationCourante.getDepot_UID());
@@ -489,6 +509,7 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
 
             //on check la présence des préparations en base
             PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandeDotationGlobaleEnInstance(db, "Dotation Globale : " + dotationCourante.getIntitule(), dateProchaineLivraison);
+            majProgressPrincipal();
 
             if(phPreparationCourante == null)
             {
@@ -497,7 +518,7 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
 
             phPreparationList.add(phPreparationCourante);
         }
-        ElementASynchroniserOpenHelper.toutSynchroniser(ServiceDemandeDotationGlobaleActivity.this, db, utilisateurConnecte, false);
+        //ElementASynchroniserOpenHelper.toutSynchroniser(ServiceDemandeDotationGlobaleActivity.this, db, utilisateurConnecte, false);
         dotationsListe.sort(new Comparator<Dotation>() {
             @SuppressLint("SimpleDateFormat")
             DateFormat f = new SimpleDateFormat("dd/MM/yyyy");
@@ -534,6 +555,41 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
         }
 
         invalidateOptionsMenu();
-        new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
+        //new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
+    }
+
+    private void affichageAlertePogression(Context context, LayoutInflater inflater, int nbElement)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View layout = inflater.inflate(R.layout.alerte_progress, null);
+
+        textViewPrincipal = layout.findViewById(R.id.TextViewPrincipal);
+        seekBarPrincipal = layout.findViewById(R.id.barDeProgressionPrincipal);
+        textViewSecondaire = layout.findViewById(R.id.TextViewSecondaire);
+        seekBarSecondaire = layout.findViewById(R.id.barDeProgressionSecondaire);
+        nbPreparationSynchroniser = 1;
+        textViewPrincipal.setText("Préparation 0/"+ nbPreparationSynchroniser);
+        seekBarPrincipal.setMax(nbElement);
+
+        builder.setView(layout);
+        alertDialogProgression = builder.create();
+        Objects.requireNonNull(alertDialogProgression.getWindow()).setGravity(Gravity.CENTER);
+        alertDialogProgression.show();
+    }
+
+    private void majProgressPrincipal()
+    {
+        nbPreparationSynchroniser++;
+        textViewPrincipal.setText("Préparation "+ nbPreparationSynchroniser +"/"+ dotationsListe.size());
+        seekBarPrincipal.setProgress(nbPreparationSynchroniser);
+    }
+
+    private void majProgressSecondaire(int compteurCourant, int compteurTotal)
+    {
+        textViewSecondaire.setVisibility(View.VISIBLE);
+        seekBarSecondaire.setVisibility(View.VISIBLE);
+        textViewSecondaire.setText("Ligne "+ compteurCourant +"/"+ compteurTotal);
+        seekBarSecondaire.setProgress(compteurCourant);
+        seekBarSecondaire.setMax(compteurTotal);
     }
 }

@@ -246,8 +246,8 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
                         if (nbResultat == 0) {
                             String string = response.getString("erreur");
                             if (string.equals(getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerte(ServiceDestructionActivity.this, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter", "alerte");
-                                DBOpenHelper.viderBasesDeDonnees(db);
+                                Alerte.afficherAlerte(ServiceDestructionActivity.this, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
+                                //DBOpenHelper.viderBasesDeDonnees(db);
                                 ServiceDestructionActivity.this.finishAffinity();
                                 Intent intent = new Intent(ServiceDestructionActivity.this, AuthentificationActivity.class);
                                 ServiceDestructionActivity.this.startActivity(intent);

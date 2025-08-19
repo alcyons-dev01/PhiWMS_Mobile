@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:ignore="MissingConstraints">
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/bleu_fonce_alcyons"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="Chargement en cours..."
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/TextViewPrincipal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Text view principal"
+            android:textStyle="bold"
+            android:textColor="@color/noir"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"/>
+
+        <SeekBar
+            android:id="@+id/barDeProgressionPrincipal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:progress="0"
+            android:verticalScrollbarPosition="left"
+            android:progressTint="@color/bleu_clair_alcyons"
+            android:thumbTint="@color/bleu_clair_alcyons"
+            tools:ignore="MissingConstraints" />
+
+        <TextView
+            android:id="@+id/TextViewSecondaire"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Text view secondaire"
+            android:textStyle="bold"
+            android:textColor="@color/noir"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:visibility="gone"/>
+
+        <SeekBar
+            android:id="@+id/barDeProgressionSecondaire"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:progress="0"
+            android:progressTint="@color/bleu_clair_alcyons"
+            android:thumbTint="@color/bleu_clair_alcyons"
+            tools:ignore="MissingConstraints"
+            android:visibility="gone"/>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

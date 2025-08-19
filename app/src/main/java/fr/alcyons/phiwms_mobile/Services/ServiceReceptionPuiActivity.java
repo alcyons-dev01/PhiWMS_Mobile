@@ -299,7 +299,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                         if (resultCount == 0) {
                             String erreur = response.getString("erreur");
                             if (erreur.equals(getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerte(ServiceReceptionPuiActivity.this, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter", "alerte");
+                                Alerte.afficherAlerte(ServiceReceptionPuiActivity.this, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
                                 DBOpenHelper.viderBasesDeDonnees(db);
                                 ServiceReceptionPuiActivity.this.finishAffinity();
                                 Intent intent = new Intent(ServiceReceptionPuiActivity.this, AuthentificationActivity.class);

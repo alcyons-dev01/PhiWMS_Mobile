@@ -140,8 +140,8 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
                             if (nbResultat == 0) {
                                 String string = response.getString("erreur");
                                 if (string.equals(getString(R.string.tokenInvalide))) {
-                                    Alerte.afficherAlerte(ServiceDemandeReassortActivity.this, "Alerte", "Votre identifiant de connexion est invalide, veuillez vous reconnecter", "alerte");
-                                    DBOpenHelper.viderBasesDeDonnees(db);
+                                    Alerte.afficherAlerte(ServiceDemandeReassortActivity.this, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
+                                    //DBOpenHelper.viderBasesDeDonnees(db);
                                     ServiceDemandeReassortActivity.this.finishAffinity();
                                     Intent intent = new Intent(ServiceDemandeReassortActivity.this, AuthentificationActivity.class);
                                     ServiceDemandeReassortActivity.this.startActivity(intent);
