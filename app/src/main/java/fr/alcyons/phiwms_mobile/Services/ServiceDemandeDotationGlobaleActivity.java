@@ -196,7 +196,7 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
                                     Intent intent = new Intent(ServiceDemandeDotationGlobaleActivity.this, AuthentificationActivity.class);
                                     ServiceDemandeDotationGlobaleActivity.this.startActivity(intent);
                                 }
-                                else
+                                /*else
                                 {
                                     Intent intent = new Intent(ServiceDemandeDotationGlobaleActivity.this, NavigationActivity.class);
                                     Bundle extras = new Bundle();
@@ -204,7 +204,7 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
                                     intent.putExtras(extras);
                                     ServiceDemandeDotationGlobaleActivity.this.startActivity(intent);
                                     ServiceDemandeDotationGlobaleActivity.this.finish();
-                                }
+                                }*/
                             } else {
                                 JSONArray phPreparationJSONArray = response.getJSONArray("PH_Preparations");
                                 List<Integer> listeUIDPreparationEnInstance = PH_PreparationOpenHelper.getUIDDotationGlobaleEnInstance(db);
@@ -485,13 +485,55 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
 
     private void gestionAdapter()
     {
-        List<String>listeDate = new ArrayList<>();
         dotationsListe = DotationOpenHelper.getDotationGlobale(db);
         /* Code nécessaire à l'affichage de la liste */
         dotationAdapter = new DotationAdapter(ServiceDemandeDotationGlobaleActivity.this, db, utilisateurConnecte);
 
         //gestion alerte de progression
         affichageAlertePogression(ServiceDemandeDotationGlobaleActivity.this, LayoutInflater.from(ServiceDemandeDotationGlobaleActivity.this), dotationsListe.size());
+    }
+
+    private void affichageAlertePogression(Context context, LayoutInflater inflater, int nbElement)
+    {
+        arreterSpinner();
+        AlertDialog.Builder builderProgression = new AlertDialog.Builder(context);
+        View layoutProgression = inflater.inflate(R.layout.alerte_progress, null);
+
+        textViewPrincipal = layoutProgression.findViewById(R.id.TextViewPrincipal);
+        seekBarPrincipal = layoutProgression.findViewById(R.id.barDeProgressionPrincipal);
+        textViewSecondaire = layoutProgression.findViewById(R.id.TextViewSecondaire);
+        seekBarSecondaire = layoutProgression.findViewById(R.id.barDeProgressionSecondaire);
+        nbPreparationSynchroniser = 1;
+        textViewPrincipal.setText("Préparation 0/"+ dotationsListe.size());
+        seekBarPrincipal.setMax(nbElement);
+
+        builderProgression.setView(layoutProgression);
+        alertDialogProgression = builderProgression.create();
+        Objects.requireNonNull(alertDialogProgression.getWindow()).setGravity(Gravity.CENTER);
+        alertDialogProgression.show();
+
+        //gestionDotation();
+    }
+
+    private void majProgressPrincipal()
+    {
+        nbPreparationSynchroniser++;
+        textViewPrincipal.setText("Préparation "+ nbPreparationSynchroniser +"/"+ dotationsListe.size());
+        seekBarPrincipal.setProgress(nbPreparationSynchroniser);
+    }
+
+    private void majProgressSecondaire(int compteurCourant, int compteurTotal)
+    {
+        textViewSecondaire.setVisibility(View.VISIBLE);
+        seekBarSecondaire.setVisibility(View.VISIBLE);
+        textViewSecondaire.setText("Ligne "+ compteurCourant +"/"+ compteurTotal);
+        seekBarSecondaire.setProgress(compteurCourant);
+        seekBarSecondaire.setMax(compteurTotal);
+    }
+
+    private void gestionDotation()
+    {
+        List<String>listeDate = new ArrayList<>();
 
         for (Dotation dotationCourante : dotationsListe) {
             String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, dotationCourante.getDepot_UID());
@@ -556,40 +598,5 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
 
         invalidateOptionsMenu();
         //new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
-    }
-
-    private void affichageAlertePogression(Context context, LayoutInflater inflater, int nbElement)
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View layout = inflater.inflate(R.layout.alerte_progress, null);
-
-        textViewPrincipal = layout.findViewById(R.id.TextViewPrincipal);
-        seekBarPrincipal = layout.findViewById(R.id.barDeProgressionPrincipal);
-        textViewSecondaire = layout.findViewById(R.id.TextViewSecondaire);
-        seekBarSecondaire = layout.findViewById(R.id.barDeProgressionSecondaire);
-        nbPreparationSynchroniser = 1;
-        textViewPrincipal.setText("Préparation 0/"+ nbPreparationSynchroniser);
-        seekBarPrincipal.setMax(nbElement);
-
-        builder.setView(layout);
-        alertDialogProgression = builder.create();
-        Objects.requireNonNull(alertDialogProgression.getWindow()).setGravity(Gravity.CENTER);
-        alertDialogProgression.show();
-    }
-
-    private void majProgressPrincipal()
-    {
-        nbPreparationSynchroniser++;
-        textViewPrincipal.setText("Préparation "+ nbPreparationSynchroniser +"/"+ dotationsListe.size());
-        seekBarPrincipal.setProgress(nbPreparationSynchroniser);
-    }
-
-    private void majProgressSecondaire(int compteurCourant, int compteurTotal)
-    {
-        textViewSecondaire.setVisibility(View.VISIBLE);
-        seekBarSecondaire.setVisibility(View.VISIBLE);
-        textViewSecondaire.setText("Ligne "+ compteurCourant +"/"+ compteurTotal);
-        seekBarSecondaire.setProgress(compteurCourant);
-        seekBarSecondaire.setMax(compteurTotal);
     }
 }
