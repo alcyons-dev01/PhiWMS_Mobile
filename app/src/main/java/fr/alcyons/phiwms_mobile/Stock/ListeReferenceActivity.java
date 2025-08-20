@@ -187,7 +187,33 @@ public class ListeReferenceActivity extends ServiceActivity {
                             toast.setGravity(Gravity.CENTER, 0, 0);
                             toast.show();
                         }
-                    } else {
+                    }
+                    else if(code.toUpperCase().startsWith("PHITAGREF:"))
+                    {
+                        String[] codeDecoupe = code.split(":");
+                        if(codeDecoupe.length > 1) {
+                            String codeProduit = codeDecoupe[1];
+                            Produit produit = ProduitOpenHelper.getProduitByID(db, Integer.parseInt(codeProduit));
+                            if (produit != null) {
+                                Intent selectionProduitIntent = new Intent(ListeReferenceActivity.this, DetailStockActivity.class);
+                                Bundle selectionProduitBundle = ListeReferenceActivity.super.getBundle();
+                                selectionProduitBundle.putInt("depotUID_Selectionne", Objects.requireNonNull(intent.getExtras()).getInt("depotUID_Selectionne"));
+                                selectionProduitBundle.putInt("produitID", produit.getID_produit());
+                                selectionProduitIntent.putExtras(selectionProduitBundle);
+                                ListeReferenceActivity.this.startActivity(selectionProduitIntent);
+                            } else {
+                                Toast toast = Toast.makeText(ListeReferenceActivity.this, "Aucun produit ne correspond à ce code", Toast.LENGTH_LONG);
+                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                toast.show();
+                            }
+                        }
+                        else {
+                            Toast toast = Toast.makeText(ListeReferenceActivity.this, "Le code fourni n'est pas un code PHITAGREF, veuillez réessayer.", Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+                        }
+                    }
+                    else {
                         Toast toast = Toast.makeText(ListeReferenceActivity.this, "Le code fourni n'est pas un code GS1, veuillez réessayer.", Toast.LENGTH_SHORT);
                         toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
