@@ -23,6 +23,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.MainActivity;
@@ -141,4 +142,109 @@ public class WS_PKI extends MainActivity {
         }
     }
 
+    public static boolean PingSerialisation(final Context context, final SQLiteDatabase db, final Utilisateur utilisateur) {
+        final boolean[] retour = {false};
+        if (!utilisateur.getToken().contentEquals("")) {
+                // Tentative de lancer la sychronisation
+                if (statutConnexion) {
+                    String urlRequete = "https://phir4.alcyons.fr/api/ldap/connexion";
+                    RequestQueue requestQueue = Volley.newRequestQueue(context);
+                    try
+                    {
+                        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null, new Response.Listener<JSONObject>() {
+                            // Takes the response from the JSON request
+                            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                try {
+
+                                    JSONObject Body = response.getJSONObject("Body");
+                                    JSONObject ReturnCode = Body.getJSONObject("ReturnCode");
+                                    String code = ReturnCode.getString("code");
+                                    String desc = ReturnCode.getString("desc");
+
+                                    if (code.contentEquals("NMVS_SUCCESS")) {
+                                        retour[0] = true;
+                                    }
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                handler.sendMessage(handler.obtainMessage());
+                            }
+                        },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        Log.e("Volley", "Error");
+                                    }
+                                }
+                        ) {
+                            @Override
+                            public Map<String, String> getHeaders() throws AuthFailureError {
+                                HashMap<String, String> headers = new HashMap<>();
+                                headers.put("Authorization", utilisateur.getToken());
+                                headers.put("Content-Type", "application/json;charset=utf-8");
+                                return headers;
+                            }
+                        };
+                        obreq.setRetryPolicy(retryPolicy);
+                        requestQueue.add(obreq);
+                        try {
+                            Looper.loop();
+                        } catch (RuntimeException e) {
+                            e.printStackTrace();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+        return retour[0];
+    }
+
+    public static CompletableFuture<Boolean> checkApiAsync(Context context) {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        String url = "https://phir4.alcyons.fr/api/ldap/connexion";
+
+        JsonObjectRequest req = new JsonObjectRequest(
+                Request.Method.GET, url, null,
+                response -> {
+                    JSONObject Body = null;
+                    try {
+                        Body = response.getJSONObject("Body");
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    JSONObject ReturnCode = null;
+                    try {
+                        ReturnCode = Body.getJSONObject("ReturnCode");
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    String code = null;
+                    try {
+                        code = ReturnCode.getString("code");
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    String desc = null;
+                    try {
+                        desc = ReturnCode.getString("desc");
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    boolean ok = false;
+                    if (code.contentEquals("API_SUCCESS") && desc.contentEquals("Serveur ouvert")) {
+                        ok = true;
+                    }
+                    future.complete(ok);
+                },
+                error -> future.complete(false)
+        );
+
+        Volley.newRequestQueue(context.getApplicationContext()).add(req);
+        return future;
+    }
 }

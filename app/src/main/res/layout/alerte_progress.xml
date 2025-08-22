@@ -29,18 +29,20 @@
             android:text="Text view principal"
             android:textStyle="bold"
             android:textColor="@color/noir"
+            android:textSize="18dp"
+            android:gravity="center"
             android:layout_marginTop="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"/>
 
-        <SeekBar
+        <ProgressBar
             android:id="@+id/barDeProgressionPrincipal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:progress="0"
             android:verticalScrollbarPosition="left"
-            android:progressTint="@color/bleu_clair_alcyons"
-            android:thumbTint="@color/bleu_clair_alcyons"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/bleu_clair_alcyons"
+            android:indeterminateDuration="500"
             tools:ignore="MissingConstraints" />
 
         <TextView
@@ -49,20 +51,23 @@
             android:layout_height="wrap_content"
             android:text="Text view secondaire"
             android:textStyle="bold"
+            android:textSize="18dp"
+            android:gravity="center"
             android:textColor="@color/noir"
             android:layout_marginTop="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:visibility="gone"/>
 
-        <SeekBar
+        <ProgressBar
             android:id="@+id/barDeProgressionSecondaire"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:progress="0"
-            android:progressTint="@color/bleu_clair_alcyons"
-            android:thumbTint="@color/bleu_clair_alcyons"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/bleu_clair_alcyons"
             tools:ignore="MissingConstraints"
+            android:indeterminateDuration="1000"
             android:visibility="gone"/>
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -620,7 +620,7 @@ public class DetailReceptionActivity extends ServiceActivity {
         lancerScan.setOnClickListener(view -> {
             Intent listeLotReception_Intent;
             Bundle listeLotReception_Bundle = new Bundle();
-            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies")  || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
+            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies")  || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google") || android.os.Build.MANUFACTURER.toLowerCase().contains("samsung"))
             {
                 listeLotReception_Intent = new Intent(DetailReceptionActivity.this, ScannerReception2025Activity.class);
             }
@@ -849,7 +849,14 @@ public class DetailReceptionActivity extends ServiceActivity {
                 Produit produit1 = ProduitOpenHelper.getProduitByID(db, oo1.getProduitID());
                 Produit produit2 = ProduitOpenHelper.getProduitByID(db, oo2.getProduitID());
 
-                return produit1.getCategorie().toLowerCase().compareTo(produit2.getCategorie().toLowerCase());
+                if(produit1 == null || produit2 == null)
+                {
+                    return 1;
+                }
+                else
+                {
+                    return produit1.getCategorie().toLowerCase().compareTo(produit2.getCategorie().toLowerCase());
+                }
             }
         });
         phReliquatReceptionAdapter = new PH_Reliquat_ReceptionAdapter(DetailReceptionActivity.this, db, phReliquatReceptionAdapteList);

@@ -32,7 +32,9 @@ import java.util.Random;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Parametres_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
+import fr.alcyons.phiwms_mobile.Classes.Parametres_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.SurveillanceReference;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.MainActivity;
@@ -70,7 +72,7 @@ public class WS_SINGLE_PACK extends MainActivity {
     //private static String url = "https://phir4.alcyons.fr/api/v2/WS_SINGLE_PACK/";
 
     public static void NMVS_G110_verifySinglePack(final Context context, final SQLiteDatabase db, final Utilisateur utilisateur, int serialisationUID, final String ProductCode_VALUE_VA, String ProductCode_SHEME_VA, String Batch_ID_VA, String Batch_EXPDATE_VA, String Pack_SN_VA) {
-        final String tokenLdap = AuthentificationLDAP(context);
+        final String tokenLdap = AuthentificationLDAP(context, db, utilisateur);
         if (!utilisateur.getToken().contentEquals("")) {
             PH_Serialisation phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, serialisationUID);
             if(phSerialisation == null)
@@ -207,7 +209,7 @@ public class WS_SINGLE_PACK extends MainActivity {
     }
 
     public static void NMVS_G120_dispenseSinglePack(final Context context, final SQLiteDatabase db, final Utilisateur utilisateur, int serialisationUID, String ProductCode_VALUE_VA, String ProductCode_SHEME_VA, String Batch_ID_VA, String Batch_EXPDATE_VA, String Pack_SN_VA) {
-        final String tokenLdap = AuthentificationLDAP(context);
+        final String tokenLdap = AuthentificationLDAP(context, db, utilisateur);
         if (!utilisateur.getToken().contentEquals("")) {
             PH_Serialisation phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, serialisationUID);
             if(phSerialisation == null)
@@ -341,7 +343,7 @@ public class WS_SINGLE_PACK extends MainActivity {
     }
 
     public static void NMVS_G150_sampleSinglePack(final Context context, final SQLiteDatabase db, final Utilisateur utilisateur, int serialisationUID, String ProductCode_VALUE_VA, String ProductCode_SHEME_VA, String Batch_ID_VA, String Batch_EXPDATE_VA, String Pack_SN_VA) {
-        final String tokenLdap = AuthentificationLDAP(context);
+        final String tokenLdap = AuthentificationLDAP(context, db, utilisateur);
         if (!utilisateur.getToken().contentEquals("")) {
             PH_Serialisation phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, serialisationUID);
             if(phSerialisation == null)
@@ -477,7 +479,7 @@ public class WS_SINGLE_PACK extends MainActivity {
     }
 
     public static void NMVS_G130_destroySinglePack(final Context context, final SQLiteDatabase db, final Utilisateur utilisateur, int serialisationUID, String ProductCode_VALUE_VA, String ProductCode_SHEME_VA, String Batch_ID_VA, String Batch_EXPDATE_VA, String Pack_SN_VA) {
-        final String tokenLdap = AuthentificationLDAP(context);
+        final String tokenLdap = AuthentificationLDAP(context, db, utilisateur);
         if (!utilisateur.getToken().contentEquals("")) {
             PH_Serialisation phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, serialisationUID);
             if(phSerialisation == null)
@@ -614,7 +616,7 @@ public class WS_SINGLE_PACK extends MainActivity {
     }
 
     public static void NMVS_G121_undoDispenseSinglePac(final Context context, final SQLiteDatabase db, final Utilisateur utilisateur, int serialisationUID, String ProductCode_VALUE_VA, String ProductCode_SHEME_VA, String Batch_ID_VA, String Batch_EXPDATE_VA, String Pack_SN_VA) {
-        final String tokenLdap = AuthentificationLDAP(context);
+        final String tokenLdap = AuthentificationLDAP(context, db, utilisateur);
         if (!utilisateur.getToken().contentEquals("")) {
             PH_Serialisation phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, serialisationUID);
             if(phSerialisation == null)
@@ -749,7 +751,7 @@ public class WS_SINGLE_PACK extends MainActivity {
     }
 
     public static void NMVS_G151_undoSampleSinglePack(final Context context, final SQLiteDatabase db, final Utilisateur utilisateur, int serialisationUID, String ProductCode_VALUE_VA, String ProductCode_SHEME_VA, String Batch_ID_VA, String Batch_EXPDATE_VA, String Pack_SN_VA) {
-        final String tokenLdap = AuthentificationLDAP(context);
+        final String tokenLdap = AuthentificationLDAP(context, db, utilisateur);
         if (!utilisateur.getToken().contentEquals("")) {
             PH_Serialisation phSerialisation = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, serialisationUID);
             if(phSerialisation == null)
@@ -883,28 +885,51 @@ public class WS_SINGLE_PACK extends MainActivity {
         }
     }
 
-    public static String AuthentificationLDAP(final Context context) {
+    public static String AuthentificationLDAP(final Context context, final SQLiteDatabase db, Utilisateur utilisateurconnecte) {
         final String[] token_LDAP = {""};
 
             // Tentative de lancer la sychronisation
             if (haveNetworkConnection(context)) {
                 String urlRequete = "https://phir4.alcyons.fr/api/ldap/authentification";
                 RequestQueue requestQueue = Volley.newRequestQueue(context);
-                String mdp_md5 = OutilsEncodage.recupererHashageMD5("alcyonsjessica");
                 JSONObject data = new JSONObject();
-                try {
-                    JSONObject body = new JSONObject();
-                    body.put("user", "Jessica LACAZE");
-                    body.put("password", mdp_md5);
-                    body.put("compagny", "ALCYONS");
-                    body.put("softwareName", "11-181122_SerialExpress");
-                    body.put("softwareSupplier", "Alcyons");
-                    body.put("softwareVersion", "1812");
 
-                    data.put("body", body);
+                Parametres_Serialisation parametresSerialisation = Parametres_SerialisationOpenHelper.getParametres_Serialisation(db);
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                if(parametresSerialisation != null)
+                {
+                    String mdp_md5 = OutilsEncodage.recupererHashageMD5(parametresSerialisation.getFranceMVO_mdp());
+                    try {
+                        JSONObject body = new JSONObject();
+                        body.put("user", "FranceMVO");
+                        body.put("password", mdp_md5);
+                        body.put("compagny", utilisateurconnecte.getEtablissement());
+                        body.put("softwareName", "PihR4");
+                        body.put("softwareSupplier", "Alcyons");
+                        body.put("softwareVersion", "1812");
+
+                        data.put("body", body);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else
+                {
+                    try {
+                        JSONObject body = new JSONObject();
+                        body.put("user", "");
+                        body.put("password", "");
+                        body.put("compagny", "");
+                        body.put("softwareName", "");
+                        body.put("softwareSupplier", "");
+                        body.put("softwareVersion", "");
+
+                        data.put("body", body);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.POST, urlRequete, data, new Response.Listener<JSONObject>() {

@@ -24,6 +24,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 
 import com.android.volley.Request;
@@ -64,6 +65,7 @@ import fr.alcyons.phiwms_mobile.Classes.Dotation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.DotationGlobaleAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
@@ -204,6 +206,18 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
         String[] tabDate = livraisonPrevueDate.split("-");
         livraisonPrevueDate = tabDate[tabDate.length-1]+"/"+tabDate[1]+"/"+tabDate[0];
         dateEnvoiListe_TV.setText(livraisonPrevueDate);
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent(InformationDotationServiceActivity.this, ServiceDemandeDotationGlobaleActivity.class);
+                Bundle extras = new Bundle();
+                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                intent.putExtras(extras);
+                InformationDotationServiceActivity.this.startActivity(intent);
+                InformationDotationServiceActivity.this.finish();
+            }
+        });
     }
 
     @Override

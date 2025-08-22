@@ -1,5 +1,7 @@
 package fr.alcyons.phiwms_mobile.BarcodeSearch;
 
+import static fr.alcyons.phiwms_mobile.OutilsSerialisation.WS_PKI.checkApiAsync;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -42,6 +44,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Parametres_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
@@ -54,12 +57,16 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_Preparation_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_Reception_Adapte;
+import fr.alcyons.phiwms_mobile.Classes.Parametres_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeEmplacementCreationActivity;
 import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeZoneCreationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
+import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
+import fr.alcyons.phiwms_mobile.OutilsSerialisation.WS_PKI;
+import fr.alcyons.phiwms_mobile.OutilsSerialisation.WS_SINGLE_PACK;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.Reception.DetailReceptionActivity;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
@@ -109,11 +116,25 @@ public class ScannerReception2025Activity extends ServiceActivity {
     Depot_Emplacement emplacement_precedent;
     Depot_Emplacement emplacement_courant;
     PH_Reliquat_Reception_Adapte.Lot nouveau_lot;
+    Serialisation serialisation;
+    boolean serialisationActive;
+    String tempCodeScanne;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scanner_preparation);
 
+        //SERIALISATION
+        serialisation = new Serialisation(ScannerReception2025Activity.this, db, utilisateurConnecte);
+        checkApiAsync(this).thenAccept(success -> {
+            serialisationActive = success;
+            if(success)
+            {
+                ((ImageView) findViewById(R.id.imageLogoFMVO)).setVisibility(View.VISIBLE);
+            }
+        });
+
+        WS_SINGLE_PACK.AuthentificationLDAP(this, db, utilisateurConnecte);
         // INTENT
         intent = ScannerReception2025Activity.this.getIntent();
         scannerContexte = intent.getExtras().getString("contexte");
@@ -266,309 +287,332 @@ public class ScannerReception2025Activity extends ServiceActivity {
             public void afterTextChanged(Editable s) {
                 if (s.toString().endsWith("\n")) {
                     String codeScanne = s.toString().substring(0, s.length() - 1);
-                    String lot;
-                    String serie;
-                    String gtin_courant = "";
-                    String gtin_courant_sans_ai = "";
-                    String date_peremption_courant = "";
-                    if(codeScanne.startsWith("PHITAGPLACE+"))
+                    if((codeScanne.startsWith("01") || codeScanne.startsWith("02")) && codeScanne.length() == 16)
                     {
-                        serie = "";
-                        lot = "";
-                        String[] tab_emplacement = codeScanne.split(":");
-                        int emplacement_uid = Integer.parseInt(tab_emplacement[tab_emplacement.length-1]);
-
-                        emplacement_courant = EmplacementOpenHelper.getUnEmplacementByID(db, emplacement_uid);
-
-                        if(emplacement_courant != null)
-                            ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacement_courant.getAdressage().trim());
-
-
-                        ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
-                        ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.VISIBLE);
-                        ((ImageView) findViewById(R.id.ImageViewEmplacement)).setVisibility(View.GONE);
-
-                        if(produitCourant != null)
-                        {
-                            //initilisation du compteur
-                            ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.VISIBLE);
-                            ((LinearLayout) findViewById(R.id.LinearLayoutBoutonBarcode)).setVisibility(View.GONE);
-                            ((TextView) findViewById(R.id.instruction)).setVisibility(View.GONE);
-                            counter = 5;
-                            Counter();
-                        }
+                        tempCodeScanne = codeScanne;
                     }
-                    else {
-                        Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeScanne);
-
-                        if (gs1Decoupe.size() != 1)
-                        {
-                            //on récupère les informations du découpage du GS1
-                            lot = gs1Decoupe.get(OutilsDecodage.numeroLot);
-                            serie = gs1Decoupe.get(OutilsDecodage.numeroSerie);
-                            gtin_courant = gs1Decoupe.get(OutilsDecodage.codeGtin);
-                            gtin_courant_sans_ai = gs1Decoupe.get(OutilsDecodage.codeGtinSansAi);
-                            date_peremption_courant = gs1Decoupe.get(OutilsDecodage.dateDePeremption);
-
-                            //gestion format date
-                            String[] date_peremption_split = date_peremption_courant.split("-");
-                            if(date_peremption_split.length == 3)
-                                date_peremption_courant = date_peremption_split[2] + "/" + date_peremption_split[1] + "/" + date_peremption_split[0];
-
-                            //récucpération du produit avec le GTIN
-                            List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gtin_courant);
-
-                            //Si la liste est vide on essaye avec le GTIN sans AI
-                            if(produits.isEmpty())
-                            {
-                                produits = ProduitOpenHelper.getProduitsParGTIN(db, gtin_courant_sans_ai);
-                            }
-
-                            //Si la liste n'est pas vide on réupère le produit courant
-                            if(!produits.isEmpty())
-                                produitCourant = produits.get(0);
-                        }
-                        else
+                    else if(tempCodeScanne != null && !tempCodeScanne.contentEquals("") && !codeScanne.startsWith("01") && !codeScanne.startsWith("02"))
+                    {
+                        tempCodeScanne = tempCodeScanne +  codeScanne;
+                        EditTextScanee.setText(tempCodeScanne+"\n");
+                        tempCodeScanne = "";
+                    }
+                    else
+                    {
+                        tempCodeScanne = "";
+                        String lot;
+                        String serie;
+                        String gtin_courant = "";
+                        String gtin_courant_sans_ai = "";
+                        String date_peremption_courant = "";
+                        if(codeScanne.startsWith("PHITAGPLACE"))
                         {
                             serie = "";
                             lot = "";
-                            //on essaye de récupérer via le code inconnu
-                            List<Produit> produits  = ProduitOpenHelper.getProduitByCodeInconnu(db, s.toString().substring(0, s.length()-1));
-                            if (produits.size() == 1) {
-                                produitCourant = produits.get(0);
-                            }
-                        }
+                            String[] tab_emplacement = codeScanne.split(":");
+                            int emplacement_uid = Integer.parseInt(tab_emplacement[tab_emplacement.length-1]);
 
-                        if(produitCourant != null)
-                        {
-                            //on vérifie que le produit courant fait partie de la liste des ph_preparation_ligne
-                            boolean produit_present = false;
-                            for(PH_Reliquat_Reception_Adapte reliquatReceptionAdapte : list_reliquat_receptionPuiAdapte)
+                            emplacement_courant = EmplacementOpenHelper.getUnEmplacementByID(db, emplacement_uid);
+
+                            if(emplacement_courant != null)
+                                ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacement_courant.getAdressage().trim());
+
+
+                            ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
+                            ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.VISIBLE);
+                            ((ImageView) findViewById(R.id.ImageViewEmplacement)).setVisibility(View.GONE);
+
+                            if(produitCourant != null)
                             {
-                                PH_Reliquat ligne = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquatReceptionAdapte.getPhReliquatUID());
-
-                                if(ligne.getProduitID() == produitCourant.getID_produit())
-                                {
-                                    reliquatCourant = ligne;
-                                    uniqueReceptionPUIAdapte = reliquatReceptionAdapte;
-                                    produit_present = true;
-                                    break;
-                                }
-                            }
-
-                            if(!produit_present)
-                            {
-                                afficherSnackBar("Produit non présent dans la liste");
-                            }
-                            else if(produitCourant.isSuivi_Serialisation() && produitCourant.isSerialiser_Reception_Delivrance() && serie.contentEquals(""))
-                            {
-                                afficherSnackBar("Numéro de série non scanné");
-                            }
-                            else
-                            {
-                                List<PH_Reliquat> reliquatPreparer = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, reliquatCourant.getcommandeNumero(), reliquatCourant.getProduitID());
-                                int qte_demander = reliquatCourant.getQteCommande() - reliquatCourant.getQteLivraison();
-                                int qte_receptionne = 0;
-                                int qte_restante = 0;
-                                for(PH_Reliquat ligne_temp : reliquatPreparer)
-                                {
-                                    qte_receptionne = qte_receptionne + ligne_temp.getQteLivraison();
-                                }
-                                qte_restante = qte_demander - qte_receptionne;
-
-                                String designationProduit = reliquatCourant.getDesignationCourte();
-                                String referenceProduit = reliquatCourant.getProduit_Reference();
-                                String conditionnement = String.valueOf((int)reliquatCourant.getConditionnementAchat());
-
-                                if(qte_restante == 0)
-                                {
-                                    afficherSnackBar("Produit déjà réceptionné en intégralité");
-                                }
-                                else
-                                {
-                                    if(emplacement_courant != null || commandeCourante.getRef_Depot_Dest().contains("-PAD"))
-                                    {
-                                        ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
-                                        ((TextView) findViewById(R.id.instruction)).setText("");
-
-                                        if (commandeCourante.getRef_Depot_Dest().contains("-PAD")) {
-                                            ((TextView) findViewById(R.id.EmplacementLotProduit)).setText("RECEPTION-" + commandeCourante.getNumero() + "-" + commandeCourante.getPatient_identite());
-                                        } else {
-                                            ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacement_courant.getAdressage());
-                                        }
-                                        blinkImageValidation();
-
-                                        //initilisation du compteur
-                                        ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.VISIBLE);
-                                        ((LinearLayout) findViewById(R.id.LinearLayoutBoutonBarcode)).setVisibility(View.GONE);
-                                        ((TextView) findViewById(R.id.instruction)).setVisibility(View.GONE);
-                                        counter = 5;
-                                        Counter();
-                                    }
-                                    else
-                                    {
-                                        ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.GONE);
-                                        ((ImageView) findViewById(R.id.ImageViewEmplacement)).setVisibility(View.VISIBLE);
-                                        ((TextView) findViewById(R.id.instruction)).setText("Scannez un emplacment");
-                                    }
-
-                                    ((TextView) findViewById(R.id.designationProduit)).setText(designationProduit);
-                                    ((TextView) findViewById(R.id.referenceProduit)).setText(referenceProduit);
-                                    ((TextView) findViewById(R.id.quantiteProduit)).setText(String.valueOf(qte_demander));
-                                    ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText(String.valueOf(qte_receptionne));
-                                    ((TextView) findViewById(R.id.qteSaisie)).setText(conditionnement);
-                                    ((TextView) findViewById(R.id.numeroLot)).setText(lot);
-                                    ((TextView) findViewById(R.id.datePeremptionLot)).setText(date_peremption_courant);
-                                    boolean seriedejascanne = false;
-                                    for(PH_Reliquat_Reception_Adapte.Lot lotCourant : uniqueReceptionPUIAdapte.getlotList())
-                                    {
-                                        if(lotCourant.getNumeroLot().equals(lot))
-                                        {
-                                            if(produitCourant.isSuivi_Serialisation() || produitCourant.isSerialiser_Reception_Delivrance())
-                                            {
-                                                if(lotCourant.getNumero_serie().contentEquals(""))
-                                                {
-                                                    nouveau_lot = lotCourant;
-                                                }
-                                                else if(lotCourant.getNumero_serie().contentEquals(serie))
-                                                {
-                                                    seriedejascanne = true;
-                                                }
-                                                else
-                                                {
-                                                    nouveau_lot = null;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                nouveau_lot = lotCourant;
-                                            }
-                                        }
-                                    }
-
-                                    if(seriedejascanne)
-                                    {
-                                        produitCourant = null;
-                                        nouveau_lot = null;
-                                        if(yourCountDownTimer != null)
-                                            yourCountDownTimer.cancel();
-
-                                        reinitialisationInterface();
-                                        afficherSnackBar("Numéro de série déjà scanné");
-                                    }
-                                    else
-                                    {
-                                        if(nouveau_lot == null)
-                                            nouveau_lot = uniqueReceptionPUIAdapte.new Lot(lot, date_peremption_courant, serie, "");
-
-                                        if(!serie.contentEquals(""))
-                                        {
-                                            /**
-                                             * TODO : vérification du statut du numéro de série lors du scan
-                                             * */
-                                            findViewById(R.id.numeroSerie).setVisibility(View.VISIBLE);
-                                            ((TextView) findViewById(R.id.numeroSerie)).setText(serie);
-                                        }
-
-                                        findViewById(R.id.validationScan).setVisibility(View.VISIBLE);
-
-                                        //gestion du clic sur le compteur
-                                        int finalQte_restante = qte_restante;
-                                        if(!produitCourant.isSuivi_Serialisation() || !produitCourant.isSerialiser_Reception_Delivrance())
-                                        {
-                                            findViewById(R.id.layout_qte_saisie_lot_preparation).setOnClickListener(view -> {
-                                                if(yourCountDownTimer != null)
-                                                    yourCountDownTimer.cancel();
-
-                                                Context context = ScannerReception2025Activity.this;
-
-                                                String title = lot;
-                                                String message = "Quantité placée : ";
-                                                int value_max = finalQte_restante;
-
-                                                int maxValue = value_max;
-                                                int value = finalQte_restante;
-
-                                                DialogInterface.OnClickListener onClickListener = (dialog, id) -> {
-                                                    int qteApres = Alerte.aNumberPicker.getValue() * Integer.parseInt(conditionnement);
-
-                                                    ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteApres));
-
-                                                    dialog.dismiss();
-                                                };
-
-                                                Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, Integer.parseInt(conditionnement));
-                                            });
-                                        }
-
-                                        //gestion de la validation du scan
-                                        blinkImageValidation();
-                                        String finalDate_peremption_courant = date_peremption_courant;
-                                        findViewById(R.id.validationScan).setOnClickListener(v -> {
-                                            //gestion enregistrement du lot scannee
-                                            int quantiteSaisie = Integer.parseInt(((TextView) findViewById(R.id.qteSaisie)).getText().toString());
-
-                                            String zone_string = "";
-                                            int zoneId = 0;
-                                            String emplacement_string = "";
-                                            int emplacementId = 0;
-                                            if (commandeCourante.getRef_Depot_Dest().contains("-PAD")) {
-                                                zone_string = "RECEPTION";
-                                                emplacement_string = "RECEPTION-" + commandeCourante.getNumero() + "-" + commandeCourante.getPatient_identite();
-                                            } else {
-                                                if(emplacement_courant != null)
-                                                {
-                                                    Depot_Zone zoneCourante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
-                                                    zone_string = zoneCourante.getZoneName();
-                                                    zoneId = zoneCourante.getZoneID();
-                                                    emplacement_string = emplacement_courant.getAdressage();
-                                                    emplacementId = emplacement_courant.get_UID();
-                                                }
-                                            }
-
-                                            boolean lotPresent = false;
-                                            boolean emplacementexiste = false;
-                                            for(PH_Reliquat_Reception_Adapte.ZoneEtEmplacement zoneEtEmplacement : nouveau_lot.getZoneEtEmplacementList())
-                                            {
-                                                if(zoneEtEmplacement.getZoneName().contentEquals(zone_string) && emplacement_string.contentEquals(zoneEtEmplacement.getEmplacementName()))
-                                                {
-                                                    zoneEtEmplacement.setQuantite(zoneEtEmplacement.getQuantite()+quantiteSaisie);
-                                                    emplacementexiste = true;
-                                                    break;
-                                                }
-                                            }
-
-                                            if(!emplacementexiste)
-                                            {
-                                                nouveau_lot = uniqueReceptionPUIAdapte.new Lot(lot, finalDate_peremption_courant, serie, "");
-                                                nouveau_lot.setZoneEtEmplacementList(new ArrayList<>());
-                                                nouveau_lot.getZoneEtEmplacementList().add(uniqueReceptionPUIAdapte.new ZoneEtEmplacement(zoneId, zone_string, emplacementId, emplacement_string, quantiteSaisie));
-                                            }
-                                            else
-                                            {
-                                                for(PH_Reliquat_Reception_Adapte.Lot lotcourant : uniqueReceptionPUIAdapte.getlotList())
-                                                {
-                                                    if(lotcourant.getNumeroLot().contentEquals(nouveau_lot.getNumeroLot()))
-                                                        lotPresent = true;
-                                                }
-                                            }
-
-                                            if(!lotPresent)
-                                                uniqueReceptionPUIAdapte.getlotList().add(nouveau_lot);
-
-                                            enregistrerPhReliquat(uniqueReceptionPUIAdapte);
-                                            produitCourant = null;
-                                            nouveau_lot = null;
-                                            reinitialisationInterface();
-                                        });
-                                    }
-                                }
+                                //initilisation du compteur
+                                ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.VISIBLE);
+                                ((LinearLayout) findViewById(R.id.LinearLayoutBoutonBarcode)).setVisibility(View.GONE);
+                                ((TextView) findViewById(R.id.instruction)).setVisibility(View.GONE);
+                                counter = 5;
+                                Counter();
                             }
                         }
                         else
                         {
-                            //le produit n'est pas trouvé en base
-                            afficherSnackBar("Produit non trouvé");
+                            Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeScanne);
+
+                            if (gs1Decoupe.size() != 1)
+                            {
+                                //on récupère les informations du découpage du GS1
+                                lot = gs1Decoupe.get(OutilsDecodage.numeroLot);
+                                serie = gs1Decoupe.get(OutilsDecodage.numeroSerie);
+                                gtin_courant = gs1Decoupe.get(OutilsDecodage.codeGtin);
+                                gtin_courant_sans_ai = gs1Decoupe.get(OutilsDecodage.codeGtinSansAi);
+                                date_peremption_courant = gs1Decoupe.get(OutilsDecodage.dateDePeremption);
+
+                                //gestion format date
+                                String[] date_peremption_split = date_peremption_courant.split("-");
+                                if(date_peremption_split.length == 3)
+                                    date_peremption_courant = date_peremption_split[2] + "/" + date_peremption_split[1] + "/" + date_peremption_split[0];
+
+                                //récucpération du produit avec le GTIN
+                                List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gtin_courant);
+
+                                //Si la liste est vide on essaye avec le GTIN sans AI
+                                if(produits.isEmpty())
+                                {
+                                    produits = ProduitOpenHelper.getProduitsParGTIN(db, gtin_courant_sans_ai);
+                                }
+
+                                //Si la liste n'est pas vide on réupère le produit courant
+                                if(!produits.isEmpty())
+                                    produitCourant = produits.get(0);
+                            }
+                            else
+                            {
+                                serie = "";
+                                lot = "";
+                                //on essaye de récupérer via le code inconnu
+                                List<Produit> produits  = ProduitOpenHelper.getProduitByCodeInconnu(db, s.toString().substring(0, s.length()-1));
+                                if (produits.size() == 1) {
+                                    produitCourant = produits.get(0);
+                                }
+                            }
+
+                            if(produitCourant != null)
+                            {
+                                if(produitCourant.isSuivi_Serialisation() && produitCourant.isSerialiser_Reception_Delivrance())
+                                {
+                                    Serialisation.Serialisation_Verifier(utilisateurConnecte.getId(), true, false, gtin_courant, "GTIN", lot, date_peremption_courant, serie, "RECEPTION", String.valueOf(receptionID), commandeCourante.getNumero(), "RECEPTION");
+                                }
+
+                                //on vérifie que le produit courant fait partie de la liste des ph_preparation_ligne
+                                boolean produit_present = false;
+                                for(PH_Reliquat_Reception_Adapte reliquatReceptionAdapte : list_reliquat_receptionPuiAdapte)
+                                {
+                                    PH_Reliquat ligne = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquatReceptionAdapte.getPhReliquatUID());
+
+                                    if(ligne.getProduitID() == produitCourant.getID_produit())
+                                    {
+                                        reliquatCourant = ligne;
+                                        uniqueReceptionPUIAdapte = reliquatReceptionAdapte;
+                                        produit_present = true;
+                                        break;
+                                    }
+                                }
+
+                                if(!produit_present)
+                                {
+                                    afficherSnackBar("Produit non présent dans la liste");
+                                }
+                                else if(produitCourant.isSuivi_Serialisation() && produitCourant.isSerialiser_Reception_Delivrance() && serie.contentEquals(""))
+                                {
+                                    afficherSnackBar("Numéro de série non scanné");
+                                }
+                                else
+                                {
+                                    List<PH_Reliquat> reliquatPreparer = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, reliquatCourant.getcommandeNumero(), reliquatCourant.getProduitID());
+                                    int qte_demander = reliquatCourant.getQteCommande() - reliquatCourant.getQteLivraison();
+                                    int qte_receptionne = 0;
+                                    int qte_restante = 0;
+                                    for(PH_Reliquat ligne_temp : reliquatPreparer)
+                                    {
+                                        qte_receptionne = qte_receptionne + ligne_temp.getQteLivraison();
+                                    }
+                                    qte_restante = qte_demander - qte_receptionne;
+
+                                    String designationProduit = reliquatCourant.getDesignationCourte();
+                                    String referenceProduit = reliquatCourant.getProduit_Reference();
+                                    String conditionnement = String.valueOf((int)reliquatCourant.getConditionnementAchat());
+
+                                    if(qte_restante == 0)
+                                    {
+                                        afficherSnackBar("Produit déjà réceptionné en intégralité");
+                                    }
+                                    else
+                                    {
+                                        if(emplacement_courant != null || commandeCourante.getRef_Depot_Dest().contains("-PAD"))
+                                        {
+                                            ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
+                                            ((TextView) findViewById(R.id.instruction)).setText("");
+
+                                            if (commandeCourante.getRef_Depot_Dest().contains("-PAD")) {
+                                                ((TextView) findViewById(R.id.EmplacementLotProduit)).setText("RECEPTION-" + commandeCourante.getNumero() + "-" + commandeCourante.getPatient_identite());
+                                            } else {
+                                                ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacement_courant.getAdressage());
+                                            }
+                                            blinkImageValidation();
+
+                                            //initilisation du compteur
+                                            ((ImageView) findViewById(R.id.imageValidationSeconde)).setVisibility(View.VISIBLE);
+                                            ((LinearLayout) findViewById(R.id.LinearLayoutBoutonBarcode)).setVisibility(View.GONE);
+                                            ((TextView) findViewById(R.id.instruction)).setVisibility(View.GONE);
+                                            counter = 5;
+                                            Counter();
+                                        }
+                                        else
+                                        {
+                                            ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.GONE);
+                                            ((ImageView) findViewById(R.id.ImageViewEmplacement)).setVisibility(View.VISIBLE);
+                                            ((TextView) findViewById(R.id.instruction)).setText("Scannez un emplacment");
+                                        }
+
+                                        ((TextView) findViewById(R.id.designationProduit)).setText(designationProduit);
+                                        ((TextView) findViewById(R.id.referenceProduit)).setText(referenceProduit);
+                                        ((TextView) findViewById(R.id.quantiteProduit)).setText(String.valueOf(qte_demander));
+                                        ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText(String.valueOf(qte_receptionne));
+                                        ((TextView) findViewById(R.id.qteSaisie)).setText(conditionnement);
+                                        ((TextView) findViewById(R.id.numeroLot)).setText(lot);
+                                        ((TextView) findViewById(R.id.datePeremptionLot)).setText(date_peremption_courant);
+                                        boolean seriedejascanne = false;
+                                        for(PH_Reliquat_Reception_Adapte.Lot lotCourant : uniqueReceptionPUIAdapte.getlotList())
+                                        {
+                                            if(lotCourant.getNumeroLot().equals(lot))
+                                            {
+                                                if(produitCourant.isSuivi_Serialisation() || produitCourant.isSerialiser_Reception_Delivrance())
+                                                {
+                                                    if(lotCourant.getNumero_serie().contentEquals(""))
+                                                    {
+                                                        nouveau_lot = lotCourant;
+                                                    }
+                                                    else if(lotCourant.getNumero_serie().contentEquals(serie))
+                                                    {
+                                                        seriedejascanne = true;
+                                                    }
+                                                    else
+                                                    {
+                                                        nouveau_lot = null;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    nouveau_lot = lotCourant;
+                                                }
+                                            }
+                                        }
+
+                                        if(seriedejascanne)
+                                        {
+                                            produitCourant = null;
+                                            nouveau_lot = null;
+                                            if(yourCountDownTimer != null)
+                                                yourCountDownTimer.cancel();
+
+                                            reinitialisationInterface();
+                                            afficherSnackBar("Numéro de série déjà scanné");
+                                        }
+                                        else
+                                        {
+                                            if(nouveau_lot == null)
+                                                nouveau_lot = uniqueReceptionPUIAdapte.new Lot(lot, date_peremption_courant, serie, "");
+
+                                            if(!serie.contentEquals(""))
+                                            {
+                                                /**
+                                                 * TODO : vérification du statut du numéro de série lors du scan
+                                                 * */
+                                                findViewById(R.id.numeroSerie).setVisibility(View.VISIBLE);
+                                                ((TextView) findViewById(R.id.numeroSerie)).setText(serie);
+                                            }
+
+                                            findViewById(R.id.validationScan).setVisibility(View.VISIBLE);
+
+                                            //gestion du clic sur le compteur
+                                            int finalQte_restante = qte_restante;
+                                            if(!produitCourant.isSuivi_Serialisation() || !produitCourant.isSerialiser_Reception_Delivrance())
+                                            {
+                                                findViewById(R.id.layout_qte_saisie_lot_preparation).setOnClickListener(view -> {
+                                                    if(yourCountDownTimer != null)
+                                                        yourCountDownTimer.cancel();
+
+                                                    Context context = ScannerReception2025Activity.this;
+
+                                                    String title = lot;
+                                                    String message = "Quantité placée : ";
+                                                    int value_max = finalQte_restante;
+
+                                                    int maxValue = value_max;
+                                                    int value = finalQte_restante;
+
+                                                    DialogInterface.OnClickListener onClickListener = (dialog, id) -> {
+                                                        int qteApres = Alerte.aNumberPicker.getValue() * Integer.parseInt(conditionnement);
+
+                                                        ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteApres));
+
+                                                        dialog.dismiss();
+                                                    };
+
+                                                    Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, Integer.parseInt(conditionnement));
+                                                });
+                                            }
+
+                                            //gestion de la validation du scan
+                                            blinkImageValidation();
+                                            String finalDate_peremption_courant = date_peremption_courant;
+                                            findViewById(R.id.validationScan).setOnClickListener(v -> {
+                                                //gestion enregistrement du lot scannee
+                                                int quantiteSaisie = Integer.parseInt(((TextView) findViewById(R.id.qteSaisie)).getText().toString());
+
+                                                String zone_string = "";
+                                                int zoneId = 0;
+                                                String emplacement_string = "";
+                                                int emplacementId = 0;
+                                                if (commandeCourante.getRef_Depot_Dest().contains("-PAD")) {
+                                                    zone_string = "RECEPTION";
+                                                    emplacement_string = "RECEPTION-" + commandeCourante.getNumero() + "-" + commandeCourante.getPatient_identite();
+                                                } else {
+                                                    if(emplacement_courant != null)
+                                                    {
+                                                        Depot_Zone zoneCourante = ZoneOpenHelper.getUneZoneByID(db, emplacement_courant.getZoneID());
+                                                        if(zoneCourante != null)
+                                                        {
+                                                            zone_string = zoneCourante.getZoneName();
+                                                            zoneId = zoneCourante.getZoneID();
+                                                        }
+                                                        emplacement_string = emplacement_courant.getAdressage();
+                                                        emplacementId = emplacement_courant.get_UID();
+                                                    }
+                                                }
+
+                                                boolean lotPresent = false;
+                                                boolean emplacementexiste = false;
+                                                for(PH_Reliquat_Reception_Adapte.ZoneEtEmplacement zoneEtEmplacement : nouveau_lot.getZoneEtEmplacementList())
+                                                {
+                                                    if(zoneEtEmplacement.getZoneName().contentEquals(zone_string) && emplacement_string.contentEquals(zoneEtEmplacement.getEmplacementName()))
+                                                    {
+                                                        zoneEtEmplacement.setQuantite(zoneEtEmplacement.getQuantite()+quantiteSaisie);
+                                                        emplacementexiste = true;
+                                                        break;
+                                                    }
+                                                }
+
+                                                if(!emplacementexiste)
+                                                {
+                                                    nouveau_lot = uniqueReceptionPUIAdapte.new Lot(lot, finalDate_peremption_courant, serie, "");
+                                                    nouveau_lot.setZoneEtEmplacementList(new ArrayList<>());
+                                                    nouveau_lot.getZoneEtEmplacementList().add(uniqueReceptionPUIAdapte.new ZoneEtEmplacement(zoneId, zone_string, emplacementId, emplacement_string, quantiteSaisie));
+                                                }
+                                                else
+                                                {
+                                                    for(PH_Reliquat_Reception_Adapte.Lot lotcourant : uniqueReceptionPUIAdapte.getlotList())
+                                                    {
+                                                        if(lotcourant.getNumeroLot().contentEquals(nouveau_lot.getNumeroLot()))
+                                                            lotPresent = true;
+                                                    }
+                                                }
+
+                                                if(!lotPresent)
+                                                    uniqueReceptionPUIAdapte.getlotList().add(nouveau_lot);
+
+                                                enregistrerPhReliquat(uniqueReceptionPUIAdapte);
+                                                produitCourant = null;
+                                                nouveau_lot = null;
+                                                reinitialisationInterface();
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                //le produit n'est pas trouvé en base
+                                afficherSnackBar("Produit non trouvé");
+                            }
                         }
                     }
 

@@ -51,6 +51,25 @@ public class Parametres_Serialisation {
         moduleVision= OutilsGestionClasses.recupererBooleen(cursor, Parametres_SerialisationOpenHelper.Constantes.NUM_COL_MODULEVISION_PARAMETRES_SERIALISATION);
     }
 
+    public Parametres_Serialisation(JSONObject jsonObject) {
+       this.ID= jsonObject.optInt("ID");
+       this.serveurAPI_host= jsonObject.optString("serveurAPI_host");
+       this.serveurLDAP_host= jsonObject.optString("serveurLDAP_host");
+       this.communicationDiffere= jsonObject.optBoolean("communicationDiffere", false);
+       this.dispenserReception= jsonObject.optBoolean("dispenserReception", false);
+       this.dispenserDelivrance= jsonObject.optBoolean("dispenserDelivrance", false);
+       this.stockParNumeroDeSerie= jsonObject.optBoolean("stockParNumeroDeSerie", false);
+       this.serveurLDAP_port= jsonObject.optString("serveurLDAP_port", "");
+       this.serveurLDAP_login= jsonObject.optString("serveurLDAP_login", "");
+       this.serveurLDAP_password= jsonObject.optString("serveurLDAP_password", "");
+       this.serveurLDAP_nomDomaine= jsonObject.optString("serveurLDAP_nomDomaine", "");
+       this.dossierVision= jsonObject.optString("dossierVision", "");
+       this.franceMVO_identifiant= jsonObject.optString("franceMVO_identifiant", "");
+       this.franceMVO_mdp= jsonObject.optString("franceMVO_mdp", "");
+       this.franceMVO_tan= jsonObject.optString("franceMVO_tan", "");
+       this.franceMVO_termesEtConditions= jsonObject.optBoolean("franceMVO_termesEtConditions", false);
+    }
+
     public JSONObject toJson(){
         JSONObject jsonObject=new JSONObject();
         try{

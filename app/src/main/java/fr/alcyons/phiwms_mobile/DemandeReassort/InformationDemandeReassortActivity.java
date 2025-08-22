@@ -24,6 +24,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 
 import com.android.volley.Request;
@@ -194,6 +195,18 @@ public class InformationDemandeReassortActivity  extends ServiceAvecConnexionAct
             else
             {
                 afficherAlerte(InformationDemandeReassortActivity.this, InformationDemandeReassortActivity.this.getLayoutInflater());
+            }
+        });
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent(InformationDemandeReassortActivity.this, ServiceDemandeReassortActivity.class);
+                Bundle extras = new Bundle();
+                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                intent.putExtras(extras);
+                InformationDemandeReassortActivity.this.startActivity(intent);
+                InformationDemandeReassortActivity.this.finish();
             }
         });
 

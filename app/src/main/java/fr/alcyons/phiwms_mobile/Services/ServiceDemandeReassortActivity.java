@@ -8,6 +8,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.ImageView;
@@ -15,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 
 import com.android.volley.Request;
@@ -69,6 +71,13 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
     LinearLayout lancerScan;
     TextView textLancerScan;
     ImageView iconLancerScan;
+    LinearLayout layoutSyncronisationPreparations;
+    LinearLayout sousTitreDate;
+    TextView compteurEnregistrementCourant;
+    TextView nbTotalPreparations;
+    TextView compteurEnregistrementPLCourant;
+    TextView nbTotalPreparationsLignes;
+    int nbPreparationSynchroniser;
     ReassortAdapter reassortAdapter;
     List<PH_Preparation> phPreparationList;
 
@@ -84,6 +93,12 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
         lancerScan = findViewById(R.id.lancerScan);
         textLancerScan = findViewById(R.id.textLancerScan);
         iconLancerScan = findViewById(R.id.iconLancerScan);
+        sousTitreDate = findViewById(R.id.sousTitreDate);
+        layoutSyncronisationPreparations = findViewById(R.id.layoutSyncronisationPreparations);
+        compteurEnregistrementCourant = findViewById(R.id.compteurEnregistrementCourant);
+        nbTotalPreparations = findViewById(R.id.nbTotalPreparations);
+        compteurEnregistrementPLCourant = findViewById(R.id.compteurEnregistrementPLCourant);
+        nbTotalPreparationsLignes = findViewById(R.id.nbTotalPreparationsLignes);
 
         Animation anim = new AlphaAnimation(0.0f, 1.0f);
         anim.setDuration(500); //You can manage the blinking time with this parameter
@@ -102,6 +117,18 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
             Intent listeReassortService_Intent = ServiceDemandeReassortActivity.this.getListeReassortServiceIntent(phPreparationCourante, PH_ReassortSelectionne);
             ServiceDemandeReassortActivity.this.startActivity(listeReassortService_Intent);
             ServiceDemandeReassortActivity.this.finish();
+        });
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent(ServiceDemandeReassortActivity.this, NavigationActivity.class);
+                Bundle extras = new Bundle();
+                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                intent.putExtras(extras);
+                ServiceDemandeReassortActivity.this.startActivity(intent);
+                ServiceDemandeReassortActivity.this.finish();
+            }
         });
     }
 
@@ -148,12 +175,12 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
                                 }
                                 else
                                 {
-                                    Intent intent = new Intent(ServiceDemandeReassortActivity.this, NavigationActivity.class);
+                                    /*Intent intent = new Intent(ServiceDemandeReassortActivity.this, NavigationActivity.class);
                                     Bundle extras = new Bundle();
                                     extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
                                     intent.putExtras(extras);
                                     ServiceDemandeReassortActivity.this.startActivity(intent);
-                                    ServiceDemandeReassortActivity.this.finish();
+                                    ServiceDemandeReassortActivity.this.finish();*/
                                 }
                             } else {
                                 JSONArray phPreparationJSONArray = response.getJSONArray("PH_Preparations");
@@ -430,12 +457,14 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
                 PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, ph_preparation_ligne);
 
                 ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparation_ligne.getPhiMR4UUID(), ph_preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.AJOUT);
+                ElementASynchroniserOpenHelper.toutSynchroniser(ServiceDemandeReassortActivity.this, db, utilisateurConnecte, false);
             }
         }
     }
 
     private void gestionAdapter()
     {
+        arreterSpinner();
         List<String>listeDate = new ArrayList<>();
         List<PH_Reassort> reassortListe;
         reassortListe = PH_ReassortOpenHelper.getPH_Reassort(db);
@@ -497,6 +526,8 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
         // Permet d'enlever le séparateur entre deux éléments d'une listeView
         phReassortListView.setDivider(footer);
         phReassortListView.setAdapter(reassortAdapter);
+        sousTitreDate.setVisibility(View.VISIBLE);
+        layoutSyncronisationPreparations.setVisibility(View.GONE);
 
         if (reassortListe.isEmpty()) {
             vide = true;
@@ -507,7 +538,7 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
         }
 
         invalidateOptionsMenu();
-        new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
+       // new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
     }
 
 }

@@ -61,6 +61,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_RetourMotifOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Parametres_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
@@ -102,7 +103,7 @@ import me.leolin.shortcutbadger.ShortcutBadger;
 
 
 public class AuthentificationActivity extends MainActivity {
-    public static int nbTableAInserer = 11;
+    public static int nbTableAInserer = 12;
     public static int nbTableinserees = 0;
     public boolean pretAPasserActiviteSuivante = false;
     // base de donnée
@@ -385,7 +386,7 @@ public class AuthentificationActivity extends MainActivity {
     @Override
     public void onResume() {
         super.onResume();
-        nbTableAInserer = 11;
+        nbTableAInserer = 12;
         nbTableinserees = 0;
         activerAuthentificationForte = ParametreUtilisateurOpenHelper.getAuthentificationForte(db);
         connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(db);
@@ -789,6 +790,7 @@ public class AuthentificationActivity extends MainActivity {
         PH_Demande_MotifOpenHelper.insererBDDLocaleDemandeMotif(AuthentificationActivity.this, db,token, utilisateurConnecte);
         EVENTOpenHelper.insererBDDLocaleEvent(AuthentificationActivity.this, db,token, utilisateurConnecte);
         ActionUtilisateurOpenHelper.insererBDDLocaleActionUtilisatuer(AuthentificationActivity.this, db, token, utilisateurConnecte, statutConnexion);
+        Parametres_SerialisationOpenHelper.synchronisationParametres_Serialisation(AuthentificationActivity.this, db, token, utilisateurConnecte, statutConnexion);
     }
 
     public void insertionDeTableEffectuee(String tableNom, boolean etat, String erreur) {
@@ -869,6 +871,8 @@ public class AuthentificationActivity extends MainActivity {
         textViewList.add(MotifDemande);
         TextView Event = layout.findViewById(R.id.Event);
         textViewList.add(Event);
+        TextView ParametreSerialisation = layout.findViewById(R.id.ParametreSerialisation);
+        textViewList.add(ParametreSerialisation);
 
         zoneok = layout.findViewById(R.id.barDeProgression);
         zoneok.setOnTouchListener((v, event) -> true);
@@ -897,6 +901,8 @@ public class AuthentificationActivity extends MainActivity {
         imageViewList.add(checkMotifDemande);
         ImageView checkEvent = layout.findViewById(R.id.checkEvent);
         imageViewList.add(checkEvent);
+        ImageView checkParametreSerialisation = layout.findViewById(R.id.checkParametreSerialisation);
+        imageViewList.add(checkParametreSerialisation);
 
         gestionExpandable = layout.findViewById(R.id.gestionExpandable);
 

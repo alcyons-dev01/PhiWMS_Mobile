@@ -18,9 +18,11 @@ import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 
 import com.android.volley.Request;
@@ -45,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.Executors;
 
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
@@ -75,7 +78,6 @@ import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionActivity {
 
-    List<Dotation> dotationList;
     List<PH_Preparation> phPreparationList;
     ListView dotationListView;
     DotationAdapter dotationAdapter;
@@ -83,14 +85,14 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
     LinearLayout lancerScan;
     TextView textLancerScan;
     ImageView iconLancerScan;
-
-    TextView textViewPrincipal;
-    SeekBar seekBarPrincipal;
-    TextView textViewSecondaire;
-    SeekBar seekBarSecondaire;
+    LinearLayout layoutSyncronisationPreparations;
+    LinearLayout sousTitreDate;
+    TextView compteurEnregistrementCourant;
+    TextView nbTotalPreparations;
+    TextView compteurEnregistrementPLCourant;
+    TextView nbTotalPreparationsLignes;
     int nbPreparationSynchroniser;
     ArrayList<Dotation> dotationsListe;
-    public AlertDialog alertDialogProgression;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -108,6 +110,12 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
         lancerScan = findViewById(R.id.lancerScan);
         textLancerScan = findViewById(R.id.textLancerScan);
         iconLancerScan = findViewById(R.id.iconLancerScan);
+        sousTitreDate = findViewById(R.id.sousTitreDate);
+        layoutSyncronisationPreparations = findViewById(R.id.layoutSyncronisationPreparations);
+        compteurEnregistrementCourant = findViewById(R.id.compteurEnregistrementCourant);
+        nbTotalPreparations = findViewById(R.id.nbTotalPreparations);
+        compteurEnregistrementPLCourant = findViewById(R.id.compteurEnregistrementPLCourant);
+        nbTotalPreparationsLignes = findViewById(R.id.nbTotalPreparationsLignes);
 
         Animation anim = new AlphaAnimation(0.0f, 1.0f);
         anim.setDuration(500); //You can manage the blinking time with this parameter
@@ -153,6 +161,18 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
             detailDotationPleinVideIntent.putExtra("designationArrayList", test);
             ServiceDemandeDotationGlobaleActivity.this.startActivityForResult(detailDotationPleinVideIntent, CodesEchangesActivites.RESULT_PLEINVIDE_LOCALISATION);
         });
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent(ServiceDemandeDotationGlobaleActivity.this, NavigationActivity.class);
+                Bundle extras = new Bundle();
+                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                intent.putExtras(extras);
+                ServiceDemandeDotationGlobaleActivity.this.startActivity(intent);
+                ServiceDemandeDotationGlobaleActivity.this.finish();
+            }
+        });
     }
 
     @NonNull
@@ -170,7 +190,6 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
     @Override
     public void onResume() {
         super.onResume();
-        dotationList = new ArrayList<>();
 
         /* Code nécessaire afin de réaliser une requête à l' API */
         if (statutConnexion && passageParOnCreate) {
@@ -378,14 +397,15 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
         PH_Preparation ph_preparation = new PH_Preparation(UID, Service, Erreur_Valid, PHIE_Tag, Saisie_Le, A_tel_heure, produitID, produitDesignation, Qte_demandee, Livree, Validee, Origine, Liste, depotDestinataireID, depotDestinataireReference, SYS_DT_MAJ, SYS_HEURE_MAJ, SYS_USER_MAJ, PrescripteurReference, Prescription_date, PrescripteurNom, depotOrigineReference, depotOrigineID, Commentaires, PreparationDate, LivraisonPrevueDate, DN_Groupe, Montant_HT, Montant_TTC, Poids, Commande_ID, Preparateur, Statut, PHIE_SYNCHRO, receptionUFNonComforme, livraisonDate, Frequence, previsionDateDebut, previsionDateFin, URGENT, Motif, preparateur_userID, pharmacien_userID, Volume, PaletteNB, CaisseNB,Conteneur_NB, numero_scelle);
         int ph_preparationphiwms_mobileuid = (int) PH_PreparationOpenHelper.insererUnPH_PreparationEnBDD(db, ph_preparation);
 
-        //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparationphiwms_mobileuid, ph_preparation.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.AJOUT);
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparationphiwms_mobileuid, ph_preparation.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.AJOUT);
 
         List<Detail_Dot> listDetailDot = Detail_DotOpenHelper.getAllDetailDotParDotation(db, dotation);
         int compteurDetailDot = 0;
+        nbTotalPreparationsLignes.setText(String.valueOf(listDetailDot.size()));
         for(Detail_Dot detail_dot : listDetailDot)
         {
             compteurDetailDot ++;
-            majProgressSecondaire(compteurDetailDot, listDetailDot.size());
+            majProgressSecondaire(compteurDetailDot);
             CreatePhPreparationLigneDetail(detail_dot, dotation);
         }
 
@@ -467,9 +487,8 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
                 PH_Preparation_Ligne ph_preparation_ligne = new PH_Preparation_Ligne(PreparationID, _UID, produitID, produitDesignation, Qte_APreparer, Qte_livrer, Livrer, Valider, ValidationDate, produitReference, ZoneDepot, produitCategorie, Qte_RAL, SYS_DT_MAJ, SYS_HEURE_MAJ, SYS_USER_MAJ, produitCondDistrib, produitPUHT, Suivi_Par_Lot, patientID, PatientNom, PrescripteurNom, prescripteurReference, Ordre_Impression, Prescription_ID, LotNumero, PeremptionDate, produitPoids, produitTVA, Montant_HT, Montant_TTC, PoidsTotal, depot_Destinataire_Reference, utilisation_Date_Prevue, Qte_besoin, Qte_StockSaisie, Qte_Demander, EmplacementParDefaut, Qte_preparer, accepter, phPreparationCourante.getUID());
                 PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, ph_preparation_ligne);
 
-                //ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparation_ligne.getPhiMR4UUID(), ph_preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.AJOUT);
-                //ElementASynchroniserOpenHelper.toutSynchroniser(ServiceDemandeDotationGlobaleActivity.this, db, utilisateurConnecte, false);
-
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparation_ligne.getPhiMR4UUID(), ph_preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.AJOUT);
+                ElementASynchroniserOpenHelper.toutSynchroniser(ServiceDemandeDotationGlobaleActivity.this, db, utilisateurConnecte, false);
             }
         }
     }
@@ -485,55 +504,17 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
 
     private void gestionAdapter()
     {
+        arreterSpinner();
         dotationsListe = DotationOpenHelper.getDotationGlobale(db);
         /* Code nécessaire à l'affichage de la liste */
         dotationAdapter = new DotationAdapter(ServiceDemandeDotationGlobaleActivity.this, db, utilisateurConnecte);
 
         //gestion alerte de progression
-        affichageAlertePogression(ServiceDemandeDotationGlobaleActivity.this, LayoutInflater.from(ServiceDemandeDotationGlobaleActivity.this), dotationsListe.size());
-    }
-
-    private void affichageAlertePogression(Context context, LayoutInflater inflater, int nbElement)
-    {
-        arreterSpinner();
-        AlertDialog.Builder builderProgression = new AlertDialog.Builder(context);
-        View layoutProgression = inflater.inflate(R.layout.alerte_progress, null);
-
-        textViewPrincipal = layoutProgression.findViewById(R.id.TextViewPrincipal);
-        seekBarPrincipal = layoutProgression.findViewById(R.id.barDeProgressionPrincipal);
-        textViewSecondaire = layoutProgression.findViewById(R.id.TextViewSecondaire);
-        seekBarSecondaire = layoutProgression.findViewById(R.id.barDeProgressionSecondaire);
-        nbPreparationSynchroniser = 1;
-        textViewPrincipal.setText("Préparation 0/"+ dotationsListe.size());
-        seekBarPrincipal.setMax(nbElement);
-
-        builderProgression.setView(layoutProgression);
-        alertDialogProgression = builderProgression.create();
-        Objects.requireNonNull(alertDialogProgression.getWindow()).setGravity(Gravity.CENTER);
-        alertDialogProgression.show();
-
-        //gestionDotation();
-    }
-
-    private void majProgressPrincipal()
-    {
-        nbPreparationSynchroniser++;
-        textViewPrincipal.setText("Préparation "+ nbPreparationSynchroniser +"/"+ dotationsListe.size());
-        seekBarPrincipal.setProgress(nbPreparationSynchroniser);
-    }
-
-    private void majProgressSecondaire(int compteurCourant, int compteurTotal)
-    {
-        textViewSecondaire.setVisibility(View.VISIBLE);
-        seekBarSecondaire.setVisibility(View.VISIBLE);
-        textViewSecondaire.setText("Ligne "+ compteurCourant +"/"+ compteurTotal);
-        seekBarSecondaire.setProgress(compteurCourant);
-        seekBarSecondaire.setMax(compteurTotal);
-    }
-
-    private void gestionDotation()
-    {
         List<String>listeDate = new ArrayList<>();
+
+        nbPreparationSynchroniser = 0;
+        int nbPreparation = dotationsListe.size();
+        nbTotalPreparations.setText(String.valueOf(nbPreparation));
 
         for (Dotation dotationCourante : dotationsListe) {
             String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, dotationCourante.getDepot_UID());
@@ -560,7 +541,7 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
 
             phPreparationList.add(phPreparationCourante);
         }
-        //ElementASynchroniserOpenHelper.toutSynchroniser(ServiceDemandeDotationGlobaleActivity.this, db, utilisateurConnecte, false);
+        ElementASynchroniserOpenHelper.toutSynchroniser(ServiceDemandeDotationGlobaleActivity.this, db, utilisateurConnecte, false);
         dotationsListe.sort(new Comparator<Dotation>() {
             @SuppressLint("SimpleDateFormat")
             DateFormat f = new SimpleDateFormat("dd/MM/yyyy");
@@ -586,10 +567,10 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
             dotationAdapter.addItem(dotationCourante);
         }
 
-        // Permet d'enlever le séparateur entre deux éléments d'une listeView
         dotationListView.setDivider(footer);
         dotationListView.setAdapter(dotationAdapter);
-
+        layoutSyncronisationPreparations.setVisibility(View.GONE);
+        sousTitreDate.setVisibility(View.VISIBLE);
         if (dotationsListe.isEmpty()) {
             vide = true;
             nomServiceVide = "Dotation Service";
@@ -597,6 +578,16 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
         }
 
         invalidateOptionsMenu();
-        //new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
+    }
+
+    private void majProgressPrincipal()
+    {
+        nbPreparationSynchroniser++;
+        compteurEnregistrementCourant.setText(String.valueOf(nbPreparationSynchroniser));
+    }
+
+    private void majProgressSecondaire(int compteurCourant)
+    {
+        compteurEnregistrementPLCourant.setText(String.valueOf(compteurCourant));
     }
 }

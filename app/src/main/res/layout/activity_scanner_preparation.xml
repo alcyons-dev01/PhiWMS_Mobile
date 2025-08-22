@@ -24,7 +24,8 @@
             android:layout_margin="10dp"
             android:focusable="true"
             android:textColor="@color/blanc"
-            android:textSize="18dp" />
+            android:textSize="18dp"
+            android:text=""/>
 
     </LinearLayout>
 
@@ -337,7 +338,24 @@
             android:layout_weight="1"
             android:textColor="#FFFFFF"
             android:textSize="17sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:layout_gravity="center_vertical"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/imageLogoFMVO"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/logo_fmvo"
+                android:layout_centerInParent="true"
+                android:visibility="invisible"/>
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/depot"
@@ -345,8 +363,9 @@
             android:layout_height="wrap_content"
             android:text=""
             android:gravity="right"
+            android:layout_gravity="center_vertical"
             android:layout_marginRight="10dp"
-            android:layout_weight="2"
+            android:layout_weight="1"
             android:textColor="#FFFFFF"
             android:textSize="17sp"
             android:textStyle="bold" />
