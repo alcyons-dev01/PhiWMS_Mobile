@@ -49,14 +49,14 @@ public class Serialisation {
             Date c = Calendar.getInstance().getTime();
 
             ClientTrxId = Serialisation_identifiant + '-' + reqType + '-' + AGL.AGL_AAMMJJ(c) + AGL.AGL_HHMMSS(c);
-            serialisationUID = PH_Serialisation_Creer(UserID, reqType, ClientTrxId, ProductCode_VALUE_VA, ProductCode_SHEME_VA, Batch_ID_VA, Batch_EXPDATE_VA, Pack_SN_VA, MVT_Type, MVT_UID);
+            serialisationUID = PH_Serialisation_Creer(UserID, reqType, ClientTrxId, ProductCode_VALUE_VA, ProductCode_SHEME_VA, Batch_ID_VA, Batch_EXPDATE_VA, Pack_SN_VA, MVT_Type, MVT_UID, false);
         }
 
         return serialisationUID;
     }
 
     // Insertion en base d'une nouvelle requête
-    public static long PH_Serialisation_Creer(int UserID, String reqType, String ClientTrxId, String ProductCode_VALUE_VA, String ProductCode_SHEME_VA, String Batch_ID_VA, String Batch_EXPDATE_VA, String Pack_SN_VA, String MVT_Type, String MVT_UID) {
+    public static long PH_Serialisation_Creer(int UserID, String reqType, String ClientTrxId, String ProductCode_VALUE_VA, String ProductCode_SHEME_VA, String Batch_ID_VA, String Batch_EXPDATE_VA, String Pack_SN_VA, String MVT_Type, String MVT_UID, boolean synchronisation) {
         long serialisationUID = 0;
         int ProduitUID = 0;
         if (ProductCode_SHEME_VA.contentEquals("GTIN")) {
@@ -91,7 +91,8 @@ public class Serialisation {
 
         PH_Serialisation phSerialisation = new PH_Serialisation(phSerialisationID, UserID, reqType, ClientTrxId, ProductCode_VALUE_VA, ProductCode_SHEME_VA, Batch_ID_VA, Batch_EXPDATE_VA, Pack_SN_VA, MVT_Type, MVT_UID, ProduitUID);
         serialisationUID = PH_SerialisationOpenHelper.insererPH_SerialisationEnBDD(db, phSerialisation);
-        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, phSerialisation.getPhiMR4UUID(), phSerialisation.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+        if(synchronisation)
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, phSerialisation.getPhiMR4UUID(), phSerialisation.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
 
         return serialisationUID;
     }

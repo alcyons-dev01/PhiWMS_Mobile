@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
+import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReception2025Activity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReception2025Activity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity;
@@ -331,12 +332,14 @@ public class DetailReceptionActivity extends ServiceActivity {
                         if(datePeremptionTab.length == 3)
                             peremptionDate = datePeremptionTab[0].substring(2)+datePeremptionTab[1]+datePeremptionTab[2];
 
-                        PH_Serialisation serialisation = new PH_Serialisation(serialisationId, utilisateurConnecte.getId(), "G110", "", produitCourant.getGTIN(), "GTIN", reliquat_temp.getLot(), peremptionDate, reliquat_temp.getSerie(), "CDE", phReliquatCourant.getCommandeNumero(), produitCourant.getID_produit());
-                        serialisation.setStatut("En attente");
-                        serialisation.setRaison("");
-                        serialisation.setResultat("");
-                        PH_SerialisationOpenHelper.insererPH_SerialisationEnBDD(db, serialisation);
-                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisation.getPhiMR4UUID(), serialisation.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                        PH_Serialisation serialisation = PH_SerialisationOpenHelper.getPH_SerialisationByMultiple(db, produitCourant.getGTIN(), "GTIN", reliquat_temp.getLot(), peremptionDate, reliquat_temp.getSerie());
+                        if(serialisation != null)
+                        {
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisation.getPhiMR4UUID(), serialisation.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                            /**
+                             * TODO : création requete G120 de sérialisation
+                             */
+                        }
 
                         Random randomAUSeri = new Random();
                         int actionSerId = randomAUSeri.nextInt();
@@ -620,13 +623,13 @@ public class DetailReceptionActivity extends ServiceActivity {
         lancerScan.setOnClickListener(view -> {
             Intent listeLotReception_Intent;
             Bundle listeLotReception_Bundle = new Bundle();
-            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies")  || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google") || android.os.Build.MANUFACTURER.toLowerCase().contains("samsung"))
+            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies")  || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
             {
                 listeLotReception_Intent = new Intent(DetailReceptionActivity.this, ScannerReception2025Activity.class);
             }
             else
             {
-                listeLotReception_Intent = new Intent(DetailReceptionActivity.this, BarcodeReceptionActivity.class);
+                listeLotReception_Intent = new Intent(DetailReceptionActivity.this, BarcodeReception2025Activity.class);
             }
 
             listeLotReception_Bundle.putString("contexte", String.valueOf(R.string.scannerContextReceptionListe));

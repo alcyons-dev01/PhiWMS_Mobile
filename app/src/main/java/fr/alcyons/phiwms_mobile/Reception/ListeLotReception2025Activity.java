@@ -40,6 +40,7 @@ import java.util.Objects;
 import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReception2025Activity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReception2025Activity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity;
@@ -246,7 +247,7 @@ public class ListeLotReception2025Activity  extends ServiceActivity {
                 }
                 else
                 {
-                    listeLotReception_Intent = new Intent(ListeLotReception2025Activity.this, BarcodeReceptionActivity.class);
+                    listeLotReception_Intent = new Intent(ListeLotReception2025Activity.this, BarcodeReception2025Activity.class);
                     listeLotReception_Bundle.putString("contexte", String.valueOf(R.string.scannerContextReceptionUnique));
                 }
                 /*listeLotReception_Bundle.putInt("ReceptionID", commandeSelectionne.getID_commande());
@@ -703,7 +704,7 @@ public class ListeLotReception2025Activity  extends ServiceActivity {
             if (!phReliquatReceptionAdapte.getlotList().isEmpty()) {
                 for (PH_Reliquat_Reception_Adapte.Lot phReliquatLot : phReliquatReceptionAdapte.getlotList()) {
                     if (phReliquatLot.getNumeroLot().contentEquals("")) {
-                        Alerte.afficherAlerte(ListeLotReception2025Activity.this, "Alerte", "Veuillez saisir ou scanner un numéro de lot s'il vous plaît", "alerte");
+                        //Alerte.afficherAlerte(ListeLotReception2025Activity.this, "Alerte", "Veuillez saisir ou scanner un numéro de lot s'il vous plaît", "alerte");
                         manqueLot = true;
                         break;
                     }

@@ -55,6 +55,7 @@ import java.util.Objects;
 import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparation2025Activity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparation2025Activity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
@@ -846,7 +847,7 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
     }
 
     private void onMenuDatamatrixClick() {
-        Intent detailPreparation_Intent = new Intent(DetailPreparation2025Activity.this, BarcodePreparationActivity.class);
+        Intent detailPreparation_Intent = new Intent(DetailPreparation2025Activity.this, BarcodePreparation2025Activity.class);
 
         List<PH_Preparation_Ligne> liste_ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesAPreparerParPHPreparation(db, ph_preparation_Selectionne);
 
@@ -1138,12 +1139,20 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
                 if(datePeremptionTab.length == 3)
                     peremptionDate = datePeremptionTab[0].substring(2)+datePeremptionTab[1]+datePeremptionTab[2];
 
-                PH_Serialisation serialisation = new PH_Serialisation(serialisationId, utilisateurConnecte.getId(), "G110", "", produit_temp.getGTIN(), "GTIN", lignecourante.getLotNumero(), peremptionDate, lignecourante.getSerieNumero(), "DELIVRANCE", String.valueOf(lignecourante.getPreparationID()), produit_temp.getID_produit());
+                /*PH_Serialisation serialisation = new PH_Serialisation(serialisationId, utilisateurConnecte.getId(), "G110", "", produit_temp.getGTIN(), "GTIN", lignecourante.getLotNumero(), peremptionDate, lignecourante.getSerieNumero(), "DELIVRANCE", String.valueOf(lignecourante.getPreparationID()), produit_temp.getID_produit());
                 serialisation.setStatut("En attente");
                 serialisation.setRaison("");
                 serialisation.setResultat("");
                 PH_SerialisationOpenHelper.insererPH_SerialisationEnBDD(db, serialisation);
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisation.getPhiMR4UUID(), serialisation.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisation.getPhiMR4UUID(), serialisation.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);*/
+                PH_Serialisation serialisation = PH_SerialisationOpenHelper.getPH_SerialisationByMultiple(db, produit_temp.getGTIN(), "GTIN", lignecourante.getLotNumero(), peremptionDate, lignecourante.getSerieNumero());
+                if(serialisation != null)
+                {
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisation.getPhiMR4UUID(), serialisation.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                    /**
+                     * TODO : création requete G120 de sérialisation
+                     */
+                }
 
                 Random randomAUSeri = new Random();
                 int actionSerId = randomAUSeri.nextInt();

@@ -228,7 +228,6 @@
                             android:text=""/>
 
                     </LinearLayout>
-
                 </LinearLayout>
 
                 <LinearLayout
@@ -291,6 +290,29 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="120dp">
+
+        <ImageView
+            android:id="@+id/ImageViewProduit"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="@drawable/phitagprod"
+            android:visibility="visible"/>
+
+        <ImageView
+            android:id="@+id/ImageViewEmplacement"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="@drawable/phitagplace"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
     <TextView
         android:id="@+id/instruction"
         android:layout_width="match_parent"
@@ -303,7 +325,7 @@
         android:gravity="center"
         android:padding="2dp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="150dp"/>
+        android:layout_marginTop="200dp"/>
 
     <LinearLayout
         android:id="@+id/entetePreparation"
@@ -321,7 +343,24 @@
             android:layout_weight="1"
             android:textColor="#FFFFFF"
             android:textSize="17sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:layout_gravity="center_vertical"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/imageLogoFMVO"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/logo_fmvo"
+                android:layout_centerInParent="true"
+                android:visibility="invisible"/>
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/depot"
@@ -330,10 +369,11 @@
             android:text=""
             android:gravity="right"
             android:layout_marginRight="10dp"
-            android:layout_weight="2"
+            android:layout_weight="1"
             android:textColor="#FFFFFF"
             android:textSize="17sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:layout_gravity="center_vertical"/>
 
     </LinearLayout>
 

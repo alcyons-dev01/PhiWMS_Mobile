@@ -1,6 +1,7 @@
 package fr.alcyons.phiwms_mobile.BarcodeSearch;
 
 import static fr.alcyons.phiwms_mobile.OutilsSerialisation.WS_PKI.checkApiAsync;
+import static fr.alcyons.phiwms_mobile.OutilsSerialisation.WS_SINGLE_PACK.serialisationVerificationSingle;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -13,6 +14,7 @@ import android.os.CountDownTimer;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -506,6 +508,16 @@ public class ScannerReception2025Activity extends ServiceActivity {
                                                 /**
                                                  * TODO : vérification du statut du numéro de série lors du scan
                                                  * */
+                                                if(serialisationActive)
+                                                {
+                                                    int serialisationUID = (int) Serialisation.Serialisation_Creer(utilisateurConnecte.getId(), "G110", gtin_courant, "GTIN", lot, date_peremption_courant, serie, "RECEPTION", commandeCourante.getNumero());
+                                                    serialisationVerificationSingle(ScannerReception2025Activity.this, db, utilisateurConnecte, serialisationUID, gtin_courant, "GTIN", lot, date_peremption_courant, serie).thenAccept(success -> {
+                                                        if(!success)
+                                                        {
+                                                            Log.e("Erreur serialisation", "Erreur lors de la création de la serialisation");
+                                                        }
+                                                    });
+                                                }
                                                 findViewById(R.id.numeroSerie).setVisibility(View.VISIBLE);
                                                 ((TextView) findViewById(R.id.numeroSerie)).setText(serie);
                                             }

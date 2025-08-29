@@ -450,9 +450,23 @@
         android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation|keyboardHidden"/>
 
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparation2025Activity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
     <!-- Barcode Réception Activity -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReception2025Activity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"

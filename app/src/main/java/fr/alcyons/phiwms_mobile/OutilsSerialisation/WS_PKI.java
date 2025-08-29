@@ -235,10 +235,7 @@ public class WS_PKI extends MainActivity {
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }
-                    boolean ok = false;
-                    if (code.contentEquals("API_SUCCESS") && desc.contentEquals("Serveur ouvert")) {
-                        ok = true;
-                    }
+                    boolean ok = code.contentEquals("API_SUCCESS") && desc.contentEquals("Serveur ouvert");
                     future.complete(ok);
                 },
                 error -> future.complete(false)
