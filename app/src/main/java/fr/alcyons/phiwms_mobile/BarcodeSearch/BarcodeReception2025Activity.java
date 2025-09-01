@@ -590,6 +590,7 @@ public class BarcodeReception2025Activity extends ServiceActivity {
                 String gtin_courant = "";
                 String gtin_courant_sans_ai = "";
                 String date_peremption_courant = "";
+                String date_peremption_serialisation = "";
                 if(codeScanne.startsWith("PHITAGPLACE"))
                 {
                     serie = "";
@@ -629,6 +630,7 @@ public class BarcodeReception2025Activity extends ServiceActivity {
                         gtin_courant = gs1Decoupe.get(OutilsDecodage.codeGtin);
                         gtin_courant_sans_ai = gs1Decoupe.get(OutilsDecodage.codeGtinSansAi);
                         date_peremption_courant = gs1Decoupe.get(OutilsDecodage.dateDePeremption);
+                        date_peremption_serialisation = gs1Decoupe.get(OutilsDecodage.dateDePeremptionSerialisation);
 
                         //gestion format date
                         String[] date_peremption_split = date_peremption_courant.split("-");
@@ -663,7 +665,7 @@ public class BarcodeReception2025Activity extends ServiceActivity {
                     {
                         if(produitCourant.isSuivi_Serialisation() && produitCourant.isSerialiser_Reception_Delivrance())
                         {
-                            Serialisation.Serialisation_Verifier(utilisateurConnecte.getId(), true, false, gtin_courant, "GTIN", lot, date_peremption_courant, serie, "RECEPTION", String.valueOf(receptionID), commandeCourante.getNumero(), "RECEPTION");
+                            //Serialisation.Serialisation_Verifier(utilisateurConnecte.getId(), true, false, gtin_courant, "GTIN", lot, date_peremption_courant, serie, "RECEPTION", String.valueOf(receptionID), commandeCourante.getNumero(), "RECEPTION");
                         }
 
                         //on vérifie que le produit courant fait partie de la liste des ph_preparation_ligne
@@ -794,8 +796,8 @@ public class BarcodeReception2025Activity extends ServiceActivity {
                                         //Création de la serialisation
                                         if(serialisationActive)
                                         {
-                                            int serialisationUID = (int) Serialisation.Serialisation_Creer(utilisateurConnecte.getId(), "G110", gtin_courant, "GTIN", lot, date_peremption_courant, serie, "RECEPTION", commandeCourante.getNumero());
-                                            serialisationVerificationSingle(this, db, utilisateurConnecte, serialisationUID, gtin_courant, "GTIN", lot, date_peremption_courant, serie).thenAccept(success -> {
+                                            int serialisationUID = (int) Serialisation.Serialisation_Creer(utilisateurConnecte.getId(), "G110", gtin_courant, "GTIN", lot, date_peremption_serialisation, serie, "RECEPTION", commandeCourante.getNumero());
+                                            serialisationVerificationSingle(this, db, utilisateurConnecte, serialisationUID, gtin_courant, "GTIN", lot, date_peremption_serialisation, serie).thenAccept(success -> {
                                                 if(!success)
                                                 {
                                                     Log.e("Erreur serialisation", "Erreur lors de la création de la serialisation");

@@ -179,7 +179,7 @@ public class WS_SINGLE_PACK extends MainActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        handler.sendMessage(handler.obtainMessage());
+                       // handler.sendMessage(handler.obtainMessage());
                     }
                 },
                         new Response.ErrorListener() {
@@ -897,6 +897,7 @@ public class WS_SINGLE_PACK extends MainActivity {
                 JSONObject data = new JSONObject();
 
                 Parametres_Serialisation parametresSerialisation = Parametres_SerialisationOpenHelper.getParametres_Serialisation(db);
+                String etablissementUtilisateur = utilisateurconnecte.getEtablissement();
 
                 if(parametresSerialisation != null)
                 {
@@ -905,7 +906,7 @@ public class WS_SINGLE_PACK extends MainActivity {
                         JSONObject body = new JSONObject();
                         body.put("user", "FranceMVO");
                         body.put("password", mdp_md5);
-                        body.put("compagny", utilisateurconnecte.getEtablissement());
+                        body.put("compagny", etablissementUtilisateur);
                         body.put("softwareName", "PihR4");
                         body.put("softwareSupplier", "Alcyons");
                         body.put("softwareVersion", "1812");
@@ -1105,14 +1106,15 @@ public class WS_SINGLE_PACK extends MainActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                handler.sendMessage(handler.obtainMessage());
+                //handler.sendMessage(handler.obtainMessage());
             }
         },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        future.complete(false);
                         Log.e("Volley", "Error");
-                        Alerte.afficherAlerte(context, "Erreur HTTP", "Veuillez contacter Alcyons !\nOpération de vérification impossible.", "alerte");
+                        //Alerte.afficherAlerte(context, "Erreur HTTP", "Veuillez contacter Alcyons !\nOpération de vérification impossible.", "alerte");
                     }
                 }
         ) {
@@ -1233,7 +1235,7 @@ public class WS_SINGLE_PACK extends MainActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                handler.sendMessage(handler.obtainMessage());
+                //handler.sendMessage(handler.obtainMessage());
             }
         },
                 new Response.ErrorListener() {

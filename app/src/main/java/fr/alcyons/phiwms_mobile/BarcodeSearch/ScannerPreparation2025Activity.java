@@ -230,6 +230,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                         String gtin_courant = "";
                         String gtin_courant_sans_ai = "";
                         String date_peremption_courant = "";
+                        String date_peremption_serialisation = "";
                         PH_Preparation_Ligne ligne_base = null;
                         if(codeScanne.startsWith("PHITAGPLACE"))
                         {
@@ -264,6 +265,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                                 gtin_courant = gs1Decoupe.get(OutilsDecodage.codeGtin);
                                 gtin_courant_sans_ai = gs1Decoupe.get(OutilsDecodage.codeGtinSansAi);
                                 date_peremption_courant = gs1Decoupe.get(OutilsDecodage.dateDePeremption);
+                                date_peremption_serialisation = gs1Decoupe.get(OutilsDecodage.dateDePeremptionSerialisation);
 
                                 //gestion format date
                                 String[] date_peremption_split = date_peremption_courant.split("-");
@@ -357,8 +359,8 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                                                      * */
                                                     if(serialisationActive)
                                                     {
-                                                        int serialisationUID = (int) Serialisation.Serialisation_Creer(utilisateurConnecte.getId(), "G110", gtin_courant, "GTIN", lot, date_peremption_courant, serie, "DELIVRANCE", String.valueOf(preparationID));
-                                                        serialisationVerificationSingle(ScannerPreparation2025Activity.this, db, utilisateurConnecte, serialisationUID, gtin_courant, "GTIN", lot, date_peremption_courant, serie).thenAccept(success -> {
+                                                        int serialisationUID = (int) Serialisation.Serialisation_Creer(utilisateurConnecte.getId(), "G110", gtin_courant, "GTIN", lot, date_peremption_serialisation, serie, "DELIVRANCE", String.valueOf(preparationID));
+                                                        serialisationVerificationSingle(ScannerPreparation2025Activity.this, db, utilisateurConnecte, serialisationUID, gtin_courant, "GTIN", lot, date_peremption_serialisation, serie).thenAccept(success -> {
                                                             if(!success)
                                                             {
                                                                 Log.e("Erreur serialisation", "Erreur lors de la création de la serialisation");

@@ -2,6 +2,8 @@ package fr.alcyons.phiwms_mobile.PreparationPUFetPAD;
 
 import static com.google.android.gms.vision.L.TAG;
 import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
+import static fr.alcyons.phiwms_mobile.OutilsSerialisation.WS_SINGLE_PACK.serialisationDispenserSingle;
+import static fr.alcyons.phiwms_mobile.OutilsSerialisation.WS_SINGLE_PACK.serialisationVerificationSingle;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -1152,6 +1154,15 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
                     /**
                      * TODO : création requete G120 de sérialisation
                      */
+                    int serialisationUID = (int) Serialisation.Serialisation_Creer(utilisateurConnecte.getId(), "G110", produit_temp.getGTIN(), "GTIN", lignecourante.getLotNumero(), peremptionDate, lignecourante.getSerieNumero(), "DELIVRANCE", String.valueOf(lignecourante.getPreparationID()));
+                    serialisationDispenserSingle(DetailPreparation2025Activity.this, db, utilisateurConnecte, serialisationUID, produit_temp.getGTIN(), "GTIN", lignecourante.getLotNumero(), peremptionDate, lignecourante.getSerieNumero()).thenAccept(success -> {
+                        if(!success)
+                        {
+                            Log.e("Erreur serialisation", "Erreur lors de la dispensiation de la serialisation");
+                        }
+                        PH_Serialisation serialisationDispenser = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, serialisationUID);
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisationDispenser.getPhiMR4UUID(), serialisationDispenser.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                    });
                 }
 
                 Random randomAUSeri = new Random();

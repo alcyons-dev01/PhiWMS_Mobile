@@ -84,6 +84,7 @@ import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Reliquat_ReceptionAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.Mail;
+import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
 import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparation2025Activity;
 import fr.alcyons.phiwms_mobile.PrisePhoto.PrisePhoto;
 import fr.alcyons.phiwms_mobile.R;
@@ -94,6 +95,7 @@ import fr.alcyons.phiwms_mobile.Services.ServiceReceptionPadActivity;
 import fr.alcyons.phiwms_mobile.Services.ServiceReceptionPuiActivity;
 
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotos.verifyStoragePermissions;
+import static fr.alcyons.phiwms_mobile.OutilsSerialisation.WS_SINGLE_PACK.serialisationDispenserSingle;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -339,6 +341,15 @@ public class DetailReceptionActivity extends ServiceActivity {
                             /**
                              * TODO : création requete G120 de sérialisation
                              */
+                            int serialisationUID = (int) Serialisation.Serialisation_Creer(utilisateurConnecte.getId(), "G110", produitCourant.getGTIN(), "GTIN", reliquat_temp.getLot(), peremptionDate, reliquat_temp.getSerie(), "RECEPTION", commandeSelectionne.getNumero());
+                            serialisationDispenserSingle(DetailReceptionActivity.this, db, utilisateurConnecte, serialisationUID, produitCourant.getGTIN(), "GTIN", reliquat_temp.getLot(), peremptionDate, reliquat_temp.getSerie()).thenAccept(success -> {
+                                if(!success)
+                                {
+                                    Log.e("Erreur serialisation", "Erreur lors de la dispensiation de la serialisation");
+                                }
+                                PH_Serialisation serialisationDispenser = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, serialisationUID);
+                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisationDispenser.getPhiMR4UUID(), serialisationDispenser.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                            });
                         }
 
                         Random randomAUSeri = new Random();

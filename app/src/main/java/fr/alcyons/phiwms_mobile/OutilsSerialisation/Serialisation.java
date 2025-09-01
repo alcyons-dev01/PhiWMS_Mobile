@@ -135,9 +135,9 @@ public class Serialisation {
 
             serialisationUID = Serialisation_Creer(UserID, "G110", ProductCode_VALUE_VA, ProductCode_SHEME_VA, Batch_ID_VA, Batch_EXPDATE_VA, Pack_SN_VA, MVT_Type, MVT_UID);
 
-            if (!differe) {
+            /*if (!differe) {
                 WS_SINGLE_PACK.NMVS_G110_verifySinglePack(context, db, utilisateur, (int) serialisationUID, ProductCode_VALUE_VA, ProductCode_SHEME_VA, Batch_ID_VA, Batch_EXPDATE_VA, Pack_SN_VA);
-            }
+            }*/
         }
         return serialisationUID;
     }

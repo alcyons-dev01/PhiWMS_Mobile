@@ -16,6 +16,7 @@ public class OutilsDecodage {
     public static String codeGtinSansAi = "codeGtinSansAi";
     public static String numeroLot = "numLot";
     public static String dateDePeremption = "datePeremption";
+    public static String dateDePeremptionSerialisation = "datePeremptionSerialisation";
     public static String conditionnementProduit = "conditionnement";
     public static String numeroSerie = "numeroSerie";
     public static String gtin_Reconstruit_AvecSerie = "GTIN_Reconstruit_AvecSerie";
@@ -133,6 +134,7 @@ public class OutilsDecodage {
         int PeremptionDate_Lenght_VN = 2+6 ; // AI + n6
         String PeremptionDate_VA = "";
         String PeremptionAAAAMM_VA = "";
+        String PeremptionAAMMJJ = "";
 
         String FabricationDate_AI_VA = "11";
         int FabricationDate_Lenght_VN = 2+6 ; // AI + n6
@@ -222,6 +224,7 @@ public class OutilsDecodage {
                         break;
 
                     case "17":
+                        PeremptionAAMMJJ = scanner_VA.substring(2,8);
                         PeremptionDate_VA = AI_Date_Controle(scanner_VA);
                         if(PeremptionDate_VA.length() > 0)
                             scanner_VA = scanner_VA.substring(PeremptionDate_Lenght_VN);
@@ -252,6 +255,7 @@ public class OutilsDecodage {
             map.put(numeroSerie, SerieNumero_VA);
             map.put(numeroLot, Lot_VA);
             map.put(dateDePeremption, PeremptionDate_VA);
+            map.put(dateDePeremptionSerialisation, PeremptionAAMMJJ);
             map.put(conditionnementProduit, Conditionnement_VA);
             map.put(gtin_Reconstruit_AvecSerie, GTIN_Reconstruit_AvecSerie);
             map.put(gtin_Reconstruit_SansSerie, GTIN_Reconstruit_SansSerie);
