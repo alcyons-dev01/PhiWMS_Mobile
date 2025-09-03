@@ -21,9 +21,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,8 +67,10 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ImprimanteEtiquetteOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
@@ -75,13 +79,16 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelp
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
+import fr.alcyons.phiwms_mobile.Classes.ImprimanteEtiquette;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_Preparation_Adapte;
+import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.AlertePreparationAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.EtiquetteZebraAdapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Preparation_Ligne_PreparationLotAdapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Preparation_Ligne_PreparationLotAdapter2025;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
@@ -121,7 +128,7 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
     PackageManager pm;
     int position_selectionne;
     Depot depotOrigine;
-
+    List<ImprimanteEtiquette> listeImprimanteEtiquette;
     public void enregistrerPhPreparation() throws JSONException {
         int nbTotalLotsAvecValeurSaisie = 0;
 
@@ -181,6 +188,8 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
             ParametreUtilisateurOpenHelper.mettreAJourTriPreparation(db, 0, "Place");
             tri_choisi = ParametreUtilisateurOpenHelper.getChoixTriPreparation(db);
         }
+
+        listeImprimanteEtiquette = ImprimanteEtiquetteOpenHelper.getAllImprimante(db);
 
         liste_lot = new ArrayList<>();
         context = DetailPreparation2025Activity.this;
@@ -1219,9 +1228,12 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
         if(ph_preparation_Selectionne.getDepotDestinataireReference().contains("-PAD-"))
             retourListeIntent = new Intent(DetailPreparation2025Activity.this, ServicePreparationPadActivity.class);
 
-        if(utilisateurConnecte.getEtablissement().toUpperCase().contentEquals("ADH"))
+        if(utilisateurConnecte.getEtablissement().toUpperCase().contentEquals("ADH") && listeImprimanteEtiquette.size() > 0)
         {
-            envoyerImpressionZebra(ph_preparation_Selectionne);
+            if(listeImprimanteEtiquette.size() == 1)
+                envoyerImpressionZebra(ph_preparation_Selectionne, listeImprimanteEtiquette.get(0).getNom());
+            else
+                afficherAlerteChoixImprimante(DetailPreparation2025Activity.this, DetailPreparation2025Activity.this.getLayoutInflater());
         }
         else
         {
@@ -1379,7 +1391,7 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
         //ElementASynchroniserOpenHelper.toutSynchroniser(DetailPreparation2025Activity.this, db, utilisateurConnecte, false);
     }
 
-    private void envoyerImpressionZebra(PH_Preparation ph_preparation) throws JSONException {
+    private void envoyerImpressionZebra(PH_Preparation ph_preparation, String nomImprimante) throws JSONException {
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         String strDate = sdf.format(cal.getTime());
@@ -1480,7 +1492,7 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
 
         Etiquette_TO.put(etiquette_v1_JO);
 
-        String imprimante_VT = "Zebra";
+        String imprimante_VT = nomImprimante;
         String aImprimer = "true";
         String format = "Préparation";
 
@@ -1536,6 +1548,42 @@ public class DetailPreparation2025Activity  extends ServiceAvecConnexionActivity
         };
         RequestQueue requestQueueUtilisateur = Volley.newRequestQueue(this);
         requestQueueUtilisateur.add(obreq);
+    }
 
+    private void afficherAlerteChoixImprimante(Context context, LayoutInflater inflater)
+    {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+        View layout = inflater.inflate(R.layout.alerte_selection_imprimante, null);
+
+        LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
+        LinearLayout buttonAnnuler = (LinearLayout) layout.findViewById(R.id.fermer_alerte_imprimante_zebra);
+        Spinner spinnerImprimante = (Spinner) layout.findViewById(R.id.spinnerImprimante);
+
+        List<String> ListNomImprimante = new ArrayList<>();
+        for(ImprimanteEtiquette imprimante : listeImprimanteEtiquette)
+        {
+            ListNomImprimante.add(imprimante.getNom());
+        }
+        ArrayAdapter<String> adapterImprimante= new ArrayAdapter<String>(this,
+                R.layout.inscription_spinner_item, ListNomImprimante);
+        spinnerImprimante.setAdapter(adapterImprimante);
+
+
+        builder.setView(layout);
+        android.app.AlertDialog alertDialogListeImprimante = builder.create();
+        Objects.requireNonNull(alertDialogListeImprimante.getWindow()).setGravity(Gravity.CENTER);
+        alertDialogListeImprimante.show();
+
+        zoneok.setOnClickListener(v -> {
+
+            String nomImprimante = spinnerImprimante.getSelectedItem().toString();
+            try {
+                envoyerImpressionZebra(ph_preparation_Selectionne, nomImprimante);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        buttonAnnuler.setOnClickListener(v -> alertDialogListeImprimante.dismiss());
     }
 }
