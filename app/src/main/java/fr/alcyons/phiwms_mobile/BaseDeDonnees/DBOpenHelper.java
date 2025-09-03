@@ -1,5 +1,7 @@
 package fr.alcyons.phiwms_mobile.BaseDeDonnees;
 
+import static fr.alcyons.phiwms_mobile.BaseDeDonnees.ImprimanteEtiquetteOpenHelper.Constantes.TABLE_IMPRIMANTE_ETIQUETTE;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -59,6 +61,7 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         db.delete(TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, null, null);
         db.delete(EVENTOpenHelper.Constantes.TABLE_EVENT, null, null);
         db.delete(PH_Demande_MotifOpenHelper.Constantes.TABLE_DEMANDE_MOTIF, null, null);
+        db.delete(TABLE_IMPRIMANTE_ETIQUETTE, null, null);
     }
 
     @Override
@@ -107,6 +110,7 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         db.execSQL(TableTraceOpenHelper.Constantes.CREATION_TABLE_TABLE_TRACE);
         db.execSQL(EVENTOpenHelper.Constantes.CREATION_TABLE_EVENT);
         db.execSQL(PH_Demande_MotifOpenHelper.Constantes.CREATION_TABLE_DEMANDE_MOTIF);
+        db.execSQL(ImprimanteEtiquetteOpenHelper.Constantes.CREATION_TABLE_IMPRIMANTE_ETIQUETTE);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -116,6 +120,12 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         int serviceActiviteMobileColumn = serviceActiviteMobileExisteCursor.getColumnIndex("activiteMobile");
         if (serviceActiviteMobileColumn < 0) {
             db.execSQL("ALTER TABLE " + ServiceOpenHelper.Constantes.TABLE_SERVICE + " ADD COLUMN activiteMobile TEXT");
+        }
+
+        Cursor ImprimanteEtiquetteExisteCursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"
+                + TABLE_IMPRIMANTE_ETIQUETTE + "'", null);
+        if (ImprimanteEtiquetteExisteCursor.getCount() == 0) {
+            db.execSQL(ImprimanteEtiquetteOpenHelper.Constantes.CREATION_TABLE_IMPRIMANTE_ETIQUETTE);
         }
     }
 
@@ -216,6 +226,7 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         public static final String uriRequeteDemandeReassortCourant = "ph_preparations/phreassort";
         public static final String uriRequeteDemandeMotif = "ph_demande_motif/";
         public static final String uriZebraImprimer = "zebrawebservice/imprimer";
+        public static final String uriImprimanteEtiquette = "imprimanteEtiquette/";
 
     }
 

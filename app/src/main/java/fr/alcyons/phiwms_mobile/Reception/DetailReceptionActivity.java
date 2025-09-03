@@ -24,10 +24,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,6 +62,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.FournisseurOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ImprimanteEtiquetteOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
@@ -74,12 +77,14 @@ import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.Classes.Fournisseur;
+import fr.alcyons.phiwms_mobile.Classes.ImprimanteEtiquette;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_Reception_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.EtiquetteZebraAdapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Reliquat_ReceptionAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
@@ -134,6 +139,7 @@ public class DetailReceptionActivity extends ServiceActivity {
     Depot_Emplacement emplacement_precedent;
     Produit produitPrecedent;
     MenuItem item;
+    List<ImprimanteEtiquette> listeImprimanteEtiquette;
     @SuppressLint("SimpleDateFormat")
     public void valider_reception()
     {
@@ -248,7 +254,7 @@ public class DetailReceptionActivity extends ServiceActivity {
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
 
-        if(utilisateurConnecte.getEtablissement().toUpperCase().contentEquals("ADH") || utilisateurConnecte.getEtablissement().toUpperCase().contentEquals("ALCYONS"))
+        /*if(utilisateurConnecte.getEtablissement().toUpperCase().contentEquals("ADH") || utilisateurConnecte.getEtablissement().toUpperCase().contentEquals("ALCYONS"))
         {
             List<PH_Reliquat> listeReliquatReceptionnee = PH_ReliquatOpenHelper.getPH_ReliquatByCommandeNumero(db, commandeSelectionne.getNumero());
 
@@ -259,7 +265,7 @@ public class DetailReceptionActivity extends ServiceActivity {
                     envoyerImpressionZebra(reliquat);
                 }
             }
-        }
+        }*/
         retourService(super.getBundle());
     }
 
@@ -485,6 +491,20 @@ public class DetailReceptionActivity extends ServiceActivity {
             phReliquatReceptionAdapteList = (List<PH_Reliquat_Reception_Adapte>) savedInstanceState.getSerializable("listePuiAdapte");
             phReliquatListView = (ListView) findViewById(R.id.liste_view);
             onResume();
+        }
+
+        listeImprimanteEtiquette = ImprimanteEtiquetteOpenHelper.getAllImprimante(db);
+        if(listeImprimanteEtiquette.size() > 0)
+        {
+            ((LinearLayout)findViewById(R.id.printEtiquette)).setVisibility(View.VISIBLE);
+
+            ((LinearLayout) findViewById(R.id.printEtiquette)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    afficherAlerteSelectionEtiquette(DetailReceptionActivity.this, DetailReceptionActivity.this.getLayoutInflater());
+
+                }
+            });
         }
 
         phReliquatListView = (ListView) findViewById(R.id.liste_view);
@@ -1172,7 +1192,7 @@ public class DetailReceptionActivity extends ServiceActivity {
         //ElementASynchroniserOpenHelper.toutSynchroniser(DetailReceptionActivity.this, db, utilisateurConnecte, false);
     }
 
-    private void envoyerImpressionZebra(PH_Reliquat reliquatCourant) throws JSONException {
+    private void envoyerImpressionZebra(PH_Reliquat reliquatCourant, String nomImprimante) throws JSONException {
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         String strDate = sdf.format(cal.getTime());
@@ -1203,7 +1223,7 @@ public class DetailReceptionActivity extends ServiceActivity {
 
         Etiquette_TO.put(etiquette_v1_JO);
 
-        String imprimante_VT = "Zebra";
+        String imprimante_VT = nomImprimante;
         String aImprimer = "true";
         String format = "Réception";
 
@@ -1241,5 +1261,53 @@ public class DetailReceptionActivity extends ServiceActivity {
         };
         RequestQueue requestQueueUtilisateur = Volley.newRequestQueue(this);
         requestQueueUtilisateur.add(obreq);
+    }
+
+    private void afficherAlerteSelectionEtiquette(Context context, LayoutInflater inflater)
+    {
+        List<PH_Reliquat> reliquatAImprimer = new ArrayList<>();
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View layout = inflater.inflate(R.layout.alerte_impression_zebra, null);
+
+        LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
+        LinearLayout buttonAnnuler = (LinearLayout) layout.findViewById(R.id.fermer_alerte_etiquette_zebra);
+        ListView listeReliquatReceptionne = (ListView) layout.findViewById(R.id.listeReliquatReceptionne);
+        Spinner spinnerImprimante = (Spinner) layout.findViewById(R.id.spinnerImprimante);
+
+        List<PH_Reliquat> listeReliquatReceptionnee = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumero(db, commandeSelectionne.getNumero());
+        EtiquetteZebraAdapter adapter = new EtiquetteZebraAdapter(this, listeReliquatReceptionnee, reliquatAImprimer);
+        listeReliquatReceptionne.setAdapter(adapter);
+
+        listeReliquatReceptionne.setOnItemClickListener(null);
+
+        List<String> ListNomImprimante = new ArrayList<>();
+        for(ImprimanteEtiquette imprimante : listeImprimanteEtiquette)
+        {
+            ListNomImprimante.add(imprimante.getNom());
+        }
+        ArrayAdapter<String> adapterImprimante= new ArrayAdapter<String>(this,
+                R.layout.inscription_spinner_item, ListNomImprimante);
+        spinnerImprimante.setAdapter(adapterImprimante);
+
+
+        builder.setView(layout);
+        AlertDialog alertDialogEtiquette = builder.create();
+        Objects.requireNonNull(alertDialogEtiquette.getWindow()).setGravity(Gravity.CENTER);
+        alertDialogEtiquette.show();
+
+        zoneok.setOnClickListener(v -> {
+
+            String nomImprimante = spinnerImprimante.getSelectedItem().toString();
+            for(PH_Reliquat reliquat : reliquatAImprimer)
+            {
+                try {
+                    envoyerImpressionZebra(reliquat, nomImprimante);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        buttonAnnuler.setOnClickListener(v -> alertDialogEtiquette.dismiss());
     }
 }
