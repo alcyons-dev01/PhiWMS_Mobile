@@ -32,6 +32,7 @@ import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparation2025Activity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparation2025_V2Activity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
@@ -70,6 +71,7 @@ public class ListeLotPreparation2025_V2Activity  extends ServiceAvecConnexionAct
     List<PH_Preparation_Ligne> phPreparationLignesPreparer;
     PH_Preparation ph_preparation;
     List<Stock_Lot_Emplacement_Light> listeStockLotEmplacement;
+    List<String> listelot;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +81,7 @@ public class ListeLotPreparation2025_V2Activity  extends ServiceAvecConnexionAct
         camera_first = false;
 
         // Récupération du ph_preparation_ligne, produit, depot sélectionné
+        listelot = new ArrayList<>();
         ph_preparation_ligne_base = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByID(db, intent.getExtras().getInt("phPreparationLigneId"));
         ph_preparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparation_ligne_base.getPreparationID());
         phPreparationLignesPreparer = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparationAndProduitNeg(db, ph_preparation, ph_preparation_ligne_base.getProduitID());
@@ -137,6 +140,16 @@ public class ListeLotPreparation2025_V2Activity  extends ServiceAvecConnexionAct
                     return o1.getPeremptionDate().compareTo(o2.getPeremptionDate());
                 }
             });
+
+            for(Stock_Lot_Emplacement_Light courant: listeStockLotEmplacement)
+            {
+                listelot.add(courant.getLot());
+            }
+
+            if(!produitserialiserreception && produitsuiviserie)
+            {
+                listeStockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepotSerie(db, produit, depot);
+            }
         }
         else
         {
@@ -182,11 +195,30 @@ public class ListeLotPreparation2025_V2Activity  extends ServiceAvecConnexionAct
                 stock_courant.setQte_Preparer(0);
                 Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
                 ((LotAdapter_V2.LotViewHolder) viewHolder).isSwipedOpen = false;
+                supprimerPhPreparationLigne(ph_preparation_ligne_base, stock_courant);
 
+                listeStockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot);
+
+                Collections.sort(listeStockLotEmplacement, new Comparator<Stock_Lot_Emplacement_Light>() {
+                    @Override
+                    public int compare(Stock_Lot_Emplacement_Light o1, Stock_Lot_Emplacement_Light o2) {
+                        return o1.getPeremptionDate().compareTo(o2.getPeremptionDate());
+                    }
+                });
+
+                for(Stock_Lot_Emplacement_Light courant: listeStockLotEmplacement)
+                {
+                    listelot.add(courant.getLot());
+                }
+
+                if(!produitserialiserreception && produitsuiviserie)
+                {
+                    listeStockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepotSerie(db, produit, depot);
+                }
                 adapter.notifyItemChanged(position);
 
-                supprimerPhPreparationLigne(ph_preparation_ligne_base, stock_courant);
                 MAJVisuel();
+                onResume();
             }
 
             // Tu peux appeler confirm dialog ici
@@ -208,7 +240,30 @@ public class ListeLotPreparation2025_V2Activity  extends ServiceAvecConnexionAct
         super.onActivityResult(requestCode, resultCode, data);
         if (data != null) {
             switch (requestCode) {
+                case CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH:
+                    listeStockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot);
+                    listelot = new ArrayList<>();
+                    if(!listeStockLotEmplacement.isEmpty())
+                    {
+                        for(Stock_Lot_Emplacement_Light courant: listeStockLotEmplacement)
+                        {
+                            listelot.add(courant.getLot());
+                        }
+                    }
 
+                    if(!produitserialiserreception && produitsuiviserie)
+                    {
+                        listeStockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepotSerie(db, produit, depot);
+                    }
+                    qteDejaPreparer = 0;
+                    for(Stock_Lot_Emplacement_Light courant: listeStockLotEmplacement)
+                    {
+                        qteDejaPreparer = qteDejaPreparer + courant.getQte_Preparer();
+                    }
+                    MAJValues(true, 0);
+                    MAJVisuel();
+                    onResume();
+                break;
             }
         }
         invalidateOptionsMenu();
@@ -272,24 +327,18 @@ public class ListeLotPreparation2025_V2Activity  extends ServiceAvecConnexionAct
         //gestion du zebra
         if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
         {
-            listeLotPreparation_Intent = new Intent(ListeLotPreparation2025_V2Activity.this, ScannerPreparation2025Activity.class);
+            listeLotPreparation_Intent = new Intent(ListeLotPreparation2025_V2Activity.this, ScannerPreparation2025_V2Activity.class);
         }
 
         List<PH_Preparation_Ligne> listePhPreparationLigne = new ArrayList<>();
         listePhPreparationLigne.add(ph_preparation_ligne_base);
 
         Bundle listeLotPreparation_Bundle = super.getBundle();
-        String designation = produit.getDesignation_interne();
-        listeLotPreparation_Bundle.putBoolean("doitEtreIdentique", true);
-        listeLotPreparation_Bundle.putString("contexte", String.valueOf(R.string.scannerContextPreparationSimple));
-        listeLotPreparation_Bundle.putString("Designation", designation);
-        listeLotPreparation_Bundle.putBoolean("isBoutonSuppressionExistant", true);
         listeLotPreparation_Bundle.putInt("UserId", utilisateurConnecte.getId());
-        listeLotPreparation_Bundle.putBoolean("modeRafale", true);
-        listeLotPreparation_Bundle.putString("GTIN_courant", produit.getGTIN());
         listeLotPreparation_Bundle.putInt("preparationId", ph_preparation_ligne_base.getPreparationID());
         listeLotPreparation_Bundle.putInt("preparationLigneId", ph_preparation_ligne_base.get_UID());
         listeLotPreparation_Bundle.putSerializable("liste_ph_preparation_ligne", (Serializable) listePhPreparationLigne);
+        listeLotPreparation_Bundle.putStringArrayList("liste_lot", (ArrayList<String>) listelot);
 
         listeLotPreparation_Intent.putExtras(listeLotPreparation_Bundle);
         ListeLotPreparation2025_V2Activity.this.startActivityForResult(listeLotPreparation_Intent, CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH);
@@ -541,5 +590,11 @@ public class ListeLotPreparation2025_V2Activity  extends ServiceAvecConnexionAct
 
         if(ligne_a_supprimer != null)
             PH_Preparation_LigneOpenHelper.supprimerUnPhPreparationLigne(db, ligne_a_supprimer);
+
+        if(produitsuiviserie && !produitserialiserreception)
+        {
+            if(!stockLotEmplacementLight.getSerie().contentEquals(""))
+                Stock_Lot_EmplacementLightOpenHelper.supprimerUnStockLotEmplacement(db, stockLotEmplacementLight);
+        }
     }
 }

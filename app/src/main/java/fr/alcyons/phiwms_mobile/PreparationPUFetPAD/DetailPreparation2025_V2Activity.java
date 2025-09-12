@@ -57,6 +57,7 @@ import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparation2025Activity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparation2025Activity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparation2025_V2Activity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
@@ -585,7 +586,7 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
             //gestion du zebra
             if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
             {
-                detailPreparation_Intent = new Intent(DetailPreparation2025_V2Activity.this, ScannerPreparation2025Activity.class);
+                detailPreparation_Intent = new Intent(DetailPreparation2025_V2Activity.this, ScannerPreparation2025_V2Activity.class);
             }
 
             List<PH_Preparation_Ligne> preparationLignesBase = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesBaseParPHPreparation(db, ph_preparation_Selectionne);

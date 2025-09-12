@@ -404,6 +404,13 @@
         android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation|keyboardHidden"/>
 
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparation2025_V2Activity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
         <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerEmplacementActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"

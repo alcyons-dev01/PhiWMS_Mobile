@@ -36,9 +36,7 @@ public class Stock_Lot_EmplacementLightOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_QTE_STOCK_LOT_EMPLACEMENT, stock_lot_emplacement.getQte());
         contentValues.put(Constantes.CLE_COL_PEREMPTIONDATE_STOCK_LOT_EMPLACEMENT, stock_lot_emplacement.getPeremptionDate());
         contentValues.put(Constantes.CLE_COL_QTE_PREPARER_STOCK_LOT_EMPLACEMENT, stock_lot_emplacement.getQte_Preparer());
-        //contentValues.put(Constantes.CLE_COL_SERIE, stock_lot_emplacement.getSerie());
-        contentValues.put(Constantes.CLE_COL_SERIE, "");
-
+        contentValues.put(Constantes.CLE_COL_SERIE, stock_lot_emplacement.getSerie());
         // Insertion du dépot en BDD
         long rowId = db.insert(Constantes.TABLE_STOCK_LOT_EMPLACEMENT, null, contentValues);
 
@@ -115,7 +113,58 @@ public class Stock_Lot_EmplacementLightOpenHelper extends DBOpenHelper {
         return stockLotEmplacementLightList;
     }
 
+    public static List<Stock_Lot_Emplacement_Light> getAllStockLotEmplacementByProduitEtDepotSerie(SQLiteDatabase db, Produit produit, Depot depot) {
+        List<Stock_Lot_Emplacement_Light> stockLotEmplacementLightList = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_STOCK_LOT_EMPLACEMENT + " WHERE " + Constantes.CLE_COL_DEPOT_REFERENCE_STOCK_LOT_EMPLACEMENT + "=? and " + Constantes.CLE_COL_PRODUIT_CODE_STOCK_LOT_EMPLACEMENT + "=?", new String[]{depot.getDepot_Reference(), String.valueOf(produit.getID_produit())});
+
+        while (cursor.moveToNext()) {
+            Stock_Lot_Emplacement_Light stockLotEmplacementLight = new Stock_Lot_Emplacement_Light(cursor);
+            if(!stockLotEmplacementLight.getSerie().contentEquals("") && stockLotEmplacementLight.getSerie() != null)
+                stockLotEmplacementLightList.add(stockLotEmplacementLight);
+        }
+        cursor.close();
+        cursor = null;
+        return stockLotEmplacementLightList;
+    }
+
     public static Stock_Lot_Emplacement_Light getAllStockLotEmplacementByLotPeremptionEtDepot(SQLiteDatabase db, String lot, String datePeremption, Depot depot) {
+        String[] dateTab = datePeremption.split("/");
+        if(dateTab.length == 3)
+            datePeremption = dateTab[dateTab.length-1]+"-"+dateTab[1]+"-"+dateTab[0];
+
+        Stock_Lot_Emplacement_Light stockLotEmplacementLightList = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_STOCK_LOT_EMPLACEMENT + " WHERE " + Constantes.CLE_COL_DEPOT_REFERENCE_STOCK_LOT_EMPLACEMENT + "=? and " + Constantes.CLE_COL_LOT_STOCK_LOT_EMPLACEMENT + "=? and " + Constantes.CLE_COL_PEREMPTIONDATE_STOCK_LOT_EMPLACEMENT + "= ?", new String[]{depot.getDepot_Reference(), lot, datePeremption});
+
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            stockLotEmplacementLightList = new Stock_Lot_Emplacement_Light(cursor);
+        }
+        cursor.close();
+        cursor = null;
+        return stockLotEmplacementLightList;
+    }
+
+    public static Stock_Lot_Emplacement_Light getStockLotEmplacementByLotPeremptionEtDepotEmplacement(SQLiteDatabase db, String lot, String datePeremption, Depot depot, String emplacement) {
+        String[] dateTab = datePeremption.split("/");
+        if(dateTab.length == 3)
+            datePeremption = dateTab[dateTab.length-1]+"-"+dateTab[1]+"-"+dateTab[0];
+
+        Stock_Lot_Emplacement_Light stockLotEmplacementLightList = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_STOCK_LOT_EMPLACEMENT + " WHERE " + Constantes.CLE_COL_DEPOT_REFERENCE_STOCK_LOT_EMPLACEMENT + "=? and " + Constantes.CLE_COL_LOT_STOCK_LOT_EMPLACEMENT + "=? and " + Constantes.CLE_COL_PEREMPTIONDATE_STOCK_LOT_EMPLACEMENT + "= ? AND "+Constantes.CLE_COL_EMPLACEMENT_STOCK_LOT_EMPLACEMENT+"=?", new String[]{depot.getDepot_Reference(), lot, datePeremption, emplacement});
+
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            stockLotEmplacementLightList = new Stock_Lot_Emplacement_Light(cursor);
+        }
+        cursor.close();
+        cursor = null;
+        return stockLotEmplacementLightList;
+    }
+
+    public static Stock_Lot_Emplacement_Light getStockLotEmplacementByLotPeremptionEtDepot(SQLiteDatabase db, String lot, String datePeremption, Depot depot) {
         String[] dateTab = datePeremption.split("/");
         if(dateTab.length == 3)
             datePeremption = dateTab[dateTab.length-1]+"-"+dateTab[1]+"-"+dateTab[0];

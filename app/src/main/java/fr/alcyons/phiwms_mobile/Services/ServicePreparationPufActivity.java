@@ -426,10 +426,10 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
                     Depot depot = DepotOpenHelper.getDepotParID(db, ph_preparation.getDepotOrigineID());
 
                     if (depot != null && produit != null) {
-                        for (Stock_Lot_Emplacement_Light stockLotEmplacement : Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot)
+                        /*for (Stock_Lot_Emplacement_Light stockLotEmplacement : Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot)
                                 ) {
                             Stock_Lot_EmplacementLightOpenHelper.supprimerUnStockLotEmplacement(db, stockLotEmplacement);
-                        }
+                        }*/
                     }
                 }
                 PH_PreparationOpenHelper.supprimerUnPhPreparation(db, ph_preparation);
