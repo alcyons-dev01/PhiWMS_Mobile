@@ -85,6 +85,7 @@ import fr.alcyons.phiwms_mobile.ParametresServeur.ServiceParametresServeurActivi
 import fr.alcyons.phiwms_mobile.VerificationConnexion.VerificationConnexionActivity;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.skydoves.expandablelayout.ExpandableLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -135,6 +136,7 @@ public class AuthentificationActivity extends MainActivity {
     Button boutonConnexion;
     ProgressBar progressBar;
     PackageManager pm;
+    ExpandableLayout expandableLayout1;
 
     DBOpenHelper gestionnaireBaseDeDonnee;
 
@@ -850,6 +852,7 @@ public class AuthentificationActivity extends MainActivity {
 
     @SuppressLint("ClickableViewAccessibility")
     private void initialisationAlerte(View layout, AlertDialog.Builder builder) {
+        expandableLayout1 = (ExpandableLayout) layout.findViewById(R.id.expandableLayout1);
 
         TextView service = layout.findViewById(R.id.Service);
         textViewList.add(service);
@@ -933,7 +936,7 @@ public class AuthentificationActivity extends MainActivity {
 
     public void RapportErreur() {
         gestionExpandable.setVisibility(View.VISIBLE);
-       // expandableLayout1.toggle();
+        expandableLayout1.expand();
         zoneok.setVisibility(View.GONE);
         TextSynchronisation.setVisibility(View.GONE);
 
@@ -949,14 +952,14 @@ public class AuthentificationActivity extends MainActivity {
     //Ouvrir l'expandable pour consulter les erreur
     public void voirErreur() {
 
-       /* final TextView messageErreur = (TextView) expandableLayout1.findViewById(R.id.messageErreur);
-        LinearLayout ok = (LinearLayout) expandableLayout1.findViewById(R.id.boutonOk);
-        ImageView suivant = (ImageView) expandableLayout1.findViewById(R.id.suivant);
-        ImageView precedent = (ImageView) expandableLayout1.findViewById(R.id.precedent);
-        final TextView nombreMessageErreur = (TextView) expandableLayout1.findViewById(R.id.nombreMessageErreur);
+        final TextView messageErreur = (TextView) alertDialog.findViewById(R.id.messageErreur);
+        LinearLayout ok = (LinearLayout) alertDialog.findViewById(R.id.boutonOk);
+        ImageView suivant = (ImageView) alertDialog.findViewById(R.id.suivant);
+        ImageView precedent = (ImageView) alertDialog.findViewById(R.id.precedent);
+        final TextView nombreMessageErreur = (TextView) alertDialog.findViewById(R.id.nombreMessageErreur);
         final int[] positionMessage = {0};
 
-        messageErreur.setText(tabErreur.get(positionMessage[0]));
+        /*messageErreur.setText(tabErreur.get(positionMessage[0]));
         int nombreMessage = positionMessage[0] + 1;
         nombreMessageErreur.setText(nombreMessage + "/" + tabErreur.size());
         suivant.setOnClickListener(new View.OnClickListener() {

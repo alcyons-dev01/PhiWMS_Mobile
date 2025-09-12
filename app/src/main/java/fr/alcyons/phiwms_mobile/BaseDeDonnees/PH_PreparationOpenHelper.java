@@ -59,7 +59,11 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
             String tab[] = DateProchaineLivraison.split("/");
             String annee = tab[tab.length-1];
             String mois = tab[1];
+            if(mois.length() == 1)
+                mois = "0"+mois;
             String jour = tab[0];
+            if(jour.length() == 1)
+                jour = "0"+jour;
             DateProchaineLivraison = annee+"-"+mois+"-"+jour;
         }
 
@@ -308,7 +312,11 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
             String tab[] = DateProchaineLivraison.split("/");
             String annee = tab[tab.length-1];
             String mois = tab[1];
+            if(mois.length() == 1)
+                mois = "0"+mois;
             String jour = tab[0];
+            if(jour.length() == 1)
+                jour = "0"+jour;
             DateProchaineLivraison = annee+"-"+mois+"-"+jour;
         }
 

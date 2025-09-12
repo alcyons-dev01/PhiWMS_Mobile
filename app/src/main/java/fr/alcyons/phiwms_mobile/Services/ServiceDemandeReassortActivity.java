@@ -135,9 +135,12 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
     @NonNull
     private Intent getListeReassortServiceIntent(PH_Preparation phPreparationCourante, PH_Reassort PH_ReassortSelectionne) {
         Bundle listeReassortService_Bundle = ServiceDemandeReassortActivity.super.getBundle();
-        listeReassortService_Bundle.putInt("depotSelectionneID", phPreparationCourante.getDepotDestinataireID());
         listeReassortService_Bundle.putInt("PH_ReassortSelectionneID", PH_ReassortSelectionne.getPhiMR4UUID());
-        listeReassortService_Bundle.putInt("phPreparationID", phPreparationCourante.getUID());
+        if(phPreparationCourante != null)
+        {
+            listeReassortService_Bundle.putInt("depotSelectionneID", phPreparationCourante.getDepotDestinataireID());
+            listeReassortService_Bundle.putInt("phPreparationID", phPreparationCourante.getUID());
+        }
 
         Intent listeReassortService_Intent = new Intent(ServiceDemandeReassortActivity.this, InformationDemandeReassortActivity.class);
         listeReassortService_Intent.putExtras(listeReassortService_Bundle);
@@ -280,188 +283,6 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
         return true;
     }
 
-    private PH_Preparation CreationPhPreparation(PH_Reassort reassort)
-    {
-        Random phPreparationRandom = new Random();
-        int phPreparationID = phPreparationRandom.nextInt();
-        if (phPreparationID > 0) {
-            phPreparationID = phPreparationID * -1;
-        }
-
-        Depot depotPUI = DepotOpenHelper.getDepotPUI(db);
-        int UID = phPreparationID;
-        String Service = "";
-        Boolean Erreur_Valid = false;
-        String PHIE_Tag = "";
-        String Saisie_Le = "";
-        String A_tel_heure = "";
-        int produitID = 0;
-        String produitDesignation = "";
-        double Qte_demandee = 0;
-        Boolean Livree = false;
-        Boolean Validee = false;
-        String Origine = "";
-        String Liste = "Réassort de service : " + reassort.getListe();
-        Depot depotDestinataire = DepotOpenHelper.getDepotParReference(db, reassort.getDepot_Reference());
-        int depotDestinataireID = depotDestinataire.getDepot_UID();
-        String depotDestinataireReference = reassort.getDepot_Reference();
-        String SYS_DT_MAJ = "";
-        String SYS_HEURE_MAJ = "";
-        String SYS_USER_MAJ = "";
-        String PrescripteurReference = "";
-        String Prescription_date = "";
-        String PrescripteurNom = "";
-        String depotOrigineReference = "";
-        int depotOrigineID = 0;
-        if(depotPUI != null)
-        {
-            depotOrigineReference = depotPUI.getDepot_Reference();
-            depotOrigineID = depotPUI.getDepot_UID();
-        }
-
-        String Commentaires = "";
-        String PreparationDate = "";
-        String[] dateTab = EVENTOpenHelper.getDateProchaineLivraison(db, depotDestinataire.getDepot_UID()).split("/");
-        String LivraisonPrevueDate = getLivraisonPrevueDate(dateTab);
-        String DN_Groupe = "";
-        double Montant_HT = 0;
-        double Montant_TTC = 0;
-        double Poids = 0;
-        int Commande_ID = 0;
-        String Preparateur = "";
-        String Statut = "En instance";
-        String PHIE_SYNCHRO = "";
-        String receptionUFNonComforme = "";
-        String livraisonDate = "";
-        String Frequence = "";
-        String previsionDateDebut = "";
-        String previsionDateFin = "";
-        Boolean URGENT = false;
-        String Motif = "";
-        int preparateur_userID = 0;
-        int pharmacien_userID = 0;
-        double Volume = 0;
-        int PaletteNB = 0;
-        int CaisseNB = 0;
-        int Conteneur_NB = 0;
-        String numero_scelle = "";
-
-        // Création et insertion en base du PH_Preparation
-        PH_Preparation ph_preparation = new PH_Preparation(UID, Service, Erreur_Valid, PHIE_Tag, Saisie_Le, A_tel_heure, produitID, produitDesignation, Qte_demandee, Livree, Validee, Origine, Liste, depotDestinataireID, depotDestinataireReference, SYS_DT_MAJ, SYS_HEURE_MAJ, SYS_USER_MAJ, PrescripteurReference, Prescription_date, PrescripteurNom, depotOrigineReference, depotOrigineID, Commentaires, PreparationDate, LivraisonPrevueDate, DN_Groupe, Montant_HT, Montant_TTC, Poids, Commande_ID, Preparateur, Statut, PHIE_SYNCHRO, receptionUFNonComforme, livraisonDate, Frequence, previsionDateDebut, previsionDateFin, URGENT, Motif, preparateur_userID, pharmacien_userID, Volume, PaletteNB, CaisseNB,Conteneur_NB, numero_scelle);
-        int ph_preparationPHIMR4uid = (int) PH_PreparationOpenHelper.insererUnPH_PreparationEnBDD(db, ph_preparation);
-
-        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparationPHIMR4uid, ph_preparation.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.AJOUT);
-
-        List<PH_Reassort_Ligne> listReassortLigne = PH_Reassort_LigneOpenHelper.getAllPH_Reassort_LigneParPH_Reassort(db, reassort);
-
-        for(PH_Reassort_Ligne reassort_ligne : listReassortLigne)
-        {
-            CreatePhPreparationLigneDetail(reassort_ligne, reassort);
-        }
-
-        return ph_preparation;
-    }
-
-    @NonNull
-    private static String getLivraisonPrevueDate(String[] dateTab) {
-        String LivraisonPrevueDate;
-        if(dateTab.length > 1)
-        {
-            LivraisonPrevueDate = dateTab[dateTab.length-1]+"-"+ dateTab[1]+"-"+ dateTab[0];
-        }
-        else
-        {
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.DAY_OF_YEAR, 1);
-            Date tomorrow = calendar.getTime();
-            @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-            LivraisonPrevueDate = dateFormat.format(tomorrow);
-        }
-        return LivraisonPrevueDate;
-    }
-
-    public void CreatePhPreparationLigneDetail(PH_Reassort_Ligne reassort_ligne, PH_Reassort reassort)
-    {
-        Depot depotDestinataire = DepotOpenHelper.getDepotParReference(db, reassort.getDepot_Reference());
-        String dateProchaineLivraison = EVENTOpenHelper.getDateProchaineLivraison(db, depotDestinataire.getDepot_UID());
-        if(Objects.equals(dateProchaineLivraison, ""))
-        {
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.DAY_OF_YEAR, 1);
-            Date tomorrow = calendar.getTime();
-            @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
-            dateProchaineLivraison = dateFormat.format(tomorrow);
-        }
-        PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandeDemandeReassortEnInstance(db, "Réassort de service : " + reassort.getListe(), dateProchaineLivraison);
-        PH_Preparation_Ligne ph_preparation_ligneCourant = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByPreparationAndIdProduit(db, phPreparationCourante, reassort_ligne.getProduit_ID());
-
-        if(ph_preparation_ligneCourant == null)
-        {
-            Produit produitCorrespondant = ProduitOpenHelper.getProduitByID(db, reassort_ligne.getProduit_ID());
-
-            if(produitCorrespondant != null)
-            {
-                Random phPreparationRandom = new Random();
-                int phPreparationLigneID = phPreparationRandom.nextInt();
-                if (phPreparationLigneID > 0) {
-                    phPreparationLigneID = phPreparationLigneID * -1;
-                }
-
-                // Initialisation des données permettant de créer un PH_Préparation_Ligne
-                int PreparationID = phPreparationCourante.getUID();
-                int _UID = phPreparationLigneID;
-
-                int produitID = produitCorrespondant.getID_produit();
-                String produitDesignation = produitCorrespondant.getDesignation_interne();
-                String produitReference = produitCorrespondant.getRef_fourni();
-                String produitCategorie = produitCorrespondant.getCategorie();
-                double produitCondDistrib = produitCorrespondant.getCond_distrib();
-                Boolean Suivi_Par_Lot = produitCorrespondant.isSuivi_Lot();
-                int Qte_APreparer = 0;
-                int Qte_livrer = 0;
-                Boolean Livrer = false;
-                Boolean Valider = false;
-                String ValidationDate = "";
-                String ZoneDepot = "";
-                int Qte_RAL = 0;
-                String SYS_DT_MAJ = "";
-                String SYS_HEURE_MAJ = "";
-                String SYS_USER_MAJ = "";
-                double produitPUHT = 0;
-                int patientID = 0;
-                String PatientNom = "";
-                String PrescripteurNom = "";
-                String prescripteurReference = "";
-                int Ordre_Impression = 0;
-                int Prescription_ID = 0;
-                String LotNumero = "";
-                String PeremptionDate = "0000-00-00";
-                double produitPoids = 0;
-                double produitTVA = 0;
-                double Montant_HT = 0;
-                double Montant_TTC = 0;
-                double PoidsTotal = 0;
-                String depot_Destinataire_Reference = "";
-                String utilisation_Date_Prevue = "";
-                int Qte_besoin = reassort_ligne.getQuantite();
-                int Qte_StockSaisie = -1;
-                int Qte_Demander = 0;
-                String EmplacementParDefaut = "";
-                int Qte_preparer = 0;
-                boolean accepter = false;
-
-                // Création et insertion en base du PH_Preparation_Ligne
-                PH_Preparation_Ligne ph_preparation_ligne = new PH_Preparation_Ligne(PreparationID, _UID, produitID, produitDesignation, Qte_APreparer, Qte_livrer, Livrer, Valider, ValidationDate, produitReference, ZoneDepot, produitCategorie, Qte_RAL, SYS_DT_MAJ, SYS_HEURE_MAJ, SYS_USER_MAJ, produitCondDistrib, produitPUHT, Suivi_Par_Lot, patientID, PatientNom, PrescripteurNom, prescripteurReference, Ordre_Impression, Prescription_ID, LotNumero, PeremptionDate, produitPoids, produitTVA, Montant_HT, Montant_TTC, PoidsTotal, depot_Destinataire_Reference, utilisation_Date_Prevue, Qte_besoin, Qte_StockSaisie, Qte_Demander, EmplacementParDefaut, Qte_preparer, accepter, phPreparationCourante.getUID());
-                PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, ph_preparation_ligne);
-
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ph_preparation_ligne.getPhiMR4UUID(), ph_preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.AJOUT);
-                ElementASynchroniserOpenHelper.toutSynchroniser(ServiceDemandeReassortActivity.this, db, utilisateurConnecte, false);
-            }
-        }
-    }
-
     private void gestionAdapter()
     {
         arreterSpinner();
@@ -487,14 +308,14 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
             reassortCourant.setDateLivraison(dateProchaineLivraison);
 
             //on check la présence des préparations en base
-            PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandeDemandeReassortEnInstance(db, "Réassort de service : " + reassortCourant.getListe(), dateProchaineLivraison);
+            /*PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandeDemandeReassortEnInstance(db, "Réassort de service : " + reassortCourant.getListe(), dateProchaineLivraison);
 
             if(phPreparationCourante == null)
             {
                 phPreparationCourante = CreationPhPreparation(reassortCourant);
             }
 
-            phPreparationList.add(phPreparationCourante);
+            phPreparationList.add(phPreparationCourante);*/
         }
         ElementASynchroniserOpenHelper.toutSynchroniser(ServiceDemandeReassortActivity.this, db, utilisateurConnecte, false);
         reassortListe.sort(new Comparator<PH_Reassort>() {

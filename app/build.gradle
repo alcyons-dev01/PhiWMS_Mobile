@@ -15,7 +15,7 @@ android {
         minSdk 25
         targetSdk 34
         versionCode getVersionCode()
-        versionName "2.09.03"
+        versionName "2.09.10.02"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
@@ -110,6 +110,7 @@ dependencies {
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
     implementation group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
     implementation "androidx.preference:preference-ktx:1.2.1"
+    implementation "com.github.skydoves:expandablelayout:1.0.7"
 }
 configurations {
     implementation.exclude group: 'com.google.guava', module: 'guava-jdk5'

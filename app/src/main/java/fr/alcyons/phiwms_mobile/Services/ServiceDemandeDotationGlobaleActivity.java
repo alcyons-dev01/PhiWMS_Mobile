@@ -180,7 +180,8 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
         Bundle listeDotationService_Bundle = ServiceDemandeDotationGlobaleActivity.super.getBundle();
         listeDotationService_Bundle.putInt("depotSelectionneID", DotationSelectionne.getDepot_UID());
         listeDotationService_Bundle.putInt("dotationSelectionneID", DotationSelectionne.getPhiMR4UUID());
-        listeDotationService_Bundle.putInt("phPreparationID", phPreparationCourante.getUID());
+        if(phPreparationCourante != null)
+            listeDotationService_Bundle.putInt("phPreparationID", phPreparationCourante.getUID());
 
         Intent listeDotationService_Intent = new Intent(ServiceDemandeDotationGlobaleActivity.this, InformationDotationServiceActivity.class);
         listeDotationService_Intent.putExtras(listeDotationService_Bundle);
@@ -291,6 +292,8 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
                 public Map<String, String> getHeaders() {
                     HashMap<String, String> headers = new HashMap<>();
                     headers.put("Authorization", utilisateurConnecte.getToken());
+                    headers.put("UserId", String.valueOf(utilisateurConnecte.getId()));
+                    headers.put("EtablissementId", String.valueOf(utilisateurConnecte.getEtablissementId()));
                     return headers;
                 }
             };
@@ -313,7 +316,7 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
     }
 
 
-    private PH_Preparation CreationPhPreparation(Dotation dotation)
+   /* private PH_Preparation CreationPhPreparation(Dotation dotation)
     {
         Random phPreparationRandom = new Random();
         int phPreparationID = phPreparationRandom.nextInt();
@@ -491,7 +494,7 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
                 ElementASynchroniserOpenHelper.toutSynchroniser(ServiceDemandeDotationGlobaleActivity.this, db, utilisateurConnecte, false);
             }
         }
-    }
+    }*/
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -534,12 +537,12 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
             PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandeDotationGlobaleEnInstance(db, "Dotation Globale : " + dotationCourante.getIntitule(), dateProchaineLivraison);
             majProgressPrincipal();
 
-            if(phPreparationCourante == null)
+            /*if(phPreparationCourante == null)
             {
                 phPreparationCourante = CreationPhPreparation(dotationCourante);
             }
 
-            phPreparationList.add(phPreparationCourante);
+            phPreparationList.add(phPreparationCourante);*/
         }
         ElementASynchroniserOpenHelper.toutSynchroniser(ServiceDemandeDotationGlobaleActivity.this, db, utilisateurConnecte, false);
         dotationsListe.sort(new Comparator<Dotation>() {

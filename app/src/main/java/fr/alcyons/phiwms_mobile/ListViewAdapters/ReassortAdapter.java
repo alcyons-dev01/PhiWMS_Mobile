@@ -23,10 +23,12 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EVENTOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Reassort_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reassort;
+import fr.alcyons.phiwms_mobile.Classes.PH_Reassort_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.R;
 
@@ -148,22 +150,30 @@ public class ReassortAdapter extends BaseAdapter {
                 dateProchaineLivraison = dateFormat.format(tomorrow);
             }
             PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandeDemandeReassortEnInstance(db, "Réassort de service : " + reassortCourant.getListe(), dateProchaineLivraison);
-
-            List<PH_Preparation_Ligne> ListPhPreparationLigne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, phPreparationCourante);
-            for(PH_Preparation_Ligne preparation_ligne : ListPhPreparationLigne)
+            int nbLigne = 0;
+            if(phPreparationCourante != null)
             {
-                if(preparation_ligne.getQte_StockSaisie() > -1)
+                List<PH_Preparation_Ligne> ListPhPreparationLigne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, phPreparationCourante);
+                for(PH_Preparation_Ligne preparation_ligne : ListPhPreparationLigne)
                 {
-                    nbDetail ++;
+                    if(preparation_ligne.getQte_StockSaisie() > -1)
+                    {
+                        nbDetail ++;
+                    }
                 }
+                listePhPreparation.add(phPreparationCourante);
+                nbLigne = ListPhPreparationLigne.size();
             }
-
-            listePhPreparation.add(phPreparationCourante);
+            else
+            {
+                List<PH_Reassort_Ligne> listPhReassort = PH_Reassort_LigneOpenHelper.getAllPH_Reassort_LigneParPH_Reassort(db, reassortCourant);
+                nbLigne = listPhReassort.size();
+            }
 
             // Affichage des valeurs
             viewHolder.nom.setText(reassortCourant.getListe());
             viewHolder.nbProduitDotation.setText(String.valueOf(nbDetail));
-            viewHolder.nbProduitDotationTotal.setText(String.valueOf(ListPhPreparationLigne.size()));
+            viewHolder.nbProduitDotationTotal.setText(String.valueOf(nbLigne));
 
             if(nbDetail == 0)
             {
@@ -187,33 +197,42 @@ public class ReassortAdapter extends BaseAdapter {
                 viewHolder.separateurQuantite.setBackgroundColor(context.getResources().getColor(R.color.orange, null));
             }
 
-            if(phPreparationCourante.getStatut().contentEquals("En instance"))
+            if(phPreparationCourante != null)
             {
-                if(nbDetail == 0)
+                if(phPreparationCourante.getStatut().contentEquals("En instance"))
                 {
-                    viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.bleu_clair_alcyons, null));
+                    if(nbDetail == 0)
+                    {
+                        viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.bleu_clair_alcyons, null));
+                    }
+                    else
+                    {
+                        viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.orange, null));
+                    }
+                    viewHolder.statutDotation.setText("A ENVOYER");
+                }
+                else if(phPreparationCourante.getStatut().contentEquals("En cours de régularisation"))
+                {
+                    viewHolder.statutDotation.setText("En cours");
+                    viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.orange, null));
+                }
+                else if(phPreparationCourante.getStatut().contentEquals("En cours de préparation"))
+                {
+                    viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.rouge, null));
+                    viewHolder.statutDotation.setText(phPreparationCourante.getStatut());
                 }
                 else
                 {
-                    viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.orange, null));
+                    viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.noir, null));
+                    viewHolder.statutDotation.setText(phPreparationCourante.getStatut());
                 }
-                viewHolder.statutDotation.setText("A ENVOYER");
-            }
-            else if(phPreparationCourante.getStatut().contentEquals("En cours de régularisation"))
-            {
-                viewHolder.statutDotation.setText("En cours");
-                viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.orange, null));
-            }
-            else if(phPreparationCourante.getStatut().contentEquals("En cours de préparation"))
-            {
-                viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.rouge, null));
-                viewHolder.statutDotation.setText(phPreparationCourante.getStatut());
             }
             else
             {
-                viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.noir, null));
-                viewHolder.statutDotation.setText(phPreparationCourante.getStatut());
+                viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.bleu_clair_alcyons, null));
+                viewHolder.statutDotation.setText("EN INSTANCE");
             }
+
         } else if (rowType == TYPE_HEADER) {
             // Gestion des dates
             String dateProchaineLivraison = listeReassort.get(position).getDateLivraison();

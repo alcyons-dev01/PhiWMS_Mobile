@@ -188,7 +188,7 @@ public class ListeLotPreparation2025Activity  extends ServiceAvecConnexionActivi
             List<PH_Preparation_Ligne_Preparation_Adapte.LotAdapte> list_temp = new ArrayList<>();
             for(PH_Preparation_Ligne_Preparation_Adapte.LotAdapte courant : lotAdapteList)
             {
-                if(!courant.getNumSerie().contentEquals(""))
+                if(courant.getNumSerie() != null && !courant.getNumSerie().contentEquals(""))
                 {
                     list_temp.add(courant);
                     //qtePreparer = courant.getQteSaisie()+qtePreparer;

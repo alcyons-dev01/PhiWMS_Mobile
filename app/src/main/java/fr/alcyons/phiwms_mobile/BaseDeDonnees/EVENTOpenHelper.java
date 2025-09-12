@@ -45,8 +45,14 @@ public class EVENTOpenHelper extends DBOpenHelper {
         if (cursor.getCount() >= 1) {
             cursor.moveToFirst();
             EVENT eventCourant = new EVENT(cursor);
-
-            dateProchaineLivraison = eventCourant.getJour_de()+"/"+eventCourant.getMois_de()+"/"+eventCourant.getAnnee_de();
+            String annee = eventCourant.getAnnee_de();
+            String mois = eventCourant.getMois_de();
+            if(mois.length() == 1)
+                mois = "0"+mois;
+            String jour = eventCourant.getJour_de();
+            if(jour.length() == 1)
+                jour = "0"+jour;
+            dateProchaineLivraison = jour+"/"+mois+"/"+annee;
         }
         cursor.close();
         cursor = null;
@@ -64,7 +70,14 @@ public class EVENTOpenHelper extends DBOpenHelper {
             cursor.moveToFirst();
             EVENT eventCourant = new EVENT(cursor);
 
-            dateProchaineLivraison = eventCourant.getJour_de()+"/"+eventCourant.getMois_de()+"/"+eventCourant.getAnnee_de();
+            String annee = eventCourant.getAnnee_de();
+            String mois = eventCourant.getMois_de();
+            if(mois.length() == 1)
+                mois = "0"+mois;
+            String jour = eventCourant.getJour_de();
+            if(jour.length() == 1)
+                jour = "0"+jour;
+            dateProchaineLivraison = jour+"/"+mois+"/"+annee;
         }
         cursor.close();
         cursor = null;

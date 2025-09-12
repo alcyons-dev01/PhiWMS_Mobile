@@ -513,15 +513,14 @@
                 android:textColor="@android:color/black" />
         </LinearLayout>
 
-        <!--<com.github.aakira.expandablelayout.ExpandableRelativeLayout
+        <com.skydoves.expandablelayout.ExpandableLayout
             android:id="@+id/expandableLayout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/gestionExpandable"
             android:gravity="center"
-            app:ael_duration="100"
-            app:ael_expanded="false"
-            app:ael_orientation="vertical">
+            app:expandable_duration="200"
+            app:expandable_isExpanded="false">
 
             <LinearLayout
                 android:id="@+id/zoneMessageErreur"
@@ -592,7 +591,7 @@
 
             </LinearLayout>
 
-        </com.github.aakira.expandablelayout.ExpandableRelativeLayout>-->
+        </com.skydoves.expandablelayout.ExpandableLayout>
 
 
     </LinearLayout>

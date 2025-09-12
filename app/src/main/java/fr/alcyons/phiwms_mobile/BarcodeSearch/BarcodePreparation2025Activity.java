@@ -870,7 +870,7 @@ public class BarcodePreparation2025Activity  extends ServiceActivity {
                                         int quantiteSaisie = Integer.parseInt(((TextView) findViewById(R.id.qteSaisie)).getText().toString());
                                         lotCourant.setQteSaisie(lotCourant.getQteSaisie() + quantiteSaisie);
                                         produitCourant = null;
-                                        emplacement_courant = null;
+                                        //emplacement_courant = null;
                                         stock_courant = null;
                                         lotCourant = null;
                                         reinitialisationInterface();

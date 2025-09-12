@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
@@ -62,7 +63,7 @@ import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
-public class ScannerPreparation2025Activity  extends ServiceActivity {
+public class ScannerPreparation2025_V2Activity  extends ServiceActivity {
     // INTENT
     String scannerContexte;
     int scannerContexteInt;
@@ -80,7 +81,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
     Produit produitCourant = null;
     Depot_Emplacement emplacement_courant = null;
     Stock_Lot_Emplacement_Light stock_courant = null;
-            // GRAPHIQUE
+    // GRAPHIQUE
     EditText EditTextScanee;
 
     String tempCodeScanne;
@@ -93,7 +94,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
         setContentView(R.layout.activity_scanner_preparation);
 
         //SERIALISATION
-        serialisation = new Serialisation(ScannerPreparation2025Activity.this, db, utilisateurConnecte);
+        serialisation = new Serialisation(ScannerPreparation2025_V2Activity.this, db, utilisateurConnecte);
         checkApiAsync(this).thenAccept(success -> {
             serialisationActive = success;
             if(success)
@@ -103,7 +104,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
         });
 
         // INTENT
-        intent = ScannerPreparation2025Activity.this.getIntent();
+        intent = ScannerPreparation2025_V2Activity.this.getIntent();
         scannerContexte = intent.getExtras().getString("contexte");
         scannerContexteInt = Integer.parseInt(scannerContexte);
         preparationID = intent.getExtras().getInt("preparationId");
@@ -144,7 +145,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
         EditTextScanee.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
-                InputMethodManager imm = (InputMethodManager) ScannerPreparation2025Activity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
+                InputMethodManager imm = (InputMethodManager) ScannerPreparation2025_V2Activity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
             }
         });
@@ -152,7 +153,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
         EditTextScanee.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                InputMethodManager imm = (InputMethodManager) ScannerPreparation2025Activity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
+                InputMethodManager imm = (InputMethodManager) ScannerPreparation2025_V2Activity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
             }
         });
@@ -182,8 +183,8 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
 
                 codeEchangeActivity = CodesEchangesActivites.RETOUR_SCANNER;
                 scannerSearchOnlyIntent.putExtras(scannerSearchOnlyBundle);
-                ScannerPreparation2025Activity.this.setResult(codeEchangeActivity, scannerSearchOnlyIntent);
-                ScannerPreparation2025Activity.this.finish();
+                ScannerPreparation2025_V2Activity.this.setResult(codeEchangeActivity, scannerSearchOnlyIntent);
+                ScannerPreparation2025_V2Activity.this.finish();
             }
         });
 
@@ -360,7 +361,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                                                     if(serialisationActive)
                                                     {
                                                         int serialisationUID = (int) Serialisation.Serialisation_Creer(utilisateurConnecte.getId(), "G110", gtin_courant, "GTIN", lot, date_peremption_serialisation, serie, "DELIVRANCE", String.valueOf(preparationID));
-                                                        serialisationVerificationSingle(ScannerPreparation2025Activity.this, db, utilisateurConnecte, serialisationUID, gtin_courant, "GTIN", lot, date_peremption_serialisation, serie).thenAccept(success -> {
+                                                        serialisationVerificationSingle(ScannerPreparation2025_V2Activity.this, db, utilisateurConnecte, serialisationUID, gtin_courant, "GTIN", lot, date_peremption_serialisation, serie).thenAccept(success -> {
                                                             if(!success)
                                                             {
                                                                 Log.e("Erreur serialisation", "Erreur lors de la création de la serialisation");
@@ -451,7 +452,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                                             findViewById(R.id.layout_qte_saisie_lot_preparation).setOnClickListener(view -> {
                                                 if(!produitCourant.isSuivi_Serialisation() || produitCourant.isSerialiser_Reception_Delivrance())
                                                 {
-                                                    Context context = ScannerPreparation2025Activity.this;
+                                                    Context context = ScannerPreparation2025_V2Activity.this;
 
                                                     String title = lotCourant.getNumLot();
                                                     String message = "Quantité placée : ";
@@ -520,11 +521,11 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                     int zoneid = data.getExtras().getInt("zoneid");
                     if(zoneid != -1)
                     {
-                        Intent newIntent = new Intent(ScannerPreparation2025Activity.this, ListeEmplacementCreationActivity.class);
-                        Bundle extras = ScannerPreparation2025Activity.super.getBundle();
+                        Intent newIntent = new Intent(ScannerPreparation2025_V2Activity.this, ListeEmplacementCreationActivity.class);
+                        Bundle extras = ScannerPreparation2025_V2Activity.super.getBundle();
                         extras.putInt("zoneid", zoneid);
                         newIntent.putExtras(extras);
-                        ScannerPreparation2025Activity.this.startActivityForResult(newIntent, CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT);
+                        ScannerPreparation2025_V2Activity.this.startActivityForResult(newIntent, CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT);
                     }
                     break;
 
@@ -558,7 +559,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                             }
                             else
                             {
-                                afficherAlerteErreurEmplacement(ScannerPreparation2025Activity.this, ScannerPreparation2025Activity.this.getLayoutInflater(), preparationMultipleContext.emplacementDisponible, preparationMultipleContext.liste_emplacement_disponible);
+                                afficherAlerteErreurEmplacement(ScannerPreparation2025_V2Activity.this, ScannerPreparation2025_V2Activity.this.getLayoutInflater(), preparationMultipleContext.emplacementDisponible, preparationMultipleContext.liste_emplacement_disponible);
                                 preparationMultipleContext.emplacement_courant = null;
                                 ((TextView) findViewById(R.id.EmplacementLotProduit)).setText("");
                                 ((TextView) findViewById(R.id.instruction)).setText("Scannez un emplacement");
@@ -582,7 +583,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
     }
 
     public void afficherSnackBar(String message) {
-        final InputMethodManager imm = (InputMethodManager)ScannerPreparation2025Activity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+        final InputMethodManager imm = (InputMethodManager)ScannerPreparation2025_V2Activity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 
         Snackbar snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>" + message + "</b>", 0), Snackbar.LENGTH_LONG);
@@ -608,7 +609,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
         snackBarView.setLayoutParams(params);
         snackbar.show();
 
-        InputMethodManager imme = (InputMethodManager) ScannerPreparation2025Activity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        InputMethodManager imme = (InputMethodManager) ScannerPreparation2025_V2Activity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
         imme.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
     }
 
@@ -646,12 +647,12 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
         {
             if(!emplacement_courant.getAdressage().contentEquals(produitCourant.getEmplacement_PUI_Defaut()))
             {
-                afficherAlerteErreurEmplacement(ScannerPreparation2025Activity.this, ScannerPreparation2025Activity.this.getLayoutInflater(), emplacement_courant.getAdressage(), stock_courant, emplacement_courant);
+                afficherAlerteErreurEmplacement(ScannerPreparation2025_V2Activity.this, ScannerPreparation2025_V2Activity.this.getLayoutInflater(), emplacement_courant.getAdressage(), stock_courant, emplacement_courant);
             }
         }
         else if(!stockEmplacement.contentEquals(emplacement_courant.getAdressage()))
         {
-            afficherAlerteErreurEmplacement(ScannerPreparation2025Activity.this, ScannerPreparation2025Activity.this.getLayoutInflater(), emplacement_courant.getAdressage(), stock_courant, emplacement_courant);
+            afficherAlerteErreurEmplacement(ScannerPreparation2025_V2Activity.this, ScannerPreparation2025_V2Activity.this.getLayoutInflater(), emplacement_courant.getAdressage(), stock_courant, emplacement_courant);
         }
     }
 
@@ -702,7 +703,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                     ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", stock_courant.get_UID(), "", "Deplacement Stock");
                     ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
                     ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getId(), new_action_utilisateur.getPhiMR4UUID(), DBOpenHelper.ActionsEAS.AJOUT);
-                    ElementASynchroniserOpenHelper.toutSynchroniser(ScannerPreparation2025Activity.this, db, utilisateurConnecte, false);
+                    ElementASynchroniserOpenHelper.toutSynchroniser(ScannerPreparation2025_V2Activity.this, db, utilisateurConnecte, false);
                 }
                 alertDialog.dismiss();
             }

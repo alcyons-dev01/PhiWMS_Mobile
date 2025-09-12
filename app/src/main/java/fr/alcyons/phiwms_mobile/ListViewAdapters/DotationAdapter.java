@@ -19,9 +19,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
 
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Detail_DotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EVENTOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.Detail_Dot;
 import fr.alcyons.phiwms_mobile.Classes.Dotation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
@@ -145,14 +147,25 @@ public class DotationAdapter extends BaseAdapter {
                 dateProchaineLivraison = dateFormat.format(tomorrow);
             }
             PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandeDotationGlobaleEnInstance(db, "Dotation Globale : " + dotationCourant.getIntitule(), dateProchaineLivraison);
-
-            List<PH_Preparation_Ligne> ListPhPreparationLigne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, phPreparationCourante);
-            for(PH_Preparation_Ligne preparation_ligne : ListPhPreparationLigne)
+            int nbLigne = 0;
+            if(phPreparationCourante != null)
             {
-                if(preparation_ligne.getQte_StockSaisie() > -1 && !preparation_ligne.getSYS_DT_MAJ().contentEquals("0000-00-00"))
+                List<PH_Preparation_Ligne> ListPhPreparationLigne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, phPreparationCourante);
+                for(PH_Preparation_Ligne preparation_ligne : ListPhPreparationLigne)
                 {
-                    nbDetail ++;
+                    if(preparation_ligne.getQte_StockSaisie() > -1 && !preparation_ligne.getSYS_DT_MAJ().contentEquals("0000-00-00"))
+                    {
+                        nbDetail ++;
+                    }
                 }
+
+                nbLigne = ListPhPreparationLigne.size();
+            }
+            else
+            {
+                nbDetail = 0;
+                List<Detail_Dot> listDetailDot = Detail_DotOpenHelper.getAllDetailDotParDotation(db, dotationCourant);
+                nbLigne = listDetailDot.size();
             }
 
             listePhPreparation.add(phPreparationCourante);
@@ -160,7 +173,7 @@ public class DotationAdapter extends BaseAdapter {
             // Affichage des valeurs
             viewHolder.nom.setText(dotationCourant.getIntitule());
             viewHolder.nbProduitDotation.setText(String.valueOf(nbDetail));
-            viewHolder.nbProduitDotationTotal.setText(String.valueOf(ListPhPreparationLigne.size()));
+            viewHolder.nbProduitDotationTotal.setText(String.valueOf(nbLigne));
 
             if(nbDetail == 0)
             {
@@ -184,32 +197,40 @@ public class DotationAdapter extends BaseAdapter {
                 viewHolder.separateurQuantite.setBackgroundColor(context.getResources().getColor(R.color.orange, null));
             }
 
-            if(phPreparationCourante.getStatut().contentEquals("En instance"))
+            if(phPreparationCourante != null)
             {
-                if(nbDetail == 0)
+                if(phPreparationCourante.getStatut().contentEquals("En instance"))
                 {
-                    viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.bleu_clair_alcyons, null));
+                    if(nbDetail == 0)
+                    {
+                        viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.bleu_clair_alcyons, null));
+                    }
+                    else
+                    {
+                        viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.orange, null));
+                    }
+                    viewHolder.statutDotation.setText("A ENVOYER");
+                }
+                else if(phPreparationCourante.getStatut().contentEquals("En cours de régularisation"))
+                {
+                    viewHolder.statutDotation.setText("En cours");
+                    viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.orange, null));
+                }
+                else if(phPreparationCourante.getStatut().contentEquals("En cours de préparation"))
+                {
+                    viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.rouge, null));
+                    viewHolder.statutDotation.setText(phPreparationCourante.getStatut());
                 }
                 else
                 {
-                    viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.orange, null));
+                    viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.noir, null));
+                    viewHolder.statutDotation.setText(phPreparationCourante.getStatut());
                 }
-                viewHolder.statutDotation.setText("A ENVOYER");
-            }
-            else if(phPreparationCourante.getStatut().contentEquals("En cours de régularisation"))
-            {
-                viewHolder.statutDotation.setText("En cours");
-                viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.orange, null));
-            }
-            else if(phPreparationCourante.getStatut().contentEquals("En cours de préparation"))
-            {
-                viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.rouge, null));
-                viewHolder.statutDotation.setText(phPreparationCourante.getStatut());
             }
             else
             {
-                viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.noir, null));
-                viewHolder.statutDotation.setText(phPreparationCourante.getStatut());
+                viewHolder.statutDotation.setTextColor(context.getResources().getColor(R.color.bleu_clair_alcyons, null));
+                viewHolder.statutDotation.setText("EN INSTANCE");
             }
         } else if (rowType == TYPE_HEADER) {
             // Gestion des dates

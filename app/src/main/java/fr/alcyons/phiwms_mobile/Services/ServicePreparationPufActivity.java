@@ -63,6 +63,7 @@ import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparation2025Activity;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparation2025_V2Activity;
 import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparationActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
@@ -93,7 +94,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
         ph_preparation_ListView.setOnItemClickListener((parent, view, position, id) -> {
             PH_Preparation ph_preparation_Selectionne = (PH_Preparation) ph_preparation_preparationAdapter.getItem(position);
 
-            Intent servicePreparationPuf_Intent = new Intent(ServicePreparationPufActivity.this, DetailPreparation2025Activity.class);
+            Intent servicePreparationPuf_Intent = new Intent(ServicePreparationPufActivity.this, DetailPreparation2025_V2Activity.class);
             Bundle servicePreparationPuf_Bundle = ServicePreparationPufActivity.super.getBundle();
             assert ph_preparation_Selectionne != null;
             servicePreparationPuf_Bundle.putInt("ph_preparationUID_Selectionne", ph_preparation_Selectionne.getUID());
@@ -564,7 +565,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
 
     @NonNull
     private Intent getIntent(PH_Preparation ph_preparation_Selectionne) {
-        Intent servicePreparationPuf_Intent = new Intent(ServicePreparationPufActivity.this, DetailPreparation2025Activity.class);
+        Intent servicePreparationPuf_Intent = new Intent(ServicePreparationPufActivity.this, DetailPreparation2025_V2Activity.class);
         Bundle servicePreparationPuf_Bundle = ServicePreparationPufActivity.super.getBundle();
         servicePreparationPuf_Bundle.putInt("ph_preparationUID_Selectionne", ph_preparation_Selectionne.getUID());
         servicePreparationPuf_Bundle.putString("genre", "PUF");
