@@ -21,14 +21,24 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Parametres_SerialisationOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
+import fr.alcyons.phiwms_mobile.Classes.Parametres_Serialisation;
+import fr.alcyons.phiwms_mobile.Classes.SurveillanceReference;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.MainActivity;
 import fr.alcyons.phiwms_mobile.OriginalActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
+import fr.alcyons.phiwms_mobile.Outils.GestionCodeErreurNMVO;
+import fr.alcyons.phiwms_mobile.Outils.OutilsEncodage;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 
 public class WS_PKI extends MainActivity {
@@ -240,6 +250,90 @@ public class WS_PKI extends MainActivity {
                 },
                 error -> future.complete(false)
         );
+
+        Volley.newRequestQueue(context.getApplicationContext()).add(req);
+        return future;
+    }
+
+    public static CompletableFuture<String> authenticateAPI(Context context, SQLiteDatabase db, Utilisateur utilisateurconnecte) {
+        CompletableFuture<String> future = new CompletableFuture<>();
+
+        String urlRequete = "https://phir4.alcyons.fr/api/ldap/authentification";
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        JSONObject data = new JSONObject();
+
+        Parametres_Serialisation parametresSerialisation = Parametres_SerialisationOpenHelper.getParametres_Serialisation(db);
+        String etablissementUtilisateur = utilisateurconnecte.getEtablissement();
+
+        if(parametresSerialisation != null)
+        {
+            String mdp_md5 = OutilsEncodage.recupererHashageMD5(parametresSerialisation.getFranceMVO_mdp());
+            try {
+                JSONObject body = new JSONObject();
+                body.put("user", "FranceMVO");
+                body.put("password", mdp_md5);
+                body.put("compagny", etablissementUtilisateur);
+                body.put("softwareName", "PihR4");
+                body.put("softwareSupplier", "Alcyons");
+                body.put("softwareVersion", "1812");
+
+                data.put("body", body);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            try {
+                JSONObject body = new JSONObject();
+                body.put("user", "");
+                body.put("password", "");
+                body.put("compagny", "");
+                body.put("softwareName", "");
+                body.put("softwareSupplier", "");
+                body.put("softwareVersion", "");
+
+                data.put("body", body);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, urlRequete, data, new Response.Listener<JSONObject>() {
+
+            // Takes the response from the JSON request
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONObject Body = response.getJSONObject("Body");
+                    JSONObject ReturnCode = Body.getJSONObject("ReturnCode");
+                    String code = ReturnCode.getString("code");
+                    if(code.equals("API_SUCCESS"))
+                    {
+                        future.complete(Body.getString("token"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                //handler.sendMessage(handler.obtainMessage());
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("Volley", "Error");
+                        future.complete("");
+                    }
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json;charset=utf-8");
+                return headers;
+            }
+        };
 
         Volley.newRequestQueue(context.getApplicationContext()).add(req);
         return future;

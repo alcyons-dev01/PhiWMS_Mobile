@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -169,6 +170,16 @@ public class AuthentificationActivity extends MainActivity {
             Intent versCGU = new Intent(AuthentificationActivity.this, CguActivity.class);
             AuthentificationActivity.this.startActivity(versCGU);
         });
+
+        try {
+            Context context = getApplicationContext();
+            PackageManager pm = context.getPackageManager();
+            PackageInfo pInfo = pm.getPackageInfo(context.getPackageName(), 0);
+            String versionName = pInfo.versionName;
+            ((TextView) findViewById(R.id.versionCode)).setText("V"+ versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
 
         //gestion du package manager
         pm = AuthentificationActivity.this.getPackageManager();

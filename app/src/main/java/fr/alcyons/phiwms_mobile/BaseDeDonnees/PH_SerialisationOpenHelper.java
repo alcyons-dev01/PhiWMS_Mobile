@@ -50,12 +50,12 @@ public class PH_SerialisationOpenHelper extends DBOpenHelper {
         PH_Serialisation objet = null;
         if(GTIN.length() > 14)
             GTIN = GTIN.substring(2);
-        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_SERIALISATION + "   WHERE " + Constantes.CLE_COL_PRODUITCODEVALUE_PH_SERIALISATION + "=? and "+ Constantes.CLE_COL_PRODUITCODESHEME_PH_SERIALISATION + "=? and "+ Constantes.CLE_COL_NUMEROLOT_PH_SERIALISATION+ "=? and "+ Constantes.CLE_COL_DATEPEREMPTIONAAMMJJ_PH_SERIALISATION+ "=? and "+ Constantes.CLE_COL_NUMEROSERIE_PH_SERIALISATION+ "=? and "+Constantes.CLE_COL_STATUT_PH_SERIALISATION+" = 'En attente'", new String[]{GTIN, Scheme, Lot, ExpDate, Serie});
+        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_SERIALISATION + "   WHERE " + Constantes.CLE_COL_PRODUITCODEVALUE_PH_SERIALISATION + "=? and "+ Constantes.CLE_COL_PRODUITCODESHEME_PH_SERIALISATION + "=? and "+ Constantes.CLE_COL_NUMEROLOT_PH_SERIALISATION+ "=? and "+ Constantes.CLE_COL_DATEPEREMPTIONAAMMJJ_PH_SERIALISATION+ "=? and "+ Constantes.CLE_COL_NUMEROSERIE_PH_SERIALISATION+ "=?", new String[]{GTIN, Scheme, Lot, ExpDate, Serie});
 
         if(cursor.getCount() == 0)
         {
             GTIN = "01"+GTIN;
-            cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_SERIALISATION + "   WHERE " + Constantes.CLE_COL_PRODUITCODEVALUE_PH_SERIALISATION + "=? and "+ Constantes.CLE_COL_PRODUITCODESHEME_PH_SERIALISATION + "=? and "+ Constantes.CLE_COL_NUMEROLOT_PH_SERIALISATION+ "=? and "+ Constantes.CLE_COL_DATEPEREMPTIONAAMMJJ_PH_SERIALISATION+ "=? and "+ Constantes.CLE_COL_NUMEROSERIE_PH_SERIALISATION+ "=? and "+Constantes.CLE_COL_STATUT_PH_SERIALISATION+" = 'En attente'", new String[]{GTIN, Scheme, Lot, ExpDate, Serie});
+            cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_SERIALISATION + "   WHERE " + Constantes.CLE_COL_PRODUITCODEVALUE_PH_SERIALISATION + "=? and "+ Constantes.CLE_COL_PRODUITCODESHEME_PH_SERIALISATION + "=? and "+ Constantes.CLE_COL_NUMEROLOT_PH_SERIALISATION+ "=? and "+ Constantes.CLE_COL_DATEPEREMPTIONAAMMJJ_PH_SERIALISATION+ "=? and "+ Constantes.CLE_COL_NUMEROSERIE_PH_SERIALISATION+ "=?", new String[]{GTIN, Scheme, Lot, ExpDate, Serie});
         }
 
         if (cursor.getCount() == 1) {
@@ -67,6 +67,43 @@ public class PH_SerialisationOpenHelper extends DBOpenHelper {
         cursor = null;
         return objet;
     }
+
+    public static List<PH_Serialisation> getAllPH_SerialisationByMultiple(SQLiteDatabase db, String GTIN, String Scheme, String Lot, String ExpDate, String Serie) {
+        List<PH_Serialisation> objet = new ArrayList<>();
+        if(GTIN.length() > 14)
+            GTIN = GTIN.substring(2);
+        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_SERIALISATION + "   WHERE " + Constantes.CLE_COL_PRODUITCODEVALUE_PH_SERIALISATION + "=? and "+ Constantes.CLE_COL_PRODUITCODESHEME_PH_SERIALISATION + "=? and "+ Constantes.CLE_COL_NUMEROLOT_PH_SERIALISATION+ "=? and "+ Constantes.CLE_COL_DATEPEREMPTIONAAMMJJ_PH_SERIALISATION+ "=? and "+ Constantes.CLE_COL_NUMEROSERIE_PH_SERIALISATION+ "=?", new String[]{GTIN, Scheme, Lot, ExpDate, Serie});
+
+        if(cursor.getCount() == 0)
+        {
+            GTIN = "01"+GTIN;
+            cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_SERIALISATION + "   WHERE " + Constantes.CLE_COL_PRODUITCODEVALUE_PH_SERIALISATION + "=? and "+ Constantes.CLE_COL_PRODUITCODESHEME_PH_SERIALISATION + "=? and "+ Constantes.CLE_COL_NUMEROLOT_PH_SERIALISATION+ "=? and "+ Constantes.CLE_COL_DATEPEREMPTIONAAMMJJ_PH_SERIALISATION+ "=? and "+ Constantes.CLE_COL_NUMEROSERIE_PH_SERIALISATION+ "=?", new String[]{GTIN, Scheme, Lot, ExpDate, Serie});
+        }
+
+        while (cursor.moveToNext()) {
+            PH_Serialisation phSerialisation = new PH_Serialisation(cursor);
+            objet.add(phSerialisation);
+        }
+
+        cursor.close();
+        cursor = null;
+        return objet;
+    }
+
+    public static List<PH_Serialisation> getAllPH_SerialisationByMvtId(SQLiteDatabase db, String mvtid) {
+        List<PH_Serialisation> objet = new ArrayList<>();
+        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_PH_SERIALISATION + "   WHERE " + Constantes.CLE_COL_MVTUID_PH_SERIALISATION + "=?", new String[]{mvtid});
+
+        while (cursor.moveToNext()) {
+            PH_Serialisation phSerialisation = new PH_Serialisation(cursor);
+            objet.add(phSerialisation);
+        }
+
+        cursor.close();
+        cursor = null;
+        return objet;
+    }
+
 
     public static PH_Serialisation getPH_SerialisationQuarantaine(SQLiteDatabase db, String GTIN, String Serie) {
         PH_Serialisation objet = null;

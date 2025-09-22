@@ -428,4 +428,87 @@
         android:textColor="@android:color/white"
         android:visibility="invisible" />
 
+    <LinearLayout
+        android:id="@+id/layoutValidationAutomatique"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/noir"
+        android:alpha="0.8"
+        android:visibility="gone">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:max="5"
+                android:progress="0"
+                android:indeterminate="false"
+                android:progressDrawable="@drawable/progress_drawable_encours"
+                android:layout_centerInParent="true"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"/>
+
+            <!-- Texte en dessous de la barre -->
+            <TextView
+                android:id="@+id/couterValidation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/progressBar"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="16dp"
+                android:textColor="@color/blanc"
+                android:text="5"
+                android:textSize="25sp"
+                android:textStyle="bold"/>
+
+            <!-- Check en dessous du texte -->
+            <ImageView
+                android:id="@+id/checkProgress"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_below="@id/couterValidation"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/validate"
+                android:layout_marginTop="12dp"
+                android:visibility="gone"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutIconeValidation"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/noir"
+        android:alpha="0.8"
+        android:visibility="gone">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center">
+
+            <!-- Check en dessous du texte -->
+            <ImageView
+                android:layout_width="128dp"
+                android:layout_height="128dp"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/validate"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="12dp"
+                android:visibility="visible"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
 </RelativeLayout>

@@ -120,7 +120,7 @@ public class Stock_Lot_EmplacementLightOpenHelper extends DBOpenHelper {
 
         while (cursor.moveToNext()) {
             Stock_Lot_Emplacement_Light stockLotEmplacementLight = new Stock_Lot_Emplacement_Light(cursor);
-            if(!stockLotEmplacementLight.getSerie().contentEquals("") && stockLotEmplacementLight.getSerie() != null)
+            if(!stockLotEmplacementLight.getSerie().contentEquals("") && stockLotEmplacementLight.getSerie() != null && !stockLotEmplacementLight.getSerie().contentEquals("null"))
                 stockLotEmplacementLightList.add(stockLotEmplacementLight);
         }
         cursor.close();

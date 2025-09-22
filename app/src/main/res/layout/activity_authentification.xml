@@ -160,6 +160,16 @@
                 android:textSize="14sp"
                 android:textStyle="normal"
                 android:textColor="@color/bleu_clair_alcyons"
+                android:layout_marginBottom="20dp"/>
+
+            <TextView
+                android:id="@+id/versionCode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                android:textColor="@color/blanc"
                 android:layout_marginBottom="50dp"/>
 
         </LinearLayout>

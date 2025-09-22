@@ -584,7 +584,7 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
         else
         {
             //gestion du zebra
-            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
+            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google") || android.os.Build.MANUFACTURER.toLowerCase().contains("samsung"))
             {
                 detailPreparation_Intent = new Intent(DetailPreparation2025_V2Activity.this, ScannerPreparation2025_V2Activity.class);
             }
@@ -854,51 +854,6 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, lignecourante.getPhiMR4UUID(), lignecourante.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
 
             Produit produit_temp = ProduitOpenHelper.getProduitByID(db, lignecourante.getProduitID());
-            if(produit_temp.isSuivi_Serialisation() && !produit_temp.isSerialiser_Reception_Delivrance())
-            {
-                Random randomserialisation = new Random();
-                int serialisationId = randomserialisation.nextInt();
-                if(serialisationId > 0)
-                    serialisationId= serialisationId*-1;
-
-                String[] datePeremptionTab = lignecourante.getPeremptionDate().split("-");
-                String peremptionDate = lignecourante.getPeremptionDate();
-                if(datePeremptionTab.length == 3)
-                    peremptionDate = datePeremptionTab[0].substring(2)+datePeremptionTab[1]+datePeremptionTab[2];
-
-                /*PH_Serialisation serialisation = new PH_Serialisation(serialisationId, utilisateurConnecte.getId(), "G110", "", produit_temp.getGTIN(), "GTIN", lignecourante.getLotNumero(), peremptionDate, lignecourante.getSerieNumero(), "DELIVRANCE", String.valueOf(lignecourante.getPreparationID()), produit_temp.getID_produit());
-                serialisation.setStatut("En attente");
-                serialisation.setRaison("");
-                serialisation.setResultat("");
-                PH_SerialisationOpenHelper.insererPH_SerialisationEnBDD(db, serialisation);
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisation.getPhiMR4UUID(), serialisation.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);*/
-                PH_Serialisation serialisation = PH_SerialisationOpenHelper.getPH_SerialisationByMultiple(db, produit_temp.getGTIN(), "GTIN", lignecourante.getLotNumero(), peremptionDate, lignecourante.getSerieNumero());
-                if(serialisation != null)
-                {
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisation.getPhiMR4UUID(), serialisation.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
-                    /**
-                     * TODO : création requete G120 de sérialisation
-                     */
-                    int serialisationUID = (int) Serialisation.Serialisation_Creer(utilisateurConnecte.getId(), "G110", produit_temp.getGTIN(), "GTIN", lignecourante.getLotNumero(), peremptionDate, lignecourante.getSerieNumero(), "DELIVRANCE", String.valueOf(lignecourante.getPreparationID()));
-                    serialisationDispenserSingle(DetailPreparation2025_V2Activity.this, db, utilisateurConnecte, serialisationUID, produit_temp.getGTIN(), "GTIN", lignecourante.getLotNumero(), peremptionDate, lignecourante.getSerieNumero()).thenAccept(success -> {
-                        if(!success)
-                        {
-                            Log.e("Erreur serialisation", "Erreur lors de la dispensiation de la serialisation");
-                        }
-                        PH_Serialisation serialisationDispenser = PH_SerialisationOpenHelper.getPH_SerialisationByid(db, serialisationUID);
-                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisationDispenser.getPhiMR4UUID(), serialisationDispenser.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
-                    });
-                }
-
-                Random randomAUSeri = new Random();
-                int actionSerId = randomAUSeri.nextInt();
-                if(actionSerId > 0)
-                    actionSerId= actionSerId*-1;
-                ActionUtilisateur new_action_utilisateur_serialisation = new ActionUtilisateur(actionSerId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", serialisation.get_UID(), "", "Serialisation");
-                ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur_serialisation);
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur_serialisation.getPhiMR4UUID(), new_action_utilisateur_serialisation.getId(), DBOpenHelper.ActionsEAS.AJOUT);
-            }
-
             Random randomactionligne = new Random();
             int actionligneId = randomactionligne.nextInt();
             if(actionligneId > 0)
@@ -907,6 +862,22 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
             ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne);
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, actionUtilisateur_ligne.getPhiMR4UUID(), actionUtilisateur_ligne.getId(), DBOpenHelper.ActionsEAS.AJOUT);
 
+        }
+
+        List<PH_Serialisation> list_serialisation = PH_SerialisationOpenHelper.getAllPH_SerialisationByMvtId(db, String.valueOf(ph_preparation_Selectionne.getUID()));
+        if(!list_serialisation.isEmpty())
+        {
+            for(PH_Serialisation serialisation : list_serialisation)
+            {
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisation.getPhiMR4UUID(), serialisation.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                Random randomAUSeri = new Random();
+                int actionSerId = randomAUSeri.nextInt();
+                if(actionSerId > 0)
+                    actionSerId= actionSerId*-1;
+                ActionUtilisateur new_action_utilisateur_serialisation = new ActionUtilisateur(actionSerId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", serialisation.get_UID(), "", "Serialisation");
+                ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur_serialisation);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur_serialisation.getPhiMR4UUID(), new_action_utilisateur_serialisation.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+            }
         }
 
         Date dateJour = new Date();

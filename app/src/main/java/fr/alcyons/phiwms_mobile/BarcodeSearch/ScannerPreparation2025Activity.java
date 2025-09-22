@@ -27,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -212,6 +213,12 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                 if (s.toString().endsWith("\n")) {
                     String codeScanne = s.toString().substring(0, s.length() - 1);
 
+                    if(utilisateurConnecte.getEtablissement().toUpperCase().contentEquals("ADH"))
+                    {
+                        FirebaseCrashlytics.getInstance().log("Code scanné ADH : "+codeScanne);
+                        FirebaseCrashlytics.getInstance().recordException(new Exception("Scan HoneyWell ADH : "+codeScanne));
+                    }
+
                     if((codeScanne.startsWith("01") || codeScanne.startsWith("02")) && codeScanne.length() == 16)
                     {
                         tempCodeScanne = codeScanne;
@@ -255,6 +262,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                         }
                         else
                         {
+                            Alerte.afficherAlerte(ScannerPreparation2025Activity.this, "Code Scanné", codeScanne, "alerte");
                             Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeScanne);
 
                             if (gs1Decoupe.size() != 1)
@@ -266,6 +274,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
                                 gtin_courant_sans_ai = gs1Decoupe.get(OutilsDecodage.codeGtinSansAi);
                                 date_peremption_courant = gs1Decoupe.get(OutilsDecodage.dateDePeremption);
                                 date_peremption_serialisation = gs1Decoupe.get(OutilsDecodage.dateDePeremptionSerialisation);
+                                Alerte.afficherAlerte(ScannerPreparation2025Activity.this, "Code Scanné", "GTIN : "+gtin_courant+"\n Lot : "+lot+"\n Péremption : "+date_peremption_courant, "alerte");
 
                                 //gestion format date
                                 String[] date_peremption_split = date_peremption_courant.split("-");

@@ -3,6 +3,7 @@ package fr.alcyons.phiwms_mobile.BarcodeSearch;
 import static fr.alcyons.phiwms_mobile.OutilsSerialisation.WS_PKI.checkApiAsync;
 import static fr.alcyons.phiwms_mobile.OutilsSerialisation.WS_SINGLE_PACK.serialisationVerificationSingle;
 
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -11,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -19,14 +21,19 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -82,6 +89,9 @@ public class ScannerPreparation2025_V2Activity  extends ServiceActivity {
 
     boolean serialisationActive;
     Serialisation serialisation;
+    CountDownTimer yourCountDownTimer;
+    public int counter;
+    LinearLayout layoutValidationAutomatique;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,7 +137,8 @@ public class ScannerPreparation2025_V2Activity  extends ServiceActivity {
 
         ((TextView) findViewById(R.id.depot)).setText(depotText);
         ((TextView) findViewById(R.id.numPreparation)).setText("#" + preparationID);
-
+        layoutValidationAutomatique = findViewById(R.id.layoutValidationAutomatique);
+        counter = 5;
         //on cache le clavier à chaque fois que l'éditText reprend le focus après l'avoir perdu
         EditTextScanee.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -331,25 +342,16 @@ public class ScannerPreparation2025_V2Activity  extends ServiceActivity {
                                                 {
                                                     lotPresent = true;
                                                     if(!ligne_base.isSerialiser_Reception() && ligne_base.isSuivi_Par_Serie()) {
-                                                        /**
-                                                         * TODO : vérification du statut du numéro de série lors du scan
-                                                         * */
                                                         if(serialisationActive)
                                                         {
                                                             int serialisationUID = (int) Serialisation.Serialisation_Creer(utilisateurConnecte.getId(), "G110", gtin_courant, "GTIN", lot, date_peremption_serialisation, serie, "DELIVRANCE", String.valueOf(preparationID));
-                                                            serialisationVerificationSingle(ScannerPreparation2025_V2Activity.this, db, utilisateurConnecte, serialisationUID, gtin_courant, "GTIN", lot, date_peremption_serialisation, serie).thenAccept(success -> {
-                                                                if(!success)
-                                                                {
-                                                                    Log.e("Erreur serialisation", "Erreur lors de la création de la serialisation");
-                                                                }
-                                                            });
+                                                            int serialisationdispenserUID = (int) Serialisation.Serialisation_Creer(utilisateurConnecte.getId(), "G120", gtin_courant, "GTIN", lot, date_peremption_serialisation, serie, "DELIVRANCE", String.valueOf(preparationID));
                                                         }
                                                     }
 
                                                     break;
                                                 }
                                             }
-
 
                                             if(!lotPresent)
                                             {
@@ -362,85 +364,103 @@ public class ScannerPreparation2025_V2Activity  extends ServiceActivity {
                                                 if(stock_courant == null)
                                                     stock_courant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByLotPeremptionEtDepot(db, lot, date_peremption_courant, DepotOpenHelper.getDepotParID(db, ph_preparation_courante.getDepotOrigineID()));
 
-                                                if(emplacement_courant != null)
+                                                if(stock_courant == null)
                                                 {
-                                                    verificationEmplacementProduit(emplacement_courant, produitCourant, stock_courant.getEmplacement());
+                                                    afficherSnackBar("Lot non présent dans votre stock");
+                                                    reinitialisationInterface();
                                                 }
                                                 else
                                                 {
-                                                    ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
-                                                    ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.GONE);
-                                                    ((ImageView) findViewById(R.id.ImageViewEmplacement)).setVisibility(View.VISIBLE);
-                                                    ((TextView) findViewById(R.id.instruction)).setText("Scannez un emplacment");
-                                                }
-
-                                                ((TextView) findViewById(R.id.designationProduit)).setText(designationProduit);
-                                                ((TextView) findViewById(R.id.referenceProduit)).setText(referenceProduit);
-                                                ((TextView) findViewById(R.id.quantiteProduit)).setText(String.valueOf(qte_demander));
-                                                ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText(String.valueOf(qte_preparer));
-                                                ((TextView) findViewById(R.id.qteSaisie)).setText(conditionnement);
-                                                ((TextView) findViewById(R.id.numeroLot)).setText(lot);
-                                                ((TextView) findViewById(R.id.datePeremptionLot)).setText(date_peremption_courant);
-
-                                                if(!serie.contentEquals(""))
-                                                {
-                                                    findViewById(R.id.numeroSerie).setVisibility(View.VISIBLE);
-                                                    ((TextView) findViewById(R.id.numeroSerie)).setText(serie);
-                                                    if(!stock_courant.getSerie().contentEquals(serie))
+                                                    if(emplacement_courant != null)
                                                     {
-                                                        Stock_Lot_Emplacement_Light stockTemp = stock_courant;
-                                                        stock_courant = new Stock_Lot_Emplacement_Light(Integer.parseInt(conditionnement), stockTemp.getLot(), stockTemp.getPeremptionDate(), stockTemp.getEmplacement(), stockTemp.getDepot_Reference(), stockTemp.getZone(), stockTemp.getProduit_Code(), Integer.parseInt(conditionnement), serie);
-                                                        Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, stock_courant);
+                                                        if(stock_courant != null)
+                                                            verificationEmplacementProduit(emplacement_courant, produitCourant, stock_courant.getEmplacement());
                                                     }
-                                                }
-
-                                                findViewById(R.id.validationScan).setVisibility(View.VISIBLE);
-
-                                                //gestion du clic sur le compteur
-                                                int finalQte_restante = qte_restante;
-                                                findViewById(R.id.layout_qte_saisie_lot_preparation).setOnClickListener(view -> {
-                                                    if(!produitCourant.isSuivi_Serialisation() || produitCourant.isSerialiser_Reception_Delivrance())
+                                                    else
                                                     {
-                                                        Context context = ScannerPreparation2025_V2Activity.this;
-
-                                                        String title = stock_courant.getLot();
-                                                        String message = "Quantité placée : ";
-                                                        int value_max = finalQte_restante;
-
-                                                        int maxValue = value_max;
-                                                        int value = finalQte_restante;
-
-                                                        DialogInterface.OnClickListener onClickListener = (dialog, id) -> {
-                                                            int qteApres = Alerte.aNumberPicker.getValue() * Integer.parseInt(conditionnement);
-
-                                                            if (stock_courant != null) {
-                                                                stock_courant.setQte_Preparer(qteApres);
-                                                                Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
-                                                            }
-                                                            ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteApres));
-
-                                                            dialog.dismiss();
-                                                        };
-
-                                                        Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, Integer.parseInt(conditionnement));
+                                                        ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
+                                                        ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.GONE);
+                                                        ((ImageView) findViewById(R.id.ImageViewEmplacement)).setVisibility(View.VISIBLE);
+                                                        ((TextView) findViewById(R.id.instruction)).setText("Scannez un emplacment");
                                                     }
-                                                });
 
-                                                //gestion de la validation du scan
-                                                blinkImageValidation();
-                                                PH_Preparation_Ligne finalLigne_base = ligne_base;
-                                                findViewById(R.id.validationScan).setOnClickListener(v -> {
-                                                    //gestion enregistrement du lot scannee
+                                                    ((TextView) findViewById(R.id.designationProduit)).setText(designationProduit);
+                                                    ((TextView) findViewById(R.id.referenceProduit)).setText(referenceProduit);
+                                                    ((TextView) findViewById(R.id.quantiteProduit)).setText(String.valueOf(qte_demander));
+                                                    ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText(String.valueOf(qte_preparer));
+                                                    ((TextView) findViewById(R.id.qteSaisie)).setText(conditionnement);
+                                                    ((TextView) findViewById(R.id.numeroLot)).setText(lot);
+                                                    ((TextView) findViewById(R.id.datePeremptionLot)).setText(date_peremption_courant);
+
+                                                    if(!serie.contentEquals(""))
+                                                    {
+                                                        findViewById(R.id.numeroSerie).setVisibility(View.VISIBLE);
+                                                        ((TextView) findViewById(R.id.numeroSerie)).setText(serie);
+                                                        if(!stock_courant.getSerie().contentEquals(serie))
+                                                        {
+                                                            Stock_Lot_Emplacement_Light stockTemp = stock_courant;
+                                                            stock_courant = new Stock_Lot_Emplacement_Light(Integer.parseInt(conditionnement), stockTemp.getLot(), stockTemp.getPeremptionDate(), stockTemp.getEmplacement(), stockTemp.getDepot_Reference(), stockTemp.getZone(), stockTemp.getProduit_Code(), 0, serie);
+                                                            Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, stock_courant);
+                                                        }
+                                                    }
+
+                                                    //findViewById(R.id.validationScan).setVisibility(View.VISIBLE);
+
+                                                    //gestion du clic sur le compteur
+                                                    int finalQte_restante = qte_restante;
+                                                    findViewById(R.id.layout_qte_saisie_lot_preparation).setOnClickListener(view -> {
+                                                        if(!produitCourant.isSuivi_Serialisation() || produitCourant.isSerialiser_Reception_Delivrance())
+                                                        {
+                                                            Context context = ScannerPreparation2025_V2Activity.this;
+
+                                                            String title = stock_courant.getLot();
+                                                            String message = "Quantité placée : ";
+                                                            int value_max = finalQte_restante;
+
+                                                            int maxValue = value_max;
+                                                            int value = finalQte_restante;
+
+                                                            DialogInterface.OnClickListener onClickListener = (dialog, id) -> {
+                                                                int qteApres = Alerte.aNumberPicker.getValue() * Integer.parseInt(conditionnement);
+
+                                                                if (stock_courant != null) {
+                                                                    stock_courant.setQte_Preparer(qteApres);
+                                                                    Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
+                                                                }
+                                                                ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteApres));
+
+                                                                dialog.dismiss();
+                                                            };
+
+                                                            Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, Integer.parseInt(conditionnement));
+                                                        }
+                                                    });
+
+                                                    //gestion de la validation du scan
+                                                    //blinkImageValidation();
+                                                    PH_Preparation_Ligne finalLigne_base = ligne_base;
+                                                    /*ValidationAutomatique();
+                                                    findViewById(R.id.validationScan).setOnClickListener(v -> {
+                                                        //gestion enregistrement du lot scannee
+                                                        int quantiteSaisie = Integer.parseInt(((TextView) findViewById(R.id.qteSaisie)).getText().toString());
+                                                        stock_courant.setQte_Preparer(stock_courant.getQte_Preparer()+quantiteSaisie);
+                                                        Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
+                                                        enregistrementPreparationLigne(finalLigne_base, stock_courant);
+                                                        produitCourant = null;
+                                                        //emplacement_courant = null;
+                                                        stock_courant = null;
+                                                        reinitialisationInterface();
+                                                        //findViewById(R.id.boutonFermeture).performClick();
+                                                    });*/
+                                                    ((LinearLayout) findViewById(R.id.layoutIconeValidation)).setVisibility(View.VISIBLE);
                                                     int quantiteSaisie = Integer.parseInt(((TextView) findViewById(R.id.qteSaisie)).getText().toString());
-                                                    stock_courant.setQte_Preparer(quantiteSaisie);
+                                                    stock_courant.setQte_Preparer(stock_courant.getQte_Preparer()+quantiteSaisie);
                                                     Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
                                                     enregistrementPreparationLigne(finalLigne_base, stock_courant);
                                                     produitCourant = null;
-                                                    //emplacement_courant = null;
                                                     stock_courant = null;
                                                     reinitialisationInterface();
-                                                    findViewById(R.id.boutonFermeture).performClick();
-                                                });
+                                                }
                                             }
                                         }
                                     }
@@ -576,6 +596,12 @@ public class ScannerPreparation2025_V2Activity  extends ServiceActivity {
         ((TextView) findViewById(R.id.datePeremptionLot)).setText("");
         ((TextView) findViewById(R.id.numeroSerie)).setText("");
         ((LinearLayout) findViewById(R.id.validationScan)).setVisibility(View.GONE);
+        ((LinearLayout) findViewById(R.id.layoutIconeValidation)).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ((LinearLayout) findViewById(R.id.layoutIconeValidation)).setVisibility(View.GONE);
+            }
+        }, 500);
     }
 
     private void blinkImageValidation() {
@@ -679,26 +705,102 @@ public class ScannerPreparation2025_V2Activity  extends ServiceActivity {
         int GlobalAPreparer = ph_preparationLigneCorrespondant.getQte_Demander();
         PH_Preparation_Ligne ph_preparationLigneCourant = null;
 
-        ph_preparationLigneCourant = new PH_Preparation_Ligne(ph_preparationLigneCorrespondant);
-        Random random = new Random();
-        int new_id = random.nextInt();
-        if(new_id > 0)
+        ph_preparationLigneCourant = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByProduitLotSerieNegPreparation(db, ph_preparationLigneCorrespondant.getProduitID(), ph_preparationLigneCorrespondant.getPreparationID(), stockLotEmplacementLight.getLot(), stockLotEmplacementLight.getSerie(), stockLotEmplacementLight.getEmplacement());
+
+        if(ph_preparationLigneCourant != null)
         {
-            new_id= new_id*-1;
+            GlobalAPreparer = GlobalAPreparer - stockLotEmplacementLight.getQte_Preparer();
+            ph_preparationLigneCourant.setQte_RAL(GlobalAPreparer);
+            ph_preparationLigneCourant.setQte_preparer(stockLotEmplacementLight.getQte_Preparer());
+            PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparationLigneCourant);
         }
+        else
+        {
+            ph_preparationLigneCourant = new PH_Preparation_Ligne(ph_preparationLigneCorrespondant);
+            Random random = new Random();
+            int new_id = random.nextInt();
+            if(new_id > 0)
+            {
+                new_id= new_id*-1;
+            }
 
-        ph_preparationLigneCourant.set_UID(new_id);
-        ph_preparationLigneCourant.setQte_Demander(GlobalAPreparer);
-        GlobalAPreparer = GlobalAPreparer - stockLotEmplacementLight.getQte_Preparer();
-        ph_preparationLigneCourant.setQte_RAL(GlobalAPreparer);
-        ph_preparationLigneCourant.setQte_preparer(stockLotEmplacementLight.getQte_Preparer());
-        ph_preparationLigneCourant.setLotNumero(stockLotEmplacementLight.getLot().trim());
-        ph_preparationLigneCourant.setPeremptionDate(stockLotEmplacementLight.getPeremptionDate());
-        ph_preparationLigneCourant.setZoneDepot(stockLotEmplacementLight.getZone().trim());
-        ph_preparationLigneCourant.setEmplacementParDefaut(stockLotEmplacementLight.getEmplacement().trim());
-        ph_preparationLigneCourant.setSerieNumero(stockLotEmplacementLight.getSerie().trim());
-        ph_preparationLigneCourant.set_UID_4D(ph_preparationLigneCorrespondant.get_UID_4D());
+            ph_preparationLigneCourant.set_UID(new_id);
+            ph_preparationLigneCourant.setQte_Demander(GlobalAPreparer);
+            GlobalAPreparer = GlobalAPreparer - stockLotEmplacementLight.getQte_Preparer();
+            ph_preparationLigneCourant.setQte_RAL(GlobalAPreparer);
+            ph_preparationLigneCourant.setQte_preparer(stockLotEmplacementLight.getQte_Preparer());
+            ph_preparationLigneCourant.setLotNumero(stockLotEmplacementLight.getLot().trim());
+            ph_preparationLigneCourant.setPeremptionDate(stockLotEmplacementLight.getPeremptionDate());
+            ph_preparationLigneCourant.setZoneDepot(stockLotEmplacementLight.getZone().trim());
+            ph_preparationLigneCourant.setEmplacementParDefaut(stockLotEmplacementLight.getEmplacement().trim());
+            ph_preparationLigneCourant.setSerieNumero(stockLotEmplacementLight.getSerie().trim());
+            ph_preparationLigneCourant.set_UID_4D(ph_preparationLigneCorrespondant.get_UID_4D());
 
-        long rowID = PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, ph_preparationLigneCourant);
+            long rowID = PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, ph_preparationLigneCourant);
+        }
+    }
+
+    private void ValidationAutomatique()
+    {
+        ((LinearLayout) findViewById(R.id.validationScan)).performClick();
+
+        /*layoutValidationAutomatique.setVisibility(View.VISIBLE);
+
+        counter = 5; // on démarre à 5 secondes
+        ProgressBar progressBar = findViewById(R.id.progressBar);
+        TextView textView = findViewById(R.id.couterValidation);
+        ImageView checkProgress = findViewById(R.id.checkProgress);
+
+        progressBar.setMax(4);
+        progressBar.setProgress(0);
+        textView.setText(String.valueOf(counter));
+        checkProgress.setVisibility(View.GONE);
+
+        yourCountDownTimer = new CountDownTimer(5000, 1000) { // 5 sec
+            public void onTick(long millisUntilFinished) {
+                int elapsed = 6 - counter; // pour progresser de 0 à 5
+                setProgressSmoothly(progressBar, progressBar.getProgress(), elapsed);
+                textView.setText(String.valueOf(counter));
+                counter--;
+
+                if (counter == 0) {
+                    textView.setVisibility(View.GONE);
+                    checkProgress.setVisibility(View.VISIBLE);
+                    progressBar.setProgressDrawable(ContextCompat.getDrawable(ScannerPreparation2025_V2Activity.this, R.drawable.progress_drawable_validate));
+                }
+            }
+
+            public void onFinish() {
+                yourCountDownTimer.cancel();
+                counter = 5;
+                layoutValidationAutomatique.setVisibility(View.GONE);
+                ((LinearLayout) findViewById(R.id.validationScan)).performClick();
+            }
+        }.start();
+
+        ((LinearLayout) findViewById(R.id.layoutInformationScan))
+            .setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    yourCountDownTimer.cancel();
+                    counter = 5;
+                    textView.setVisibility(View.GONE);
+                    layoutValidationAutomatique.setVisibility(View.GONE);
+                }
+        });*/
+    }
+
+    private void setProgressSmoothly(ProgressBar progressBar, int from, int to) {
+        ObjectAnimator animation = ObjectAnimator.ofInt(progressBar, "progress", from, to);
+        animation.setDuration(900); // durée de l’animation entre deux ticks
+        animation.setInterpolator(new DecelerateInterpolator()); // effet fluide
+        animation.start();
     }
 }
+//PHITAGPLACEA2102:2757
+//01034009565350571727093010G246224
+//157312
+//PHITAGPLACED2:11701
+//010340093634076317271031104A497
+//PHITAGPLACED3:11699
+//010340093634076317271231105A302

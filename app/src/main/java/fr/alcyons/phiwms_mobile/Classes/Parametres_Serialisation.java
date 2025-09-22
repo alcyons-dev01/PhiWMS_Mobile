@@ -30,6 +30,7 @@ public class Parametres_Serialisation {
     private boolean franceMVO_termesEtConditions;
     private boolean moduleVision;
     private int phiwms_mobileUUID=-1;
+    private String tokenSerialisation;
 
     public Parametres_Serialisation(Cursor cursor){
         ID=cursor.getInt(Parametres_SerialisationOpenHelper.Constantes.NUM_COL_ID_PARAMETRES_SERIALISATION);
@@ -237,5 +238,13 @@ public class Parametres_Serialisation {
 
     public void setphiwms_mobileUUID(int phiwms_mobileUUID) {
         this.phiwms_mobileUUID = phiwms_mobileUUID;
+    }
+
+    public String getTokenSerialisation() {
+        return tokenSerialisation;
+    }
+
+    public void setTokenSerialisation(String tokenSerialisation) {
+        this.tokenSerialisation = tokenSerialisation;
     }
 }

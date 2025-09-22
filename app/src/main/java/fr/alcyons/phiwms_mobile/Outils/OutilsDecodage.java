@@ -250,13 +250,13 @@ public class OutilsDecodage {
         String GTIN_Reconstruit_SansSerie = GTIN_VA+"17"+dateFormatScan+"10"+Lot_VA;
 
         if (GTIN_VA.length() == 16) {
-            map.put(codeGtin, GTIN_VA);
-            map.put(codeGtinSansAi, GTIN_VA_SANS_AI);
-            map.put(numeroSerie, SerieNumero_VA);
-            map.put(numeroLot, Lot_VA);
+            map.put(codeGtin, GTIN_VA.trim());
+            map.put(codeGtinSansAi, GTIN_VA_SANS_AI.trim());
+            map.put(numeroSerie, SerieNumero_VA.trim());
+            map.put(numeroLot, Lot_VA.trim());
             map.put(dateDePeremption, PeremptionDate_VA);
             map.put(dateDePeremptionSerialisation, PeremptionAAMMJJ);
-            map.put(conditionnementProduit, Conditionnement_VA);
+            map.put(conditionnementProduit, Conditionnement_VA.trim());
             map.put(gtin_Reconstruit_AvecSerie, GTIN_Reconstruit_AvecSerie);
             map.put(gtin_Reconstruit_SansSerie, GTIN_Reconstruit_SansSerie);
         }

@@ -31,6 +31,7 @@ import java.util.Map;
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
+import fr.alcyons.phiwms_mobile.Classes.PH_Lot_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Parametres_Serialisation;
@@ -86,6 +87,30 @@ public class Parametres_SerialisationOpenHelper  extends DBOpenHelper {
         long rowID = db.insert(Constantes.TABLE_PARAMETRES_SERIALISATION, null, contentValues);
         objet.setphiwms_mobileUUID((int) rowID);
         return rowID;
+    }
+
+    public static long mettreAJourParametreSerialisation(SQLiteDatabase db, Parametres_Serialisation objet) {
+        // Récupération des valeurs à mettre à jour
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Parametres_SerialisationOpenHelper.Constantes.CLE_COL_ID_PARAMETRES_SERIALISATION, objet.getID());
+        contentValues.put(Parametres_SerialisationOpenHelper.Constantes.CLE_COL_SERVEURAPI_HOST_PARAMETRES_SERIALISATION, objet.getServeurAPI_host());
+        contentValues.put(Parametres_SerialisationOpenHelper.Constantes.CLE_COL_SERVEURLDAP_HOST_PARAMETRES_SERIALISATION, objet.getServeurLDAP_host());
+        contentValues.put(Parametres_SerialisationOpenHelper.Constantes.CLE_COL_COMMUNICATIONDIFFERE_PARAMETRES_SERIALISATION, objet.isCommunicationDiffere());
+        contentValues.put(Parametres_SerialisationOpenHelper.Constantes.CLE_COL_DISPENSERRECEPTION_PARAMETRES_SERIALISATION, objet.isDispenserReception());
+        contentValues.put(Parametres_SerialisationOpenHelper.Constantes.CLE_COL_DISPENSERDELIVRANCE_PARAMETRES_SERIALISATION, objet.isDispenserDelivrance());
+        contentValues.put(Parametres_SerialisationOpenHelper.Constantes.CLE_COL_STOCKPARNUMERODESERIE_PARAMETRES_SERIALISATION, objet.isStockParNumeroDeSerie());
+        contentValues.put(Parametres_SerialisationOpenHelper.Constantes.CLE_COL_SERVEURLDAP_PORT_PARAMETRES_SERIALISATION, objet.getServeurLDAP_port());
+        contentValues.put(Parametres_SerialisationOpenHelper.Constantes.CLE_COL_SERVEURLDAP_LOGIN_PARAMETRES_SERIALISATION, objet.getServeurLDAP_login());
+        contentValues.put(Parametres_SerialisationOpenHelper.Constantes.CLE_COL_SERVEURLDAP_PASSWORD_PARAMETRES_SERIALISATION, objet.getServeurLDAP_password());
+        contentValues.put(Parametres_SerialisationOpenHelper.Constantes.CLE_COL_SERVEURLDAP_NOMDOMAINE_PARAMETRES_SERIALISATION, objet.getServeurLDAP_nomDomaine());
+        contentValues.put(Parametres_SerialisationOpenHelper.Constantes.CLE_COL_DOSSIERVISION_PARAMETRES_SERIALISATION, objet.getDossierVision());
+        contentValues.put(Parametres_SerialisationOpenHelper.Constantes.CLE_COL_FRANCEMVO_IDENTIFIANT_PARAMETRES_SERIALISATION, objet.getFranceMVO_identifiant());
+        contentValues.put(Parametres_SerialisationOpenHelper.Constantes.CLE_COL_FRANCEMVO_MDP_PARAMETRES_SERIALISATION, objet.getFranceMVO_mdp());
+        contentValues.put(Parametres_SerialisationOpenHelper.Constantes.CLE_COL_FRANCEMVO_TAN_PARAMETRES_SERIALISATION, objet.getFranceMVO_tan());
+        contentValues.put(Parametres_SerialisationOpenHelper.Constantes.CLE_COL_FRANCEMVO_TERMESETCONDITIONS_PARAMETRES_SERIALISATION, objet.isFranceMVO_termesEtConditions());
+        contentValues.put(Constantes.CLE_COL_TOKEN_SERIALISATION, objet.getTokenSerialisation());
+
+        return db.update(Constantes.TABLE_PARAMETRES_SERIALISATION, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + String.valueOf(objet.getPhiMR4UUID()), null);
     }
 
     public static void synchronisationParametres_Serialisation(final Context context, final SQLiteDatabase db, final String token, final Utilisateur utilisateur, final boolean statutConnexion) {
@@ -252,6 +277,10 @@ public class Parametres_SerialisationOpenHelper  extends DBOpenHelper {
         public static final int NUM_COL_MODULEVISION_PARAMETRES_SERIALISATION=17;
         public static final String TYPE_COL_MODULEVISION_PARAMETRES_SERIALISATION="INTEGER";
 
+        public static final String CLE_COL_TOKEN_SERIALISATION="tokenSerialisation";
+        public static final int NUM_COL_TOKEN_SERIALISATION=18;
+        public static final String TYPE_COL_TOKEN_SERIALISATION="TEXT";
+
         public static final String CREATION_TABLE_PARAMETRES_SERIALISATION = " CREATE TABLE       " + Constantes.TABLE_PARAMETRES_SERIALISATION
                 +"("+
                 DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID+"    PRIMARY KEY,"
@@ -271,7 +300,8 @@ public class Parametres_SerialisationOpenHelper  extends DBOpenHelper {
                 + Constantes.CLE_COL_FRANCEMVO_MDP_PARAMETRES_SERIALISATION + "   " + Constantes.TYPE_COL_FRANCEMVO_MDP_PARAMETRES_SERIALISATION + " , "
                 + Constantes.CLE_COL_FRANCEMVO_TAN_PARAMETRES_SERIALISATION + "   " + Constantes.TYPE_COL_FRANCEMVO_TAN_PARAMETRES_SERIALISATION + " , "
                 + Constantes.CLE_COL_FRANCEMVO_TERMESETCONDITIONS_PARAMETRES_SERIALISATION + "   " + Constantes.TYPE_COL_FRANCEMVO_TERMESETCONDITIONS_PARAMETRES_SERIALISATION + " , "
-                + Constantes.CLE_COL_MODULEVISION_PARAMETRES_SERIALISATION + "   " + Constantes.TYPE_COL_MODULEVISION_PARAMETRES_SERIALISATION
+                + Constantes.CLE_COL_MODULEVISION_PARAMETRES_SERIALISATION + "   " + Constantes.TYPE_COL_MODULEVISION_PARAMETRES_SERIALISATION + " , "
+                + Constantes.CLE_COL_TOKEN_SERIALISATION + "   " + Constantes.TYPE_COL_TOKEN_SERIALISATION
                 + " ); ";
 
     }
