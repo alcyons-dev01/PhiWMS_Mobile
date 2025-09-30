@@ -25,12 +25,11 @@
 
             <ImageView
                 android:id="@+id/imageLogo"
-                android:layout_width="300dp"
-                android:layout_height="0dp"
-                android:layout_weight="2"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/logophiwms"
-                android:src="@mipmap/ic_logo_phiwms" />
+                android:src="@drawable/phiwms_icon_100x100" />
         </LinearLayout>
 
         <LinearLayout

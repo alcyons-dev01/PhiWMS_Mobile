@@ -5,7 +5,8 @@
     <color name="colorAccent">#FF4081</color>
     <color name="enable_thumb_green">#46BDBF</color>
     <color name="bleu_clair_alcyons">#50B1F7</color>
-    <color name="bleu_fonce_alcyons">#343D4C</color>
+    <color name="bleu_fonce_alcyons">#323347</color>
+    <color name="bleu_fonce_alcyons_old">#343D4C</color>
     <color name="bleu2">#2DB1FF</color>
     <color name="bleuTransparent">#802DB1FF</color>
     <color name="vert">#00CC00</color>

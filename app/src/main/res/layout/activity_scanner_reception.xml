@@ -36,7 +36,7 @@
                 android:id="@+id/imageLogoFMVO"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@mipmap/logo_fmvo"
+                android:background="@mipmap/fmvo_25"
                 android:visibility="gone"/>
 
         </LinearLayout>
