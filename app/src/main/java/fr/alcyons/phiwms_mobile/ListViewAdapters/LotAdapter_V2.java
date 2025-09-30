@@ -165,7 +165,7 @@ public class LotAdapter_V2 extends RecyclerView.Adapter<LotAdapter_V2.LotViewHol
         }
 
         if (position == swipedPosition) {
-            holder.contentLayout.setTranslationX(200f);
+            holder.contentLayout.setTranslationX(150f);
             holder.btnDelete.setClickable(true);
             holder.isSwipedOpen = true;
         } else {
@@ -265,7 +265,7 @@ public class LotAdapter_V2 extends RecyclerView.Adapter<LotAdapter_V2.LotViewHol
                     case MotionEvent.ACTION_UP:
                         float totalDeltaX = event.getX() - downX;
                         if (totalDeltaX > SWIPE_THRESHOLD) {
-                            contentLayout.animate().translationX(200f).setDuration(200).start();
+                            contentLayout.animate().translationX(150f).setDuration(200).start();
                             isSwipedOpen = true;
                             btnDelete.setClickable(true);
                             adapter.swipedPosition = getAdapterPosition();

@@ -225,6 +225,19 @@ public class ScannerPreparation2025_V2Activity  extends ServiceActivity {
                             {
                                 ((TextView) findViewById(R.id.EmplacementLotProduit)).setVisibility(View.VISIBLE);
                                 ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacement_courant.getAdressage().trim());
+                                ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
+                                ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.VISIBLE);
+                            }
+                            else
+                            {
+
+                                ((LinearLayout) findViewById(R.id.layoutScannerEmplacementInconnu)).setVisibility(View.VISIBLE);
+                                ((LinearLayout) findViewById(R.id.layoutScannerEmplacementInconnu)).postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ((LinearLayout) findViewById(R.id.layoutScannerEmplacementInconnu)).setVisibility(View.INVISIBLE);
+                                    }
+                                }, 2500);
                             }
 
                             if(emplacement_courant != null && produitCourant != null)
@@ -232,9 +245,6 @@ public class ScannerPreparation2025_V2Activity  extends ServiceActivity {
                                 if(stock_courant != null)
                                     verificationEmplacementProduit(emplacement_courant, produitCourant, stock_courant.getEmplacement());
                             }
-
-                            ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
-                            ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.VISIBLE);
                         }
                         else
                         {

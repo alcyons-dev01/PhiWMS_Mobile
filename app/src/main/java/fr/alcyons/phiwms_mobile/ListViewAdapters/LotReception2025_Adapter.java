@@ -155,7 +155,7 @@ public class LotReception2025_Adapter extends RecyclerView.Adapter<LotReception2
         }
 
         if (position == swipedPosition) {
-            viewHolder.contentLayout.setTranslationX(150f);
+            viewHolder.contentLayout.setTranslationX(200f);
             viewHolder.btnDelete.setClickable(true);
             viewHolder.isSwipedOpen = true;
         } else {
@@ -270,7 +270,7 @@ public class LotReception2025_Adapter extends RecyclerView.Adapter<LotReception2
                             if (isSwiping) {
                                 float totalDeltaX = event.getX() - downX;
                                 if (totalDeltaX > SWIPE_THRESHOLD) {
-                                    contentLayout.animate().translationX(150f).setDuration(200).start();
+                                    contentLayout.animate().translationX(200f).setDuration(200).start();
                                     isSwipedOpen = true;
                                     btnDelete.setClickable(true);
                                     adapter.swipedPosition = getAdapterPosition();

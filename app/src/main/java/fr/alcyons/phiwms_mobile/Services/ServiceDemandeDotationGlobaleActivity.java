@@ -60,6 +60,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.EVENTOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReassortOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
@@ -67,6 +68,7 @@ import fr.alcyons.phiwms_mobile.Classes.Detail_Dot;
 import fr.alcyons.phiwms_mobile.Classes.Dotation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
+import fr.alcyons.phiwms_mobile.Classes.PH_Reassort;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.DemandeDotationGlobale.InformationDotationServiceActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.DotationAdapter;
@@ -142,7 +144,7 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
             Intent detailDotationPleinVideIntent = new Intent(ServiceDemandeDotationGlobaleActivity.this, BarcodeCaptureActivity.class);
             Bundle detailDotationPleinVideBundle = ServiceDemandeDotationGlobaleActivity.super.getBundle();
 
-            if(Build.MANUFACTURER.contains("Zebra Technologies"))
+            if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
             {
                 detailDotationPleinVideIntent = new Intent(ServiceDemandeDotationGlobaleActivity.this, ScannerPreparationPleinVideActivity.class);
                 detailDotationPleinVideBundle.putInt("scannerContexteInt", R.string.scannerContextePleinVide);
@@ -216,15 +218,20 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
                                     Intent intent = new Intent(ServiceDemandeDotationGlobaleActivity.this, AuthentificationActivity.class);
                                     ServiceDemandeDotationGlobaleActivity.this.startActivity(intent);
                                 }
-                                /*else
+                                else
                                 {
-                                    Intent intent = new Intent(ServiceDemandeDotationGlobaleActivity.this, NavigationActivity.class);
-                                    Bundle extras = new Bundle();
-                                    extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                                    intent.putExtras(extras);
-                                    ServiceDemandeDotationGlobaleActivity.this.startActivity(intent);
-                                    ServiceDemandeDotationGlobaleActivity.this.finish();
-                                }*/
+                                    List<Dotation> listDotation = DotationOpenHelper.getDotationGlobale(db);
+                                    if(listDotation.isEmpty()) {
+                                        Intent intent = new Intent(ServiceDemandeDotationGlobaleActivity.this, NavigationActivity.class);
+                                        Bundle extras = new Bundle();
+                                        vide = true;
+                                        nomServiceVide = "Dotation Service";
+                                        extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                                        intent.putExtras(extras);
+                                        ServiceDemandeDotationGlobaleActivity.this.startActivity(intent);
+                                        ServiceDemandeDotationGlobaleActivity.this.finish();
+                                    }
+                                }
                             } else {
                                 JSONArray phPreparationJSONArray = response.getJSONArray("PH_Preparations");
                                 List<Integer> listeUIDPreparationEnInstance = PH_PreparationOpenHelper.getUIDDotationGlobaleEnInstance(db);

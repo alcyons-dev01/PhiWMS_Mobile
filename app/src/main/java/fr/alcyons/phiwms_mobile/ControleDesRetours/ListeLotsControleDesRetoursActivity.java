@@ -642,7 +642,7 @@ public class ListeLotsControleDesRetoursActivity extends ServiceActivity {
             //si c'est le cas on cache les autres lignes
             ((LinearLayout) findViewById(R.id.firstRow)).setBackground(ListeLotsControleDesRetoursActivity.this.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
             ((TextView) findViewById(R.id.qteDeclaree)).setTextColor(ListeLotsControleDesRetoursActivity.this.getResources().getColor(R.color.orange2));
-            ((LinearLayout) findViewById(R.id.boutonAddScan)).setVisibility(View.VISIBLE);
+            //((LinearLayout) findViewById(R.id.boutonAddScan)).setVisibility(View.VISIBLE);
             ((TextView) findViewById(R.id.QteRetourner)).setVisibility(View.VISIBLE);
             ((TextView) findViewById(R.id.qteDeclaree)).setTextColor(ListeLotsControleDesRetoursActivity.this.getResources().getColor(R.color.noir));
 

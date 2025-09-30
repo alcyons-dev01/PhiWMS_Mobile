@@ -44,6 +44,7 @@ import java.util.Random;
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DotationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EVENTOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
@@ -53,6 +54,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Reassort_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
+import fr.alcyons.phiwms_mobile.Classes.Dotation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reassort;
@@ -178,6 +180,18 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
                                 }
                                 else
                                 {
+                                    List<PH_Reassort> listReassort = PH_ReassortOpenHelper.getPH_Reassort(db);
+                                    if(listReassort.isEmpty())
+                                    {
+                                        vide = true;
+                                        nomServiceVide = "PH_Reassort";
+                                        Intent intent = new Intent(ServiceDemandeReassortActivity.this, NavigationActivity.class);
+                                        Bundle extras = new Bundle();
+                                        extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                                        intent.putExtras(extras);
+                                        ServiceDemandeReassortActivity.this.startActivity(intent);
+                                        ServiceDemandeReassortActivity.this.finish();
+                                    }
                                     /*Intent intent = new Intent(ServiceDemandeReassortActivity.this, NavigationActivity.class);
                                     Bundle extras = new Bundle();
                                     extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
@@ -353,6 +367,11 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
         if (reassortListe.isEmpty()) {
             vide = true;
             nomServiceVide = "PH_Reassort";
+            Intent intent = new Intent(ServiceDemandeReassortActivity.this, NavigationActivity.class);
+            Bundle extras = new Bundle();
+            extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+            intent.putExtras(extras);
+            ServiceDemandeReassortActivity.this.startActivity(intent);
             ServiceDemandeReassortActivity.this.finish();
         } else {
             reassortListe.size();

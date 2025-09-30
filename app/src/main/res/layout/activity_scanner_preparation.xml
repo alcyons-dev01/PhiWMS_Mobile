@@ -516,4 +516,72 @@
                 android:text="Scannez un\nemplacement"/>
 
     </LinearLayout>
+
+    <!-- LAYOUT FILM SCANNER EMPLACEMENT -->
+    <LinearLayout
+        android:id="@+id/layoutScannerEmplacementInconnu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/noir"
+        android:alpha="0.9"
+        android:gravity="center"
+        android:visibility="invisible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:background="@drawable/phitagplace"
+                    android:visibility="visible"
+                    android:layout_gravity="center"
+                    android:layout_centerInParent="true"
+                    android:layout_below="@+id/LinearLayoutBoutonBarcode"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:background="@drawable/ic_croix_rouge"
+                    android:visibility="visible"
+                    android:layout_gravity="center"
+                    android:layout_centerInParent="true"
+                    android:layout_below="@+id/LinearLayoutBoutonBarcode"/>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:textColor="@color/blanc"
+            android:textSize="24dp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:text="Emplacement scanné inconnu"/>
+
+    </LinearLayout>
 </RelativeLayout>
