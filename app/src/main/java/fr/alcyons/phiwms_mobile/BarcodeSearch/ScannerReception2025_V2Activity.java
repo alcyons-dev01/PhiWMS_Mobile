@@ -327,7 +327,7 @@ public class ScannerReception2025_V2Activity  extends ServiceActivity {
                                     else
                                     {
                                         List<PH_Reliquat> reliquatPreparer = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, commandeCourante.getNumero(), produitCourant.getID_produit());
-                                        int qte_demander = reliquatCourant.getQteCommande();
+                                        int qte_demander = reliquatCourant.getQteReliquat_X();
                                         int qte_receptionne = 0;
                                         int qte_restante = 0;
                                         for(PH_Reliquat ligne_temp : reliquatPreparer)

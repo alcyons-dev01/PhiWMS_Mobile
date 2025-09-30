@@ -140,7 +140,7 @@ public class ListeLotReception2025_V2Activity extends ServiceActivity {
 
             //calcul quantite restante à réceptionner
             List<PH_Reliquat> reliquatReceptionne = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, commandeSelectionne.getNumero(), phReliquat.getProduitID());
-            quantiteRestant = phReliquat.getQteCommande();
+            quantiteRestant = phReliquat.getQteReliquat_X();
             for(PH_Reliquat reliquatCourant : reliquatReceptionne)
             {
                 quantiteRestant = quantiteRestant - reliquatCourant.getQteLivraison();
@@ -149,7 +149,7 @@ public class ListeLotReception2025_V2Activity extends ServiceActivity {
             //Entête
             designationProduitTextView.setText(phReliquat.getdesignationCourte().trim());
             referenceProduitTextView.setText(phReliquat.getProduit_Reference().trim());
-            QteDemandeeTextView.setText(String.valueOf(phReliquat.getQteCommande()-phReliquat.getQteLivraison()));
+            QteDemandeeTextView.setText(String.valueOf(phReliquat.getQteReliquat_X()));
 
             calculQuantiteReception();
             //gestion du clic sur la zone du datamatrix -> ouverture de l'appareil photo pour scanner des lots de la référence
@@ -216,7 +216,7 @@ public class ListeLotReception2025_V2Activity extends ServiceActivity {
             if(!numero_serie)
                 ((Button) findViewById(R.id.btnAjoutManuel)).setVisibility(View.VISIBLE);
 
-            quantiteReliquat = phReliquat.getQteCommande() - phReliquat.getQteLivraison();
+            quantiteReliquat = phReliquat.getQteReliquat_X() - phReliquat.getQteLivraison();
 
             lotReceptionAdapter = new LotReception2025_Adapter(reliquatReceptionne, position -> {
                 PH_Reliquat courantasupprimer = lotReceptionAdapter.getReliquatAt(position);
@@ -515,7 +515,7 @@ public class ListeLotReception2025_V2Activity extends ServiceActivity {
             quantite_total += courant.getQteLivraison();
         }
 
-        if(phReliquat.getQteCommande() < quantite_total)
+        if(phReliquat.getQteReliquat_X() < quantite_total)
         {
             quantite_ok = false;
         }
@@ -537,7 +537,7 @@ public class ListeLotReception2025_V2Activity extends ServiceActivity {
     private void checkEtatReception()
     {
         int qteReceptionne = Integer.parseInt(QtePreparerTextView.getText().toString());
-        if(phReliquat.getQteCommande() == qteReceptionne)
+        if(phReliquat.getQteReliquat_X() == qteReceptionne)
         {
             //si c'est le cas on cache les autres lignes
             firstRowLinearLayout.setBackground(ListeLotReception2025_V2Activity.this.getResources().getDrawable(R.drawable.background_detail_preparation_vert, null));
@@ -575,7 +575,7 @@ public class ListeLotReception2025_V2Activity extends ServiceActivity {
             }
             String message = "Quantité placée : ";
 
-            int qteAttendu = (int)phReliquat.getQteCommande() - phReliquat.getQteLivraison();
+            int qteAttendu = (int)phReliquat.getQteReliquat_X() - phReliquat.getQteLivraison();
             int maxValue = qteAttendu;
             String emplacementcourant = lotReceptionAdapter.getReliquatAt(position).getEmplacement();
             List<PH_Reliquat> reliquatDejaReception = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, phReliquat.getcommandeNumero(), phReliquat.getProduitID());
