@@ -95,8 +95,8 @@
     <!-- IMAGE SCAN PRODUIT & EMPLACEMENT -->
     <ImageView
         android:id="@+id/ImageViewEmplacement"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:background="@drawable/phitagplace"
         android:visibility="visible"
         android:layout_gravity="center"
@@ -123,8 +123,8 @@
     <!-- IMAGE SCAN PRODUIT & EMPLACEMENT -->
     <ImageView
         android:id="@+id/ImageViewProduit"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:background="@drawable/phitagprod"
         android:layout_marginTop="15dp"
         android:layout_gravity="center"
@@ -223,6 +223,8 @@
                 android:textColor="@color/blanc"
                 android:textSize="18dp"
                 android:textStyle="bold" />
+
+
         </LinearLayout>
 
         <LinearLayout
@@ -288,7 +290,7 @@
                 android:gravity="left"
                 android:textStyle="bold"
                 android:layout_gravity="center_vertical"
-                android:text="numSerie"/>
+                android:text=""/>
 
 
         </LinearLayout>
@@ -347,7 +349,7 @@
             android:textStyle="bold"
             android:layout_marginTop="10dp"
             android:layout_gravity="center_vertical"
-            android:text=""/>
+            android:text="10/25"/>
 
         <ImageView
             android:layout_width="64dp"
@@ -355,9 +357,9 @@
             android:layout_centerHorizontal="true"
             android:background="@drawable/validate_bleu"
             android:layout_centerInParent="true"
-            android:layout_marginTop="20dp"
             android:layout_gravity="center"
-            android:visibility="visible"/>
+            android:visibility="visible"
+            android:layout_marginTop="20dp"/>
     </LinearLayout>
 
     <!-- LAYOUT FILM PRODUIT COMPLET -->
@@ -447,7 +449,7 @@
             android:textSize="24dp"
             android:gravity="center"
             android:textStyle="bold"
-            android:text="Référence absente\nde la préparation"/>
+            android:text="Référence absente\nde la réception"/>
 
     </LinearLayout>
 
@@ -462,25 +464,90 @@
         android:gravity="center"
         android:visibility="invisible">
 
-            <ImageView
-                android:layout_width="128dp"
-                android:layout_height="128dp"
-                android:layout_centerHorizontal="true"
-                android:background="@drawable/ic_croix_rouge"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center"
-                android:visibility="visible"/>
+        <ImageView
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/ic_croix_rouge"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:visibility="visible"/>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="20dp"
-                android:textColor="@color/blanc"
-                android:textSize="24dp"
-                android:gravity="center"
-                android:textStyle="bold"
-                android:text="Référence inconnue\nen base de données"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:textColor="@color/blanc"
+            android:textSize="24dp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:text="Référence inconnue\nen base de données"/>
+
+    </LinearLayout>
+
+    <!-- LAYOUT FILM SERIE SCANNEE -->
+    <LinearLayout
+        android:id="@+id/layoutSerieScannee"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/noir"
+        android:alpha="0.9"
+        android:gravity="center"
+        android:visibility="invisible">
+
+        <ImageView
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/ic_croix_rouge"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:visibility="visible"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:textColor="@color/blanc"
+            android:textSize="24dp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:text="Numéro de série\ndéjà scanné"/>
+    </LinearLayout>
+
+    <!-- LAYOUT FILM SERIE NON SCANNEE -->
+    <LinearLayout
+        android:id="@+id/layoutSerieNonScannee"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/noir"
+        android:alpha="0.9"
+        android:gravity="center"
+        android:visibility="invisible">
+
+        <ImageView
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/ic_croix_rouge"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:visibility="visible"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:textColor="@color/blanc"
+            android:textSize="24dp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:text="Numéro de série\nabsent du scan"/>
 
     </LinearLayout>
 
@@ -496,24 +563,92 @@
         android:visibility="invisible">
 
         <ImageView
-                android:layout_width="128dp"
-                android:layout_height="128dp"
-                android:background="@drawable/phitagplace"
-                android:visibility="visible"
-                android:layout_gravity="center"
-                android:layout_centerInParent="true"
-                android:layout_below="@+id/LinearLayoutBoutonBarcode"/>
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:background="@drawable/phitagplace"
+            android:visibility="visible"
+            android:layout_gravity="center"
+            android:layout_centerInParent="true"
+            android:layout_below="@+id/LinearLayoutBoutonBarcode"/>
 
-            <TextView
-                android:layout_width="match_parent"
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:textColor="@color/blanc"
+            android:textSize="24dp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:text="Scannez un\nemplacement"/>
+
+    </LinearLayout>
+
+    <!-- LAYOUT FILM SCANNER EMPLACEMENT -->
+    <LinearLayout
+        android:id="@+id/layoutScannerEmplacementInconnu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/noir"
+        android:alpha="0.9"
+        android:gravity="center"
+        android:visibility="invisible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="20dp"
-                android:textColor="@color/blanc"
-                android:textSize="24dp"
-                android:gravity="center"
-                android:textStyle="bold"
-                android:text="Scannez un\nemplacement"/>
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:background="@drawable/phitagplace"
+                    android:visibility="visible"
+                    android:layout_gravity="center"
+                    android:layout_centerInParent="true"
+                    android:layout_below="@+id/LinearLayoutBoutonBarcode"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:background="@drawable/ic_croix_rouge"
+                    android:visibility="visible"
+                    android:layout_gravity="center"
+                    android:layout_centerInParent="true"
+                    android:layout_below="@+id/LinearLayoutBoutonBarcode"/>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:textColor="@color/blanc"
+            android:textSize="24dp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:text="Emplacement scanné inconnu"/>
 
     </LinearLayout>
 </RelativeLayout>

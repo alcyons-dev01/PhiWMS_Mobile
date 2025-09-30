@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_Preparation_Adapte;
-import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparation2025Activity;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparation2025_V2Activity;
 import fr.alcyons.phiwms_mobile.R;
 public class Lot_PreparationAdapter extends ArrayAdapter {
 
@@ -121,7 +121,7 @@ public class Lot_PreparationAdapter extends ArrayAdapter {
                 viewHolder.qteSaisie.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        ((ListeLotPreparation2025Activity) context).ClickNumberPicker(position);
+                        ((ListeLotPreparation2025_V2Activity) context).ClickNumberPicker(position);
                     }
                 });
 

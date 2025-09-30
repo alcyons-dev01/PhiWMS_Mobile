@@ -26,16 +26,16 @@ public class ScannerProduitActivity extends ServiceActivity {
     String scannerContexte;
     String designation;
     int scannerContexteInt;
-    int preparationID;
+    String numerodocument;
+    int depotdestinataireid;
     List<String> listGTIN;
-    PH_Preparation preparation_courante;
 
     // CONTEXTE
     ProduitContexte produitContexte;
 
     // GRAPHIQUE
     EditText EditTextScanee;
-    TextView numPreparation;
+    TextView numDocTextView;
     TextView depot;
 
 
@@ -49,29 +49,31 @@ public class ScannerProduitActivity extends ServiceActivity {
         scannerContexte = intent.getExtras().getString("contexte");
         designation = intent.getExtras().getString("Designation");
         scannerContexteInt = Integer.parseInt(scannerContexte);
-        preparationID = intent.getExtras().getInt("preparationId");
+        numerodocument = intent.getExtras().getString("numerodocument");
+        depotdestinataireid = intent.getExtras().getInt("depotdestinataireid");
+
         listGTIN = new ArrayList<>();
 
         // GRAPHIQUE
         EditTextScanee = (EditText) findViewById(R.id.EditTextScanee);
-        numPreparation = (TextView) findViewById(R.id.numPreparation);
+        numDocTextView = (TextView) findViewById(R.id.numDocument);
         depot = (TextView) findViewById(R.id.depot);
         EditTextScanee.setBackground(getResources().getDrawable(R.drawable.background_scanner_preparation));
 
         //Affichage des informations de la préparation
-        preparation_courante = PH_PreparationOpenHelper.getPH_PreparationByID(db, preparationID);
-        if(preparation_courante != null)
+        Depot depotdestinataire = DepotOpenHelper.getDepotParID(db, depotdestinataireid);
+        String depotText = intent.getExtras().getString("depotRef");
+        if(depotdestinataire != null)
         {
-            Depot depotdestinataire = DepotOpenHelper.getDepotParID(db, preparation_courante.getDepotDestinataireID());
-            String depotText = depotdestinataire.getNom();
+            depotText = depotdestinataire.getNom();
             if (utilisateurConnecte.getIdentifiant().toLowerCase().contentEquals("alcyons") && depotdestinataire.getStructure().contentEquals("PAD")) {
                 depotText = "Patient - " + depotdestinataire.getPAD_IPP();
             }
-
-            depot.setText(depotText);
-            numPreparation.setText("#" + preparationID);
         }
 
+
+        depot.setText(depotText);
+        numDocTextView.setText("#" + numerodocument);
 
         // CONTEXTE
         produitContexte = new ProduitContexte(this,db, false, false, false, true, designation, false);

@@ -25,41 +25,27 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.github.clans.fab.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.ReceptionListeContext;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.ReceptionPADContext2025;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.ReceptionUniqueContext;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.Parametres_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Commande;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.Classes.ObjetReceptionScannee;
-import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
-import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_Preparation_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_Reception_Adapte;
-import fr.alcyons.phiwms_mobile.Classes.Parametres_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeEmplacementCreationActivity;
 import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeZoneCreationActivity;
@@ -67,10 +53,8 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
-import fr.alcyons.phiwms_mobile.OutilsSerialisation.WS_PKI;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.WS_SINGLE_PACK;
 import fr.alcyons.phiwms_mobile.R;
-import fr.alcyons.phiwms_mobile.Reception.DetailReceptionActivity;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
 public class ScannerReception2025Activity extends ServiceActivity {
@@ -463,6 +447,7 @@ public class ScannerReception2025Activity extends ServiceActivity {
                                         ((TextView) findViewById(R.id.qteSaisie)).setText(conditionnement);
                                         ((TextView) findViewById(R.id.numeroLot)).setText(lot);
                                         ((TextView) findViewById(R.id.datePeremptionLot)).setText(date_peremption_courant);
+
                                         boolean seriedejascanne = false;
                                         for(PH_Reliquat_Reception_Adapte.Lot lotCourant : uniqueReceptionPUIAdapte.getlotList())
                                         {
@@ -560,6 +545,10 @@ public class ScannerReception2025Activity extends ServiceActivity {
                                             String finalDate_peremption_courant = date_peremption_courant;
                                             findViewById(R.id.validationScan).setOnClickListener(v -> {
                                                 //gestion enregistrement du lot scannee
+                                                /**
+                                                 * TODO : gestion de la validation automatique du lot
+                                                 * Revoir la gestion des PH_Reliquat
+                                                 */
                                                 int quantiteSaisie = Integer.parseInt(((TextView) findViewById(R.id.qteSaisie)).getText().toString());
 
                                                 String zone_string = "";

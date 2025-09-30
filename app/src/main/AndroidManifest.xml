@@ -134,19 +134,25 @@
         android:configChanges="orientation|screenSize"/>
 
     <activity
-        android:name="fr.alcyons.phiwms_mobile.Reception.ListeLotReceptionActivity"
-        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:configChanges="orientation|screenSize"/>
-
-    <activity
         android:name="fr.alcyons.phiwms_mobile.Reception.ListeLotReception2025Activity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
 
     <activity
+        android:name="fr.alcyons.phiwms_mobile.Reception.ListeLotReception2025_V2Activity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
         android:name="fr.alcyons.phiwms_mobile.Reception.DetailReceptionActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.Reception.DetailReception2025Activity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
@@ -171,30 +177,7 @@
         android:configChanges="orientation|screenSize"/>
 
     <activity
-        android:name="fr.alcyons.phiwms_mobile.ReceptionPAD.DetailReceptionPadActivity"
-        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:configChanges="orientation|screenSize"/>
-
-    <activity
-        android:name="fr.alcyons.phiwms_mobile.ReceptionPAD.DetailReceptionPAD2025Activity"
-        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:configChanges="orientation|screenSize"/>
-
-    <activity
         android:name="fr.alcyons.phiwms_mobile.ReceptionPAD.AjoutManuelProduitReceptionPADActivity"
-        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:configChanges="orientation|screenSize"/>
-    <activity
-        android:name="fr.alcyons.phiwms_mobile.ReceptionPAD.ListeLotReceptionPadActivity"
-        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:configChanges="orientation|screenSize"/>
-
-    <activity
-        android:name="fr.alcyons.phiwms_mobile.ReceptionPAD.CreationLotManuelReceptionPADActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
@@ -321,31 +304,7 @@
         android:configChanges="orientation|screenSize"/>
 
     <activity
-        android:name="fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparationActivity"
-        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:configChanges="orientation|screenSize"/>
-
-    <activity
-        android:name="fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparationActivity"
-        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:configChanges="orientation|screenSize"/>
-
-    <activity
-        android:name="fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparation2025Activity"
-        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:configChanges="orientation|screenSize"/>
-
-    <activity
         android:name="fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparation2025_V2Activity"
-        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:configChanges="orientation|screenSize"/>
-
-    <activity
-        android:name="fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparation2025Activity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
@@ -390,13 +349,6 @@
         android:configChanges="orientation|keyboardHidden"/>
 
     <!-- Scanner Activity -->
-    <activity
-        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity"
-        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:windowSoftInputMode="stateHidden"
-        android:configChanges="orientation|keyboardHidden"/>
-
     <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparation2025Activity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
@@ -463,13 +415,6 @@
 
     <!-- Barcode Preparation Activity -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity"
-        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:windowSoftInputMode="stateHidden"
-        android:configChanges="orientation|keyboardHidden"/>
-
-    <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparation2025Activity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
@@ -477,12 +422,6 @@
         android:configChanges="orientation|keyboardHidden"/>
 
     <!-- Barcode Réception Activity -->
-    <activity
-        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity"
-        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:windowSoftInputMode="stateHidden"
-        android:configChanges="orientation|keyboardHidden"/>
 
     <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReception2025Activity"
@@ -492,13 +431,14 @@
         android:configChanges="orientation|keyboardHidden"/>
 
     <activity
-        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity"
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReception2025Activity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation|keyboardHidden"/>
+
     <activity
-        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReception2025Activity"
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReception2025_V2Activity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"

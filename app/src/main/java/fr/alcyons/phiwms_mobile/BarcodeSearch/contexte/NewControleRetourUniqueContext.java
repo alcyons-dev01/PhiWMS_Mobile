@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.negative.BarcodeCaptureNegativeActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_Reception_Adapte;
@@ -91,11 +89,11 @@ public class NewControleRetourUniqueContext  {
                 }
                 else if(activityName.contentEquals("BarcodePreparationActivity"))
                 {
-                    ((BarcodePreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                    //((BarcodePreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
                 }
                 else if(activityName.contentEquals("ScannerPreparationActivity"))
                 {
-                    ((ScannerPreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                    //((ScannerPreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
                 }
                 else
                 {
@@ -129,7 +127,7 @@ public class NewControleRetourUniqueContext  {
                 }
                 else if(activityName.contentEquals("ScannerPreparationActivity"))
                 {
-                    ((ScannerPreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                    //((ScannerPreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
                 }
                 else
                 {
@@ -157,11 +155,11 @@ public class NewControleRetourUniqueContext  {
 
             if(activityName.contentEquals("BarcodePreparationActivity"))
             {
-                ((BarcodePreparationActivity)context).afficherSnackBar("Mauvais produit scanné");
+                //((BarcodePreparationActivity)context).afficherSnackBar("Mauvais produit scanné");
             }
              else if(activityName.contentEquals("ScannerPreparationActivity"))
             {
-                ((ScannerPreparationActivity) context).afficherSnackBar("Mauvais produit scanné");
+                //((ScannerPreparationActivity) context).afficherSnackBar("Mauvais produit scanné");
             }
             validation = true;
             lot = "";
@@ -244,7 +242,7 @@ public class NewControleRetourUniqueContext  {
                 }
                 else if(activityName.contentEquals("BarcodePreparationActivity"))
                 {
-                    ((BarcodePreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                    //((BarcodePreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
                 }
                 else
                 {
@@ -300,7 +298,7 @@ public class NewControleRetourUniqueContext  {
 
         if(!produit_present)
         {
-            ((BarcodePreparationActivity)context).afficherSnackBar("Mauvais produit scanné");
+            //((BarcodePreparationActivity)context).afficherSnackBar("Mauvais produit scanné");
             validation = true;
             return false;
         }

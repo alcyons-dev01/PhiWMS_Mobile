@@ -2,7 +2,6 @@ package fr.alcyons.phiwms_mobile.ListViewAdapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -12,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,10 +21,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
-import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_Preparation_Adapte;
-import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparation2025Activity;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparation2025_V2Activity;
 import fr.alcyons.phiwms_mobile.R;
 
 public class LotAdapter extends RecyclerView.Adapter<LotAdapter.LotViewHolder> {
@@ -94,7 +90,7 @@ public class LotAdapter extends RecyclerView.Adapter<LotAdapter.LotViewHolder> {
             holder.qteSaisie.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((ListeLotPreparation2025Activity) context).ClickNumberPicker(position);
+                    ((ListeLotPreparation2025_V2Activity) context).ClickNumberPicker(position);
                 }
             });
 
@@ -161,7 +157,7 @@ public class LotAdapter extends RecyclerView.Adapter<LotAdapter.LotViewHolder> {
             if (lotAdapte.getQteSaisie() == 0) {
                 holder.layoutPrincipal.setClickable(true);
                 holder.layoutPrincipal.setOnClickListener(v -> {
-                    ((ListeLotPreparation2025Activity) context).ClickLigneLot(position);
+                    ((ListeLotPreparation2025_V2Activity) context).ClickLigneLot(position);
                 });
                 holder.contentLayout.setOnClickListener(null);
 

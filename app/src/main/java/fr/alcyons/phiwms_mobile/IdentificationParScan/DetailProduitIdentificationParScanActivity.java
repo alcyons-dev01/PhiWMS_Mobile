@@ -15,8 +15,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -40,12 +38,9 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.MedicalObjective;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
-import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparationActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 import fr.alcyons.phiwms_mobile.Services.ServiceIdentificationParScanActivity;
-import fr.alcyons.phiwms_mobile.Services.ServicePreparationPadActivity;
-import fr.alcyons.phiwms_mobile.Services.ServicePreparationPufActivity;
 
 public class DetailProduitIdentificationParScanActivity extends ServiceActivity {
 

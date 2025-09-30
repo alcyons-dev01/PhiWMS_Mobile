@@ -37,7 +37,6 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_Reception_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.R;
-import fr.alcyons.phiwms_mobile.Reception.ListeLotReceptionActivity;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -117,7 +116,7 @@ public class Lot_ReceptionAdapter extends ArrayAdapter {
                 viewHolder.qteSaisie.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        ((ListeLotReceptionActivity) context).ClickNumberPicker(position);
+                        //((ListeLotReceptionActivity) context).ClickNumberPicker(position);
                     }
                 });
 

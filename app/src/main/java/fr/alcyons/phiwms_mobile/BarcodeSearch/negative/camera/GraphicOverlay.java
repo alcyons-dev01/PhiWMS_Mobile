@@ -176,7 +176,7 @@ public class GraphicOverlay<T extends GraphicOverlay.Graphic> extends View {
 
                     if (autofocusRect.contains(bouncingBox)) {
                         graphic.draw(canvas);
-                        ((BarcodeCaptureNegativeActivity) getContext()).onTap(getMeasuredWidth() / 2, getMeasuredHeight() / 2);
+                        //((BarcodeCaptureNegativeActivity) getContext()).onTap(getMeasuredWidth() / 2, getMeasuredHeight() / 2);
                     }
                 }
             }

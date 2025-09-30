@@ -55,7 +55,6 @@ import java.util.Random;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.camera.CameraSource;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.camera.CameraSourcePreview;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.camera.GraphicOverlay;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.ReceptionPADContexte;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.negative.BarcodeCaptureNegativeActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
@@ -260,7 +259,7 @@ public class BarcodeReception2025Activity extends ServiceActivity {
         findViewById(R.id.takePictureButton).setVisibility(View.GONE);
 
         findViewById(R.id.scannerMode).setOnClickListener(v -> {
-            Intent newIntent = new Intent(BarcodeReception2025Activity.this, ScannerPreparationActivity.class);
+            Intent newIntent = new Intent(BarcodeReception2025Activity.this, ScannerPreparation2025_V2Activity.class);
             Bundle extras = new Bundle();
             extras.putInt("utilisateurConnecteID", intent.getExtras().getInt("utilisateurConnecteID"));
             extras.putInt("serviceSelectionneID", intent.getExtras().getInt("serviceSelectionneID"));

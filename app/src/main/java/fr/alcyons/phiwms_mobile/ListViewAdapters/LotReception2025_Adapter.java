@@ -20,15 +20,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.Date;
 import java.util.List;
 
+import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_Reception_Adapte;
 import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparation2025_V2Activity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.Reception.ListeLotReception2025Activity;
+import fr.alcyons.phiwms_mobile.Reception.ListeLotReception2025_V2Activity;
 
-public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapter.LotViewHolder> {
+public class LotReception2025_Adapter extends RecyclerView.Adapter<LotReception2025_Adapter.LotViewHolder> {
 
     public Context context;
-    private List<PH_Reliquat_Reception_Adapte.Lot> lots;
+    private List<PH_Reliquat> list_ph_reliquat;
     private LotAdapter.OnDeleteClickListener deleteClickListener;
     public boolean receptionComplete;
 
@@ -37,8 +39,8 @@ public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapte
     }
     public int swipedPosition = -1;
 
-    public LotReceptionAdapter(List<PH_Reliquat_Reception_Adapte.Lot> lots, LotAdapter.OnDeleteClickListener listener, Context context) {
-        this.lots = lots;
+    public LotReception2025_Adapter(List<PH_Reliquat> list_ph_reliquat, LotAdapter.OnDeleteClickListener listener, Context context) {
+        this.list_ph_reliquat = list_ph_reliquat;
         this.deleteClickListener = listener;
         this.context = context;
         this.receptionComplete = false;
@@ -46,16 +48,16 @@ public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapte
 
     @NonNull
     @Override
-    public LotReceptionAdapter.LotViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public LotReception2025_Adapter.LotViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_lot_reception, parent, false);
-        return new LotReceptionAdapter.LotViewHolder(view, this);
+        return new LotReception2025_Adapter.LotViewHolder(view, this);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull LotReceptionAdapter.LotViewHolder viewHolder, int position) {
-        PH_Reliquat_Reception_Adapte.Lot lot = (PH_Reliquat_Reception_Adapte.Lot) lots.get(position);
+    public void onBindViewHolder(@NonNull LotReception2025_Adapter.LotViewHolder viewHolder, int position) {
+        PH_Reliquat reliquatCourant = (PH_Reliquat) list_ph_reliquat.get(position);
 
-        if(lot.getNumeroLot().contentEquals("row_ajouter"))
+        if(reliquatCourant.getLot().contentEquals("row_ajouter"))
         {
             if(!receptionComplete)
             {
@@ -74,28 +76,28 @@ public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapte
             viewHolder.layout_ajouter_lot.setVisibility(GONE);
             viewHolder.layoutPrincipal.setVisibility(GONE);
 
-            if (lot != null) {
-                if(!lot.getNumero_serie().contentEquals("") && lot.getNumero_serie() != null)
+            if (reliquatCourant != null) {
+                if(!reliquatCourant.getSerie().contentEquals("") && reliquatCourant.getSerie() != null)
                 {
                     viewHolder.zoneSerie.setVisibility(VISIBLE);
-                    viewHolder.serie.setText(lot.getNumero_serie());
+                    viewHolder.serie.setText(reliquatCourant.getSerie());
                 }
                 else
                 {
                     viewHolder.zoneSerie.setVisibility(GONE);
                 }
                 viewHolder.layoutPrincipal.setVisibility(VISIBLE);
-                viewHolder.nomEmplacement.setText(lot.getZoneEtEmplacementList().get(0).getEmplacementName());
-                viewHolder.lot.setText(lot.getNumeroLot());
-                viewHolder.qteSaisie.setText(String.valueOf(lot.getZoneEtEmplacementList().get(0).getQuantite()));
+                viewHolder.nomEmplacement.setText(reliquatCourant.getEmplacement());
+                viewHolder.lot.setText(reliquatCourant.getLot());
+                viewHolder.qteSaisie.setText(String.valueOf(reliquatCourant.getQteLivraison()));
                 viewHolder.qteSaisie.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        ((ListeLotReception2025Activity) context).ClickNumberPicker(viewHolder.getAdapterPosition());
+                        ((ListeLotReception2025_V2Activity) context).ClickNumberPicker(viewHolder.getAdapterPosition());
                     }
                 });
 
-                String datePeremption = lot.getDatePeremption();
+                String datePeremption = reliquatCourant.getPeremptionDate();
                 String[] datePeremptionTab = datePeremption.split("-");
                 if(datePeremptionTab.length == 3)
                     datePeremption = datePeremptionTab[2] + "/" + datePeremptionTab[1] + "/" + datePeremptionTab[0];
@@ -130,7 +132,7 @@ public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapte
                 swipedPosition = -1;
             });
 
-            if (lot.getZoneEtEmplacementList().get(0).getQuantite() == 0) {
+            if (reliquatCourant.getQteLivraison() == 0) {
                 viewHolder.layoutPrincipal.setClickable(true);
                 viewHolder.layoutPrincipal.setOnClickListener(v -> {
                     ((ListeLotPreparation2025_V2Activity) context).ClickLigneLot(position);
@@ -153,7 +155,7 @@ public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapte
         }
 
         if (position == swipedPosition) {
-            viewHolder.contentLayout.setTranslationX(200f);
+            viewHolder.contentLayout.setTranslationX(150f);
             viewHolder.btnDelete.setClickable(true);
             viewHolder.isSwipedOpen = true;
         } else {
@@ -166,7 +168,7 @@ public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapte
 
     @Override
     public int getItemCount() {
-        return lots.size();
+        return list_ph_reliquat.size();
     }
 
     public void resetItem(int position) {
@@ -192,9 +194,9 @@ public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapte
 
         private float downX;
         private final int SWIPE_THRESHOLD = 100;
-        private final LotReceptionAdapter adapter;
+        private final LotReception2025_Adapter adapter;
 
-        public LotViewHolder(@NonNull View itemView, LotReceptionAdapter adapter) {
+        public LotViewHolder(@NonNull View itemView, LotReception2025_Adapter adapter) {
             super(itemView);
             this.adapter = adapter;
 
@@ -217,10 +219,10 @@ public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapte
         public void enableSwipeIfQteNotZero() {
             contentLayout.setOnTouchListener(null); // désactive tout swipe par défaut
 
-            PH_Reliquat_Reception_Adapte.Lot courant = adapter.getLotAt(getAdapterPosition());
-            if(courant != null && !courant.getNumeroLot().contentEquals("row_ajouter"))
+            PH_Reliquat courant = adapter.getReliquatAt(getAdapterPosition());
+            if(courant != null && !courant.getLot().contentEquals("row_ajouter"))
             {
-                int qte = courant.getZoneEtEmplacementList().get(0).getQuantite();
+                int qte = courant.getQteLivraison();
 
                 if (qte > 0) {
                     setupSwipeTouch();
@@ -268,7 +270,7 @@ public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapte
                             if (isSwiping) {
                                 float totalDeltaX = event.getX() - downX;
                                 if (totalDeltaX > SWIPE_THRESHOLD) {
-                                    contentLayout.animate().translationX(200f).setDuration(200).start();
+                                    contentLayout.animate().translationX(150f).setDuration(200).start();
                                     isSwipedOpen = true;
                                     btnDelete.setClickable(true);
                                     adapter.swipedPosition = getAdapterPosition();
@@ -310,8 +312,7 @@ public class LotReceptionAdapter extends RecyclerView.Adapter<LotReceptionAdapte
         }
     }
 
-    public PH_Reliquat_Reception_Adapte.Lot getLotAt(int position) {
-        return lots.get(position);
+    public PH_Reliquat getReliquatAt(int position) {
+        return list_ph_reliquat.get(position);
     }
 }
-

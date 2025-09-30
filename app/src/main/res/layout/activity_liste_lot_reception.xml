@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingBottom="15dp">
 
 
         <LinearLayout
@@ -162,13 +163,29 @@
 
         </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/liste_view_reception"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_below="@id/firstRow"
-            android:layout_alignParentBottom="true"
-            android:scrollbars="vertical"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/liste_view_reception"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_below="@id/firstRow"
+        android:layout_above="@id/btnAjoutManuel"
+        android:scrollbars="vertical"/>
 
-</LinearLayout>
+    <Button
+        android:id="@+id/btnAjoutManuel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ajoutez un lot"
+        android:background="@drawable/background_plain_bleu_radius"
+        android:backgroundTint="@color/bleu_clair_alcyons"
+        android:layout_marginHorizontal="50dp"
+        android:layout_marginBottom="10dp"
+        android:layout_alignParentEnd="true"
+        android:textColor="@color/blanc"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible"/>
+
+</RelativeLayout>

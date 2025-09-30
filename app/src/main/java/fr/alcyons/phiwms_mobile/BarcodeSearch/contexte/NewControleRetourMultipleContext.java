@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.negative.BarcodeCaptureNegativeActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
@@ -99,11 +97,11 @@ public class NewControleRetourMultipleContext  {
                 }
                 else if(activityName.contentEquals("BarcodePreparationActivity"))
                 {
-                    ((BarcodePreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                    //((BarcodePreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
                 }
                 else if(activityName.contentEquals("ScannerPreparationActivity"))
                 {
-                    ((ScannerPreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                    //((ScannerPreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
                 }
                 else
                 {
@@ -137,7 +135,7 @@ public class NewControleRetourMultipleContext  {
                 }
                 else if(activityName.contentEquals("ScannerPreparationActivity"))
                 {
-                    ((ScannerPreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                    //((ScannerPreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
                 }
                 else
                 {
@@ -169,11 +167,11 @@ public class NewControleRetourMultipleContext  {
 
             if(activityName.contentEquals("BarcodePreparationActivity"))
             {
-                ((BarcodePreparationActivity)context).afficherSnackBar("Le produit n'est pas présent dans la liste");
+                //((BarcodePreparationActivity)context).afficherSnackBar("Le produit n'est pas présent dans la liste");
             }
             else if(activityName.contentEquals("ScannerPreparationActivity"))
             {
-                ((ScannerPreparationActivity) context).afficherSnackBar("Le produit n'est pas présent dans la liste");
+                //((ScannerPreparationActivity) context).afficherSnackBar("Le produit n'est pas présent dans la liste");
             }
             validation = true;
             lot = "";
@@ -186,7 +184,7 @@ public class NewControleRetourMultipleContext  {
             quantiteRestante = (int)retour_ligne_courant.getQte_Demander()-(int)retour_ligne_courant.getQte_Retourner();
             if(quantiteRestante == 0)
             {
-                ((ScannerPreparationActivity)context).afficherSnackBar("Le produit est retourné en intégralité");
+                //((ScannerPreparationActivity)context).afficherSnackBar("Le produit est retourné en intégralité");
                 validation = true;
             }
             quantiteAAfficher = quantiteRestante;
@@ -243,7 +241,7 @@ public class NewControleRetourMultipleContext  {
                 }
                 else if(activityName.contentEquals("BarcodePreparationActivity"))
                 {
-                    ((BarcodePreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
+                    //((BarcodePreparationActivity) context).afficherSnackBar("Le code concerne plusieurs produits");
                 }
                 else
                 {
@@ -303,7 +301,7 @@ public class NewControleRetourMultipleContext  {
 
         if(!produit_present)
         {
-            ((BarcodePreparationActivity)context).afficherSnackBar("Le produit n'est pas présent dans la liste");
+            //((BarcodePreparationActivity)context).afficherSnackBar("Le produit n'est pas présent dans la liste");
             validation = true;
             return false;
         }
@@ -312,7 +310,7 @@ public class NewControleRetourMultipleContext  {
             quantiteRestante = (int)retour_ligne_courant.getQte_Demander()-(int)retour_ligne_courant.getQte_Retourner();
             if(quantiteRestante == 0)
             {
-                ((BarcodePreparationActivity)context).afficherSnackBar("Le produit est retourné en intégralité");
+                //((BarcodePreparationActivity)context).afficherSnackBar("Le produit est retourné en intégralité");
                 validation = true;
                 return false;
             }

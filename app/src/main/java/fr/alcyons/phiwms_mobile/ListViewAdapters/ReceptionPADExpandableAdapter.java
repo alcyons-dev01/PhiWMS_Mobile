@@ -21,7 +21,6 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.R;
-import fr.alcyons.phiwms_mobile.ReceptionPAD.DetailReceptionPadActivity;
 
 public class ReceptionPADExpandableAdapter extends BaseExpandableListAdapter {
 
@@ -108,7 +107,7 @@ public class ReceptionPADExpandableAdapter extends BaseExpandableListAdapter {
         supprimerScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((DetailReceptionPadActivity) context).supprimerScan(groupPosition, childPosition);
+                //((DetailReceptionPadActivity) context).supprimerScan(groupPosition, childPosition);
             }
         });
 

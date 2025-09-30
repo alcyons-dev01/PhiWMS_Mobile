@@ -54,6 +54,7 @@ import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.Reception.DetailReception2025Activity;
 import fr.alcyons.phiwms_mobile.Reception.DetailReceptionActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
@@ -110,7 +111,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
             Commande commandeSelectionne = (Commande) commandeReceptionPUIAdapter.getItem(position);
 
             if (commandeSelectionne != null) {
-                Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPuiActivity.this, DetailReceptionActivity.class);
+                Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPuiActivity.this, DetailReception2025Activity.class);
                 Bundle serviceReceptionPui_Bundle = ServiceReceptionPuiActivity.super.getBundle();
                 serviceReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
                 serviceReceptionPui_Intent.putExtras(serviceReceptionPui_Bundle);
@@ -152,7 +153,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
 
                                         invalidateOptionsMenu();
                                     } else {
-                                        Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPuiActivity.this, DetailReceptionActivity.class);
+                                        Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPuiActivity.this, DetailReception2025Activity.class);
                                         Bundle serviceReceptionPui_Bundle = ServiceReceptionPuiActivity.super.getBundle();
                                         serviceReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
                                         serviceReceptionPui_Intent.putExtras(serviceReceptionPui_Bundle);

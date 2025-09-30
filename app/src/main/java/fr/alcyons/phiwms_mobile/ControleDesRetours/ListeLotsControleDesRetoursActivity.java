@@ -1,6 +1,5 @@
 package fr.alcyons.phiwms_mobile.ControleDesRetours;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,12 +22,7 @@ import android.widget.Toast;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
@@ -37,20 +31,15 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
-import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne_ControleRetour_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.Lot_ControleDesRetoursAdapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Lot_ControleDesRetoursScanneeAdapter;
-import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
-import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
-import fr.alcyons.phiwms_mobile.Services.ServiceControleRetoursActivity;
 
 import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_CODE_GS1;
@@ -715,17 +704,17 @@ public class ListeLotsControleDesRetoursActivity extends ServiceActivity {
             Intent clicBoutonAjoutParScan_intent = null;
             if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || Build.MANUFACTURER.toLowerCase().contains("google"))
             {
-                clicBoutonAjoutParScan_intent = new Intent(ListeLotsControleDesRetoursActivity.this, ScannerPreparationActivity.class);
+                //clicBoutonAjoutParScan_intent = new Intent(ListeLotsControleDesRetoursActivity.this, ScannerPreparationActivity.class);
             }
             else
             {
                 if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
                 {
-                    clicBoutonAjoutParScan_intent = new Intent(ListeLotsControleDesRetoursActivity.this, BarcodePreparationActivity.class);
+                    //clicBoutonAjoutParScan_intent = new Intent(ListeLotsControleDesRetoursActivity.this, BarcodePreparationActivity.class);
                 }
                 else
                 {
-                    clicBoutonAjoutParScan_intent = new Intent(ListeLotsControleDesRetoursActivity.this, ScannerPreparationActivity.class);
+                    //clicBoutonAjoutParScan_intent = new Intent(ListeLotsControleDesRetoursActivity.this, ScannerPreparationActivity.class);
                 }
             }
             clicBoutonAjoutParScan_intent.putExtras(clicBoutonAjoutParScan_Bundle);

@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.TimeZone;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
@@ -94,7 +95,6 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
     RelativeLayout relativeQte;
     Commande commandecourante;
     PH_Reliquat reliquat_courant;
-    PH_Reliquat_Reception_Adapte phReliquatReceptionAdapte;
     int qte_commande;
     int qte_receptionne;
     int qte_restante;
@@ -112,7 +112,6 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
         produitSelectionne = ProduitOpenHelper.getProduitByID(db, Objects.requireNonNull(intent.getExtras()).getInt("produitID"));
         depotSelectionne = DepotOpenHelper.getDepotParID(db, intent.getExtras().getInt("depotID"));
         reliquat_courant = PH_ReliquatOpenHelper.getPH_ReliquatById(db, intent.getExtras().getInt("ReliquatID"));
-        phReliquatReceptionAdapte = (PH_Reliquat_Reception_Adapte) intent.getExtras().getSerializable("phReliquatReceptionAdapte");
         commandecourante = CommandeOpenHelper.getCommandeByNumero(db, reliquat_courant.getCommandeNumero());
 
         /**
@@ -256,7 +255,8 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
 
         //clic sur le datamtrix permettant de récupérer le numéro de lot et la date de péremption
         datamatrix2ImageView.setOnClickListener(view -> {
-            if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+
+            if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell") || Build.MANUFACTURER.toLowerCase().contains("google"))
             {
                 Bundle detailProduitPlanDePlacementBundle = CreationLotManuelReceptionActivity.super.getBundle();
                 detailProduitPlanDePlacementBundle.putBoolean("doitEtreIdentique", false);
@@ -264,6 +264,9 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
                 detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un numéro de lot");
                 detailProduitPlanDePlacementBundle.putString("contexte", String.valueOf(R.string.scannerContexteProduit));
                 detailProduitPlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
+                detailProduitPlanDePlacementBundle.putString("numerodocument", commandecourante.getNumero());
+                detailProduitPlanDePlacementBundle.putInt("depotdestinataireid", commandecourante.getID_Depot());
+                detailProduitPlanDePlacementBundle.putString("depotRef", commandecourante.getRef_Depot_Dest());
                 Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotManuelReceptionActivity.this, ScannerProduitActivity.class);
                 detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
                 CreationLotManuelReceptionActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_LOT);
@@ -446,29 +449,8 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
             Toast.makeText(CreationLotManuelReceptionActivity.this, "Tous les éléments n'ont pas été saisis.", Toast.LENGTH_SHORT).show();
         } else {
             Bundle onMenuSaveClick_Bundle = CreationLotManuelReceptionActivity.super.getBundle();
-            onMenuSaveClick_Bundle.putString("nomZone", zoneTextView.getText().toString());
-            onMenuSaveClick_Bundle.putString("nomEmplacement", emplacementTextView.getText().toString());
-            onMenuSaveClick_Bundle.putString("numLot", lotEditText.getText().toString());
-            onMenuSaveClick_Bundle.putString("numSerie", numSerieEditText.getText().toString());
-            if(!qteActuelleEditText.getText().toString().trim().isEmpty()){
-                onMenuSaveClick_Bundle.putInt("qteActuelle", Integer.parseInt(qteActuelleEditText.getText().toString().trim()));
-            }
 
-            @SuppressLint("SimpleDateFormat") DateFormat dateDecodeur = new SimpleDateFormat("dd/MM/yyyy");
-            @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-            Date date;
-            String dateARetourner = "";
-
-            try {
-                date = dateDecodeur.parse(datePeremptionTextView.getText().toString().trim());
-                assert date != null;
-                dateARetourner = dateFormat.format(date);
-            } catch (ParseException e) {
-                Log.e("ParseException", Objects.requireNonNull(e.getMessage()));
-            }
-
-            onMenuSaveClick_Bundle.putString("datePeremption", dateARetourner);
+            ajoutReliquatBDD();
 
             Intent onMenuSaveClick_Intent = new Intent();
             onMenuSaveClick_Intent.putExtras(onMenuSaveClick_Bundle);
@@ -698,5 +680,45 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
         TextView textView = (TextView) layout.findViewById(com.google.android.material.R.id.snackbar_text);
         textView.setTextSize(TypedValue.TYPE_STRING, 8);
         snackbar.show();
+    }
+
+    private void ajoutReliquatBDD() {
+        Random randomreliquat = new Random();
+        int reliquatId = randomreliquat.nextInt();
+        if (reliquatId > 0)
+            reliquatId = reliquatId * -1;
+
+        PH_Reliquat phReliquatCourant = reliquat_courant;
+        phReliquatCourant.setReliquat_UID(reliquatId);
+        String numeroLot = lotEditText.getText().toString();
+        String datePeremption = datePeremptionTextView.getText().toString();
+        String[] datePeremptionTab = datePeremption.split("/");
+        if (datePeremptionTab.length == 3)
+            datePeremption = datePeremptionTab[2] + "-" + datePeremptionTab[1] + "-" + datePeremptionTab[0];
+
+        String zoneName = zoneTextView.getText().toString();
+        String emplacementName = emplacementTextView.getText().toString();
+        String numero_Serie = numSerieEditText.getText().toString();
+        int quantite = Integer.parseInt(qteActuelleEditText.getText().toString());
+
+        phReliquatCourant.setLot(numeroLot.trim());
+        phReliquatCourant.setSerie(numero_Serie.trim());
+        phReliquatCourant.setPeremptionDate(datePeremption.trim());
+
+        if (commandecourante.getRef_Depot_Dest().contains("-PAD")) {
+            phReliquatCourant.setZone("RECEPTION");
+            phReliquatCourant.setEmplacement("RECEPTION-" + commandecourante.getNumero() + "-" + commandecourante.getPatient_identite());
+        } else {
+            phReliquatCourant.setZone(zoneName.trim());
+            phReliquatCourant.setEmplacement(emplacementName.trim());
+        }
+        phReliquatCourant.setQteLivraison(quantite);
+        phReliquatCourant.setBL_Numero("");
+        phReliquatCourant.setScanValue("");
+
+        long rowID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, phReliquatCourant);
+        if (rowID != -1) {
+
+        }
     }
 }

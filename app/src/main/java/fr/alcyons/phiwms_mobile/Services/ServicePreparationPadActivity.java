@@ -63,9 +63,7 @@ import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Preparation_PreparationAdapt
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
-import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparation2025Activity;
 import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparation2025_V2Activity;
-import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparationActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 

@@ -30,8 +30,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
-import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparation2025Activity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparation2025Activity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparation2025_V2Activity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
@@ -323,7 +322,7 @@ public class ListeLotPreparation2025_V2Activity  extends ServiceAvecConnexionAct
         int index = -1;
         MAJListeLot();
 
-        Intent listeLotPreparation_Intent = new Intent(ListeLotPreparation2025_V2Activity.this, BarcodePreparationActivity.class);
+        Intent listeLotPreparation_Intent = new Intent(ListeLotPreparation2025_V2Activity.this, BarcodePreparation2025Activity.class);
         //gestion du zebra
         if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
         {

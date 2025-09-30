@@ -51,9 +51,7 @@ import java.util.Objects;
 import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReception2025Activity;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReception2025Activity;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
@@ -61,9 +59,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.FournisseurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ImprimanteEtiquetteOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
@@ -76,10 +72,7 @@ import fr.alcyons.phiwms_mobile.Classes.Commande;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
-import fr.alcyons.phiwms_mobile.Classes.Fournisseur;
 import fr.alcyons.phiwms_mobile.Classes.ImprimanteEtiquette;
-import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
-import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_Reception_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
@@ -90,12 +83,9 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.Mail;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
-import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparation2025Activity;
 import fr.alcyons.phiwms_mobile.PrisePhoto.PrisePhoto;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
-import fr.alcyons.phiwms_mobile.Services.ServicePreparationPadActivity;
-import fr.alcyons.phiwms_mobile.Services.ServicePreparationPufActivity;
 import fr.alcyons.phiwms_mobile.Services.ServiceReceptionPadActivity;
 import fr.alcyons.phiwms_mobile.Services.ServiceReceptionPuiActivity;
 
@@ -268,8 +258,7 @@ public class DetailReceptionActivity extends ServiceActivity {
         }*/
         retourService(super.getBundle());
     }
-
-
+    
     public void onMenuSaveClick() {
         boolean validationPossible = false;
         List<PH_Reliquat> listePHReliquat = new ArrayList<>();

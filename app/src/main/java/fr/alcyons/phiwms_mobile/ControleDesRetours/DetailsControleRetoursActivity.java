@@ -40,8 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
@@ -556,18 +554,18 @@ public class DetailsControleRetoursActivity extends ServiceAvecConnexionActivity
 
         if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
         {
-            controleDesRetour_Intent = new Intent(DetailsControleRetoursActivity.this, ScannerPreparationActivity.class);
+            //controleDesRetour_Intent = new Intent(DetailsControleRetoursActivity.this, ScannerPreparationActivity.class);
         }
         else
         {
             if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
             {
-                controleDesRetour_Intent = new Intent(DetailsControleRetoursActivity.this, BarcodePreparationActivity.class);
+                //controleDesRetour_Intent = new Intent(DetailsControleRetoursActivity.this, BarcodePreparationActivity.class);
 
             }
             else
             {
-                controleDesRetour_Intent = new Intent(DetailsControleRetoursActivity.this, ScannerPreparationActivity.class);
+                //controleDesRetour_Intent = new Intent(DetailsControleRetoursActivity.this, ScannerPreparationActivity.class);
             }
         }
 

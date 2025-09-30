@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.ToneGenerator;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
@@ -49,10 +48,7 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.DocumentScannerContext;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.EmplacementContexte;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.PleinVideContexte;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.PleinVideLocalisationContexte;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.PreparationScanneeScanProduitScannerSearchContexte;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.ProduitContexte;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.ProduitReceptionScanneeScannerSearchContexte;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.ReceptionPADScannerContexte;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.ServiceContexte;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.ZoneEtEmplacementContext;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
@@ -101,9 +97,9 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
     EmplacementContexte emplacementContexte;
     PleinVideContexte pleinVideContexte;
     PleinVideLocalisationContexte pleinVideLocalisationContexte;
-    ProduitReceptionScanneeScannerSearchContexte produitReceptionScanneeContexte;
-    PreparationScanneeScanProduitScannerSearchContexte preparationADHContext;
-    ReceptionPADScannerContexte receptionPADScannerContexte;
+//    ProduitReceptionScanneeScannerSearchContexte produitReceptionScanneeContexte;
+//    PreparationScanneeScanProduitScannerSearchContexte preparationADHContext;
+//    ReceptionPADScannerContexte receptionPADScannerContexte;
     ServiceContexte serviceContexte;
     AuthentificationContext authentificationContext;
     ControleDesRetourScanContext controleDesRetourScanContext;
@@ -219,10 +215,10 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
         pleinVideContexte = new PleinVideContexte(this, message);
         zoneEtEmplacementContext = new ZoneEtEmplacementContext(this, db, utilisateurConnecte);
         pleinVideLocalisationContexte = new PleinVideLocalisationContexte(this, db, message);
-        produitReceptionScanneeContexte = new ProduitReceptionScanneeScannerSearchContexte(this,db, modeRafale, modePhoto, modeCumule, doitEtreIdentique, designation, serialisation, utilisateurConnecte, actionId);
-        if(utilisateurConnecte != null)
-            preparationADHContext = new PreparationScanneeScanProduitScannerSearchContexte(this, db, utilisateurConnecte.getId(), message, PreparationID);
-        receptionPADScannerContexte = new ReceptionPADScannerContexte(this,db, modeRafale, modePhoto, modeCumule, doitEtreIdentique, designation, service_serialisation, conditionnementProduit, utilisateurConnecte, actionId, liste_id_reliquat);
+//        produitReceptionScanneeContexte = new ProduitReceptionScanneeScannerSearchContexte(this,db, modeRafale, modePhoto, modeCumule, doitEtreIdentique, designation, serialisation, utilisateurConnecte, actionId);
+//        if(utilisateurConnecte != null)
+//            preparationADHContext = new PreparationScanneeScanProduitScannerSearchContexte(this, db, utilisateurConnecte.getId(), message, PreparationID);
+//        receptionPADScannerContexte = new ReceptionPADScannerContexte(this,db, modeRafale, modePhoto, modeCumule, doitEtreIdentique, designation, service_serialisation, conditionnementProduit, utilisateurConnecte, actionId, liste_id_reliquat);
         documentScannerContext = new DocumentScannerContext(this, db);
         serviceContexte = new ServiceContexte(ScannerSearchOnlyActivity.this, db);
         authentificationContext = new AuthentificationContext(ScannerSearchOnlyActivity.this, db);
@@ -271,173 +267,173 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
         }
         else if(scannerContexteInt == R.string.scannerContextePreparationADH)
         {
-            message.setVisibility(GONE);
-            compteurScan.setVisibility(GONE);
-            LinearZoneEmplacementReceptionScannee.setVisibility(GONE);
-            nomListePreparation.setVisibility(View.VISIBLE);
-            nomListePreparation.setText(intent.getExtras().getString("Preparation_Code"));
-            bannerTexte = preparationADHContext.bannerTexte;
-            LinearReceptionScanne.setVisibility(View.VISIBLE);
-            preparationADHContext.liste_code_scanne = intent.getExtras().getStringArrayList("Liste_GTIN_Scannee");
-            if(preparationADHContext.liste_code_scanne == null)
-            {
-                preparationADHContext.liste_code_scanne = intent.getExtras().getStringArrayList("ListString");
-                if(preparationADHContext.liste_code_scanne == null)
-                {
-                    preparationADHContext.liste_code_scanne = new ArrayList<>();
-                }
-            }
-
-            preparationADHContext.liste_resultat = (List<ObjetReceptionScannee>) intent.getExtras().getSerializable("ListeObjetScannee");
-            if(preparationADHContext.liste_resultat == null)
-            {
-                preparationADHContext.liste_resultat = (List<ObjetReceptionScannee>) intent.getExtras().getSerializable("Liste_Objet_Scanne");
-                if(preparationADHContext.liste_resultat == null)
-                {
-                    preparationADHContext.liste_resultat = new ArrayList<>();
-                }
-                else
-                {
-                    preparationADHContext.Initialisation(preparationADHContext.liste_resultat);
-                }
-            }
-            else
-            {
-                preparationADHContext.Initialisation(preparationADHContext.liste_resultat);
-                nomZoneReceptionScannee.setText(preparationADHContext.zoneProduitCourant);
-                nomEmplacementReceptionScannee.setText(preparationADHContext.emplacementProduitCourant);
-                bannerTexte = "Scanner le datamatrix d'un produit";
-                //preparationADHContext.scanEmplacement = false;
-                if(contenuCode.getVisibility() == View.VISIBLE)
-                {
-                    contenuCode.requestFocus();
-                }
-                else
-                {
-                    contenuCodeManuel.requestFocus();
-                }
-            }
-            GestionAffichagePreparation();
-            if(contenuCode.getVisibility() == View.VISIBLE)
-            {
-                contenuCode.requestFocus();
-            }
-            else
-            {
-                contenuCodeManuel.requestFocus();
-            }
+//            message.setVisibility(GONE);
+//            compteurScan.setVisibility(GONE);
+//            LinearZoneEmplacementReceptionScannee.setVisibility(GONE);
+//            nomListePreparation.setVisibility(View.VISIBLE);
+//            nomListePreparation.setText(intent.getExtras().getString("Preparation_Code"));
+//            bannerTexte = preparationADHContext.bannerTexte;
+//            LinearReceptionScanne.setVisibility(View.VISIBLE);
+//            preparationADHContext.liste_code_scanne = intent.getExtras().getStringArrayList("Liste_GTIN_Scannee");
+//            if(preparationADHContext.liste_code_scanne == null)
+//            {
+//                preparationADHContext.liste_code_scanne = intent.getExtras().getStringArrayList("ListString");
+//                if(preparationADHContext.liste_code_scanne == null)
+//                {
+//                    preparationADHContext.liste_code_scanne = new ArrayList<>();
+//                }
+//            }
+//
+//            preparationADHContext.liste_resultat = (List<ObjetReceptionScannee>) intent.getExtras().getSerializable("ListeObjetScannee");
+//            if(preparationADHContext.liste_resultat == null)
+//            {
+//                preparationADHContext.liste_resultat = (List<ObjetReceptionScannee>) intent.getExtras().getSerializable("Liste_Objet_Scanne");
+//                if(preparationADHContext.liste_resultat == null)
+//                {
+//                    preparationADHContext.liste_resultat = new ArrayList<>();
+//                }
+//                else
+//                {
+//                    preparationADHContext.Initialisation(preparationADHContext.liste_resultat);
+//                }
+//            }
+//            else
+//            {
+//                preparationADHContext.Initialisation(preparationADHContext.liste_resultat);
+//                nomZoneReceptionScannee.setText(preparationADHContext.zoneProduitCourant);
+//                nomEmplacementReceptionScannee.setText(preparationADHContext.emplacementProduitCourant);
+//                bannerTexte = "Scanner le datamatrix d'un produit";
+//                //preparationADHContext.scanEmplacement = false;
+//                if(contenuCode.getVisibility() == View.VISIBLE)
+//                {
+//                    contenuCode.requestFocus();
+//                }
+//                else
+//                {
+//                    contenuCodeManuel.requestFocus();
+//                }
+//            }
+//            GestionAffichagePreparation();
+//            if(contenuCode.getVisibility() == View.VISIBLE)
+//            {
+//                contenuCode.requestFocus();
+//            }
+//            else
+//            {
+//                contenuCodeManuel.requestFocus();
+//            }
         }
         else if(scannerContexteInt == R.string.scannerContexteProduitReceptionScannee)
         {
-            message.setVisibility(GONE);
-            compteurScan.setVisibility(GONE);
-            bannerTexte = "Scanner un emplacement";
-            LinearReceptionScanne.setVisibility(View.VISIBLE);
-            produitReceptionScanneeContexte.stringList = intent.getExtras().getStringArrayList("Liste_GTIN_Scannee");
-            if(produitReceptionScanneeContexte.stringList == null || produitReceptionScanneeContexte.stringList.size()==0)
-            {
-                produitReceptionScanneeContexte.stringList = new ArrayList<>();
-            }
-            produitReceptionScanneeContexte.liste_resultat = (List<ObjetReceptionScannee>) intent.getExtras().getSerializable("ListeObjetScannee");
-            if(produitReceptionScanneeContexte.liste_resultat == null|| produitReceptionScanneeContexte.liste_resultat.size()==0)
-            {
-                produitReceptionScanneeContexte.liste_resultat = new ArrayList<>();
-            }
-            else
-            {
-                produitReceptionScanneeContexte.Initialisation(produitReceptionScanneeContexte.liste_resultat);
-                nomZoneReceptionScannee.setText(produitReceptionScanneeContexte.zoneProduitCourant);
-                nomEmplacementReceptionScannee.setText(produitReceptionScanneeContexte.emplacementProduitCourant);
-                bannerTexte = "Scanner le datamatrix d'un produit";
-                produitReceptionScanneeContexte.scanEmplacement = false;
-                GestionAffichage();
-                if(contenuCode.getVisibility() == View.VISIBLE)
-                {
-                    contenuCode.requestFocus();
-                }
-                else
-                {
-                    contenuCodeManuel.requestFocus();
-                }
-            }
+//            message.setVisibility(GONE);
+//            compteurScan.setVisibility(GONE);
+//            bannerTexte = "Scanner un emplacement";
+//            LinearReceptionScanne.setVisibility(View.VISIBLE);
+//            produitReceptionScanneeContexte.stringList = intent.getExtras().getStringArrayList("Liste_GTIN_Scannee");
+//            if(produitReceptionScanneeContexte.stringList == null || produitReceptionScanneeContexte.stringList.size()==0)
+//            {
+//                produitReceptionScanneeContexte.stringList = new ArrayList<>();
+//            }
+//            produitReceptionScanneeContexte.liste_resultat = (List<ObjetReceptionScannee>) intent.getExtras().getSerializable("ListeObjetScannee");
+//            if(produitReceptionScanneeContexte.liste_resultat == null|| produitReceptionScanneeContexte.liste_resultat.size()==0)
+//            {
+//                produitReceptionScanneeContexte.liste_resultat = new ArrayList<>();
+//            }
+//            else
+//            {
+//                produitReceptionScanneeContexte.Initialisation(produitReceptionScanneeContexte.liste_resultat);
+//                nomZoneReceptionScannee.setText(produitReceptionScanneeContexte.zoneProduitCourant);
+//                nomEmplacementReceptionScannee.setText(produitReceptionScanneeContexte.emplacementProduitCourant);
+//                bannerTexte = "Scanner le datamatrix d'un produit";
+//                produitReceptionScanneeContexte.scanEmplacement = false;
+//                GestionAffichage();
+//                if(contenuCode.getVisibility() == View.VISIBLE)
+//                {
+//                    contenuCode.requestFocus();
+//                }
+//                else
+//                {
+//                    contenuCodeManuel.requestFocus();
+//                }
+//            }
         }
         else if(scannerContexteInt == R.string.scannerContexteReceptionPAD)
         {
-            message.setVisibility(GONE);
-            compteurScan.setVisibility(GONE);
-            nomListePreparation.setVisibility(View.VISIBLE);
-            nomListePreparation.setText(intent.getExtras().getString("Fournisseur_Reception"));
-            bannerTexte = "Scanner le datamatrix d'un produits";
-            LinearReceptionScanne.setVisibility(View.VISIBLE);
-            receptionPADScannerContexte.stringList = intent.getExtras().getStringArrayList("Liste_GTIN_Scannee");
-            if(receptionPADScannerContexte.stringList == null)
-            {
-                receptionPADScannerContexte.stringList = new ArrayList<>();
-            }
-            receptionPADScannerContexte.list_result = (List<ObjetReceptionScannee>) intent.getExtras().getSerializable("ListeObjetScannee");
-            if(receptionPADScannerContexte.list_result == null)
-            {
-                receptionPADScannerContexte.list_result = new ArrayList<>();
-            }
-            else
-            {
-                int size_liste = receptionPADScannerContexte.list_result.size();
-                receptionPADScannerContexte.chargementscan = true;
-
-                for(int i = 0; i < size_liste; i++)
-                {
-                    ObjetReceptionScannee courant = receptionPADScannerContexte.list_result.get(0);
-                    Map<String, String> mapResult = OutilsDecodage.decouperGTIN(courant.getGs1_scannee());
-                    Produit produitCourant = null;
-                    if(mapResult.size() > 1)
-                    {
-                        produitCourant = ProduitOpenHelper.getUnProduitParGTIN(db, mapResult.get(OutilsDecodage.codeGtin));
-                    }
-                    else
-                    {
-                        produitCourant = ProduitOpenHelper.getUnProduitByCodeInconnu(db, courant.getGs1_scannee());
-                    }
-
-                    if(produitCourant != null)
-                    {
-                        for(Integer id_courant : liste_id_reliquat)
-                        {
-                            PH_Reliquat reliquat_courant = PH_ReliquatOpenHelper.getPH_ReliquatById(db, id_courant);
-                            int produitid = produitCourant.getID_produit();
-                            int reliquatproduitid = reliquat_courant.getProduitID();
-                            if(produitid == reliquatproduitid)
-                            {
-                                receptionPADScannerContexte.ph_reliquat_courant = reliquat_courant;
-                                break;
-                            }
-                        }
-                        receptionPADScannerContexte.objetReceptionPADCourant = new ObjetReceptionPAD();
-                        receptionPADScannerContexte.objetReceptionPADCourant.setDesignation_produit(receptionPADScannerContexte.ph_reliquat_courant.getDesignationCourte());
-                        receptionPADScannerContexte.objetReceptionPADCourant.setQuantite_commander(receptionPADScannerContexte.ph_reliquat_courant.getQteCommande());
-                        receptionPADScannerContexte.objetReceptionPADCourant.setQuantite_receptionner(courant.getQuantiteScannee());
-                        receptionPADScannerContexte.quantite_a_afficher = courant.getQuantiteScannee();
-                        receptionPADScannerContexte.designationProduitCourant = receptionPADScannerContexte.ph_reliquat_courant.getDesignationCourte();
-                        receptionPADScannerContexte.objetReceptionScanneeCourant = courant;
-                        receptionPADScannerContexte.doitEtreSupprimer = true;
-                        receptionPADScannerContexte.index_objet_a_supprimer = 0;
-                        receptionPADScannerContexte.objetReceptionScanneeCourant.setQuantiteScannee(0);
-                        receptionPADScannerContexte.AjoutDuProduit();
-                    }
-                }
-                receptionPADScannerContexte.chargementscan = false;
-
-                bannerTexte = "Scanner le datamatrix d'un produit";
-                GestionAffichage();
-                if(contenuCode.getVisibility() == View.VISIBLE)
-                {
-                    contenuCode.requestFocus();
-                }
-                else
-                {
-                    contenuCodeManuel.requestFocus();
-                }
-            }
-            GestionAffichagePAD();
+//            message.setVisibility(GONE);
+//            compteurScan.setVisibility(GONE);
+//            nomListePreparation.setVisibility(View.VISIBLE);
+//            nomListePreparation.setText(intent.getExtras().getString("Fournisseur_Reception"));
+//            bannerTexte = "Scanner le datamatrix d'un produits";
+//            LinearReceptionScanne.setVisibility(View.VISIBLE);
+//            receptionPADScannerContexte.stringList = intent.getExtras().getStringArrayList("Liste_GTIN_Scannee");
+//            if(receptionPADScannerContexte.stringList == null)
+//            {
+//                receptionPADScannerContexte.stringList = new ArrayList<>();
+//            }
+//            receptionPADScannerContexte.list_result = (List<ObjetReceptionScannee>) intent.getExtras().getSerializable("ListeObjetScannee");
+//            if(receptionPADScannerContexte.list_result == null)
+//            {
+//                receptionPADScannerContexte.list_result = new ArrayList<>();
+//            }
+//            else
+//            {
+//                int size_liste = receptionPADScannerContexte.list_result.size();
+//                receptionPADScannerContexte.chargementscan = true;
+//
+//                for(int i = 0; i < size_liste; i++)
+//                {
+//                    ObjetReceptionScannee courant = receptionPADScannerContexte.list_result.get(0);
+//                    Map<String, String> mapResult = OutilsDecodage.decouperGTIN(courant.getGs1_scannee());
+//                    Produit produitCourant = null;
+//                    if(mapResult.size() > 1)
+//                    {
+//                        produitCourant = ProduitOpenHelper.getUnProduitParGTIN(db, mapResult.get(OutilsDecodage.codeGtin));
+//                    }
+//                    else
+//                    {
+//                        produitCourant = ProduitOpenHelper.getUnProduitByCodeInconnu(db, courant.getGs1_scannee());
+//                    }
+//
+//                    if(produitCourant != null)
+//                    {
+//                        for(Integer id_courant : liste_id_reliquat)
+//                        {
+//                            PH_Reliquat reliquat_courant = PH_ReliquatOpenHelper.getPH_ReliquatById(db, id_courant);
+//                            int produitid = produitCourant.getID_produit();
+//                            int reliquatproduitid = reliquat_courant.getProduitID();
+//                            if(produitid == reliquatproduitid)
+//                            {
+//                                receptionPADScannerContexte.ph_reliquat_courant = reliquat_courant;
+//                                break;
+//                            }
+//                        }
+//                        receptionPADScannerContexte.objetReceptionPADCourant = new ObjetReceptionPAD();
+//                        receptionPADScannerContexte.objetReceptionPADCourant.setDesignation_produit(receptionPADScannerContexte.ph_reliquat_courant.getDesignationCourte());
+//                        receptionPADScannerContexte.objetReceptionPADCourant.setQuantite_commander(receptionPADScannerContexte.ph_reliquat_courant.getQteCommande());
+//                        receptionPADScannerContexte.objetReceptionPADCourant.setQuantite_receptionner(courant.getQuantiteScannee());
+//                        receptionPADScannerContexte.quantite_a_afficher = courant.getQuantiteScannee();
+//                        receptionPADScannerContexte.designationProduitCourant = receptionPADScannerContexte.ph_reliquat_courant.getDesignationCourte();
+//                        receptionPADScannerContexte.objetReceptionScanneeCourant = courant;
+//                        receptionPADScannerContexte.doitEtreSupprimer = true;
+//                        receptionPADScannerContexte.index_objet_a_supprimer = 0;
+//                        receptionPADScannerContexte.objetReceptionScanneeCourant.setQuantiteScannee(0);
+//                        receptionPADScannerContexte.AjoutDuProduit();
+//                    }
+//                }
+//                receptionPADScannerContexte.chargementscan = false;
+//
+//                bannerTexte = "Scanner le datamatrix d'un produit";
+//                GestionAffichage();
+//                if(contenuCode.getVisibility() == View.VISIBLE)
+//                {
+//                    contenuCode.requestFocus();
+//                }
+//                else
+//                {
+//                    contenuCodeManuel.requestFocus();
+//                }
+//            }
+//            GestionAffichagePAD();
         }
         else if(scannerContexteInt == R.string.scannerContexteService)
         {
@@ -520,7 +516,7 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                         Bundle scannerSearchOnlyBundle = new Bundle();
                         if(scannerContexteInt == R.string.scannerContextePreparationADH)
                         {
-                            scannerSearchOnlyBundle.putStringArrayList("listeString", (ArrayList) preparationADHContext.liste_resultat);
+                            //scannerSearchOnlyBundle.putStringArrayList("listeString", (ArrayList) preparationADHContext.liste_resultat);
                         }
                         scannerSearchOnlyBundle.putString("code", code);
                         scannerSearchOnlyBundle.putBoolean("close", true);
@@ -615,86 +611,86 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                     }
                     else if(scannerContexteInt == R.string.scannerContextePreparationADH)
                     {
-                        if(modeTrace)
-                        {
-                            tableTrace = new TableTrace(id, date, "Context_Preparation_ADH", "Récupération après scan", s.toString().substring(0, s.length() - 1), utilisateurConnecte.getIdentifiant(), utilisateurConnecte.getId());
-                            rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
-                            if(rowId != -1)
-                            {
-                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
-                            }
-                        }
-                        LinearResultatFranceMVO.setVisibility(View.GONE);
-
-                        if(s.toString().startsWith("RecepetionScanneeValider"))
-                        {
-                            preparationADHContext.ajouterProduit();
-                            code = "Valider";
-                        }
-                        else
-                        {
-                            preparationADHContext.onTextWatcher(s);
-                            if(s.toString().startsWith("PHITAGPLACE"))
-                            {
-                                LayoutResultatScanProduit.setVisibility(View.GONE);
-                                ImageSeparateur.setVisibility(View.GONE);
-                                nomZoneReceptionScannee.setText(preparationADHContext.zoneProduitCourant);
-                                nomEmplacementReceptionScannee.setText(preparationADHContext.emplacementProduitCourant);
-                                bannerTexte = "Scanner le datamatrix d'un produit";
-                                ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
-                                //preparationADHContext.scanEmplacement = false;
-                                GestionAffichagePreparation();
-                            }
-                            else
-                            {
-                                //LayoutResultatScanProduit.setVisibility(View.VISIBLE);
-                                ImageSeparateur.setVisibility(View.VISIBLE);
-                                referenceProduitReceptionScannee.setText(preparationADHContext.referenceProduitScanne);
-                                numeroLotProduitReceptionScannee.setText(preparationADHContext.numeroLotProduitScanne);
-                                peremptionProduitReceptionScannee.setText(preparationADHContext.peremptionProduitScanne);
-                                if(preparationADHContext.quantiteAAfficher == 0)
-                                {
-                                    qteProduitReceptionScannee.setText("");
-                                    textPresentationRefProduitScannee.setVisibility(GONE);
-                                    LayoutResultatScanProduit.setVisibility(View.GONE);
-                                    ImageSeparateur.setVisibility(View.GONE);
-                                }
-                                else
-                                {
-                                    qteProduitReceptionScannee.setText(String.valueOf(preparationADHContext.quantiteAAfficher));
-                                    qteProduitReceptionScannee.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            // Ouvre une boite de dialogue avec un NumberPicker
-                                            Context context = ScannerSearchOnlyActivity.this;
-                                            String title = preparationADHContext.designationProduitScanne;
-                                            String message = "Changer la quantité: ";
-                                            int maxValue = preparationADHContext.quantite_max_number_picker;
-                                            int value = preparationADHContext.quantiteAAfficher;
-
-                                            DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int id) {
-
-                                                    int qteAprès = Alerte.aNumberPicker.getValue();
-                                                    qteProduitReceptionScannee.setText(String.valueOf(String.valueOf(qteAprès).trim()));
-                                                    //produitReceptionScanneeContexte.quantite_a_afficher = qteAprès;
-                                                    //preparationADHContext.ChangerQuantite(qteAprès);
-                                                    //adapter.notifyDataSetChanged();
-                                                    InputMethodManager imm = (InputMethodManager) ScannerSearchOnlyActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-                                                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                                                    dialog.dismiss();
-                                                    GestionAffichage();
-                                                }
-                                            };
-
-                                            Alerte.afficherAlerteNumberPicker(context, title, message, value, maxValue, onClickListener);
-                                        }
-                                    });
-                                }
-                            }
-                            GestionAffichagePreparation();
-                            ExpandGroupAfterScan(preparationADHContext.designationProduitScanne);
-                        }
+//                        if(modeTrace)
+//                        {
+//                            tableTrace = new TableTrace(id, date, "Context_Preparation_ADH", "Récupération après scan", s.toString().substring(0, s.length() - 1), utilisateurConnecte.getIdentifiant(), utilisateurConnecte.getId());
+//                            rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
+//                            if(rowId != -1)
+//                            {
+//                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+//                            }
+//                        }
+//                        LinearResultatFranceMVO.setVisibility(View.GONE);
+//
+//                        if(s.toString().startsWith("RecepetionScanneeValider"))
+//                        {
+//                            preparationADHContext.ajouterProduit();
+//                            code = "Valider";
+//                        }
+//                        else
+//                        {
+//                            preparationADHContext.onTextWatcher(s);
+//                            if(s.toString().startsWith("PHITAGPLACE"))
+//                            {
+//                                LayoutResultatScanProduit.setVisibility(View.GONE);
+//                                ImageSeparateur.setVisibility(View.GONE);
+//                                nomZoneReceptionScannee.setText(preparationADHContext.zoneProduitCourant);
+//                                nomEmplacementReceptionScannee.setText(preparationADHContext.emplacementProduitCourant);
+//                                bannerTexte = "Scanner le datamatrix d'un produit";
+//                                ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
+//                                //preparationADHContext.scanEmplacement = false;
+//                                GestionAffichagePreparation();
+//                            }
+//                            else
+//                            {
+//                                //LayoutResultatScanProduit.setVisibility(View.VISIBLE);
+//                                ImageSeparateur.setVisibility(View.VISIBLE);
+//                                referenceProduitReceptionScannee.setText(preparationADHContext.referenceProduitScanne);
+//                                numeroLotProduitReceptionScannee.setText(preparationADHContext.numeroLotProduitScanne);
+//                                peremptionProduitReceptionScannee.setText(preparationADHContext.peremptionProduitScanne);
+//                                if(preparationADHContext.quantiteAAfficher == 0)
+//                                {
+//                                    qteProduitReceptionScannee.setText("");
+//                                    textPresentationRefProduitScannee.setVisibility(GONE);
+//                                    LayoutResultatScanProduit.setVisibility(View.GONE);
+//                                    ImageSeparateur.setVisibility(View.GONE);
+//                                }
+//                                else
+//                                {
+//                                    qteProduitReceptionScannee.setText(String.valueOf(preparationADHContext.quantiteAAfficher));
+//                                    qteProduitReceptionScannee.setOnClickListener(new View.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(View v) {
+//                                            // Ouvre une boite de dialogue avec un NumberPicker
+//                                            Context context = ScannerSearchOnlyActivity.this;
+//                                            String title = preparationADHContext.designationProduitScanne;
+//                                            String message = "Changer la quantité: ";
+//                                            int maxValue = preparationADHContext.quantite_max_number_picker;
+//                                            int value = preparationADHContext.quantiteAAfficher;
+//
+//                                            DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+//                                                public void onClick(DialogInterface dialog, int id) {
+//
+//                                                    int qteAprès = Alerte.aNumberPicker.getValue();
+//                                                    qteProduitReceptionScannee.setText(String.valueOf(String.valueOf(qteAprès).trim()));
+//                                                    //produitReceptionScanneeContexte.quantite_a_afficher = qteAprès;
+//                                                    //preparationADHContext.ChangerQuantite(qteAprès);
+//                                                    //adapter.notifyDataSetChanged();
+//                                                    InputMethodManager imm = (InputMethodManager) ScannerSearchOnlyActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+//                                                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+//                                                    dialog.dismiss();
+//                                                    GestionAffichage();
+//                                                }
+//                                            };
+//
+//                                            Alerte.afficherAlerteNumberPicker(context, title, message, value, maxValue, onClickListener);
+//                                        }
+//                                    });
+//                                }
+//                            }
+//                            GestionAffichagePreparation();
+//                            ExpandGroupAfterScan(preparationADHContext.designationProduitScanne);
+//                        }
                     }
                     else if(scannerContexteInt == R.string.scannerContextePleinVide) {
                         pleinVideContexte.onTextWatcher(s);
@@ -707,147 +703,147 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                     }
                     else if(scannerContexteInt == R.string.scannerContexteProduitReceptionScannee)
                     {
-                        if(modeTrace)
-                        {
-                            tableTrace = new TableTrace(id, date, "Context_Reception_Scannee", "Récupération après scan", s.toString().substring(0, s.length() - 1), utilisateurConnecte.getIdentifiant(), utilisateurConnecte.getId());
-                            rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
-                            if(rowId != -1)
-                            {
-                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
-                            }
-                        }
-                        LinearResultatFranceMVO.setVisibility(View.GONE);
-
-                        if(s.toString().startsWith("PHITAGPLACE"))
-                            produitReceptionScanneeContexte.scanEmplacement = true;
-
-                        if(s.toString().startsWith("RecepetionScanneeValider"))
-                        {
-                            produitReceptionScanneeContexte.AjoutDuProduit();
-                            code = "Valider";
-                        }
-                        else
-                        {
-                            produitReceptionScanneeContexte.onTextWatcher(s);
-                            if(produitReceptionScanneeContexte.scanEmplacement)
-                            {
-                                LayoutResultatScanProduit.setVisibility(View.GONE);
-                                ImageSeparateur.setVisibility(View.GONE);
-                                nomZoneReceptionScannee.setText(produitReceptionScanneeContexte.zoneProduitCourant);
-                                nomEmplacementReceptionScannee.setText(produitReceptionScanneeContexte.emplacementProduitCourant);
-                                bannerTexte = "Scanner le datamatrix d'un produit";
-                                ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
-                                produitReceptionScanneeContexte.scanEmplacement = false;
-                                GestionAffichage();
-                            }
-                            else
-                            {
-/*                                    LayoutResultatScanProduit.setVisibility(View.VISIBLE);
-                                ImageSeparateur.setVisibility(View.VISIBLE);
-                                referenceProduitReceptionScannee.setText(produitReceptionScanneeContexte.referenceProduitCourant);
-                                numeroLotProduitReceptionScannee.setText(produitReceptionScanneeContexte.numeroLotProduitCourant);
-                                peremptionProduitReceptionScannee.setText(produitReceptionScanneeContexte.peremptionProduitCourant);
-                                qteProduitReceptionScannee.setText(String.valueOf(produitReceptionScanneeContexte.quantite_a_afficher));
-                                qteProduitReceptionScannee.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        // Ouvre une boite de dialogue avec un NumberPicker
-                                        Context context = ScannerSearchOnlyActivity.this;
-                                        String title = produitReceptionScanneeContexte.designationProduitCourant;
-                                        String message = "Changer la quantité: ";
-                                        int maxValue = 10000;
-                                        int value = Integer.parseInt(produitReceptionScanneeContexte.quantiteProduitCourant);
-
-                                        DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-
-                                                int qteAprès = aNumberPicker.getValue();
-                                                qteProduitReceptionScannee.setText(String.valueOf(String.valueOf(qteAprès).trim()));
-                                                //produitReceptionScanneeContexte.quantite_a_afficher = qteAprès;
-                                                produitReceptionScanneeContexte.ChangerQuantite(qteAprès);
-                                                //adapter.notifyDataSetChanged();
-                                                dialog.dismiss();
-                                                GestionAffichage();
-                                            }
-                                        };
-
-                                        Alerte.afficherAlerteNumberPicker(context, title, message, value, maxValue, onClickListener);
-
-                                    }
-                                });*/
-                                GestionAffichage();
-                            }
-                        }
+//                        if(modeTrace)
+//                        {
+//                            tableTrace = new TableTrace(id, date, "Context_Reception_Scannee", "Récupération après scan", s.toString().substring(0, s.length() - 1), utilisateurConnecte.getIdentifiant(), utilisateurConnecte.getId());
+//                            rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
+//                            if(rowId != -1)
+//                            {
+//                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+//                            }
+//                        }
+//                        LinearResultatFranceMVO.setVisibility(View.GONE);
+//
+//                        if(s.toString().startsWith("PHITAGPLACE"))
+//                            produitReceptionScanneeContexte.scanEmplacement = true;
+//
+//                        if(s.toString().startsWith("RecepetionScanneeValider"))
+//                        {
+//                            produitReceptionScanneeContexte.AjoutDuProduit();
+//                            code = "Valider";
+//                        }
+//                        else
+//                        {
+//                            produitReceptionScanneeContexte.onTextWatcher(s);
+//                            if(produitReceptionScanneeContexte.scanEmplacement)
+//                            {
+//                                LayoutResultatScanProduit.setVisibility(View.GONE);
+//                                ImageSeparateur.setVisibility(View.GONE);
+//                                nomZoneReceptionScannee.setText(produitReceptionScanneeContexte.zoneProduitCourant);
+//                                nomEmplacementReceptionScannee.setText(produitReceptionScanneeContexte.emplacementProduitCourant);
+//                                bannerTexte = "Scanner le datamatrix d'un produit";
+//                                ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
+//                                produitReceptionScanneeContexte.scanEmplacement = false;
+//                                GestionAffichage();
+//                            }
+//                            else
+//                            {
+///*                                    LayoutResultatScanProduit.setVisibility(View.VISIBLE);
+//                                ImageSeparateur.setVisibility(View.VISIBLE);
+//                                referenceProduitReceptionScannee.setText(produitReceptionScanneeContexte.referenceProduitCourant);
+//                                numeroLotProduitReceptionScannee.setText(produitReceptionScanneeContexte.numeroLotProduitCourant);
+//                                peremptionProduitReceptionScannee.setText(produitReceptionScanneeContexte.peremptionProduitCourant);
+//                                qteProduitReceptionScannee.setText(String.valueOf(produitReceptionScanneeContexte.quantite_a_afficher));
+//                                qteProduitReceptionScannee.setOnClickListener(new View.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(View v) {
+//                                        // Ouvre une boite de dialogue avec un NumberPicker
+//                                        Context context = ScannerSearchOnlyActivity.this;
+//                                        String title = produitReceptionScanneeContexte.designationProduitCourant;
+//                                        String message = "Changer la quantité: ";
+//                                        int maxValue = 10000;
+//                                        int value = Integer.parseInt(produitReceptionScanneeContexte.quantiteProduitCourant);
+//
+//                                        DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+//                                            public void onClick(DialogInterface dialog, int id) {
+//
+//                                                int qteAprès = aNumberPicker.getValue();
+//                                                qteProduitReceptionScannee.setText(String.valueOf(String.valueOf(qteAprès).trim()));
+//                                                //produitReceptionScanneeContexte.quantite_a_afficher = qteAprès;
+//                                                produitReceptionScanneeContexte.ChangerQuantite(qteAprès);
+//                                                //adapter.notifyDataSetChanged();
+//                                                dialog.dismiss();
+//                                                GestionAffichage();
+//                                            }
+//                                        };
+//
+//                                        Alerte.afficherAlerteNumberPicker(context, title, message, value, maxValue, onClickListener);
+//
+//                                    }
+//                                });*/
+//                                GestionAffichage();
+//                            }
+//                        }
                     }
                     else if(scannerContexteInt == R.string.scannerContexteReceptionPAD)
                     {
-                        if(modeTrace)
-                        {
-                            tableTrace = new TableTrace(id, date, "Context_Reception_PAD", "Récupération après scan", s.toString().substring(0, s.length() - 1), utilisateurConnecte.getIdentifiant(), utilisateurConnecte.getId());
-                            rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
-                            if(rowId != -1)
-                            {
-                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
-                            }
-                        }
-                        LinearResultatFranceMVO.setVisibility(View.GONE);
-
-                        if(s.toString().startsWith("RecepetionScanneeValider"))
-                        {
-                            receptionPADScannerContexte.AjoutDuProduit();
-                            code = "Valider";
-                        }
-                        else
-                        {
-                            receptionPADScannerContexte.onTextWatcher(s);
-                            LayoutResultatScanProduit.setVisibility(View.VISIBLE);
-                            ImageSeparateur.setVisibility(View.VISIBLE);
-                            referenceProduitReceptionScannee.setText(receptionPADScannerContexte.referenceProduitCourant);
-                            numeroLotProduitReceptionScannee.setText(receptionPADScannerContexte.numeroLotProduitCourant);
-                            peremptionProduitReceptionScannee.setText(receptionPADScannerContexte.peremptionProduitCourant);
-                            if(receptionPADScannerContexte.quantite_a_afficher == 0)
-                            {
-                                textPresentationRefProduitScannee.setVisibility(GONE);
-                                LayoutResultatScanProduit.setVisibility(View.GONE);
-                                ImageSeparateur.setVisibility(View.GONE);
-                                qteProduitReceptionScannee.setText("");
-                            }
-                            else
-                            {
-                                qteProduitReceptionScannee.setText(String.valueOf(receptionPADScannerContexte.quantite_a_afficher));
-                                qteProduitReceptionScannee.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        // Ouvre une boite de dialogue avec un NumberPicker
-                                        Context context = ScannerSearchOnlyActivity.this;
-                                        String title = receptionPADScannerContexte.designationProduitCourant;
-                                        String message = "Changer la quantité: ";
-                                        int maxValue = receptionPADScannerContexte.quantiteMaxNumberPicker;
-                                        int value = receptionPADScannerContexte.quantite_a_afficher;
-
-                                        DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-
-                                                int qteAprès = Alerte.aNumberPicker.getValue();
-                                                qteProduitReceptionScannee.setText(String.valueOf(String.valueOf(qteAprès).trim()));
-                                                receptionPADScannerContexte.quantite_a_afficher = qteAprès;
-                                                /*receptionPADScannerContexte.ChangerQuantite(qteAprès);*/
-                                                //adapter.notifyDataSetChanged();
-                                                InputMethodManager imm = (InputMethodManager) ScannerSearchOnlyActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-                                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                                                dialog.dismiss();
-                                                GestionAffichage();
-                                            }
-                                        };
-
-                                        Alerte.afficherAlerteNumberPicker(context, title, message, value, maxValue, onClickListener);
-
-                                    }
-                                });
-                            }
-
-                            GestionAffichagePAD();
-                        }
+//                        if(modeTrace)
+//                        {
+//                            tableTrace = new TableTrace(id, date, "Context_Reception_PAD", "Récupération après scan", s.toString().substring(0, s.length() - 1), utilisateurConnecte.getIdentifiant(), utilisateurConnecte.getId());
+//                            rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
+//                            if(rowId != -1)
+//                            {
+//                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+//                            }
+//                        }
+//                        LinearResultatFranceMVO.setVisibility(View.GONE);
+//
+//                        if(s.toString().startsWith("RecepetionScanneeValider"))
+//                        {
+//                            receptionPADScannerContexte.AjoutDuProduit();
+//                            code = "Valider";
+//                        }
+//                        else
+//                        {
+//                            receptionPADScannerContexte.onTextWatcher(s);
+//                            LayoutResultatScanProduit.setVisibility(View.VISIBLE);
+//                            ImageSeparateur.setVisibility(View.VISIBLE);
+//                            referenceProduitReceptionScannee.setText(receptionPADScannerContexte.referenceProduitCourant);
+//                            numeroLotProduitReceptionScannee.setText(receptionPADScannerContexte.numeroLotProduitCourant);
+//                            peremptionProduitReceptionScannee.setText(receptionPADScannerContexte.peremptionProduitCourant);
+//                            if(receptionPADScannerContexte.quantite_a_afficher == 0)
+//                            {
+//                                textPresentationRefProduitScannee.setVisibility(GONE);
+//                                LayoutResultatScanProduit.setVisibility(View.GONE);
+//                                ImageSeparateur.setVisibility(View.GONE);
+//                                qteProduitReceptionScannee.setText("");
+//                            }
+//                            else
+//                            {
+//                                qteProduitReceptionScannee.setText(String.valueOf(receptionPADScannerContexte.quantite_a_afficher));
+//                                qteProduitReceptionScannee.setOnClickListener(new View.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(View v) {
+//                                        // Ouvre une boite de dialogue avec un NumberPicker
+//                                        Context context = ScannerSearchOnlyActivity.this;
+//                                        String title = receptionPADScannerContexte.designationProduitCourant;
+//                                        String message = "Changer la quantité: ";
+//                                        int maxValue = receptionPADScannerContexte.quantiteMaxNumberPicker;
+//                                        int value = receptionPADScannerContexte.quantite_a_afficher;
+//
+//                                        DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+//                                            public void onClick(DialogInterface dialog, int id) {
+//
+//                                                int qteAprès = Alerte.aNumberPicker.getValue();
+//                                                qteProduitReceptionScannee.setText(String.valueOf(String.valueOf(qteAprès).trim()));
+//                                                receptionPADScannerContexte.quantite_a_afficher = qteAprès;
+//                                                /*receptionPADScannerContexte.ChangerQuantite(qteAprès);*/
+//                                                //adapter.notifyDataSetChanged();
+//                                                InputMethodManager imm = (InputMethodManager) ScannerSearchOnlyActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+//                                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+//                                                dialog.dismiss();
+//                                                GestionAffichage();
+//                                            }
+//                                        };
+//
+//                                        Alerte.afficherAlerteNumberPicker(context, title, message, value, maxValue, onClickListener);
+//
+//                                    }
+//                                });
+//                            }
+//
+//                            GestionAffichagePAD();
+//                        }
                     }
                     else if(scannerContexteInt == R.string.scannerContexteService)
                     {
@@ -875,12 +871,12 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                         Intent resultIntent = new Intent();
                         if(scannerContexteInt == R.string.scannerContexteProduitReceptionScannee)
                         {
-                            resultIntent.putExtra("listeString", (Serializable) produitReceptionScanneeContexte.liste_resultat);
+                            //resultIntent.putExtra("listeString", (Serializable) produitReceptionScanneeContexte.liste_resultat);
                         }
 
                         if(scannerContexteInt == R.string.scannerContexteReceptionPAD)
                         {
-                            resultIntent.putExtra("listeString", (Serializable) receptionPADScannerContexte.list_result);
+                            //resultIntent.putExtra("listeString", (Serializable) receptionPADScannerContexte.list_result);
                         }
 
                         if(scannerContexteInt == R.string.scannerContexteAuthentification)
@@ -896,8 +892,8 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
 
                         if(scannerContexteInt == R.string.scannerContextePreparationADH)
                         {
-                            resultIntent.putExtra("listeString", (Serializable) preparationADHContext.liste_resultat);
-                            resultIntent.putExtra("listecodescannee", (Serializable) preparationADHContext.liste_code_scanne);
+                            //resultIntent.putExtra("listeString", (Serializable) preparationADHContext.liste_resultat);
+                            //resultIntent.putExtra("listecodescannee", (Serializable) preparationADHContext.liste_code_scanne);
                         }
                         resultIntent.putExtra("code", code);
                         setResult(BarcodeCaptureActivity.RESULT_OK, resultIntent);
@@ -988,86 +984,86 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                     }
                     else if(scannerContexteInt == R.string.scannerContextePreparationADH)
                     {
-                        if(modeTrace)
-                        {
-                            tableTrace = new TableTrace(id, date, "Context_Preparation_ADH", "Récupération après scan", s.toString().substring(0, s.length() - 1), utilisateurConnecte.getIdentifiant(), utilisateurConnecte.getId());
-                            rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
-                            if(rowId != -1)
-                            {
-                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
-                            }
-                        }
-                        LinearResultatFranceMVO.setVisibility(View.GONE);
-
-                        if(s.toString().startsWith("RecepetionScanneeValider"))
-                        {
-                            preparationADHContext.ajouterProduit();
-                            code = "Valider";
-                        }
-                        else
-                        {
-                            preparationADHContext.onTextWatcher(s);
-                            if(s.toString().startsWith("PHITAGPLACE"))
-                            {
-                                LayoutResultatScanProduit.setVisibility(View.GONE);
-                                ImageSeparateur.setVisibility(View.GONE);
-                                nomZoneReceptionScannee.setText(preparationADHContext.zoneProduitCourant);
-                                nomEmplacementReceptionScannee.setText(preparationADHContext.emplacementProduitCourant);
-                                bannerTexte = "Scanner le datamatrix d'un produit";
-                                ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
-                                //preparationADHContext.scanEmplacement = false;
-                                GestionAffichagePreparation();
-                            }
-                            else
-                            {
-                                //LayoutResultatScanProduit.setVisibility(View.VISIBLE);
-                                ImageSeparateur.setVisibility(View.VISIBLE);
-                                referenceProduitReceptionScannee.setText(preparationADHContext.referenceProduitScanne);
-                                numeroLotProduitReceptionScannee.setText(preparationADHContext.numeroLotProduitScanne);
-                                peremptionProduitReceptionScannee.setText(preparationADHContext.peremptionProduitScanne);
-                                if(preparationADHContext.quantiteAAfficher == 0)
-                                {
-                                    qteProduitReceptionScannee.setText("");
-                                    textPresentationRefProduitScannee.setVisibility(GONE);
-                                    LayoutResultatScanProduit.setVisibility(View.GONE);
-                                    ImageSeparateur.setVisibility(View.GONE);
-                                }
-                                else
-                                {
-                                    qteProduitReceptionScannee.setText(String.valueOf(preparationADHContext.quantiteAAfficher));
-                                    qteProduitReceptionScannee.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            // Ouvre une boite de dialogue avec un NumberPicker
-                                            Context context = ScannerSearchOnlyActivity.this;
-                                            String title = preparationADHContext.designationProduitScanne;
-                                            String message = "Changer la quantité: ";
-                                            int maxValue = preparationADHContext.quantite_max_number_picker;
-                                            int value = preparationADHContext.quantiteAAfficher;
-
-                                            DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int id) {
-
-                                                    int qteAprès = Alerte.aNumberPicker.getValue();
-                                                    qteProduitReceptionScannee.setText(String.valueOf(String.valueOf(qteAprès).trim()));
-                                                    //produitReceptionScanneeContexte.quantite_a_afficher = qteAprès;
-                                                    //preparationADHContext.ChangerQuantite(qteAprès);
-                                                    //adapter.notifyDataSetChanged();
-                                                    InputMethodManager imm = (InputMethodManager) ScannerSearchOnlyActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-                                                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                                                    dialog.dismiss();
-                                                    GestionAffichage();
-                                                }
-                                            };
-
-                                            Alerte.afficherAlerteNumberPicker(context, title, message, value, maxValue, onClickListener);
-                                        }
-                                    });
-                                }
-                            }
-                            GestionAffichagePreparation();
-                            ExpandGroupAfterScan(preparationADHContext.designationProduitScanne);
-                        }
+//                        if(modeTrace)
+//                        {
+//                            tableTrace = new TableTrace(id, date, "Context_Preparation_ADH", "Récupération après scan", s.toString().substring(0, s.length() - 1), utilisateurConnecte.getIdentifiant(), utilisateurConnecte.getId());
+//                            rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
+//                            if(rowId != -1)
+//                            {
+//                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+//                            }
+//                        }
+//                        LinearResultatFranceMVO.setVisibility(View.GONE);
+//
+//                        if(s.toString().startsWith("RecepetionScanneeValider"))
+//                        {
+//                            preparationADHContext.ajouterProduit();
+//                            code = "Valider";
+//                        }
+//                        else
+//                        {
+//                            preparationADHContext.onTextWatcher(s);
+//                            if(s.toString().startsWith("PHITAGPLACE"))
+//                            {
+//                                LayoutResultatScanProduit.setVisibility(View.GONE);
+//                                ImageSeparateur.setVisibility(View.GONE);
+//                                nomZoneReceptionScannee.setText(preparationADHContext.zoneProduitCourant);
+//                                nomEmplacementReceptionScannee.setText(preparationADHContext.emplacementProduitCourant);
+//                                bannerTexte = "Scanner le datamatrix d'un produit";
+//                                ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
+//                                //preparationADHContext.scanEmplacement = false;
+//                                GestionAffichagePreparation();
+//                            }
+//                            else
+//                            {
+//                                //LayoutResultatScanProduit.setVisibility(View.VISIBLE);
+//                                ImageSeparateur.setVisibility(View.VISIBLE);
+//                                referenceProduitReceptionScannee.setText(preparationADHContext.referenceProduitScanne);
+//                                numeroLotProduitReceptionScannee.setText(preparationADHContext.numeroLotProduitScanne);
+//                                peremptionProduitReceptionScannee.setText(preparationADHContext.peremptionProduitScanne);
+//                                if(preparationADHContext.quantiteAAfficher == 0)
+//                                {
+//                                    qteProduitReceptionScannee.setText("");
+//                                    textPresentationRefProduitScannee.setVisibility(GONE);
+//                                    LayoutResultatScanProduit.setVisibility(View.GONE);
+//                                    ImageSeparateur.setVisibility(View.GONE);
+//                                }
+//                                else
+//                                {
+//                                    qteProduitReceptionScannee.setText(String.valueOf(preparationADHContext.quantiteAAfficher));
+//                                    qteProduitReceptionScannee.setOnClickListener(new View.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(View v) {
+//                                            // Ouvre une boite de dialogue avec un NumberPicker
+//                                            Context context = ScannerSearchOnlyActivity.this;
+//                                            String title = preparationADHContext.designationProduitScanne;
+//                                            String message = "Changer la quantité: ";
+//                                            int maxValue = preparationADHContext.quantite_max_number_picker;
+//                                            int value = preparationADHContext.quantiteAAfficher;
+//
+//                                            DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+//                                                public void onClick(DialogInterface dialog, int id) {
+//
+//                                                    int qteAprès = Alerte.aNumberPicker.getValue();
+//                                                    qteProduitReceptionScannee.setText(String.valueOf(String.valueOf(qteAprès).trim()));
+//                                                    //produitReceptionScanneeContexte.quantite_a_afficher = qteAprès;
+//                                                    //preparationADHContext.ChangerQuantite(qteAprès);
+//                                                    //adapter.notifyDataSetChanged();
+//                                                    InputMethodManager imm = (InputMethodManager) ScannerSearchOnlyActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+//                                                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+//                                                    dialog.dismiss();
+//                                                    GestionAffichage();
+//                                                }
+//                                            };
+//
+//                                            Alerte.afficherAlerteNumberPicker(context, title, message, value, maxValue, onClickListener);
+//                                        }
+//                                    });
+//                                }
+//                            }
+//                            GestionAffichagePreparation();
+//                            ExpandGroupAfterScan(preparationADHContext.designationProduitScanne);
+//                        }
                     }
                     else if(scannerContexteInt == R.string.scannerContextePleinVide)
                     {
@@ -1081,147 +1077,147 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                     }
                     else if(scannerContexteInt == R.string.scannerContexteProduitReceptionScannee)
                     {
-                        if(modeTrace)
-                        {
-                            tableTrace = new TableTrace(id, date, "Context_Reception_Scannee", "Récupération après scan", s.toString().substring(0, s.length() - 1), utilisateurConnecte.getIdentifiant(), utilisateurConnecte.getId());
-                            rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
-                            if(rowId != -1)
-                            {
-                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
-                            }
-                        }
-                        LinearResultatFranceMVO.setVisibility(View.GONE);
-
-                        if(s.toString().startsWith("PHITAGPLACE"))
-                            produitReceptionScanneeContexte.scanEmplacement = true;
-
-                        if(s.toString().startsWith("RecepetionScanneeValider"))
-                        {
-                            produitReceptionScanneeContexte.AjoutDuProduit();
-                            code = "Valider";
-                        }
-                        else
-                        {
-                            produitReceptionScanneeContexte.onTextWatcher(s);
-                            if(produitReceptionScanneeContexte.scanEmplacement)
-                            {
-                                LayoutResultatScanProduit.setVisibility(View.GONE);
-                                ImageSeparateur.setVisibility(View.GONE);
-                                nomZoneReceptionScannee.setText(produitReceptionScanneeContexte.zoneProduitCourant);
-                                nomEmplacementReceptionScannee.setText(produitReceptionScanneeContexte.emplacementProduitCourant);
-                                bannerTexte = "Scanner le datamatrix d'un produit";
-                                ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
-                                produitReceptionScanneeContexte.scanEmplacement = false;
-                                GestionAffichage();
-                            }
-                            else
-                            {
-/*                                    LayoutResultatScanProduit.setVisibility(View.VISIBLE);
-                                ImageSeparateur.setVisibility(View.VISIBLE);
-                                referenceProduitReceptionScannee.setText(produitReceptionScanneeContexte.referenceProduitCourant);
-                                numeroLotProduitReceptionScannee.setText(produitReceptionScanneeContexte.numeroLotProduitCourant);
-                                peremptionProduitReceptionScannee.setText(produitReceptionScanneeContexte.peremptionProduitCourant);
-                                qteProduitReceptionScannee.setText(String.valueOf(produitReceptionScanneeContexte.quantite_a_afficher));
-                                qteProduitReceptionScannee.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        // Ouvre une boite de dialogue avec un NumberPicker
-                                        Context context = ScannerSearchOnlyActivity.this;
-                                        String title = produitReceptionScanneeContexte.designationProduitCourant;
-                                        String message = "Changer la quantité: ";
-                                        int maxValue = 10000;
-                                        int value = Integer.parseInt(produitReceptionScanneeContexte.quantiteProduitCourant);
-
-                                        DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-
-                                                int qteAprès = aNumberPicker.getValue();
-                                                qteProduitReceptionScannee.setText(String.valueOf(String.valueOf(qteAprès).trim()));
-                                                //produitReceptionScanneeContexte.quantite_a_afficher = qteAprès;
-                                                produitReceptionScanneeContexte.ChangerQuantite(qteAprès);
-                                                //adapter.notifyDataSetChanged();
-                                                dialog.dismiss();
-                                                GestionAffichage();
-                                            }
-                                        };
-
-                                        Alerte.afficherAlerteNumberPicker(context, title, message, value, maxValue, onClickListener);
-
-                                    }
-                                });*/
-                                GestionAffichage();
-                            }
-                        }
+//                        if(modeTrace)
+//                        {
+//                            tableTrace = new TableTrace(id, date, "Context_Reception_Scannee", "Récupération après scan", s.toString().substring(0, s.length() - 1), utilisateurConnecte.getIdentifiant(), utilisateurConnecte.getId());
+//                            rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
+//                            if(rowId != -1)
+//                            {
+//                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+//                            }
+//                        }
+//                        LinearResultatFranceMVO.setVisibility(View.GONE);
+//
+//                        if(s.toString().startsWith("PHITAGPLACE"))
+//                            produitReceptionScanneeContexte.scanEmplacement = true;
+//
+//                        if(s.toString().startsWith("RecepetionScanneeValider"))
+//                        {
+//                            produitReceptionScanneeContexte.AjoutDuProduit();
+//                            code = "Valider";
+//                        }
+//                        else
+//                        {
+//                            produitReceptionScanneeContexte.onTextWatcher(s);
+//                            if(produitReceptionScanneeContexte.scanEmplacement)
+//                            {
+//                                LayoutResultatScanProduit.setVisibility(View.GONE);
+//                                ImageSeparateur.setVisibility(View.GONE);
+//                                nomZoneReceptionScannee.setText(produitReceptionScanneeContexte.zoneProduitCourant);
+//                                nomEmplacementReceptionScannee.setText(produitReceptionScanneeContexte.emplacementProduitCourant);
+//                                bannerTexte = "Scanner le datamatrix d'un produit";
+//                                ((TextView) findViewById(R.id.banner)).setText(bannerTexte);
+//                                produitReceptionScanneeContexte.scanEmplacement = false;
+//                                GestionAffichage();
+//                            }
+//                            else
+//                            {
+///*                                    LayoutResultatScanProduit.setVisibility(View.VISIBLE);
+//                                ImageSeparateur.setVisibility(View.VISIBLE);
+//                                referenceProduitReceptionScannee.setText(produitReceptionScanneeContexte.referenceProduitCourant);
+//                                numeroLotProduitReceptionScannee.setText(produitReceptionScanneeContexte.numeroLotProduitCourant);
+//                                peremptionProduitReceptionScannee.setText(produitReceptionScanneeContexte.peremptionProduitCourant);
+//                                qteProduitReceptionScannee.setText(String.valueOf(produitReceptionScanneeContexte.quantite_a_afficher));
+//                                qteProduitReceptionScannee.setOnClickListener(new View.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(View v) {
+//                                        // Ouvre une boite de dialogue avec un NumberPicker
+//                                        Context context = ScannerSearchOnlyActivity.this;
+//                                        String title = produitReceptionScanneeContexte.designationProduitCourant;
+//                                        String message = "Changer la quantité: ";
+//                                        int maxValue = 10000;
+//                                        int value = Integer.parseInt(produitReceptionScanneeContexte.quantiteProduitCourant);
+//
+//                                        DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+//                                            public void onClick(DialogInterface dialog, int id) {
+//
+//                                                int qteAprès = aNumberPicker.getValue();
+//                                                qteProduitReceptionScannee.setText(String.valueOf(String.valueOf(qteAprès).trim()));
+//                                                //produitReceptionScanneeContexte.quantite_a_afficher = qteAprès;
+//                                                produitReceptionScanneeContexte.ChangerQuantite(qteAprès);
+//                                                //adapter.notifyDataSetChanged();
+//                                                dialog.dismiss();
+//                                                GestionAffichage();
+//                                            }
+//                                        };
+//
+//                                        Alerte.afficherAlerteNumberPicker(context, title, message, value, maxValue, onClickListener);
+//
+//                                    }
+//                                });*/
+//                                GestionAffichage();
+//                            }
+//                        }
                     }
                     else if(scannerContexteInt == R.string.scannerContexteReceptionPAD)
                     {
-                        if(modeTrace)
-                        {
-                            tableTrace = new TableTrace(id, date, "Context_Reception_PAD", "Récupération après scan", s.toString().substring(0, s.length() - 1), utilisateurConnecte.getIdentifiant(), utilisateurConnecte.getId());
-                            rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
-                            if(rowId != -1)
-                            {
-                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
-                            }
-                        }
-                        LinearResultatFranceMVO.setVisibility(View.GONE);
-
-                        if(s.toString().startsWith("RecepetionScanneeValider"))
-                        {
-                            receptionPADScannerContexte.AjoutDuProduit();
-                            code = "Valider";
-                        }
-                        else
-                        {
-                            receptionPADScannerContexte.onTextWatcher(s);
-                            LayoutResultatScanProduit.setVisibility(View.VISIBLE);
-                            ImageSeparateur.setVisibility(View.VISIBLE);
-                            referenceProduitReceptionScannee.setText(receptionPADScannerContexte.referenceProduitCourant);
-                            numeroLotProduitReceptionScannee.setText(receptionPADScannerContexte.numeroLotProduitCourant);
-                            peremptionProduitReceptionScannee.setText(receptionPADScannerContexte.peremptionProduitCourant);
-                            if(receptionPADScannerContexte.quantite_a_afficher == 0)
-                            {
-                                textPresentationRefProduitScannee.setVisibility(GONE);
-                                LayoutResultatScanProduit.setVisibility(View.GONE);
-                                ImageSeparateur.setVisibility(View.GONE);
-                                qteProduitReceptionScannee.setText("");
-                            }
-                            else
-                            {
-                                qteProduitReceptionScannee.setText(String.valueOf(receptionPADScannerContexte.quantite_a_afficher));
-                                qteProduitReceptionScannee.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        // Ouvre une boite de dialogue avec un NumberPicker
-                                        Context context = ScannerSearchOnlyActivity.this;
-                                        String title = receptionPADScannerContexte.designationProduitCourant;
-                                        String message = "Changer la quantité: ";
-                                        int maxValue = receptionPADScannerContexte.quantiteMaxNumberPicker;
-                                        int value = receptionPADScannerContexte.quantite_a_afficher;
-
-                                        DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-
-                                                int qteAprès = Alerte.aNumberPicker.getValue();
-                                                qteProduitReceptionScannee.setText(String.valueOf(String.valueOf(qteAprès).trim()));
-                                                receptionPADScannerContexte.quantite_a_afficher = qteAprès;
-                                                /*receptionPADScannerContexte.ChangerQuantite(qteAprès);*/
-                                                //adapter.notifyDataSetChanged();
-                                                InputMethodManager imm = (InputMethodManager) ScannerSearchOnlyActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-                                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                                                dialog.dismiss();
-                                                GestionAffichage();
-                                            }
-                                        };
-
-                                        Alerte.afficherAlerteNumberPicker(context, title, message, value, maxValue, onClickListener);
-
-                                    }
-                                });
-                            }
-
-                            GestionAffichagePAD();
-                        }
+//                        if(modeTrace)
+//                        {
+//                            tableTrace = new TableTrace(id, date, "Context_Reception_PAD", "Récupération après scan", s.toString().substring(0, s.length() - 1), utilisateurConnecte.getIdentifiant(), utilisateurConnecte.getId());
+//                            rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
+//                            if(rowId != -1)
+//                            {
+//                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+//                            }
+//                        }
+//                        LinearResultatFranceMVO.setVisibility(View.GONE);
+//
+//                        if(s.toString().startsWith("RecepetionScanneeValider"))
+//                        {
+//                            receptionPADScannerContexte.AjoutDuProduit();
+//                            code = "Valider";
+//                        }
+//                        else
+//                        {
+//                            receptionPADScannerContexte.onTextWatcher(s);
+//                            LayoutResultatScanProduit.setVisibility(View.VISIBLE);
+//                            ImageSeparateur.setVisibility(View.VISIBLE);
+//                            referenceProduitReceptionScannee.setText(receptionPADScannerContexte.referenceProduitCourant);
+//                            numeroLotProduitReceptionScannee.setText(receptionPADScannerContexte.numeroLotProduitCourant);
+//                            peremptionProduitReceptionScannee.setText(receptionPADScannerContexte.peremptionProduitCourant);
+//                            if(receptionPADScannerContexte.quantite_a_afficher == 0)
+//                            {
+//                                textPresentationRefProduitScannee.setVisibility(GONE);
+//                                LayoutResultatScanProduit.setVisibility(View.GONE);
+//                                ImageSeparateur.setVisibility(View.GONE);
+//                                qteProduitReceptionScannee.setText("");
+//                            }
+//                            else
+//                            {
+//                                qteProduitReceptionScannee.setText(String.valueOf(receptionPADScannerContexte.quantite_a_afficher));
+//                                qteProduitReceptionScannee.setOnClickListener(new View.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(View v) {
+//                                        // Ouvre une boite de dialogue avec un NumberPicker
+//                                        Context context = ScannerSearchOnlyActivity.this;
+//                                        String title = receptionPADScannerContexte.designationProduitCourant;
+//                                        String message = "Changer la quantité: ";
+//                                        int maxValue = receptionPADScannerContexte.quantiteMaxNumberPicker;
+//                                        int value = receptionPADScannerContexte.quantite_a_afficher;
+//
+//                                        DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+//                                            public void onClick(DialogInterface dialog, int id) {
+//
+//                                                int qteAprès = Alerte.aNumberPicker.getValue();
+//                                                qteProduitReceptionScannee.setText(String.valueOf(String.valueOf(qteAprès).trim()));
+//                                                receptionPADScannerContexte.quantite_a_afficher = qteAprès;
+//                                                /*receptionPADScannerContexte.ChangerQuantite(qteAprès);*/
+//                                                //adapter.notifyDataSetChanged();
+//                                                InputMethodManager imm = (InputMethodManager) ScannerSearchOnlyActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+//                                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+//                                                dialog.dismiss();
+//                                                GestionAffichage();
+//                                            }
+//                                        };
+//
+//                                        Alerte.afficherAlerteNumberPicker(context, title, message, value, maxValue, onClickListener);
+//
+//                                    }
+//                                });
+//                            }
+//
+//                            GestionAffichagePAD();
+//                        }
                     }
                     else if(scannerContexteInt == R.string.scannerContexteService)
                     {
@@ -1249,12 +1245,12 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                         Intent resultIntent = new Intent();
                         if(scannerContexteInt == R.string.scannerContexteProduitReceptionScannee)
                         {
-                            resultIntent.putExtra("listeString", (Serializable) produitReceptionScanneeContexte.liste_resultat);
+                           // resultIntent.putExtra("listeString", (Serializable) produitReceptionScanneeContexte.liste_resultat);
                         }
 
                         if(scannerContexteInt == R.string.scannerContexteReceptionPAD)
                         {
-                            resultIntent.putExtra("listeString", (Serializable) receptionPADScannerContexte.list_result);
+                            //resultIntent.putExtra("listeString", (Serializable) receptionPADScannerContexte.list_result);
                         }
 
                         if(scannerContexteInt == R.string.scannerContexteControleDesRetours)
@@ -1271,8 +1267,8 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
 
                         if(scannerContexteInt == R.string.scannerContextePreparationADH)
                         {
-                            resultIntent.putExtra("listeString", (Serializable) preparationADHContext.liste_resultat);
-                            resultIntent.putExtra("listecodescannee", (Serializable) preparationADHContext.liste_code_scanne);
+                           // resultIntent.putExtra("listeString", (Serializable) preparationADHContext.liste_resultat);
+                           // resultIntent.putExtra("listecodescannee", (Serializable) preparationADHContext.liste_code_scanne);
                         }
                         resultIntent.putExtra("code", code);
                         setResult(BarcodeCaptureActivity.RESULT_OK, resultIntent);
@@ -1295,14 +1291,14 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
         Bundle scannerSearchOnlyBundle = new Bundle();
         scannerSearchOnlyBundle.putString("code", "");
         if (scannerContexteInt == R.string.scannerContexteProduitReceptionScannee) {
-            scannerSearchOnlyBundle.putSerializable("listeString", (Serializable) produitReceptionScanneeContexte.liste_resultat);
+           // scannerSearchOnlyBundle.putSerializable("listeString", (Serializable) produitReceptionScanneeContexte.liste_resultat);
         }
 
         if (scannerContexteInt == R.string.scannerContexteReceptionPAD) {
-            scannerSearchOnlyBundle.putSerializable("listeString", (Serializable) receptionPADScannerContexte.list_result);
+           // scannerSearchOnlyBundle.putSerializable("listeString", (Serializable) receptionPADScannerContexte.list_result);
         }
         if (scannerContexteInt == R.string.scannerContextePreparationADH) {
-            scannerSearchOnlyBundle.putStringArrayList("listeString", (ArrayList) preparationADHContext.liste_resultat);
+           // scannerSearchOnlyBundle.putStringArrayList("listeString", (ArrayList) preparationADHContext.liste_resultat);
         }
         scannerSearchOnlyBundle.putStringArrayList("stringList", (ArrayList) pleinVideContexte.stringList);
         scannerSearchOnlyIntent.putExtras(scannerSearchOnlyBundle);
@@ -1401,23 +1397,23 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
 
     public void GestionAffichage()
     {
-        designationProduitReceptionScannee.setText(produitReceptionScanneeContexte.designationProduitCourant);
-        produit_ReceptionScanneeAdapter = new Produit_ReceptionScanneeAdapter(ScannerSearchOnlyActivity.this, db, produitReceptionScanneeContexte.ZoneEmplacement, produitReceptionScanneeContexte.mapExpandable, utilisateurConnecte);
-        ListViewProduitReceptionScannee.setAdapter(produit_ReceptionScanneeAdapter);
-        ListViewProduitReceptionScannee.setDivider(footer);
-        if(produitReceptionScanneeContexte.mapExpandable.size() != 0)
-        {
-            expandAll();
-            ListViewProduitReceptionScannee.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-                @Override
-                public boolean onChildClick(ExpandableListView expandableListView, View view, int groupePosition, int childPosition, long l) {
-                    ObjetReceptionScannee objetClick = (ObjetReceptionScannee) produit_ReceptionScanneeAdapter.getChild(groupePosition, childPosition);
-                    onClick_Child_Reception_Scannee(objetClick);
-                    GestionAffichage();
-                    return true;
-                }
-            });
-        }
+//        designationProduitReceptionScannee.setText(produitReceptionScanneeContexte.designationProduitCourant);
+//        produit_ReceptionScanneeAdapter = new Produit_ReceptionScanneeAdapter(ScannerSearchOnlyActivity.this, db, produitReceptionScanneeContexte.ZoneEmplacement, produitReceptionScanneeContexte.mapExpandable, utilisateurConnecte);
+//        ListViewProduitReceptionScannee.setAdapter(produit_ReceptionScanneeAdapter);
+//        ListViewProduitReceptionScannee.setDivider(footer);
+//        if(produitReceptionScanneeContexte.mapExpandable.size() != 0)
+//        {
+//            expandAll();
+//            ListViewProduitReceptionScannee.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+//                @Override
+//                public boolean onChildClick(ExpandableListView expandableListView, View view, int groupePosition, int childPosition, long l) {
+//                    ObjetReceptionScannee objetClick = (ObjetReceptionScannee) produit_ReceptionScanneeAdapter.getChild(groupePosition, childPosition);
+//                    onClick_Child_Reception_Scannee(objetClick);
+//                    GestionAffichage();
+//                    return true;
+//                }
+//            });
+//        }
     }
 
     public void onClick_Child_Preparation_Scannee(final ObjetReceptionScannee objetCourant, final int quantiteRestante) {
@@ -1642,56 +1638,56 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
 
     public void GestionAffichagePAD()
     {
-        designationProduitReceptionScannee.setText(receptionPADScannerContexte.designationProduitCourant);
-        if(receptionPADScannerContexte.mapResult != null)
-        {
-            receptionPADExpandableAdapter = new Produit_ReceptionPADAdapter(ScannerSearchOnlyActivity.this, db, receptionPADScannerContexte.listeObjetReceptionPAD, receptionPADScannerContexte.mapResult, utilisateurConnecte);
-            ListViewProduitReceptionScannee.setAdapter(receptionPADExpandableAdapter);
-            ListViewProduitReceptionScannee.setDivider(footer);
-            if(receptionPADScannerContexte.mapResult.size() != 0)
-            {
-                expandAllReceptionPAD();
-            }
-        }
+//        designationProduitReceptionScannee.setText(receptionPADScannerContexte.designationProduitCourant);
+//        if(receptionPADScannerContexte.mapResult != null)
+//        {
+//            receptionPADExpandableAdapter = new Produit_ReceptionPADAdapter(ScannerSearchOnlyActivity.this, db, receptionPADScannerContexte.listeObjetReceptionPAD, receptionPADScannerContexte.mapResult, utilisateurConnecte);
+//            ListViewProduitReceptionScannee.setAdapter(receptionPADExpandableAdapter);
+//            ListViewProduitReceptionScannee.setDivider(footer);
+//            if(receptionPADScannerContexte.mapResult.size() != 0)
+//            {
+//                expandAllReceptionPAD();
+//            }
+//        }
     }
 
     public void GestionAffichagePreparation()
     {
-        designationProduitReceptionScannee.setText(preparationADHContext.designationProduitScanne);
-        produitPreparationScanneeAdapter = new Produit_PreparationScanneeAdapter(ScannerSearchOnlyActivity.this, db, preparationADHContext.liste_designation_produit, preparationADHContext.mapExpandable, utilisateurConnecte, preparationADHContext.Map_Zone_Emplacement_Defaut);
-        ListViewProduitReceptionScannee.setAdapter(produitPreparationScanneeAdapter);
-        ListViewProduitReceptionScannee.setDivider(footer);
-        if(preparationADHContext.mapExpandable.size() != 0)
-        {
-           for(int i = 0; i < produitPreparationScanneeAdapter.getGroupCount(); i++)
-           {
-               ListViewProduitReceptionScannee.collapseGroup(i);
-           }
-        }
-
-        ListViewProduitReceptionScannee.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView expandableListView, View view, int groupePosition, int childPosition, long l) {
-                ObjetReceptionScannee objetClick = (ObjetReceptionScannee) produitPreparationScanneeAdapter.getChild(groupePosition, childPosition);
-                String phraseGroup = produitPreparationScanneeAdapter.getGroup(groupePosition).toString();
-                String[] tab_phraseGroup = phraseGroup.split("-");
-                int quantite_totale = Integer.parseInt(tab_phraseGroup[tab_phraseGroup.length-1]);
-                int quantiteRestante = 0;
-                int quantite_preparer = 0;
-                List<ObjetReceptionScannee> listEnfant = produitPreparationScanneeAdapter.objetParentListItems.get(produitPreparationScanneeAdapter.produitListe.get(groupePosition));
-                for(int i = 0; i < listEnfant.size(); i++)
-                {
-                    if(i < listEnfant.size()-1)
-                    {
-                        quantite_preparer = quantite_preparer+listEnfant.get(i).getQuantiteScannee();
-                    }
-                }
-                quantiteRestante = quantite_totale-quantite_preparer;
-                onClick_Child_Preparation_Scannee(objetClick, quantiteRestante);
-                GestionAffichagePreparation();
-                return false;
-            }
-        });
+//        designationProduitReceptionScannee.setText(preparationADHContext.designationProduitScanne);
+//        produitPreparationScanneeAdapter = new Produit_PreparationScanneeAdapter(ScannerSearchOnlyActivity.this, db, preparationADHContext.liste_designation_produit, preparationADHContext.mapExpandable, utilisateurConnecte, preparationADHContext.Map_Zone_Emplacement_Defaut);
+//        ListViewProduitReceptionScannee.setAdapter(produitPreparationScanneeAdapter);
+//        ListViewProduitReceptionScannee.setDivider(footer);
+//        if(preparationADHContext.mapExpandable.size() != 0)
+//        {
+//           for(int i = 0; i < produitPreparationScanneeAdapter.getGroupCount(); i++)
+//           {
+//               ListViewProduitReceptionScannee.collapseGroup(i);
+//           }
+//        }
+//
+//        ListViewProduitReceptionScannee.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+//            @Override
+//            public boolean onChildClick(ExpandableListView expandableListView, View view, int groupePosition, int childPosition, long l) {
+//                ObjetReceptionScannee objetClick = (ObjetReceptionScannee) produitPreparationScanneeAdapter.getChild(groupePosition, childPosition);
+//                String phraseGroup = produitPreparationScanneeAdapter.getGroup(groupePosition).toString();
+//                String[] tab_phraseGroup = phraseGroup.split("-");
+//                int quantite_totale = Integer.parseInt(tab_phraseGroup[tab_phraseGroup.length-1]);
+//                int quantiteRestante = 0;
+//                int quantite_preparer = 0;
+//                List<ObjetReceptionScannee> listEnfant = produitPreparationScanneeAdapter.objetParentListItems.get(produitPreparationScanneeAdapter.produitListe.get(groupePosition));
+//                for(int i = 0; i < listEnfant.size(); i++)
+//                {
+//                    if(i < listEnfant.size()-1)
+//                    {
+//                        quantite_preparer = quantite_preparer+listEnfant.get(i).getQuantiteScannee();
+//                    }
+//                }
+//                quantiteRestante = quantite_totale-quantite_preparer;
+//                onClick_Child_Preparation_Scannee(objetClick, quantiteRestante);
+//                GestionAffichagePreparation();
+//                return false;
+//            }
+//        });
     }
 
     public void ExpandGroupAfterScan(String designationProduit)
@@ -1715,15 +1711,15 @@ public class ScannerSearchOnlyActivity extends ServiceActivity {
                 {
                     ListViewProduitReceptionScannee.expandGroup(i);
 
-                    if(preparationADHContext.emplacement_saisie)
-                    {
-                        int last_child = produitPreparationScanneeAdapter.getChildrenCount(i)-1;
-                        ObjetReceptionScannee lastchildobjet = (ObjetReceptionScannee) produitPreparationScanneeAdapter.getChild(i, last_child);
-                       // if(lastchildobjet.getEmplacement_uid() == 0 && !lastchildobjet.getGs1_scannee().contentEquals(""))
-                        //{
-                          //  produitPreparationScanneeAdapter.getChildView(i, last_child, true, null, ListViewProduitReceptionScannee).findViewById(R.id.quantite).performClick();
-                        //}
-                    }
+//                    if(preparationADHContext.emplacement_saisie)
+//                    {
+//                        int last_child = produitPreparationScanneeAdapter.getChildrenCount(i)-1;
+//                        ObjetReceptionScannee lastchildobjet = (ObjetReceptionScannee) produitPreparationScanneeAdapter.getChild(i, last_child);
+//                       // if(lastchildobjet.getEmplacement_uid() == 0 && !lastchildobjet.getGs1_scannee().contentEquals(""))
+//                        //{
+//                          //  produitPreparationScanneeAdapter.getChildView(i, last_child, true, null, ListViewProduitReceptionScannee).findViewById(R.id.quantite).performClick();
+//                        //}
+//                    }
                 }
             }
         }
