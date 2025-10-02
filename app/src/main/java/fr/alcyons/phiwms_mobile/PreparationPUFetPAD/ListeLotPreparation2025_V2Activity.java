@@ -347,8 +347,6 @@ public class ListeLotPreparation2025_V2Activity  extends ServiceAvecConnexionAct
         Context context = ListeLotPreparation2025_V2Activity.this;
         if(!produit.isSuivi_Serialisation() || produit.isSerialiser_Reception_Delivrance())
         {
-            if(restantAPrepaper != 0)
-            {
                 Stock_Lot_Emplacement_Light courant = listeStockLotEmplacement.get(position);
                 if(courant.getLot().contentEquals(""))
                 {
@@ -418,7 +416,7 @@ public class ListeLotPreparation2025_V2Activity  extends ServiceAvecConnexionAct
                     //Alerte.afficherAlerteNumberPicker(context, title, message, value, maxValue, onClickListener);
                     Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, (int)ph_preparation_ligne_base.getProduitCondDistrib());
                 }
-            }
+
 
         }
     };

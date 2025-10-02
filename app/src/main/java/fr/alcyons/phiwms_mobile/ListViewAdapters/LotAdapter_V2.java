@@ -145,7 +145,11 @@ public class LotAdapter_V2 extends RecyclerView.Adapter<LotAdapter_V2.LotViewHol
             if (stockcourant.getQte_Preparer() == 0) {
                 holder.layoutPrincipal.setClickable(true);
                 holder.layoutPrincipal.setOnClickListener(v -> {
+                    v.setEnabled(false); // désactive pour éviter un second clic
                     ((ListeLotPreparation2025_V2Activity) context).ClickLigneLot(position);
+
+                    // optionnel : réactiver après un délai
+                    v.postDelayed(() -> v.setEnabled(true), 500);
                 });
                 holder.contentLayout.setOnClickListener(null);
 
