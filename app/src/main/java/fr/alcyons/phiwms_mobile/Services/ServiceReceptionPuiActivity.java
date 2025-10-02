@@ -17,7 +17,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -80,11 +83,12 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
     ListView commandeListView;
     PackageManager pm;
     ActivityResultLauncher<Intent> resultScanDocument;
+    Spinner optionTri;
 
     @SuppressLint("SetTextI18n")
     private void initObjetGraphique()
     {
-        //optionTri = (Spinner) findViewById(R.id.optionTri);
+        optionTri = (Spinner) findViewById(R.id.optionTri);
         commandeListView = findViewById(R.id.listeView);
         pm = ServiceReceptionPuiActivity.this.getPackageManager();
     }
@@ -119,6 +123,45 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                 ServiceReceptionPuiActivity.this.finish();
             }
         });
+
+        optionTri.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            boolean isFirstSelection = true; // drapeau pour ignorer le premier appel
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (isFirstSelection) {
+                    isFirstSelection = false; // on consomme le premier appel
+                    return; // ne rien faire au lancement
+                }
+
+                if (((TextView) parent.getChildAt(0)) != null) {
+                    ((TextView) parent.getChildAt(0)).setVisibility(View.INVISIBLE);
+                }
+                tri_choisi = optionTri.getItemAtPosition(position).toString();
+                ParametreUtilisateurOpenHelper.mettreAJourTriReception(db, 0, tri_choisi);
+
+                switch (tri_choisi)
+                {
+                    case "Numéro de commande":
+                        onClickTriNumero();
+                        break;
+
+                    case "Date de livraison":
+                        onClickTriDate();
+                        break;
+
+                    case "Fournisseur":
+                        onClickTriFournisseur();
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
 
         connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(db);
 
@@ -478,24 +521,27 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
     public void onClickTriNumero()
     {
         tri_choisi = "Numéro de commande";
-        commandeReceptionPUIAdapter.commandeList.sort(Comparator.comparing(Commande::getNumero));
+        commandeList.sort(Comparator.comparing(Commande::getNumero));
 
-        commandeReceptionPUIAdapter.notifyDataSetChanged();
+        commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPuiActivity.this, db, commandeList);
+        commandeListView.setAdapter(commandeReceptionPUIAdapter);
     }
 
     public void onClickTriDate()
     {
         tri_choisi = "Date de livraison";
-        commandeReceptionPUIAdapter.commandeList.sort((o1, o2) -> o2.getDate_Liv().compareTo(o1.getDate_Liv()));
+        commandeList.sort(Comparator.comparing(Commande::getDate_Liv));
 
-        commandeReceptionPUIAdapter.notifyDataSetChanged();
+        commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPuiActivity.this, db, commandeList);
+        commandeListView.setAdapter(commandeReceptionPUIAdapter);
     }
 
     public void onClickTriFournisseur()
     {
         tri_choisi = "Fournisseur";
-        commandeReceptionPUIAdapter.commandeList.sort(Comparator.comparing(Commande::getFournisseur));
+        commandeList.sort(Comparator.comparing(Commande::getFournisseur));
 
-        commandeReceptionPUIAdapter.notifyDataSetChanged();
+        commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPuiActivity.this, db, commandeList);
+        commandeListView.setAdapter(commandeReceptionPUIAdapter);
     }
 }

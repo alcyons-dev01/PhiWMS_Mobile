@@ -24,7 +24,7 @@
                 android:orientation="horizontal"
                 android:gravity="center"
                 android:background="@color/bleu_clair_alcyons"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <Spinner
                     android:id="@+id/optionTri"

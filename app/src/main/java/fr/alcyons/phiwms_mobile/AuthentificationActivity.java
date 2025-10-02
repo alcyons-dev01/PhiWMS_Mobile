@@ -555,6 +555,11 @@ public class AuthentificationActivity extends MainActivity {
                             Boolean plan_de_cueillette = false;
                             Boolean module_transport = paramatres.getInt("Module_Transport")==1;
                             ParametresServeurOpenHelper.updateParametresServeurEnBDD(db, ip, port, apiVersion, mailPharmacie, pubnubPublishKey, pubnubSubscribeKey, etablissementNom, etablissementNumero, etablissementLogoNom, Reliquats_pour_prevision, Liv_indirecte_egal_Cond_achat, plan_de_cueillette,module_transport, mailEmetteur, mdpEmetteur, smtpPort, smtpServeur, smtpSession, loginEmetteur);
+
+                            int nbUtilisateur = ParametreUtilisateurOpenHelper.getNbUtilisateur(db);
+                            if (nbUtilisateur == 0) {
+                                ParametreUtilisateurOpenHelper.insererParametreUtilisateurEnBDD(db, 0, false, false, false, "Designation", "Numéro de commande", "Categorie", "Numéro de retour", "Designation");
+                            }
                         }
 
                         token = response.getString("token");
