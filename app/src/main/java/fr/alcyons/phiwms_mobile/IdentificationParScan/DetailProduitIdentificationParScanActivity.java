@@ -5,12 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,6 +26,7 @@ import java.util.Objects;
 import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerProduitActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
@@ -49,6 +53,7 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
     String codeComplet;
     String messageAlerte;
     String ancienGTIN;
+    String ancienCodeInconnu;
     Boolean estCodeGS1;
     boolean confirmation;
 
@@ -70,6 +75,7 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
         // Récupération des variables globales et du produit selectionné
         produitSelectionne = ProduitOpenHelper.getProduitByID(db, Objects.requireNonNull(intent.getExtras()).getInt("produitSelectionneID"));
         ancienGTIN = produitSelectionne.getGTIN();
+        ancienCodeInconnu = produitSelectionne.getCodeInconnue();
         if (intent.getExtras().getString("codeGS1") != null) {
             codeComplet = intent.getExtras().getString("codeGS1");
             estCodeGS1 = true;
@@ -81,11 +87,157 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
 
         if(!codeComplet.contentEquals(""))
         {
-            ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.VISIBLE);
+            if(produitSelectionne.getGTIN().contentEquals(codeComplet) || produitSelectionne.getCodeInconnue().contentEquals(codeComplet))
+            {
+                ((TextView) findViewById(R.id.codeGS1)).setText(codeComplet);
+                ((TextView) findViewById(R.id.referenceIdentifie)).setVisibility(View.VISIBLE);
+                ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.GONE);
+            }
+            else
+            {
+                if(estCodeGS1)
+                    produitSelectionne.setGTIN(codeComplet);
+                else
+                    produitSelectionne.setCodeInconnue(codeComplet);
+                ((TextView) findViewById(R.id.referenceIdentifie)).setVisibility(View.GONE);
+                ((TextView) findViewById(R.id.warningNonIdentifie)).setVisibility(View.GONE);
+                ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.VISIBLE);
+                ((LinearLayout) findViewById(R.id.layouteditcode)).setVisibility(View.GONE);
+                ((LinearLayout) findViewById(R.id.layoutcodeGS1)).setVisibility(View.VISIBLE);
+                ((ImageView) findViewById(R.id.suppressioncodescanne)).setVisibility(View.VISIBLE);
+
+                ((ImageView) findViewById(R.id.suppressioncodescanne)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        produitSelectionne.setGTIN("");
+                        produitSelectionne.setCodeInconnue("");
+                        ((TextView) findViewById(R.id.codeGS1)).setText("");
+                        ((LinearLayout) findViewById(R.id.layoutcodeGS1)).setVisibility(View.GONE);
+                        ((ImageView) findViewById(R.id.suppressioncodescanne)).setVisibility(View.GONE);
+                        ((LinearLayout) findViewById(R.id.layouteditcode)).setVisibility(View.VISIBLE);
+                        ((EditText) findViewById(R.id.editcodescanne)).setText("");
+                        ((EditText) findViewById(R.id.editcodescanne)).requestFocus();
+                        ((TextView) findViewById(R.id.warningNonIdentifie)).setVisibility(View.VISIBLE);
+                        ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.GONE);
+                    }
+                });
+            }
         }
         else if(produitSelectionne.getGTIN().contentEquals("") && produitSelectionne.getCodeInconnue().contentEquals(""))
         {
             ((TextView) findViewById(R.id.warningNonIdentifie)).setVisibility(View.VISIBLE);
+            ((LinearLayout) findViewById(R.id.layouteditcode)).setVisibility(View.VISIBLE);
+            ((LinearLayout) findViewById(R.id.layoutcodeGS1)).setVisibility(View.GONE);
+            ((EditText) findViewById(R.id.editcodescanne)).requestFocus();
+
+            ((EditText) findViewById(R.id.editcodescanne)).addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    String codeIdentification = "";
+
+                    if (s.toString().endsWith("\n")) {
+                        String codeRecu = s.toString().trim();
+                        if(codeRecu.startsWith("PHITAGTIN:"))
+                        {
+                            String[] tabCode = codeRecu.toString().split(":");
+                            if(tabCode.length == 2)
+                            {
+                                estCodeGS1 = true;
+                                codeIdentification = tabCode[1];
+                            }
+                        }
+                        else
+                        {
+                            Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeRecu);
+                            if (gs1Decoupe.size() != 1) {
+                                estCodeGS1 = true;
+                                codeIdentification = gs1Decoupe.get("codeGtin");
+                            } else {
+                                estCodeGS1 = false;
+                                codeIdentification = codeRecu;
+                            }
+                        }
+                    }
+                    boolean modifiable = true;
+
+                    if(!codeIdentification.contentEquals(""))
+                    {
+                        if(estCodeGS1)
+                        {
+                            List<Produit> listeProduitRecherche = ProduitOpenHelper.getProduitsParGTIN(db, codeIdentification);
+                            for(Produit produitCourant : listeProduitRecherche)
+                            {
+                                if(produitCourant.getID_produit() != produitSelectionne.getID_produit())
+                                {
+                                    modifiable = false;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            List<Produit> listeProduitRecherche = ProduitOpenHelper.getProduitsParCodeInconnue(db, codeIdentification);
+                            for(Produit produitCourant : listeProduitRecherche)
+                            {
+                                if(produitCourant.getID_produit() != produitSelectionne.getID_produit())
+                                {
+                                    modifiable = false;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if(modifiable)
+                        {
+                            if(estCodeGS1)
+                                produitSelectionne.setGTIN(codeIdentification);
+                            else
+                                produitSelectionne.setCodeInconnue(codeIdentification);
+                            ((TextView) findViewById(R.id.codeGS1)).setText(codeIdentification);
+                            ((TextView) findViewById(R.id.referenceIdentifie)).setVisibility(View.GONE);
+                            ((TextView) findViewById(R.id.warningNonIdentifie)).setVisibility(View.GONE);
+                            ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.VISIBLE);
+                            ((LinearLayout) findViewById(R.id.layouteditcode)).setVisibility(View.GONE);
+                            ((LinearLayout) findViewById(R.id.layoutcodeGS1)).setVisibility(View.VISIBLE);
+                            ((ImageView) findViewById(R.id.suppressioncodescanne)).setVisibility(View.VISIBLE);
+
+                            ((ImageView) findViewById(R.id.suppressioncodescanne)).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    produitSelectionne.setGTIN("");
+                                    produitSelectionne.setCodeInconnue("");
+                                    ((TextView) findViewById(R.id.codeGS1)).setText("");
+                                    ((LinearLayout) findViewById(R.id.layoutcodeGS1)).setVisibility(View.GONE);
+                                    ((ImageView) findViewById(R.id.suppressioncodescanne)).setVisibility(View.GONE);
+                                    ((LinearLayout) findViewById(R.id.layouteditcode)).setVisibility(View.VISIBLE);
+                                    ((EditText) findViewById(R.id.editcodescanne)).setText("");
+                                    ((EditText) findViewById(R.id.editcodescanne)).requestFocus();
+                                    ((TextView) findViewById(R.id.warningNonIdentifie)).setVisibility(View.VISIBLE);
+                                    ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.GONE);
+                                }
+                            });
+                        }
+                        else
+                        {
+                            produitSelectionne.setGTIN("");
+                            produitSelectionne.setCodeInconnue("");
+                            ((EditText) findViewById(R.id.editcodescanne)).setText("");
+                            ((EditText) findViewById(R.id.editcodescanne)).requestFocus();
+                            Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Erreur", "Code GTIN déjà utilisé pour une autre référence", "alerte");
+                        }
+                    }
+
+                    ((EditText) findViewById(R.id.editcodescanne)).setShowSoftInputOnFocus(false);
+                }
+            });
         }
         else
         {
@@ -97,83 +249,10 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
         MedicalObjective medicalObjective = new MedicalObjective(DetailProduitIdentificationParScanActivity.this, utilisateurConnecte, depot, depot, produitSelectionne, true);
         medicalObjective.getPictureImage("DetailProduitIdentificationParScanActivity");
 
-
-        // Gestion du bouton de modification de code
-        findViewById(R.id.boutonEditCode).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
-                {
-                    Intent newIntent = new Intent(DetailProduitIdentificationParScanActivity.this, ScannerSearchOnlyActivity.class);
-                    Bundle bundle = DetailProduitIdentificationParScanActivity.super.getBundle();
-                    bundle.putBoolean("isBoutonSuppressionExistant", true);
-                    newIntent.putExtras(bundle);
-                    DetailProduitIdentificationParScanActivity.this.startActivityForResult(newIntent, CodesEchangesActivites.RETOUR_CODE_GS1);
-                }
-                else
-                {
-                    if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
-                    {
-                        Intent newIntent = new Intent(DetailProduitIdentificationParScanActivity.this, BarcodeCaptureActivity.class);
-                        Bundle bundle = DetailProduitIdentificationParScanActivity.super.getBundle();
-                        bundle.putBoolean("isBoutonSuppressionExistant", true);
-                        newIntent.putExtras(bundle);
-                        DetailProduitIdentificationParScanActivity.this.startActivityForResult(newIntent, CodesEchangesActivites.RETOUR_CODE_GS1);
-                    }
-                    else
-                    {
-                        Intent newIntent = new Intent(DetailProduitIdentificationParScanActivity.this, ScannerSearchOnlyActivity.class);
-                        Bundle bundle = DetailProduitIdentificationParScanActivity.super.getBundle();
-                        bundle.putBoolean("isBoutonSuppressionExistant", true);
-                        newIntent.putExtras(bundle);
-                        DetailProduitIdentificationParScanActivity.this.startActivityForResult(newIntent, CodesEchangesActivites.RETOUR_CODE_GS1);
-                    }
-                }
-            }
-        });
-
-        // Gestion du bouton de suppression de code
-        findViewById(R.id.boutonSuppressionCode).setOnClickListener(v -> {
-            boolean confirmation = Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Attention", "Etes vous sûr de vouloir supprimer le code de ce produit ?", "OuiNon");
-            if (confirmation) {
-                if (estCodeGS1) {
-                    produitSelectionne.setGTIN("");
-                } else {
-                    produitSelectionne.setCodeInconnue("");
-                }
-                codeComplet = "";
-                messageAlerte = "";
-                onResume();
-            }
-        });
-
-        // On gère l'affichage en fonction de si codeComplet a déjà une valeur ou non
-        if (estCodeGS1) {
-            if (produitSelectionne.getGTIN().equals("") || produitSelectionne.getGTIN() == null) {
-                produitSelectionne.setGTIN(codeComplet);
-            }
-        }
-        else
-        {
-            boolean produitAModifier = false;
-            if (produitSelectionne.getCodeInconnue() == null) {
-                produitAModifier = true;
-            } else if (!produitSelectionne.getCodeInconnue().contentEquals(codeComplet)) {
-                produitAModifier = true;
-            }
-
-            if (produitAModifier) {
-                produitSelectionne.setCodeInconnue(codeComplet.trim());
-            }
-        }
-
-
         String identification = produitSelectionne.getGTIN();
         if(identification.contentEquals(""))
             identification = produitSelectionne.getCodeInconnue();
 
-        if(!identification.contentEquals(""))
-            ((ImageView) findViewById(R.id.boutonEditCode)).setVisibility(View.GONE);
         // Affichage des valeurs
         ((TextView) findViewById(R.id.nomProduit)).setText(produitSelectionne.getDesignation_interne().trim());
         ((TextView) findViewById(R.id.codeGS1)).setText(identification);
@@ -190,137 +269,6 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
     public void onResume() {
         super.onResume();
         invalidateOptionsMenu();
-
-        //((TextView) findViewById(R.id.numLot)).setText(numLot.trim());
-       // ((TextView) findViewById(R.id.conditionnement)).setText(conditionnement.trim());
-        //((TextView) findViewById(R.id.numSerie)).setText(numeroSerie.trim());
-
-        // Gestion de la date de péremption
-        /*if (!Objects.equals(dateP, "")) {
-            DateFormat dateFormat;
-            assert dateP != null;
-            if (dateP.length() == 5) {
-                dateFormat = new SimpleDateFormat("yy-MM");
-            } else {
-                dateFormat = new SimpleDateFormat("yy-MM-dd");
-            }
-
-            Date datePeremption = null;
-
-            try {
-                datePeremption = dateFormat.parse(dateP);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            if (datePeremption != null) {
-                Date now = new Date();
-                if (now.after(datePeremption)) {
-                    findViewById(R.id.warningPeremption).setVisibility(View.VISIBLE);
-                } else {
-                    findViewById(R.id.warningPeremption).setVisibility(View.GONE);
-                }
-                DateFormat newDateFormat = new SimpleDateFormat("MM-yyyy");
-                String dateAAfficher = newDateFormat.format(datePeremption);
-                ((TextView) findViewById(R.id.datePeremption)).setText(dateAAfficher);
-            }
-        }*/
-    }
-
-    // Lorsqu'on lance une nouvelle activity avec " startActivityForResult ", action à réaliser à la fin de l'activity lancé suivant le " CodesEchangesActivites " passé
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (data != null) {
-            switch (requestCode) {
-                case CodesEchangesActivites.RETOUR_CODE_GS1: {
-                    // Gestion du code GS1
-                    String codeRecu = data.getStringExtra("code");
-                    if(codeRecu != null)
-                    {
-                        String codeGtin = "";
-                        if(codeRecu.startsWith("PHITAGTIN:"))
-                        {
-                            String[] tabCode = codeRecu.toString().split(":");
-                            if(tabCode.length == 2)
-                            {
-                                estCodeGS1 = true;
-                                codeGtin = tabCode[1];
-                            }
-                        }
-                        else
-                        {
-                            Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeRecu);
-                            if (gs1Decoupe.size() != 1) {
-                                // Si le code fourni est valide, on recharge l'activité actuelle avec le nouveau code
-                                // Vérification utilisateur
-                                //confirmation = Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Verification", "Etes vous sûrs de vouloir changer la référence GTIN ?", "OuiNon");
-                                estCodeGS1 = true;
-                                codeGtin = gs1Decoupe.get("codeGtin");
-                            } else {
-                                // Si le code fourni n'est pas un code GS1, on affiche un message d'erreur
-                                //confirmation = Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Verification", "Etes vous sûrs de vouloir changer la référence Inconnue ?", "OuiNon");
-                                estCodeGS1 = false;
-                            }
-                        }
-
-                        confirmation = true;
-                        if (confirmation) {
-                            if (estCodeGS1) {
-                                List<Produit> listeProduitRecherche = ProduitOpenHelper.getProduitsParGTIN(db, codeGtin);
-                                boolean modifiable = true;
-                                for(Produit produitCourant : listeProduitRecherche)
-                                {
-                                    if(produitCourant.getID_produit() != produitSelectionne.getID_produit())
-                                    {
-                                        modifiable = false;
-                                        break;
-                                    }
-                                }
-                                if(modifiable)
-                                {
-                                    produitSelectionne.setGTIN(codeGtin);
-                                    ((TextView) findViewById(R.id.codeGS1)).setText(codeGtin);
-                                    ((TextView) findViewById(R.id.referenceIdentifie)).setVisibility(View.GONE);
-                                    ((TextView) findViewById(R.id.warningNonIdentifie)).setVisibility(View.GONE);
-                                    ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.VISIBLE);
-                                }
-                                else
-                                {
-                                    Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Erreur", "Code GTIN déjà utilisé pour une autre référence", "alerte");
-                                }
-                            } else {
-                                List<Produit> listeProduitRecherche = ProduitOpenHelper.getProduitByCodeInconnu(db, codeRecu);
-                                boolean modifiable = true;
-                                for(Produit produitCourant : listeProduitRecherche)
-                                {
-                                    if(produitCourant.getID_produit() != produitSelectionne.getID_produit())
-                                    {
-                                        modifiable = false;
-                                        break;
-                                    }
-                                }
-                                if(modifiable)
-                                {
-                                    produitSelectionne.setCodeInconnue(codeRecu);
-                                    ((TextView) findViewById(R.id.codeGS1)).setText(codeRecu);
-                                    ((TextView) findViewById(R.id.referenceIdentifie)).setVisibility(View.GONE);
-                                    ((TextView) findViewById(R.id.warningNonIdentifie)).setVisibility(View.GONE);
-                                    ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.VISIBLE);
-                                }
-                                else
-                                {
-                                    Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Erreur", "Code d'identification déjà utilisé pour une autre référence", "alerte");
-                                }
-
-                            }
-                        }
-                    }
-                    break;
-                }
-            }
-            invalidateOptionsMenu();
-        }
     }
 
     @Override
@@ -341,7 +289,7 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
         itemSave.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                if(ancienGTIN.contentEquals(produitSelectionne.getGTIN()))
+                if(ancienGTIN.contentEquals(produitSelectionne.getGTIN()) && ancienCodeInconnu.contentEquals(produitSelectionne.getCodeInconnue()))
                 {
                     retourService(DetailProduitIdentificationParScanActivity.this.getBundle());
                 }
@@ -424,7 +372,7 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
     @Override
     public void onBackPressed()
     {
-        if(ancienGTIN.contentEquals(produitSelectionne.getGTIN())) {
+        if(ancienGTIN.contentEquals(produitSelectionne.getGTIN()) && ancienCodeInconnu.contentEquals(produitSelectionne.getCodeInconnue())) {
             retourService(DetailProduitIdentificationParScanActivity.this.getBundle());
         }
         else

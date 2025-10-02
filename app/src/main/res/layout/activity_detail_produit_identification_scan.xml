@@ -49,52 +49,66 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:orientation="horizontal"
-                android:weightSum="10">
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/codeGS1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="8"
-                    android:gravity="center_horizontal|center_vertical"
-                    android:text=""
-                    android:textColor="@android:color/black"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:id="@+id/layoutcodeGS1"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:orientation="horizontal"
+                    android:weightSum="10"
+                    android:layout_gravity="center"
+                    android:padding="10dp"
+                    android:visibility="visible">
 
-                    <ImageView
-                        android:id="@+id/boutonEditCode"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center_horizontal"
-                        android:clickable="true"
-                        android:src="@drawable/ic_datamatrix"
-                        android:tint="@color/bleu_clair_alcyons" />
-
-                    <ImageView
-                        android:id="@+id/boutonSuppressionCode"
-                        android:layout_width="wrap_content"
+                    <TextView
+                        android:id="@+id/codeGS1"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:clickable="true"
-                        android:src="@drawable/ic_delete"
-                        android:tint="@android:color/black"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:text=""
+                        android:textColor="@android:color/black"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_weight="10"/>
+
+                    <ImageView
+                        android:id="@+id/suppressioncodescanne"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/ic_croix_noir"
                         android:visibility="gone"/>
+
                 </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layouteditcode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/background_encadrer_vert"
+                    android:weightSum="10"
+                    android:layout_gravity="center"
+                    android:padding="10dp"
+                    android:visibility="gone">
+
+                    <EditText
+                        android:id="@+id/editcodescanne"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="10"
+                        android:textStyle="bold"
+                        android:textSize="16dp"
+                        android:paddingLeft="10dp"
+                        android:text=""/>
+
+                </LinearLayout>
+
 
             </LinearLayout>
 

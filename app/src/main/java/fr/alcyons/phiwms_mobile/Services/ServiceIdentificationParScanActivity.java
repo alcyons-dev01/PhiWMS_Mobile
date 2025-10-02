@@ -11,6 +11,7 @@ import androidx.activity.OnBackPressedCallback;
 import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerProduitActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.IdentificationParScan.ListeProduitsIdentificationParScanActivity;
@@ -54,8 +55,8 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
             if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
             {
                 // Si on passe pour la première fois, on lance l'activité de décodage.
-                Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ScannerSearchOnlyActivity.class);
-                Bundle extras = super.getBundle();
+                Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ScannerProduitActivity.class);
+                Bundle extras = ServiceIdentificationParScanActivity.super.getBundle();
                 extras.putBoolean("isBoutonSuppressionExistant", true);
                 newIntent.putExtras(extras);
                 ServiceIdentificationParScanActivity.this.startActivityForResult(newIntent, CodesEchangesActivites.RETOUR_CODE_GS1);
@@ -67,7 +68,7 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
                 {
                     // Si on passe pour la première fois, on lance l'activité de décodage.
                     Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, BarcodeCaptureActivity.class);
-                    Bundle extras = super.getBundle();
+                    Bundle extras = ServiceIdentificationParScanActivity.super.getBundle();
                     extras.putBoolean("isBoutonSuppressionExistant", true);
                     newIntent.putExtras(extras);
                     ServiceIdentificationParScanActivity.this.startActivityForResult(newIntent, CodesEchangesActivites.RETOUR_CODE_GS1);
@@ -76,8 +77,8 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
                 else
                 {
                     // Si on passe pour la première fois, on lance l'activité de décodage.
-                    Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ScannerSearchOnlyActivity.class);
-                    Bundle extras = super.getBundle();
+                    Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ScannerProduitActivity.class);
+                    Bundle extras = ServiceIdentificationParScanActivity.super.getBundle();
                     extras.putBoolean("isBoutonSuppressionExistant", true);
                     newIntent.putExtras(extras);
                     ServiceIdentificationParScanActivity.this.startActivityForResult(newIntent, CodesEchangesActivites.RETOUR_CODE_GS1);
@@ -104,7 +105,7 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
                             gtin = tabCode[1];
                         }
                         Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
-                        Bundle extras = super.getBundle();
+                        Bundle extras = ServiceIdentificationParScanActivity.super.getBundle();
                         extras.putString("codeGS1", gtin);
                         newIntent.putExtras(extras);
                         ServiceIdentificationParScanActivity.this.startActivity(newIntent);
@@ -116,7 +117,7 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
                         if (gs1Decoupe.size() != 1) {
                             // Si le code est valide, on lance l'activité de liste des produits correspondants à ce code
                             Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
-                            Bundle extras = super.getBundle();
+                            Bundle extras = ServiceIdentificationParScanActivity.super.getBundle();
                             extras.putString("codeGS1", gs1Decoupe.get("codeGtin"));
                             newIntent.putExtras(extras);
                             ServiceIdentificationParScanActivity.this.startActivity(newIntent);
@@ -130,7 +131,7 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
                             toast.show();
 
                             Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
-                            Bundle extras = super.getBundle();
+                            Bundle extras = ServiceIdentificationParScanActivity.super.getBundle();
                             extras.putString("codeInconnue", codeComplet);
                             newIntent.putExtras(extras);
                             ServiceIdentificationParScanActivity.this.startActivity(newIntent);
@@ -140,7 +141,7 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
 
                 } else {
                     Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
-                    Bundle extras = super.getBundle();
+                    Bundle extras = ServiceIdentificationParScanActivity.super.getBundle();
                     extras.putString("codeInconnue", "");
                     newIntent.putExtras(extras);
                     ServiceIdentificationParScanActivity.this.startActivity(newIntent);

@@ -75,7 +75,16 @@ public class Produit_IdentificationParScanAdapter extends ArrayAdapter {
         viewHolder.nom.setText(produitCourant.getDesignation_interne());
         viewHolder.refProduit.setText(produitCourant.getRef_fourni());
         viewHolder.fournisseurProduit.setText(produitCourant.getFournisseur());
-        viewHolder.gtinProduit.setText(produitCourant.getGTIN());
+        if(produitCourant.getGTIN().contentEquals(""))
+        {
+            viewHolder.gtinProduit.setText(produitCourant.getCodeInconnue());
+            viewHolder.gtinProduit.setTextColor(context.getResources().getColorStateList(R.color.noir));
+        }
+        else
+        {
+            viewHolder.gtinProduit.setText(produitCourant.getGTIN());
+            viewHolder.gtinProduit.setTextColor(context.getResources().getColorStateList(R.color.vert3));
+        }
 
         return convertView;
     }

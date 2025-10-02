@@ -48,7 +48,6 @@ public class ScannerProduitActivity extends ServiceActivity {
         intent = ScannerProduitActivity.this.getIntent();
         scannerContexte = intent.getExtras().getString("contexte");
         designation = intent.getExtras().getString("Designation");
-        scannerContexteInt = Integer.parseInt(scannerContexte);
         numerodocument = intent.getExtras().getString("numerodocument");
         depotdestinataireid = intent.getExtras().getInt("depotdestinataireid");
 
@@ -73,8 +72,10 @@ public class ScannerProduitActivity extends ServiceActivity {
 
 
         depot.setText(depotText);
-        numDocTextView.setText("#" + numerodocument);
-
+        if(numerodocument != null)
+            numDocTextView.setText("#" + numerodocument);
+        else
+            numDocTextView.setText("");
         // CONTEXTE
         produitContexte = new ProduitContexte(this,db, false, false, false, true, designation, false);
 
@@ -102,7 +103,7 @@ public class ScannerProduitActivity extends ServiceActivity {
             @Override
             public void onClick(View v) {
                 Intent scannerSearchOnlyIntent = new Intent();
-                Bundle scannerSearchOnlyBundle = new Bundle();
+                Bundle scannerSearchOnlyBundle = ScannerProduitActivity.super.getBundle();
                 int codeEchangeActivity = 0;
 
                 scannerSearchOnlyBundle.putString("code", "");
@@ -139,7 +140,7 @@ public class ScannerProduitActivity extends ServiceActivity {
                 if (s.toString().endsWith("\n")) {
                     produitContexte.onTextWatcher(s);
                     Intent scannerSearchOnlyIntent = new Intent();
-                    Bundle scannerSearchOnlyBundle = new Bundle();
+                    Bundle scannerSearchOnlyBundle = ScannerProduitActivity.super.getBundle();
                     int codeEchangeActivity = 0;
 
                     scannerSearchOnlyBundle.putString("code", produitContexte.code);

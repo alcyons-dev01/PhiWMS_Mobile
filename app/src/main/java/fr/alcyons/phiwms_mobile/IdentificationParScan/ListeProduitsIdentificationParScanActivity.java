@@ -53,24 +53,9 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
             final String codeGS1 = intent.getExtras().getString("codeGS1");
             listeAAfficher = ProduitOpenHelper.getProduitsParGTIN(db, codeGS1);
 
-        } else if(codeInconnue != null && !codeInconnue.contentEquals("")){
+        } else if(intent.getExtras().getString("codeInconnue") != null){
             codeInconnue = intent.getExtras().getString("codeInconnue");
             listeAAfficher = ProduitOpenHelper.getProduitsParCodeInconnue(db, codeInconnue);
-        }
-
-        //gestion de la liste
-        if (listeAAfficher.size() == 1) {
-            passerAuDetailProduit(listeAAfficher.get(0));
-        } else if (listeAAfficher.size() > 1) {
-            Alerte.afficherAlerte(ListeProduitsIdentificationParScanActivity.this, "Attention", "Plusieurs produits correspondent à ce code.", "alerte");
-        } else {
-            listeAAfficher = ProduitOpenHelper.getAllProduits(db);
-            if(codeInconnue != null && !codeInconnue.contentEquals(""))
-            {
-                Toast toast = Toast.makeText(ListeProduitsIdentificationParScanActivity.this, "Aucun produit ne correspond au code fourni", Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
-            }
         }
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -78,7 +63,7 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
             public void handleOnBackPressed() {
                 //ListeProduitsIdentificationParScanActivity.this.finish();
                 Intent intent = new Intent(ListeProduitsIdentificationParScanActivity.this, NavigationActivity.class);
-                Bundle extras = new Bundle();
+                Bundle extras = ListeProduitsIdentificationParScanActivity.this.getBundle();
                 extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
                 intent.putExtras(extras);
                 ListeProduitsIdentificationParScanActivity.this.startActivity(intent);
@@ -91,8 +76,14 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
     public void onResume() {
         super.onResume();
         invalidateOptionsMenu();
-        listeAAfficher = new ArrayList<>();
-        listeAAfficher = ProduitOpenHelper.getAllProduits(db);
+        //gestion de la liste
+        if (listeAAfficher.size() == 1) {
+            passerAuDetailProduit(listeAAfficher.get(0));
+        } else if (listeAAfficher.size() > 1) {
+            //Alerte.afficherAlerte(ListeProduitsIdentificationParScanActivity.this, "Attention", "Plusieurs produits correspondent à ce code.", "alerte");
+        } else {
+            listeAAfficher = ProduitOpenHelper.getProduitsNonIdentifier(db);
+        }
 
         // Affichage de la liste
         adapter = new Produit_IdentificationParScanAdapter(ListeProduitsIdentificationParScanActivity.this, listeAAfficher, db);
@@ -112,7 +103,7 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
         Intent newIntent = new Intent(ListeProduitsIdentificationParScanActivity.this, DetailProduitIdentificationParScanActivity.class);
 
         // Récupération des éléments à transmettre à la prochaine activité
-        Bundle extras = super.getBundle();
+        Bundle extras = ListeProduitsIdentificationParScanActivity.super.getBundle();
         extras.putInt("produitSelectionneID", produitSelectionne.getID_produit());
         String codeGS1 = Objects.requireNonNull(intent.getExtras()).getString("codeGS1");
         extras.putString("codeGS1", codeGS1);
@@ -121,6 +112,7 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
 
         // Appel de la prochaine activité
         ListeProduitsIdentificationParScanActivity.this.startActivity(newIntent);
+        ListeProduitsIdentificationParScanActivity.this.finish();
         listeAAfficher = new ArrayList<>();
         listeAAfficher.add(produitSelectionne);
     }
@@ -149,7 +141,7 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
     private void retourScan()
     {
         Intent newIntent = new Intent(ListeProduitsIdentificationParScanActivity.this, ServiceIdentificationParScanActivity.class);
-        newIntent.putExtras(super.getBundle());
+        newIntent.putExtras(ListeProduitsIdentificationParScanActivity.super.getBundle());
         ListeProduitsIdentificationParScanActivity.this.startActivity(newIntent);
         ListeProduitsIdentificationParScanActivity.this.finish();
     }
