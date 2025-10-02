@@ -122,6 +122,8 @@ public class DetailReception2025Activity  extends ServiceActivity {
     MenuItem item;
     List<ImprimanteEtiquette> listeImprimanteEtiquette;
 
+    Spinner optionTri;
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,6 +162,7 @@ public class DetailReception2025Activity  extends ServiceActivity {
             });
         }
 
+        optionTri = (Spinner) findViewById(R.id.optionTri);
         phReliquatListView = (ListView) findViewById(R.id.liste_view);
         phReliquatListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -197,6 +200,47 @@ public class DetailReception2025Activity  extends ServiceActivity {
         } else {
             DetailReception2025Activity.this.finish();
         }
+
+        optionTri.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            boolean isFirstSelection = true; // drapeau pour ignorer le premier appel
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (isFirstSelection) {
+                    isFirstSelection = false; // on consomme le premier appel
+                    return; // ne rien faire au lancement
+                }
+
+                if (((TextView) parent.getChildAt(0)) != null) {
+                    ((TextView) parent.getChildAt(0)).setVisibility(View.INVISIBLE);
+                }
+                tri_choisi = optionTri.getItemAtPosition(position).toString();
+                ParametreUtilisateurOpenHelper.mettreAJourTriReliquat(db, 0, tri_choisi);
+
+                switch (tri_choisi)
+                {
+                    case "Categorie":
+                        onClickTriCategorie();
+                        break;
+                    case "Designation":
+                        onClickTriDesignation();
+                        break;
+
+                    case "Place":
+                        onTriParPlace();
+                        break;
+                    case "Poids":
+                        onTriParPoids();
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -213,8 +257,6 @@ public class DetailReception2025Activity  extends ServiceActivity {
     public void onResume() {
         super.onResume();
         lancerScan = (LinearLayout) findViewById(R.id.lancerScan);
-        tri_choisi = "Categorie";
-
         //gestion du bouton qui lance le scan
         lancerScan.setOnClickListener(view -> {
             Intent listeLotReception_Intent;
@@ -250,6 +292,9 @@ public class DetailReception2025Activity  extends ServiceActivity {
 
             case "Place":
                 onTriParPlace();
+                break;
+            case "Poids":
+                onTriParPoids();
                 break;
         }
 
@@ -347,6 +392,8 @@ public class DetailReception2025Activity  extends ServiceActivity {
             {
                 String oo1EmplacementParDefaut = o1.getEmplacement();
                 String oo2EmplacementParDefaut = o2.getEmplacement();
+                String oo1ZoneDefaut = o1.getZone();
+                String oo2ZoneDefaut = o2.getZone();
 
                 if (oo1EmplacementParDefaut == null || oo1EmplacementParDefaut.contentEquals("")) {
                     Produit produit = ProduitOpenHelper.getProduitByID(db, o1.getProduitID());
@@ -358,7 +405,68 @@ public class DetailReception2025Activity  extends ServiceActivity {
                     oo2EmplacementParDefaut = produit.getEmplacement_PUI_Defaut();
                 }
 
-                return oo1EmplacementParDefaut.compareTo(oo2EmplacementParDefaut);
+                if((oo1EmplacementParDefaut == null || oo1EmplacementParDefaut.contentEquals("")) && (oo2EmplacementParDefaut == null || oo2EmplacementParDefaut.contentEquals("")))
+                {
+                    if (oo1ZoneDefaut == null || oo1ZoneDefaut.contentEquals("")) {
+                        Produit produit = ProduitOpenHelper.getProduitByID(db, o1.getProduitID());
+                        oo1ZoneDefaut = produit.getZone_PUI_Defaut();
+
+                    }
+                    if (oo2ZoneDefaut == null || oo2ZoneDefaut.contentEquals("")) {
+                        Produit produit = ProduitOpenHelper.getProduitByID(db, o2.getProduitID());
+                        oo2ZoneDefaut = produit.getZone_PUI_Defaut();
+                    }
+                    return oo1ZoneDefaut.compareTo(oo2ZoneDefaut);
+                }
+                else
+                {
+                    return oo1EmplacementParDefaut.compareTo(oo2EmplacementParDefaut);
+                }
+
+            }
+        });
+        phReliquatReceptionAdapter = new PH_Reliquat_Reception_2025Adapter(DetailReception2025Activity.this, db, utilisateurConnecte);
+        List<String> listeZoneEmplacement = new ArrayList<>();
+        for(PH_Reliquat ph_reliquat : phReliquatList)
+        {
+            if(ph_reliquat != null)
+            {
+                Produit produit = ProduitOpenHelper.getProduitByID(db, ph_reliquat.getProduitID());
+                String zone = produit.getZone_PUI_Defaut();
+                String emplacement = produit.getEmplacement_PUI_Defaut();
+                String zoneemplacement = zone + "-" + emplacement;
+
+                if(!listeZoneEmplacement.contains(zoneemplacement)) {
+                    listeZoneEmplacement.add(zoneemplacement);
+                    phReliquatReceptionAdapter.addSectionHeaderItem(ph_reliquat);
+                }
+
+                phReliquatReceptionAdapter.addItem(ph_reliquat);
+            }
+        }
+        phReliquatListView.setDivider(footer);
+        phReliquatListView.setAdapter(phReliquatReceptionAdapter);
+    }
+
+    private void onTriParPoids()
+    {
+        tri_choisi = "Poids";
+        phReliquatList.sort((o1, o2) -> {
+            if(o2 == null || o1 == null)
+                return 1;
+            else
+            {
+                double poids1 = 0;
+                double poids2= 0;
+
+                Produit produit = ProduitOpenHelper.getProduitByID(db, o1.getProduitID());
+                poids1 = produit.getPoids()*o1.getQteReliquat_X();
+
+                Produit produit2 = ProduitOpenHelper.getProduitByID(db, o2.getProduitID());
+                poids2 = produit2.getPoids()*o2.getQteReliquat_X();
+
+
+                return Double.compare(poids1, poids2);
             }
         });
         phReliquatReceptionAdapter = new PH_Reliquat_Reception_2025Adapter(DetailReception2025Activity.this, db, utilisateurConnecte);

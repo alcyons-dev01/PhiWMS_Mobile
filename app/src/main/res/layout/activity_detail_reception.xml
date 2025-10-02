@@ -26,23 +26,24 @@
                 android:id="@+id/triListe"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
+                android:padding="5dp"
                 android:orientation="horizontal"
                 android:gravity="center"
                 android:background="@color/bleu_clair_alcyons"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <Spinner
                     android:id="@+id/optionTri"
                     android:background="@drawable/ic_sort_white"
-                    android:entries="@array/option_tri_preparation"
-                    android:layout_height="30dp"
-                    android:layout_width="30dp"/>
+                    android:entries="@array/option_tri_reception_detail"
+                    android:layout_height="24dp"
+                    android:layout_width="24dp"/>
 
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="4"
                 android:orientation="vertical">
 
@@ -54,7 +55,7 @@
                     android:textColor="#FFFFFF"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
-                    android:textSize="17sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -65,7 +66,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
                     android:textColor="#FFFFFF"
-                    android:textSize="17sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
             </LinearLayout>
@@ -101,7 +102,8 @@
                 android:gravity="center"
                 android:layout_gravity="right"
                 android:background="@color/bleu_clair_alcyons"
-                tools:ignore="RtlHardcoded">
+                tools:ignore="RtlHardcoded"
+                android:visibility="visible">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -118,8 +120,6 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/barreDeTitre"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
             android:background="@android:color/darker_gray" />
 
 

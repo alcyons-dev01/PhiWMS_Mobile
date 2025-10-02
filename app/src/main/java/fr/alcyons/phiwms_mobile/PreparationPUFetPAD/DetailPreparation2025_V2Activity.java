@@ -19,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -105,6 +106,7 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
     int position_selectionne;
     Depot depotOrigine;
     List<ImprimanteEtiquette> listeImprimanteEtiquette;
+    Spinner optionTri;
     public void enregistrerPhPreparation() throws JSONException {
         int nbTotalLotsAvecValeurSaisie = 0;
 
@@ -143,6 +145,7 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
         Chronometer.LancementChrono();
         //Gestion spinner
         //initi du tri
+        optionTri = (Spinner) findViewById(R.id.optionTri);
         tri_choisi = ParametreUtilisateurOpenHelper.getChoixTriPreparation(db);
 
         listeImprimanteEtiquette = ImprimanteEtiquetteOpenHelper.getAllImprimante(db);
@@ -192,6 +195,46 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
 
             DetailPreparation2025_V2Activity.this.startActivityForResult(detailPreparation_Intent, CodesEchangesActivites.RETOUR_LISTE_LOTS);
         });
+
+        optionTri.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            boolean isFirstSelection = true; // drapeau pour ignorer le premier appel
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (isFirstSelection) {
+                    isFirstSelection = false; // on consomme le premier appel
+                    return; // ne rien faire au lancement
+                }
+
+                if (((TextView) parent.getChildAt(0)) != null) {
+                    ((TextView) parent.getChildAt(0)).setVisibility(View.INVISIBLE);
+                }
+                tri_choisi = optionTri.getItemAtPosition(position).toString();
+                ParametreUtilisateurOpenHelper.mettreAJourTriPreparation(db, 0, tri_choisi);
+
+                switch (tri_choisi)
+                {
+                    case "Designation":
+                        onClickTriDesignation();
+                        break;
+                    case "Place":
+                        onTriParPlace();
+                        break;
+                    case "Poids":
+                        onTriParPoids();
+                        break;
+                    case "Categorie":
+                        onClickTriCategorie();
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
     }
 
     @Override
@@ -266,6 +309,9 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
                     break;
                 case "Poids":
                     onTriParPoids();
+                    break;
+                case "Categorie":
+                    onClickTriCategorie();
                     break;
             }
         }
@@ -356,6 +402,9 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
                                     case "Poids":
                                         onTriParPoids();
                                         break;
+                                    case "Categorie":
+                                        onClickTriCategorie();
+                                        break;
                                 }
 
                                 passageParOnCreate = false;
@@ -443,6 +492,45 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
         phPreparationLignes.sort((o1, o2) -> {
 
             return o1.getProduitDesignation().compareTo(o2.getProduitDesignation());
+        });
+        premierpassage = false;
+        ph_preparation_ligne_preparationLotAdapter = new PH_Preparation_Ligne_PreparationLotAdapter2025_V2(DetailPreparation2025_V2Activity.this, db, utilisateurConnecte);
+
+        List<String> listeZoneEmplacement = new ArrayList<>();
+        for(PH_Preparation_Ligne ph_preparationLigne : phPreparationLignes)
+        {
+            Produit produit = ProduitOpenHelper.getProduitByID(db, ph_preparationLigne.getProduitID());
+            String zone = produit.getZone_PUI_Defaut();
+            String emplacement = produit.getEmplacement_PUI_Defaut();
+            String zoneemplacement = zone + "-" + emplacement;
+
+            if(!listeZoneEmplacement.contains(zoneemplacement)) {
+                listeZoneEmplacement.add(zoneemplacement);
+                ph_preparation_ligne_preparationLotAdapter.addSectionHeaderItem(ph_preparationLigne);
+            }
+
+            ph_preparation_ligne_preparationLotAdapter.addItem(ph_preparationLigne);
+        }
+
+        phPreparationLigne_ListView.setAdapter(ph_preparation_ligne_preparationLotAdapter);
+        phPreparationLigne_ListView.setDivider(null);
+        phPreparationLigne_ListView.setSelection(position_selectionne);
+    }
+
+    private void onClickTriCategorie()
+    {
+        tri_choisi = "Categorie";
+        phPreparationLignes.sort((o1, o2) -> {
+            String categorie1 = o1.getProduitCategorie();
+            String categorie2 = o2.getProduitCategorie();
+
+            if(categorie1 == null)
+                categorie1 = "";
+
+            if(categorie2 == null)
+                categorie2 = "";
+
+            return categorie1.compareTo(categorie2);
         });
         premierpassage = false;
         ph_preparation_ligne_preparationLotAdapter = new PH_Preparation_Ligne_PreparationLotAdapter2025_V2(DetailPreparation2025_V2Activity.this, db, utilisateurConnecte);

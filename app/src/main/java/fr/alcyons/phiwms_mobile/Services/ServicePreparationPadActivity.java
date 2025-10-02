@@ -37,6 +37,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -161,7 +162,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
                 if(connexionDirecte)
                 {
                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(ph_preparation_List.size()));
-                    ph_preparation_List.sort((o1, o2) -> o2.getLivraisonPrevueDate().compareTo(o1.getLivraisonPrevueDate()));
+                    ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
                     ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPadActivity.this, ph_preparation_List, db, utilisateurConnecte);
                     // Permet d'enlever le séparateur entre deux éléments d'une listeView
                     ph_preparation_ListView.setDivider(footer);
@@ -179,7 +180,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
                 else
                 {
                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(ph_preparation_List.size()));
-                    ph_preparation_List.sort((o1, o2) -> o2.getLivraisonPrevueDate().compareTo(o1.getLivraisonPrevueDate()));
+                    ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
                     ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPadActivity.this, ph_preparation_List, db, utilisateurConnecte);
                     // Permet d'enlever le séparateur entre deux éléments d'une listeView
                     ph_preparation_ListView.setDivider(footer);
@@ -224,7 +225,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
                         }
                     }
 
-                    ph_preparation_List.sort((o1, o2) -> o2.getLivraisonPrevueDate().compareTo(o1.getLivraisonPrevueDate()));
+                    ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
 
                     ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPadActivity.this, ph_preparation_List, db, utilisateurConnecte);
 
@@ -321,7 +322,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
                             }
                             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(ph_preparation_List.size()));
                             ((TextView) findViewById(R.id.titre)).setText("Préparations");
-                            ph_preparation_List.sort((o1, o2) -> o2.getLivraisonPrevueDate().compareTo(o1.getLivraisonPrevueDate()));
+                            ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
                             ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPadActivity.this, ph_preparation_List, db, utilisateurConnecte);
                             // Permet d'enlever le séparateur entre deux éléments d'une listeView
                             ph_preparation_ListView.setDivider(footer);
@@ -369,7 +370,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
                                         }
                                     }
 
-                                    ph_preparation_List.sort((o1, o2) -> o2.getLivraisonPrevueDate().compareTo(o1.getLivraisonPrevueDate()));
+                                    ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
 
                                     ph_preparation_preparationAdapter.phPreparationPreparation.clear();
                                     ph_preparation_preparationAdapter.phPreparationPreparation.addAll(ph_preparation_List);
@@ -507,7 +508,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
                         }
                         /* Code nécessaire à l'affichage de la liste */
                         ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(ph_preparation_List.size()));
-                        ph_preparation_List.sort((o1, o2) -> o2.getLivraisonPrevueDate().compareTo(o1.getLivraisonPrevueDate()));
+                        ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
                         ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPadActivity.this, ph_preparation_List, db, utilisateurConnecte);
                         // Permet d'enlever le séparateur entre deux éléments d'une listeView
                         ph_preparation_ListView.setDivider(footer);
@@ -528,7 +529,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
                 } else {
                     /* Code nécessaire à l'affichage de la liste */
                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(ph_preparation_List.size()));
-                    ph_preparation_List.sort((o1, o2) -> o2.getLivraisonPrevueDate().compareTo(o1.getLivraisonPrevueDate()));
+                    ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
                     ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPadActivity.this, ph_preparation_List, db, utilisateurConnecte);
                     // Permet d'enlever le séparateur entre deux éléments d'une listeView
                     ph_preparation_ListView.setDivider(footer);
@@ -545,7 +546,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
             } else {
                 /* Code nécessaire à l'affichage de la liste */
                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(ph_preparation_List.size()));
-                ph_preparation_List.sort((o1, o2) -> o2.getLivraisonPrevueDate().compareTo(o1.getLivraisonPrevueDate()));
+                ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
                 ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPadActivity.this, ph_preparation_List, db, utilisateurConnecte);
                 // Permet d'enlever le séparateur entre deux éléments d'une listeView
                 ph_preparation_ListView.setDivider(footer);

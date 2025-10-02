@@ -29,14 +29,14 @@
                 android:orientation="horizontal"
                 android:gravity="center"
                 android:background="@color/bleu_clair_alcyons"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <Spinner
                     android:id="@+id/optionTri"
                     android:background="@drawable/ic_sort_white"
                     android:entries="@array/option_tri_preparation"
-                    android:layout_height="30dp"
-                    android:layout_width="30dp"/>
+                    android:layout_height="24dp"
+                    android:layout_width="24dp"/>
 
             </LinearLayout>
 
