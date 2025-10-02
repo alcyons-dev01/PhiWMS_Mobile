@@ -195,8 +195,7 @@ public class DetailReception2025Activity  extends ServiceActivity {
 
             phReliquatList.sort(Comparator.comparing(PH_Reliquat::getdesignationCourte));
 
-            //initi du tri
-            tri_choisi = ParametreUtilisateurOpenHelper.getChoixTriReliquat(db);
+
         } else {
             DetailReception2025Activity.this.finish();
         }
@@ -256,6 +255,8 @@ public class DetailReception2025Activity  extends ServiceActivity {
     @Override
     public void onResume() {
         super.onResume();
+        //initi du tri
+        tri_choisi = ParametreUtilisateurOpenHelper.getChoixTriReliquat(db);
         lancerScan = (LinearLayout) findViewById(R.id.lancerScan);
         //gestion du bouton qui lance le scan
         lancerScan.setOnClickListener(view -> {

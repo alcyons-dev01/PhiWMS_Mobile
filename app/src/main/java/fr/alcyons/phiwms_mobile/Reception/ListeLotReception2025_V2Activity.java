@@ -561,7 +561,7 @@ public class ListeLotReception2025_V2Activity extends ServiceActivity {
         }
     }
 
-    public void ClickNumberPicker(final int position)
+    public void ClickNumberPicker(final int position, PH_Reliquat reliquatAModifier)
     {
         if(!produit.isSuivi_Serialisation() || !produit.isSerialiser_Reception_Delivrance())
         {
@@ -578,13 +578,14 @@ public class ListeLotReception2025_V2Activity extends ServiceActivity {
             int qteAttendu = (int)phReliquat.getQteReliquat_X() - phReliquat.getQteLivraison();
             int maxValue = qteAttendu;
             String emplacementcourant = lotReceptionAdapter.getReliquatAt(position).getEmplacement();
+            String lotcourant = lotReceptionAdapter.getReliquatAt(position).getLot();
             List<PH_Reliquat> reliquatDejaReception = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, phReliquat.getcommandeNumero(), phReliquat.getProduitID());
 
             if(reliquatDejaReception.size() > 1)
             {
                 for(PH_Reliquat reliquat : reliquatDejaReception)
                 {
-                    if(!reliquat.getEmplacement().contentEquals(emplacementcourant))
+                    if(!reliquat.getLot().contentEquals(lotcourant) || (!reliquat.getEmplacement().contentEquals(emplacementcourant) && reliquat.getLot().contentEquals(lotcourant)))
                     {
                         maxValue = maxValue - reliquat.getQteLivraison();
                     }
@@ -598,7 +599,9 @@ public class ListeLotReception2025_V2Activity extends ServiceActivity {
                 if (viewHolder != null && viewHolder instanceof LotReceptionAdapter.LotViewHolder) {
                     ((LotReceptionAdapter.LotViewHolder) viewHolder).qteSaisie.setText(String.valueOf(qteApres));
                 }
-                //gestionPhReliquatBDD(phReliquatReceptionAdapte.getlotList());
+
+                modifierReliquatBDD(reliquatAModifier, qteApres);
+
                 calculQuantiteReception();
                 checkEtatReception();
                 lotReceptionAdapter.notifyDataSetChanged();
@@ -658,5 +661,14 @@ public class ListeLotReception2025_V2Activity extends ServiceActivity {
         Intent clicBoutonAjouterManuellement_Intent = new Intent(ListeLotReception2025_V2Activity.this, CreationLotManuelReceptionActivity.class);
         clicBoutonAjouterManuellement_Intent.putExtras(clicBoutonAjouterManuellement_Bundle);
         ListeLotReception2025_V2Activity.this.startActivityForResult(clicBoutonAjouterManuellement_Intent, RETOUR_LOT);
+    }
+
+    private void modifierReliquatBDD(PH_Reliquat reliquatAModifier, int quantiteAModifier) {
+        reliquatAModifier.setQteLivraison(quantiteAModifier);
+
+        long rowID = PH_ReliquatOpenHelper.mettreAJourUnPHReliquat(db, reliquatAModifier);
+        if (rowID != -1) {
+
+        }
     }
 }

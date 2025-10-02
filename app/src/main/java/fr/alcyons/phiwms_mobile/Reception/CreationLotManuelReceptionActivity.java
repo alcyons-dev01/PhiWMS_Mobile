@@ -683,42 +683,71 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
     }
 
     private void ajoutReliquatBDD() {
-        Random randomreliquat = new Random();
-        int reliquatId = randomreliquat.nextInt();
-        if (reliquatId > 0)
-            reliquatId = reliquatId * -1;
 
+        //on regarde si un reliquat existe déjà avec ces informations
+        List<PH_Reliquat> reliquatliste = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, commandecourante.getNumero(), produitSelectionne.getID_produit());
         PH_Reliquat phReliquatCourant = reliquat_courant;
-        phReliquatCourant.setReliquat_UID(reliquatId);
-        String numeroLot = lotEditText.getText().toString();
-        String datePeremption = datePeremptionTextView.getText().toString();
-        String[] datePeremptionTab = datePeremption.split("/");
-        if (datePeremptionTab.length == 3)
-            datePeremption = datePeremptionTab[2] + "-" + datePeremptionTab[1] + "-" + datePeremptionTab[0];
 
-        String zoneName = zoneTextView.getText().toString();
-        String emplacementName = emplacementTextView.getText().toString();
-        String numero_Serie = numSerieEditText.getText().toString();
-        int quantite = Integer.parseInt(qteActuelleEditText.getText().toString());
+        boolean existe = false;
+        for(PH_Reliquat reliquatcourant : reliquatliste)
+        {
+            String datePeremption = datePeremptionTextView.getText().toString();
+            String[] datePeremptionTab = datePeremption.split("/");
+            if (datePeremptionTab.length == 3)
+                datePeremption = datePeremptionTab[2] + "-" + datePeremptionTab[1] + "-" + datePeremptionTab[0];
 
-        phReliquatCourant.setLot(numeroLot.trim());
-        phReliquatCourant.setSerie(numero_Serie.trim());
-        phReliquatCourant.setPeremptionDate(datePeremption.trim());
-
-        if (commandecourante.getRef_Depot_Dest().contains("-PAD")) {
-            phReliquatCourant.setZone("RECEPTION");
-            phReliquatCourant.setEmplacement("RECEPTION-" + commandecourante.getNumero() + "-" + commandecourante.getPatient_identite());
-        } else {
-            phReliquatCourant.setZone(zoneName.trim());
-            phReliquatCourant.setEmplacement(emplacementName.trim());
+            if(reliquatcourant.getLot().trim().contentEquals(lotEditText.getText().toString().trim()) && reliquatcourant.getPeremptionDate().trim().contentEquals(datePeremption))
+            {
+                phReliquatCourant = reliquatcourant;
+                existe = true;
+            }
         }
-        phReliquatCourant.setQteLivraison(quantite);
-        phReliquatCourant.setBL_Numero("");
-        phReliquatCourant.setScanValue("");
 
-        long rowID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, phReliquatCourant);
-        if (rowID != -1) {
-
+        if(existe)
+        {
+            int quantite = Integer.parseInt(qteActuelleEditText.getText().toString());
+            phReliquatCourant.setQteLivraison(phReliquatCourant.getQteLivraison()+quantite);
+            long rowID = PH_ReliquatOpenHelper.mettreAJourUnPHReliquat(db, phReliquatCourant);
         }
+        else
+        {
+            Random randomreliquat = new Random();
+            int reliquatId = randomreliquat.nextInt();
+            if (reliquatId > 0)
+                reliquatId = reliquatId * -1;
+
+            phReliquatCourant.setReliquat_UID(reliquatId);
+            String numeroLot = lotEditText.getText().toString();
+            String datePeremption = datePeremptionTextView.getText().toString();
+            String[] datePeremptionTab = datePeremption.split("/");
+            if (datePeremptionTab.length == 3)
+                datePeremption = datePeremptionTab[2] + "-" + datePeremptionTab[1] + "-" + datePeremptionTab[0];
+
+            String zoneName = zoneTextView.getText().toString();
+            String emplacementName = emplacementTextView.getText().toString();
+            String numero_Serie = numSerieEditText.getText().toString();
+            int quantite = Integer.parseInt(qteActuelleEditText.getText().toString());
+
+            phReliquatCourant.setLot(numeroLot.trim());
+            phReliquatCourant.setSerie(numero_Serie.trim());
+            phReliquatCourant.setPeremptionDate(datePeremption.trim());
+
+            if (commandecourante.getRef_Depot_Dest().contains("-PAD")) {
+                phReliquatCourant.setZone("RECEPTION");
+                phReliquatCourant.setEmplacement("RECEPTION-" + commandecourante.getNumero() + "-" + commandecourante.getPatient_identite());
+            } else {
+                phReliquatCourant.setZone(zoneName.trim());
+                phReliquatCourant.setEmplacement(emplacementName.trim());
+            }
+            phReliquatCourant.setQteLivraison(quantite);
+            phReliquatCourant.setBL_Numero("");
+            phReliquatCourant.setScanValue("");
+
+            long rowID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, phReliquatCourant);
+            if (rowID != -1) {
+
+            }
+        }
+
     }
 }

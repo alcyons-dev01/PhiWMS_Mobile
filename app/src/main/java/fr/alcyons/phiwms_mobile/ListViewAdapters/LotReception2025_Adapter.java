@@ -93,7 +93,7 @@ public class LotReception2025_Adapter extends RecyclerView.Adapter<LotReception2
                 viewHolder.qteSaisie.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        ((ListeLotReception2025_V2Activity) context).ClickNumberPicker(viewHolder.getAdapterPosition());
+                        ((ListeLotReception2025_V2Activity) context).ClickNumberPicker(viewHolder.getAdapterPosition(), reliquatCourant);
                     }
                 });
 
