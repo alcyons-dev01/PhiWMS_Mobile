@@ -10,6 +10,7 @@
 
     <string-array name="option_tri_preparation">
         <item>Designation</item>
+        <item>Categorie</item>
         <item>Place</item>
         <item>Poids</item>
     </string-array>
@@ -43,5 +44,6 @@
         <item>Categorie</item>
         <item>Designation</item>
         <item>Place</item>
+        <item>Poids</item>
     </string-array>
 </resources>

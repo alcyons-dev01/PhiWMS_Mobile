@@ -30,8 +30,8 @@
                     android:id="@+id/optionTri"
                     android:background="@drawable/ic_sort_white"
                     android:entries="@array/option_tri_reception"
-                    android:layout_height="30dp"
-                    android:layout_width="30dp"/>
+                    android:layout_height="24dp"
+                    android:layout_width="24dp"/>
 
             </LinearLayout>
 

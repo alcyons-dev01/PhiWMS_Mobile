@@ -139,8 +139,8 @@ public class PH_Reliquat_Reception_2025Adapter extends BaseAdapter {
             if(ph_reliquat != null)
             {
                 Commande commandeCourante = CommandeOpenHelper.getCommandeByNumero(db, ph_reliquat.getCommandeNumero());
-                viewHolder.designationProduit.setText(ph_reliquat.getDesignationCourte());
-                viewHolder.referenceProduit.setText(ph_reliquat.getProduit_Reference());
+                viewHolder.designationProduit.setText(ph_reliquat.getDesignationCourte().trim());
+                viewHolder.referenceProduit.setText(ph_reliquat.getProduit_Reference().trim());
                 viewHolder.QteDemandee.setText(String.valueOf((int) ph_reliquat.getQteReliquat_X()));
                 int nbDetail = 0;
 
