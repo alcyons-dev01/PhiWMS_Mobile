@@ -153,6 +153,7 @@ public class Produit implements Serializable, Comparable {
     private String UCD_NomCourt;
     private String PHIE_Synchro;
     private String codeInconnue;
+    private String classeATC;
     private boolean Suivi_Serialisation;
     private boolean Serialiser_Reception_Delivrance;
     private int phiwms_mobileUUID = -1;
@@ -1440,6 +1441,14 @@ public class Produit implements Serializable, Comparable {
 
     public void setSerialiser_Reception_Delivrance(boolean serialiser_Reception_Delivrance) {
         Serialiser_Reception_Delivrance = serialiser_Reception_Delivrance;
+    }
+
+    public String getClasseATC() {
+        return classeATC;
+    }
+
+    public void setClasseATC(String classeATC) {
+        this.classeATC = classeATC;
     }
 
     public JSONObject toJson() {

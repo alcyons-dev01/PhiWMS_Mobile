@@ -126,10 +126,6 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
                         else
                         {
                             // Si le code fourni n'est pas valide, on affiche un message d'erreur et on redémarre l'activité pour réinitialiser le booléen firstPassage
-                            Toast toast = Toast.makeText(ServiceIdentificationParScanActivity.this, "Le code fourni n'est pas un code GS1, c'est un code inconnu.", Toast.LENGTH_SHORT);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-
                             Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
                             Bundle extras = ServiceIdentificationParScanActivity.super.getBundle();
                             extras.putString("codeInconnue", codeComplet);
@@ -142,7 +138,6 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
                 } else {
                     Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
                     Bundle extras = ServiceIdentificationParScanActivity.super.getBundle();
-                    extras.putString("codeInconnue", "");
                     newIntent.putExtras(extras);
                     ServiceIdentificationParScanActivity.this.startActivity(newIntent);
                     ServiceIdentificationParScanActivity.this.finish();

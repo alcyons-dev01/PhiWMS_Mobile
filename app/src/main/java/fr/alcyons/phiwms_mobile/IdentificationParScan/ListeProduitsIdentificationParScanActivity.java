@@ -8,7 +8,10 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,7 +46,7 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_liste);
+        setContentView(R.layout.activity_liste_identification_par_scan);
         imm = (InputMethodManager) ListeProduitsIdentificationParScanActivity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
         // Récupération de la liste_view à remplir
         listViewProduits = findViewById(R.id.listeView);
@@ -56,6 +59,11 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
         } else if(intent.getExtras().getString("codeInconnue") != null){
             codeInconnue = intent.getExtras().getString("codeInconnue");
             listeAAfficher = ProduitOpenHelper.getProduitsParCodeInconnue(db, codeInconnue);
+        }
+        else
+        {
+            listeAAfficher = ProduitOpenHelper.getProduitsIdentifier(db);
+
         }
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -70,6 +78,34 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
                 ListeProduitsIdentificationParScanActivity.this.finish();
             }
         });
+
+        int nombreProduitIdentifier = ProduitOpenHelper.getNbProduitIdentifier(db);
+        int nombreProduitNonIdentifier = ProduitOpenHelper.getNbProduitNonIdentifier(db);
+
+        ((TextView) findViewById(R.id.nbIdentifier)).setText(String.valueOf(nombreProduitIdentifier));
+        ((TextView) findViewById(R.id.nbNonIdentifier)).setText(String.valueOf(nombreProduitNonIdentifier));
+
+        ((LinearLayout) findViewById(R.id.linearProduitIdentifie)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listeAAfficher = ProduitOpenHelper.getProduitsIdentifier(db);
+                adapter.replaceData(listeAAfficher);
+                ((LinearLayout) findViewById(R.id.linearProduitIdentifie)).setAlpha(1F);
+                ((LinearLayout) findViewById(R.id.linearProduitNonIdentifie)).setAlpha(0.5F);
+                listViewProduits.smoothScrollToPositionFromTop(0, 0, 250);
+            }
+        });
+
+        ((LinearLayout) findViewById(R.id.linearProduitNonIdentifie)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listeAAfficher = ProduitOpenHelper.getProduitsNonIdentifier(db);
+                adapter.replaceData(listeAAfficher);
+                ((LinearLayout) findViewById(R.id.linearProduitNonIdentifie)).setAlpha(1F);
+                ((LinearLayout) findViewById(R.id.linearProduitIdentifie)).setAlpha(0.5F);
+                listViewProduits.smoothScrollToPositionFromTop(0, 0, 250);
+            }
+        });
     }
 
     @Override
@@ -80,23 +116,23 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
         if (listeAAfficher.size() == 1) {
             passerAuDetailProduit(listeAAfficher.get(0));
         } else if (listeAAfficher.size() > 1) {
-            //Alerte.afficherAlerte(ListeProduitsIdentificationParScanActivity.this, "Attention", "Plusieurs produits correspondent à ce code.", "alerte");
         } else {
             listeAAfficher = ProduitOpenHelper.getProduitsNonIdentifier(db);
         }
 
         // Affichage de la liste
-        adapter = new Produit_IdentificationParScanAdapter(ListeProduitsIdentificationParScanActivity.this, listeAAfficher, db);
-        listViewProduits.setDivider(footer);
-        listViewProduits.setAdapter(adapter);
+        if (adapter == null) {
+            adapter = new Produit_IdentificationParScanAdapter(this, listeAAfficher, db);
+            listViewProduits.setAdapter(adapter);
+        } else {
+            adapter.replaceData(listeAAfficher);
+        }
 
         listViewProduits.setOnItemClickListener((parent, view, position, id) -> {
             Produit produitSelectionne = (Produit) adapter.getItem(position);
             assert produitSelectionne != null;
             passerAuDetailProduit(produitSelectionne);
         });
-        // Mise à jour du nombre de produits
-        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeAAfficher.size()));
     }
 
     public void passerAuDetailProduit(Produit produitSelectionne) {

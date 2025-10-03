@@ -384,8 +384,7 @@ public class MedicalObjective {
                 if(activityName.contentEquals("DetailPADActivity")){
                 }
                 if(activityName.contentEquals("DetailProduitIdentificationParScanActivity")){
-                    ((DetailProduitIdentificationParScanActivity) context).photo.setImageBitmap(response);
-                    ((DetailProduitIdentificationParScanActivity) context).photo.setVisibility(View.VISIBLE);
+
                 }
             }
         }, 0, 0, null, null);

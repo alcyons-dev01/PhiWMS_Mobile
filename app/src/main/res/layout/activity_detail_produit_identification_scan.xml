@@ -11,478 +11,326 @@
         android:id="@+id/barreDeTitre"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:background="@color/bleu_fonce_alcyons"
-        android:orientation="vertical">
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
 
-        <RelativeLayout
+        <TextView
+            android:id="@+id/nomProduit"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/nomProduit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:text="nomProduit"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-        </RelativeLayout>
+            android:layout_height="match_parent"
+            android:background="@color/vert"
+            android:text=""
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:padding="10dp"/>
 
     </LinearLayout>
 
-    <ScrollView
+    <LinearLayout
+        android:id="@+id/zoneCodeGS1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/barreDeTitre">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/barreDeTitre"
+        android:orientation="horizontal"
+        android:layout_margin="5dp">
 
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/layoutcodeGS1"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="10"
+            android:layout_gravity="center"
+            android:padding="10dp"
+            android:visibility="visible">
 
-            <LinearLayout
-                android:id="@+id/zoneCodeGS1"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/codeGS1"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
-
-
-
-                <LinearLayout
-                    android:id="@+id/layoutcodeGS1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:weightSum="10"
-                    android:layout_gravity="center"
-                    android:padding="10dp"
-                    android:visibility="visible">
-
-                    <TextView
-                        android:id="@+id/codeGS1"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:gravity="center_horizontal|center_vertical"
-                        android:text=""
-                        android:textColor="@android:color/black"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:layout_weight="10"/>
-
-                    <ImageView
-                        android:id="@+id/suppressioncodescanne"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/ic_croix_noir"
-                        android:visibility="gone"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/layouteditcode"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:background="@drawable/background_encadrer_vert"
-                    android:weightSum="10"
-                    android:layout_gravity="center"
-                    android:padding="10dp"
-                    android:visibility="gone">
-
-                    <EditText
-                        android:id="@+id/editcodescanne"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="10"
-                        android:textStyle="bold"
-                        android:textSize="16dp"
-                        android:paddingLeft="10dp"
-                        android:text=""/>
-
-                </LinearLayout>
-
-
-            </LinearLayout>
+                android:layout_gravity="center_vertical"
+                android:gravity="center_horizontal|center_vertical"
+                android:text=""
+                android:textColor="@android:color/black"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_weight="10"/>
 
             <ImageView
-                android:id="@+id/separateur1"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_below="@id/zoneCodeGS1"
-                android:layout_margin="15dp"
-                android:background="@android:color/darker_gray" />
-
-            <RelativeLayout
-                android:id="@+id/contenuPage"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/separateur1"
-                android:gravity="center_horizontal">
-
-                <LinearLayout
-                    android:id="@+id/zoneGtin"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:orientation="horizontal"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="GTIN : "
-                        android:textColor="@android:color/holo_blue_light"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/gtin"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textColor="@android:color/holo_blue_light"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/zoneSerie"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:layout_below="@id/zoneGtin"
-                    android:orientation="horizontal"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="N° Série : "
-                        android:textColor="@android:color/holo_blue_light"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/numSerie"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textColor="@android:color/holo_blue_light"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/zoneLot"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/zoneSerie"
-                    android:layout_margin="10dp"
-                    android:orientation="horizontal"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Lot scanné : "
-                        android:textColor="@android:color/holo_blue_light"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/numLot"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textColor="@android:color/holo_blue_light"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/warningPeremption"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/zoneLot"
-                    android:layout_centerHorizontal="true"
-                    android:background="@android:color/holo_red_light"
-                    android:gravity="center_horizontal"
-                    android:padding="15dp"
-                    android:text="ATTENTION : Produit périmé"
-                    android:textColor="@android:color/white"
-                    android:textSize="17sp"
-                    android:textStyle="bold"
-                    android:visibility="gone"/>
-
-                <LinearLayout
-                    android:id="@+id/layoutIdentification"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_below="@id/zoneGtin">
-
-                    <TextView
-                        android:id="@+id/warningNonIdentifie"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:background="@android:color/holo_red_light"
-                        android:gravity="center_horizontal"
-                        android:padding="15dp"
-                        android:text="RÉFÉRENCE NON IDENTIFIÉE"
-                        android:textColor="@android:color/white"
-                        android:textSize="17sp"
-                        android:textStyle="bold"
-                        android:visibility="gone"/>
-
-                    <TextView
-                        android:id="@+id/referenceIdentifie"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:background="@color/vert"
-                        android:gravity="center_horizontal"
-                        android:padding="15dp"
-                        android:text="RÉFÉRENCE IDENTIFIÉE"
-                        android:textColor="@android:color/white"
-                        android:textSize="17sp"
-                        android:textStyle="bold"
-                        android:visibility="gone"/>
-
-                    <TextView
-                        android:id="@+id/referenceEnCoursIdentification"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:background="@color/bleu_clair_alcyons"
-                        android:gravity="center_horizontal"
-                        android:padding="15dp"
-                        android:text="RÉFÉRENCE EN COURS D'IDENTIFICATION"
-                        android:textColor="@android:color/white"
-                        android:textSize="17sp"
-                        android:textStyle="bold"
-                        android:visibility="gone"/>
-
-                </LinearLayout>
-
-
-                <LinearLayout
-                    android:id="@+id/zonePeremption"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/warningPeremption"
-                    android:layout_margin="10dp"
-                    android:orientation="horizontal"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Date de péremption : "
-                        android:textColor="@android:color/holo_blue_light"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/datePeremption"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textColor="@android:color/holo_blue_light"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/zoneConditionnement"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/zonePeremption"
-                    android:layout_margin="10dp"
-                    android:orientation="horizontal"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Conditionnement : "
-                        android:textColor="@android:color/holo_blue_light"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/conditionnement"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textColor="@android:color/holo_blue_light"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/separateur2"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_below="@id/layoutIdentification"
-                    android:layout_margin="15dp"
-                    android:background="@android:color/darker_gray" />
-
-                <LinearLayout
-                    android:id="@+id/zoneFournisseur"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/separateur2"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Fournisseur : "
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/nomFournisseur"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" ("
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/referenceFournisseur"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/textView2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=")"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/zoneCategorie"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/zoneFournisseur"
-                    android:layout_margin="10dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Catégorie : "
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/categorie"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/zoneCondAchat"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/zoneCategorie"
-                    android:layout_marginBottom="20dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Conditionnement d'achat Phi : "
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/condAchat"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/zoneCondDistrib"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/zoneCondAchat"
-                    android:layout_marginBottom="20dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Conditionnement d'achat Phi : "
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/condDistrib"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-
-            </RelativeLayout>
-
-
-            <ImageView
-                android:id="@+id/photo"
-                android:layout_width="640dp"
-                android:layout_height="480dp"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/photoProduit"
-                android:layout_below="@id/contenuPage"
+                android:id="@+id/suppressioncodescanne"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:background="@drawable/ic_croix_noir"
                 android:visibility="gone"/>
 
-        </RelativeLayout>
-    </ScrollView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layouteditcode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/background_encadrer_vert"
+            android:weightSum="10"
+            android:layout_gravity="center"
+            android:padding="10dp"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/editcodescanne"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="10"
+                android:textStyle="bold"
+                android:textSize="16dp"
+                android:paddingLeft="10dp"
+                android:text=""/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/separateur1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/zoneCodeGS1"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="15dp"
+        android:background="@android:color/darker_gray" />
+
+    <RelativeLayout
+        android:id="@+id/contenuPage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/separateur1"
+        android:gravity="center_horizontal">
+
+        <LinearLayout
+            android:id="@+id/layoutIdentification"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/warningNonIdentifie"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:background="@android:color/holo_red_light"
+                android:gravity="center_horizontal"
+                android:padding="15dp"
+                android:text="RÉFÉRENCE NON IDENTIFIÉE"
+                android:textColor="@android:color/white"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/referenceIdentifie"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:background="@color/vert"
+                android:gravity="center_horizontal"
+                android:padding="15dp"
+                android:text="RÉFÉRENCE IDENTIFIÉE"
+                android:textColor="@android:color/white"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/referenceEnCoursIdentification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:background="@color/bleu_clair_alcyons"
+                android:gravity="center_horizontal"
+                android:padding="15dp"
+                android:text="RÉFÉRENCE EN COURS D'IDENTIFICATION"
+                android:textColor="@android:color/white"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/zoneRefFournisseur"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/layoutIdentification"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginVertical="10dp"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/grey_color"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Référence"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/referenceFournisseur"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:maxLines="1"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/zoneFournisseur"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/zoneRefFournisseur"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginVertical="10dp"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/separateurMessage"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/grey_color"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fournisseur"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/nomFournisseur"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:maxLines="1"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/zoneCategorie"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/zoneFournisseur"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginVertical="10dp"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/separateurFournisseur"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/grey_color"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Catégorie"
+                android:textSize="14sp"
+                android:textStyle="" />
+
+            <TextView
+                android:id="@+id/categorie"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:maxLines="1"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/zoneClassATC"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/zoneCategorie"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginVertical="10dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/separateurCategorie"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/grey_color"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Classe ATC"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/classATC"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:maxLines="1"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/zoneDCI"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/zoneClassATC"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginVertical="10dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/separateurATC"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/grey_color"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="DCI"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/dci"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:maxLines="1"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/boutonValidation"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="@drawable/ic_check_circle_green"
+            android:backgroundTint="@color/vert"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_alignParentBottom="true"/>
+
+    </RelativeLayout>
+
 </RelativeLayout>

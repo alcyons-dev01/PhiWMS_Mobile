@@ -47,6 +47,23 @@ public class ProduitOpenHelper extends DBOpenHelper {
         return nbRetours;
     }
 
+    public static int getNbProduitIdentifier(SQLiteDatabase db) {
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT+" WHERE "+Constantes.CLE_COL_GTIN_PRODUIT+" != \"\" OR "+Constantes.CLE_COL_CODE_INCONNU+" != \"\"", null);
+        int nbReferences = cursor.getCount();
+        cursor.close();
+        cursor = null;
+        return nbReferences;
+    }
+
+
+    public static int getNbProduitNonIdentifier(SQLiteDatabase db) {
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT+" WHERE "+Constantes.CLE_COL_GTIN_PRODUIT+" = \"\" AND "+Constantes.CLE_COL_CODE_INCONNU+" = \"\"", null);
+        int nbReferences = cursor.getCount();
+        cursor.close();
+        cursor = null;
+        return nbReferences;
+    }
+
     public static List<Produit> getAllMedicaments(final SQLiteDatabase db) {
         List<Produit> produitList = new ArrayList<>();
 
@@ -78,7 +95,7 @@ public class ProduitOpenHelper extends DBOpenHelper {
     public static List<Produit> getAllProduits(final SQLiteDatabase db) {
         List<Produit> produitList = new ArrayList<>();
 
-        Cursor cursor = db.query(true, Constantes.TABLE_PRODUIT, new String[]{"*"}, null, null, Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT, null, null, null);
+        Cursor cursor = db.query(true, Constantes.TABLE_PRODUIT+" WHERE "+Constantes.CLE_COL_ARRET_COMMANDE_PRODUIT+" != 1", new String[]{"*"}, null, null, Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT, null, null, null);
 
         while (cursor.moveToNext()) {
             Produit produit = new Produit(cursor);
@@ -186,7 +203,7 @@ public class ProduitOpenHelper extends DBOpenHelper {
 
     public static List<Produit> getProduitsNonIdentifier(SQLiteDatabase db) {
         List<Produit> produitList = new ArrayList<>();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + Constantes.CLE_COL_GTIN_PRODUIT + "= \"\" AND "+Constantes.CLE_COL_CODE_INCONNU+"= \"\" AND "+Constantes.CLE_COL_ARRET_COMMANDE_PRODUIT+" != 1 ", new String[]{});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + Constantes.CLE_COL_GTIN_PRODUIT + "= \"\" AND "+Constantes.CLE_COL_CODE_INCONNU+"= \"\" AND "+Constantes.CLE_COL_ARRET_COMMANDE_PRODUIT+" != 1 ORDER BY "+Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT, new String[]{});
 
         while (cursor.moveToNext()) {
             Produit produit = new Produit(cursor);
@@ -196,6 +213,20 @@ public class ProduitOpenHelper extends DBOpenHelper {
         cursor = null;
         return produitList;
     }
+
+    public static List<Produit> getProduitsIdentifier(SQLiteDatabase db) {
+        List<Produit> produitList = new ArrayList<>();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + Constantes.CLE_COL_GTIN_PRODUIT + "!= \"\" OR "+Constantes.CLE_COL_CODE_INCONNU+"!= \"\" AND "+Constantes.CLE_COL_ARRET_COMMANDE_PRODUIT+" != 1 ORDER BY "+Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT, new String[]{});
+
+        while (cursor.moveToNext()) {
+            Produit produit = new Produit(cursor);
+            produitList.add(produit);
+        }
+        cursor.close();
+        cursor = null;
+        return produitList;
+    }
+
 
     public static List<Produit> getProduitsParGTIN(SQLiteDatabase db, String produitGTIN) {
         List<Produit> produitList = new ArrayList<>();

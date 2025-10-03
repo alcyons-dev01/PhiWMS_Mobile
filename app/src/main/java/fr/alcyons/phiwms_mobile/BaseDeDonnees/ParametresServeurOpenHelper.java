@@ -310,7 +310,7 @@ public class ParametresServeurOpenHelper extends DBOpenHelper {
             String base = "http://";
             String ipServeur = cursor.getString(Constantes.NUM_COL_IP_SERVEUR_PARAMETRES_SERVEUR);
 
-            urlARetourner = base + ipServeur+ ":80" + "/";
+            urlARetourner = base + ipServeur+ ":81" + "/";
         }
         cursor.close();
         cursor = null;

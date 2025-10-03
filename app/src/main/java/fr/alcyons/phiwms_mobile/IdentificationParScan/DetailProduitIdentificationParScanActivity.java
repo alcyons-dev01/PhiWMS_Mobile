@@ -55,10 +55,7 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
     String ancienGTIN;
     String ancienCodeInconnu;
     Boolean estCodeGS1;
-    boolean confirmation;
-
-    PackageManager pm;
-    public ImageView photo;
+    ImageView boutonValidation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,9 +63,6 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
         setContentView(R.layout.activity_detail_produit_identification_scan);
 
         //gestion du package manager
-        pm = DetailProduitIdentificationParScanActivity.this.getPackageManager();
-        photo = (ImageView) findViewById(R.id.photo);
-
         messageAlerte = "";
         codeComplet = "";
         estCodeGS1 = false;
@@ -92,13 +86,28 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
                 ((TextView) findViewById(R.id.codeGS1)).setText(codeComplet);
                 ((TextView) findViewById(R.id.referenceIdentifie)).setVisibility(View.VISIBLE);
                 ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.GONE);
+
+                if(estCodeGS1)
+                {
+                    ((TextView) findViewById(R.id.referenceIdentifie)).setText("RÉFÉRENCE IDENTIFIÉE (Code GS1)");
+                }
+                else
+                {
+                    ((TextView) findViewById(R.id.referenceIdentifie)).setText("RÉFÉRENCE IDENTIFIÉE (Type inconnu)");
+                }
             }
             else
             {
                 if(estCodeGS1)
+                {
                     produitSelectionne.setGTIN(codeComplet);
+                    ((TextView) findViewById(R.id.referenceIdentifie)).setText("RÉFÉRENCE IDENTIFIÉE (Code GS1)");
+                }
                 else
+                {
                     produitSelectionne.setCodeInconnue(codeComplet);
+                    ((TextView) findViewById(R.id.referenceIdentifie)).setText("RÉFÉRENCE IDENTIFIÉE (Type inconnu)");
+                }
                 ((TextView) findViewById(R.id.referenceIdentifie)).setVisibility(View.GONE);
                 ((TextView) findViewById(R.id.warningNonIdentifie)).setVisibility(View.GONE);
                 ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.VISIBLE);
@@ -198,9 +207,15 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
                         if(modifiable)
                         {
                             if(estCodeGS1)
+                            {
                                 produitSelectionne.setGTIN(codeIdentification);
+                                ((TextView) findViewById(R.id.referenceIdentifie)).setText("RÉFÉRENCE IDENTIFIÉE (Code GS1)");
+                            }
                             else
+                            {
                                 produitSelectionne.setCodeInconnue(codeIdentification);
+                                ((TextView) findViewById(R.id.referenceIdentifie)).setText("RÉFÉRENCE IDENTIFIÉE (Type inconnu)");
+                            }
                             ((TextView) findViewById(R.id.codeGS1)).setText(codeIdentification);
                             ((TextView) findViewById(R.id.referenceIdentifie)).setVisibility(View.GONE);
                             ((TextView) findViewById(R.id.warningNonIdentifie)).setVisibility(View.GONE);
@@ -245,13 +260,24 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
         }
 
         //récupération photo
-        Depot depot = DepotOpenHelper.getDepotPUI(db);
-        MedicalObjective medicalObjective = new MedicalObjective(DetailProduitIdentificationParScanActivity.this, utilisateurConnecte, depot, depot, produitSelectionne, true);
-        medicalObjective.getPictureImage("DetailProduitIdentificationParScanActivity");
-
         String identification = produitSelectionne.getGTIN();
         if(identification.contentEquals(""))
+        {
             identification = produitSelectionne.getCodeInconnue();
+            if(!identification.contentEquals(""))
+                estCodeGS1 = false;
+        }
+        else
+            estCodeGS1 = true;
+
+        if(estCodeGS1)
+        {
+            ((TextView) findViewById(R.id.referenceIdentifie)).setText("RÉFÉRENCE IDENTIFIÉE (Code GS1)");
+        }
+        else
+        {
+            ((TextView) findViewById(R.id.referenceIdentifie)).setText("RÉFÉRENCE IDENTIFIÉE (Type inconnu)");
+        }
 
         // Affichage des valeurs
         ((TextView) findViewById(R.id.nomProduit)).setText(produitSelectionne.getDesignation_interne().trim());
@@ -259,36 +285,21 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
         ((TextView) findViewById(R.id.nomFournisseur)).setText(produitSelectionne.getFournisseur().trim());
         ((TextView) findViewById(R.id.referenceFournisseur)).setText(produitSelectionne.getRef_fourni().trim());
         ((TextView) findViewById(R.id.categorie)).setText(produitSelectionne.getCategorie().trim());
-        ((TextView) findViewById(R.id.condAchat)).setText(String.valueOf(produitSelectionne.getCond_achat()).trim());
-        ((TextView) findViewById(R.id.condDistrib)).setText(String.valueOf(produitSelectionne.getCond_distrib()).trim());
 
-    }
+        if(produitSelectionne.getClasse_numero() == 1)
+        {
+            ((LinearLayout) findViewById(R.id.zoneClassATC)).setVisibility(View.VISIBLE);
+            ((LinearLayout) findViewById(R.id.zoneDCI)).setVisibility(View.VISIBLE);
+            String classeATC = "";
+            if(produitSelectionne.getClasseATC() != null)
+                classeATC = produitSelectionne.getClasseATC();
+            ((TextView) findViewById(R.id.classATC)).setText(classeATC);
+            ((TextView) findViewById(R.id.dci)).setText(produitSelectionne.getDCI());
+        }
 
-    @SuppressLint("SimpleDateFormat")
-    @Override
-    public void onResume() {
-        super.onResume();
-        invalidateOptionsMenu();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        //Récupération du menu
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_action, menu);
-
-        menu.findItem(R.id.menuSaveCircle).setVisible(true);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem itemSave = menu.findItem(R.id.menuSaveCircle);
-
-        itemSave.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        ((ImageView) findViewById(R.id.boutonValidation)).setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
+            public void onClick(View v) {
                 if(ancienGTIN.contentEquals(produitSelectionne.getGTIN()) && ancienCodeInconnu.contentEquals(produitSelectionne.getCodeInconnue()))
                 {
                     retourService(DetailProduitIdentificationParScanActivity.this.getBundle());
@@ -297,11 +308,15 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
                 {
                     onMenuSaveClick();
                 }
-                return true;
             }
         });
+    }
 
-        return true;
+    @SuppressLint("SimpleDateFormat")
+    @Override
+    public void onResume() {
+        super.onResume();
+        invalidateOptionsMenu();
     }
 
     private void onMenuSaveClick()
