@@ -98,7 +98,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:background="@drawable/phitagplace"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
         android:layout_centerInParent="true"
@@ -130,7 +130,7 @@
         android:layout_gravity="center"
         android:layout_below="@+id/EmplacementLotProduit"
         android:layout_centerInParent="true"
-        android:visibility="gone"/>
+        android:visibility="visible"/>
 
     <!-- TEXT VIEW INSTRUCTION -->
     <TextView
@@ -138,7 +138,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/rouge"
-        android:text="Scannez un emplacement"
+        android:text="Scannez une référence"
         android:textColor="#FFFFFF"
         android:textSize="17sp"
         android:textStyle="bold"
@@ -502,7 +502,7 @@
                 android:visibility="visible"
                 android:layout_gravity="center"
                 android:layout_centerInParent="true"
-                android:layout_below="@+id/LinearLayoutBoutonBarcode"/>
+                android:layout_below="@+id/LinearLayoutBoutonBarcode" />
 
             <TextView
                 android:layout_width="match_parent"

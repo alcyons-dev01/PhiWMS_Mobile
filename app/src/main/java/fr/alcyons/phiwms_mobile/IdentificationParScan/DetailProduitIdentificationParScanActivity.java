@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -40,6 +42,7 @@ import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
+import fr.alcyons.phiwms_mobile.Outils.GS1Parser;
 import fr.alcyons.phiwms_mobile.Outils.MedicalObjective;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.R;
@@ -56,7 +59,8 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
     String ancienCodeInconnu;
     Boolean estCodeGS1;
     ImageView boutonValidation;
-
+    private Handler handler = new Handler(Looper.getMainLooper());
+    private Runnable lectureTerminee = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +90,6 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
                 ((TextView) findViewById(R.id.codeGS1)).setText(codeComplet);
                 ((TextView) findViewById(R.id.referenceIdentifie)).setVisibility(View.VISIBLE);
                 ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.GONE);
-
                 if(estCodeGS1)
                 {
                     ((TextView) findViewById(R.id.referenceIdentifie)).setText("RÉFÉRENCE IDENTIFIÉE (Code GS1)");
@@ -113,23 +116,6 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
                 ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.VISIBLE);
                 ((LinearLayout) findViewById(R.id.layouteditcode)).setVisibility(View.GONE);
                 ((LinearLayout) findViewById(R.id.layoutcodeGS1)).setVisibility(View.VISIBLE);
-                ((ImageView) findViewById(R.id.suppressioncodescanne)).setVisibility(View.VISIBLE);
-
-                ((ImageView) findViewById(R.id.suppressioncodescanne)).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        produitSelectionne.setGTIN("");
-                        produitSelectionne.setCodeInconnue("");
-                        ((TextView) findViewById(R.id.codeGS1)).setText("");
-                        ((LinearLayout) findViewById(R.id.layoutcodeGS1)).setVisibility(View.GONE);
-                        ((ImageView) findViewById(R.id.suppressioncodescanne)).setVisibility(View.GONE);
-                        ((LinearLayout) findViewById(R.id.layouteditcode)).setVisibility(View.VISIBLE);
-                        ((EditText) findViewById(R.id.editcodescanne)).setText("");
-                        ((EditText) findViewById(R.id.editcodescanne)).requestFocus();
-                        ((TextView) findViewById(R.id.warningNonIdentifie)).setVisibility(View.VISIBLE);
-                        ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.GONE);
-                    }
-                });
             }
         }
         else if(produitSelectionne.getGTIN().contentEquals("") && produitSelectionne.getCodeInconnue().contentEquals(""))
@@ -138,121 +124,7 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
             ((LinearLayout) findViewById(R.id.layouteditcode)).setVisibility(View.VISIBLE);
             ((LinearLayout) findViewById(R.id.layoutcodeGS1)).setVisibility(View.GONE);
             ((EditText) findViewById(R.id.editcodescanne)).requestFocus();
-
-            ((EditText) findViewById(R.id.editcodescanne)).addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    String codeIdentification = "";
-
-                    if (s.toString().endsWith("\n")) {
-                        String codeRecu = s.toString().trim();
-                        if(codeRecu.startsWith("PHITAGTIN:"))
-                        {
-                            String[] tabCode = codeRecu.toString().split(":");
-                            if(tabCode.length == 2)
-                            {
-                                estCodeGS1 = true;
-                                codeIdentification = tabCode[1];
-                            }
-                        }
-                        else
-                        {
-                            Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeRecu);
-                            if (gs1Decoupe.size() != 1) {
-                                estCodeGS1 = true;
-                                codeIdentification = gs1Decoupe.get("codeGtin");
-                            } else {
-                                estCodeGS1 = false;
-                                codeIdentification = codeRecu;
-                            }
-                        }
-                    }
-                    boolean modifiable = true;
-
-                    if(!codeIdentification.contentEquals(""))
-                    {
-                        if(estCodeGS1)
-                        {
-                            List<Produit> listeProduitRecherche = ProduitOpenHelper.getProduitsParGTIN(db, codeIdentification);
-                            for(Produit produitCourant : listeProduitRecherche)
-                            {
-                                if(produitCourant.getID_produit() != produitSelectionne.getID_produit())
-                                {
-                                    modifiable = false;
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            List<Produit> listeProduitRecherche = ProduitOpenHelper.getProduitsParCodeInconnue(db, codeIdentification);
-                            for(Produit produitCourant : listeProduitRecherche)
-                            {
-                                if(produitCourant.getID_produit() != produitSelectionne.getID_produit())
-                                {
-                                    modifiable = false;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if(modifiable)
-                        {
-                            if(estCodeGS1)
-                            {
-                                produitSelectionne.setGTIN(codeIdentification);
-                                ((TextView) findViewById(R.id.referenceIdentifie)).setText("RÉFÉRENCE IDENTIFIÉE (Code GS1)");
-                            }
-                            else
-                            {
-                                produitSelectionne.setCodeInconnue(codeIdentification);
-                                ((TextView) findViewById(R.id.referenceIdentifie)).setText("RÉFÉRENCE IDENTIFIÉE (Type inconnu)");
-                            }
-                            ((TextView) findViewById(R.id.codeGS1)).setText(codeIdentification);
-                            ((TextView) findViewById(R.id.referenceIdentifie)).setVisibility(View.GONE);
-                            ((TextView) findViewById(R.id.warningNonIdentifie)).setVisibility(View.GONE);
-                            ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.VISIBLE);
-                            ((LinearLayout) findViewById(R.id.layouteditcode)).setVisibility(View.GONE);
-                            ((LinearLayout) findViewById(R.id.layoutcodeGS1)).setVisibility(View.VISIBLE);
-                            ((ImageView) findViewById(R.id.suppressioncodescanne)).setVisibility(View.VISIBLE);
-
-                            ((ImageView) findViewById(R.id.suppressioncodescanne)).setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    produitSelectionne.setGTIN("");
-                                    produitSelectionne.setCodeInconnue("");
-                                    ((TextView) findViewById(R.id.codeGS1)).setText("");
-                                    ((LinearLayout) findViewById(R.id.layoutcodeGS1)).setVisibility(View.GONE);
-                                    ((ImageView) findViewById(R.id.suppressioncodescanne)).setVisibility(View.GONE);
-                                    ((LinearLayout) findViewById(R.id.layouteditcode)).setVisibility(View.VISIBLE);
-                                    ((EditText) findViewById(R.id.editcodescanne)).setText("");
-                                    ((EditText) findViewById(R.id.editcodescanne)).requestFocus();
-                                    ((TextView) findViewById(R.id.warningNonIdentifie)).setVisibility(View.VISIBLE);
-                                    ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.GONE);
-                                }
-                            });
-                        }
-                        else
-                        {
-                            produitSelectionne.setGTIN("");
-                            produitSelectionne.setCodeInconnue("");
-                            ((EditText) findViewById(R.id.editcodescanne)).setText("");
-                            ((EditText) findViewById(R.id.editcodescanne)).requestFocus();
-                            Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Erreur", "Code GTIN déjà utilisé pour une autre référence", "alerte");
-                        }
-                    }
-
-                    ((EditText) findViewById(R.id.editcodescanne)).setShowSoftInputOnFocus(false);
-                }
-            });
+            gestionEditText();
         }
         else
         {
@@ -285,6 +157,8 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
         ((TextView) findViewById(R.id.nomFournisseur)).setText(produitSelectionne.getFournisseur().trim());
         ((TextView) findViewById(R.id.referenceFournisseur)).setText(produitSelectionne.getRef_fourni().trim());
         ((TextView) findViewById(R.id.categorie)).setText(produitSelectionne.getCategorie().trim());
+        ((ImageView) findViewById(R.id.suppressioncodescanne)).setVisibility(View.VISIBLE);
+        gestionClickSuppression();
 
         if(produitSelectionne.getClasse_numero() == 1)
         {
@@ -394,5 +268,114 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
         {
             onMenuSaveClick();
         }
+    }
+
+    private void gestionEditText()
+    {
+        ((EditText) findViewById(R.id.editcodescanne)).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s == null) return;
+
+                final String texteBrut = s.toString();
+
+                if (!texteBrut.endsWith("\n") && !texteBrut.endsWith("\r") && !texteBrut.endsWith("\t")) {
+                    return;
+                }
+
+                if(!texteBrut.contentEquals(""))
+                {
+                    // Annule tout déclenchement précédent
+                    if (lectureTerminee != null) {
+                        handler.removeCallbacks(lectureTerminee);
+                    }
+
+                    // Planifie un déclenchement différé
+                    lectureTerminee = new Runnable() {
+                        @Override
+                        public void run() {
+                            String chaineRetourner = "";
+                            GS1Parser.GS1Result result = GS1Parser.parseGS1Code(texteBrut);
+
+                            String code = result.productCode;
+                            boolean gtin = false;
+                            if(!code.contentEquals(""))
+                            {
+                                chaineRetourner = code.trim();
+                                gtin = true;
+                            }
+                            else
+                            {
+                                String texteNettoye = texteBrut.replaceAll("\u0000", "");
+                                chaineRetourner = texteNettoye.trim();
+                                gtin = false;
+                            }
+
+                            List<Produit> listeProduitIdentifier = ProduitOpenHelper.getProduitsByIdentification(db, chaineRetourner);
+                            if(listeProduitIdentifier.isEmpty())
+                            {
+                                if(gtin)
+                                {
+                                    produitSelectionne.setGTIN(chaineRetourner);
+                                }
+                                else
+                                {
+                                    produitSelectionne.setCodeInconnue(chaineRetourner);
+                                }
+
+                                ((TextView) findViewById(R.id.codeGS1)).setText(chaineRetourner);
+                                ((TextView) findViewById(R.id.referenceIdentifie)).setVisibility(View.GONE);
+                                ((TextView) findViewById(R.id.warningNonIdentifie)).setVisibility(View.GONE);
+                                ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.VISIBLE);
+                                ((LinearLayout) findViewById(R.id.layouteditcode)).setVisibility(View.GONE);
+                                ((LinearLayout) findViewById(R.id.layoutcodeGS1)).setVisibility(View.VISIBLE);
+                                ((ImageView) findViewById(R.id.suppressioncodescanne)).setVisibility(View.VISIBLE);
+                                gestionClickSuppression();
+                            }
+                            else
+                            {
+                                produitSelectionne.setGTIN("");
+                                produitSelectionne.setCodeInconnue("");
+                                ((EditText) findViewById(R.id.editcodescanne)).setText("");
+                                ((EditText) findViewById(R.id.editcodescanne)).requestFocus();
+                                Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Erreur", "Code GTIN déjà utilisé pour une autre référence", "alerte");
+                            }
+                        }
+                    };
+
+                    // Lance le traitement 200 ms après la dernière frappe
+                    handler.postDelayed(lectureTerminee, 200);
+                }
+            }
+        });
+    }
+
+    private void gestionClickSuppression()
+    {
+        ((ImageView) findViewById(R.id.suppressioncodescanne)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                produitSelectionne.setGTIN("");
+                produitSelectionne.setCodeInconnue("");
+                ((TextView) findViewById(R.id.codeGS1)).setText("");
+                ((LinearLayout) findViewById(R.id.layoutcodeGS1)).setVisibility(View.GONE);
+                ((ImageView) findViewById(R.id.suppressioncodescanne)).setVisibility(View.GONE);
+                ((TextView) findViewById(R.id.referenceEnCoursIdentification)).setVisibility(View.GONE);
+                ((TextView) findViewById(R.id.referenceIdentifie)).setVisibility(View.GONE);
+                ((LinearLayout) findViewById(R.id.layouteditcode)).setVisibility(View.VISIBLE);
+                ((EditText) findViewById(R.id.editcodescanne)).setText("");
+                ((EditText) findViewById(R.id.editcodescanne)).requestFocus();
+                ((TextView) findViewById(R.id.warningNonIdentifie)).setVisibility(View.VISIBLE);
+                gestionEditText();
+            }
+        });
     }
 }

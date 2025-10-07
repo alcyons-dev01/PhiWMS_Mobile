@@ -498,6 +498,8 @@ public class ListeLotsControleDesRetoursActivity extends ServiceActivity {
         Bundle clicBoutonAjouterManuellement_Bundle = ListeLotsControleDesRetoursActivity.super.getBundle();
         clicBoutonAjouterManuellement_Bundle.putInt("produitID", produit.getID_produit());
         clicBoutonAjouterManuellement_Bundle.putInt("depotID", depot.getDepot_UID());
+        clicBoutonAjouterManuellement_Bundle.putInt("retourUID", retour_courant.get_UID());
+        clicBoutonAjouterManuellement_Bundle.putInt("retourLigneID", retourLigne.get_UID());
 
         Intent clicBoutonAjouterManuellement_Intent = new Intent(ListeLotsControleDesRetoursActivity.this, CreationLotControleDesRetoursActivity.class);
         clicBoutonAjouterManuellement_Intent.putExtras(clicBoutonAjouterManuellement_Bundle);

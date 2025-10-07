@@ -27,6 +27,8 @@ import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import org.w3c.dom.Text;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -54,6 +56,7 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeEmplacementCreationActivity;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
+import fr.alcyons.phiwms_mobile.Outils.GS1Parser;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
 import fr.alcyons.phiwms_mobile.R;
@@ -196,6 +199,30 @@ public class ScannerPreparation2025_V2Activity  extends ServiceActivity {
                     if((codeScanne.startsWith("01") || codeScanne.startsWith("02")) && codeScanne.length() == 16)
                     {
                         tempCodeScanne = codeScanne;
+
+                        Produit produitTemp = ProduitOpenHelper.getUnProduitParGTIN(db, codeScanne);
+                        if(produitTemp == null)
+                            produitTemp = ProduitOpenHelper.getUnProduitParGTIN(db, codeScanne.substring(2));
+
+                        if(produitTemp != null)
+                        {
+                            if(emplacement_courant == null)
+                            {
+                                Depot depotPui = DepotOpenHelper.getDepotPUI(db);
+                                Depot_Zone zoneCourante = ZoneOpenHelper.getZoneByDepotEtNom(db, depotPui, produitTemp.getZone_PUI_Defaut());
+                                if(zoneCourante != null)
+                                    emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zoneCourante, produitTemp.getEmplacement_PUI_Defaut());
+                            }
+                            if(emplacement_courant != null) {
+                                ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
+                                ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.VISIBLE);
+                                ((TextView) findViewById(R.id.EmplacementLotProduit)).setVisibility(View.VISIBLE);
+                                ((ImageView) findViewById(R.id.ImageViewEmplacement)).setVisibility(View.VISIBLE);
+                                ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacement_courant.getAdressage().trim());
+                            }
+                        }
+
+                        ((TextView) findViewById(R.id.instruction)).setText("Scannez la deuxième partie du code scindé");
                     }
                     else if(tempCodeScanne != null && !tempCodeScanne.contentEquals("") && !codeScanne.startsWith("01") && !codeScanne.startsWith("02"))
                     {
@@ -205,6 +232,7 @@ public class ScannerPreparation2025_V2Activity  extends ServiceActivity {
                     }
                     else
                     {
+                        ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
                         tempCodeScanne = "";
                         String lot = "";
                         String serie;
@@ -224,6 +252,7 @@ public class ScannerPreparation2025_V2Activity  extends ServiceActivity {
                             if(emplacement_courant != null)
                             {
                                 ((TextView) findViewById(R.id.EmplacementLotProduit)).setVisibility(View.VISIBLE);
+                                ((ImageView) findViewById(R.id.ImageViewEmplacement)).setVisibility(View.VISIBLE);
                                 ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacement_courant.getAdressage().trim());
                                 ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
                                 ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.VISIBLE);
@@ -248,22 +277,17 @@ public class ScannerPreparation2025_V2Activity  extends ServiceActivity {
                         }
                         else
                         {
-                            Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeScanne);
+                            GS1Parser.GS1Result result = GS1Parser.parseGS1Code(codeScanne);
 
-                            if (gs1Decoupe.size() != 1)
+                            if (!result.productCode.contentEquals(""))
                             {
                                 //on récupère les informations du découpage du GS1
-                                lot = gs1Decoupe.get(OutilsDecodage.numeroLot);
-                                serie = gs1Decoupe.get(OutilsDecodage.numeroSerie);
-                                gtin_courant = gs1Decoupe.get(OutilsDecodage.codeGtin);
-                                gtin_courant_sans_ai = gs1Decoupe.get(OutilsDecodage.codeGtinSansAi);
-                                date_peremption_courant = gs1Decoupe.get(OutilsDecodage.dateDePeremption);
-                                date_peremption_serialisation = gs1Decoupe.get(OutilsDecodage.dateDePeremptionSerialisation);
-
-                                //gestion format date
-                                String[] date_peremption_split = date_peremption_courant.split("-");
-                                if(date_peremption_split.length == 3)
-                                    date_peremption_courant = date_peremption_split[2] + "/" + date_peremption_split[1] + "/" + date_peremption_split[0];
+                                lot = result.lotNumber;
+                                serie = result.serie;
+                                gtin_courant = "01"+result.productCode;
+                                gtin_courant_sans_ai = result.productCode;
+                                date_peremption_courant = result.expirationDateAffichage;
+                                date_peremption_serialisation = result.expirationDate;
 
                                 //récucpération du produit avec le GTIN
                                 List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gtin_courant);
@@ -303,6 +327,7 @@ public class ScannerPreparation2025_V2Activity  extends ServiceActivity {
                                     ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
                                     ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.VISIBLE);
                                     ((TextView) findViewById(R.id.EmplacementLotProduit)).setVisibility(View.VISIBLE);
+                                    ((ImageView) findViewById(R.id.ImageViewEmplacement)).setVisibility(View.VISIBLE);
                                     ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacement_courant.getAdressage().trim());
 
                                     //on vérifie que le produit courant fait partie de la liste des ph_preparation_ligne
@@ -685,6 +710,7 @@ public class ScannerPreparation2025_V2Activity  extends ServiceActivity {
             public void onClick(View view) {
                 //preparationMultipleContext.emplacement_courant = null;
                 ((TextView) findViewById(R.id.EmplacementLotProduit)).setVisibility(View.GONE);
+                ((ImageView) findViewById(R.id.ImageViewEmplacement)).setVisibility(View.GONE);
                 ((TextView) findViewById(R.id.EmplacementLotProduit)).setText("");
                 ((TextView) findViewById(R.id.instruction)).setText("Scannez un emplacement");
                 ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.GONE);
@@ -736,3 +762,8 @@ public class ScannerPreparation2025_V2Activity  extends ServiceActivity {
         }
     }
 }
+
+/**
+ * 0110818392015284172612101002111035
+ *
+ */

@@ -211,13 +211,13 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
                                 ServiceVerrouPharmacieActivity.this.finishAffinity();
                             }
                         } else {
-                            PH_SerialisationOpenHelper.viderTablePH_Serialisation(db);
+                            /*PH_SerialisationOpenHelper.viderTablePH_Serialisation(db);
                             JSONArray SerialisationJSONArray = response.getJSONArray("Ph_Serialisation");
                             for (int s = 0; s < SerialisationJSONArray.length(); s++) {
                                 JSONObject serialisationJSONObject = SerialisationJSONArray.getJSONObject(s);
                                 PH_Serialisation serialisation = new PH_Serialisation(serialisationJSONObject);
                                 PH_SerialisationOpenHelper.insererPH_SerialisationEnBDD(db, serialisation);
-                            }
+                            }*/
 
                             phPreparationJSONArray = response.getJSONArray("PH_Preparations");
                             viderTablesConcernees();

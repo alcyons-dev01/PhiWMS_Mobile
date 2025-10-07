@@ -45,6 +45,7 @@ import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeEmplacementCreationActiv
 import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeZoneCreationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
+import fr.alcyons.phiwms_mobile.Outils.GS1Parser;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.WS_SINGLE_PACK;
@@ -186,6 +187,29 @@ public class ScannerReception2025_V2Activity  extends ServiceActivity {
                     if((codeScanne.startsWith("01") || codeScanne.startsWith("02")) && codeScanne.length() == 16)
                     {
                         tempCodeScanne = codeScanne;
+                        Produit produitTemp = ProduitOpenHelper.getUnProduitParGTIN(db, codeScanne);
+                        if(produitTemp == null)
+                            produitTemp = ProduitOpenHelper.getUnProduitParGTIN(db, codeScanne.substring(2));
+
+                        if(produitTemp != null)
+                        {
+                            if(emplacement_courant == null)
+                            {
+                                Depot depotPui = DepotOpenHelper.getDepotPUI(db);
+                                Depot_Zone zoneCourante = ZoneOpenHelper.getZoneByDepotEtNom(db, depotPui, produitTemp.getZone_PUI_Defaut());
+                                if(zoneCourante != null)
+                                    emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zoneCourante, produitTemp.getEmplacement_PUI_Defaut());
+                            }
+                            if(emplacement_courant != null) {
+                                ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
+                                ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.VISIBLE);
+                                ((TextView) findViewById(R.id.EmplacementLotProduit)).setVisibility(View.VISIBLE);
+                                ((ImageView) findViewById(R.id.ImageViewEmplacement)).setVisibility(View.VISIBLE);
+                                ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacement_courant.getAdressage().trim());
+                            }
+                        }
+
+                        ((TextView) findViewById(R.id.instruction)).setText("Scannez la deuxième partie du code scindé");
                     }
                     else if(tempCodeScanne != null && !tempCodeScanne.contentEquals("") && !codeScanne.startsWith("01") && !codeScanne.startsWith("02"))
                     {
@@ -232,22 +256,17 @@ public class ScannerReception2025_V2Activity  extends ServiceActivity {
                         }
                         else
                         {
-                            Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeScanne);
+                            GS1Parser.GS1Result result = GS1Parser.parseGS1Code(codeScanne);
 
-                            if (gs1Decoupe.size() != 1)
+                            if (!result.productCode.contentEquals(""))
                             {
                                 //on récupère les informations du découpage du GS1
-                                lot = gs1Decoupe.get(OutilsDecodage.numeroLot);
-                                serie = gs1Decoupe.get(OutilsDecodage.numeroSerie);
-                                gtin_courant = gs1Decoupe.get(OutilsDecodage.codeGtin);
-                                gtin_courant_sans_ai = gs1Decoupe.get(OutilsDecodage.codeGtinSansAi);
-                                date_peremption_courant = gs1Decoupe.get(OutilsDecodage.dateDePeremption);
-                                date_peremption_serialisation = gs1Decoupe.get(OutilsDecodage.dateDePeremptionSerialisation);
-
-                                //gestion format date
-                                String[] date_peremption_split = date_peremption_courant.split("-");
-                                if(date_peremption_split.length == 3)
-                                    date_peremption_courant = date_peremption_split[2] + "/" + date_peremption_split[1] + "/" + date_peremption_split[0];
+                                lot = result.lotNumber;
+                                serie = result.serie;
+                                gtin_courant = "01"+result.productCode;
+                                gtin_courant_sans_ai = result.productCode;
+                                date_peremption_courant = result.expirationDateAffichage;
+                                date_peremption_serialisation = result.expirationDate;
 
                                 //récucpération du produit avec le GTIN
                                 List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gtin_courant);
@@ -433,29 +452,6 @@ public class ScannerReception2025_V2Activity  extends ServiceActivity {
 
                                                 //gestion du clic sur le compteur
                                                 int finalQte_restante = qte_restante;
-                                                if(!produitCourant.isSuivi_Serialisation() || !produitCourant.isSerialiser_Reception_Delivrance())
-                                                {
-                                                    findViewById(R.id.layout_qte_saisie_lot_preparation).setOnClickListener(view -> {
-                                                        Context context = ScannerReception2025_V2Activity.this;
-
-                                                        String title = lot;
-                                                        String message = "Quantité placée : ";
-                                                        int value_max = finalQte_restante;
-
-                                                        int maxValue = value_max;
-                                                        int value = finalQte_restante;
-
-                                                        DialogInterface.OnClickListener onClickListener = (dialog, id) -> {
-                                                            int qteApres = Alerte.aNumberPicker.getValue() * Integer.parseInt(conditionnement);
-
-                                                            ((TextView) findViewById(R.id.qteSaisie)).setText(String.valueOf(qteApres));
-
-                                                            dialog.dismiss();
-                                                        };
-
-                                                        Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, Integer.parseInt(conditionnement));
-                                                    });
-                                                }
 
                                                 //gestion de la validation du scan
                                                 ((LinearLayout) findViewById(R.id.layoutIconeValidation)).setVisibility(View.VISIBLE);

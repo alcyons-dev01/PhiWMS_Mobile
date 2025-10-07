@@ -83,7 +83,7 @@ public class Produit_IdentificationParScanAdapter extends ArrayAdapter {
         viewHolder.nom.setText(produitCourant.getDesignation_interne());
         viewHolder.refProduit.setText(produitCourant.getRef_fourni());
         viewHolder.fournisseurProduit.setText(produitCourant.getFournisseur());
-        if(produitCourant.getGTIN().contentEquals(""))
+        if(produitCourant.getGTIN().contentEquals("") && produitCourant.getGTIN() != null)
         {
             viewHolder.gtinProduit.setText(produitCourant.getCodeInconnue());
             viewHolder.gtinProduit.setTextColor(context.getResources().getColorStateList(R.color.orange));

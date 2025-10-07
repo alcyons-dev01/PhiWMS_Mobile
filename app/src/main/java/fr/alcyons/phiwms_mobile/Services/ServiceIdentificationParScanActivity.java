@@ -113,26 +113,20 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
                     }
                     else
                     {
-                        Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeComplet);
-                        if (gs1Decoupe.size() != 1) {
-                            // Si le code est valide, on lance l'activité de liste des produits correspondants à ce code
-                            Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
-                            Bundle extras = ServiceIdentificationParScanActivity.super.getBundle();
-                            extras.putString("codeGS1", gs1Decoupe.get("codeGtin"));
-                            newIntent.putExtras(extras);
-                            ServiceIdentificationParScanActivity.this.startActivity(newIntent);
-                            ServiceIdentificationParScanActivity.this.finish();
+                        Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
+                        Bundle extras = ServiceIdentificationParScanActivity.super.getBundle();
+                        boolean gtin = data.getBooleanExtra("gtin", false);
+                        if (gtin) {
+                            extras.putString("codeGS1", codeComplet);
                         }
                         else
                         {
-                            // Si le code fourni n'est pas valide, on affiche un message d'erreur et on redémarre l'activité pour réinitialiser le booléen firstPassage
-                            Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
-                            Bundle extras = ServiceIdentificationParScanActivity.super.getBundle();
                             extras.putString("codeInconnue", codeComplet);
-                            newIntent.putExtras(extras);
-                            ServiceIdentificationParScanActivity.this.startActivity(newIntent);
-                            ServiceIdentificationParScanActivity.this.finish();
                         }
+
+                        newIntent.putExtras(extras);
+                        ServiceIdentificationParScanActivity.this.startActivity(newIntent);
+                        ServiceIdentificationParScanActivity.this.finish();
                     }
 
                 } else {

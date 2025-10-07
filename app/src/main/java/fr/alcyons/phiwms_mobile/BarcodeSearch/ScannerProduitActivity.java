@@ -3,6 +3,8 @@ package fr.alcyons.phiwms_mobile.BarcodeSearch;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -11,6 +13,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.ProduitContexte;
@@ -18,6 +21,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
+import fr.alcyons.phiwms_mobile.Outils.GS1Parser;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
@@ -38,7 +42,8 @@ public class ScannerProduitActivity extends ServiceActivity {
     TextView numDocTextView;
     TextView depot;
 
-
+    private Handler handler = new Handler(Looper.getMainLooper());
+    private Runnable lectureTerminee = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -137,23 +142,63 @@ public class ScannerProduitActivity extends ServiceActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.toString().endsWith("\n")) {
-                    produitContexte.onTextWatcher(s);
-                    Intent scannerSearchOnlyIntent = new Intent();
-                    Bundle scannerSearchOnlyBundle = ScannerProduitActivity.super.getBundle();
-                    int codeEchangeActivity = 0;
+                if (s == null) return;
 
-                    scannerSearchOnlyBundle.putString("code", produitContexte.code);
-                    scannerSearchOnlyBundle.putString("numLot", "");
-                    scannerSearchOnlyBundle.putString("numSerie", "");
-                    scannerSearchOnlyBundle.putString("datePeremption", "");
-                    scannerSearchOnlyIntent.putExtras(scannerSearchOnlyBundle);
-                    ScannerProduitActivity.this.setResult(codeEchangeActivity, scannerSearchOnlyIntent);
-                    ScannerProduitActivity.this.finish();
+                final String texteBrut = s.toString();
 
-                    EditTextScanee.getText().clear();
+                // Annule tout déclenchement précédent
+                if (lectureTerminee != null) {
+                    handler.removeCallbacks(lectureTerminee);
                 }
-                EditTextScanee.setShowSoftInputOnFocus(false);
+
+                // Planifie un déclenchement différé
+                lectureTerminee = new Runnable() {
+                    @Override
+                    public void run() {
+
+                        String chaineRetourner = "";
+                        GS1Parser.GS1Result result = GS1Parser.parseGS1Code(texteBrut);
+
+                        String code = result.productCode;
+                        String lot = result.lotNumber;
+                        String date = result.expirationDate;
+                        String serie = result.serie;
+                        boolean gtin = false;
+                        if(!code.contentEquals(""))
+                        {
+                            chaineRetourner = code;
+                            gtin = true;
+                        }
+                        else
+                        {
+                            String texteNettoye = texteBrut.replaceAll("\u0000", "");
+                            chaineRetourner = texteNettoye;
+                            gtin = false;
+                        }
+
+                        // Détection d’un GTIN (AI 01) ou d’un retour ligne
+                        Intent scannerSearchOnlyIntent = new Intent();
+                        Bundle scannerSearchOnlyBundle = ScannerProduitActivity.super.getBundle();
+                        int codeEchangeActivity = 0;
+
+                        scannerSearchOnlyBundle.putString("code", chaineRetourner.trim());
+                        scannerSearchOnlyBundle.putString("numLot", "");
+                        scannerSearchOnlyBundle.putString("numSerie", "");
+                        scannerSearchOnlyBundle.putString("datePeremption", "");
+                        scannerSearchOnlyBundle.putBoolean("gtin", gtin);
+                        scannerSearchOnlyIntent.putExtras(scannerSearchOnlyBundle);
+
+                        ScannerProduitActivity.this.setResult(codeEchangeActivity, scannerSearchOnlyIntent);
+                        ScannerProduitActivity.this.finish();
+
+                        EditTextScanee.getText().clear();
+
+                        EditTextScanee.setShowSoftInputOnFocus(false);
+                    }
+                };
+
+                // Lance le traitement 200 ms après la dernière frappe
+                handler.postDelayed(lectureTerminee, 200);
             }
         });
     }

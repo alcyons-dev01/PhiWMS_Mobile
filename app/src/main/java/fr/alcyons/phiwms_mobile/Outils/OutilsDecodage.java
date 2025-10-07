@@ -169,7 +169,7 @@ public class OutilsDecodage {
             }
         }
 
-        if (scanner_VA.length() > 16) {
+        if (scanner_VA.length() >= 16) {
             int i=0;
             while (i<7) {
                 String AI_Courant = "";

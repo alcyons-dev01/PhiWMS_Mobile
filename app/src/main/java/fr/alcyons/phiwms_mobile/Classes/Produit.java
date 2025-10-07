@@ -216,7 +216,10 @@ public class Produit implements Serializable, Comparable {
         this.Arret_Commande =recupererBooleen(produitJson,  "Arret_Commande");
         this.Commentaire = produitJson.optString("Commentaire");
         this.Classe_numero = produitJson.optInt("Classe_numero");
-        this.GTIN = produitJson.optString("GTIN");
+        String gtin_temp = produitJson.optString("GTIN");
+        if(gtin_temp.contentEquals("null") || gtin_temp == null)
+            gtin_temp = "";
+        this.GTIN = gtin_temp;
         this.Emplacement_PUI_Defaut = produitJson.optString("Emplacement_PUI_Defaut");
         this.Informations_importantes = produitJson.optString("Informations_importantes");
         this.Zone_UF_Defaut = produitJson.optString("Zone_UF_Defaut");
@@ -248,7 +251,10 @@ public class Produit implements Serializable, Comparable {
         this.Zone_PAD_Defaut = produitJson.optString("Zone_PAD_Defaut");
         this.Emplacement_PAD_Defaut = produitJson.optString("Emplacement_PAD_Defaut");
         this.UCD_NomCourt = produitJson.optString("UCD_NomCourt");
-        this.codeInconnue = produitJson.optString("codeInconnue");
+        String inconnuTemp =produitJson.optString("codeInconnue");
+        if(inconnuTemp.contentEquals("null") || inconnuTemp == null)
+            inconnuTemp = "";
+        this.codeInconnue = inconnuTemp;
         this.Suivi_Serialisation =recupererBooleen(produitJson, "Suivi_Serialisation");
         this.Serialiser_Reception_Delivrance =recupererBooleen(produitJson, "Serialiser_Reception_Delivrance");
     }

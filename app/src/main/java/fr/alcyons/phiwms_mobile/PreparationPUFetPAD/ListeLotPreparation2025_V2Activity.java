@@ -399,7 +399,7 @@ public class ListeLotPreparation2025_V2Activity  extends ServiceAvecConnexionAct
                                 supprimerPhPreparationLigne(ph_preparation_ligne_base, courant);
                             else
                             {
-                                PH_Preparation_Ligne ligneCourante = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByProduitLotPreparationSerieEmplacement(db, ph_preparation_ligne_base.getProduitID(), ph_preparation_ligne_base.getPreparationID(), courant.getLot(), courant.getSerie(), courant.getEmplacement());
+                                PH_Preparation_Ligne ligneCourante = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByProduitLotSerieNegPreparation(db, ph_preparation_ligne_base.getProduitID(), ph_preparation_ligne_base.getPreparationID(), courant.getLot(), courant.getSerie(), courant.getEmplacement());
                                 if(ligneCourante == null)
                                     enregistrementPreparationLigne(ph_preparation_ligne_base, courant);
                                 else
@@ -565,14 +565,6 @@ public class ListeLotPreparation2025_V2Activity  extends ServiceAvecConnexionAct
     private void modifierPreparationLigne(PH_Preparation_Ligne ph_preparationLigneCorrespondant, PH_Preparation_Ligne ph_preparation_ligne, Stock_Lot_Emplacement_Light stockLotEmplacementLight)
     {
         int GlobalAPreparer = ph_preparationLigneCorrespondant.getQte_Demander();
-        Random random = new Random();
-        int new_id = random.nextInt();
-        if(new_id > 0)
-        {
-            new_id= new_id*-1;
-        }
-
-        ph_preparation_ligne.set_UID(new_id);
         ph_preparation_ligne.setQte_Demander(GlobalAPreparer);
         GlobalAPreparer = GlobalAPreparer - stockLotEmplacementLight.getQte_Preparer();
         ph_preparation_ligne.setQte_RAL(GlobalAPreparer);
@@ -612,7 +604,7 @@ public class ListeLotPreparation2025_V2Activity  extends ServiceAvecConnexionAct
 
     private void supprimerPhPreparationLigne(PH_Preparation_Ligne ligne_base, Stock_Lot_Emplacement_Light stockLotEmplacementLight)
     {
-        PH_Preparation_Ligne ligne_a_supprimer = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByProduitLotPreparationSerieEmplacement(db, ligne_base.getProduitID(), ligne_base.getPreparationID(), stockLotEmplacementLight.getLot(), stockLotEmplacementLight.getSerie(), stockLotEmplacementLight.getEmplacement());
+        PH_Preparation_Ligne ligne_a_supprimer = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByProduitLotSerieNegPreparation(db, ligne_base.getProduitID(), ligne_base.getPreparationID(), stockLotEmplacementLight.getLot(), stockLotEmplacementLight.getSerie(), stockLotEmplacementLight.getEmplacement());
 
         if(ligne_a_supprimer != null)
             PH_Preparation_LigneOpenHelper.supprimerUnPhPreparationLigne(db, ligne_a_supprimer);

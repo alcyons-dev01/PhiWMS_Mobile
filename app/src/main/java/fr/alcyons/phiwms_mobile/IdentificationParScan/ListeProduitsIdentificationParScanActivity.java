@@ -56,6 +56,11 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
             final String codeGS1 = intent.getExtras().getString("codeGS1");
             listeAAfficher = ProduitOpenHelper.getProduitsParGTIN(db, codeGS1);
 
+            if(listeAAfficher.isEmpty())
+            {
+                listeAAfficher = ProduitOpenHelper.getProduitsParGTIN(db, codeGS1.substring(2));
+            }
+
         } else if(intent.getExtras().getString("codeInconnue") != null){
             codeInconnue = intent.getExtras().getString("codeInconnue");
             listeAAfficher = ProduitOpenHelper.getProduitsParCodeInconnue(db, codeInconnue);
@@ -63,7 +68,6 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
         else
         {
             listeAAfficher = ProduitOpenHelper.getProduitsIdentifier(db);
-
         }
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {

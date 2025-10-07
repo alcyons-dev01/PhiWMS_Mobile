@@ -550,9 +550,9 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
                     JSONObject indicateurJSONObject = response.getJSONObject("Indicateurs");
 
                     int indicateurVerrouPharmacie = indicateurJSONObject.getInt("VerrouPharmacie");
-                    serviceIndicateurNom.add("Verrou Pharmacie Préparation externe");
+                    serviceIndicateurNom.add("Verrou Pharmacie externe");
                     serviceIndicateurValeur.add(indicateurVerrouPharmacie);
-                    mapServiceIndicateur.put("Verrou Pharmacie Préparation externe", indicateurVerrouPharmacie);
+                    mapServiceIndicateur.put("Verrou Pharmacie externe", indicateurVerrouPharmacie);
 
                     int indicateurQuarantaine = indicateurJSONObject.getInt("Quarantaine");
                     serviceIndicateurNom.add("Quarantaine");
