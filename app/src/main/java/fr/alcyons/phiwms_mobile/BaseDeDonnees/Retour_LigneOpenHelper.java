@@ -95,10 +95,10 @@ public class Retour_LigneOpenHelper extends DBOpenHelper {
         return retourLigneList;
     }
 
-    public static List<Retour_Ligne> getAllRetourLignesByRetourProduitNeg(SQLiteDatabase db, Retour retour, int idProduit) {
+    public static List<Retour_Ligne> getAllRetourLignesBaseByRetour(SQLiteDatabase db, Retour retour) {
         List<Retour_Ligne> retourLigneList = new ArrayList<>();
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_RETOUR_LIGNE + " WHERE " + Constantes.CLE_COL_RETOUR_UID_RETOUR_LIGNE + "=? AND "+Constantes.CLE_COL_CODE_PRODUIT_RETOUR_LIGNE+"=? AND "+Constantes.CLE_COL__UID_RETOUR_LIGNE+" < 0", new String[]{String.valueOf(retour.get_UID()), String.valueOf(idProduit)});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_RETOUR_LIGNE + " WHERE " + Constantes.CLE_COL_RETOUR_UID_RETOUR_LIGNE + "=? AND "+Constantes.CLE_COL__UID_RETOUR_LIGNE+" > 0", new String[]{String.valueOf(retour.get_UID())});
 
         while (cursor.moveToNext()) {
             Retour_Ligne retourLigne = new Retour_Ligne(cursor);
@@ -108,6 +108,35 @@ public class Retour_LigneOpenHelper extends DBOpenHelper {
         cursor.close();
         cursor = null;
         return retourLigneList;
+    }
+
+    public static List<Retour_Ligne> getAllRetourLignesByRetourProduitNeg(SQLiteDatabase db, Retour retour, int idProduit) {
+        List<Retour_Ligne> retourLigneList = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_RETOUR_LIGNE + " WHERE  " + Constantes.CLE_COL_RETOUR_UID_RETOUR_LIGNE + "=? AND "+Constantes.CLE_COL_CODE_PRODUIT_RETOUR_LIGNE+"=? AND "+Constantes.CLE_COL__UID_RETOUR_LIGNE+"< 0", new String[]{String.valueOf(retour.get_UID()), String.valueOf(idProduit)});
+
+        while (cursor.moveToNext()) {
+            Retour_Ligne retourLigne = new Retour_Ligne(cursor);
+            retourLigneList.add(retourLigne);
+        }
+
+        cursor.close();
+        cursor = null;
+        return retourLigneList;
+    }
+
+    public static Retour_Ligne getRetourLigneNegByProduitLot(SQLiteDatabase db, int retouruid, int idProduit, String lot, String serie) {
+        Retour_Ligne retourLigne = null;
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_RETOUR_LIGNE + " WHERE  " + Constantes.CLE_COL_RETOUR_UID_RETOUR_LIGNE + "=? AND "+Constantes.CLE_COL_CODE_PRODUIT_RETOUR_LIGNE+"=? AND "+Constantes.CLE_COL_LOT_RETOURNER_RETOUR_LIGNE+"=? AND "+Constantes.CLE_COL_SERIE_RETOURNER+"=? AND "+Constantes.CLE_COL__UID_RETOUR_LIGNE+"< 0", new String[]{String.valueOf(retouruid), String.valueOf(idProduit), lot, serie});
+
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+            retourLigne = new Retour_Ligne(cursor);
+        }
+
+        cursor.close();
+        cursor = null;
+        return retourLigne;
     }
 
     public static Retour_Ligne getRetourLigneByID(SQLiteDatabase db, int id) {

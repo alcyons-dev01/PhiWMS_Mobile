@@ -40,6 +40,8 @@ public class ListeZonesActivity extends ServiceActivity {
 
         // Récupération du dépot avec la variable globale
         depotSelectionne = DepotOpenHelper.getDepotParID(db, intent.getExtras().getInt("depotSelectionneID"));
+        if(depotSelectionne == null)
+            depotSelectionne = DepotOpenHelper.getDepotPUI(db);
 
         //gestion du produit designation
         designationProduit = (TextView) findViewById(R.id.designationProduit);

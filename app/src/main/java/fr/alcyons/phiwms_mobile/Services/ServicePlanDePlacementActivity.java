@@ -8,10 +8,12 @@ import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPlanDePlacementActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
@@ -26,11 +28,15 @@ public class ServicePlanDePlacementActivity extends ServiceActivity {
     boolean firstPassage = true;
     PackageManager pm;
 
+    List<Produit> listeProduitScannees;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_service_plan_de_placement);
         pm = ServicePlanDePlacementActivity.this.getPackageManager();
+        intent = ServicePlanDePlacementActivity.this.getIntent();
+        listeProduitScannees = new ArrayList<>();
     }
 
     @Override
@@ -42,18 +48,13 @@ public class ServicePlanDePlacementActivity extends ServiceActivity {
             Intent servicePlanDePlacementIntent = null;
             Bundle servicePlanDePlacementBundle = super.getBundle();
 
-            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
-            {
-                servicePlanDePlacementIntent = new Intent(ServicePlanDePlacementActivity.this, ScannerSearchOnlyActivity.class);
-                servicePlanDePlacementBundle.putBoolean("activerTextSuppression", true);
-                servicePlanDePlacementBundle.putString("TextBannerManuel", "Scannez le datamatrix d'une référence");
-                servicePlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
-            }
-            else
-            {
+            if (android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google")) {
+                servicePlanDePlacementIntent = new Intent(ServicePlanDePlacementActivity.this, ScannerPlanDePlacementActivity.class);
+            } else {
                 servicePlanDePlacementIntent = new Intent(ServicePlanDePlacementActivity.this, BarcodeCaptureActivity.class);
             }
-            servicePlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
+
+            servicePlanDePlacementBundle.putSerializable("ListProduitScannees", (Serializable) listeProduitScannees);
             servicePlanDePlacementIntent.putExtras(servicePlanDePlacementBundle);
             ServicePlanDePlacementActivity.this.startActivityForResult(servicePlanDePlacementIntent, CodesEchangesActivites.RETOUR_CODE_GS1);
             firstPassage = false;
@@ -69,59 +70,18 @@ public class ServicePlanDePlacementActivity extends ServiceActivity {
         } else {
             switch (requestCode) {
                 case CodesEchangesActivites.RETOUR_CODE_GS1:
-                    if (resultCode == BarcodeCaptureActivity.RESULT_OK) {
-                        String codeComplet = data.getStringExtra("code");
-                        if(codeComplet.contentEquals(""))
-                        {
-                            // On envoie volontairement une liste vide
-                            List<Integer> produitIDs = new ArrayList<>();
+                    listeProduitScannees = new ArrayList<>();
+                    listeProduitScannees.addAll((List<Produit>) data.getExtras().getSerializable("ListProduitScannes"));
 
-                            Intent servicePlanDePlacementIntent = new Intent(ServicePlanDePlacementActivity.this, ListeProduitsPlanDePlacementActivity.class);
-                            Bundle servicePlanDePlacementBundle = super.getBundle();
-                            servicePlanDePlacementBundle.putSerializable("produitIDs", (Serializable) produitIDs);
-                            servicePlanDePlacementIntent.putExtras(servicePlanDePlacementBundle);
+                    boolean placement = data.getExtras().getBoolean("placement");
+                    Intent servicePlanDePlacementIntent = servicePlanDePlacementIntent = new Intent(ServicePlanDePlacementActivity.this, ListeProduitsPlanDePlacementActivity.class);
+                    Bundle servicePlanDePlacementBundle = super.getBundle();
+                    servicePlanDePlacementBundle.putSerializable("ListProduitScannes", (Serializable) listeProduitScannees);
+                    servicePlanDePlacementBundle.putSerializable("placement", (Serializable) placement);
+                    servicePlanDePlacementIntent.putExtras(servicePlanDePlacementBundle);
 
-                            ServicePlanDePlacementActivity.this.startActivity(servicePlanDePlacementIntent);
-                            ServicePlanDePlacementActivity.this.finish();
-                        }
-                        else
-                        {
-                            Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeComplet);
-                            if (gs1Decoupe.size() != 0) {
-                                List<Produit> produitsConcernes = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
-                                List<Integer> produitIDs = new ArrayList<>();
-                                for (Produit produit : produitsConcernes
-                                ) {
-                                    produitIDs.add(produit.getID_produit());
-                                }
-
-                                Intent servicePlanDePlacementIntent = new Intent(ServicePlanDePlacementActivity.this, ListeProduitsPlanDePlacementActivity.class);
-                                Bundle servicePlanDePlacementBundle = super.getBundle();
-                                servicePlanDePlacementBundle.putSerializable("produitIDs", (Serializable) produitIDs);
-                                servicePlanDePlacementIntent.putExtras(servicePlanDePlacementBundle);
-
-                                ServicePlanDePlacementActivity.this.startActivity(servicePlanDePlacementIntent);
-                                ServicePlanDePlacementActivity.this.finish();
-                            } else {
-                                Toast toast = Toast.makeText(ServicePlanDePlacementActivity.this, "Le code fourni n'est pas un code GS1, veuillez réessayer.", Toast.LENGTH_SHORT);
-                                toast.setGravity(Gravity.CENTER, 0, 0);
-                                toast.show();
-                                firstPassage = true;
-                                ServicePlanDePlacementActivity.this.onRestart();
-                            }
-                        }
-                    } else if (resultCode == CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH) {
-                        // On envoie volontairement une liste vide
-                        List<Integer> produitIDs = new ArrayList<>();
-
-                        Intent servicePlanDePlacementIntent = new Intent(ServicePlanDePlacementActivity.this, ListeProduitsPlanDePlacementActivity.class);
-                        Bundle servicePlanDePlacementBundle = super.getBundle();
-                        servicePlanDePlacementBundle.putSerializable("produitIDs", (Serializable) produitIDs);
-                        servicePlanDePlacementIntent.putExtras(servicePlanDePlacementBundle);
-
-                        ServicePlanDePlacementActivity.this.startActivity(servicePlanDePlacementIntent);
-                        ServicePlanDePlacementActivity.this.finish();
-                    }
+                    ServicePlanDePlacementActivity.this.startActivity(servicePlanDePlacementIntent);
+                    ServicePlanDePlacementActivity.this.finish();
                     break;
             }
             invalidateOptionsMenu();

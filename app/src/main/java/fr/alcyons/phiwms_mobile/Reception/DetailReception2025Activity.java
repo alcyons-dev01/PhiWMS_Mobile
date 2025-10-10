@@ -768,13 +768,8 @@ public class DetailReception2025Activity  extends ServiceActivity {
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
 
             // Si possible, on essaie de mettre à jour les éléments
-            if (statutConnexion) {
-                ElementASynchroniserOpenHelper.toutSynchroniser(DetailReception2025Activity.this, db, utilisateurConnecte, true);
-            }
-            else
-            {
-                Alerte.afficherAlerte(DetailReception2025Activity.this, "Erreur", "Serveur inaccessible. Votre action sera exécuté ultérieurement", "alerte");
-            }
+            ElementASynchroniserOpenHelper.toutSynchroniser(DetailReception2025Activity.this, db, utilisateurConnecte, true);
+
 
             return listeProduitRAL.isEmpty();
         } else {

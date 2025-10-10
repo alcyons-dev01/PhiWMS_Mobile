@@ -127,13 +127,27 @@ public class Mail extends javax.mail.Authenticator {
         }
         else
         {
-            properties.setProperty("mail.transport.protocol", "smtps");
+//            properties.setProperty("mail.transport.protocol", "smtps");
+//            properties.put("mail.smtp.auth", "true");
+//            properties.put("mail.smtp.ssl.enable", "true");
+//            properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+//            properties.put("mail.smtp.socketFactory.fallback", "false");
+//            properties.setProperty("mail.smtp.quitwait", "false");
+//            properties.put("mail.smtp.starttls.enable", "true");
+//            properties.put("mail.smtp.port", "465");
+//            properties.put("mail.smtp.socketFactory.port", "465");
+//            session = Session.getDefaultInstance(properties, this);
+            smtphost = "217.70.178.3";
+            loginEmetteur = "noreply@phiwms.com";
+            mailEmetteur = "noreply@phiwms.com";
+            psswordEmetteur = "PACT!automata5zoom";
+            properties.setProperty("mail.transport.protocol", "smtp");
             properties.put("mail.smtp.auth", "true");
             properties.put("mail.smtp.ssl.enable", "true");
+            properties.put("mail.smtp.starttls.enable", "true");
             properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
             properties.put("mail.smtp.socketFactory.fallback", "false");
             properties.setProperty("mail.smtp.quitwait", "false");
-            properties.put("mail.smtp.starttls.enable", "true");
             properties.put("mail.smtp.port", "465");
             properties.put("mail.smtp.socketFactory.port", "465");
             session = Session.getDefaultInstance(properties, this);
@@ -190,7 +204,22 @@ public class Mail extends javax.mail.Authenticator {
         }
         else
         {
-            properties.setProperty("mail.transport.protocol", "smtps");
+//            properties.setProperty("mail.transport.protocol", "smtps");
+//            properties.put("mail.smtp.auth", "true");
+//            properties.put("mail.smtp.ssl.enable", "true");
+//            properties.put("mail.smtp.starttls.enable", "true");
+//            properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+//            properties.put("mail.smtp.socketFactory.fallback", "false");
+//            properties.setProperty("mail.smtp.quitwait", "false");
+//            properties.put("mail.smtp.port", "465");
+//            properties.put("mail.smtp.socketFactory.port", "465");
+//            session = Session.getDefaultInstance(properties, this);
+
+            smtphost = "217.70.178.3";
+            loginEmetteur = "noreply@phiwms.com";
+            mailEmetteur = "noreply@phiwms.com";
+            psswordEmetteur = "PACT!automata5zoom";
+            properties.setProperty("mail.transport.protocol", "smtp");
             properties.put("mail.smtp.auth", "true");
             properties.put("mail.smtp.ssl.enable", "true");
             properties.put("mail.smtp.starttls.enable", "true");

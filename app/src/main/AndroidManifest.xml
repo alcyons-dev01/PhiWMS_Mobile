@@ -209,7 +209,19 @@
         android:configChanges="orientation|screenSize"/>
 
     <activity
+        android:name="fr.alcyons.phiwms_mobile.ControleDesRetours.DetailControleDesRetours2025Activity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
         android:name="fr.alcyons.phiwms_mobile.ControleDesRetours.ListeLotsControleDesRetoursActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.ControleDesRetours.ListeLotsControleDesRetours2025Activity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
@@ -358,6 +370,20 @@
 
     <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparation2025_V2Activity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerRetourActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPlanDePlacementActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
@@ -653,6 +679,22 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation|keyboardHidden"/>
+
+        <!-- Plan de Placement -->
+        <activity
+            android:name="fr.alcyons.phiwms_mobile.Services.ServicePlanDePlacementActivity"
+            android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|keyboardHidden"/>
+
+        <activity
+            android:name="fr.alcyons.phiwms_mobile.PlanDePlacement.ListeProduitsPlanDePlacementActivity"
+            android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|keyboardHidden"/>
+
     </application>
 
 </manifest>

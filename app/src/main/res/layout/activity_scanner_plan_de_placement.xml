@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/bleu_fonce_alcyons"
+    android:backgroundTint="@color/bleu_fonce_alcyons"
+    android:paddingBottom="10dp">
+
+    <!-- ENTETE BOUTON BARCODE -->
+    <RelativeLayout
+        android:id="@+id/LinearLayoutBoutonBarcode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="visible"
+        android:paddingHorizontal="10dp"
+        android:layout_marginTop="10dp">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/boutonFermeture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_list_white"
+            app:fab_size="mini"
+            android:layout_alignParentEnd="true"
+            app:fab_colorNormal="@color/bleu_clair_alcyons"
+            app:fab_colorPressed="@color/bleu_clair_alcyons"
+            app:fab_colorRipple="@color/bleu_clair_alcyons"
+            app:fab_label="Quitter"/>
+
+    </RelativeLayout>
+
+    <!-- IMAGE SCAN PRODUIT & EMPLACEMENT -->
+    <ImageView
+        android:id="@+id/ImageViewProduit"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/phitagprod"
+        android:layout_marginTop="15dp"
+        android:layout_gravity="center"
+        android:layout_below="@+id/LinearLayoutBoutonBarcode"
+        android:layout_centerHorizontal="true"
+        android:visibility="visible"/>
+
+    <!-- TEXT VIEW INSTRUCTION -->
+    <TextView
+        android:id="@+id/instruction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/rouge"
+        android:text="Scannez des référence"
+        android:textColor="#FFFFFF"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:padding="2dp"
+        android:layout_marginTop="15dp"
+        android:layout_below="@+id/ImageViewProduit"
+        android:visibility="visible"/>
+
+    <!-- EDIT TEXT SCAN -->
+    <LinearLayout
+        android:id="@+id/layoutTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="15dp"
+        android:layout_below="@+id/instruction">
+
+        <EditText
+            android:id="@+id/EditTextScanee"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:layout_margin="10dp"
+            android:focusable="true"
+            android:textColor="@color/blanc"
+            android:textSize="18dp"
+            android:text=""/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ListeDesignationProduitScanner"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:orientation="vertical"
+        android:layout_below="@+id/layoutTextView">
+
+        <ListView
+            android:id="@+id/ListViewDesignation"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/boutonPlacerReferences"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+        android:textColor="@color/blanc"
+        android:background="@drawable/background_plain_bleu_radius"
+        android:text="Placer les x références"
+        android:visibility="invisible"/>
+
+</RelativeLayout>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:paddingBottom="10dp">
+
+    <!-- Zone de boutons haut -->
+    <LinearLayout
+        android:id="@+id/layoutboutonplacement"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_margin="5dp">
+
+        <LinearLayout
+            android:id="@+id/linearProduitsPlaces"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/background_plain_vert_alcyons"
+            android:orientation="vertical"
+            android:layout_margin="5dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Placés"
+                android:gravity="center"
+                android:textColor="@color/blanc"
+                android:textSize="14dp" />
+
+            <TextView
+                android:id="@+id/nbPlaces"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="18dp"
+                android:textColor="@color/blanc"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearProduitNonPlaces"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/background_plain_rouge"
+            android:orientation="vertical"
+            android:layout_margin="5dp"
+            android:alpha="0.5">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Non Placés"
+                android:gravity="center"
+                android:textColor="@color/blanc"
+                android:textSize="14dp" />
+
+            <TextView
+                android:id="@+id/nbNonPlace"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="18dp"
+                android:textColor="@color/blanc"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Contenu principal avec ListView -->
+    <RelativeLayout
+        android:id="@+id/contenuPage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/boutonAction"
+        android:layout_below="@id/layoutboutonplacement"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <ListView
+            android:id="@+id/listeView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null"
+            android:dividerHeight="0dp"
+            android:descendantFocusability="afterDescendants" />
+    </RelativeLayout>
+
+    <!-- Bouton toujours visible en bas -->
+    <Button
+        android:id="@+id/boutonAction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="Placer les x références"
+        android:textColor="@color/blanc"
+        android:layout_margin="10dp"
+        android:background="@drawable/background_plain_bleu_radius"
+        android:visibility="visible"/>
+
+    <LinearLayout
+        android:id="@+id/layoutBoutonPlacer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/boutonRetour"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_alignParentBottom="true"
+            android:text="Retour"
+            android:textColor="@color/blanc"
+            android:layout_margin="10dp"
+            android:background="@drawable/background_plain_bleu_radius" />
+
+        <Button
+            android:id="@+id/boutonPlacer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:layout_alignParentBottom="true"
+            android:text="PLACER"
+            android:textColor="@color/blanc"
+            android:layout_margin="10dp"
+            android:background="@drawable/background_plain_bleu_radius" />
+    </LinearLayout>
+
+
+</RelativeLayout>

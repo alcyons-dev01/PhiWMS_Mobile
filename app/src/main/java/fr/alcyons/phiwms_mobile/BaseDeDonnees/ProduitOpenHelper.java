@@ -64,6 +64,48 @@ public class ProduitOpenHelper extends DBOpenHelper {
         return nbReferences;
     }
 
+    public static int getNbProduitPlace(SQLiteDatabase db) {
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT+" WHERE "+Constantes.CLE_COL_EMPLACEMENT_PUI_DEFAUT_PRODUIT+" != \"EMPLACEMENT\" AND "+Constantes.CLE_COL_EMPLACEMENT_PUI_DEFAUT_PRODUIT+" != \"\" AND "+Constantes.CLE_COL_ARRET_COMMANDE_PRODUIT+" != 1", null);
+        int nbReferences = cursor.getCount();
+        cursor.close();
+        cursor = null;
+        return nbReferences;
+    }
+
+    public static List<Produit> getProduitPlace(SQLiteDatabase db) {
+        List<Produit> produitList = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT+" WHERE "+Constantes.CLE_COL_EMPLACEMENT_PUI_DEFAUT_PRODUIT+" != \"EMPLACEMENT\" AND "+Constantes.CLE_COL_EMPLACEMENT_PUI_DEFAUT_PRODUIT+" != \"\" AND "+Constantes.CLE_COL_ARRET_COMMANDE_PRODUIT+" != 1  ORDER BY "+Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT, null);
+        while (cursor.moveToNext()) {
+            Produit produit = new Produit(cursor);
+            produitList.add(produit);
+        }
+        cursor.close();
+        cursor = null;
+        return produitList;
+    }
+
+    public static int getNbProduitNonPlace(SQLiteDatabase db) {
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT+" WHERE "+Constantes.CLE_COL_EMPLACEMENT_PUI_DEFAUT_PRODUIT+" = \"EMPLACEMENT\" OR "+Constantes.CLE_COL_EMPLACEMENT_PUI_DEFAUT_PRODUIT+" = \"\" AND "+Constantes.CLE_COL_ARRET_COMMANDE_PRODUIT+" != 1", null);
+        int nbReferences = cursor.getCount();
+        cursor.close();
+        cursor = null;
+        return nbReferences;
+    }
+
+    public static List<Produit> getProduitNonPlace(SQLiteDatabase db) {
+        List<Produit> produitList = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT+" WHERE "+Constantes.CLE_COL_EMPLACEMENT_PUI_DEFAUT_PRODUIT+" = \"EMPLACEMENT\" OR "+Constantes.CLE_COL_EMPLACEMENT_PUI_DEFAUT_PRODUIT+" = \"\" AND "+Constantes.CLE_COL_ARRET_COMMANDE_PRODUIT+" != 1 ORDER BY "+Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT, null);
+        while (cursor.moveToNext()) {
+            Produit produit = new Produit(cursor);
+            produitList.add(produit);
+        }
+        cursor.close();
+        cursor = null;
+        return produitList;
+    }
+
     public static List<Produit> getAllMedicaments(final SQLiteDatabase db) {
         List<Produit> produitList = new ArrayList<>();
 

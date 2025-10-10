@@ -129,21 +129,7 @@ public class ScannerEmplacementActivity  extends ServiceActivity {
                 long rowId = 0;
                 if (s.toString().endsWith("\n")) {
 
-                    code = "";
-                    if(scannerContexteInt == R.string.scannerContexteEmplacement)
-                    {
-                        if(modeTrace)
-                        {
-                            tableTrace = new TableTrace(id, date, "Context_Emplacement", "Récupération après scan", s.toString().substring(0, s.length() - 1), utilisateurConnecte.getIdentifiant(), utilisateurConnecte.getId());
-                            rowId = TableTraceOpenHelper.insererTableTraceEnBDD(db, tableTrace);
-                            if(rowId != -1)
-                            {
-                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, TableTraceOpenHelper.Constantes.TABLE_TABLE_TRACE, tableTrace.getPhiMR4UUID(), tableTrace.getId(), DBOpenHelper.ActionsEAS.AJOUT);
-                            }
-                        }
-                        code = s.toString().substring(0, s.length() - 1);
-                    }
-
+                    code = s.toString().substring(0, s.length() - 1);
 
                     if(code != null && !code.isEmpty()){
                         Intent resultIntent = new Intent();

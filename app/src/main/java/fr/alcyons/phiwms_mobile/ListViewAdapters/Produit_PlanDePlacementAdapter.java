@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -14,11 +15,13 @@ import fr.alcyons.phiwms_mobile.R;
 public class Produit_PlanDePlacementAdapter extends ArrayAdapter {
 
     public List<Produit> produits;
+    public List<Produit> produitsScannes;
     Context context;
 
-    public Produit_PlanDePlacementAdapter(Context context, List<Produit> produits) {
+    public Produit_PlanDePlacementAdapter(Context context, List<Produit> produits, List<Produit> produitsScannes) {
         super(context, 0, produits);
         this.produits = produits;
+        this.produitsScannes = produitsScannes;
         this.context = context;
     }
 
@@ -34,9 +37,9 @@ public class Produit_PlanDePlacementAdapter extends ArrayAdapter {
             viewHolder = new ProduitViewHolder();
             viewHolder.nom = (TextView) convertView.findViewById(R.id.nomProduit);
             viewHolder.refProduit = (TextView) convertView.findViewById(R.id.refProduit);
-            viewHolder.alerte = (TextView) convertView.findViewById(R.id.alerte);
             viewHolder.zonePUI = (TextView) convertView.findViewById(R.id.nomZonePUI);
             viewHolder.emplacementPUI = (TextView) convertView.findViewById(R.id.nomEmplacementPUI);
+            viewHolder.linearPrincipal = (LinearLayout) convertView.findViewById(R.id.linearPrincipal);
             convertView.setTag(viewHolder);
         }
 
@@ -45,16 +48,23 @@ public class Produit_PlanDePlacementAdapter extends ArrayAdapter {
         // Affichage des valeurs du produit
         viewHolder.nom.setText(produitCourant.getDesignation_interne());
         viewHolder.refProduit.setText(produitCourant.getRef_fourni());
-        if (produitCourant.isArret_Commande() || produitCourant.isArret_Dis()) {
-            if (produitCourant.isArret_Dis())
-                viewHolder.alerte.setText("ARRET-DISTRIBUTION");
-            else
-                viewHolder.alerte.setText("ARRET-COMMANDE");
-        } else {
-            viewHolder.alerte.setVisibility(View.GONE);
-        }
         viewHolder.zonePUI.setText(produitCourant.getZone_PUI_Defaut());
         viewHolder.emplacementPUI.setText(produitCourant.getEmplacement_PUI_Defaut());
+
+        boolean selection = false;
+        for(Produit temp : produitsScannes)
+        {
+            if(temp.getID_produit() == produitCourant.getID_produit())
+            {
+                selection = true;
+                break;
+            }
+        }
+
+        if(selection)
+            viewHolder.linearPrincipal.setBackgroundResource(R.drawable.background_element_liste_selection);
+        else
+            viewHolder.linearPrincipal.setBackgroundResource(R.drawable.background_element_liste);
 
         return convertView;
     }
@@ -62,8 +72,8 @@ public class Produit_PlanDePlacementAdapter extends ArrayAdapter {
     private class ProduitViewHolder {
         public TextView nom;
         public TextView refProduit;
-        public TextView alerte;
         public TextView zonePUI;
         public TextView emplacementPUI;
+        public LinearLayout linearPrincipal;
     }
 }

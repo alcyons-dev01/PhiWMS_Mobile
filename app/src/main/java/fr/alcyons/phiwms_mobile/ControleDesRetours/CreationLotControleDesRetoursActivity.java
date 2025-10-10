@@ -55,6 +55,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Commande;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
@@ -64,6 +65,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
+import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
@@ -699,7 +701,7 @@ public class CreationLotControleDesRetoursActivity extends ServiceActivity {
             if (datePeremptionTab.length == 3)
                 datePeremption = datePeremptionTab[2] + "-" + datePeremptionTab[1] + "-" + datePeremptionTab[0];
 
-            if(retourligne.getLot().trim().contentEquals(lotEditText.getText().toString().trim()) && retourligne.getPeremptionDate().trim().contentEquals(datePeremption))
+            if(retourligne.getLot_Retourner().trim().contentEquals(lotEditText.getText().toString().trim()) && retourligne.getPeremptionDate().trim().contentEquals(datePeremption))
             {
                 retourLigneTemp = retourligne;
                 existe = true;
@@ -709,17 +711,23 @@ public class CreationLotControleDesRetoursActivity extends ServiceActivity {
         if(existe)
         {
             int quantite = Integer.parseInt(qteActuelleEditText.getText().toString());
+
+            /**
+             * MAJ du stock lot emplacement
+             */
+            Stock_Lot_Emplacement_Light stockLotEmplacementLight = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(db, produitSelectionne, depotSelectionne, retourLigneTemp.getLot(), retourLigneTemp.getSerie_Retourner());
+            stockLotEmplacementLight.setQte(stockLotEmplacementLight.getQte()+quantite);
+            stockLotEmplacementLight.setQte_Preparer(stockLotEmplacementLight.getQte_Preparer()+quantite);
+            Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockLotEmplacementLight);
+
+            /**
+             * MAJ retourLigne
+             */
             retourLigneTemp.setQte_Retourner(retourLigneTemp.getQte_Retourner()+quantite);
             long rowID = Retour_LigneOpenHelper.mettreAJourUnRetourLigne(db, retourLigneTemp);
         }
         else
         {
-            Random randomretourLigne = new Random();
-            int retourLigneId = randomretourLigne.nextInt();
-            if (retourLigneId > 0)
-                retourLigneId = retourLigneId * -1;
-
-            retourLigneTemp.set_UID(retourLigneId);
             String numeroLot = lotEditText.getText().toString();
             String datePeremption = datePeremptionTextView.getText().toString();
             String[] datePeremptionTab = datePeremption.split("/");
@@ -731,7 +739,27 @@ public class CreationLotControleDesRetoursActivity extends ServiceActivity {
             String numero_Serie = numSerieEditText.getText().toString();
             int quantite = Integer.parseInt(qteActuelleEditText.getText().toString());
 
-            retourLigneTemp.setLot(numeroLot.trim());
+            /**
+             * Création du stock correspondant
+             */
+            Random randomStock = new Random();
+            int stockId = randomStock.nextInt();
+            if (stockId > 0)
+                stockId = stockId * -1;
+            Stock_Lot_Emplacement_Light newStockLot = new Stock_Lot_Emplacement_Light(quantite, numeroLot, datePeremption, emplacementName, depotSelectionne.getDepot_Reference(), zoneName, produitSelectionne.getID_produit(), quantite, numero_Serie);
+            newStockLot.set_UID(stockId);
+            Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, newStockLot);
+
+            /**
+             * Création du retourLigne
+             */
+            Random randomretourLigne = new Random();
+            int retourLigneId = randomretourLigne.nextInt();
+            if (retourLigneId > 0)
+                retourLigneId = retourLigneId * -1;
+
+            retourLigneTemp.set_UID(retourLigneId);
+            retourLigneTemp.setLot_Retourner(numeroLot.trim());
             retourLigneTemp.setSerie_Retourner(numero_Serie.trim());
             retourLigneTemp.setPeremptionDate(datePeremption.trim());
 
@@ -744,6 +772,5 @@ public class CreationLotControleDesRetoursActivity extends ServiceActivity {
 
             }
         }
-
     }
 }

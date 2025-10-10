@@ -74,7 +74,7 @@ public class RetourAdapter extends ArrayAdapter implements Filterable {
         Retour retour = (Retour) getItem(position);
 
         if (retour != null) {
-            retourLigneList = Retour_LigneOpenHelper.getAllRetourLignesByRetour(db, retour);
+            retourLigneList = Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(db, retour);
 
 
             int size = retourLigneList.size();

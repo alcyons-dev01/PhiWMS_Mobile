@@ -995,9 +995,7 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
         }
 
         // Si possible, on essaie de mettre à jour les éléments
-        if (statutConnexion) {
-            ElementASynchroniserOpenHelper.toutSynchroniser(DetailPreparation2025_V2Activity.this, db, utilisateurConnecte, true);
-        }
+        ElementASynchroniserOpenHelper.toutSynchroniser(DetailPreparation2025_V2Activity.this, db, utilisateurConnecte, true);
         //NewDetailPreparationActivity.this.setResult(CodesEchangesActivites.RETOUR_LISTE_LOTS);
         Intent retourListeIntent = new Intent(DetailPreparation2025_V2Activity.this, ServicePreparationPufActivity.class);
         if(ph_preparation_Selectionne.getDepotDestinataireReference().contains("-PAD-"))

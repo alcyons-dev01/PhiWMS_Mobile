@@ -62,9 +62,8 @@ import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
-import fr.alcyons.phiwms_mobile.ControleDesRetours.DetailsControleRetoursActivity;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.DetailControleDesRetours2025Activity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourAdapter;
-import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
@@ -101,28 +100,39 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
             assert retourSelectionne != null;
             serviceControleRetours_Bundle.putInt("retourSelectionneID", retourSelectionne.get_UID());
 
-            Intent serviceControleRetours_Intent = new Intent(ServiceControleRetoursActivity.this, DetailsControleRetoursActivity.class);
+            Intent serviceControleRetours_Intent = new Intent(ServiceControleRetoursActivity.this, DetailControleDesRetours2025Activity.class);
             serviceControleRetours_Intent.putExtras(serviceControleRetours_Bundle);
             ServiceControleRetoursActivity.this.startActivity(serviceControleRetours_Intent);
             ServiceControleRetoursActivity.this.finish();
         });
 
         //gestion du spinner de tri
-        tri_choisi= "Numéro de retour";
+        tri_choisi= ParametreUtilisateurOpenHelper.getChoixTriRetour(db);
+        if(tri_choisi == null)
+        {
+            ParametreUtilisateurOpenHelper.mettreAJourTriRetour(db, 0, "Numéro de retour");
+            tri_choisi = ParametreUtilisateurOpenHelper.getChoixTriRetour(db);
+        }
+
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.option_tri_retour, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(R.layout.spinner_item);
         optionTri.setAdapter(adapter);
-        if (tri_choisi != null) {
-            int spinnerPosition = adapter.getPosition(tri_choisi);
-            optionTri.setSelection(spinnerPosition);
-        }
         optionTri.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
+            boolean isFirstSelection = true; // drapeau pour ignorer le premier appel
+
             @Override
-            public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
-                arg0.getChildAt(0).setVisibility(View.INVISIBLE);
-                String optionSelect = arg0.getItemAtPosition(position).toString();
-                switch (optionSelect)
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (isFirstSelection) {
+                    isFirstSelection = false; // on consomme le premier appel
+                    return; // ne rien faire au lancement
+                }
+                if (((TextView) parent.getChildAt(0)) != null) {
+                    ((TextView) parent.getChildAt(0)).setVisibility(View.INVISIBLE);
+                }
+                tri_choisi = optionTri.getItemAtPosition(position).toString();
+                ParametreUtilisateurOpenHelper.mettreAJourTriRetour(db, 0, tri_choisi);
+                switch (tri_choisi)
                 {
                     case "Numéro de retour":
                         onClickTriNumero();
@@ -177,7 +187,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                                     Bundle serviceControleRetours_Bundle = ServiceControleRetoursActivity.super.getBundle();
                                     serviceControleRetours_Bundle.putInt("retourSelectionneID", retourSelectionne.get_UID());
 
-                                    Intent serviceControleRetours_Intent = new Intent(ServiceControleRetoursActivity.this, DetailsControleRetoursActivity.class);
+                                    Intent serviceControleRetours_Intent = new Intent(ServiceControleRetoursActivity.this, DetailControleDesRetours2025Activity.class);
                                     serviceControleRetours_Intent.putExtras(serviceControleRetours_Bundle);
                                     ServiceControleRetoursActivity.this.startActivity(serviceControleRetours_Intent);
                                     ServiceControleRetoursActivity.this.finish();
@@ -370,6 +380,20 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                             }
                             else
                             {
+                                switch (tri_choisi)
+                                {
+                                    case "Numéro de retour":
+                                        onClickTriNumero();
+                                        break;
+
+                                    case "Date de retour":
+                                        onClickTriDate();
+                                        break;
+
+                                    case "Dépôt Origine":
+                                        onClickTriDepot();
+                                        break;
+                                }
                                 invalidateOptionsMenu();
                             }
                             passageParOnCreate = false;
@@ -408,7 +432,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         for (Retour retour : RetourOpenHelper.getRetoursByEnAttenteDe(db, getString(R.string.RepriseDemandee))) {
             if(!retour.getIntitule().contentEquals("Retour_ALCYONS"))
             {
-                for (Retour_Ligne retourLigne : Retour_LigneOpenHelper.getAllRetourLignesByRetour(db, retour)) {
+                for (Retour_Ligne retourLigne : Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(db, retour)) {
                     Retour_LigneOpenHelper.supprimerUnRetourLigne(db, retourLigne);
                     Produit produit = ProduitOpenHelper.getProduitByID(db, retourLigne.getCode_produit());
                     Depot depot = DepotOpenHelper.getDepotParReference(db, retour.getRef_Depot_Origine());
@@ -416,7 +440,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                     if(produit != null && depot != null)
                     {
                         for (Stock_Lot_Emplacement_Light stockLotEmplacementLight : Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot)) {
-                            Stock_Lot_EmplacementLightOpenHelper.supprimerUnStockLotEmplacement(db, stockLotEmplacementLight);
+                            //Stock_Lot_EmplacementLightOpenHelper.supprimerUnStockLotEmplacement(db, stockLotEmplacementLight);
                         }
                     }
                 }
@@ -480,7 +504,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
     public void onClickTriDate()
     {
         tri_choisi = "Date de retour";
-        retourList.sort((o1, o2) -> o2.getDate_retour().compareTo(o1.getDate_retour()));
+        retourList.sort((o1, o2) -> o1.getDate_retour().compareTo(o2.getDate_retour()));
 
         retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList);
         retourListView.setDivider(footer);
