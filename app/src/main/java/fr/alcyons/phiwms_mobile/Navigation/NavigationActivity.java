@@ -40,6 +40,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.NotificationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ServiceOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.UtilisateurOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.ElementASynchroniser;
 import fr.alcyons.phiwms_mobile.Classes.PerimetreFonctionnel;
 import fr.alcyons.phiwms_mobile.Classes.Service;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.ListPerimetreAdapter;
@@ -84,7 +85,6 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
         pm = NavigationActivity.this.getPackageManager();
-
         etablissement = Objects.requireNonNull(intent.getExtras()).getString("etablissement");
         if (etablissement == null) {
             etablissement = ParametresServeurOpenHelper.getEtablissementNom(db);
@@ -125,6 +125,20 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
     @Override
     public void onResume() {
         super.onResume();
+        int nbElement = ElementASynchroniserOpenHelper.compterElementsASynchroniser(db);
+        if(nbElement > 0)
+        {
+            ((LinearLayout) findViewById(R.id.layoutSynchronisation)).setVisibility(View.VISIBLE);
+            ((TextView) findViewById(R.id.nbElementASynchroniser)).setText(String.valueOf(nbElement));
+            ((LinearLayout) findViewById(R.id.layoutSynchronisation)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ElementASynchroniserOpenHelper.toutSynchroniser(NavigationActivity.this, db, utilisateurConnecte, false);
+                    ((LinearLayout) findViewById(R.id.layoutSynchronisation)).setVisibility(View.GONE);
+                }
+            });
+        }
+
         if (statutConnexion) {
             ElementASynchroniserOpenHelper.toutSynchroniser(NavigationActivity.this, db, utilisateurConnecte, true);
         }
