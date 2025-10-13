@@ -169,7 +169,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                                     afficherSnackBarControleDesRetours();
                                     /* Code nécessaire à l'affichage de la liste */
                                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                                    retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList);
+                                    retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
                                     // Permet d'enlever le séparateur entre deux éléments d'une listeView
                                     retourListView.setDivider(footer);
                                     retourListView.setAdapter(retourAdapter);
@@ -195,7 +195,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                             } else {
                                 /* Code nécessaire à l'affichage de la liste */
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                                retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList);
+                                retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
                                 // Permet d'enlever le séparateur entre deux éléments d'une listeView
                                 retourListView.setDivider(footer);
                                 retourListView.setAdapter(retourAdapter);
@@ -213,7 +213,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                         } else {
                             /* Code nécessaire à l'affichage de la liste */
                             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                            retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList);
+                            retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
                             // Permet d'enlever le séparateur entre deux éléments d'une listeView
                             retourListView.setDivider(footer);
                             retourListView.setAdapter(retourAdapter);
@@ -275,7 +275,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                 {
                     /* Code nécessaire à l'affichage de la liste */
                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                    retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList);
+                    retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
                     // Permet d'enlever le séparateur entre deux éléments d'une listeView
                     retourListView.setDivider(footer);
                     retourListView.setAdapter(retourAdapter);
@@ -368,7 +368,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                             /* Code nécessaire à l'affichage de la liste */
                             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                             ((TextView) findViewById(R.id.titre)).setText("Demandes de retour");
-                            retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList);
+                            retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
                             // Permet d'enlever le séparateur entre deux éléments d'une listeView
                             retourListView.setDivider(footer);
                             retourListView.setAdapter(retourAdapter);
@@ -496,7 +496,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         tri_choisi = "Numéro de retour";
         retourList.sort(Comparator.comparing(Retour::getNumero));
 
-        retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList);
+        retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
         retourListView.setDivider(footer);
         retourListView.setAdapter(retourAdapter);
     }
@@ -506,7 +506,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         tri_choisi = "Date de retour";
         retourList.sort((o1, o2) -> o1.getDate_retour().compareTo(o2.getDate_retour()));
 
-        retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList);
+        retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
         retourListView.setDivider(footer);
         retourListView.setAdapter(retourAdapter);
     }
@@ -516,7 +516,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         tri_choisi = "Dépôt Origine";
         retourList.sort(Comparator.comparing(Retour::getRef_Depot_Origine));
 
-        retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList);
+        retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
         retourListView.setDivider(footer);
         retourListView.setAdapter(retourAdapter);
     }

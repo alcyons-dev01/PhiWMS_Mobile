@@ -16,10 +16,14 @@ import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
+import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.R;
+import okhttp3.internal.Util;
 
 public class RetourAdapter extends ArrayAdapter implements Filterable {
 
@@ -29,8 +33,8 @@ public class RetourAdapter extends ArrayAdapter implements Filterable {
     Context context;
     SQLiteDatabase db;
     RetourFilter filter;
-
-    public RetourAdapter(Context context, SQLiteDatabase database, List<Retour> retourList) {
+    Utilisateur utilisateur;
+    public RetourAdapter(Context context, SQLiteDatabase database, List<Retour> retourList, Utilisateur utilisateur) {
         super(context, 0, retourList);
         this.context = context;
         this.db = database;
@@ -40,6 +44,7 @@ public class RetourAdapter extends ArrayAdapter implements Filterable {
         this.retourDeBaseList.addAll(retourList);
 
         this.filter = null;
+        this.utilisateur = utilisateur;
     }
 
 
@@ -87,6 +92,11 @@ public class RetourAdapter extends ArrayAdapter implements Filterable {
             viewHolder.intitule.setText(intitule_split);
             viewHolder.motif.setText(retour.getMotif());
             viewHolder.numero.setText("#"+retour.getNumero());
+
+            if(retour.getRef_Depot_Origine().contains("-PAD-") && utilisateur.getIdentifiant().toLowerCase().contains("alcyons"))
+            {
+                depot_origine = "XXX-PAD-XXX";
+            }
             viewHolder.depotOrigine.setText(depot_origine);
         }
 

@@ -130,7 +130,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
 
                                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                                     retourList.sort(Comparator.comparing(Retour::getDate_retour));
-                                    retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList);
+                                    retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
                                     retourListView.setDivider(footer);
 
                                     retourListView.setAdapter(retourAdapter);
@@ -156,7 +156,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
 
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                                 retourList.sort(Comparator.comparing(Retour::getDate_retour));
-                                retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList);
+                                retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
                                 retourListView.setDivider(footer);
 
                                 retourListView.setAdapter(retourAdapter);
@@ -169,7 +169,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                         } else {
                             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                             retourList.sort(Comparator.comparing(Retour::getDate_retour));
-                            retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList);
+                            retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
                             retourListView.setDivider(footer);
 
                             retourListView.setAdapter(retourAdapter);
@@ -329,7 +329,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                                     ((TextView) findViewById(R.id.titre)).setText("Demandes de quarantaine");
                                     retourList.sort(Comparator.comparing(Retour::getDate_retour));
-                                    retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList);
+                                    retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
                                     retourListView.setDivider(footer);
 
                                     retourListView.setAdapter(retourAdapter);

@@ -105,7 +105,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
                                         afficherSnackBarDestruction();
                                     }
                                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
-                                    adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours);
+                                    adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours, utilisateurConnecte);
                                     listViewRetours.setDivider(footer);
                                     listViewRetours.setAdapter(adapter);
 
@@ -128,7 +128,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
                             } else {
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
                                 ((TextView) findViewById(R.id.titre)).setText("Demandes de destruction");
-                                adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours);
+                                adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours, utilisateurConnecte);
                                 listViewRetours.setDivider(footer);
                                 listViewRetours.setAdapter(adapter);
 
@@ -143,7 +143,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
                         } else {
                             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
                             ((TextView) findViewById(R.id.titre)).setText("Demandes de destruction");
-                            adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours);
+                            adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours, utilisateurConnecte);
                             listViewRetours.setDivider(footer);
                             listViewRetours.setAdapter(adapter);
 
@@ -207,7 +207,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
                 {
                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
                     ((TextView) findViewById(R.id.titre)).setText("Demandes de destruction");
-                    adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours);
+                    adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours, utilisateurConnecte);
                     listViewRetours.setDivider(footer);
                     listViewRetours.setAdapter(adapter);
 
@@ -285,7 +285,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
                             {
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
                                 ((TextView) findViewById(R.id.titre)).setText("Demandes de destruction");
-                                adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours);
+                                adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours, utilisateurConnecte);
                                 listViewRetours.setDivider(footer);
                                 listViewRetours.setAdapter(adapter);
                                 invalidateOptionsMenu();

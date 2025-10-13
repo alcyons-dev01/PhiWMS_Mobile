@@ -119,7 +119,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
 
                                     ((TextView) findViewById(R.id.titre)).setText(titre);
                                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                                    adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList);
+                                    adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
                                     retourListView.setDivider(footer);
                                     retourListView.setAdapter(adapter);
 
@@ -149,7 +149,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
 
                                 ((TextView) findViewById(R.id.titre)).setText(titre);
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                                adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList);
+                                adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
                                 retourListView.setDivider(footer);
                                 retourListView.setAdapter(adapter);
 
@@ -171,7 +171,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
 
                             ((TextView) findViewById(R.id.titre)).setText(titre);
                             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                            adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList);
+                            adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
                             retourListView.setDivider(footer);
                             retourListView.setAdapter(adapter);
 
@@ -254,7 +254,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                     ((TextView) findViewById(R.id.titre)).setText(titre);
                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                     ((TextView) findViewById(R.id.titre)).setText("Retours PUI demandés");
-                    adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList);
+                    adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
                     retourListView.setDivider(footer);
                     retourListView.setAdapter(adapter);
 
@@ -340,7 +340,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                                 ((TextView) findViewById(R.id.titre)).setText(titre);
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                                 ((TextView) findViewById(R.id.titre)).setText("Retours PUI demandés");
-                                adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList);
+                                adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
                                 retourListView.setDivider(footer);
                                 retourListView.setAdapter(adapter);
                                 new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
