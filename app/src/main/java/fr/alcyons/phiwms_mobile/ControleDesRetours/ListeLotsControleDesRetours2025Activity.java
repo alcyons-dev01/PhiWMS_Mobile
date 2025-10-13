@@ -134,6 +134,7 @@ public class ListeLotsControleDesRetours2025Activity extends ServiceActivity {
                 clicBoutonAjoutParScan_Bundle.putSerializable("DepotOrigine", (Serializable) depot);
                 clicBoutonAjoutParScan_Bundle.putStringArrayList("liste_lot", (ArrayList<String>) listelot);
                 clicBoutonAjoutParScan_Bundle.putSerializable("ListeRetourLigne", (Serializable) listeScannerRetourLigne);
+                clicBoutonAjoutParScan_Bundle.putBoolean("EmplacementUF", true);
 
                 Intent clicBoutonAjoutParScan_intent = null;
                 if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || Build.MANUFACTURER.toLowerCase().contains("google"))
@@ -316,7 +317,7 @@ public class ListeLotsControleDesRetours2025Activity extends ServiceActivity {
         }
         else
         {
-            if(quantiteRestant != 0)
+            if(quantiteRestant != 0 && courant.getQte() != 0)
             {
                 int quantite_stock_selectionne = (int) courant.getQte();
 

@@ -7,8 +7,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -81,6 +84,7 @@ public class ScannerRetourActivity extends ServiceActivity {
     CountDownTimer yourCountDownTimer;
     public int counter;
 
+    boolean checkEmplacementUF = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,6 +106,7 @@ public class ScannerRetourActivity extends ServiceActivity {
         liste_retour_ligne = (List<Retour_Ligne>) intent.getExtras().getSerializable("ListeRetourLigne");
         depotOrigine = (Depot) intent.getExtras().getSerializable("DepotOrigine");
         liste_lot = intent.getExtras().getStringArrayList("liste_lot");
+        checkEmplacementUF = intent.getExtras().getBoolean("EmplacementUF");
         listGTIN = new ArrayList<>();
 
         // GRAPHIQUE
@@ -110,11 +115,10 @@ public class ScannerRetourActivity extends ServiceActivity {
 
         //Affichage des informations de la préparation
         String depotText = depotOrigine.getNom();
-        if (utilisateurConnecte.getIdentifiant().toLowerCase().contentEquals("alcyons") && depotOrigine.getStructure().contentEquals("PAD")) {
+        if (utilisateurConnecte.getIdentifiant().toLowerCase().contentEquals("alcyons") && depotOrigine.getStructure().contentEquals("PAD"))
+        {
             depotText = "Patient - " + depotOrigine.getPAD_IPP();
         }
-        else
-
         ((TextView) findViewById(R.id.depot)).setText(depotText);
         ((TextView) findViewById(R.id.numRetour)).setText("#" + retour_courant.getNumero());
         counter = 5;
@@ -195,10 +199,21 @@ public class ScannerRetourActivity extends ServiceActivity {
                         {
                             if(emplacement_courant == null)
                             {
-                                Depot depotPui = DepotOpenHelper.getDepotPUI(db);
-                                Depot_Zone zoneCourante = ZoneOpenHelper.getZoneByDepotEtNom(db, depotPui, produitTemp.getZone_PUI_Defaut());
-                                if(zoneCourante != null)
-                                    emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zoneCourante, produitTemp.getEmplacement_PUI_Defaut());
+                                if(checkEmplacementUF)
+                                {
+                                    Depot depotCourant = DepotOpenHelper.getDepotParReference(db, retour_courant.getRef_Depot_Origine());
+                                    Depot_Zone zoneCourante = ZoneOpenHelper.getZoneByDepotEtNom(db, depotCourant, produitTemp.getZone_UF_Defaut());
+                                    if(zoneCourante != null)
+                                        emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zoneCourante, produitTemp.getEmplacement_UF_Defaut());
+                                }
+                                else
+                                {
+                                    Depot depotPui = DepotOpenHelper.getDepotPUI(db);
+                                    Depot_Zone zoneCourante = ZoneOpenHelper.getZoneByDepotEtNom(db, depotPui, produitTemp.getZone_PUI_Defaut());
+                                    if(zoneCourante != null)
+                                        emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zoneCourante, produitTemp.getEmplacement_PUI_Defaut());
+                                }
+
                             }
                             if(emplacement_courant != null) {
                                 ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
@@ -303,10 +318,21 @@ public class ScannerRetourActivity extends ServiceActivity {
                             {
                                 if(emplacement_courant == null)
                                 {
-                                    Depot depotPui = DepotOpenHelper.getDepotPUI(db);
-                                    Depot_Zone zoneCourante = ZoneOpenHelper.getZoneByDepotEtNom(db, depotPui, produitCourant.getZone_PUI_Defaut());
-                                    if(zoneCourante != null)
-                                        emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zoneCourante, produitCourant.getEmplacement_PUI_Defaut());
+                                    if(checkEmplacementUF)
+                                    {
+                                        Depot depotCourant = DepotOpenHelper.getDepotParReference(db, retour_courant.getRef_Depot_Origine());
+                                        Depot_Zone zoneCourante = ZoneOpenHelper.getZoneByDepotEtNom(db, depotCourant, produitCourant.getZone_UF_Defaut());
+                                        if(zoneCourante != null)
+                                            emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zoneCourante, produitCourant.getEmplacement_UF_Defaut());
+                                    }
+                                    else
+                                    {
+                                        Depot depotPui = DepotOpenHelper.getDepotPUI(db);
+                                        Depot_Zone zoneCourante = ZoneOpenHelper.getZoneByDepotEtNom(db, depotPui, produitCourant.getZone_PUI_Defaut());
+                                        if(zoneCourante != null)
+                                            emplacement_courant = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zoneCourante, produitCourant.getEmplacement_PUI_Defaut());
+                                    }
+
                                 }
 
                                 if(emplacement_courant != null)
@@ -331,6 +357,15 @@ public class ScannerRetourActivity extends ServiceActivity {
 
                                     if(!produit_present)
                                     {
+                                        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                            v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.EFFECT_TICK));
+                                        }
+                                        else
+                                        {
+                                            v.vibrate(500);
+                                        }
+
                                         ((LinearLayout) findViewById(R.id.layoutProduitAbsent)).setVisibility(View.VISIBLE);
                                         ((LinearLayout) findViewById(R.id.layoutProduitAbsent)).postDelayed(new Runnable() {
                                             @Override
@@ -357,6 +392,8 @@ public class ScannerRetourActivity extends ServiceActivity {
                                         String designationProduit = ligne_base.getProduit_Designation();
                                         String referenceProduit = ligne_base.getProduit_Reference();
                                         String conditionnement = String.valueOf((int)produitCourant.getCond_distrib());
+                                        if((int)produitCourant.getCond_distrib() > qte_restante)
+                                            conditionnement = String.valueOf(qte_restante);
 
                                         if(qte_restante == 0)
                                         {
@@ -512,72 +549,6 @@ public class ScannerRetourActivity extends ServiceActivity {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (data != null) {
-
-            switch (requestCode)
-            {
-                case CodesEchangesActivites.RESULT_ZONE:
-                    int zoneid = data.getExtras().getInt("zoneid");
-                    if(zoneid != -1)
-                    {
-                        Intent newIntent = new Intent(ScannerRetourActivity.this, ListeEmplacementCreationActivity.class);
-                        Bundle extras = ScannerRetourActivity.super.getBundle();
-                        extras.putInt("zoneid", zoneid);
-                        newIntent.putExtras(extras);
-                        ScannerRetourActivity.this.startActivityForResult(newIntent, CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT);
-                    }
-                    break;
-
-                case CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT:
-                    int emplacementid = data.getExtras().getInt("emplacementId");
-                    if(emplacementid != -1)
-                    {
-                       /* Depot_Emplacement emplacementSelectionner = EmplacementOpenHelper.getUnEmplacementByID(db, emplacementid);
-                        ((TextView) findViewById(R.id.EmplacementLotProduit)).setText(emplacementSelectionner.getAdressage().trim());
-                        ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
-                        preparationMultipleContext.emplacement_courant = emplacementSelectionner;
-                        if(preparationMultipleContext.lot_courant != null)
-                        {
-                            if(preparationMultipleContext.emplacementLotVerifier(preparationMultipleContext.emplacement_courant.getAdressage(), preparationMultipleContext.lot_courant.getNumLot()))
-                            {
-                                blinkImageValidation();
-                                ((LinearLayout) findViewById(R.id.validationScan)).setVisibility(View.VISIBLE);
-                                ((LinearLayout) findViewById(R.id.validationScan)).setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        preparationMultipleContext.ValiderScan(Integer.parseInt(((TextView) findViewById(R.id.qteSaisie)).getText().toString()));
-                                        ((TextView) findViewById(R.id.quantiteProduit)).setText("");
-                                        ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText("");
-                                        ((TextView) findViewById(R.id.numeroLot)).setText("");
-                                        ((TextView) findViewById(R.id.datePeremptionLot)).setText("");
-                                        ((TextView) findViewById(R.id.qteSaisie)).setText("");
-                                        ((LinearLayout) findViewById(R.id.validationScan)).setVisibility(View.GONE);
-                                        findViewById(R.id.boutonFermeture).performClick();
-                                    }
-                                });
-                            }
-                            else
-                            {
-                                afficherAlerteErreurEmplacement(ScannerRetourActivity.this, ScannerRetourActivity.this.getLayoutInflater(), preparationMultipleContext.emplacementDisponible, preparationMultipleContext.liste_emplacement_disponible);
-                                preparationMultipleContext.emplacement_courant = null;
-                                ((TextView) findViewById(R.id.EmplacementLotProduit)).setText("");
-                                ((TextView) findViewById(R.id.instruction)).setText("Scannez un emplacement");
-                            }
-                        }
-                        else
-                        {
-                            ((TextView) findViewById(R.id.instruction)).setText("Scannez une référence");
-                        }*/
-                    }
-                    break;
-            }
-            boolean close = data.getBooleanExtra("close", false);
-        }
-    }
-
-    @Override
     public void onBackPressed() {
         super.onBackPressed();
         findViewById(R.id.boutonFermeture).performClick();
@@ -585,14 +556,6 @@ public class ScannerRetourActivity extends ServiceActivity {
 
     private void reinitialisationInterface()
     {
-        /*((TextView) findViewById(R.id.designationProduit)).setText("");
-        ((TextView) findViewById(R.id.referenceProduit)).setText("");
-        ((TextView) findViewById(R.id.quantiteProduit)).setText("");
-        ((TextView) findViewById(R.id.quantiteDejaPreparer)).setText("");
-        ((TextView) findViewById(R.id.qteSaisie)).setText("");
-        ((TextView) findViewById(R.id.numeroLot)).setText("");
-        ((TextView) findViewById(R.id.datePeremptionLot)).setText("");
-        ((TextView) findViewById(R.id.numeroSerie)).setText("");*/
         ((LinearLayout) findViewById(R.id.layoutIconeValidation)).postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -611,9 +574,19 @@ public class ScannerRetourActivity extends ServiceActivity {
     {
         if(stockEmplacement.contentEquals(""))
         {
-            if(!emplacement_courant.getAdressage().contentEquals(produitCourant.getEmplacement_PUI_Defaut()))
+            if(checkEmplacementUF)
             {
-                afficherAlerteErreurEmplacement(ScannerRetourActivity.this, ScannerRetourActivity.this.getLayoutInflater(), emplacement_courant.getAdressage(), stock_courant, emplacement_courant);
+                if(!emplacement_courant.getAdressage().contentEquals(produitCourant.getEmplacement_UF_Defaut()))
+                {
+                    afficherAlerteErreurEmplacement(ScannerRetourActivity.this, ScannerRetourActivity.this.getLayoutInflater(), emplacement_courant.getAdressage(), stock_courant, emplacement_courant);
+                }
+            }
+            else
+            {
+                if(!emplacement_courant.getAdressage().contentEquals(produitCourant.getEmplacement_PUI_Defaut()))
+                {
+                    afficherAlerteErreurEmplacement(ScannerRetourActivity.this, ScannerRetourActivity.this.getLayoutInflater(), emplacement_courant.getAdressage(), stock_courant, emplacement_courant);
+                }
             }
         }
         else if(!stockEmplacement.contentEquals(emplacement_courant.getAdressage()))
@@ -716,19 +689,11 @@ public class ScannerRetourActivity extends ServiceActivity {
             /**
              * MAJ retourLigne
              */
-            retourLigneTemp.setQte_Retourner(retourLigneTemp.getQte_Retourner()+quantite);
+            retourLigneTemp.setQte_Retourner(quantite);
             long rowID = Retour_LigneOpenHelper.mettreAJourUnRetourLigne(db, retourLigneTemp);
         }
         else
         {
-            ((LinearLayout) findViewById(R.id.layoutIconeValidation)).setVisibility(View.INVISIBLE);
-            ((TextView) findViewById(R.id.designationValidation)).setText("");
-            ((TextView) findViewById(R.id.quantiteValidation)).setText("");
-            ((TextView) findViewById(R.id.lotValidation)).setText("");
-            ((TextView) findViewById(R.id.peremptionValidation)).setText("");
-            ((TextView) findViewById(R.id.emplacementValidation)).setText("");
-            ((TextView) findViewById(R.id.serieValidation)).setText("");
-
             String numeroLot = stock_courant.getLot();
             String datePeremption = stock_courant.getPeremptionDate();
             String[] datePeremptionTab = datePeremption.split("/");
@@ -760,3 +725,8 @@ public class ScannerRetourActivity extends ServiceActivity {
         }
     }
 }
+
+/*
+01036608121365321726113010F7UM244 //inconnu
+01040393611559951726113010F7UM244
+ */
