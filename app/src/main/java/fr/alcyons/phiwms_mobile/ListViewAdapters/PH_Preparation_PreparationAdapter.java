@@ -74,12 +74,18 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
             viewHolder.origine = (TextView) convertView.findViewById(R.id.origine);
             viewHolder.relative_principal = (RelativeLayout) convertView.findViewById(R.id.relative_principal);
             viewHolder.imageSeparateurLayout = (ImageView) convertView.findViewById(R.id.imageSeparateurLayout);
+            viewHolder.preparationUrgente = (TextView) convertView.findViewById(R.id.preparationUrgente);
 
             convertView.setTag(viewHolder);
         }
 
         PH_Preparation phPreparationCourant = (PH_Preparation) getItem(position);
         Depot depot = DepotOpenHelper.getDepotParReference(db, phPreparationCourant.getDepotDestinataireReference());
+
+        if(phPreparationCourant.getURGENT())
+        {
+            viewHolder.preparationUrgente.setVisibility(View.VISIBLE);
+        }
 
         List<PH_Preparation_Ligne> ph_preparation_ligne_List = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesBaseParPHPreparation(db, phPreparationCourant);
         int nbApreparer = 0;
@@ -217,6 +223,7 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
         public TextView origine;
         public RelativeLayout relative_principal;
         public ImageView imageSeparateurLayout;
+        public TextView preparationUrgente;
 
         public void setDateLivraisonColor(Date date) {
 

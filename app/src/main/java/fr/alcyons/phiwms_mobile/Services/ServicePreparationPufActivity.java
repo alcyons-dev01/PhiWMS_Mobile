@@ -160,7 +160,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
                     //lancerScan();
                     /* Code nécessaire à l'affichage de la liste */
                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(ph_preparation_List.size()));
-                    ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
+                    ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getURGENT).reversed().thenComparing(PH_Preparation::getLivraisonPrevueDate));
                     ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPufActivity.this, ph_preparation_List, db, utilisateurConnecte);
                     // Permet d'enlever le séparateur entre deux éléments d'une listeView
                     ph_preparation_ListView.setDivider(footer);
@@ -178,7 +178,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
                 else
                 {
                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(ph_preparation_List.size()));
-                    ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
+                    ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getURGENT).reversed().thenComparing(PH_Preparation::getLivraisonPrevueDate));
                     ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPufActivity.this, ph_preparation_List, db, utilisateurConnecte);
                     // Permet d'enlever le séparateur entre deux éléments d'une listeView
                     ph_preparation_ListView.setDivider(footer);
@@ -218,7 +218,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
                         }
                     }
 
-                    ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
+                    ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getURGENT).reversed().thenComparing(PH_Preparation::getLivraisonPrevueDate));
 
                     ph_preparation_preparationAdapter.phPreparationPreparation.clear();
                     ph_preparation_preparationAdapter.phPreparationPreparation.addAll(ph_preparation_List);
@@ -322,7 +322,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(ph_preparation_List.size()));
                                 ((TextView) findViewById(R.id.titre)).setText("Préparations");
 
-                                ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
+                                ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getURGENT).reversed().thenComparing(PH_Preparation::getLivraisonPrevueDate));
                                 ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPufActivity.this, ph_preparation_List, db, utilisateurConnecte);
                                 // Permet d'enlever le séparateur entre deux éléments d'une listeView
                                 ph_preparation_ListView.setDivider(footer);
@@ -369,7 +369,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
                                         }
                                     }
 
-                                    ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
+                                    ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getURGENT).reversed().thenComparing(PH_Preparation::getLivraisonPrevueDate));
 
                                     ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPufActivity.this, ph_preparation_List, db, utilisateurConnecte);
 
@@ -505,7 +505,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
                         }
                         /* Code nécessaire à l'affichage de la liste */
                         ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(ph_preparation_List.size()));
-                        ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
+                        ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getURGENT).reversed().thenComparing(PH_Preparation::getLivraisonPrevueDate));
                         ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPufActivity.this, ph_preparation_List, db, utilisateurConnecte);
                         // Permet d'enlever le séparateur entre deux éléments d'une listeView
                         ph_preparation_ListView.setDivider(footer);
@@ -526,7 +526,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
                 } else {
                     /* Code nécessaire à l'affichage de la liste */
                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(ph_preparation_List.size()));
-                    ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
+                    ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getURGENT).reversed().thenComparing(PH_Preparation::getLivraisonPrevueDate));
                     ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPufActivity.this, ph_preparation_List, db, utilisateurConnecte);
                     // Permet d'enlever le séparateur entre deux éléments d'une listeView
                     ph_preparation_ListView.setDivider(footer);
@@ -543,7 +543,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
             } else {
                 /* Code nécessaire à l'affichage de la liste */
                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(ph_preparation_List.size()));
-                ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
+                ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getURGENT).reversed().thenComparing(PH_Preparation::getLivraisonPrevueDate));
                 ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPufActivity.this, ph_preparation_List, db, utilisateurConnecte);
                 // Permet d'enlever le séparateur entre deux éléments d'une listeView
                 ph_preparation_ListView.setDivider(footer);

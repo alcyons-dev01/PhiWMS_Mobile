@@ -163,6 +163,7 @@ public class Commande implements Serializable, Comparable {
         this.Numero = commandeJson.optString("Numero");
         this.Fournisseur = commandeJson.optString("Fournisseur");
         this.Situation = commandeJson.optString("Situation");
+        this.Commentaire = commandeJson.optString("Commentaire");
         this.Date_Liv = commandeJson.optString("Date_Liv");
         this.Ref_Depot_Dest = commandeJson.optString("Ref_Depot_Dest");
         this.Patient_identite = commandeJson.optString("Patient_identite");
@@ -181,6 +182,7 @@ public class Commande implements Serializable, Comparable {
         this.Patient_identite = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_PATIENT_IDENTITE_COMMANDE);
         this.NbColisTotal_CE = commandeCursor.getInt(CommandeOpenHelper.Constantes.NUM_COL_NBCOLISTOTAL_CE_COMMANDE);
         this.PoidsTotal_CE = commandeCursor.getInt(CommandeOpenHelper.Constantes.NUM_COL_POIDSTOTAL_CE_COMMANDE);
+        this.Commentaire = commandeCursor.getString(CommandeOpenHelper.Constantes.NUM_COL_COMMENTAIRE_COMMANDE);
         this.phiwms_mobileUUID = commandeCursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 

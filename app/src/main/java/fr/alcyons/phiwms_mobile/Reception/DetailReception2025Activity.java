@@ -88,6 +88,7 @@ import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Reliquat_Reception_2025Adapt
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.Mail;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparation2025_V2Activity;
 import fr.alcyons.phiwms_mobile.PrisePhoto.PrisePhoto;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
@@ -160,6 +161,21 @@ public class DetailReception2025Activity  extends ServiceActivity {
                     afficherAlerteSelectionEtiquette(DetailReception2025Activity.this, DetailReception2025Activity.this.getLayoutInflater());
                 }
             });
+        }
+
+        if(commandeSelectionne.getCommentaire() != null && !commandeSelectionne.getCommentaire().contentEquals(""))
+        {
+            ((LinearLayout) findViewById(R.id.informationPreparation)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    afficherModaleCommentaire(DetailReception2025Activity.this, getLayoutInflater());
+                }
+            });
+        }
+        else
+        {
+            ((LinearLayout) findViewById(R.id.informationPreparation)).setOnClickListener(null);
+            ((LinearLayout) findViewById(R.id.informationPreparation)).setAlpha(0.3F);
         }
 
         optionTri = (Spinner) findViewById(R.id.optionTri);
@@ -1121,5 +1137,26 @@ public class DetailReception2025Activity  extends ServiceActivity {
         });
 
         buttonAnnuler.setOnClickListener(v -> alertDialogEtiquette.dismiss());
+    }
+
+    private void afficherModaleCommentaire(Context context, LayoutInflater inflater)
+    {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
+        View layout = inflater.inflate(R.layout.alerte, null);
+
+        LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
+        TextView messageTextView = (TextView) layout.findViewById(R.id.messageFin);
+        TextView titreTextView = (TextView) layout.findViewById(R.id.titre);
+        titreTextView.setText("Commentaire");
+        messageTextView.setText(commandeSelectionne.getCommentaire());
+        builder.setView(layout);
+
+        final androidx.appcompat.app.AlertDialog alertDialog = builder.create();
+        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
+        alertDialog.show();
+
+        zoneok.setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
     }
 }

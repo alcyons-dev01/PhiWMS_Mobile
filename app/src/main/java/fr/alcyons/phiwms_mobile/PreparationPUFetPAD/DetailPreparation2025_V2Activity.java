@@ -160,6 +160,21 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
         depotOrigine = DepotOpenHelper.getDepotParReference(db, ph_preparation_Selectionne.getDepotOrigineReference());
         Depot depot = DepotOpenHelper.getDepotParReference(db, ph_preparation_Selectionne.getDepotDestinataireReference());
 
+        if(ph_preparation_Selectionne.getCommentaires() != null && !ph_preparation_Selectionne.getCommentaires().contentEquals(""))
+        {
+            ((LinearLayout) findViewById(R.id.informationPreparation)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    afficherModaleCommentaire(DetailPreparation2025_V2Activity.this, getLayoutInflater());
+                }
+            });
+        }
+        else
+        {
+            ((LinearLayout) findViewById(R.id.informationPreparation)).setOnClickListener(null);
+            ((LinearLayout) findViewById(R.id.informationPreparation)).setAlpha(0.3F);
+        }
+
         String intitule = "#" + String.valueOf(ph_preparation_Selectionne.getUID());
         ((TextView) findViewById(R.id.intitule)).setText(intitule);
 
@@ -1252,5 +1267,26 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
         });
 
         buttonAnnuler.setOnClickListener(v -> alertDialogListeImprimante.dismiss());
+    }
+
+    private void afficherModaleCommentaire(Context context, LayoutInflater inflater)
+    {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
+        View layout = inflater.inflate(R.layout.alerte, null);
+
+        LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
+        TextView messageTextView = (TextView) layout.findViewById(R.id.messageFin);
+        TextView titreTextView = (TextView) layout.findViewById(R.id.titre);
+        titreTextView.setText("Commentaire");
+        messageTextView.setText(ph_preparation_Selectionne.getCommentaires());
+        builder.setView(layout);
+
+        final androidx.appcompat.app.AlertDialog alertDialog = builder.create();
+        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
+        alertDialog.show();
+
+        zoneok.setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
     }
 }
