@@ -412,7 +412,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
         scanDocumentBundle.putString("contexte", String.valueOf(R.string.scannerContexteDocument));
         scanDocumentBundle.putBoolean("isBoutonSuppressionExistant", true);
         Intent scanDocumentIntent = null;
-        if(Build.MANUFACTURER.contains("Zebra Technologies"))
+        if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell") || Build.MANUFACTURER.toLowerCase().contains("google"))
         {
             scanDocumentIntent = new Intent(ServiceRetourPUIActivity.this, ScannerDocumentActivity.class);
             scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteDocument);

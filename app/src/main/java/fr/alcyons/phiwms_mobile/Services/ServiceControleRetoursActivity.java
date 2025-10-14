@@ -466,7 +466,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         scanDocumentBundle.putBoolean("modeRafale", false);
 
         Intent scanDocumentIntent;
-        if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+        if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell") || Build.MANUFACTURER.toLowerCase().contains("google"))
         {
             scanDocumentIntent = new Intent(ServiceControleRetoursActivity.this, ScannerDocumentActivity.class);
             scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteDocument);

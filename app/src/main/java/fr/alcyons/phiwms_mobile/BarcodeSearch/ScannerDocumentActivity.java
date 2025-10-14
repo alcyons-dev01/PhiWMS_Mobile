@@ -53,7 +53,7 @@ public class ScannerDocumentActivity extends ServiceActivity {
         //toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
 
         //Objet graphique pour la réception scannée
-        contenuCodeManuel = (EditText) findViewById(R.id.contenuCodeManuel);
+        contenuCodeManuel = (EditText) findViewById(R.id.EditTextScanee);
 
         //on donne le focus sur l'input
         contenuCodeManuel.requestFocus();
@@ -77,34 +77,9 @@ public class ScannerDocumentActivity extends ServiceActivity {
             }
         });
 
-        String contextService = "";
-        if(intent.hasExtra("Context"))
-            contextService = intent.getExtras().getString("Context");
-        switch (contextService)
-        {
-            case "Preparation":
-                ((ImageView) findViewById(R.id.imageGriseScanManuel)).setVisibility(View.GONE);
-                ((ImageView) findViewById(R.id.imageScanPreparation)).setVisibility(View.VISIBLE);
-                ((TextView) findViewById(R.id.designationProduit_Scan)).setText("Préparation");
-                break;
-            case "Reception":
-                ((ImageView) findViewById(R.id.imageGriseScanManuel)).setVisibility(View.GONE);
-                ((ImageView) findViewById(R.id.imageScanReception)).setVisibility(View.VISIBLE);
-                ((TextView) findViewById(R.id.designationProduit_Scan)).setText("Réception");
-                break;
-            default:
+        ((TextView)findViewById(R.id.instruction)).setText(intent.getExtras().getString("TextBannerManuel"));
 
-                break;
-        }
-
-        ((TextView)findViewById(R.id.textManuelScan)).setText(intent.getExtras().getString("TextBannerManuel"));
-        if(scannerContexteInt == R.string.scannerContexteAuthentification)
-        {
-            Button boutonFermeture = (Button) findViewById(R.id.boutonFermetureManuel);
-            boutonFermeture.setText("Connexion manuelle");
-        }
-
-        findViewById(R.id.boutonFermetureManuel).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.boutonFermeture).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent scannerSearchOnlyIntent = new Intent();

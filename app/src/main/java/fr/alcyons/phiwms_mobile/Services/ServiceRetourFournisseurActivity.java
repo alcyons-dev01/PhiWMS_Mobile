@@ -351,7 +351,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
         scanDocumentBundle.putString("contexte", String.valueOf(R.string.scannerContexteDocument));
         scanDocumentBundle.putBoolean("isBoutonSuppressionExistant", true);
         Intent scanDocumentIntent;
-        if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+        if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell") || Build.MANUFACTURER.toLowerCase().contains("google"))
         {
             scanDocumentIntent = new Intent(ServiceRetourFournisseurActivity.this, ScannerDocumentActivity.class);
             scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteDocument);
