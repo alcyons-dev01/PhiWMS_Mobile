@@ -75,7 +75,7 @@ public class ListeLivraisonDepotAdapter extends ArrayAdapter {
         viewHolder.liste.setText(String.valueOf(phPreparations.getListe()));
 
         String urgent = "";
-        if (phPreparations.getURGENT()) {
+        if (phPreparations.isURGENT()) {
             urgent += "URGENT";
 
         }

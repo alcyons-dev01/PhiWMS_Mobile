@@ -197,8 +197,14 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
             spinner.setAdapter(spinnerArrayAdapter);
 
             spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+                boolean isFirstSelection = true; // drapeau pour ignorer le premier appel
+
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if (isFirstSelection) {
+                        isFirstSelection = false; // on consomme le premier appel
+                        return; // ne rien faire au lancement
+                    }
                     if(((TextView) parent.getChildAt(0)) != null)
                     {
                         ((TextView) parent.getChildAt(0)).setVisibility(View.INVISIBLE);

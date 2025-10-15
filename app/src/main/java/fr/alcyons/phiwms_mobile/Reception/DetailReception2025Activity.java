@@ -752,6 +752,7 @@ public class DetailReception2025Activity  extends ServiceActivity {
         for(PH_Reliquat reliquatcourant : listeReliquat)
         {
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, reliquatcourant.getPhiMR4UUID(), reliquatcourant.getReliquat_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+
             Random randomactionligne = new Random();
             int actionligneId = randomactionligne.nextInt();
             if(actionligneId > 0)

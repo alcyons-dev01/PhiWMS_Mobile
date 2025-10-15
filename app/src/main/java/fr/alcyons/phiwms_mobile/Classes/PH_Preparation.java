@@ -57,7 +57,7 @@ public class PH_Preparation implements Serializable, Comparable {
     private String Frequence;
     private String previsionDateDebut;
     private String previsionDateFin;
-    private Boolean URGENT;
+    private boolean URGENT;
     private String Motif;
     private int preparateur_userID;
     private int pharmacien_userID;
@@ -114,7 +114,7 @@ public class PH_Preparation implements Serializable, Comparable {
         this.numero_scelle = numero_scelle;
     }
 
-    public PH_Preparation(int UID, String service, Boolean erreur_Valid, String PHIE_Tag, String saisie_Le, String a_tel_heure, int produitID, String produitDesignation, double qte_demandee, Boolean livree, Boolean validee, String origine, String liste, int depotDestinataireID, String depotDestinataireReference, String SYS_DT_MAJ, String SYS_HEURE_MAJ, String SYS_USER_MAJ, String prescripteurReference, String prescription_date, String prescripteurNom, String depotOrigineReference, int depotOrigineID, String commentaires, String preparationDate, String livraisonPrevueDate, String DN_Groupe, double montant_HT, double montant_TTC, double poids, int commande_ID, String preparateur, String statut, String PHIE_SYNCHRO, String receptionUFNonComforme, String livraisonDate, String frequence, String previsionDateDebut, String previsionDateFin, Boolean URGENT, String motif, int preparateur_userID, int pharmacien_userID, double volume, int paletteNB, int ColisNB, int Conteneur_NB, String numero_scelle) {
+    public PH_Preparation(int UID, String service, Boolean erreur_Valid, String PHIE_Tag, String saisie_Le, String a_tel_heure, int produitID, String produitDesignation, double qte_demandee, Boolean livree, Boolean validee, String origine, String liste, int depotDestinataireID, String depotDestinataireReference, String SYS_DT_MAJ, String SYS_HEURE_MAJ, String SYS_USER_MAJ, String prescripteurReference, String prescription_date, String prescripteurNom, String depotOrigineReference, int depotOrigineID, String commentaires, String preparationDate, String livraisonPrevueDate, String DN_Groupe, double montant_HT, double montant_TTC, double poids, int commande_ID, String preparateur, String statut, String PHIE_SYNCHRO, String receptionUFNonComforme, String livraisonDate, String frequence, String previsionDateDebut, String previsionDateFin, boolean URGENT, String motif, int preparateur_userID, int pharmacien_userID, double volume, int paletteNB, int ColisNB, int Conteneur_NB, String numero_scelle) {
         this.UID = UID;
         this.Service = service;
         this.Erreur_Valid = erreur_Valid;
@@ -549,11 +549,11 @@ public class PH_Preparation implements Serializable, Comparable {
         this.previsionDateFin = previsionDateFin;
     }
 
-    public Boolean getURGENT() {
+    public boolean isURGENT() {
         return URGENT;
     }
 
-    public void setURGENT(Boolean URGENT) {
+    public void setURGENT(boolean URGENT) {
         this.URGENT = URGENT;
     }
 

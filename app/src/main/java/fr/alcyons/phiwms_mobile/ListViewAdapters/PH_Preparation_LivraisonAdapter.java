@@ -120,7 +120,7 @@ public class PH_Preparation_LivraisonAdapter extends BaseAdapter {
             viewHolder.liste.setText(String.valueOf(phPreparations.get(position).getListe()));
 
             String urgent = "";
-            if (phPreparations.get(position).getURGENT()) {
+            if (phPreparations.get(position).isURGENT()) {
                 urgent += "URGENT";
 
             }

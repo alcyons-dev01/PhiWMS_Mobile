@@ -957,6 +957,10 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, lignecourante.getPhiMR4UUID(), lignecourante.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
 
             Produit produit_temp = ProduitOpenHelper.getProduitByID(db, lignecourante.getProduitID());
+            Stock_Lot_Emplacement_Light stocklotEmplacementLight = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(db, produit_temp, depotOrigine, lignecourante.getLotNumero(), lignecourante.getSerieNumero());
+            if(stocklotEmplacementLight != null)
+                Stock_Lot_EmplacementLightOpenHelper.supprimerUnStockLotEmplacement(db, stocklotEmplacementLight);
+
             Random randomactionligne = new Random();
             int actionligneId = randomactionligne.nextInt();
             if(actionligneId > 0)

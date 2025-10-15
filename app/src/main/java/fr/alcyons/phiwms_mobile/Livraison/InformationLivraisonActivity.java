@@ -500,7 +500,7 @@ public class InformationLivraisonActivity extends ServiceActivity {
 
         ((TextView) findViewById(R.id.telephone)).setText(depot.getTel().trim());
 
-        if (!ph_preparation_Selectionne.getURGENT()) {
+        if (!ph_preparation_Selectionne.isURGENT()) {
             findViewById(R.id.isUrgent).setVisibility(View.GONE);
         }
 

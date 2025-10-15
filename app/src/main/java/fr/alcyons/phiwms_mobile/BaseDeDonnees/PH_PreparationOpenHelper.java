@@ -152,7 +152,7 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_FREQUENCE_PH_PREPARATION, ph_preparation.getFrequence());
         contentValues.put(Constantes.CLE_COL_PREVISIONDATEDEBUT_PH_PREPARATION, ph_preparation.getPrevisionDateDebut());
         contentValues.put(Constantes.CLE_COL_PREVISIONDATEFIN_PH_PREPARATION, ph_preparation.getPrevisionDateFin());
-        contentValues.put(Constantes.CLE_COL_URGENT_PH_PREPARATION, ph_preparation.getURGENT());
+        contentValues.put(Constantes.CLE_COL_URGENT_PH_PREPARATION, ph_preparation.isURGENT());
         contentValues.put(Constantes.CLE_COL_MOTIF_PH_PREPARATION, ph_preparation.getMotif());
         contentValues.put(Constantes.CLE_COL_PREPARATEUR_USERID_PH_PREPARATION, ph_preparation.getPreparateur());
         contentValues.put(Constantes.CLE_COL_PHARMACIEN_USERID_PH_PREPARATION, ph_preparation.getPharmacien_userID());
@@ -218,7 +218,7 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_FREQUENCE_PH_PREPARATION, ph_preparation.getFrequence());
         contentValues.put(Constantes.CLE_COL_PREVISIONDATEDEBUT_PH_PREPARATION, ph_preparation.getPrevisionDateDebut());
         contentValues.put(Constantes.CLE_COL_PREVISIONDATEFIN_PH_PREPARATION, ph_preparation.getPrevisionDateFin());
-        contentValues.put(Constantes.CLE_COL_URGENT_PH_PREPARATION, ph_preparation.getURGENT());
+        contentValues.put(Constantes.CLE_COL_URGENT_PH_PREPARATION, ph_preparation.isURGENT());
         contentValues.put(Constantes.CLE_COL_MOTIF_PH_PREPARATION, ph_preparation.getMotif());
         contentValues.put(Constantes.CLE_COL_PREPARATEUR_USERID_PH_PREPARATION, ph_preparation.getPreparateur());
         contentValues.put(Constantes.CLE_COL_PHARMACIEN_USERID_PH_PREPARATION, ph_preparation.getPharmacien_userID());

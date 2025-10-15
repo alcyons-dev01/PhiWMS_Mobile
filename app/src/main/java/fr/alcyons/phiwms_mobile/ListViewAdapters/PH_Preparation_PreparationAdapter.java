@@ -82,9 +82,13 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
         PH_Preparation phPreparationCourant = (PH_Preparation) getItem(position);
         Depot depot = DepotOpenHelper.getDepotParReference(db, phPreparationCourant.getDepotDestinataireReference());
 
-        if(phPreparationCourant.getURGENT())
+        if(phPreparationCourant.isURGENT())
         {
             viewHolder.preparationUrgente.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            viewHolder.preparationUrgente.setVisibility(View.GONE);
         }
 
         List<PH_Preparation_Ligne> ph_preparation_ligne_List = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesBaseParPHPreparation(db, phPreparationCourant);
