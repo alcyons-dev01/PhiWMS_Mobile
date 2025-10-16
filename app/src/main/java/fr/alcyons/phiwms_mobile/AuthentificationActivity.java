@@ -385,8 +385,8 @@ public class AuthentificationActivity extends MainActivity {
             TextView textViewIdentifiant = findViewById(R.id.identifiant);
             TextView textViewMotDePasse = findViewById(R.id.motDePasse);
 
-            /*textViewIdentifiant.setText("alcyons");
-            textViewMotDePasse.setText("65ken64btz");*/
+            textViewIdentifiant.setText("alcyons");
+            textViewMotDePasse.setText("helpdesk");
         }
 
         // create class object

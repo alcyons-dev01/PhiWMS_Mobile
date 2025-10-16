@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -89,6 +90,8 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
             ServiceRetourFournisseurActivity.this.finish();
         });
 
+        ((LinearLayout) findViewById(R.id.triListe)).setVisibility(ListView.GONE);
+
         connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(db);
 
         resultScanDocument = registerForActivityResult(
@@ -106,7 +109,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                                     }
                                     /* Code nécessaire à l'affichage de la liste */
                                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
-                                    ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur demandés");
+                                    ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur");
                                     adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
                                     listViewRetours.setDivider(footer);
                                     listViewRetours.setAdapter(adapter);
@@ -209,7 +212,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                 {
                     /* Code nécessaire à l'affichage de la liste */
                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
-                    ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur demandés");
+                    ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur");
                     adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
                     listViewRetours.setDivider(footer);
                     listViewRetours.setAdapter(adapter);
@@ -275,7 +278,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                             {
                                 /* Code nécessaire à l'affichage de la liste */
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
-                                ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur demandés");
+                                ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur");
                                 adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
                                 listViewRetours.setDivider(footer);
                                 listViewRetours.setAdapter(adapter);
@@ -335,6 +338,14 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
         super.prepareOptionsMenu(menu, adapter, null, "Produit, Intitulé, N°...");
         MenuItem item = menu.findItem(R.id.menuDatamatrix);
         item.setOnMenuItemClickListener(item1 -> true);
+        MenuItem itemScan = menu.findItem(R.id.menuDatamatrix);
+        itemScan.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem item) {
+                lancerScan();
+                return false;
+            }
+        });
         return true;
     }
     @Override
@@ -342,7 +353,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
         super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_action, menu);
-        menu.findItem(R.id.menuDatamatrix).setVisible(false);
+        menu.findItem(R.id.menuDatamatrix).setVisible(true);
         return true;
     }
     public void lancerScan()

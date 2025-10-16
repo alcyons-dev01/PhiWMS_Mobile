@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="4"
-            android:background="@color/bleu_clair_alcyons"
+            android:background="@drawable/background_plain_bleu_radius_top"
             android:padding="5dp">
 
             <TextView
@@ -87,7 +87,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:background="@color/orange2"
+                android:background="@drawable/background_orange_radius_bottom_right"
                 android:padding="5dp"
                 android:gravity="center_vertical"
                 android:layout_marginLeft="2dp">
