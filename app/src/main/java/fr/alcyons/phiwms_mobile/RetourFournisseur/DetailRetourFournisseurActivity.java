@@ -69,33 +69,6 @@ public class DetailRetourFournisseurActivity extends ServiceActivity {
     {
         int compteurReussite = 0;
 
-        /*Bitmap bitmap = dialogue.signaturePad.getSignatureBitmap();
-        String nom_chauffeur = dialogue.edit_nom_chauffeur.getText().toString();
-        String prenom_chauffeur = dialogue.edit_prenom_chauffeur.getText().toString();
-        String transporteur = dialogue.edit_transporteur.getText().toString();
-
-        if(nom_chauffeur.contentEquals("") || transporteur.contentEquals(""))
-        {
-            Alerte.afficherAlerte(DetailRetourFournisseurActivity.this, "Erreur", "Veuillez saisir toutes les informations demandées s'il vous plaît", "alerte");
-            return;
-        }
-
-        InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-
-        if(bitmap != null)
-        {
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            byte[] byteArray = stream.toByteArray();
-            String img_str = Base64.encodeToString(byteArray, Base64.DEFAULT);
-            retourSelectionne.setSignature_Chauffeur(img_str);
-        }
-
-        retourSelectionne.setNom_Chauffeur(nom_chauffeur);
-        retourSelectionne.setPrenom_Chauffeur(prenom_chauffeur);
-        retourSelectionne.setTransporteur(transporteur);*/
-
         Random random = new Random();
         int actionId = random.nextInt();
         if(actionId > 0)

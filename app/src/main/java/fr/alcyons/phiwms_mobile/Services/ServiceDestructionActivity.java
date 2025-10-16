@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -74,6 +75,8 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
         setContentView(R.layout.activity_liste_refresh);
         pm = ServiceDestructionActivity.this.getPackageManager();
         // Affichage des informations de base
+
+        ((LinearLayout) findViewById(R.id.triListe)).setVisibility(ListView.GONE);
 
         // Gestion de la listView
         listViewRetours = findViewById(R.id.listeView);
@@ -253,7 +256,8 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
                                 ServiceDestructionActivity.this.startActivity(intent);
                             } else {
                                 arreterSpinner();
-                                Alerte.afficherAlerte(ServiceDestructionActivity.this, "Alerte", "Aucune Destruction à traiter", "alerte");
+                                vide = true;
+                                nomServiceVide = "Destruction";
                                 retourNavigation(ServiceDestructionActivity.this);
                             }
                         } else {
@@ -348,6 +352,12 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
         super.prepareOptionsMenu(menu, adapter, null, "Produit, Intitulé, N°...");
         MenuItem item = menu.findItem(R.id.menuDatamatrix);
         item.setOnMenuItemClickListener(item1 -> true);
+
+        MenuItem itemScan = menu.findItem(R.id.menuDatamatrix);
+        itemScan.setOnMenuItemClickListener(menuItem -> {
+            lancerScan();
+            return true;
+        });
         return true;
     }
     @Override
@@ -355,7 +365,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
         super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_action, menu);
-        menu.findItem(R.id.menuDatamatrix).setVisible(false);
+        menu.findItem(R.id.menuDatamatrix).setVisible(true);
         return true;
     }
     public void lancerScan()

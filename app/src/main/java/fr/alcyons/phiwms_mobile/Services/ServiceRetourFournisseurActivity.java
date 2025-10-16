@@ -247,7 +247,8 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                                 ServiceRetourFournisseurActivity.this.startActivity(intent);
                             } else {
                                 arreterSpinner();
-                                Alerte.afficherAlerte(ServiceRetourFournisseurActivity.this, "Alerte", "Aucun Retour Fournisseur à traiter", "alerte");
+                                vide = true;
+                                nomServiceVide = "Retour fournisseur";
                                 retourNavigation(ServiceRetourFournisseurActivity.this);
                             }
                         } else {
