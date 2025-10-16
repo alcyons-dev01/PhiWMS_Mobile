@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_empty_radius"
+    android:clipToOutline="true"
+    android:outlineProvider="background">
+
+    <TextView
+        android:id="@+id/titre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Confirmation"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:backgroundTint="@color/bleu_fonce_alcyons"
+        android:background="@drawable/background_plain_bleu_radius_top"
+        android:padding="10dp"
+        />
+
+    <TextView
+        android:id="@+id/messageFin"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Êtes-vous sûr de vouloir envoyer cette demande ?"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textSize="17dp"
+        android:textColor="@android:color/black"/>
+
+    <EditText
+        android:id="@+id/commentaire"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Saisir un commentaire"
+        android:textColor="@color/noir"
+        android:textColorHint="@color/gris_fonce"
+        android:padding="10dp"
+        android:layout_margin="10dp"
+        android:background="@drawable/edittext_background"
+        android:inputType="textCapSentences"/>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bleu_fonce_alcyons"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="5dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/background_empty_radius"
+        android:weightSum="2"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:id="@+id/buttonAnnuler"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/ic_clear"
+                android:backgroundTint="@color/rouge"
+                android:layout_gravity="center"
+                android:layout_centerHorizontal="true" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Annuler"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/noir"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/bleu_fonce_alcyons"/>
+
+        <LinearLayout
+            android:id="@+id/buttonOk"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/ic_check_circle"
+                android:backgroundTint="@color/bleu_clair_alcyons"
+                android:layout_gravity="center"
+                android:layout_centerHorizontal="true" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Confirmer"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/noir"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
