@@ -1,27 +1,60 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Bouton Enregistrer (icône visible dans la Toolbar) -->
     <item
-        android:id="@+id/tout_detruire"
-        android:orderInCategory="100"
-        android:title="Tout détruire"
-        app:showAsAction="never" />
+        android:id="@+id/menuSaveCircle"
+        android:icon="@drawable/ic_check_circle_white"
+        android:title="Enregistrer"
+        android:iconTint="@color/blanc"
+        app:showAsAction="always"
+        android:visible="true"
+        android:orderInCategory="2"
+        android:contentDescription="@string/enregistrer" />
+
+    <!-- Menu déroulant Quarantaine (accessible via les 3 points) -->
+    <item
+        android:id="@+id/menu_quarantaine"
+        android:icon="@drawable/more_circle"
+        android:title="Options Quarantaine"
+        android:iconTint="@color/blanc"
+        app:showAsAction="always"
+        android:orderInCategory="1">
+        <menu>
+
+            <item
+                android:id="@+id/tout_detruire"
+                android:title="Tout détruire"
+                android:orderInCategory="10"
+                app:showAsAction="never" />
+
+            <item
+                android:id="@+id/tout_retourner_pui"
+                android:title="Tout retourner en PUI"
+                android:orderInCategory="20"
+                app:showAsAction="never" />
+
+            <item
+                android:id="@+id/tout_retourner_fournisseur"
+                android:title="Tout retourner fournisseur"
+                android:orderInCategory="30"
+                app:showAsAction="never" />
+
+            <item
+                android:id="@+id/tout_remettre_zero"
+                android:title="Tout remettre à 0"
+                android:orderInCategory="40"
+                app:showAsAction="never" />
+
+        </menu>
+    </item>
 
     <item
-        android:id="@+id/tout_retourner_pui"
-        android:orderInCategory="100"
-        android:title="Tout retourner en PUI"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/tout_retourner_fournisseur"
-        android:orderInCategory="100"
-        android:title="Tout retourner fournisseur"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/tout_remettre_zero"
-        android:orderInCategory="100"
-        android:title="Tout remettre à 0"
-        app:showAsAction="never" />
+        android:id="@+id/menuCommentaire"
+        android:icon="@drawable/ic_insert_comment"
+        android:title="Commentaire"
+        android:iconTint="@color/blanc"
+        app:showAsAction="always"
+        android:visible="true"
+        android:orderInCategory="0" />
 </menu>

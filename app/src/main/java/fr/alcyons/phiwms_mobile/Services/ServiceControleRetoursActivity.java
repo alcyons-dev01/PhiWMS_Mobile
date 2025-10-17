@@ -334,7 +334,8 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                                 ServiceControleRetoursActivity.this.finishAffinity();
                             }else {
                                 arreterSpinner();
-                                Alerte.afficherAlerte(ServiceControleRetoursActivity.this, "Alerte", "Aucun retour à contrôler", "alerte");
+                                vide = true;
+                                nomServiceVide = "Contrôle des retours";
                                 retourNavigation(ServiceControleRetoursActivity.this);
                    }
                         } else {

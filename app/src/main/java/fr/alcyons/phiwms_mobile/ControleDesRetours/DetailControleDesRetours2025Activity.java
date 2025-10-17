@@ -12,8 +12,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -91,6 +93,8 @@ public class DetailControleDesRetours2025Activity  extends ServiceAvecConnexionA
     LinearLayout lancerScan;
     Depot depot;
     List<String> listelot;
+
+    Spinner optionTri;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -134,12 +138,53 @@ public class DetailControleDesRetours2025Activity  extends ServiceAvecConnexionA
         pm = DetailControleDesRetours2025Activity.this.getPackageManager();
         liste_retour_ligne =  Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(db, retourSelectionne);
 
+        optionTri = (Spinner) findViewById(R.id.optionTri);
         tri_choisi = ParametreUtilisateurOpenHelper.getChoixTriRetourLigne(db);
         if(tri_choisi == null)
         {
             ParametreUtilisateurOpenHelper.mettreAJourTriRetourLigne(db, 0, "Designation");
             tri_choisi= ParametreUtilisateurOpenHelper.getChoixTriRetourLigne(db);
         }
+
+        optionTri.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            boolean isFirstSelection = true; // drapeau pour ignorer le premier appel
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (isFirstSelection) {
+                    isFirstSelection = false; // on consomme le premier appel
+                    return; // ne rien faire au lancement
+                }
+
+                if (((TextView) parent.getChildAt(0)) != null) {
+                    ((TextView) parent.getChildAt(0)).setVisibility(View.INVISIBLE);
+                }
+                tri_choisi = optionTri.getItemAtPosition(position).toString();
+                ParametreUtilisateurOpenHelper.mettreAJourTriPreparation(db, 0, tri_choisi);
+
+                switch (tri_choisi)
+                {
+                    case "Designation":
+                        onClickTriDesignation();
+                        break;
+                    case "Place":
+                        onClickTriParPlace();
+                        break;
+
+                    case "Catégorie":
+                        onClickTriCategorie();
+                        break;
+
+                    case "Poids":
+                        onClickTriParPoids();
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
 
         //gestion du bouton de scan
         lancerScan = (LinearLayout) findViewById(R.id.lancerScan);
@@ -377,13 +422,13 @@ public class DetailControleDesRetours2025Activity  extends ServiceAvecConnexionA
         //Récupération du menu
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_action, menu);
-        menu.findItem(R.id.menuSave).setVisible(true);
+        menu.findItem(R.id.menuSaveCircle).setVisible(true);
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem item = menu.findItem(R.id.menuSave);
+        MenuItem item = menu.findItem(R.id.menuSaveCircle);
         item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
             @Override
@@ -587,7 +632,6 @@ public class DetailControleDesRetours2025Activity  extends ServiceAvecConnexionA
     public void gestionAdapter()
     {
         retourLigneControleRetoursAdapter = new Retour_Ligne_ControleRetoursAdapter_2025(DetailControleDesRetours2025Activity.this, liste_retour_ligne, db, retourSelectionne);
-        retourLigneControleRetourAdapteListView.setDivider(footer);
         retourLigneControleRetourAdapteListView.setAdapter(retourLigneControleRetoursAdapter);
     }
 

@@ -1,0 +1,29 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:foreground="?attr/selectableItemBackgroundBorderless"
+    android:padding="8dp">
+
+    <!-- Le fond vert est mis sur une sous-vue pour éviter l’écrasement -->
+    <LinearLayout
+        android:id="@+id/layoutSave"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@color/vert3"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="6dp"
+        android:elevation="6dp"
+        android:clipToOutline="true"
+        android:layout_gravity="center">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_check_circle_white"
+            app:tint="@color/blanc"
+            android:contentDescription="@string/enregistrer"/>
+    </LinearLayout>
+</FrameLayout>

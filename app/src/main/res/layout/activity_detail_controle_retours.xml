@@ -104,17 +104,17 @@
             android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/separateur"
             android:layout_below="@id/barreDeTitre"
             android:orientation="vertical"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp">
+            android:padding="10dp">
 
             <ListView
                 android:id="@+id/listeView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:descendantFocusability="afterDescendants"/>
+                android:descendantFocusability="afterDescendants"
+                android:dividerHeight="12dp"
+                android:divider="@android:color/transparent" />
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

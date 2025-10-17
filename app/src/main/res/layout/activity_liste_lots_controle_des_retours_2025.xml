@@ -170,6 +170,8 @@
         android:layout_weight="1"
         android:layout_below="@id/firstRow"
         android:layout_above="@id/btnAjoutManuel"
+        android:divider="@android:color/transparent"
+        android:layout_marginTop="10dp"
         android:scrollbars="vertical"/>
 
     <Button

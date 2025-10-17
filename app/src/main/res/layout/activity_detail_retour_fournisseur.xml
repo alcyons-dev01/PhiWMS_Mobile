@@ -67,12 +67,19 @@
             android:id="@+id/zoneListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/separateur"
             android:layout_below="@id/barreDeTitre"
             android:orientation="vertical"
             android:padding="10dp">
 
-            <include layout="@layout/liste_view" />
+            <ListView
+                android:id="@+id/listeView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:descendantFocusability="afterDescendants"
+                android:dividerHeight="12dp"
+                android:divider="@android:color/transparent">
+
+            </ListView>
 
         </RelativeLayout>
 

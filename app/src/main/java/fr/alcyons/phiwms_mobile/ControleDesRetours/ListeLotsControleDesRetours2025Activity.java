@@ -26,6 +26,8 @@ import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -92,7 +94,7 @@ public class ListeLotsControleDesRetours2025Activity extends ServiceActivity {
         int id_produit = intent.getExtras().getInt("produitID");
         produit = ProduitOpenHelper.getProduitByID(db, id_produit);
         listelot = new ArrayList<>();
-
+        listeStockLotEmplacement = new ArrayList<>();
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -100,7 +102,10 @@ public class ListeLotsControleDesRetours2025Activity extends ServiceActivity {
             }
         });
 
-        listeStockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot);
+        if(depot != null && produit != null)
+        {
+            listeStockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot);
+        }
 
         for(Stock_Lot_Emplacement_Light tempLot : listeStockLotEmplacement)
         {
@@ -193,6 +198,9 @@ public class ListeLotsControleDesRetours2025Activity extends ServiceActivity {
 
 
             recyclerView = (RecyclerView) findViewById(R.id.liste_view_lot_retour_ligne);
+            DividerItemDecoration divider = new DividerItemDecoration(ListeLotsControleDesRetours2025Activity.this, DividerItemDecoration.VERTICAL);
+            divider.setDrawable(ContextCompat.getDrawable(ListeLotsControleDesRetours2025Activity.this, R.drawable.recycler_divider));
+            recyclerView.addItemDecoration(divider);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             adapter = new LotControleDesRetoursAdapter(listeStockLotEmplacement, position -> {
                 Toast.makeText(this, "Supprimer " + listeStockLotEmplacement.get(position), Toast.LENGTH_SHORT).show();
@@ -394,13 +402,13 @@ public class ListeLotsControleDesRetours2025Activity extends ServiceActivity {
         //Récupération du menu
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_action, menu);
-        menu.findItem(R.id.menuSave).setVisible(true);
+        menu.findItem(R.id.menuSaveCircle).setVisible(true);
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem item = menu.findItem(R.id.menuSave);
+        MenuItem item = menu.findItem(R.id.menuSaveCircle);
         item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
             @Override

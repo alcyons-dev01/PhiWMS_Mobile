@@ -66,10 +66,9 @@ public class DetailQuarantaineActivity extends ServiceActivity {
     List<Retour_Ligne> retourLigneList;
     Retour_Ligne_QuarantaineAdapter retourLigneQuarantaineAdapter;
     ListView retourLigneListView;
-    EditText commentaireEditText;
-    FloatingActionButton validerRetour;
     public boolean tous_inconnu;
     PackageManager pm;
+    String commentaire;
     ActivityResultLauncher<Intent> resultScanCodeGs1;
     private void clicToutRetournerPUI()
     {
@@ -103,13 +102,6 @@ public class DetailQuarantaineActivity extends ServiceActivity {
             viewHolder.toutRemettreAZero();
         }
     }
-
-    View.OnClickListener clicValider = new View.OnClickListener(){
-        @Override
-        public void onClick(View v) {
-            afficherAlerteConfirmationValidation(DetailQuarantaineActivity.this, LayoutInflater.from(DetailQuarantaineActivity.this));
-        }
-    };
 
     public void decoderCodeBarre(TextView dateAModifier, TextView numLotAModifier, Retour_Ligne_QuarantaineAdapter.Retour_LigneViewHolder viewHolder, String designation) {
         datePeremtionTextView = dateAModifier;
@@ -151,20 +143,13 @@ public class DetailQuarantaineActivity extends ServiceActivity {
         retourSelectionne = RetourOpenHelper.getRetourByID(db, retour_UID);
 
         // Affichage des informations de base
-        commentaireEditText = findViewById(R.id.commentaire);
-
         ((TextView) findViewById(R.id.intitule)).setText(retourSelectionne.getIntitule());
         ((TextView) findViewById(R.id.numero)).setText(retourSelectionne.getNumero());
         ((TextView) findViewById(R.id.motif)).setText(retourSelectionne.getMotif());
-        commentaireEditText.setText(retourSelectionne.getCommentaire());
-
-        // Récupération et affectation des Floating Button
-        validerRetour = findViewById(R.id.boutonValiderRetour);
-        validerRetour.setOnClickListener(clicValider);
 
         // Gestion de la listView
         retourLigneListView = findViewById(R.id.listeView);
-        retourLigneListView.setDivider(footer);
+        //retourLigneListView.setDivider(footer);
         retourLigneListView.setItemsCanFocus(true);
         retourLigneListView.setOnItemClickListener((parent, view, position, id) -> {
             Retour_Ligne_QuarantaineAdapter.Retour_LigneViewHolder viewHolder = retourLigneQuarantaineAdapter.viewHolderList.get(position);
@@ -274,7 +259,6 @@ public class DetailQuarantaineActivity extends ServiceActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        //Récupération du menu action et utilisation de l'item ADD
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_quarantaine, menu);
         return true;
@@ -307,6 +291,17 @@ public class DetailQuarantaineActivity extends ServiceActivity {
             return true;
         });
 
+        MenuItem item_valider = menu.findItem(R.id.menuSaveCircle);
+        item_valider.setOnMenuItemClickListener(item-> {
+            afficherAlerteConfirmationValidation(DetailQuarantaineActivity.this, LayoutInflater.from(DetailQuarantaineActivity.this));
+            return true;
+        });
+
+        MenuItem item_commentaire = menu.findItem(R.id.menuCommentaire);
+        item_commentaire.setOnMenuItemClickListener(item-> {
+            afficherModaleCommentaire(DetailQuarantaineActivity.this, LayoutInflater.from(DetailQuarantaineActivity.this));
+            return true;
+        });
 
         return true;
     }
@@ -426,7 +421,7 @@ public class DetailQuarantaineActivity extends ServiceActivity {
             if (compteurReussite == retourLigneQuarantaineAdapter.retourLigneList.size()) {
                 retourSelectionne.setStatut(getString(R.string.statutValide));
                 retourSelectionne.setEn_Attente_de(getString(R.string.Quarantaine));
-                retourSelectionne.setCommentaire(commentaireEditText.getText().toString().trim());
+                retourSelectionne.setCommentaire(commentaire);
 
                 long rowID = RetourOpenHelper.mettreAJourRetour(db, retourSelectionne);
 
@@ -461,5 +456,26 @@ public class DetailQuarantaineActivity extends ServiceActivity {
         detailQuanrantaineIntent.putExtras(detailQuarantaineBundle);
         DetailQuarantaineActivity.this.startActivity(detailQuanrantaineIntent);
         DetailQuarantaineActivity.this.finish();
+    }
+
+    private void afficherModaleCommentaire(Context context, LayoutInflater inflater)
+    {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
+        View layout = inflater.inflate(R.layout.alerte, null);
+
+        LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
+        TextView messageTextView = (TextView) layout.findViewById(R.id.messageFin);
+        TextView titreTextView = (TextView) layout.findViewById(R.id.titre);
+        titreTextView.setText("Commentaire");
+        messageTextView.setText(retourSelectionne.getCommentaire());
+        builder.setView(layout);
+
+        final androidx.appcompat.app.AlertDialog alertDialog = builder.create();
+        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
+        alertDialog.show();
+
+        zoneok.setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
     }
 }

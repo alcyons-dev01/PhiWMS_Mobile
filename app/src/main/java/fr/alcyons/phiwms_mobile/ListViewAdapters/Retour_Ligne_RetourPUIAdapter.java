@@ -68,7 +68,6 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
         viewHolder.numSerieProduit = (TextView) convertView.findViewById(R.id.numSerie);
         viewHolder.labelSerie = (TextView) convertView.findViewById(R.id.labelSerie);
         viewHolder.textEmplacement = (TextView) convertView.findViewById(R.id.textEmplacement);
-        viewHolder.listZoneEtEmplacement = (LinearLayout) convertView.findViewById(R.id.listZoneEtEmplacement);
         viewHolder.layoutSerie = (LinearLayout) convertView.findViewById(R.id.layoutSerie);
         viewHolder.layoutPrincipal = (RelativeLayout) convertView.findViewById(R.id.layoutPrincipal);
         viewHolder.progressBar = (ProgressBar) convertView.findViewById(R.id.progressBar);
@@ -146,7 +145,6 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
         public TextView numSerieProduit;
         public TextView labelSerie;
         public TextView textEmplacement;
-        public LinearLayout listZoneEtEmplacement;
         public RelativeLayout layoutPrincipal;
         public ProgressBar progressBar;
         public LinearLayout layoutSerie;

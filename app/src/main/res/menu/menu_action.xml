@@ -61,9 +61,12 @@
     <item
         android:id="@+id/menuSaveCircle"
         android:icon="@drawable/ic_check_circle_white"
-        android:title="@string/enregistrer"
+        android:title="Enregistrer"
+        android:iconTint="@color/blanc"
         app:showAsAction="ifRoom"
-        android:visible="false"/>
+        android:background="@color/vert3"
+        android:visible="false"
+        android:orderInCategory="2"/>
 
     <item
         android:id="@+id/menuEdit"

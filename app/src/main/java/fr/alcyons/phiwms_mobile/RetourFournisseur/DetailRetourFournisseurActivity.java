@@ -152,7 +152,7 @@ public class DetailRetourFournisseurActivity extends ServiceActivity {
 
         // Gestion de la listView
         listViewRetourLignes = findViewById(R.id.listeView);
-        listViewRetourLignes.setDivider(footer);
+        //listViewRetourLignes.setDivider(footer);
         listViewRetourLignes.setItemsCanFocus(true);
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
