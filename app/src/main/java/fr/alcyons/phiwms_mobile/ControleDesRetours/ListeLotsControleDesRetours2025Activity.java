@@ -193,11 +193,15 @@ public class ListeLotsControleDesRetours2025Activity extends ServiceActivity {
             ((TextView) findViewById(R.id.designationProduit)).setText(produit.getDesignation_interne());
             ((TextView) findViewById(R.id.referenceProduit)).setText(produit.getRef_fourni());
             ((TextView) findViewById(R.id.numeroRetour)).setText("#"+retour_courant.getNumero());
+            ((TextView) findViewById(R.id.motif)).setText(retour_courant.getMotif());
             ((TextView) findViewById(R.id.nomDepot)).setText(depot.getNom());
             ((TextView) findViewById(R.id.colis)).setText(String.valueOf(nbColis));
 
-
             recyclerView = (RecyclerView) findViewById(R.id.liste_view_lot_retour_ligne);
+            int decorationCount = recyclerView.getItemDecorationCount();
+            for (int i = 0; i < decorationCount; i++) {
+                recyclerView.removeItemDecorationAt(0);
+            }
             DividerItemDecoration divider = new DividerItemDecoration(ListeLotsControleDesRetours2025Activity.this, DividerItemDecoration.VERTICAL);
             divider.setDrawable(ContextCompat.getDrawable(ListeLotsControleDesRetours2025Activity.this, R.drawable.recycler_divider));
             recyclerView.addItemDecoration(divider);

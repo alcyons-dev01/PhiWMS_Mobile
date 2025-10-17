@@ -134,7 +134,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                                     retourList.sort(Comparator.comparing(Retour::getDate_retour));
                                     retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
-                                    retourListView.setDivider(footer);
+                                    //retourListView.setDivider(footer);
 
                                     retourListView.setAdapter(retourAdapter);
                                     if (retourList.isEmpty()) {
@@ -160,7 +160,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                                 retourList.sort(Comparator.comparing(Retour::getDate_retour));
                                 retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
-                                retourListView.setDivider(footer);
+                                //retourListView.setDivider(footer);
 
                                 retourListView.setAdapter(retourAdapter);
                                 if (retourList.isEmpty()) {
@@ -173,7 +173,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                             retourList.sort(Comparator.comparing(Retour::getDate_retour));
                             retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
-                            retourListView.setDivider(footer);
+                            //retourListView.setDivider(footer);
 
                             retourListView.setAdapter(retourAdapter);
                             if (retourList.isEmpty()) {
@@ -288,7 +288,8 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                                 Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Quarantaine", "alerte");
                             } else {
                                 arreterSpinner();
-                                Alerte.afficherAlerte(ServiceQuarantaineActivity.this, "Alerte", "Aucune Quarantaine à traiter", "alerte");
+                                vide = true;
+                                nomServiceVide = "Quarantaine";
                                 retourNavigation(ServiceQuarantaineActivity.this);
                             }
                         } else {
@@ -333,7 +334,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                                     ((TextView) findViewById(R.id.titre)).setText("Demandes de quarantaine");
                                     retourList.sort(Comparator.comparing(Retour::getDate_retour));
                                     retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
-                                    retourListView.setDivider(footer);
+                                    //retourListView.setDivider(footer);
 
                                     retourListView.setAdapter(retourAdapter);
                                     new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);

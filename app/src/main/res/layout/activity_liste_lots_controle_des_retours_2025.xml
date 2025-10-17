@@ -64,6 +64,16 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/temp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/barreDeTitre"
+        android:background="@color/bleu_fonce_alcyons"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:weightSum="2"/>
 
     <LinearLayout
         android:id="@+id/firstRow"
@@ -71,7 +81,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/barreDeTitre"
         android:orientation="horizontal"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="10dp"
         android:padding="5dp"
         android:weightSum="5.75"
         android:background="@drawable/background_detail_preparation_orange">
@@ -171,7 +181,7 @@
         android:layout_below="@id/firstRow"
         android:layout_above="@id/btnAjoutManuel"
         android:divider="@android:color/transparent"
-        android:layout_marginTop="10dp"
+        android:paddingTop="10dp"
         android:scrollbars="vertical"/>
 
     <Button

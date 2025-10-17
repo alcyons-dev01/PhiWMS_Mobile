@@ -29,6 +29,7 @@
                 android:textColor="@color/noir"
                 android:textStyle="bold"
                 android:textSize="15dp"
+                android:paddingLeft="10dp"
                 android:text="#"/>
 
             <TextView
@@ -39,6 +40,7 @@
                 android:textColor="@color/noir"
                 android:textSize="15dp"
                 android:gravity="right"
+                android:paddingRight="10dp"
                 android:text="En cours"/>
 
 

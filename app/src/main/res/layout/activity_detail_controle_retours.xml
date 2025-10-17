@@ -90,22 +90,27 @@
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/separateur2"
+        <LinearLayout
+            android:id="@+id/temp"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@+id/barreDeTitre"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@android:color/darker_gray" />
+            android:layout_height="match_parent"
+            android:layout_below="@id/barreDeTitre"
+            android:background="@color/bleu_fonce_alcyons"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:weightSum="2">
 
+        </LinearLayout>
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/barreDeTitre"
+            android:background="@drawable/background_empty_radius"
             android:orientation="vertical"
+            android:layout_marginTop="5dp"
             android:padding="10dp">
 
             <ListView
@@ -113,7 +118,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:descendantFocusability="afterDescendants"
-                android:dividerHeight="12dp"
+                android:dividerHeight="10dp"
                 android:divider="@android:color/transparent" />
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

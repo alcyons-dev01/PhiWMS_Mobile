@@ -63,13 +63,28 @@
 
         </LinearLayout>
 
-        <RelativeLayout
-            android:id="@+id/zoneListView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/barreDeTitre"
-            android:orientation="vertical"
-            android:padding="10dp">
+    <LinearLayout
+        android:id="@+id/temp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/barreDeTitre"
+        android:background="@color/bleu_fonce_alcyons"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:weightSum="2">
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/zoneListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/barreDeTitre"
+        android:orientation="vertical"
+        android:background="@drawable/background_empty_radius"
+        android:layout_marginTop="5dp"
+        android:padding="15dp">
 
             <ListView
                 android:id="@+id/listeView"

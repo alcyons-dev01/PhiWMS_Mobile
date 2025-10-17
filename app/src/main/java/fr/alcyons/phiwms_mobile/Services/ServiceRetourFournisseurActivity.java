@@ -111,7 +111,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
                                     ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur");
                                     adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
-                                    listViewRetours.setDivider(footer);
+                                    //listViewRetours.setDivider(footer);
                                     listViewRetours.setAdapter(adapter);
 
                                     if (listeRetours.isEmpty()) {
@@ -132,7 +132,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                             } else {
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
                                 adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
-                                listViewRetours.setDivider(footer);
+                                //listViewRetours.setDivider(footer);
                                 listViewRetours.setAdapter(adapter);
 
                                 if (listeRetours.isEmpty()) {
@@ -147,7 +147,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                             /* Code nécessaire à l'affichage de la liste */
                             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
                             adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
-                            listViewRetours.setDivider(footer);
+                            //listViewRetours.setDivider(footer);
                             listViewRetours.setAdapter(adapter);
 
                             if (listeRetours.isEmpty()) {
@@ -214,7 +214,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
                     ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur");
                     adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
-                    listViewRetours.setDivider(footer);
+                    //listViewRetours.setDivider(footer);
                     listViewRetours.setAdapter(adapter);
 
                     if (listeRetours.isEmpty()) {
@@ -281,7 +281,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
                                 ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur");
                                 adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
-                                listViewRetours.setDivider(footer);
+                                //listViewRetours.setDivider(footer);
                                 listViewRetours.setAdapter(adapter);
 
                                 invalidateOptionsMenu();

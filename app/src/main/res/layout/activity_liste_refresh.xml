@@ -61,20 +61,36 @@
 
         </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/temp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/barreDeTitre"
+        android:background="@color/bleu_fonce_alcyons"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:weightSum="2">
+
+    </LinearLayout>
+
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/barreDeTitre"
+            android:background="@drawable/background_empty_radius"
             android:orientation="vertical"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp">
+            android:layout_marginTop="5dp"
+            android:padding="15dp">
 
             <ListView
                 android:id="@+id/listeView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:descendantFocusability="afterDescendants">
+                android:descendantFocusability="afterDescendants"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="10dp">
 
             </ListView>
 

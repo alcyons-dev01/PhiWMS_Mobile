@@ -107,15 +107,22 @@ public class DetailDestructionActivity extends ServiceActivity {
         super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_action, menu);
-        menu.findItem(R.id.menuSave).setVisible(true);
+        menu.findItem(R.id.menuSaveCircle).setVisible(true);
+        menu.findItem(R.id.menuCommentaire).setVisible(true);
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem item = menu.findItem(R.id.menuSave);
+        MenuItem item = menu.findItem(R.id.menuSaveCircle);
         item.setOnMenuItemClickListener(item1 -> {
             afficherModaleCommentaire(DetailDestructionActivity.this, getLayoutInflater());
+            return true;
+        });
+
+        MenuItem itemCommentaire = menu.findItem(R.id.menuCommentaire);
+        itemCommentaire.setOnMenuItemClickListener(item1 -> {
+            afficherModaleCommentaireAlerte(DetailDestructionActivity.this, getLayoutInflater());
             return true;
         });
         return true;
@@ -245,5 +252,26 @@ public class DetailDestructionActivity extends ServiceActivity {
         detailDestructionIntent.putExtras(detailDestructionBundle);
         DetailDestructionActivity.this.startActivity(detailDestructionIntent);
         DetailDestructionActivity.this.finish();
+    }
+
+    private void afficherModaleCommentaireAlerte(Context context, LayoutInflater inflater)
+    {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
+        View layout = inflater.inflate(R.layout.alerte, null);
+
+        LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
+        TextView messageTextView = (TextView) layout.findViewById(R.id.messageFin);
+        TextView titreTextView = (TextView) layout.findViewById(R.id.titre);
+        titreTextView.setText("Commentaire");
+        messageTextView.setText(retourSelectionne.getCommentaire());
+        builder.setView(layout);
+
+        final androidx.appcompat.app.AlertDialog alertDialog = builder.create();
+        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
+        alertDialog.show();
+
+        zoneok.setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
     }
 }

@@ -82,4 +82,12 @@
         app:showAsAction="ifRoom"
         android:visible="false"/>
 
+    <item
+        android:id="@+id/menuCommentaire"
+        android:icon="@drawable/ic_insert_comment"
+        android:title="Commentaire"
+        android:iconTint="@color/blanc"
+        app:showAsAction="ifRoom"
+        android:visible="false"
+        android:orderInCategory="0" />
 </menu>

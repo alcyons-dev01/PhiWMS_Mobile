@@ -179,13 +179,13 @@ public class DetailRetourFournisseurActivity extends ServiceActivity {
         super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_action, menu);
-        menu.findItem(R.id.menuSave).setVisible(true);
+        menu.findItem(R.id.menuSaveCircle).setVisible(true);
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem item = menu.findItem(R.id.menuSave);
+        MenuItem item = menu.findItem(R.id.menuSaveCircle);
         item.setOnMenuItemClickListener(item1 -> {
             afficherModaleCommentaire(DetailRetourFournisseurActivity.this, getLayoutInflater());
             return true;
