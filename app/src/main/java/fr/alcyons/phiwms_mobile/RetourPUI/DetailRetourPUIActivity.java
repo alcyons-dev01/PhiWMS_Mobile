@@ -62,7 +62,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 
 public class  DetailRetourPUIActivity extends ServiceActivity {
     Retour retourSelectionne;
-    List<Retour_Ligne_RetourPUI_Adapte> retourLigneRetourPUIAdapteList;
+    List<Retour_Ligne> retourLigneList;
     ListView retourLigneListView;
     Retour_Ligne_RetourPUIAdapter adapter;
     Retour_Ligne_RetourPUIAdapter.Retour_LigneViewHolder viewHolderAModifier;
@@ -101,7 +101,7 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
             resultListeEmplacement.launch(detailRetourPUIIntent);
         });
 
-        retourLigneRetourPUIAdapteList = new ArrayList<>();
+        retourLigneList = new ArrayList<>();
 
         resultListeEmplacement = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -109,14 +109,9 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
                     Intent data = result.getData();
                     if (result.getResultCode() == CodesEchangesActivites.RETOUR_LISTE_EMPLACEMENTS) {
                         assert data != null;
-                        Retour_Ligne_RetourPUI_Adapte retourLigneAdapte = (Retour_Ligne_RetourPUI_Adapte) Objects.requireNonNull(data.getExtras()).getSerializable("retourLigneAdapte");
-                        for (Retour_Ligne_RetourPUI_Adapte retourLigneCourant : retourLigneRetourPUIAdapteList
-                        ) {
-                            assert retourLigneAdapte != null;
-                            if (retourLigneCourant.getRetourLigneID() == retourLigneAdapte.getRetourLigneID()) {
-                                retourLigneCourant.setEmplacementAdaptes(retourLigneAdapte.getEmplacementAdaptes());
-                            }
-                        }
+                        /**
+                         * TODO : ajouter l'emplacement scanner à la liste
+                         */
                     }
                 });
 
@@ -133,25 +128,7 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
         invalidateOptionsMenu();
 
         // Récupération des retour_lige si nécessaire
-        if (retourLigneRetourPUIAdapteList.isEmpty()) {
-            List<Retour_Ligne> retourLignes = Retour_LigneOpenHelper.getAllRetourLignesByRetour(db, retourSelectionne);
-            for (Retour_Ligne retourLigne : retourLignes
-            ) {
-                Retour_Ligne_RetourPUI_Adapte retourLigneAdapte = new Retour_Ligne_RetourPUI_Adapte(retourLigne.get_UID());
-                Depot depot = DepotOpenHelper.getDepotParReference(db, retourSelectionne.getRef_Depot_Dest());
-                Produit produit = ProduitOpenHelper.getProduitByID(db, retourLigne.getCode_produit());
-
-                Depot_Zone zone = ZoneOpenHelper.getZoneByDepotEtNom(db, depot, ProduitOpenHelper.getProduitByID(db, retourLigne.getCode_produit()).getZone_PUI_Defaut());
-                if (zone != null) {
-                    Depot_Emplacement emplacement = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zone, produit.getEmplacement_PUI_Defaut());
-                    if (emplacement != null) {
-                        Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte emplacementAdapte = retourLigneAdapte.new EmplacementAdapte(emplacement.get_UID(), (int) retourLigne.getQte_avant_retour());
-                        retourLigneAdapte.getEmplacementAdaptes().add(emplacementAdapte);
-                    }
-                }
-                retourLigneRetourPUIAdapteList.add(retourLigneAdapte);
-            }
-        }
+        retourLigneList = Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(db, retourSelectionne);
         // Initialisation de l'adapter puis transfere de l'adapter à la listeView pour l'affichage
         adapter = new Retour_Ligne_RetourPUIAdapter(DetailRetourPUIActivity.this, db, retourLigneRetourPUIAdapteList);
         retourLigneListView.setAdapter(adapter);

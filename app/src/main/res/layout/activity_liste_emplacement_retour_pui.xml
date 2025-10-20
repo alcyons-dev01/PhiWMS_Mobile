@@ -30,10 +30,22 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/temp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/barreDeTitre"
+            android:background="@color/bleu_fonce_alcyons"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"/>
+
+
+        <LinearLayout
             android:id="@+id/layoutQteRetourner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/barreDeTitre"
+            android:background="@drawable/background_empty_radius_top"
             android:orientation="horizontal"
             android:weightSum="4">
 
@@ -43,7 +55,8 @@
                 android:layout_weight="3"
                 android:text="Quantité à retourner"
                 android:layout_gravity="center_vertical"
-                android:textSize="20sp"/>
+                android:textSize="20sp"
+                android:paddingLeft="10dp"/>
 
             <TextView
                 android:id="@+id/qteRetournee"
@@ -69,67 +82,21 @@
             android:id="@+id/zoneListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/separateur2"
-            android:layout_above="@id/separateur"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp">
+            android:layout_below="@id/separateur2">
 
-            <include layout="@layout/liste_view" />
+            <ListView
+                android:id="@+id/listeView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:descendantFocusability="afterDescendants"
+                android:paddingHorizontal="10dp"
+                android:paddingTop="10dp"
+                android:background="@color/blanc"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="10dp">
 
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/boutonAjoutEmplacmeent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/fab_add"
-                android:layout_centerHorizontal="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="40dp"
-                app:fab_colorNormal="@color/vert"
-                app:fab_colorPressed="@color/vert"
-                app:fab_colorRipple="@color/vert"
-                app:fab_size="normal" />
-
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/boutonSupprimerEmplacement"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_delete"
-                android:layout_centerHorizontal="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="40dp"
-                app:fab_colorNormal="@color/rouge"
-                app:fab_colorPressed="@color/rouge"
-                app:fab_colorRipple="@color/rouge"
-                app:fab_size="normal"
-                android:visibility="gone" />
-
+            </ListView>
         </RelativeLayout>
-
-        <ImageView
-            android:id="@+id/separateur"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_alignBottom="@+id/boutonValider"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="68dp"
-            android:contentDescription="@string/separateur"
-            android:background="@android:color/darker_gray" />
-
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/boutonValider"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_margin="@dimen/fab_margin"
-            android:src="@drawable/ic_check"
-            app:fab_colorNormal="@color/vert"
-            app:fab_colorPressed="@color/vert"
-            app:fab_colorRipple="@color/vert"
-            app:fab_size="normal" />
-
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

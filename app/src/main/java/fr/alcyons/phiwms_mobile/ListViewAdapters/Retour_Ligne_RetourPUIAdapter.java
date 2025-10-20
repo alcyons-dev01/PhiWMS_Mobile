@@ -32,20 +32,19 @@ import static android.view.View.GONE;
 
 public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
 
-    public List<Retour_Ligne_RetourPUI_Adapte> retourLigneRetourPUIAdapteList;
+    public List<Retour_Ligne> retourLigne;
     public List<Retour_LigneViewHolder> viewHolderList;
-    public List<Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte> emplacementAdapteList;
     Context context;
     SQLiteDatabase db;
 
-    public Retour_Ligne_RetourPUIAdapter(Context context, SQLiteDatabase db, List<Retour_Ligne_RetourPUI_Adapte> retourLigneRetourPUIAdapteList) {
-        super(context, 0, retourLigneRetourPUIAdapteList);
+    public Retour_Ligne_RetourPUIAdapter(Context context, SQLiteDatabase db, List<Retour_Ligne> retourLigne) {
+        super(context, 0, retourLigne);
         this.context = context;
         this.db = db;
-        this.retourLigneRetourPUIAdapteList = retourLigneRetourPUIAdapteList;
+        this.retourLigne = retourLigne;
 
         viewHolderList = new ArrayList<>();
-        for (int i = 0; i < retourLigneRetourPUIAdapteList.size(); i++) {
+        for (int i = 0; i < retourLigne.size(); i++) {
             Retour_LigneViewHolder viewHolder = new Retour_LigneViewHolder();
             viewHolderList.add(viewHolder);
         }
@@ -72,9 +71,7 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
         viewHolder.layoutPrincipal = (RelativeLayout) convertView.findViewById(R.id.layoutPrincipal);
         viewHolder.progressBar = (ProgressBar) convertView.findViewById(R.id.progressBar);
 
-
-        Retour_Ligne_RetourPUI_Adapte retour_LigneAdapteCourant = (Retour_Ligne_RetourPUI_Adapte) getItem(position);
-        Retour_Ligne retourLigne = Retour_LigneOpenHelper.getRetourLigneByID(db, retour_LigneAdapteCourant.getRetourLigneID());
+        Retour_Ligne retourLigne = (Retour_Ligne) getItem(position);
 
         viewHolder.designationProduit.setText(retourLigne.getProduit_Designation());
         viewHolder.referenceProduit.setText(retourLigne.getProduit_Reference());
@@ -105,9 +102,8 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
 
         int quantiteRetourner = 0;
         emplacementAdapteList = new ArrayList<>();
-        emplacementAdapteList.addAll(retour_LigneAdapteCourant.getEmplacementAdaptes());
-
-
+        emplacementAdapteList.addAll(retourLigne);
+        
         for (int i = 0; i < emplacementAdapteList.size(); i++) {
 
             Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte emplacementAdapte = emplacementAdapteList.get(i);

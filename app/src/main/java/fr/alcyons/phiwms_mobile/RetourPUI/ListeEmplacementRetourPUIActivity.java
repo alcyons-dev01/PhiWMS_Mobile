@@ -53,9 +53,6 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
     List<Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte> emplacementAdapteList;
     Emplacement_RetourPUIAdapter adapter;
     boolean premierPassageScan;
-    FloatingActionButton boutonValider;
-    FloatingActionButton boutonAjoutEmplacmeent;
-    FloatingActionButton boutonSupprimerEmplacement;
     int quantiteARetourner = 0;
     int quantiteRestantARetourner = 0;
     int quantiteRetourner = 0;
@@ -159,13 +156,6 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
         ((TextView) findViewById(R.id.qteRetournee)).setText(String.valueOf((int) retourLigne.getQte_avant_retour()));
         ((TextView) findViewById(R.id.designationProduit)).setText(produit.getDesignation_interne());
 
-        // Récupération et affectation des bouton
-        boutonValider = findViewById(R.id.boutonValider);
-        boutonAjoutEmplacmeent = findViewById(R.id.boutonAjoutEmplacmeent);
-        boutonSupprimerEmplacement = findViewById(R.id.boutonSupprimerEmplacement);
-        boutonValider.setOnClickListener(clicBoutonValider);
-        boutonAjoutEmplacmeent.setOnClickListener(clicBoutonAjoutEmplacement);
-
         //Gestion de la listView
         emplacementListView = findViewById(R.id.listeView);
         emplacementListView.setItemsCanFocus(true);
@@ -236,7 +226,6 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
                                 }
                                 else
                                 {
-                                    boutonAjoutEmplacmeent.performClick();
                                 }
                                 break;
                         }
@@ -258,15 +247,6 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
         adapter = new Emplacement_RetourPUIAdapter(ListeEmplacementRetourPUIActivity.this, emplacementAdapteList, db, retourLigneSelectionne);
         emplacementListView.setAdapter(adapter);
         emplacementListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
-        final SimpleMultiChoiceModeListener cml = new SimpleMultiChoiceModeListener(ListeEmplacementRetourPUIActivity.this, adapter, boutonAjoutEmplacmeent, boutonSupprimerEmplacement);
-        emplacementListView.setMultiChoiceModeListener(cml);
-        emplacementListView.setOnItemLongClickListener((adapterView, view, position, l) -> {
-            boutonAjoutEmplacmeent.setVisibility(View.GONE);
-            boutonSupprimerEmplacement.setVisibility(View.VISIBLE);
-            view.setActivated(true);
-            ((ListView) view).setItemChecked(position, !((Emplacement_RetourPUIAdapter) adapterView.getAdapter()).isPositionChecked(position));
-            return false;
-        });
 
         emplacementListView.setOnItemClickListener((parent, view, position, id) -> {
             final Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte emplacementAdapte = (Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte) adapter.getItem(position);
@@ -312,16 +292,6 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
                 imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 
                 dialog.dismiss();
-
-                if(quantiteRetourner == quantiteARetourner)
-                {
-                    boutonAjoutEmplacmeent.setVisibility(View.GONE);
-                    boutonValider.performClick();
-                }
-                else
-                {
-                    boutonAjoutEmplacmeent.setVisibility(View.VISIBLE);
-                }
             };
 
             Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, (int)produit.getCond_distrib());
@@ -336,9 +306,7 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
 
         if(emplacementAdapteList.size() == 1 && !lot_ajouter)
         {
-            emplacementListView.performItemClick(emplacementListView.getAdapter().getView(0, null, null), 0, emplacementListView.getAdapter().getItemId(0));
-            InputMethodManager imm = (InputMethodManager) ListeEmplacementRetourPUIActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+
         }
     }
     @Override
