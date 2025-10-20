@@ -84,8 +84,7 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
         retourLigneListView = findViewById(R.id.listeView);
         retourLigneListView.setItemsCanFocus(true);
         retourLigneListView.setOnItemClickListener((parent, view, position, id) -> {
-            Retour_Ligne_RetourPUI_Adapte retourLigneAdapte = adapter.retourLigneRetourPUIAdapteList.get(position);
-            Retour_Ligne retourLigne = Retour_LigneOpenHelper.getRetourLigneByID(db, retourLigneAdapte.getRetourLigneID());
+            Retour_Ligne retourLigne = adapter.retourLigne.get(position);
 
             viewHolderAModifier = adapter.viewHolderList.get(position);
             viewHolderAModifier.progressBar.setVisibility(View.VISIBLE);
@@ -94,7 +93,7 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
             Intent detailRetourPUIIntent = new Intent(DetailRetourPUIActivity.this, ListeEmplacementRetourPUIActivity.class);
             Bundle detailRetourPUIBundle = DetailRetourPUIActivity.super.getBundle();
             detailRetourPUIBundle.putInt("produitID", retourLigne.getCode_produit());
-            detailRetourPUIBundle.putSerializable("retourLigneAdapte", retourLigneAdapte);
+            detailRetourPUIBundle.putSerializable("retourLigne", retourLigne);
             detailRetourPUIBundle.putInt("depotID", DepotOpenHelper.getDepotParReference(db, retourSelectionne.getRef_Depot_Dest()).getDepot_UID());
             detailRetourPUIIntent.putExtras(detailRetourPUIBundle);
 
@@ -129,8 +128,24 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
 
         // Récupération des retour_lige si nécessaire
         retourLigneList = Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(db, retourSelectionne);
+
+        //gestion des retours lignes
+        for(Retour_Ligne retourLigneTemp : retourLigneList)
+        {
+            List<Retour_Ligne> retourLigneRetournee = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(db, retourSelectionne, retourLigneTemp.getCode_produit());
+
+            if(retourLigneRetournee.isEmpty())
+            {
+                Produit produitCourant  = ProduitOpenHelper.getProduitByID(db, retourLigneTemp.getCode_produit());
+                if(!produitCourant.getEmplacement_PUI_Defaut().contentEquals("") && produitCourant.getEmplacement_PUI_Defaut() != null)
+                {
+                    creationRetourLigne(retourLigneTemp, produitCourant);
+                }
+            }
+        }
+
         // Initialisation de l'adapter puis transfere de l'adapter à la listeView pour l'affichage
-        adapter = new Retour_Ligne_RetourPUIAdapter(DetailRetourPUIActivity.this, db, retourLigneRetourPUIAdapteList);
+        adapter = new Retour_Ligne_RetourPUIAdapter(DetailRetourPUIActivity.this, db, retourLigneList, retourSelectionne);
         retourLigneListView.setAdapter(adapter);
     }
 
@@ -223,7 +238,10 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
 
     private void validerRetourPUI()
     {
-        int compteurReussiteGlobale = 0;
+        /**
+         * TODO : revoir la validation du retour PUI
+         */
+        /*int compteurReussiteGlobale = 0;
 
         // On vérifie que chaque élément a au moins un emplacement de retour
         for (Retour_Ligne_RetourPUI_Adapte retour_ligneAdapte : adapter.retourLigneRetourPUIAdapteList)
@@ -319,6 +337,22 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
         if (statutConnexion) {
             ElementASynchroniserOpenHelper.toutSynchroniser(DetailRetourPUIActivity.this, db, utilisateurConnecte, true);
         }
-        retourService();
+        retourService();*/
+    }
+
+    private void creationRetourLigne(Retour_Ligne retourLigneBase, Produit produit)
+    {
+        Random random = new Random();
+        int retourLigneId = random.nextInt();
+        if(retourLigneId > 0)
+            retourLigneId = retourLigneId*-1;
+
+        Retour_Ligne retourLigneCourant = new Retour_Ligne(retourLigneBase);
+        retourLigneCourant.set_UID(retourLigneId);
+        retourLigneCourant.setRetourPUI_Zone(produit.getZone_PUI_Defaut());
+        retourLigneCourant.setRetourPUI_Emplacement(produit.getEmplacement_PUI_Defaut());
+        retourLigneCourant.setQte_Retourner(retourLigneBase.getQte_Retourner());
+
+        long rowID = Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(db, retourLigneCourant);
     }
 }

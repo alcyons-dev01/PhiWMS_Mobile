@@ -46,7 +46,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 
 public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
     Retour_Ligne retourLigne;
-    Retour_Ligne_RetourPUI_Adapte retourLigneSelectionne;
     Produit produit;
     Depot depot;
     ListView emplacementListView;
@@ -64,8 +63,6 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
         @Override
         public void onClick(View v) {
             int sommeQteRetournee = 0;
-
-            Retour_Ligne retourLigne = Retour_LigneOpenHelper.getRetourLigneByID(db, retourLigneSelectionne.getRetourLigneID());
 
             List<Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte> emplacementsARetirer = new ArrayList<>();
 
@@ -117,41 +114,14 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
 
         premierPassageScan = true;
         // Récupération des éléments nécessaires à la consitituion de la liste des emplacement
-        retourLigneSelectionne = (Retour_Ligne_RetourPUI_Adapte) Objects.requireNonNull(intent.getExtras()).getSerializable("retourLigneAdapte");
-        assert retourLigneSelectionne != null;
-        retourLigne = Retour_LigneOpenHelper.getRetourLigneByID(db, retourLigneSelectionne.getRetourLigneID());
+        retourLigne = (Retour_Ligne) Objects.requireNonNull(intent.getExtras()).getSerializable("retourLigne");
+
         produit = ProduitOpenHelper.getProduitByID(db, intent.getExtras().getInt("produitID"));
         depot = DepotOpenHelper.getDepotParID(db, intent.getExtras().getInt("depotID"));
 
         quantiteARetourner = (int) retourLigne.getQte_avant_retour();
         quantiteRestantARetourner = (int) retourLigne.getQte_avant_retour();
         quantiteRetourner = 0;
-
-        // Constitution de la liste emplacementAdaptes
-        emplacementAdapteList = retourLigneSelectionne.getEmplacementAdaptes();
-
-        if (emplacementAdapteList.isEmpty()) {
-            Depot_Zone zone = ZoneOpenHelper.getZoneByDepotEtNom(db, depot, produit.getZone_PUI_Defaut());
-            if (zone != null) {
-                Depot_Emplacement emplacement = EmplacementOpenHelper.getUnEmplacementZoneEtNom(db, zone, produit.getEmplacement_PUI_Defaut());
-                if (emplacement != null) {
-                    quantiteRetourner = quantiteARetourner;
-                    quantiteRestantARetourner = 0;
-                    Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte emplacementAdapte = retourLigneSelectionne.new EmplacementAdapte(emplacement.get_UID(), 0);
-                    emplacementAdapteList.add(emplacementAdapte);
-                }
-            }
-        }
-        else if(emplacementAdapteList.size() == 1)
-        {
-            emplacementAdapteList.get(0).setQte(0);
-        }
-        else {
-            for (Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte emplacementAdapte : emplacementAdapteList) {
-                quantiteRetourner += emplacementAdapte.getQte();
-                quantiteRestantARetourner -= emplacementAdapte.getQte();
-            }
-        }
 
         ((TextView) findViewById(R.id.qteRetournee)).setText(String.valueOf((int) retourLigne.getQte_avant_retour()));
         ((TextView) findViewById(R.id.designationProduit)).setText(produit.getDesignation_interne());
@@ -168,7 +138,7 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
                     Intent data = result.getData();
                     if (data != null) {
                         switch (result.getResultCode()) {
-                            case CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT:
+                        /*    case CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT:
                                 Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte emplacementAdapte = retourLigneSelectionne.new EmplacementAdapte(Objects.requireNonNull(data.getExtras()).getInt("emplacementSelectionneID"), 0);
                                 boolean emplacementExistant = false;
                                 for (Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte emplacementAdapteCourant : adapter.emplacementAdapteList) {
@@ -227,7 +197,7 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
                                 else
                                 {
                                 }
-                                break;
+                                break;*/
                         }
                     }
                 });

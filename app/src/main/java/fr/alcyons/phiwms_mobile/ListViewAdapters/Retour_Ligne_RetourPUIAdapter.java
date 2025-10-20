@@ -24,6 +24,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
+import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne_RetourPUI_Adapte;
 import fr.alcyons.phiwms_mobile.R;
@@ -34,15 +35,16 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
 
     public List<Retour_Ligne> retourLigne;
     public List<Retour_LigneViewHolder> viewHolderList;
+    Retour retourCourant;
     Context context;
     SQLiteDatabase db;
 
-    public Retour_Ligne_RetourPUIAdapter(Context context, SQLiteDatabase db, List<Retour_Ligne> retourLigne) {
+    public Retour_Ligne_RetourPUIAdapter(Context context, SQLiteDatabase db, List<Retour_Ligne> retourLigne, Retour retourCourant) {
         super(context, 0, retourLigne);
         this.context = context;
         this.db = db;
         this.retourLigne = retourLigne;
-
+        this.retourCourant = retourCourant;
         viewHolderList = new ArrayList<>();
         for (int i = 0; i < retourLigne.size(); i++) {
             Retour_LigneViewHolder viewHolder = new Retour_LigneViewHolder();
@@ -101,27 +103,27 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
 
 
         int quantiteRetourner = 0;
-        emplacementAdapteList = new ArrayList<>();
-        emplacementAdapteList.addAll(retourLigne);
-        
-        for (int i = 0; i < emplacementAdapteList.size(); i++) {
 
-            Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte emplacementAdapte = emplacementAdapteList.get(i);
+        List<Retour_Ligne> retourLigneProduitCourant = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(db, retourCourant, retourLigne.getCode_produit());
+        List<String> listEmplacement = new ArrayList<>();
 
-            Depot_Emplacement emplacement = EmplacementOpenHelper.getUnEmplacementByID(db, emplacementAdapte.getEmplacementID());
-            Depot_Zone zone = ZoneOpenHelper.getUneZoneByID(db, emplacement.getZoneID());
+        for(Retour_Ligne retour_ligne_temp : retourLigneProduitCourant)
+        {
+            if(!listEmplacement.contains(retour_ligne_temp.getRetourPUI_Emplacement()))
+            {
+                listEmplacement.add(retour_ligne_temp.getRetourPUI_Emplacement());
+            }
 
-            quantiteRetourner += emplacementAdapte.getQte();
+            quantiteRetourner = (int) (quantiteRetourner + retour_ligne_temp.getQte_Retourner());
         }
 
-        if(emplacementAdapteList.size() == 1)
+        if(listEmplacement.size() == 1)
         {
-            Depot_Emplacement emplacement = EmplacementOpenHelper.getUnEmplacementByID(db, emplacementAdapteList.get(0).getEmplacementID());
-            viewHolder.textEmplacement.setText(emplacement.getAdressage());
+            viewHolder.textEmplacement.setText(listEmplacement.get(0));
         }
         else
         {
-            String nb_emplacement = emplacementAdapteList.size()+" emplacements";
+            String nb_emplacement = listEmplacement.size()+" emplacements";
             viewHolder.textEmplacement.setText(nb_emplacement);
         }
 

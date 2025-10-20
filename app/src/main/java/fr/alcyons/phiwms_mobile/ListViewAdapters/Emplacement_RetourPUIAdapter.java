@@ -15,9 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
@@ -26,30 +28,23 @@ import fr.alcyons.phiwms_mobile.R;
 
 public class Emplacement_RetourPUIAdapter extends ArrayAdapter {
 
-    public List<Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte> emplacementAdapteList;
 
     public List<EmplacementViewHolder> viewHolderList;
     public Context context;
     public SQLiteDatabase db;
-    public Retour_Ligne_RetourPUI_Adapte retourLigneAdapte;
-
-    public List<Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte> emplacementAdapteDeBaseList;
-
-    public HashMap<Integer, Boolean> emplacementAdaptesSelectedHasMap = new HashMap<>();
+    public List<Retour_Ligne> retourLigneList;
     public int qteRestanteARetourner;
 
-    public Emplacement_RetourPUIAdapter(Context context, List<Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte> emplacementAdaptes, SQLiteDatabase db, Retour_Ligne_RetourPUI_Adapte retourLigneAdapte) {
-        super(context, 0, emplacementAdaptes);
+    public Emplacement_RetourPUIAdapter(Context context, List<Retour_Ligne> retourLigneList, SQLiteDatabase db) {
+        super(context, 0, retourLigneList);
         this.viewHolderList = new ArrayList<>();
         this.context = context;
-        this.emplacementAdapteList = emplacementAdaptes;
+        this.retourLigneList = retourLigneList;
         this.db = db;
-        this.retourLigneAdapte = retourLigneAdapte;
 
-        this.emplacementAdapteDeBaseList = new ArrayList<>();
-        for (Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte emplacementAdapte : this.emplacementAdapteList
-                ) {
-            this.emplacementAdapteDeBaseList.add(emplacementAdapte);
+        for (Retour_Ligne retourLigneTemp : this.retourLigneList)
+        {
+            this.retourLigneList.add(retourLigneTemp);
             this.viewHolderList.add(new EmplacementViewHolder());
         }
 
@@ -70,7 +65,7 @@ public class Emplacement_RetourPUIAdapter extends ArrayAdapter {
             viewHolder.qteRetournee = (TextView) convertView.findViewById(R.id.qteRetournee);
         }
 
-        viewHolder.qteRetournee.setOnKeyListener(new View.OnKeyListener() {
+        /*viewHolder.qteRetournee.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 EmplacementViewHolder viewHolder = null;
@@ -87,73 +82,15 @@ public class Emplacement_RetourPUIAdapter extends ArrayAdapter {
                 }
                 return false;
             }
-        });
+        });*/
 
-        Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte emplacementAdapte = (Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte) getItem(position);
+        Retour_Ligne retourLigne = (Retour_Ligne) getItem(position);
+        viewHolder.nomEmplacement.setText(retourLigne.getRetourPUI_Emplacement());
+        viewHolder.nomZone.setText(retourLigne.getRetourPUI_Zone());
 
-        Depot_Emplacement emplacement = EmplacementOpenHelper.getUnEmplacementByID(db, emplacementAdapte.getEmplacementID());
-        Depot_Zone zone = (Depot_Zone) ZoneOpenHelper.getUneZoneByID(db, emplacement.getZoneID());
-
-        viewHolder.nomEmplacement.setText(emplacement.getAdressage());
-        viewHolder.nomZone.setText(zone.getZoneName());
-        if (retourLigneAdapte.getEmplacementAdaptes().get(position).getQte() == 0 && emplacementAdapteList.size() == 1) {
-            Retour_Ligne retourLigneActuel = Retour_LigneOpenHelper.getRetourLigneByID(db, retourLigneAdapte.getRetourLigneID());
-            retourLigneAdapte.getEmplacementAdaptes().get(position).setQte(0);
-        }
-
-        viewHolder.qteRetournee.setText(String.valueOf(retourLigneAdapte.getEmplacementAdaptes().get(position).getQte()));
+        viewHolder.qteRetournee.setText(String.valueOf(retourLigne.getQte_Retourner()));
 
         return convertView;
-    }
-
-    public void setNewSelection(int position, boolean value) {
-        emplacementAdaptesSelectedHasMap.put(position, value);
-    }
-
-    public boolean isPositionChecked(int position) {
-        Boolean result = emplacementAdaptesSelectedHasMap.get(position);
-        return result == null ? false : result;
-    }
-
-    public Set<Integer> getCurrentCheckedPosition() {
-        return emplacementAdaptesSelectedHasMap.keySet();
-    }
-
-    public void removeSelection(int position) {
-        emplacementAdaptesSelectedHasMap.remove(position);
-    }
-
-    public void remove() {
-
-       for (HashMap.Entry<Integer, Boolean> entry : emplacementAdaptesSelectedHasMap.entrySet()) {
-            int position = entry.getKey();
-            boolean checked = entry.getValue();
-            if (checked) {
-                Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte emplacementAdapte = emplacementAdapteDeBaseList.get(position);
-                qteRestanteARetourner = qteRestanteARetourner  + emplacementAdapte.getQte();
-                emplacementAdapteList.remove(emplacementAdapte);
-                emplacementAdapteDeBaseList.remove(emplacementAdapte);
-                int position_view_holder = -1;
-                Depot_Emplacement emplacementCourant = EmplacementOpenHelper.getUnEmplacementByID(db, emplacementAdapte.getEmplacementID());
-                for(int i=0; i < viewHolderList.size(); i++)
-                {
-                    if(viewHolderList.get(i).nomEmplacement.getText().toString().contentEquals(emplacementCourant.getAdressage()))
-                    {
-                        position_view_holder = i;
-                        break;
-                    }
-                }
-
-                if(position_view_holder != -1)
-                    viewHolderList.remove(viewHolderList.get(position_view_holder));
-                this.notifyDataSetChanged();
-            }
-        }
-        clearSelection();
-    }
-
-    public void clearSelection() {
-        emplacementAdaptesSelectedHasMap = new HashMap<>();
     }
 
     public class EmplacementViewHolder {
