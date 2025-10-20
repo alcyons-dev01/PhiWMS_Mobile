@@ -372,7 +372,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
     public void viderTablesConcernees() {
         for (Retour retour : RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(db, getString(R.string.statutEncours), getString(R.string.RetourPUIDemande))
                 ) {
-            List<Retour_Ligne> retourLigneList = Retour_LigneOpenHelper.getAllRetourLignesByRetour(db, retour);
+            List<Retour_Ligne> retourLigneList = Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(db, retour);
             for (Retour_Ligne retourLigne : retourLigneList
                     ) {
                 Retour_LigneOpenHelper.supprimerUnRetourLigne(db, retourLigne);

@@ -110,6 +110,21 @@ public class Retour_LigneOpenHelper extends DBOpenHelper {
         return retourLigneList;
     }
 
+    public static List<Retour_Ligne> getAllRetourLignesNegByRetour(SQLiteDatabase db, Retour retour) {
+        List<Retour_Ligne> retourLigneList = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_RETOUR_LIGNE + " WHERE " + Constantes.CLE_COL_RETOUR_UID_RETOUR_LIGNE + "=? AND "+Constantes.CLE_COL__UID_RETOUR_LIGNE+" < 0", new String[]{String.valueOf(retour.get_UID())});
+
+        while (cursor.moveToNext()) {
+            Retour_Ligne retourLigne = new Retour_Ligne(cursor);
+            retourLigneList.add(retourLigne);
+        }
+
+        cursor.close();
+        cursor = null;
+        return retourLigneList;
+    }
+
     public static List<Retour_Ligne> getAllRetourLignesByRetourProduitNeg(SQLiteDatabase db, Retour retour, int idProduit) {
         List<Retour_Ligne> retourLigneList = new ArrayList<>();
 

@@ -68,7 +68,7 @@ public class SimpleMultiChoiceModeListener implements AbsListView.MultiChoiceMod
             notificationAdapter.clearSelection();
         }
         if (emplacementRetourPUIAdapter != null) {
-            emplacementRetourPUIAdapter.clearSelection();
+            //emplacementRetourPUIAdapter.clearSelection();
             if(emplacementRetourPUIAdapter.qteRestanteARetourner != 0)
                 this.boutonAjoutEmplacementPui.setVisibility(View.VISIBLE);
             this.boutonSuppressionEmplacementPui.setVisibility(View.GONE);
@@ -96,7 +96,7 @@ public class SimpleMultiChoiceModeListener implements AbsListView.MultiChoiceMod
             this.boutonSuppressionEmplacementPui.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    emplacementRetourPUIAdapter.remove();
+                    //emplacementRetourPUIAdapter.remove();
                     emplacementRetourPUIAdapter.notifyDataSetChanged();
                     closeActionMode();
                 }
@@ -122,7 +122,7 @@ public class SimpleMultiChoiceModeListener implements AbsListView.MultiChoiceMod
                 notificationAdapter.notifyDataSetChanged();
             }
             if (emplacementRetourPUIAdapter != null) {
-                emplacementRetourPUIAdapter.remove();
+                //emplacementRetourPUIAdapter.remove();
                 emplacementRetourPUIAdapter.notifyDataSetChanged();
             }
             if (depotZoneAdapter != null) {
@@ -164,7 +164,7 @@ public class SimpleMultiChoiceModeListener implements AbsListView.MultiChoiceMod
                 notificationAdapter.setNewSelection(position, checked);
             }
             if (emplacementRetourPUIAdapter != null) {
-                emplacementRetourPUIAdapter.setNewSelection(position, checked);
+                //emplacementRetourPUIAdapter.setNewSelection(position, checked);
             }
             if (depotZoneAdapter != null) {
                 depotZoneAdapter.setNewSelection(position, checked);
@@ -178,7 +178,7 @@ public class SimpleMultiChoiceModeListener implements AbsListView.MultiChoiceMod
                 notificationAdapter.removeSelection(position);
             }
             if (emplacementRetourPUIAdapter != null) {
-                emplacementRetourPUIAdapter.removeSelection(position);
+                //emplacementRetourPUIAdapter.removeSelection(position);
             }
             if (depotZoneAdapter != null) {
                 depotZoneAdapter.removeSelection(position);

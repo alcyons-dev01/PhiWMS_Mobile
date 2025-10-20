@@ -11,30 +11,34 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.github.clans.fab.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
+
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerEmplacementActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne_RetourPUI_Adapte;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Emplacement_RetourPUIAdapter;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
-import fr.alcyons.phiwms_mobile.Outils.SimpleMultiChoiceModeListener;
 import fr.alcyons.phiwms_mobile.PlanDePlacement.ListeZonesActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
@@ -49,7 +53,6 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
     Produit produit;
     Depot depot;
     ListView emplacementListView;
-    List<Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte> emplacementAdapteList;
     Emplacement_RetourPUIAdapter adapter;
     boolean premierPassageScan;
     int quantiteARetourner = 0;
@@ -58,52 +61,9 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
     boolean lot_ajouter = false;
     PackageManager pm;
     ActivityResultLauncher<Intent> resultListeEmplacementRetour;
+    List<Retour_Ligne> retourLigneRetourner;
+    Retour retourCourant;
 
-    View.OnClickListener clicBoutonValider = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            int sommeQteRetournee = 0;
-
-            List<Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte> emplacementsARetirer = new ArrayList<>();
-
-            // On vérifie que chaque emplacement sélectionné a une quantité à retourner sinon on enlève cet emplacement de la liste
-            for (Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte emplacementAdapte : emplacementAdapteList
-                    ) {
-                if (emplacementAdapte.getQte() != 0) {
-                    sommeQteRetournee += emplacementAdapte.getQte();
-                } else {
-                    emplacementsARetirer.add(emplacementAdapte);
-                }
-            }
-
-            // Si la somme des quantités n'est pas bonne, on préviens l'utilisateur
-            if (sommeQteRetournee != retourLigne.getQte_avant_retour()) {
-                Alerte.afficherAlerte(ListeEmplacementRetourPUIActivity.this, "Alerte", "La somme des quantités n'est pas égale à la quantité à retourner", "alerte");
-                return;
-            }
-
-            emplacementAdapteList.removeAll(emplacementsARetirer);
-            retourLigneSelectionne.setEmplacementAdaptes(emplacementAdapteList);
-            Intent listeEmplacementRetourPuiIntent = new Intent();
-            Bundle listeEmplacementRetourPuiBundle = ListeEmplacementRetourPUIActivity.super.getBundle();
-            listeEmplacementRetourPuiBundle.putSerializable("retourLigneAdapte", retourLigneSelectionne);
-            listeEmplacementRetourPuiIntent.putExtras(listeEmplacementRetourPuiBundle);
-            ListeEmplacementRetourPUIActivity.this.setResult(CodesEchangesActivites.RETOUR_LISTE_EMPLACEMENTS, listeEmplacementRetourPuiIntent);
-            ListeEmplacementRetourPUIActivity.this.finish();
-        }
-    };
-    View.OnClickListener clicBoutonAjoutEmplacement = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Intent listeEmplacementRetourPuiIntent = new Intent(ListeEmplacementRetourPUIActivity.this, ListeZonesActivity.class);
-            Bundle listeEmplacementRetourPuiBundle = ListeEmplacementRetourPUIActivity.super.getBundle();
-            listeEmplacementRetourPuiBundle.putInt("depotSelectionneID", depot.getDepot_UID());
-            listeEmplacementRetourPuiBundle.putString("designationProduit", retourLigne.getProduit_Designation());
-            listeEmplacementRetourPuiIntent.putExtras(listeEmplacementRetourPuiBundle);
-
-            resultListeEmplacementRetour.launch(listeEmplacementRetourPuiIntent);
-        }
-    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,6 +75,8 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
         premierPassageScan = true;
         // Récupération des éléments nécessaires à la consitituion de la liste des emplacement
         retourLigne = (Retour_Ligne) Objects.requireNonNull(intent.getExtras()).getSerializable("retourLigne");
+        retourCourant = RetourOpenHelper.getRetourByID(db, retourLigne.getRetour_UID());
+        retourLigneRetourner = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(db, retourCourant, retourLigne.getCode_produit());
 
         produit = ProduitOpenHelper.getProduitByID(db, intent.getExtras().getInt("produitID"));
         depot = DepotOpenHelper.getDepotParID(db, intent.getExtras().getInt("depotID"));
@@ -122,10 +84,22 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
         quantiteARetourner = (int) retourLigne.getQte_avant_retour();
         quantiteRestantARetourner = (int) retourLigne.getQte_avant_retour();
         quantiteRetourner = 0;
+        for(Retour_Ligne retourLigneTemp : retourLigneRetourner)
+        {
+            quantiteRetourner += retourLigneTemp.getQte_Retourner();
+            quantiteRestantARetourner -= retourLigneTemp.getQte_Retourner();
+        }
 
-        ((TextView) findViewById(R.id.qteRetournee)).setText(String.valueOf((int) retourLigne.getQte_avant_retour()));
+        ((TextView) findViewById(R.id.qteARetourner)).setText(String.valueOf((int) retourLigne.getQte_avant_retour()));
         ((TextView) findViewById(R.id.designationProduit)).setText(produit.getDesignation_interne());
+        ((TextView) findViewById(R.id.referenceProduit)).setText(produit.getRef_fourni());
+        int nbColis = 0;
+        if (produit.getCond_distrib() > 0) {
+            nbColis = (int) Math.ceil(retourLigne.getQte_avant_retour() / produit.getCond_distrib());
+        }
 
+        ((TextView) findViewById(R.id.colis)).setText(String.valueOf(nbColis));
+        majVisuel();
         //Gestion de la listView
         emplacementListView = findViewById(R.id.listeView);
         emplacementListView.setItemsCanFocus(true);
@@ -138,24 +112,13 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
                     Intent data = result.getData();
                     if (data != null) {
                         switch (result.getResultCode()) {
-                        /*    case CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT:
-                                Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte emplacementAdapte = retourLigneSelectionne.new EmplacementAdapte(Objects.requireNonNull(data.getExtras()).getInt("emplacementSelectionneID"), 0);
-                                boolean emplacementExistant = false;
-                                for (Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte emplacementAdapteCourant : adapter.emplacementAdapteList) {
-                                    if (emplacementAdapteCourant.getEmplacementID() == emplacementAdapte.getEmplacementID()) {
-                                        emplacementExistant = true;
-                                        break;
-                                    }
-                                }
-                                if (!emplacementExistant) {
-                                    lot_ajouter = true;
-                                    adapter.emplacementAdapteList.add(emplacementAdapte);
-                                    adapter.viewHolderList.add(adapter.new EmplacementViewHolder());
-                                    adapter.notifyDataSetChanged();
-                                    emplacementListView.performItemClick(emplacementListView.getAdapter().getView(adapter.viewHolderList.size()-1, null, null), adapter.viewHolderList.size()-1, emplacementListView.getAdapter().getItemId(adapter.viewHolderList.size()-1));
-                                    InputMethodManager imm = (InputMethodManager) ListeEmplacementRetourPUIActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-                                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                                }
+                           case CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT:
+                                int emplacementID = Objects.requireNonNull(data.getExtras()).getInt("emplacementSelectionneID");
+                                Retour_Ligne newRetourLigne = creationRetourLigne(retourLigne, emplacementID);
+                                adapter.retourLigneList.add(newRetourLigne);
+                                adapter.viewHolderList.add(adapter.new EmplacementViewHolder());
+                                adapter.notifyDataSetChanged();
+                                emplacementListView.performItemClick(emplacementListView.getAdapter().getView(adapter.viewHolderList.size()-1, null, null), adapter.viewHolderList.size()-1, emplacementListView.getAdapter().getItemId(adapter.viewHolderList.size()-1));
                                 break;
                             case CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT:
                                 String emplacement_scanne = Objects.requireNonNull(data.getExtras()).getString("code");
@@ -171,33 +134,13 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
                                 }
                                 if(emplacement != null)
                                 {
-                                    Depot_Zone zone_concernee = ZoneOpenHelper.getUneZoneByID(db, emplacement.getZoneID());
-                                    if(zone_concernee.getDepotID() != depot.getDepot_UID())
-                                    {
-                                        Alerte.afficherAlerte(ListeEmplacementRetourPUIActivity.this, "Attention", "L'emplacement scannée n'appartient pas à la PUI", "alerte");
-                                        premierPassageScan = true;
-                                        onResume();
-                                        break;
-                                    }
-                                    Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte emplacementAdapteScan = retourLigneSelectionne.new EmplacementAdapte(emplacement.get_UID(), 0);
-                                    boolean emplacementExistantScan = false;
-                                    for (Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte emplacementAdapteCourant : adapter.emplacementAdapteList) {
-                                        if (emplacementAdapteCourant.getEmplacementID() == emplacementAdapteScan.getEmplacementID()) {
-                                            emplacementExistantScan = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!emplacementExistantScan) {
-                                        adapter.emplacementAdapteList.add(emplacementAdapteScan);
-                                        premierPassageScan = true;
-                                        adapter.notifyDataSetChanged();
-                                        lot_ajouter = true;
-                                    }
+                                    Retour_Ligne newRetourLigneEmplacement = creationRetourLigne(retourLigne, emplacement.get_UID());
+                                    adapter.retourLigneList.add(newRetourLigneEmplacement);
+                                    adapter.viewHolderList.add(adapter.new EmplacementViewHolder());
+                                    adapter.notifyDataSetChanged();
+                                    emplacementListView.performItemClick(emplacementListView.getAdapter().getView(adapter.viewHolderList.size()-1, null, null), adapter.viewHolderList.size()-1, emplacementListView.getAdapter().getItemId(adapter.viewHolderList.size()-1));
                                 }
-                                else
-                                {
-                                }
-                                break;*/
+                                break;
                         }
                     }
                 });
@@ -214,49 +157,50 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
         super.onResume();
         invalidateOptionsMenu();
         // Initialisation de l'adapter puis transfere de l'adapter à la listeView pour l'affichage
-        adapter = new Emplacement_RetourPUIAdapter(ListeEmplacementRetourPUIActivity.this, emplacementAdapteList, db, retourLigneSelectionne);
+        adapter = new Emplacement_RetourPUIAdapter(ListeEmplacementRetourPUIActivity.this, retourLigneRetourner, db);
         emplacementListView.setAdapter(adapter);
         emplacementListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
 
         emplacementListView.setOnItemClickListener((parent, view, position, id) -> {
-            final Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte emplacementAdapte = (Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte) adapter.getItem(position);
+            final Retour_Ligne retourLigne = (Retour_Ligne) adapter.getItem(position);
             //on recalcule les quantité retourner et a retourner
             quantiteRetourner=0;
             quantiteRestantARetourner=quantiteARetourner;
-            for(Retour_Ligne_RetourPUI_Adapte.EmplacementAdapte emplacementAdapteCourant : emplacementAdapteList)
-            {
-                quantiteRetourner += emplacementAdapteCourant.getQte();
-                quantiteRestantARetourner -= emplacementAdapteCourant.getQte();
-            }
-            assert emplacementAdapte != null;
-            Depot_Emplacement emplacement = EmplacementOpenHelper.getUnEmplacementByID(db, emplacementAdapte.getEmplacementID());
-            Depot_Zone zone = ZoneOpenHelper.getUneZoneByID(db, emplacement.getZoneID());
 
+            List<Retour_Ligne> listRetourLigneTemp = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(db, retourCourant, retourLigne.getCode_produit());
+
+            for(Retour_Ligne retourLigneTemp : listRetourLigneTemp)
+            {
+                if(retourLigneTemp.get_UID() != retourLigne.get_UID())
+                {
+                    quantiteRetourner += retourLigneTemp.getQte_Retourner();
+                    quantiteRestantARetourner -= retourLigneTemp.getQte_Retourner();
+                }
+            }
             // Ouvre une boite de dialogue avec un NumberPicker
             Context context = ListeEmplacementRetourPUIActivity.this;
-            String title = zone.getZoneName() + " - " + emplacement.getAdressage();
+            String title = retourLigne.getRetourPUI_Zone() + " - " + retourLigne.getRetourPUI_Emplacement();
             String message = "Quantité retournée : ";
-            int maxValue = quantiteARetourner;
+            int maxValue = quantiteRestantARetourner;
             int value = quantiteRestantARetourner;
 
-            if (emplacementAdapte.getQte() > 0) {
-                value = emplacementAdapte.getQte();
+            if (retourLigne.getQte_Retourner() > 0) {
+                value = (int) retourLigne.getQte_Retourner();
             }
             DialogInterface.OnClickListener onClickListener = (dialog, id1) -> {
 
-                int qteAvant = emplacementAdapte.getQte();
+                int qteAvant = (int) retourLigne.getQte_Retourner();
                 String[] displayValue = aNumberPicker.getDisplayedValues();
                 int qteApres = Integer.parseInt(displayValue[aNumberPicker.getValue()]);
-                int difference;
-                difference = qteApres - qteAvant;
-                quantiteRetourner = quantiteRetourner + difference;
                 int result = quantiteRetourner - quantiteARetourner;
                 if (result > 0) {
                     qteApres = qteApres - result;
                 }
 
-                emplacementAdapte.setQte(qteApres);
+                retourLigne.setQte_Retourner(qteApres);
+                Retour_LigneOpenHelper.mettreAJourUnRetourLigne(db, retourLigne);
                 adapter.qteRestanteARetourner = quantiteARetourner - quantiteRetourner;
+                majVisuel();
                 adapter.notifyDataSetChanged();
                 InputMethodManager imm = (InputMethodManager) ListeEmplacementRetourPUIActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
@@ -264,20 +208,28 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
                 dialog.dismiss();
             };
 
-            Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, (int)produit.getCond_distrib());
+            int pasNumberPicker = (int) produit.getCond_distrib();
+
+            if(pasNumberPicker == 0 || pasNumberPicker > maxValue)
+            {
+                pasNumberPicker = 1;
+            }
+
+            Alerte.afficherAlerteNumberPickerAvecPas(context, title, message, value, maxValue, onClickListener, pasNumberPicker);
         });
 
-        if(emplacementAdapteList.isEmpty() && premierPassageScan)
-        {
-            premierPassageScan = false;
-            onMenuDatamatrixClick();
-        }
+        ((Button) findViewById(R.id.btnAjoutManuel)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent listeEmplacementRetourPuiIntent = new Intent(ListeEmplacementRetourPUIActivity.this, ListeZonesActivity.class);
+                Bundle listeEmplacementRetourPuiBundle = ListeEmplacementRetourPUIActivity.super.getBundle();
+                listeEmplacementRetourPuiBundle.putInt("depotSelectionneID", depot.getDepot_UID());
+                listeEmplacementRetourPuiBundle.putString("designationProduit", retourLigne.getProduit_Designation());
+                listeEmplacementRetourPuiIntent.putExtras(listeEmplacementRetourPuiBundle);
 
-
-        if(emplacementAdapteList.size() == 1 && !lot_ajouter)
-        {
-
-        }
+                resultListeEmplacementRetour.launch(listeEmplacementRetourPuiIntent);
+            }
+        });
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -286,8 +238,9 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_action, menu);
         menu.findItem(R.id.menuAdd).setVisible(false);
+        menu.findItem(R.id.menuSaveCircle).setVisible(true);
 
-        if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY) && !android.os.Build.MANUFACTURER.contains("Zebra Technologies") && !android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+        if(quantiteRestantARetourner != 0)
         {
             menu.findItem(R.id.menuDatamatrix).setVisible(true);
         }
@@ -306,6 +259,28 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
             onMenuDatamatrixClick();
             return true;
         });
+
+        MenuItem itemSave = menu.findItem(R.id.menuSaveCircle);
+        itemSave.setOnMenuItemClickListener(item -> {
+
+            List<Retour_Ligne> retourLigneRetourner = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(db, retourCourant, retourLigne.getCode_produit());
+
+            for(Retour_Ligne retour_ligne_temp : retourLigneRetourner)
+            {
+                if(retour_ligne_temp.getQte_Retourner() == 0)
+                {
+                    Retour_LigneOpenHelper.supprimerUnRetourLigne(db, retour_ligne_temp);
+                }
+            }
+
+            Intent listeEmplacementRetourPuiIntent = new Intent();
+            Bundle listeEmplacementRetourPuiBundle = ListeEmplacementRetourPUIActivity.super.getBundle();
+            listeEmplacementRetourPuiIntent.putExtras(listeEmplacementRetourPuiBundle);
+            ListeEmplacementRetourPUIActivity.this.setResult(CodesEchangesActivites.RETOUR_LISTE_EMPLACEMENTS, listeEmplacementRetourPuiIntent);
+            ListeEmplacementRetourPUIActivity.this.finish();
+
+            return true;
+        });
         return true;
     }
     private void onMenuDatamatrixClick()
@@ -313,7 +288,7 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
         Intent scanEmplacement_Intent;
         Bundle listeLotPreparation_Bundle = super.getBundle();
 
-        if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+        if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
         {
             scanEmplacement_Intent = new Intent(ListeEmplacementRetourPUIActivity.this, ScannerEmplacementActivity.class);
             listeLotPreparation_Bundle.putInt("scannerContexteInt", R.string.scannerContexteEmplacement);
@@ -348,5 +323,51 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
         scanEmplacement_Intent.putExtras(listeLotPreparation_Bundle);
 
         resultListeEmplacementRetour.launch(scanEmplacement_Intent);
+    }
+
+    private void majVisuel()
+    {
+        quantiteRetourner = 0;
+        quantiteRestantARetourner = (int) retourLigne.getQte_avant_retour();
+        retourLigneRetourner = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(db, retourCourant, retourLigne.getCode_produit());
+        for(Retour_Ligne retourLigneTemp : retourLigneRetourner)
+        {
+            quantiteRetourner += retourLigneTemp.getQte_Retourner();
+            quantiteRestantARetourner -= retourLigneTemp.getQte_Retourner();
+        }
+
+        ((TextView) findViewById(R.id.QteRetourner)).setText(String.valueOf(quantiteRetourner));
+
+        if(quantiteRestantARetourner == 0)
+        {
+            ((Button) findViewById(R.id.btnAjoutManuel)).setVisibility(View.INVISIBLE);
+        }
+        else
+        {
+            ((Button) findViewById(R.id.btnAjoutManuel)).setVisibility(View.VISIBLE);
+        }
+
+        invalidateOptionsMenu();
+    }
+
+    private Retour_Ligne creationRetourLigne(Retour_Ligne retourLigneBase, int emplacementID)
+    {
+        Depot_Emplacement emplacement = EmplacementOpenHelper.getUnEmplacementByID(db, emplacementID);
+        Depot_Zone zone = ZoneOpenHelper.getUneZoneByID(db, emplacement.getZoneID());
+
+        Random random = new Random();
+        int retourLigneId = random.nextInt();
+        if(retourLigneId > 0)
+            retourLigneId = retourLigneId*-1;
+
+        Retour_Ligne retourLigneCourant = new Retour_Ligne(retourLigneBase);
+        retourLigneCourant.set_UID(retourLigneId);
+        retourLigneCourant.setRetourPUI_Zone(zone.getZoneName());
+        retourLigneCourant.setRetourPUI_Emplacement(emplacement.getAdressage());
+        retourLigneCourant.setQte_Retourner(0);
+
+        long rowID = Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(db, retourLigneCourant);
+
+        return retourLigneCourant;
     }
 }

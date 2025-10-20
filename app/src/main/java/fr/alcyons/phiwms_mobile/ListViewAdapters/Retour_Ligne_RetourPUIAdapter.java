@@ -64,12 +64,14 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
         viewHolder.referenceProduit = (TextView) convertView.findViewById(R.id.referenceProduit);
         viewHolder.nomFournisseur = (TextView) convertView.findViewById(R.id.nomFournisseur);
         viewHolder.qteRetourner = (TextView) convertView.findViewById(R.id.QteRetourner);
+        viewHolder.QteARetourner = (TextView) convertView.findViewById(R.id.QteARetourner);
         viewHolder.lotRetourne = (TextView) convertView.findViewById(R.id.lotRetourne);
         viewHolder.datePeremption = (TextView) convertView.findViewById(R.id.datePeremption);
         viewHolder.numSerieProduit = (TextView) convertView.findViewById(R.id.numSerie);
         viewHolder.labelSerie = (TextView) convertView.findViewById(R.id.labelSerie);
         viewHolder.textEmplacement = (TextView) convertView.findViewById(R.id.textEmplacement);
         viewHolder.layoutSerie = (LinearLayout) convertView.findViewById(R.id.layoutSerie);
+        viewHolder.layoutQteARetourner = (LinearLayout) convertView.findViewById(R.id.layoutQteARetourner);
         viewHolder.layoutPrincipal = (RelativeLayout) convertView.findViewById(R.id.layoutPrincipal);
         viewHolder.progressBar = (ProgressBar) convertView.findViewById(R.id.progressBar);
 
@@ -82,8 +84,8 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
         viewHolder.numSerieProduit.setText(retourLigne.getSerie_Retourner());
         if(retourLigne.getSerie_Retourner().contentEquals(""))
         {
-            viewHolder.labelSerie.setVisibility(GONE);
-            viewHolder.numSerieProduit.setVisibility(GONE);
+            viewHolder.labelSerie.setVisibility(View.GONE);
+            viewHolder.numSerieProduit.setVisibility(View.GONE);
         }
         Date date = null;
         String dateAAfficher = "";
@@ -109,7 +111,7 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
 
         for(Retour_Ligne retour_ligne_temp : retourLigneProduitCourant)
         {
-            if(!listEmplacement.contains(retour_ligne_temp.getRetourPUI_Emplacement()))
+            if(!listEmplacement.contains(retour_ligne_temp.getRetourPUI_Emplacement()) && retour_ligne_temp.getQte_Retourner() > 0)
             {
                 listEmplacement.add(retour_ligne_temp.getRetourPUI_Emplacement());
             }
@@ -123,12 +125,15 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
         }
         else
         {
-            String nb_emplacement = listEmplacement.size()+" emplacements";
+            String nb_emplacement = listEmplacement.size()+" Emp.";
             viewHolder.textEmplacement.setText(nb_emplacement);
         }
 
         viewHolder.qteRetourner.setText(String.valueOf(quantiteRetourner));
+        viewHolder.QteARetourner.setText(String.valueOf((int)retourLigne.getQte_avant_retour()));
 
+        if(quantiteRetourner == retourLigne.getQte_avant_retour())
+            viewHolder.layoutQteARetourner.setVisibility(GONE);
 
         return convertView;
     }
@@ -138,6 +143,7 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
         public TextView referenceProduit;
         public TextView nomFournisseur;
         public TextView qteRetourner;
+        public TextView QteARetourner;
         public TextView lotRetourne;
         public TextView datePeremption;
         public TextView numSerieProduit;
@@ -146,6 +152,7 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
         public RelativeLayout layoutPrincipal;
         public ProgressBar progressBar;
         public LinearLayout layoutSerie;
+        public LinearLayout layoutQteARetourner;
 
         public void setDatePeremptionColor(Date date) {
 

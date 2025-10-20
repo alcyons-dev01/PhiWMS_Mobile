@@ -698,8 +698,6 @@ public class Alerte {
             }
         }
 
-
-
         aNumberPicker.setMaxValue(values.length-1);
         aNumberPicker.setDisplayedValues(values);
 

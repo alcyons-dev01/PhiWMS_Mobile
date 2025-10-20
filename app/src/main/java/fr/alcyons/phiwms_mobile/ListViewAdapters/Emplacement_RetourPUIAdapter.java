@@ -44,7 +44,6 @@ public class Emplacement_RetourPUIAdapter extends ArrayAdapter {
 
         for (Retour_Ligne retourLigneTemp : this.retourLigneList)
         {
-            this.retourLigneList.add(retourLigneTemp);
             this.viewHolderList.add(new EmplacementViewHolder());
         }
 
@@ -65,30 +64,11 @@ public class Emplacement_RetourPUIAdapter extends ArrayAdapter {
             viewHolder.qteRetournee = (TextView) convertView.findViewById(R.id.qteRetournee);
         }
 
-        /*viewHolder.qteRetournee.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                EmplacementViewHolder viewHolder = null;
-                for (EmplacementViewHolder viewHolderCourant : viewHolderList
-                        ) {
-                    if (viewHolderCourant.qteRetournee == v) {
-                        viewHolder = viewHolderCourant;
-                    }
-                }
-                if (viewHolder != null) {
-                    if (!viewHolder.qteRetournee.getText().toString().equals("")) {
-                        retourLigneAdapte.getEmplacementAdaptes().get(position).setQte(Integer.parseInt(viewHolder.qteRetournee.getText().toString()));
-                    }
-                }
-                return false;
-            }
-        });*/
-
         Retour_Ligne retourLigne = (Retour_Ligne) getItem(position);
         viewHolder.nomEmplacement.setText(retourLigne.getRetourPUI_Emplacement());
         viewHolder.nomZone.setText(retourLigne.getRetourPUI_Zone());
 
-        viewHolder.qteRetournee.setText(String.valueOf(retourLigne.getQte_Retourner()));
+        viewHolder.qteRetournee.setText(String.valueOf((int)retourLigne.getQte_Retourner()));
 
         return convertView;
     }
