@@ -209,7 +209,7 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
             }
 
             if (!retourPuiValide) {
-                Alerte.afficherAlerte(DetailRetourPUIActivity.this, "Alerte", "Tous les éléments n'ont pas été retourné entièrement.", "alerte");
+                afficherModaleConfirmation(DetailRetourPUIActivity.this, getLayoutInflater());
             }
             else
             {
@@ -254,6 +254,41 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
             public void onClick(View view) {
                 commentaire = editCommentaire.getText().toString();
                 validerRetourPUI();
+                alertDialog.dismiss();
+            }
+        });
+    }
+
+
+    private void afficherModaleConfirmation(Context context, LayoutInflater inflater)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View layout = inflater.inflate(R.layout.alerte_confirmation_validation, null);
+        TextView titre = layout.findViewById(R.id.messageFin);
+        LinearLayout buttonAnnuler = layout.findViewById(R.id.buttonAnnuler);
+        LinearLayout buttonValider = layout.findViewById(R.id.buttonOk);
+        titre.setText("Tous les éléments n'ont pas été retourné entièrement.\nSouhaitez-vous continuer ?");
+        builder.setView(layout);
+        final AlertDialog alertDialog = builder.create();
+        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
+        alertDialog.setCancelable(false);
+        if (alertDialog.getWindow() != null) {
+            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        alertDialog.show();
+
+        buttonAnnuler.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertDialog.dismiss();
+            }
+        });
+
+        buttonValider.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                afficherModaleCommentaire(context, inflater);
                 alertDialog.dismiss();
             }
         });
