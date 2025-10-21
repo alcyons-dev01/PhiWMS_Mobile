@@ -23,6 +23,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -54,6 +56,7 @@ import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat_Reception_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeLotsControleDesRetours2025Activity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.LotReception2025_Adapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.LotReceptionAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
@@ -103,6 +106,13 @@ public class ListeLotReception2025_V2Activity extends ServiceActivity {
         firstRowLinearLayout = ((LinearLayout) findViewById(R.id.firstRow));
         recyclerView = (RecyclerView) findViewById(R.id.liste_view_reception);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        int decorationCount = recyclerView.getItemDecorationCount();
+        for (int i = 0; i < decorationCount; i++) {
+            recyclerView.removeItemDecorationAt(0);
+        }
+        DividerItemDecoration divider = new DividerItemDecoration(ListeLotReception2025_V2Activity.this, DividerItemDecoration.VERTICAL);
+        divider.setDrawable(ContextCompat.getDrawable(ListeLotReception2025_V2Activity.this, R.drawable.recycler_divider));
+        recyclerView.addItemDecoration(divider);
     }
 
     @SuppressLint("SetTextI18n")

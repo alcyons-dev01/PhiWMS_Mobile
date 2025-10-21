@@ -11,7 +11,7 @@
     <!-- Bordure gauche -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="@color/noir" />
+            <solid android:color="@color/bleu_fonce_alcyons" />
             <corners
                 android:radius="15dp"/>
         </shape>

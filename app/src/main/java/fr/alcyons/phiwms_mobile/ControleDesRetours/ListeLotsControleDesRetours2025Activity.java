@@ -193,7 +193,7 @@ public class ListeLotsControleDesRetours2025Activity extends ServiceActivity {
             ((TextView) findViewById(R.id.designationProduit)).setText(produit.getDesignation_interne());
             ((TextView) findViewById(R.id.referenceProduit)).setText(produit.getRef_fourni());
             ((TextView) findViewById(R.id.numeroRetour)).setText("#"+retour_courant.getNumero());
-            ((TextView) findViewById(R.id.motif)).setText(retour_courant.getMotif());
+            //((TextView) findViewById(R.id.motif)).setText(retour_courant.getMotif());
             ((TextView) findViewById(R.id.nomDepot)).setText(depot.getNom());
             ((TextView) findViewById(R.id.colis)).setText(String.valueOf(nbColis));
 

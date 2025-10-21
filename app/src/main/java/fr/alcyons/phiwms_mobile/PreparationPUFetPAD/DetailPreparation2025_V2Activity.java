@@ -288,7 +288,7 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
                 }
 
                 phPreparationLigne_ListView.setAdapter(ph_preparation_ligne_preparationLotAdapter);
-                phPreparationLigne_ListView.setDivider(null);
+                //phPreparationLigne_ListView.setDivider(null);
                 ph_preparation_ligne_preparationLotAdapter.notifyDataSetChanged();
             }
         }
@@ -528,7 +528,7 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
         }
 
         phPreparationLigne_ListView.setAdapter(ph_preparation_ligne_preparationLotAdapter);
-        phPreparationLigne_ListView.setDivider(null);
+        //phPreparationLigne_ListView.setDivider(null);
         phPreparationLigne_ListView.setSelection(position_selectionne);
     }
 
@@ -567,7 +567,7 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
         }
 
         phPreparationLigne_ListView.setAdapter(ph_preparation_ligne_preparationLotAdapter);
-        phPreparationLigne_ListView.setDivider(null);
+        //phPreparationLigne_ListView.setDivider(null);
         phPreparationLigne_ListView.setSelection(position_selectionne);
     }
 
@@ -634,7 +634,7 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
         }
 
         phPreparationLigne_ListView.setAdapter(ph_preparation_ligne_preparationLotAdapter);
-        phPreparationLigne_ListView.setDivider(null);
+        //phPreparationLigne_ListView.setDivider(null);
         phPreparationLigne_ListView.setSelection(position_selectionne);
     }
 
@@ -671,7 +671,7 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
         }
 
         phPreparationLigne_ListView.setAdapter(ph_preparation_ligne_preparationLotAdapter);
-        phPreparationLigne_ListView.setDivider(null);
+        //phPreparationLigne_ListView.setDivider(null);
         phPreparationLigne_ListView.setSelection(position_selectionne);
     }
 
@@ -1054,6 +1054,7 @@ public class DetailPreparation2025_V2Activity extends ServiceAvecConnexionActivi
 
         final androidx.appcompat.app.AlertDialog alertDialog = builder.create();
         Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         alertDialog.show();
 
         zoneok.setOnClickListener(v -> {

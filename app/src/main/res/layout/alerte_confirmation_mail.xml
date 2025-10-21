@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_entete_alerte"
+    android:padding="2dp">
 
     <TextView
         android:id="@+id/titre"
@@ -12,31 +14,35 @@
         android:gravity="center"
         android:textColor="@android:color/white"
         android:textStyle="bold"
-        android:background="@color/bleu_fonce_alcyons"
-        android:padding="10dp"
-        />
+        android:layout_marginTop="10dp"/>
 
     <TextView
         android:id="@+id/messageFin"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Voulez-vous recevoir une copie du mail ?"
         android:layout_gravity="center"
+        android:layout_below="@+id/titre"
         android:gravity="center"
+        android:background="@color/blanc"
+        android:paddingVertical="20dp"
         android:textColor="@android:color/black"/>
 
     <ImageView
+        android:id="@+id/separateur"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/bleu_fonce_alcyons"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="5dp"/>
+        android:layout_below="@id/messageFin"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_below="@+id/separateur"
+        android:background="@drawable/background_empty_radius_bottom"
+        android:padding="1dp"
         android:weightSum="2">
 
         <LinearLayout
@@ -97,11 +103,4 @@
         </LinearLayout>
 
     </LinearLayout>
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/bleu_fonce_alcyons"
-        android:layout_marginTop="5dp"/>
-
-</LinearLayout>
+</RelativeLayout>

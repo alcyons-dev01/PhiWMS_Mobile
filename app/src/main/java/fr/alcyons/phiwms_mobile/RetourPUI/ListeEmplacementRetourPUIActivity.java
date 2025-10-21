@@ -210,7 +210,7 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
 
             int pasNumberPicker = (int) produit.getCond_distrib();
 
-            if(pasNumberPicker == 0 || pasNumberPicker > maxValue)
+            if(pasNumberPicker == 0 || pasNumberPicker >= maxValue)
             {
                 pasNumberPicker = 1;
             }

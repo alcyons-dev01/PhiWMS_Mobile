@@ -20,6 +20,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -42,6 +44,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeLotsControleDesRetours2025Activity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.LotAdapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.LotAdapter_V2;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
@@ -156,6 +159,13 @@ public class ListeLotPreparation2025_V2Activity  extends ServiceAvecConnexionAct
         }
 
         recyclerView = findViewById(R.id.recyclerView);
+        int decorationCount = recyclerView.getItemDecorationCount();
+        for (int i = 0; i < decorationCount; i++) {
+            recyclerView.removeItemDecorationAt(0);
+        }
+        DividerItemDecoration divider = new DividerItemDecoration(ListeLotPreparation2025_V2Activity.this, DividerItemDecoration.VERTICAL);
+        divider.setDrawable(ContextCompat.getDrawable(ListeLotPreparation2025_V2Activity.this, R.drawable.recycler_divider));
+        recyclerView.addItemDecoration(divider);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         if(!gtin_ok && produitsuiviserie)

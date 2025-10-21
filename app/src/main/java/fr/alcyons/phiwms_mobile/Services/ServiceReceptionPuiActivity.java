@@ -79,7 +79,6 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
     Depot depotPUI;
     boolean connexionDirecte;
     ReceptionAdapter commandeReceptionPUIAdapter;
-
     ListView commandeListView;
     PackageManager pm;
     ActivityResultLauncher<Intent> resultScanDocument;

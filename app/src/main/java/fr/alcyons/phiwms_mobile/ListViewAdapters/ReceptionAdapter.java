@@ -97,11 +97,9 @@ public class ReceptionAdapter extends ArrayAdapter implements Filterable {
         viewHolder.numCommande.setText("#"+commandeCourant.getNumero());
 
         if (commandeCourant.getSituation().equals("L")) {
-            viewHolder.zone_info_reception.setBackgroundColor(ContextCompat.getColor(context, R.color.orange2));
             viewHolder.ZoneNbColisEnAttente.setBackgroundColor(ContextCompat.getColor(context, R.color.orange2));
             viewHolder.relative_principal.setBackground(ContextCompat.getDrawable(context, R.drawable.background_preparation_orange));
         } else {
-            viewHolder.zone_info_reception.setBackgroundColor(ContextCompat.getColor(context, R.color.bleu_clair_alcyons));
             viewHolder.ZoneNbColisEnAttente.setBackgroundColor(ContextCompat.getColor(context, R.color.orange2));
             viewHolder.relative_principal.setBackground(ContextCompat.getDrawable(context, R.drawable.background_preparation_bleu));
         }

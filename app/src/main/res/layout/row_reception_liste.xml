@@ -18,7 +18,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="3"
-            android:background="@color/vert"
             android:padding="5dp">
 
             <TextView
@@ -51,6 +50,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:background="@color/blanc"
+            android:layout_marginLeft="8dp"
             android:weightSum="5">
 
             <TextView

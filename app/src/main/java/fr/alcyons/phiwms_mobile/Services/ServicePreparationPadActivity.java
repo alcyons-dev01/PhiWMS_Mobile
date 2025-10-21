@@ -165,7 +165,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
                     ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
                     ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPadActivity.this, ph_preparation_List, db, utilisateurConnecte);
                     // Permet d'enlever le séparateur entre deux éléments d'une listeView
-                    ph_preparation_ListView.setDivider(footer);
+                    //ph_preparation_ListView.setDivider(footer);
                     ph_preparation_ListView.setAdapter(ph_preparation_preparationAdapter);
 
                     if (ph_preparation_List.isEmpty()) {
@@ -183,7 +183,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
                     ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
                     ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPadActivity.this, ph_preparation_List, db, utilisateurConnecte);
                     // Permet d'enlever le séparateur entre deux éléments d'une listeView
-                    ph_preparation_ListView.setDivider(footer);
+                    //ph_preparation_ListView.setDivider(footer);
                     ph_preparation_ListView.setAdapter(ph_preparation_preparationAdapter);
                 }
 
@@ -235,7 +235,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
 
                     ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPadActivity.this, ph_preparation_List, db, utilisateurConnecte);
 
-                    ph_preparation_ListView.setDivider(footer);
+                    //ph_preparation_ListView.setDivider(footer);
                     ph_preparation_ListView.setAdapter(ph_preparation_preparationAdapter);
 
 
@@ -327,11 +327,11 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
                                 ph_preparation_List.add(preparation_alcyons);
                             }
                             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(ph_preparation_List.size()));
-                            ((TextView) findViewById(R.id.titre)).setText("Préparations");
+                            ((TextView) findViewById(R.id.titre)).setText("Préparations en cours");
                             ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
                             ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPadActivity.this, ph_preparation_List, db, utilisateurConnecte);
                             // Permet d'enlever le séparateur entre deux éléments d'une listeView
-                            ph_preparation_ListView.setDivider(footer);
+                            //ph_preparation_ListView.setDivider(footer);
                             ph_preparation_ListView.setAdapter(ph_preparation_preparationAdapter);
 
                             if (ph_preparation_List.isEmpty()) {
@@ -517,7 +517,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
                         ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
                         ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPadActivity.this, ph_preparation_List, db, utilisateurConnecte);
                         // Permet d'enlever le séparateur entre deux éléments d'une listeView
-                        ph_preparation_ListView.setDivider(footer);
+                        //ph_preparation_ListView.setDivider(footer);
                         ph_preparation_ListView.setAdapter(ph_preparation_preparationAdapter);
 
                         if (ph_preparation_List.isEmpty()) {
@@ -538,7 +538,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
                     ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
                     ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPadActivity.this, ph_preparation_List, db, utilisateurConnecte);
                     // Permet d'enlever le séparateur entre deux éléments d'une listeView
-                    ph_preparation_ListView.setDivider(footer);
+                    //ph_preparation_ListView.setDivider(footer);
                     ph_preparation_ListView.setAdapter(ph_preparation_preparationAdapter);
 
                     if (ph_preparation_List.isEmpty()) {
@@ -555,7 +555,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
                 ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
                 ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPadActivity.this, ph_preparation_List, db, utilisateurConnecte);
                 // Permet d'enlever le séparateur entre deux éléments d'une listeView
-                ph_preparation_ListView.setDivider(footer);
+                //ph_preparation_ListView.setDivider(footer);
                 ph_preparation_ListView.setAdapter(ph_preparation_preparationAdapter);
 
                 if (ph_preparation_List.isEmpty()) {

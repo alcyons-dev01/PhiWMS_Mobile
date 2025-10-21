@@ -348,7 +348,7 @@ public class DetailReception2025Activity  extends ServiceActivity {
                 phReliquatReceptionAdapter.addItem(ph_reliquat);
             }
         }
-        phReliquatListView.setDivider(footer);
+        //phReliquatListView.setDivider(footer);
         phReliquatListView.setAdapter(phReliquatReceptionAdapter);
     }
 
@@ -395,7 +395,7 @@ public class DetailReception2025Activity  extends ServiceActivity {
                 phReliquatReceptionAdapter.addItem(ph_reliquat);
             }
         }
-        phReliquatListView.setDivider(footer);
+        //phReliquatListView.setDivider(footer);
         phReliquatListView.setAdapter(phReliquatReceptionAdapter);
     }
 
@@ -461,7 +461,7 @@ public class DetailReception2025Activity  extends ServiceActivity {
                 phReliquatReceptionAdapter.addItem(ph_reliquat);
             }
         }
-        phReliquatListView.setDivider(footer);
+        //phReliquatListView.setDivider(footer);
         phReliquatListView.setAdapter(phReliquatReceptionAdapter);
     }
 
@@ -505,7 +505,7 @@ public class DetailReception2025Activity  extends ServiceActivity {
                 phReliquatReceptionAdapter.addItem(ph_reliquat);
             }
         }
-        phReliquatListView.setDivider(footer);
+        //phReliquatListView.setDivider(footer);
         phReliquatListView.setAdapter(phReliquatReceptionAdapter);
     }
 

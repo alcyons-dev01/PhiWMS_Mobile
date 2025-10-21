@@ -451,9 +451,10 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
             return a.getLivraisonPrevueDate().compareTo(b.getLivraisonPrevueDate());
         });
         ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(ph_preparation_List.size()));
+        ((TextView) findViewById(R.id.titre)).setText("Préparations en cours");
         ph_preparation_preparationAdapter = new PH_Preparation_PreparationAdapter(ServicePreparationPufActivity.this, ph_preparation_List, db, utilisateurConnecte);
         // Permet d'enlever le séparateur entre deux éléments d'une listeView
-        ph_preparation_ListView.setDivider(footer);
+        //ph_preparation_ListView.setDivider(footer);
         ph_preparation_ListView.setAdapter(ph_preparation_preparationAdapter);
 
         if (ph_preparation_List.isEmpty()) {

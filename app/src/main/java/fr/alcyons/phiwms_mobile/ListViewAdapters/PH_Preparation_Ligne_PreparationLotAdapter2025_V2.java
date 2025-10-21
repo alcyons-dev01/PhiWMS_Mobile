@@ -94,7 +94,7 @@ public class PH_Preparation_Ligne_PreparationLotAdapter2025_V2 extends BaseAdapt
         if (convertView == null) {
             switch (rowType) {
                 case TYPE_ITEM:
-                    convertView =  mInflater.inflate(R.layout.row_dotation, parent, false);
+                    convertView =  mInflater.inflate(R.layout.row_ph_preparation_ligne_preparation_lot, parent, false);
                     break;
                 case TYPE_HEADER:
                     convertView = mInflater.inflate(R.layout.row_header_ph_preparation_plein_vide, parent, false);

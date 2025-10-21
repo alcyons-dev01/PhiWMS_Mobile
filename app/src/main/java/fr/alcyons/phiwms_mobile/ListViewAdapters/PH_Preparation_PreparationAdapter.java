@@ -12,6 +12,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -73,7 +75,6 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
             viewHolder.nbAPreparer = (TextView) convertView.findViewById(R.id.nbAPreparer);
             viewHolder.origine = (TextView) convertView.findViewById(R.id.origine);
             viewHolder.relative_principal = (RelativeLayout) convertView.findViewById(R.id.relative_principal);
-            viewHolder.imageSeparateurLayout = (ImageView) convertView.findViewById(R.id.imageSeparateurLayout);
             viewHolder.preparationUrgente = (TextView) convertView.findViewById(R.id.preparationUrgente);
 
             convertView.setTag(viewHolder);
@@ -226,7 +227,6 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
         public TextView nbAPreparer;
         public TextView origine;
         public RelativeLayout relative_principal;
-        public ImageView imageSeparateurLayout;
         public TextView preparationUrgente;
 
         public void setDateLivraisonColor(Date date) {
@@ -240,25 +240,15 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
                 int demain = -1;
 
                 if (delai > 0) {
-                    zoneDateLivraisonPrevue.setBackgroundColor(context.getResources().getColor(R.color.grey_color_fonce, null));
-                    imageSeparateurLayout.setBackgroundColor(context.getResources().getColor(R.color.grey_color_fonce, null));
                     relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_preparation_gris, null));
                 } else if (delai == 0) {
-                    zoneDateLivraisonPrevue.setBackgroundColor(context.getResources().getColor(R.color.rouge2));
-                    imageSeparateurLayout.setBackgroundColor(context.getResources().getColor(R.color.rouge2));
                     relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_preparation_rouge, null));
                 } else if (delai == demain) {
-                    zoneDateLivraisonPrevue.setBackgroundColor(context.getResources().getColor(R.color.orange2));
-                    imageSeparateurLayout.setBackgroundColor(context.getResources().getColor(R.color.orange2));
                     relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_preparation_orange, null));
                 } else {
-                    zoneDateLivraisonPrevue.setBackgroundColor(context.getResources().getColor(R.color.vert));
-                    imageSeparateurLayout.setBackgroundColor(context.getResources().getColor(R.color.vert));
                     relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_preparation_vert, null));
                 }
             } else {
-                zoneDateLivraisonPrevue.setBackgroundColor(context.getResources().getColor(R.color.noir, null));
-                imageSeparateurLayout.setBackgroundColor(context.getResources().getColor(R.color.noir, null));
                 relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_preparation_noir, null));
             }
 
