@@ -111,7 +111,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
                                     ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur");
                                     adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
-                                    //listViewRetours.setDivider(footer);
+                                    
                                     listViewRetours.setAdapter(adapter);
 
                                     if (listeRetours.isEmpty()) {
@@ -132,7 +132,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                             } else {
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
                                 adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
-                                //listViewRetours.setDivider(footer);
+                                
                                 listViewRetours.setAdapter(adapter);
 
                                 if (listeRetours.isEmpty()) {
@@ -147,7 +147,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                             /* Code nécessaire à l'affichage de la liste */
                             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
                             adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
-                            //listViewRetours.setDivider(footer);
+                            
                             listViewRetours.setAdapter(adapter);
 
                             if (listeRetours.isEmpty()) {
@@ -214,7 +214,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
                     ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur");
                     adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
-                    //listViewRetours.setDivider(footer);
+                    
                     listViewRetours.setAdapter(adapter);
 
                     if (listeRetours.isEmpty()) {
@@ -240,16 +240,12 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                         if (nbResultat == 0) {
                             String string = response.getString("erreur");
                             if (string.equals(getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerte(ServiceRetourFournisseurActivity.this, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
-                                //DBOpenHelper.viderBasesDeDonnees(db);
-                                ServiceRetourFournisseurActivity.this.finishAffinity();
-                                Intent intent = new Intent(ServiceRetourFournisseurActivity.this, AuthentificationActivity.class);
-                                ServiceRetourFournisseurActivity.this.startActivity(intent);
+                                Alerte.afficherAlerteInformation(ServiceRetourFournisseurActivity.this, getLayoutInflater(), "Alerte", "Votre session a expirée, veuillez vous reconnecter.", false, true);
                             } else {
                                 arreterSpinner();
                                 vide = true;
                                 nomServiceVide = "Retour fournisseur";
-                                retourNavigation(ServiceRetourFournisseurActivity.this);
+                                retourNavigation();
                             }
                         } else {
                             retoursJson = response.getJSONArray("PH_Retours");
@@ -281,7 +277,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
                                 ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur");
                                 adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
-                                //listViewRetours.setDivider(footer);
+                                
                                 listViewRetours.setAdapter(adapter);
 
                                 invalidateOptionsMenu();
@@ -296,7 +292,7 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                 },
                 error -> {
                     Log.e("Volley", "Error");
-                    Alerte.afficherAlerte(ServiceRetourFournisseurActivity.this, "Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Retour Fournisseur)", "alerte");
+                    Alerte.afficherAlerteInformation(ServiceRetourFournisseurActivity.this, getLayoutInflater(), "Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Retour Fournisseur)", false, true);
                 }
         ) {
 

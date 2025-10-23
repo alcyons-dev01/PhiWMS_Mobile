@@ -120,11 +120,9 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                                     ((TextView) findViewById(R.id.titre)).setText(titre);
                                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                                     adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
-                                    //retourListView.setDivider(footer);
                                     retourListView.setAdapter(adapter);
 
                                     if (retourList.isEmpty()) {
-
                                         vide = true;
                                         nomServiceVide = "Retour PUI";
                                         ServiceRetourPUIActivity.this.finish();
@@ -150,7 +148,6 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                                 ((TextView) findViewById(R.id.titre)).setText(titre);
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                                 adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
-                                //retourListView.setDivider(footer);
                                 retourListView.setAdapter(adapter);
 
                                 if (retourList.isEmpty()) {
@@ -172,7 +169,6 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                             ((TextView) findViewById(R.id.titre)).setText(titre);
                             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                             adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
-                            //retourListView.setDivider(footer);
                             retourListView.setAdapter(adapter);
 
                             if (retourList.isEmpty()) {
@@ -255,7 +251,6 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                     ((TextView) findViewById(R.id.titre)).setText("Retours PUI demandés");
                     adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
-                    //retourListView.setDivider(footer);
                     retourListView.setAdapter(adapter);
 
                     if (retourList.isEmpty()) {
@@ -284,22 +279,14 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                         if (resultCount == 0) {
                             String erreur = response.getString("erreur");
                             if (erreur.equals(getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerte(ServiceRetourPUIActivity.this, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
-                                DBOpenHelper.viderBasesDeDonnees(db);
-                                ServiceRetourPUIActivity.this.finishAffinity();
-                                Intent serviceNotificationsIntent = new Intent(ServiceRetourPUIActivity.this, AuthentificationActivity.class);
-                                ServiceRetourPUIActivity.this.startActivity(serviceNotificationsIntent);
+                                Alerte.afficherAlerteInformation(ServiceRetourPUIActivity.this, getLayoutInflater(), "Alerte", "Votre session a expirée, veuillez vous reconnecter.", false, true);
                             } else if (erreur.equals(getString(R.string.tokenExpire))) {
-                                Alerte.afficherAlerte(ServiceRetourPUIActivity.this, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter", "alerte");
-                                ServiceRetourPUIActivity.this.finishAffinity();
-                                Intent serviceNotificationsIntent = new Intent(ServiceRetourPUIActivity.this, AuthentificationActivity.class);
-                                ServiceRetourPUIActivity.this.startActivity(serviceNotificationsIntent);
+                                Alerte.afficherAlerteInformation(ServiceRetourPUIActivity.this, getLayoutInflater(), "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter", false, true);
                             } else if (!erreur.equals(getString(R.string.aucunRetour))) {
-                                Alerte.afficherAlerte(ServiceRetourPUIActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete service retour pui", "alerte");
+                                Alerte.afficherAlerteInformation(ServiceRetourPUIActivity.this, getLayoutInflater(), "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete service retour pui", false, true);
                             } else {
                                 arreterSpinner();
-                                Alerte.afficherAlerte(ServiceRetourPUIActivity.this, "Alerte", "Aucun Retour PUI à traiter", "alerte");
-                                retourNavigation(ServiceRetourPUIActivity.this);
+                                Alerte.afficherAlerteInformation(ServiceRetourPUIActivity.this, getLayoutInflater(), "Alerte", "Aucun Retour PUI à traiter", false, true);
                             }
                         } else {
                             viderTablesConcernees();
@@ -341,7 +328,6 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                                 ((TextView) findViewById(R.id.titre)).setText("Retours PUI demandés");
                                 adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
-                                //retourListView.setDivider(footer);
                                 retourListView.setAdapter(adapter);
                                 new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
                                 passageParOnCreate = false;
@@ -355,7 +341,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                 },
                 error -> {
                     Log.e("Volley", "Error");
-                    Alerte.afficherAlerte(ServiceRetourPUIActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP service retour pui", "alerte");
+                    Alerte.afficherAlerteInformation(ServiceRetourPUIActivity.this, getLayoutInflater(), "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP service retour pui", false, true);
                 }
         ) {
             @Override

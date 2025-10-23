@@ -65,7 +65,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_weight="1"
-                android:background="@drawable/backeground_cadre_bleu"
+                android:background="@drawable/background_cadre_bleu"
                 android:orientation="vertical">
 
                 <ImageView
@@ -95,7 +95,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_weight="1"
-                android:background="@drawable/backeground_cadre_bleu"
+                android:background="@drawable/background_cadre_bleu"
                 android:orientation="horizontal">
 
                 <ImageView
@@ -145,7 +145,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_weight="1"
-                android:background="@drawable/backeground_cadre_bleu"
+                android:background="@drawable/background_cadre_bleu"
                 android:orientation="vertical">
 
                 <ImageView
@@ -175,7 +175,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_weight="1"
-                android:background="@drawable/backeground_cadre_bleu"
+                android:background="@drawable/background_cadre_bleu"
                 android:orientation="vertical">
 
                 <ImageView
@@ -225,7 +225,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_weight="1"
-                android:background="@drawable/backeground_cadre_bleu"
+                android:background="@drawable/background_cadre_bleu"
                 android:orientation="vertical">
 
                 <ImageView
@@ -255,7 +255,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_weight="1"
-                android:background="@drawable/backeground_cadre_bleu"
+                android:background="@drawable/background_cadre_bleu"
                 android:orientation="vertical">
 
                 <ImageView
@@ -306,7 +306,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_weight="1"
-                android:background="@drawable/backeground_cadre_bleu"
+                android:background="@drawable/background_cadre_bleu"
                 android:orientation="vertical">
 
                 <ImageView
@@ -336,7 +336,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_weight="1"
-                android:background="@drawable/backeground_cadre_bleu"
+                android:background="@drawable/background_cadre_bleu"
                 android:orientation="vertical">
 
                 <ImageView

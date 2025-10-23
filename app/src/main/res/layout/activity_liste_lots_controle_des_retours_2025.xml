@@ -81,95 +81,106 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/barreDeTitre"
         android:orientation="horizontal"
-        android:layout_marginTop="10dp"
-        android:padding="5dp"
-        android:weightSum="5.75"
-        android:background="@drawable/background_detail_preparation_orange">
+        android:layout_marginTop="15dp"
+        android:background="@drawable/background_cadre_orange"
+        android:paddingHorizontal="3dp"
+        android:paddingTop="3dp">
 
         <LinearLayout
-            android:id="@+id/layoutColis"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5"
-            android:orientation="vertical"
-            android:layout_gravity="center_vertical"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/colis"
-                android:background="@drawable/ic_colis" />
-
-            <TextView
-                android:id="@+id/colis"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/rouge2"
-                android:textSize="14sp"
-                android:text="" />
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="4"
-            android:orientation="vertical">
+            android:weightSum="5.75"
+            android:background="@drawable/background_empty_radius_top">
 
-            <TextView
-                android:id="@+id/designationProduit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="18dp"
-                android:text=""
-                android:textColor="@color/noir"
-                android:textStyle="bold"/>
+            <LinearLayout
+                android:id="@+id/layoutColis"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5"
+                android:orientation="vertical"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/referenceProduit"
-                android:layout_width="match_parent"
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/colis"
+                    android:layout_gravity="center"
+                    android:background="@drawable/ic_colis" />
+
+                <TextView
+                    android:id="@+id/colis"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/rouge2"
+                    android:gravity="center"
+                    android:textSize="14sp"
+                    android:text="" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textSize="16dp"
-                android:text=""
-                android:textColor="@color/noir"/>
+                android:layout_weight="4"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/designationProduit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18dp"
+                    android:text=""
+                    android:textColor="@color/noir"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/referenceProduit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16dp"
+                    android:text=""
+                    android:textColor="@color/noir"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.25"
+                android:orientation="vertical"
+                android:weightSum="2">
+
+                <TextView
+                    android:id="@+id/QteRetourner"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:layout_marginRight="10dp"
+                    android:text=""
+                    android:textColor="@color/orange2"
+                    android:textSize="18dp"
+                    android:textStyle="bold"/>
+
+
+                <TextView
+                    android:id="@+id/qteDeclaree"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text=""
+                    android:layout_marginRight="10dp"
+                    android:textColor="@android:color/black"
+                    android:textSize="18dp"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.25"
-            android:orientation="vertical"
-            android:weightSum="2">
-
-            <TextView
-                android:id="@+id/QteRetourner"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="right"
-                android:layout_marginRight="10dp"
-                android:text=""
-                android:textColor="@color/orange2"
-                android:textSize="18dp"
-                android:textStyle="bold"/>
-
-
-            <TextView
-                android:id="@+id/qteDeclaree"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="right"
-                android:text=""
-                android:layout_marginRight="10dp"
-                android:textColor="@android:color/black"
-                android:textSize="18dp"
-                android:textStyle="bold"/>
-
-        </LinearLayout>
 
     </LinearLayout>
 
@@ -181,6 +192,7 @@
         android:layout_below="@id/firstRow"
         android:layout_above="@id/btnAjoutManuel"
         android:divider="@android:color/transparent"
+        android:layout_marginTop="5dp"
         android:paddingTop="10dp"
         android:scrollbars="vertical"/>
 
@@ -189,7 +201,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Ajoutez un lot"
-        android:background="@drawable/background_plain_bleu_radius"
+        android:background="@drawable/background_plein_bleu_radius"
         android:backgroundTint="@color/bleu_clair_alcyons"
         android:layout_marginHorizontal="50dp"
         android:layout_marginBottom="10dp"

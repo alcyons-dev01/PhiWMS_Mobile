@@ -228,7 +228,7 @@ public class Produit_PreparationScanneeAdapter extends BaseExpandableListAdapter
 
     public View getGroupView(int groupPosition, boolean isExpanded, View ListView, ViewGroup parent) {
 
-        String produitCourant = (String) getGroup(groupPosition);
+        /*String produitCourant = (String) getGroup(groupPosition);
         if (ListView == null) {
             LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             ListView = infalInflater.inflate(R.layout.expandable_liste_groupe_preparationscannee, null);
@@ -274,7 +274,7 @@ public class Produit_PreparationScanneeAdapter extends BaseExpandableListAdapter
         else
         {
             layoutparent.setBackgroundResource(R.color.orange);
-        }
+        }*/
 
         return ListView;
     }

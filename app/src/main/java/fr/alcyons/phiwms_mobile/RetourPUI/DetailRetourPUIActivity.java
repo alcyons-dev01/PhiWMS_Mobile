@@ -19,8 +19,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.clans.fab.FloatingActionButton;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,26 +31,18 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne;
-import fr.alcyons.phiwms_mobile.Classes.Depot;
-import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
-import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
-import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne_RetourPUI_Adapte;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Retour_Ligne_RetourPUIAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
-import fr.alcyons.phiwms_mobile.RetourFournisseur.DetailRetourFournisseurActivity;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 import fr.alcyons.phiwms_mobile.Services.ServiceRetourPUIActivity;
 
@@ -114,7 +104,7 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                afficherAlerteConfirmationRetour(DetailRetourPUIActivity.this, LayoutInflater.from(DetailRetourPUIActivity.this));
+                Alerte.afficherAlerteConfirmation(DetailRetourPUIActivity.this, getLayoutInflater(), getBundle(), "Voulez-vous quitter le détail du retour PUI ?", true, false, DetailRetourPUIActivity.this);
             }
         });
     }
@@ -146,29 +136,8 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
         retourLigneListView.setAdapter(adapter);
     }
 
-    @SuppressLint("SetTextI18n")
-    public void afficherAlerteConfirmationRetour(Context context, LayoutInflater inflater) {
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
-        View layout = inflater.inflate(R.layout.alerte_confirmation_mail, null);
-
-        LinearLayout zoneok = layout.findViewById(R.id.buttonOk);
-        LinearLayout buttonAnnuler = layout.findViewById(R.id.buttonAnnuler);
-        TextView messageTextView = layout.findViewById(R.id.messageFin);
-        messageTextView.setText("Vous allez quitter le retour PUI, confirmez vous ?");
-        builder.setView(layout);
-
-        final androidx.appcompat.app.AlertDialog alertDialog = builder.create();
-        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
-        alertDialog.show();
-
-        zoneok.setOnClickListener(v -> {
-            alertDialog.dismiss();
-            retourService();
-        });
-
-        buttonAnnuler.setOnClickListener(v -> alertDialog.dismiss());
-    }
-    private void retourService()
+    @Override
+    public void retourService(Bundle bundle)
     {
         Intent detailRetourPUIIntent = new Intent(DetailRetourPUIActivity.this, ServiceRetourPUIActivity.class);
         Bundle detailRetourPUIBundle = super.getBundle();
@@ -209,11 +178,11 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
             }
 
             if (!retourPuiValide) {
-                afficherModaleConfirmation(DetailRetourPUIActivity.this, getLayoutInflater());
+                Alerte.afficherAlerteConfirmation(DetailRetourPUIActivity.this, getLayoutInflater(), getBundle(), "Tous les éléments n'ont pas été retourné entièrement.\nSouhaitez-vous continuer ?", false, true, DetailRetourPUIActivity.this);
             }
             else
             {
-                afficherModaleCommentaire(DetailRetourPUIActivity.this, getLayoutInflater());
+                Alerte.afficherAlerteSaisieText(DetailRetourPUIActivity.this, getLayoutInflater(), "Commentaire", "Souhaitez-vous valider le retour PUI ?", "Ajouter un commentaire...");
             }
 
             return true;
@@ -221,77 +190,16 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
         return true;
     }
 
-    private void afficherModaleCommentaire(Context context, LayoutInflater inflater)
+    @Override
+    public void retourSaisieText(String text)
     {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View layout = inflater.inflate(R.layout.alerte_commentaire, null);
-        TextView titre = layout.findViewById(R.id.messageFin);
-        EditText editCommentaire = layout.findViewById(R.id.commentaire);
-        LinearLayout buttonAnnuler = layout.findViewById(R.id.buttonAnnuler);
-        LinearLayout buttonValider = layout.findViewById(R.id.buttonOk);
-        titre.setText("Souhaitez-vous valider le retour à la PUI ?");
-        builder.setView(layout);
-        final AlertDialog alertDialog = builder.create();
-        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
-        alertDialog.setCancelable(false);
-        if (alertDialog.getWindow() != null) {
-            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
-
-        alertDialog.show();
-
-        editCommentaire.setText(retourSelectionne.getCommentaire());
-
-        buttonAnnuler.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alertDialog.dismiss();
-            }
-        });
-
-        buttonValider.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                commentaire = editCommentaire.getText().toString();
-                validerRetourPUI();
-                alertDialog.dismiss();
-            }
-        });
+        commentaire = text;
+        validerRetourPUI();
     }
 
-
-    private void afficherModaleConfirmation(Context context, LayoutInflater inflater)
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View layout = inflater.inflate(R.layout.alerte_confirmation_validation, null);
-        TextView titre = layout.findViewById(R.id.messageFin);
-        LinearLayout buttonAnnuler = layout.findViewById(R.id.buttonAnnuler);
-        LinearLayout buttonValider = layout.findViewById(R.id.buttonOk);
-        titre.setText("Tous les éléments n'ont pas été retourné entièrement.\nSouhaitez-vous continuer ?");
-        builder.setView(layout);
-        final AlertDialog alertDialog = builder.create();
-        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
-        alertDialog.setCancelable(false);
-        if (alertDialog.getWindow() != null) {
-            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
-
-        alertDialog.show();
-
-        buttonAnnuler.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alertDialog.dismiss();
-            }
-        });
-
-        buttonValider.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                afficherModaleCommentaire(context, inflater);
-                alertDialog.dismiss();
-            }
-        });
+    @Override
+    public void confirmationService() {
+        Alerte.afficherAlerteSaisieText(DetailRetourPUIActivity.this, getLayoutInflater(), "Commentaire", "Veuillez saisir un commentaire pour ce retour PUI :", "Saisir un commentaire...");
     }
 
     private void validerRetourPUI()
@@ -345,7 +253,7 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
 
         ElementASynchroniserOpenHelper.toutSynchroniser(DetailRetourPUIActivity.this, db, utilisateurConnecte, true);
         Toast.makeText(DetailRetourPUIActivity.this, "Retour PUI effectué", Toast.LENGTH_SHORT).show();
-        retourService();
+        retourService(getBundle());
     }
 
     private void creationRetourLigne(Retour_Ligne retourLigneBase, Produit produit)

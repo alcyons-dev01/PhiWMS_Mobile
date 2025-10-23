@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_plein_bleu_fonce_radius"
+    android:padding="2dp">
+
+    <TextView
+        android:id="@+id/titre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Confirmation"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/messageFin"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Voulez-vous recevoir une copie du mail ?"
+        android:layout_gravity="center"
+        android:layout_below="@+id/titre"
+        android:gravity="center"
+        android:background="@color/blanc"
+        android:paddingVertical="20dp"
+        android:textColor="@android:color/black"/>
+
+    <ImageView
+        android:id="@+id/separateur"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bleu_fonce_alcyons"
+        android:layout_below="@id/messageFin"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/separateur"
+        android:background="@drawable/background_empty_radius_bottom"
+        android:padding="1dp"
+        android:weightSum="3">
+
+        <LinearLayout
+            android:id="@+id/zone1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingVertical="10dp"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/text1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="text3"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/noir"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/bleu_fonce_alcyons"/>
+
+        <LinearLayout
+            android:id="@+id/zone2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingVertical="10dp"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/text2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="text2"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/noir"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/bleu_fonce_alcyons"/>
+
+        <LinearLayout
+            android:id="@+id/zone3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingVertical="10dp"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/text3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="text3"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/noir"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

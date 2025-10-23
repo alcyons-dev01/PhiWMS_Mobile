@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
-import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparation2025_V2Activity;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparationActivity;
 import fr.alcyons.phiwms_mobile.R;
 
 public class LotAdapter_V2 extends RecyclerView.Adapter<LotAdapter_V2.LotViewHolder> {
@@ -45,7 +45,7 @@ public class LotAdapter_V2 extends RecyclerView.Adapter<LotAdapter_V2.LotViewHol
     @NonNull
     @Override
     public LotAdapter_V2.LotViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_lot_preparation, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_stock_lot_selection, parent, false);
         return new LotViewHolder(view, this);
     }
 
@@ -90,7 +90,7 @@ public class LotAdapter_V2 extends RecyclerView.Adapter<LotAdapter_V2.LotViewHol
             holder.qteSaisie.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((ListeLotPreparation2025_V2Activity) context).ClickNumberPicker(position);
+                    ((ListeLotPreparationActivity) context).ClickNumberPicker(position);
                 }
             });
 
@@ -115,14 +115,14 @@ public class LotAdapter_V2 extends RecyclerView.Adapter<LotAdapter_V2.LotViewHol
 
             if(Integer.parseInt(holder.qteSaisie.getText().toString()) == 0)
             {
-                holder.layout_qte_saisie_lot_preparation.setBackground(context.getResources().getDrawable(R.drawable.background_qte_lot_phpreparationligne));
+                holder.layout_qte_saisie_lot_preparation.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_orange));
                 holder.layoutPrincipal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
                 holder.layoutStock.setVisibility(View.VISIBLE);
                 holder.separateur.setBackgroundColor(context.getResources().getColor(R.color.orange, null));
             }
             else
             {
-                holder.layout_qte_saisie_lot_preparation.setBackground(context.getResources().getDrawable(R.drawable.background_qte_lot_phpreparationligne_valider));
+                holder.layout_qte_saisie_lot_preparation.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_vert));
                 holder.layoutPrincipal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_vert));
                 holder.separateur.setBackgroundColor(context.getResources().getColor(R.color.vert, null));
                 holder.layoutStock.setVisibility(View.INVISIBLE);
@@ -146,7 +146,7 @@ public class LotAdapter_V2 extends RecyclerView.Adapter<LotAdapter_V2.LotViewHol
                 holder.layoutPrincipal.setClickable(true);
                 holder.layoutPrincipal.setOnClickListener(v -> {
                     v.setEnabled(false); // désactive pour éviter un second clic
-                    ((ListeLotPreparation2025_V2Activity) context).ClickLigneLot(position);
+                    ((ListeLotPreparationActivity) context).ClickLigneLot(position);
 
                     // optionnel : réactiver après un délai
                     v.postDelayed(() -> v.setEnabled(true), 500);

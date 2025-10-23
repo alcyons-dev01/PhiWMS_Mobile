@@ -146,7 +146,7 @@ public class ScannerReception2025Activity extends ServiceActivity {
         qteSaisie = (TextView) findViewById(R.id.qteSaisie);
         numPreparation = (TextView) findViewById(R.id.numPreparation);
         depot = (TextView) findViewById(R.id.depot);
-        EditTextScanee.setBackground(getResources().getDrawable(R.drawable.background_scanner_preparation));
+        EditTextScanee.setBackground(getResources().getDrawable(R.drawable.background_cadre_vert_fond_noir));
         imageValidation = ((ImageView) findViewById(R.id.imageValidation));
 
         //Affichage des informations de la préparation

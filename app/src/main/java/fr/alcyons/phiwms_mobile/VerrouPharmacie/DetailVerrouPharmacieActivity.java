@@ -48,7 +48,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
@@ -800,7 +799,7 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
 
     public void afficherAlerteConfirmationRetour(Context context, LayoutInflater inflater, final Bundle bundle) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View layout = inflater.inflate(R.layout.alerte_confirmation_mail, null);
+        View layout = inflater.inflate(R.layout.alerte_confirmation, null);
 
         LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
         LinearLayout buttonAnnuler = (LinearLayout) layout.findViewById(R.id.buttonAnnuler);
@@ -827,8 +826,8 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
             }
         });
     }
-
-    private void retourService(final Bundle bundle)
+    @Override
+    public void retourService(final Bundle bundle)
     {
         Intent detailVerrouIntent = new Intent(DetailVerrouPharmacieActivity.this, ServiceVerrouPharmacieActivity.class);
         Bundle detailVerrouBundle = super.getBundle();

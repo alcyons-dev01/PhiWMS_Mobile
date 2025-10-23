@@ -471,7 +471,7 @@ public class ListeProduitActivity extends ServiceActivity implements DemandePart
         if(viewscan)
         {
             viewscan = false;
-            view.findViewById(R.id.linearLigneProduit).setBackground(ListeProduitActivity.this.getResources().getDrawable(R.drawable.background_plain_vert, null));
+            view.findViewById(R.id.linearLigneProduit).setBackground(ListeProduitActivity.this.getResources().getDrawable(R.drawable.background_plein_vert_radius, null));
         }
         else
         {

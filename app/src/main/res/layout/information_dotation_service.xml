@@ -30,7 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:orientation="horizontal"
-        android:background="@drawable/background_plain_vert_alcyons"
+        android:background="@drawable/background_plein_vert_radius"
         android:layout_below="@+id/layout1"
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
@@ -144,7 +144,7 @@
         android:layout_marginBottom="10dp"
         android:layout_below="@+id/resumerDemande"
         android:orientation="horizontal"
-        android:background="@drawable/contour_gestion_statut_action_soumise">
+        android:background="@drawable/background_cadre_bleu">
 
         <ImageView
             android:id="@+id/iconRecherche"

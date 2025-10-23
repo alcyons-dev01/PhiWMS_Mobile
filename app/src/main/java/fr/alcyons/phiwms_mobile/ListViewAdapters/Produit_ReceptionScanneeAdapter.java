@@ -152,7 +152,7 @@ public class Produit_ReceptionScanneeAdapter extends BaseExpandableListAdapter {
         String depotTypeCourant = (String) getGroup(groupPosition);
         if (ListView == null) {
             LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            ListView = infalInflater.inflate(R.layout.expandable_liste_groupe_receptionscanne, null);
+            //ListView = infalInflater.inflate(R.layout.expandable_liste_groupe_receptionscanne, null);
         }
 
         TextView depotType = (TextView) ListView.findViewById(R.id.depotType);

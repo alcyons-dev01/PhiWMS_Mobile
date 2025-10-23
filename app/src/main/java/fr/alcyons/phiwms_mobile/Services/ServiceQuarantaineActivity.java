@@ -274,23 +274,16 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                         if (resultCount == 0) {
                             String erreur = response.getString("erreur");
                             if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerte(context, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
-                                //DBOpenHelper.viderBasesDeDonnees(db);
-                                ServiceQuarantaineActivity.this.finishAffinity();
-                                Intent intent1 = new Intent(context, AuthentificationActivity.class);
-                                context.startActivity(intent1);
+                                Alerte.afficherAlerteInformation(context, getLayoutInflater(),"Erreur HTTP", "Votre session est invalide, veuillez vous reconnecter.", false, true);
                             } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
-                                Alerte.afficherAlerte(context, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", "alerte");
-                                ServiceQuarantaineActivity.this.finishAffinity();
-                                Intent intent1 = new Intent(context, AuthentificationActivity.class);
-                                context.startActivity(intent1);
+                                Alerte.afficherAlerteInformation(context, getLayoutInflater(),"Erreur HTTP", "Votre session a expirée, veuillez vous reconnecter.", false, true);
                             } else if (!erreur.contentEquals("Aucun PH_Retour trouvé")) {
-                                Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Quarantaine", "alerte");
+                                Alerte.afficherAlerteInformation(context, getLayoutInflater(),"Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP Service Récupération Quarantaine", false, true);
                             } else {
                                 arreterSpinner();
                                 vide = true;
                                 nomServiceVide = "Quarantaine";
-                                retourNavigation(ServiceQuarantaineActivity.this);
+                                retourNavigation();
                             }
                         } else {
                             retourJSONArray = response.getJSONArray("PH_Retours");
@@ -350,7 +343,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                 }, error -> {
                     // TODO: Handle error
                     Log.e("Volley", "Error");
-                    Alerte.afficherAlerte(context, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP Service Récupération Quarantaine", "alerte");
+                    Alerte.afficherAlerteInformation(context, getLayoutInflater(),"Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP Service Récupération Quarantaine", false, true);
                 }) {
             @Override
             public Map<String, String> getHeaders() {

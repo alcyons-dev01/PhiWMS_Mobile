@@ -90,17 +90,17 @@ public class PH_Preparation_Ligne_LivraisonAdapter extends ArrayAdapter {
         if (qteLivrer == qteAPreparer) {
             viewHolder.Accepter.setVisibility(View.VISIBLE);
             viewHolder.Refuser.setVisibility(View.GONE);
-            viewHolder.layoutValidation.setBackground(context.getDrawable(R.drawable.background_livraison_vert));
+            viewHolder.layoutValidation.setBackground(context.getDrawable(R.drawable.background_plein_vert_radius));
         } else if(ph_preparation_ligneCourante.getQte_livrer()== 0) {
             viewHolder.Accepter.setVisibility(View.GONE);
             viewHolder.Refuser.setVisibility(View.VISIBLE);
-            viewHolder.layoutValidation.setBackground(context.getDrawable(R.drawable.background_livraison_rouge));
+            viewHolder.layoutValidation.setBackground(context.getDrawable(R.drawable.background_plein_rouge_radius));
         }
         else
         {
             viewHolder.Accepter.setVisibility(View.VISIBLE);
             viewHolder.Refuser.setVisibility(View.GONE);
-            viewHolder.layoutValidation.setBackground(context.getDrawable(R.drawable.background_livraison_orange));
+            viewHolder.layoutValidation.setBackground(context.getDrawable(R.drawable.background_plein_orange_radius));
         }
 
         final PreparationLigneViewHolder finalViewHolder = viewHolder;

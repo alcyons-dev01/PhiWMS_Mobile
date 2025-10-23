@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -15,8 +16,6 @@ import java.util.List;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
-import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
-import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeLotsControleDesRetours2025Activity;
 import fr.alcyons.phiwms_mobile.R;
 
 public class Retour_Ligne_ControleRetoursAdapter_2025 extends ArrayAdapter {
@@ -53,6 +52,7 @@ public class Retour_Ligne_ControleRetoursAdapter_2025 extends ArrayAdapter {
         viewHolder.qteDeclaree = (TextView) convertView.findViewById(R.id.qteDeclaree);
         viewHolder.nbLotsRetournes = (TextView) convertView.findViewById(R.id.nbLotsRetournes);
         viewHolder.linear_principal = (LinearLayout) convertView.findViewById(R.id.linear_principal);
+        viewHolder.relativeparent = (RelativeLayout) convertView.findViewById(R.id.relativeparent);
         Retour_Ligne retourLigne = (Retour_Ligne) getItem(position);
 
         // Affichage des valeurs
@@ -74,13 +74,13 @@ public class Retour_Ligne_ControleRetoursAdapter_2025 extends ArrayAdapter {
 
             if(qte_retourner == retourLigne.getQte_Demander())
             {
-                viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_vert));
+                viewHolder.relativeparent.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_vert));
                 viewHolder.nbLotsRetournes.setVisibility(View.GONE);
                 viewHolder.qteDeclaree.setTextColor(context.getResources().getColor(R.color.vert));
             }
             else
             {
-                viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_bleu));
+                viewHolder.relativeparent.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_bleu));
                 viewHolder.nbLotsRetournes.setVisibility(View.VISIBLE);
                 viewHolder.qteDeclaree.setTextColor(context.getResources().getColor(R.color.noir));
             }
@@ -97,5 +97,6 @@ public class Retour_Ligne_ControleRetoursAdapter_2025 extends ArrayAdapter {
         public TextView nbLotsRetournes;
         public LinearLayout linear_principal;
         public LinearLayout listLots;
+        public RelativeLayout relativeparent;
     }
 }

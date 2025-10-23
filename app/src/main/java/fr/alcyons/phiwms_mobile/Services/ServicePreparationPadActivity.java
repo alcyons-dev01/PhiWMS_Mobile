@@ -64,7 +64,7 @@ import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Preparation_PreparationAdapt
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
-import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparation2025_V2Activity;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparationActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
@@ -94,7 +94,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
         ph_preparation_ListView.setOnItemClickListener((parent, view, position, id) -> {
             PH_Preparation ph_preparation_Selectionne = (PH_Preparation) ph_preparation_preparationAdapter.getItem(position);
 
-            Intent servicePreparationPad_Intent = new Intent(ServicePreparationPadActivity.this, DetailPreparation2025_V2Activity.class);
+            Intent servicePreparationPad_Intent = new Intent(ServicePreparationPadActivity.this, DetailPreparationActivity.class);
             Bundle servicePreparationPad_Bundle = ServicePreparationPadActivity.super.getBundle();
             assert ph_preparation_Selectionne != null;
             servicePreparationPad_Bundle.putInt("ph_preparationUID_Selectionne", ph_preparation_Selectionne.getUID());
@@ -275,23 +275,14 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
                         if (nbResultat == 0) {
                             String erreur = response.getString("erreur");
                             if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerte(context, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
-                                //DBOpenHelper.viderBasesDeDonnees(db);
-                                ServicePreparationPadActivity.this.finishAffinity();
-                                Intent intent = new Intent(context, AuthentificationActivity.class);
-                                context.startActivity(intent);
+                                Alerte.afficherAlerteInformation(ServicePreparationPadActivity.this, getLayoutInflater(),"Erreur", "Votre session de connexion est invalide, veuillez vous reconnecter", false, true);
                             } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
-                                Alerte.afficherAlerte(context, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", "alerte");
-                                ServicePreparationPadActivity.this.finishAffinity();
-                                Intent intent = new Intent(context, AuthentificationActivity.class);
-                                context.startActivity(intent);
+                                Alerte.afficherAlerteInformation(ServicePreparationPadActivity.this, getLayoutInflater(),"Erreur", "Votre session de connexion est expirée, veuillez vous reconnecter", false, true);
                             } else if (!erreur.contentEquals("Aucun PH_Preparation trouvé")) {
-                                Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Préparation PAD", "alerte");
-                                ServicePreparationPadActivity.this.finishAffinity();
+                                Alerte.afficherAlerteInformation(ServicePreparationPadActivity.this, getLayoutInflater(),"Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Préparation PAD)", false, true);
                             } else {
                                 arreterSpinner();
-                                Alerte.afficherAlerte(ServicePreparationPadActivity.this, "Alerte", "Aucune préparation PAD à traiter", "alerte");
-                                retourNavigation(ServicePreparationPadActivity.this);
+                                Alerte.afficherAlerteInformation(ServicePreparationPadActivity.this, getLayoutInflater(),"Information", "Aucune préparation PAD à traiter", false, true);
                             }
                         } else {
                             JSONArray ph_preparations_JSONArray = response.getJSONArray("PH_Preparations");
@@ -405,7 +396,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
                 },
                 error -> {
                     Log.e("Volley", "Error");
-                    Alerte.afficherAlerte(ServicePreparationPadActivity.this, "Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Préparation PAD)", "alerte");
+                    Alerte.afficherAlerteInformation(ServicePreparationPadActivity.this, getLayoutInflater(),"Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Préparation PAD)", false, true);
                 }
         ) {
             @Override
@@ -571,7 +562,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
 
     @NonNull
     private Intent getIntent(PH_Preparation ph_preparation_Selectionne) {
-        Intent servicePreparationPad_Intent = new Intent(ServicePreparationPadActivity.this, DetailPreparation2025_V2Activity.class);
+        Intent servicePreparationPad_Intent = new Intent(ServicePreparationPadActivity.this, DetailPreparationActivity.class);
         Bundle servicePreparationPad_Bundle = ServicePreparationPadActivity.super.getBundle();
         servicePreparationPad_Bundle.putInt("ph_preparationUID_Selectionne", ph_preparation_Selectionne.getUID());
         servicePreparationPad_Bundle.putString("genre", "PAD");

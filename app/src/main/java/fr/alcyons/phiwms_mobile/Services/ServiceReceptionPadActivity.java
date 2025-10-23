@@ -62,7 +62,6 @@ import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
-import fr.alcyons.phiwms_mobile.Reception.DetailReception2025Activity;
 import fr.alcyons.phiwms_mobile.Reception.DetailReceptionActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
@@ -102,7 +101,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                 Commande commandeSelectionne = (Commande) commandeReceptionPADAdapter.getItem(position);
 
                 if (commandeSelectionne != null) {
-                    Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPadActivity.this, DetailReception2025Activity.class);
+                    Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPadActivity.this, DetailReceptionActivity.class);
 
                     Bundle serviceReceptionPui_Bundle = ServiceReceptionPadActivity.super.getBundle();
                     serviceReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
@@ -155,7 +154,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
 
                                     invalidateOptionsMenu();
                                 } else {
-                                    Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPadActivity.this, DetailReception2025Activity.class);
+                                    Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPadActivity.this, DetailReceptionActivity.class);
                                     Bundle serviceReceptionPui_Bundle = ServiceReceptionPadActivity.super.getBundle();
                                     serviceReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
                                     serviceReceptionPui_Intent.putExtras(serviceReceptionPui_Bundle);
@@ -310,20 +309,12 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                         if (resultCount == 0) {
                             String erreur = response.getString("erreur");
                             if (erreur.equals(getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
-                                DBOpenHelper.viderBasesDeDonnees(db);
-                                ServiceReceptionPadActivity.this.finishAffinity();
-                                Intent intent = new Intent(ServiceReceptionPadActivity.this, AuthentificationActivity.class);
-                                ServiceReceptionPadActivity.this.startActivity(intent);
+                                Alerte.afficherAlerteInformation(ServiceReceptionPadActivity.this, getLayoutInflater(), "Alerte", "Votre session est invalide, veuillez vous reconnecter.", false, true);
                             } else if (erreur.equals(getString(R.string.tokenExpire))) {
-                                Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter", "alerte");
-                                ServiceReceptionPadActivity.this.finishAffinity();
-                                Intent intent = new Intent(ServiceReceptionPadActivity.this, AuthentificationActivity.class);
-                                ServiceReceptionPadActivity.this.startActivity(intent);
+                                Alerte.afficherAlerteInformation(ServiceReceptionPadActivity.this, getLayoutInflater(), "Alerte", "Votre session a expirée, veuillez vous reconnecter.", false, true);
                             }  else {
                                 arreterSpinner();
-                                Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Alerte", "Aucune réception PAD à traiter", "alerte");
-                                retourNavigation(ServiceReceptionPadActivity.this);
+                                Alerte.afficherAlerteInformation(ServiceReceptionPadActivity.this, getLayoutInflater(), "Erreur", "Aucune réception PAD à traiter", false, true);
                             }
                         } else {
                             commandeJSONArray = response.getJSONArray("PH_Commandes");
@@ -374,12 +365,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                             {
                                 vide = true;
                                 nomServiceVide = "Réception PAD";
-                                Intent intent = new Intent(ServiceReceptionPadActivity.this, NavigationActivity.class);
-                                Bundle extras = new Bundle();
-                                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                                intent.putExtras(extras);
-                                ServiceReceptionPadActivity.this.startActivity(intent);
-                                ServiceReceptionPadActivity.this.finish();
+                                retourNavigation();
                             }
 
                             passageParOnCreate = false;
@@ -408,7 +394,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                 }, error -> {
                     // TODO: Handle error
                     Log.e("Volley", "Error");
-                    Alerte.afficherAlerte(ServiceReceptionPadActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP Service Récupération Quarantaine", "alerte");
+                    Alerte.afficherAlerteInformation(ServiceReceptionPadActivity.this, getLayoutInflater(), "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP Service Récupération Quarantaine", false, true);
                 }) {
             @Override
             public Map<String, String> getHeaders() {

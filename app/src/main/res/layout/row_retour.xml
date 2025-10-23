@@ -2,15 +2,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:backgroundTint="@android:color/white">
+    android:background="@drawable/background_plein_bleu_radius">
 
     <RelativeLayout
         android:id="@+id/relative_principal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dp"
-        android:background="@drawable/background_preparation_bleu">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:id="@+id/zone_info_reception"
@@ -18,7 +15,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="4"
-            android:background="@drawable/background_plain_bleu_radius_top"
             android:padding="5dp">
 
             <TextView
@@ -52,6 +48,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_marginLeft="8dp"
+            android:background="@drawable/background_empty_radius_bottom"
             android:weightSum="5">
 
 

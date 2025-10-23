@@ -36,7 +36,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +60,7 @@ import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Preparation_PreparationAdapt
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
-import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparation2025_V2Activity;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparationActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
@@ -91,7 +90,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
         ph_preparation_ListView.setOnItemClickListener((parent, view, position, id) -> {
             PH_Preparation ph_preparation_Selectionne = (PH_Preparation) ph_preparation_preparationAdapter.getItem(position);
 
-            Intent servicePreparationPuf_Intent = new Intent(ServicePreparationPufActivity.this, DetailPreparation2025_V2Activity.class);
+            Intent servicePreparationPuf_Intent = new Intent(ServicePreparationPufActivity.this, DetailPreparationActivity.class);
             Bundle servicePreparationPuf_Bundle = ServicePreparationPufActivity.super.getBundle();
             assert ph_preparation_Selectionne != null;
             servicePreparationPuf_Bundle.putInt("ph_preparationUID_Selectionne", ph_preparation_Selectionne.getUID());
@@ -196,23 +195,14 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
                         if (resultCount == 0) {
                             String erreur = response.getString("erreur");
                             if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerte(context, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
-                                //DBOpenHelper.viderBasesDeDonnees(db);
-                                ServicePreparationPufActivity.this.finishAffinity();
-                                Intent intent = new Intent(context, AuthentificationActivity.class);
-                                context.startActivity(intent);
+                                Alerte.afficherAlerteInformation(ServicePreparationPufActivity.this, getLayoutInflater(), "Erreur", "Votre session de connexion est invalide, veuillez vous reconnecter.", false, true);
                             } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
-                                Alerte.afficherAlerte(context, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", "alerte");
-                                ServicePreparationPufActivity.this.finishAffinity();
-                                Intent intent = new Intent(context, AuthentificationActivity.class);
-                                context.startActivity(intent);
+                                Alerte.afficherAlerteInformation(ServicePreparationPufActivity.this, getLayoutInflater(), "Erreur", "Votre session de connexion est expirée, veuillez vous reconnecter.", false, true);
                             } else if (!erreur.contentEquals("Aucun PH_Preparation trouvé")) {
-                                Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Préparation PUF", "alerte");
-                                ServicePreparationPufActivity.this.finishAffinity();
+                                Alerte.afficherAlerteInformation(ServicePreparationPufActivity.this, getLayoutInflater(), "Erreur", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Préparation PUF", false, true);
                             } else {
                                 arreterSpinner();
-                                Alerte.afficherAlerte(ServicePreparationPufActivity.this, "Alerte", "Aucune préparation UF à traiter", "alerte");
-                                retourNavigation(ServicePreparationPufActivity.this);
+                                Alerte.afficherAlerteInformation(ServicePreparationPufActivity.this, getLayoutInflater(), "Information", "Aucune préparation UF à traiter", false, true);
                             }
                         } else {
                             JSONArray ph_preparation_JSONArray = response.getJSONArray("PH_Preparations");
@@ -304,7 +294,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
                 },
                 error -> {
                     Log.e("Volley", "Error");
-                    Alerte.afficherAlerte(ServicePreparationPufActivity.this, "Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Préparation PUF)", "alerte");
+                    Alerte.afficherAlerteInformation(ServicePreparationPufActivity.this, getLayoutInflater(), "Erreur", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Préparation PUF", false, true);
                 }
         ) {
             @Override
@@ -425,7 +415,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
 
     @NonNull
     private Intent getIntent(PH_Preparation ph_preparation_Selectionne) {
-        Intent servicePreparationPuf_Intent = new Intent(ServicePreparationPufActivity.this, DetailPreparation2025_V2Activity.class);
+        Intent servicePreparationPuf_Intent = new Intent(ServicePreparationPufActivity.this, DetailPreparationActivity.class);
         Bundle servicePreparationPuf_Bundle = ServicePreparationPufActivity.super.getBundle();
         servicePreparationPuf_Bundle.putInt("ph_preparationUID_Selectionne", ph_preparation_Selectionne.getUID());
         servicePreparationPuf_Bundle.putString("genre", "PUF");

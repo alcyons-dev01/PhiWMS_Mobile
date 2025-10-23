@@ -310,7 +310,7 @@ public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
                             } else if (erreur.contentEquals("Aucun PH_Preparation trouvé")) {
                                 arreterSpinner();
                                 Alerte.afficherAlerte(ServiceLivraisonActivity.this, "Alerte", "Aucune Livraison à traiter", "alerte");
-                                retourNavigation(ServiceLivraisonActivity.this);
+                                //retourNavigation(ServiceLivraisonActivity.this);
                             }
                         } else {
                             ph_preparation_JSONArray = response.getJSONArray("PH_Preparations");

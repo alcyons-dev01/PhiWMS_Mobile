@@ -14,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,7 +23,6 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
-import com.github.clans.fab.FloatingActionButton;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -40,7 +38,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
@@ -219,7 +216,7 @@ public class DetailQuarantaineActivity extends ServiceActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                afficherAlerteConfirmationRetour(DetailQuarantaineActivity.this, LayoutInflater.from(DetailQuarantaineActivity.this));
+                Alerte.afficherAlerteConfirmation(DetailQuarantaineActivity.this, getLayoutInflater(), getBundle(), "Souhaitez vous quitter sans enregistrer les modifications ?", true, false,DetailQuarantaineActivity.this);
             }
         });
     }
@@ -293,189 +290,140 @@ public class DetailQuarantaineActivity extends ServiceActivity {
 
         MenuItem item_valider = menu.findItem(R.id.menuSaveCircle);
         item_valider.setOnMenuItemClickListener(item-> {
-            afficherAlerteConfirmationValidation(DetailQuarantaineActivity.this, LayoutInflater.from(DetailQuarantaineActivity.this));
+            Alerte.afficherAlerteConfirmation(DetailQuarantaineActivity.this, getLayoutInflater(), getBundle(), "Confirmez-vous la validation de cette quarantaine ?", false, true, DetailQuarantaineActivity.this);
             return true;
         });
 
         MenuItem item_commentaire = menu.findItem(R.id.menuCommentaire);
-        item_commentaire.setOnMenuItemClickListener(item-> {
-            afficherModaleCommentaire(DetailQuarantaineActivity.this, LayoutInflater.from(DetailQuarantaineActivity.this));
-            return true;
-        });
+
+        if(retourSelectionne.getCommentaire().contentEquals(""))
+        {
+            item_commentaire.getIcon().mutate().setAlpha(50);
+            item_commentaire.setOnMenuItemClickListener(null);
+        }
+        else
+        {
+            item_commentaire.getIcon().mutate().setAlpha(255);
+            item_commentaire.setOnMenuItemClickListener(item-> {
+                Alerte.afficherAlerteInformation(DetailQuarantaineActivity.this, getLayoutInflater(), "Commentaire", retourSelectionne.getCommentaire(), false, false);
+                return true;
+            });
+        }
+
 
         return true;
     }
 
-    @SuppressLint("SetTextI18n")
-    public void afficherAlerteConfirmationRetour(Context context, LayoutInflater inflater) {
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
-        View layout = inflater.inflate(R.layout.alerte_confirmation_mail, null);
+    @Override
+    public void confirmationService(){
+        int compteurReussite = 0;
+        int nbElements = retourLigneQuarantaineAdapter.viewHolderList.size();
 
-        LinearLayout zoneok = layout.findViewById(R.id.buttonOk);
-        LinearLayout buttonAnnuler = layout.findViewById(R.id.buttonAnnuler);
-        TextView messageTextView = layout.findViewById(R.id.messageFin);
-        messageTextView.setText("Vous allez quitter la quarantaine, confirmez vous ?");
-        builder.setView(layout);
+        // Vérifie que toutes les quantités ont été répartie
+        for (int i = 0; i < nbElements; i++) {
 
-        final androidx.appcompat.app.AlertDialog alertDialog = builder.create();
-        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
-        alertDialog.show();
+            Retour_Ligne_QuarantaineAdapter.Retour_LigneViewHolder viewHolder = retourLigneQuarantaineAdapter.viewHolderList.get(i);
 
-        zoneok.setOnClickListener(v -> {
-            alertDialog.dismiss();
-            retourService();
-        });
+            int qteDestruction = viewHolder.valeurDestruction == -1 ? 0 : viewHolder.valeurDestruction;
+            int qteRetourPui = viewHolder.valeurPUI == -1 ? 0 : viewHolder.valeurPUI;
+            int qteRetourFrs = viewHolder.valeurFrs == -1 ? 0 : viewHolder.valeurFrs;
 
-        buttonAnnuler.setOnClickListener(v -> alertDialog.dismiss());
+            int sommeQte = qteDestruction + qteRetourFrs + qteRetourPui;
+
+            if (sommeQte == viewHolder.valeurQteRetourner) {
+                compteurReussite++;
+            }
+        }
+
+        if (nbElements != compteurReussite) {
+            Alerte.afficherAlerteInformation(DetailQuarantaineActivity.this, getLayoutInflater(), "Erreur", "Tous les éléments n'ont pas été correctement traités.", false, false);
+            return;
+        }
+
+        //Création de l'action utilisateur
+        Random random = new Random();
+        int actionId = random.nextInt();
+        if(actionId > 0)
+            actionId= actionId*-1;
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date dateDestruction =new Date();
+        String date_string = parseFormat.format(dateDestruction);
+        ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", retourSelectionne.get_UID(), "", "Quarantaine");
+        ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+        //fin de la création de l'action utilisateur
+
+        // Met à jour les Retour_Ligne
+        compteurReussite = 0;
+        for (Retour_Ligne retourLigne : retourLigneQuarantaineAdapter.retourLigneList)
+        {
+            Retour_Ligne_QuarantaineAdapter.Retour_LigneViewHolder viewHolder = retourLigneQuarantaineAdapter.viewHolderList.get(retourLigneQuarantaineAdapter.retourLigneList.indexOf(retourLigne));
+            @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            @SuppressLint("SimpleDateFormat") DateFormat dateDecodeur = new SimpleDateFormat("dd/MM/yyyy");
+
+            try {
+                Date dateFournie = dateDecodeur.parse(viewHolder.valeurDate);
+                assert dateFournie != null;
+                retourLigne.setPeremptionDate(dateFormat.format(dateFournie));
+            } catch (Throwable e) {
+                Log.e(TAG, "Error date peremption :", e);
+            }
+
+            retourLigne.setLot_Retourner(viewHolder.valeurLot);
+            retourLigne.setDestruction_Qte(viewHolder.valeurDestruction);
+            retourLigne.setRetourPui_Qte(viewHolder.valeurPUI);
+            retourLigne.setRetourFrs_Qte(viewHolder.valeurFrs);
+
+            long rowID = Retour_LigneOpenHelper.mettreAJourUnRetourLigne(db, retourLigne);
+
+            if (rowID != -1) {
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE, retourLigne.getPhiMR4UUID(), retourLigne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+                compteurReussite++;
+            }
+
+            Random randomactionligne = new Random();
+            int actionligneId = randomactionligne.nextInt();
+            if(actionligneId > 0)
+                actionligneId= actionligneId*-1;
+
+            ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.getId(), "Retour Ligne", retourLigne.get_UID(), "", 0, (int)retourLigne.getQte_Retourner(), retourLigne.getProduit_Designation());
+            ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne);
+        }
+
+        if (compteurReussite == retourLigneQuarantaineAdapter.retourLigneList.size()) {
+            retourSelectionne.setStatut(getString(R.string.statutValide));
+            retourSelectionne.setEn_Attente_de(getString(R.string.Quarantaine));
+            retourSelectionne.setCommentaire(commentaire);
+
+            long rowID = RetourOpenHelper.mettreAJourRetour(db, retourSelectionne);
+
+            if (rowID != -1) {
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, RetourOpenHelper.Constantes.TABLE_RETOUR, retourSelectionne.getPhiMR4UUID(), retourSelectionne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+            }
+            if (statutConnexion) {
+                ElementASynchroniserOpenHelper.toutSynchroniser(DetailQuarantaineActivity.this, db, utilisateurConnecte, true);
+            }
+            Toast.makeText(DetailQuarantaineActivity.this, "Demande d'enregistrement effectuée", Toast.LENGTH_SHORT).show();
+        } else {
+            Alerte.afficherAlerteInformation(DetailQuarantaineActivity.this, getLayoutInflater(),"Alerte", "Une erreur est survenue, aucun traitement ne sera effectué.", false, false);
+            ElementASynchroniserOpenHelper.viderTableElementASynchroniser(db);
+        }
+
+        Intent serviceQuarantaineIntent = new Intent(DetailQuarantaineActivity.this, ServiceQuarantaineActivity.class);
+        Bundle serviceQuarantaineBundle = DetailQuarantaineActivity.super.getBundle();
+
+        serviceQuarantaineIntent.putExtras(serviceQuarantaineBundle);
+        DetailQuarantaineActivity.this.startActivity(serviceQuarantaineIntent);
+        DetailQuarantaineActivity.this.finish();
     }
 
-    public void afficherAlerteConfirmationValidation(Context context, LayoutInflater inflater) {
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
-        View layout = inflater.inflate(R.layout.alerte_confirmation_mail, null);
-
-        LinearLayout zoneok = layout.findViewById(R.id.buttonOk);
-        LinearLayout buttonAnnuler = layout.findViewById(R.id.buttonAnnuler);
-        TextView messageTextView = layout.findViewById(R.id.messageFin);
-        messageTextView.setText("Souhaitez vous valider la quarantaine ?");
-        builder.setView(layout);
-
-        final androidx.appcompat.app.AlertDialog alertDialog = builder.create();
-        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
-        alertDialog.show();
-
-        zoneok.setOnClickListener(v -> {
-            int compteurReussite = 0;
-            int nbElements = retourLigneQuarantaineAdapter.viewHolderList.size();
-
-            // Vérifie que toutes les quantités ont été répartie
-            for (int i = 0; i < nbElements; i++) {
-
-                Retour_Ligne_QuarantaineAdapter.Retour_LigneViewHolder viewHolder = retourLigneQuarantaineAdapter.viewHolderList.get(i);
-
-                int qteDestruction = viewHolder.valeurDestruction == -1 ? 0 : viewHolder.valeurDestruction;
-                int qteRetourPui = viewHolder.valeurPUI == -1 ? 0 : viewHolder.valeurPUI;
-                int qteRetourFrs = viewHolder.valeurFrs == -1 ? 0 : viewHolder.valeurFrs;
-
-                int sommeQte = qteDestruction + qteRetourFrs + qteRetourPui;
-
-                if (sommeQte == viewHolder.valeurQteRetourner) {
-                    compteurReussite++;
-                }
-            }
-
-            if (nbElements != compteurReussite) {
-                Alerte.afficherAlerte(DetailQuarantaineActivity.this, "Erreur", "Tous les éléments n'ont pas été correctement traités.", "alerte");
-                return;
-            }
-
-            //Création de l'action utilisateur
-            Random random = new Random();
-            int actionId = random.nextInt();
-            if(actionId > 0)
-                actionId= actionId*-1;
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date dateDestruction =new Date();
-            String date_string = parseFormat.format(dateDestruction);
-            ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", retourSelectionne.get_UID(), "", "Quarantaine");
-            ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
-            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
-            //fin de la création de l'action utilisateur
-
-            // Met à jour les Retour_Ligne
-            compteurReussite = 0;
-            for (Retour_Ligne retourLigne : retourLigneQuarantaineAdapter.retourLigneList)
-            {
-                Retour_Ligne_QuarantaineAdapter.Retour_LigneViewHolder viewHolder = retourLigneQuarantaineAdapter.viewHolderList.get(retourLigneQuarantaineAdapter.retourLigneList.indexOf(retourLigne));
-                @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                @SuppressLint("SimpleDateFormat") DateFormat dateDecodeur = new SimpleDateFormat("dd/MM/yyyy");
-
-                try {
-                    Date dateFournie = dateDecodeur.parse(viewHolder.valeurDate);
-                    assert dateFournie != null;
-                    retourLigne.setPeremptionDate(dateFormat.format(dateFournie));
-                } catch (Throwable e) {
-                    Log.e(TAG, "Error date peremption :", e);
-                }
-
-                retourLigne.setLot_Retourner(viewHolder.valeurLot);
-                retourLigne.setDestruction_Qte(viewHolder.valeurDestruction);
-                retourLigne.setRetourPui_Qte(viewHolder.valeurPUI);
-                retourLigne.setRetourFrs_Qte(viewHolder.valeurFrs);
-
-                long rowID = Retour_LigneOpenHelper.mettreAJourUnRetourLigne(db, retourLigne);
-
-                if (rowID != -1) {
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE, retourLigne.getPhiMR4UUID(), retourLigne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
-                    compteurReussite++;
-                }
-
-                Random randomactionligne = new Random();
-                int actionligneId = randomactionligne.nextInt();
-                if(actionligneId > 0)
-                    actionligneId= actionligneId*-1;
-
-                ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.getId(), "Retour Ligne", retourLigne.get_UID(), "", 0, (int)retourLigne.getQte_Retourner(), retourLigne.getProduit_Designation());
-                ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne);
-            }
-
-            if (compteurReussite == retourLigneQuarantaineAdapter.retourLigneList.size()) {
-                retourSelectionne.setStatut(getString(R.string.statutValide));
-                retourSelectionne.setEn_Attente_de(getString(R.string.Quarantaine));
-                retourSelectionne.setCommentaire(commentaire);
-
-                long rowID = RetourOpenHelper.mettreAJourRetour(db, retourSelectionne);
-
-                if (rowID != -1) {
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, RetourOpenHelper.Constantes.TABLE_RETOUR, retourSelectionne.getPhiMR4UUID(), retourSelectionne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
-                }
-                if (statutConnexion) {
-                    ElementASynchroniserOpenHelper.toutSynchroniser(DetailQuarantaineActivity.this, db, utilisateurConnecte, true);
-                }
-                Toast.makeText(DetailQuarantaineActivity.this, "Demande d'enregistrement effectuée", Toast.LENGTH_SHORT).show();
-            } else {
-                Alerte.afficherAlerte(DetailQuarantaineActivity.this, "Alerte", "Une erreur est survenue, aucun traitement ne sera effectué.", "alerte");
-                ElementASynchroniserOpenHelper.viderTableElementASynchroniser(db);
-            }
-
-            Intent serviceQuarantaineIntent = new Intent(DetailQuarantaineActivity.this, ServiceQuarantaineActivity.class);
-            Bundle serviceQuarantaineBundle = DetailQuarantaineActivity.super.getBundle();
-
-            serviceQuarantaineIntent.putExtras(serviceQuarantaineBundle);
-            DetailQuarantaineActivity.this.startActivity(serviceQuarantaineIntent);
-            DetailQuarantaineActivity.this.finish();
-            alertDialog.dismiss();
-        });
-
-        buttonAnnuler.setOnClickListener(v -> alertDialog.dismiss());
-    }
-
-    private void retourService()
+    @Override
+    public void retourService(Bundle bundle)
     {
         Intent detailQuanrantaineIntent = new Intent(DetailQuarantaineActivity.this, ServiceQuarantaineActivity.class);
         Bundle detailQuarantaineBundle = super.getBundle();
         detailQuanrantaineIntent.putExtras(detailQuarantaineBundle);
         DetailQuarantaineActivity.this.startActivity(detailQuanrantaineIntent);
         DetailQuarantaineActivity.this.finish();
-    }
-
-    private void afficherModaleCommentaire(Context context, LayoutInflater inflater)
-    {
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
-        View layout = inflater.inflate(R.layout.alerte, null);
-
-        LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
-        TextView messageTextView = (TextView) layout.findViewById(R.id.messageFin);
-        TextView titreTextView = (TextView) layout.findViewById(R.id.titre);
-        titreTextView.setText("Commentaire");
-        messageTextView.setText(retourSelectionne.getCommentaire());
-        builder.setView(layout);
-
-        final androidx.appcompat.app.AlertDialog alertDialog = builder.create();
-        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
-        alertDialog.show();
-
-        zoneok.setOnClickListener(v -> {
-            alertDialog.dismiss();
-        });
     }
 }

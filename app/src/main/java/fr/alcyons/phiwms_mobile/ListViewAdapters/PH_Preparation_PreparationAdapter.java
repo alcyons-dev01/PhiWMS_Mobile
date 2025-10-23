@@ -7,12 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filterable;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import androidx.core.content.ContextCompat;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -60,7 +57,7 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_ph_preparation_preparation, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_ph_preparation_liste, parent, false);
         }
 
         PH_PreparationPreparationViewHolder viewHolder = (PH_PreparationPreparationViewHolder) convertView.getTag();
@@ -240,16 +237,16 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
                 int demain = -1;
 
                 if (delai > 0) {
-                    relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_preparation_gris, null));
+                    relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_plein_gris_radius, null));
                 } else if (delai == 0) {
-                    relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_preparation_rouge, null));
+                    relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_plein_rouge_radius, null));
                 } else if (delai == demain) {
-                    relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_preparation_orange, null));
+                    relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_plein_orange_radius, null));
                 } else {
-                    relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_preparation_vert, null));
+                    relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_plein_vert_radius, null));
                 }
             } else {
-                relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_preparation_noir, null));
+                relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_plein_noir_radius, null));
             }
 
         }

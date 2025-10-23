@@ -5,7 +5,6 @@ import static fr.alcyons.phiwms_mobile.OutilsSerialisation.WS_PKI.checkApiAsync;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -26,7 +25,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
@@ -43,12 +41,9 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeEmplacementCreationActivity;
 import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeZoneCreationActivity;
-import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.GS1Parser;
-import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
-import fr.alcyons.phiwms_mobile.OutilsSerialisation.WS_SINGLE_PACK;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
@@ -82,7 +77,7 @@ public class ScannerReception2025_V2Activity  extends ServiceActivity {
         EditTextScanee = (EditText) findViewById(R.id.EditTextScanee);
         numCommande = (TextView) findViewById(R.id.numPreparation);
         depot = (TextView) findViewById(R.id.depot);
-        EditTextScanee.setBackground(getResources().getDrawable(R.drawable.background_scanner_preparation));
+        EditTextScanee.setBackground(getResources().getDrawable(R.drawable.background_cadre_vert_fond_noir));
 
         commandeCourante = CommandeOpenHelper.getCommandeByID(db, receptionID);
         numCommande.setText("#" + commandeCourante.getNumero());

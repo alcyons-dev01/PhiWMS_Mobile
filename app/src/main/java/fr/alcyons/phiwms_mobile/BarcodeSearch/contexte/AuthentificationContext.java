@@ -101,7 +101,7 @@ public class AuthentificationContext {
 
     public void afficherAlerteErreur(Context context, LayoutInflater inflater) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View layout = inflater.inflate(R.layout.alerte_confirmation, null);
+        View layout = inflater.inflate(R.layout.alerte_information, null);
 
         ImageView buttonOk = (ImageView) layout.findViewById(R.id.buttonOk);
         TextView messageFin = (TextView) layout.findViewById(R.id.messageFin);

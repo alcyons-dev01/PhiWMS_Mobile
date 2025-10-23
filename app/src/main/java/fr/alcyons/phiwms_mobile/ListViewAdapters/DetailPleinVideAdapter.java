@@ -92,7 +92,7 @@ public class DetailPleinVideAdapter extends ArrayAdapter {
 
         if(ph_preparation_ligne.getQte_APreparer() > 0)
         {
-            viewHolder.layoutPrincipal.setBackground(context.getResources().getDrawable(R.drawable.background_plain_vert, null));
+            viewHolder.layoutPrincipal.setBackground(context.getResources().getDrawable(R.drawable.background_plein_vert_radius, null));
         }
 
         return convertView;

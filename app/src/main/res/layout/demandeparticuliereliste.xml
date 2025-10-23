@@ -105,7 +105,7 @@
         android:layout_below="@id/zoneSousSelection"
         android:layout_width="match_parent"
         android:layout_height="50sp"
-        android:background="@drawable/background_plain_rouge"
+        android:background="@drawable/background_plein_rouge_radius"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:layout_marginVertical="5dp"
@@ -144,7 +144,7 @@
         android:layout_marginBottom="10dp"
         android:layout_below="@+id/lancerScan"
         android:orientation="horizontal"
-        android:background="@drawable/contour_gestion_statut_action_soumise">
+        android:background="@drawable/background_cadre_bleu">
 
         <ImageView
             android:id="@+id/iconRecherche"

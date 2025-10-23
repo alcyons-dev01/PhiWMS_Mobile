@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_plein_bleu_fonce_radius"
+    android:padding="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="10">
+
+        <TextView
+            android:id="@+id/titre"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="9"
+            android:text="Validation Réception"
+            android:textSize="20sp"
+            android:gravity="left"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:padding="10dp"
+            android:layout_gravity="left"/>
+
+        <LinearLayout
+            android:id="@+id/fermer_alerte_reception"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal|center_vertical">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical|center_horizontal"
+                android:background="@drawable/ic_clear"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:background="@drawable/background_empty_radius"
+       android:orientation="vertical"
+       android:layout_alignParentBottom="true"
+       android:gravity="bottom"
+       android:weightSum="3">
+
+        <EditText
+            android:id="@+id/numeroBL"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/titre"
+            android:layout_height="wrap_content"
+            android:layout_margin="0dp"
+            android:hint="Saisir un numéro de BL"
+            android:textColor="@color/noir"
+            android:textStyle="bold"
+            android:padding="10dp"
+            android:background="@color/jaune"
+            android:minLines="5"
+            android:textColorHint="@color/noir"/>
+
+       <ImageView
+           android:id="@+id/separateur"
+           android:layout_width="match_parent"
+           android:layout_height="1dp"
+           android:background="@color/bleu_fonce_alcyons"
+           android:layout_below="@+id/numeroBL"
+           android:layout_marginBottom="1dp"/>
+
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="horizontal"
+           android:layout_marginVertical="5dp"
+           android:layout_marginHorizontal="15dp"
+           android:background="@drawable/background_empty_radius"
+           android:weightSum="2">
+
+           <LinearLayout
+               android:id="@+id/boutonPhoto"
+               android:layout_width="0dp"
+               android:layout_height="wrap_content"
+               android:orientation="vertical"
+               android:layout_weight="1">
+
+               <ImageView
+                   android:id="@+id/btnPhoto"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:background="@drawable/ic_photo_camera"
+                   android:backgroundTint="@color/bleu_clair_alcyons"
+                   android:layout_gravity="center"
+                   android:layout_centerHorizontal="true"
+                   android:layout_marginTop="10dp"/>
+
+               <TextView
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:text="Photo"
+                   android:layout_gravity="center"
+                   android:gravity="center"
+                   android:textColor="@color/bleu_clair_alcyons"
+                   android:layout_margin="2dp"/>
+
+           </LinearLayout>
+
+           <ImageView
+               android:layout_width="1dp"
+               android:layout_height="match_parent"
+               android:background="@color/bleu_fonce_alcyons"/>
+
+           <LinearLayout
+               android:id="@+id/buttonOk"
+               android:layout_width="0dp"
+               android:layout_height="wrap_content"
+               android:orientation="vertical"
+               android:layout_weight="1">
+
+               <ImageView
+                   android:id="@+id/iconValidation"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:background="@drawable/ic_check_circle"
+                   android:backgroundTint="@color/vert"
+                   android:layout_gravity="center"
+                   android:layout_centerHorizontal="true"
+                   android:layout_marginTop="10dp"/>
+
+               <TextView
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:text="Valider"
+                   android:layout_gravity="center"
+                   android:gravity="center"
+                   android:textColor="@color/vert"
+                   android:layout_margin="2dp"/>
+
+           </LinearLayout>
+       </LinearLayout>
+
+   </LinearLayout>
+</LinearLayout>

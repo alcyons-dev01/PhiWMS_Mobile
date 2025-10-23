@@ -1,16 +1,22 @@
 package fr.alcyons.phiwms_mobile;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 
 import com.google.android.material.navigation.NavigationView;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
@@ -36,6 +42,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
@@ -46,6 +53,9 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ServiceOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.UtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.PerimetreFonctionnel;
 import fr.alcyons.phiwms_mobile.Classes.Service;
+import fr.alcyons.phiwms_mobile.Interfaces.ConfirmationServiceListener;
+import fr.alcyons.phiwms_mobile.Interfaces.RetourServiceListener;
+import fr.alcyons.phiwms_mobile.Interfaces.SaisieTextListener;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.ServiceActivityExpandableAdapter;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
@@ -53,7 +63,7 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionListeServices;
 
 
-public class ServiceActivity extends MenuActivity {
+public class ServiceActivity extends MenuActivity implements RetourServiceListener, ConfirmationServiceListener, SaisieTextListener {
 
     public LinearLayout boutonRetourListePerimetresFonctionnelsLinearLayout;
     // Le service selectionné
@@ -274,17 +284,7 @@ public class ServiceActivity extends MenuActivity {
                 toolbar.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        boolean confirmation = Alerte.afficherAlerte(ServiceActivity.this, "Confirmation", "Souhaitez-vous retourner à l'accueil ?", "OuiNon");
-
-                        if(confirmation)
-                        {
-                            Intent serviceHome_Intent = new Intent(ServiceActivity.this, NavigationActivity.class);
-                            Bundle serviceHome_Bundle = new Bundle();
-                            serviceHome_Bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                            serviceHome_Intent.putExtras(serviceHome_Bundle);
-                            ServiceActivity.this.startActivity(serviceHome_Intent);
-                            ServiceActivity.this.finish();
-                        }
+                        Alerte.afficherAlerteConfirmation(context, getLayoutInflater(), ServiceActivity.this.getBundle(),"Souhaitez-vous revenir à l'écran d'accueil des services ?", true, false, ((Activity) context));
                     }
                 });
 
@@ -483,5 +483,35 @@ public class ServiceActivity extends MenuActivity {
         for (int i = 0; i < nbPerimetreFonctionnel; i++) {
             expandablelistView.collapseGroup(i);
         }
+    }
+
+    @Override
+    public void retourService(Bundle bundle) {
+        Intent serviceHome_Intent = new Intent(ServiceActivity.this, NavigationActivity.class);
+        Bundle serviceHome_Bundle = new Bundle();
+        serviceHome_Bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+        serviceHome_Intent.putExtras(serviceHome_Bundle);
+        ServiceActivity.this.startActivity(serviceHome_Intent);
+        ServiceActivity.this.finish();
+    }
+
+    @Override
+    public void retourNavigation() {
+        Intent serviceHome_Intent = new Intent(ServiceActivity.this, NavigationActivity.class);
+        Bundle serviceHome_Bundle = new Bundle();
+        serviceHome_Bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+        serviceHome_Intent.putExtras(serviceHome_Bundle);
+        ServiceActivity.this.startActivity(serviceHome_Intent);
+        ServiceActivity.this.finish();
+    }
+
+    @Override
+    public void confirmationService() {
+
+    }
+
+    @Override
+    public void retourSaisieText(String text) {
+
     }
 }

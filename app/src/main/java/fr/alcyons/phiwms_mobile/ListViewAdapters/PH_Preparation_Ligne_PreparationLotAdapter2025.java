@@ -110,7 +110,7 @@ public class PH_Preparation_Ligne_PreparationLotAdapter2025 extends BaseAdapter 
             viewHolder = new PH_PreparationLigneViewHolder();
             switch (rowType) {
                 case TYPE_ITEM:
-                    convertView =  mInflater.inflate(R.layout.row_ph_preparation_ligne_preparation_lot, parent, false);
+                    convertView =  mInflater.inflate(R.layout.row_reference_detail, parent, false);
                     // Récupération des objets graphiques
                     viewHolder.designationProduit = (TextView) convertView.findViewById(R.id.designationProduit);
                     viewHolder.referenceProduit = (TextView) convertView.findViewById(R.id.referenceProduit);

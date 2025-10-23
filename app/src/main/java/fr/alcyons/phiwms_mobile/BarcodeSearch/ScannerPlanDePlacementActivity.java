@@ -46,7 +46,7 @@ public class ScannerPlanDePlacementActivity extends ServiceActivity {
         // GRAPHIQUE
         EditTextScanee = (EditText) findViewById(R.id.EditTextScanee);
         ListViewDesignation = (ListView) findViewById(R.id.ListViewDesignation);
-        EditTextScanee.setBackground(getResources().getDrawable(R.drawable.background_scanner_preparation));
+        EditTextScanee.setBackground(getResources().getDrawable(R.drawable.background_cadre_vert_fond_noir));
         listeProduitScannee = (List<Produit>) intent.getExtras().getSerializable("ListProduitScannes");
 
         if(listeProduitScannee == null)

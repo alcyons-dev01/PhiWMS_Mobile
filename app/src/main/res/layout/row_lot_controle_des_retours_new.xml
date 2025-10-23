@@ -30,7 +30,7 @@
                 android:layout_weight="3"
                 android:layout_gravity="center"
                 android:layout_marginTop="2dp"
-                android:background="@drawable/background_preparation_emplacement_orange"
+                android:background="@drawable/background_plein_orange_radius"
                 android:visibility="gone">
 
                 <TextView
@@ -134,7 +134,7 @@
                 android:id="@+id/layout_qte_saisie_lot_preparation"
                 android:layout_width="55dp"
                 android:layout_height="match_parent"
-                android:background="@drawable/background_qte_lot_phpreparationligne"
+                android:background="@drawable/background_cadre_orange"
                 android:orientation="vertical"
                 android:layout_marginRight="15dp"
                 android:layout_marginTop="5dp">
@@ -161,14 +161,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:background="@drawable/background_detail_preparation_bleu"
+        android:background="@drawable/background_plein_bleu_radius"
         android:orientation="horizontal"
         android:padding="5dp"
         android:visibility="gone">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:padding="2dp"
+            android:background="@color/blanc">
 
             <TextView
                 android:id="@+id/textViewAjouter"

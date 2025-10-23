@@ -76,7 +76,7 @@ public class DemandeParticuliereAdapater extends RecyclerView.Adapter<DemandePar
             @Override
             public void onFocusChange(View view, boolean hasfocus) {
                 if(hasfocus)
-                    finalViewHolder.linearLigneProduit.setBackground(context.getResources().getDrawable(R.drawable.background_plain_vert, null));
+                    finalViewHolder.linearLigneProduit.setBackground(context.getResources().getDrawable(R.drawable.background_plein_vert_radius, null));
                 else
                 {
                     gestionQuantite(produit, finalViewHolder);

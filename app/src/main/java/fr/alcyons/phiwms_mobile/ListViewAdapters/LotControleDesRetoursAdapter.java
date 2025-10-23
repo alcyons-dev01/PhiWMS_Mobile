@@ -22,8 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
-import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeLotsControleDesRetours2025Activity;
-import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparation2025_V2Activity;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeLotsControleDesRetoursActivity;
 import fr.alcyons.phiwms_mobile.R;
 
 public class LotControleDesRetoursAdapter extends RecyclerView.Adapter<LotControleDesRetoursAdapter.LotViewHolder> {
@@ -46,7 +45,7 @@ public class LotControleDesRetoursAdapter extends RecyclerView.Adapter<LotContro
     @NonNull
     @Override
     public LotControleDesRetoursAdapter.LotViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_lot_preparation, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_stock_lot_selection, parent, false);
         return new LotControleDesRetoursAdapter.LotViewHolder(view, this);
     }
 
@@ -91,7 +90,7 @@ public class LotControleDesRetoursAdapter extends RecyclerView.Adapter<LotContro
             holder.qteSaisie.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((ListeLotsControleDesRetours2025Activity) context).ClickNumberPicker(position);
+                    ((ListeLotsControleDesRetoursActivity) context).ClickNumberPicker(position);
                 }
             });
 
@@ -116,15 +115,15 @@ public class LotControleDesRetoursAdapter extends RecyclerView.Adapter<LotContro
 
             if(Integer.parseInt(holder.qteSaisie.getText().toString()) == 0)
             {
-                holder.layout_qte_saisie_lot_preparation.setBackground(context.getResources().getDrawable(R.drawable.background_qte_lot_phpreparationligne));
-                holder.layoutPrincipal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
+                holder.layout_qte_saisie_lot_preparation.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_orange));
+                holder.layoutPrincipal.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_orange));
                 holder.layoutStock.setVisibility(View.VISIBLE);
                 holder.separateur.setBackgroundColor(context.getResources().getColor(R.color.orange, null));
             }
             else
             {
-                holder.layout_qte_saisie_lot_preparation.setBackground(context.getResources().getDrawable(R.drawable.background_qte_lot_phpreparationligne_valider));
-                holder.layoutPrincipal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_vert));
+                holder.layout_qte_saisie_lot_preparation.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_vert));
+                holder.layoutPrincipal.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_vert));
                 holder.separateur.setBackgroundColor(context.getResources().getColor(R.color.vert, null));
                 holder.layoutStock.setVisibility(View.INVISIBLE);
             }
@@ -147,7 +146,7 @@ public class LotControleDesRetoursAdapter extends RecyclerView.Adapter<LotContro
                 holder.layoutPrincipal.setClickable(true);
                 holder.layoutPrincipal.setOnClickListener(v -> {
                     v.setEnabled(false); // désactive pour éviter un second clic
-                    ((ListeLotsControleDesRetours2025Activity) context).ClickLigneLot(position);
+                    ((ListeLotsControleDesRetoursActivity) context).ClickLigneLot(position);
 
                     // optionnel : réactiver après un délai
                     v.postDelayed(() -> v.setEnabled(true), 500);

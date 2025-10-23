@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    android:id="@+id/relativeparent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:backgroundTint="@android:color/white">
+    android:background="@drawable/background_plein_bleu_radius"
+    android:padding="2dp">
 
 
     <LinearLayout
         android:id="@+id/linear_principal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:background="@drawable/background_detail_preparation_bleu"
-        android:padding="5dp"
         android:orientation="horizontal"
+        android:background="@drawable/background_empty_radius"
+        android:padding="5dp"
         android:weightSum="5">
 
         <LinearLayout
@@ -25,9 +27,10 @@
                 android:id="@+id/designationProduit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Designation"
+                android:text=""
                 android:textColor="@android:color/black"
                 android:textStyle="bold"
+                android:paddingLeft="5dp"
                 android:textSize="16dp"/>
 
             <LinearLayout
@@ -43,6 +46,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:textColor="@color/noir"
+                    android:paddingLeft="5dp"
                     android:text="" />
 
                 <TextView
@@ -50,7 +54,8 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:gravity="center"
+                    android:gravity="right"
+                    android:paddingRight="5dp"
                     android:text=""
                     android:textColor="@color/noir"
                     android:textSize="15dp" />
@@ -71,13 +76,12 @@
                 android:id="@+id/nbLotsRetournes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
                 android:gravity="right"
                 android:text=""
-                android:layout_marginRight="10dp"
                 android:textColor="@color/orange2"
                 android:textSize="20dp"
-                android:textStyle="bold"/>
-
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/qteDeclaree"

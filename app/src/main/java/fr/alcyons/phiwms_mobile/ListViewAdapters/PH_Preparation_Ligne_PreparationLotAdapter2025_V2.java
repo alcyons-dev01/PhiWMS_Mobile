@@ -94,7 +94,7 @@ public class PH_Preparation_Ligne_PreparationLotAdapter2025_V2 extends BaseAdapt
         if (convertView == null) {
             switch (rowType) {
                 case TYPE_ITEM:
-                    convertView =  mInflater.inflate(R.layout.row_ph_preparation_ligne_preparation_lot, parent, false);
+                    convertView =  mInflater.inflate(R.layout.row_reference_detail, parent, false);
                     break;
                 case TYPE_HEADER:
                     convertView = mInflater.inflate(R.layout.row_header_ph_preparation_plein_vide, parent, false);
@@ -108,7 +108,7 @@ public class PH_Preparation_Ligne_PreparationLotAdapter2025_V2 extends BaseAdapt
             viewHolder = new PH_Preparation_Ligne_PreparationLotAdapter2025_V2.PH_PreparationLigneViewHolder();
             switch (rowType) {
                 case TYPE_ITEM:
-                    convertView =  mInflater.inflate(R.layout.row_ph_preparation_ligne_preparation_lot, parent, false);
+                    convertView =  mInflater.inflate(R.layout.row_reference_detail, parent, false);
                     // Récupération des objets graphiques
                     viewHolder.designationProduit = (TextView) convertView.findViewById(R.id.designationProduit);
                     viewHolder.referenceProduit = (TextView) convertView.findViewById(R.id.referenceProduit);
@@ -163,14 +163,14 @@ public class PH_Preparation_Ligne_PreparationLotAdapter2025_V2 extends BaseAdapt
                 if (ph_preparationLigne.getQte_APreparer() != qtePreparer) {
                     viewHolder.QtePreparer.setText(String.valueOf(qtePreparer));
                     viewHolder.QtePreparer.setTextColor(context.getResources().getColor(R.color.orange2));
-                    viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
+                    viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_orange));
                     viewHolder.emplacementParDefaut.setVisibility(View.GONE);
                     viewHolder.QteDemandee.setVisibility(View.VISIBLE);
                 } else {
                     viewHolder.QtePreparer.setText(String.valueOf(ph_preparationLigne.getQte_RAL()));
                     viewHolder.QtePreparer.setTextColor(context.getResources().getColor(R.color.vert));
                     viewHolder.QteDemandee.setVisibility(View.GONE);
-                    viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_vert));
+                    viewHolder.linear_principal.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_vert));
                     viewHolder.emplacementParDefaut.setVisibility(View.GONE);
                 }
 

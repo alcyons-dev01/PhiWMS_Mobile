@@ -46,7 +46,8 @@
         android:orientation="vertical"
         android:layout_marginTop="15dp"
         android:layout_margin="5dp"
-        android:background="@drawable/background_detail_preparation_orange">
+        android:background="@drawable/background_cadre_orange"
+        android:padding="2dp">
 
         <TextView
             android:id="@+id/nomProduit"

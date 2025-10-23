@@ -114,10 +114,9 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
                         switch (result.getResultCode()) {
                            case CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT:
                                 int emplacementID = Objects.requireNonNull(data.getExtras()).getInt("emplacementSelectionneID");
-                                Retour_Ligne newRetourLigne = creationRetourLigne(retourLigne, emplacementID);
-                                adapter.retourLigneList.add(newRetourLigne);
-                                adapter.viewHolderList.add(adapter.new EmplacementViewHolder());
-                                adapter.notifyDataSetChanged();
+                                Retour_Ligne ajoutRetourLigneEmplacement = creationRetourLigne(retourLigne, emplacementID);
+                                retourLigneRetourner.add(ajoutRetourLigneEmplacement);
+                                onResume();
                                 emplacementListView.performItemClick(emplacementListView.getAdapter().getView(adapter.viewHolderList.size()-1, null, null), adapter.viewHolderList.size()-1, emplacementListView.getAdapter().getItemId(adapter.viewHolderList.size()-1));
                                 break;
                             case CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT:
@@ -135,9 +134,8 @@ public class ListeEmplacementRetourPUIActivity extends ServiceActivity {
                                 if(emplacement != null)
                                 {
                                     Retour_Ligne newRetourLigneEmplacement = creationRetourLigne(retourLigne, emplacement.get_UID());
-                                    adapter.retourLigneList.add(newRetourLigneEmplacement);
-                                    adapter.viewHolderList.add(adapter.new EmplacementViewHolder());
-                                    adapter.notifyDataSetChanged();
+                                    retourLigneRetourner.add(newRetourLigneEmplacement);
+                                    onResume();
                                     emplacementListView.performItemClick(emplacementListView.getAdapter().getView(adapter.viewHolderList.size()-1, null, null), adapter.viewHolderList.size()-1, emplacementListView.getAdapter().getItemId(adapter.viewHolderList.size()-1));
                                 }
                                 break;

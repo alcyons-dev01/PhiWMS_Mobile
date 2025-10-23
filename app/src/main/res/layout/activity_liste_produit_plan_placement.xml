@@ -20,7 +20,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/background_plain_vert_alcyons"
+            android:background="@drawable/background_plein_vert_radius"
             android:orientation="vertical"
             android:layout_margin="5dp">
 
@@ -47,7 +47,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/background_plain_rouge"
+            android:background="@drawable/background_plein_rouge_radius"
             android:orientation="vertical"
             android:layout_margin="5dp"
             android:alpha="0.5">
@@ -99,7 +99,7 @@
         android:text="Placer les x références"
         android:textColor="@color/blanc"
         android:layout_margin="10dp"
-        android:background="@drawable/background_plain_bleu_radius"
+        android:background="@drawable/background_plein_bleu_radius"
         android:visibility="visible"/>
 
     <LinearLayout
@@ -121,7 +121,7 @@
             android:text="Retour"
             android:textColor="@color/blanc"
             android:layout_margin="10dp"
-            android:background="@drawable/background_plain_bleu_radius" />
+            android:background="@drawable/background_plein_bleu_radius" />
 
         <Button
             android:id="@+id/boutonPlacer"
@@ -132,7 +132,7 @@
             android:text="PLACER"
             android:textColor="@color/blanc"
             android:layout_margin="10dp"
-            android:background="@drawable/background_plain_bleu_radius" />
+            android:background="@drawable/background_plein_bleu_radius" />
     </LinearLayout>
 
 

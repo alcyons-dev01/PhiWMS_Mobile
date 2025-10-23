@@ -112,7 +112,6 @@ public class PleinVideAdapter extends BaseAdapter {
                     viewHolder.nbProduitDotation = convertView.findViewById(R.id.nbProduitDotation);
                     viewHolder.statutDotation = convertView.findViewById(R.id.statutDotation);
                     viewHolder.barreStatutDotation = convertView.findViewById(R.id.barreStatutDotation);
-                    viewHolder.separateurQuantitePleinVide = convertView.findViewById(R.id.separateurQuantitePleinVide);
                     viewHolder.linearQuantitePleinVide = convertView.findViewById(R.id.linearQuantitePleinVide);
                     viewHolder.nbProduitDotationTotal = convertView.findViewById(R.id.nbProduitDotationTotal);
                     break;
@@ -165,21 +164,21 @@ public class PleinVideAdapter extends BaseAdapter {
             {
                 viewHolder.barreStatutDotation.setBackgroundColor(context.getResources().getColor(R.color.bleu_clair_alcyons, null));
                 viewHolder.nbProduitDotation.setTextColor(context.getResources().getColor(R.color.bleu_clair_alcyons, null));
-                viewHolder.linearQuantitePleinVide.setBackground(context.getResources().getDrawable(R.drawable.background_border_left_bleu, null));
+                viewHolder.linearQuantitePleinVide.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_bleu, null));
                 viewHolder.separateurQuantitePleinVide.setBackgroundColor(context.getResources().getColor(R.color.bleu_clair_alcyons, null));
             }
             else if(phPreparationCourante.getStatut().contentEquals("En cours de préparation"))
             {
                 viewHolder.barreStatutDotation.setBackgroundColor(context.getResources().getColor(R.color.rouge, null));
                 viewHolder.nbProduitDotation.setTextColor(context.getResources().getColor(R.color.rouge, null));
-                viewHolder.linearQuantitePleinVide.setBackground(context.getResources().getDrawable(R.drawable.background_border_left_rouge, null));
+                viewHolder.linearQuantitePleinVide.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_rouge, null));
                 viewHolder.separateurQuantitePleinVide.setBackgroundColor(context.getResources().getColor(R.color.rouge, null));
             }
             else
             {
                 viewHolder.barreStatutDotation.setBackgroundColor(context.getResources().getColor(R.color.orange, null));
                 viewHolder.nbProduitDotation.setTextColor(context.getResources().getColor(R.color.orange, null));
-                viewHolder.linearQuantitePleinVide.setBackground(context.getResources().getDrawable(R.drawable.background_border_left_orange, null));
+                viewHolder.linearQuantitePleinVide.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_orange, null));
                 viewHolder.separateurQuantitePleinVide.setBackgroundColor(context.getResources().getColor(R.color.orange, null));
             }
 

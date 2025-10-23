@@ -22,7 +22,6 @@ import java.util.List;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne_ControleRetour_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
-import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeLotsControleDesRetoursActivity;
 import fr.alcyons.phiwms_mobile.R;
 
 public class Lot_ControleDesRetoursScanneeAdapter extends ArrayAdapter {
@@ -119,7 +118,7 @@ public class Lot_ControleDesRetoursScanneeAdapter extends ArrayAdapter {
                 viewHolder.qteSaisie.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        ((ListeLotsControleDesRetoursActivity) context).ClickNumberPicker(position);
+                        //((ListeLotsControleDesRetoursActivity) context).ClickNumberPicker(position);
                     }
                 });
 
@@ -146,12 +145,12 @@ public class Lot_ControleDesRetoursScanneeAdapter extends ArrayAdapter {
                     {
                         viewHolder.layoutPrincipal.setVisibility(View.GONE);
                     }
-                    viewHolder.layout_qte_saisie_lot_preparation.setBackground(context.getResources().getDrawable(R.drawable.background_qte_lot_phpreparationligne));
+                    viewHolder.layout_qte_saisie_lot_preparation.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_orange));
                     viewHolder.layoutPrincipal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
                      }
                 else
                 {
-                    viewHolder.layout_qte_saisie_lot_preparation.setBackground(context.getResources().getDrawable(R.drawable.background_qte_lot_phpreparationligne_valider));
+                    viewHolder.layout_qte_saisie_lot_preparation.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_vert));
                     viewHolder.layoutPrincipal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_vert));
                 }
             }

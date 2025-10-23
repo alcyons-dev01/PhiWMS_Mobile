@@ -68,17 +68,15 @@
 
         </LinearLayout>
 
-
         <LinearLayout
             android:id="@+id/firstRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/barreDeTitre"
             android:orientation="horizontal"
-            android:layout_marginTop="5dp"
             android:padding="5dp"
             android:weightSum="5"
-            android:background="@drawable/background_detail_preparation_orange">
+            android:background="@drawable/background_cadre_orange">
 
             <LinearLayout
                 android:layout_width="0dp"

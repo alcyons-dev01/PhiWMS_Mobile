@@ -61,7 +61,7 @@ public class PH_Preparation_Ligne_PreparationLotAdapter extends ArrayAdapter {
             if(ph_preparationLigne != null) {
                 viewHolder = ph_preparation_ligneViewHolderList.get(position);
 
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_ph_preparation_ligne_preparation_lot, parent, false);
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_reference_detail, parent, false);
 
                 // Récupération des objets graphiques
                 viewHolder.designationProduit = (TextView) convertView.findViewById(R.id.designationProduit);

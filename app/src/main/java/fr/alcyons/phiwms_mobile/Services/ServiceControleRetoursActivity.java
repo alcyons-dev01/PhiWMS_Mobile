@@ -62,7 +62,7 @@ import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
-import fr.alcyons.phiwms_mobile.ControleDesRetours.DetailControleDesRetours2025Activity;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.DetailControleDesRetoursActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.R;
@@ -100,7 +100,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
             assert retourSelectionne != null;
             serviceControleRetours_Bundle.putInt("retourSelectionneID", retourSelectionne.get_UID());
 
-            Intent serviceControleRetours_Intent = new Intent(ServiceControleRetoursActivity.this, DetailControleDesRetours2025Activity.class);
+            Intent serviceControleRetours_Intent = new Intent(ServiceControleRetoursActivity.this, DetailControleDesRetoursActivity.class);
             serviceControleRetours_Intent.putExtras(serviceControleRetours_Bundle);
             ServiceControleRetoursActivity.this.startActivity(serviceControleRetours_Intent);
             ServiceControleRetoursActivity.this.finish();
@@ -187,7 +187,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                                     Bundle serviceControleRetours_Bundle = ServiceControleRetoursActivity.super.getBundle();
                                     serviceControleRetours_Bundle.putInt("retourSelectionneID", retourSelectionne.get_UID());
 
-                                    Intent serviceControleRetours_Intent = new Intent(ServiceControleRetoursActivity.this, DetailControleDesRetours2025Activity.class);
+                                    Intent serviceControleRetours_Intent = new Intent(ServiceControleRetoursActivity.this, DetailControleDesRetoursActivity.class);
                                     serviceControleRetours_Intent.putExtras(serviceControleRetours_Bundle);
                                     ServiceControleRetoursActivity.this.startActivity(serviceControleRetours_Intent);
                                     ServiceControleRetoursActivity.this.finish();
@@ -234,7 +234,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                retourNavigation(ServiceControleRetoursActivity.this);
+                retourNavigation();
             }
         });
     }
@@ -319,24 +319,16 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                         if (resultCount == 0) {
                             String erreur = response.getString("erreur");
                             if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerte(context, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
-                                //DBOpenHelper.viderBasesDeDonnees(db);
-                                ServiceControleRetoursActivity.this.finishAffinity();
-                                Intent intent = new Intent(context, AuthentificationActivity.class);
-                                context.startActivity(intent);
+                                Alerte.afficherAlerteInformation(context, getLayoutInflater(), "Alerte", "Votre session est invalide, veuillez vous reconnecter.", false, true);
                             } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
-                                Alerte.afficherAlerte(context, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", "alerte");
-                                ServiceControleRetoursActivity.this.finishAffinity();
-                                Intent intent = new Intent(context, AuthentificationActivity.class);
-                                context.startActivity(intent);
+                                Alerte.afficherAlerteInformation(context, getLayoutInflater(), "Alerte", "Votre session est expirée, veuillez vous reconnecter.", false, true);
                             } else if (!erreur.contentEquals("Aucun PH_Retour trouvé")) {
-                                Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Contrôle des retours", "alerte");
-                                ServiceControleRetoursActivity.this.finishAffinity();
+                                Alerte.afficherAlerteInformation(context, getLayoutInflater(), "Alerte", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Contrôle des retours", false, true);
                             }else {
                                 arreterSpinner();
                                 vide = true;
                                 nomServiceVide = "Contrôle des retours";
-                                retourNavigation(ServiceControleRetoursActivity.this);
+                                retourNavigation();
                    }
                         } else {
                             JSONArray retoursJSONArray = response.getJSONArray("PH_Retours");
@@ -408,7 +400,8 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                 }, error -> {
                     // TODO: Handle error
                     Log.e("Volley", "Error");
-                    Alerte.afficherAlerte(context, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP Service Récupération Quarantaine", "alerte");
+                    Alerte.afficherAlerteInformation(context, getLayoutInflater(), "Erreur", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Contrôle des retours", false, true);
+
                 }) {
             @Override
             public Map<String, String> getHeaders() {

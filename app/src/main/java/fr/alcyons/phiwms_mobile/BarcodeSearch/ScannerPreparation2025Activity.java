@@ -119,7 +119,7 @@ public class ScannerPreparation2025Activity  extends ServiceActivity {
 //010340095567941717260630108445A@212X6NT7NCP6
         // GRAPHIQUE
         EditTextScanee = (EditText) findViewById(R.id.EditTextScanee);
-        EditTextScanee.setBackground(getResources().getDrawable(R.drawable.background_scanner_preparation));
+        EditTextScanee.setBackground(getResources().getDrawable(R.drawable.background_cadre_vert_fond_noir));
 
         //Affichage des informations de la préparation
         if (scannerContexteInt == R.string.scannerContextPreparationSimple || scannerContexteInt == R.string.scannerContextPreparationMultiple) {

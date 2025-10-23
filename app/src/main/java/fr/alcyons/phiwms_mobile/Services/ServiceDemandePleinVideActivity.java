@@ -504,7 +504,7 @@ public class ServiceDemandePleinVideActivity extends ServiceAvecConnexionActivit
     public void afficherAlerte()
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(ServiceDemandePleinVideActivity.this);
-        View layout = ServiceDemandePleinVideActivity.this.getLayoutInflater().inflate(R.layout.alerte_confirmation, null);
+        View layout = ServiceDemandePleinVideActivity.this.getLayoutInflater().inflate(R.layout.alerte_information, null);
 
         ImageView buttonOk = (ImageView) layout.findViewById(R.id.buttonOk);
         TextView messageFin = (TextView) layout.findViewById(R.id.messageFin);

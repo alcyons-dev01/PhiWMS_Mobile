@@ -101,13 +101,13 @@ public class Produit_ReceptionPADAdapter  extends BaseExpandableListAdapter {
 
         if (ListView == null) {
             LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            ListView = infalInflater.inflate(R.layout.expandable_liste_groupe_reception_pad_scanner, null);
+            //ListView = infalInflater.inflate(R.layout.expandable_liste_groupe_reception_pad_scanner, null);
         }
 
         TextView desingationProduit = (TextView) ListView.findViewById(R.id.designationProduit);
-        TextView quantiteProduitReceptionPad = (TextView) ListView.findViewById(R.id.quantiteProduitReceptionPad);
+        //TextView quantiteProduitReceptionPad = (TextView) ListView.findViewById(R.id.quantiteProduitReceptionPad);
         desingationProduit.setText(objetCourant.getDesignation_produit());
-        quantiteProduitReceptionPad.setText(objetCourant.getQuantite_receptionner()+"/"+objetCourant.getQuantite_commander());
+        //quantiteProduitReceptionPad.setText(objetCourant.getQuantite_receptionner()+"/"+objetCourant.getQuantite_commander());
         return ListView;
     }
 

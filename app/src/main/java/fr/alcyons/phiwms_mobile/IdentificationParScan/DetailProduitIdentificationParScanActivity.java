@@ -3,7 +3,6 @@ package fr.alcyons.phiwms_mobile.IdentificationParScan;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,41 +10,32 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
-import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerProduitActivity;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne;
-import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
-import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.GS1Parser;
-import fr.alcyons.phiwms_mobile.Outils.MedicalObjective;
-import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.RetourPUI.DetailRetourPUIActivity;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 import fr.alcyons.phiwms_mobile.Services.ServiceIdentificationParScanActivity;
 
@@ -184,6 +174,19 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
                 }
             }
         });
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if(ancienGTIN.contentEquals(produitSelectionne.getGTIN()) && ancienCodeInconnu.contentEquals(produitSelectionne.getCodeInconnue())) {
+                    retourService(DetailProduitIdentificationParScanActivity.this.getBundle());
+                }
+                else
+                {
+                    onMenuSaveClick();
+                }
+            }
+        });
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -195,59 +198,39 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
 
     private void onMenuSaveClick()
     {
-        afficherAlerteConfirmationRetour(DetailProduitIdentificationParScanActivity.this, LayoutInflater.from(DetailProduitIdentificationParScanActivity.this), DetailProduitIdentificationParScanActivity.super.getBundle());
+        Alerte.afficherAlerteConfirmation(DetailProduitIdentificationParScanActivity.this, getLayoutInflater(), getBundle(), "Souhaitez-vous enregistrer les modifications ?", false, true, DetailProduitIdentificationParScanActivity.this);
     }
 
-    public void afficherAlerteConfirmationRetour(Context context, LayoutInflater inflater, final Bundle bundle) {
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
-        View layout = inflater.inflate(R.layout.alerte_confirmation_mail, null);
+    @Override
+    public void confirmationService() {
+        long rowId = ProduitOpenHelper.mettreAJourProduit(db, produitSelectionne);
+        if (rowId != -1) {
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitSelectionne.getPhiMR4UUID(), produitSelectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
+            Random randomaction = new Random();
+            int actionId = randomaction.nextInt();
+            if(actionId > 0)
+                actionId= actionId*-1;
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date dateAction =new Date();
+            String date_string = parseFormat.format(dateAction);
+            ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", produitSelectionne.getID_produit(), "", "Identification Par Scan");
+            ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
 
-        LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
-        LinearLayout buttonAnnuler = (LinearLayout) layout.findViewById(R.id.buttonAnnuler);
-        TextView messageTextView = (TextView) layout.findViewById(R.id.messageFin);
-        messageTextView.setText("Souhaitez vous enregistrer les modifications ?");
-        builder.setView(layout);
+            Random randomactionligne = new Random();
+            int actionligneId = randomactionligne.nextInt();
+            if(actionligneId > 0)
+                actionligneId= actionligneId*-1;
 
-        final androidx.appcompat.app.AlertDialog alertDialog = builder.create();
-        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
-        alertDialog.show();
-
-        zoneok.setOnClickListener(v -> {
-            long rowId = ProduitOpenHelper.mettreAJourProduit(db, produitSelectionne);
-            if (rowId != -1) {
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitSelectionne.getPhiMR4UUID(), produitSelectionne.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
-                Random randomaction = new Random();
-                int actionId = randomaction.nextInt();
-                if(actionId > 0)
-                    actionId= actionId*-1;
-                @SuppressLint("SimpleDateFormat") SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                Date dateAction =new Date();
-                String date_string = parseFormat.format(dateAction);
-                ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", produitSelectionne.getID_produit(), "", "Identification Par Scan");
-                ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
-
-                Random randomactionligne = new Random();
-                int actionligneId = randomactionligne.nextInt();
-                if(actionligneId > 0)
-                    actionligneId= actionligneId*-1;
-
-                ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.getId(), "PH_Produit", produitSelectionne.getID_produit(), produitSelectionne.getGTIN(), 0, 0, produitSelectionne.getDesignation_interne());
-                ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne);
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, actionUtilisateur_ligne.getPhiMR4UUID(), actionUtilisateur_ligne.getId(), DBOpenHelper.ActionsEAS.AJOUT);
-                ElementASynchroniserOpenHelper.toutSynchroniser(DetailProduitIdentificationParScanActivity.this, db, utilisateurConnecte, false);
-            }
-            alertDialog.dismiss();
-            retourService(bundle);
-        });
-
-        buttonAnnuler.setOnClickListener(v -> {
-            alertDialog.dismiss();
-            retourService(bundle);
-        });
+            ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.getId(), "PH_Produit", produitSelectionne.getID_produit(), produitSelectionne.getGTIN(), 0, 0, produitSelectionne.getDesignation_interne());
+            ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne);
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, actionUtilisateur_ligne.getPhiMR4UUID(), actionUtilisateur_ligne.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+            ElementASynchroniserOpenHelper.toutSynchroniser(DetailProduitIdentificationParScanActivity.this, db, utilisateurConnecte, false);
+        }
+        retourService(getBundle());
     }
-
-    private void retourService(final Bundle bundle)
+    @Override
+    public void retourService(final Bundle bundle)
     {
         Intent detailPreparationIntent = null;
         detailPreparationIntent = new Intent(DetailProduitIdentificationParScanActivity.this, ServiceIdentificationParScanActivity.class);
@@ -256,18 +239,6 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
         detailPreparationIntent.putExtras(detailPreparationBundle);
         DetailProduitIdentificationParScanActivity.this.startActivity(detailPreparationIntent);
         DetailProduitIdentificationParScanActivity.this.finish();
-    }
-
-    @Override
-    public void onBackPressed()
-    {
-        if(ancienGTIN.contentEquals(produitSelectionne.getGTIN()) && ancienCodeInconnu.contentEquals(produitSelectionne.getCodeInconnue())) {
-            retourService(DetailProduitIdentificationParScanActivity.this.getBundle());
-        }
-        else
-        {
-            onMenuSaveClick();
-        }
     }
 
     private void gestionEditText()
@@ -346,7 +317,7 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
                                 produitSelectionne.setCodeInconnue("");
                                 ((EditText) findViewById(R.id.editcodescanne)).setText("");
                                 ((EditText) findViewById(R.id.editcodescanne)).requestFocus();
-                                Alerte.afficherAlerte(DetailProduitIdentificationParScanActivity.this, "Erreur", "Code GTIN déjà utilisé pour une autre référence", "alerte");
+                                Alerte.afficherAlerteInformation(DetailProduitIdentificationParScanActivity.this, getLayoutInflater(),"Erreur", "Code GTIN déjà utilisé pour une autre référence", false, false);
                             }
                         }
                     };

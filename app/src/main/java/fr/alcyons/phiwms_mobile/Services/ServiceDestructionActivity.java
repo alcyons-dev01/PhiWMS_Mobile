@@ -249,16 +249,12 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
                         if (nbResultat == 0) {
                             String string = response.getString("erreur");
                             if (string.equals(getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerte(ServiceDestructionActivity.this, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
-                                //DBOpenHelper.viderBasesDeDonnees(db);
-                                ServiceDestructionActivity.this.finishAffinity();
-                                Intent intent = new Intent(ServiceDestructionActivity.this, AuthentificationActivity.class);
-                                ServiceDestructionActivity.this.startActivity(intent);
+                                Alerte.afficherAlerteInformation(ServiceDestructionActivity.this, getLayoutInflater(), "Alerte", "Votre session a expirée, veuillez vous reconnecter.", false, true);
                             } else {
                                 arreterSpinner();
                                 vide = true;
                                 nomServiceVide = "Destruction";
-                                retourNavigation(ServiceDestructionActivity.this);
+                                retourNavigation();
                             }
                         } else {
                             retoursJson = response.getJSONArray("PH_Retours");
@@ -303,7 +299,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
                 },
                 error -> {
                     Log.e("Volley", "Error");
-                    Alerte.afficherAlerte(ServiceDestructionActivity.this, "Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Destruction)", "alerte");
+                    Alerte.afficherAlerteInformation(ServiceDestructionActivity.this, getLayoutInflater(),"Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Destruction)", false, true);
                 }
         ) {
 

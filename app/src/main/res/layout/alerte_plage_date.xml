@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_plein_bleu_fonce_radius"
+    android:padding="2dp">
+
+    <TextView
+        android:id="@+id/titre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sélectionnez les dates"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:padding="10dp"/>
+
+    <LinearLayout
+        android:id="@+id/layoutDatePicker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/background_empty_radius_top"
+        android:layout_below="@id/titre"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="DU"
+            android:textColor="@color/bleu_fonce_alcyons"
+            android:textSize="16dp"
+            android:textStyle="bold"/>
+
+        <EditText
+            android:id="@+id/date1"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:inputType="date"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:text="Date Début"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="AU"
+            android:textColor="@color/bleu_fonce_alcyons"
+            android:textSize="16dp"
+            android:textStyle="bold"/>
+
+        <EditText
+            android:id="@+id/date2"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:inputType="date"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:text="Date fin"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/separateur"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bleu_fonce_alcyons"
+        android:layout_below="@id/layoutDatePicker"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/separateur"
+        android:background="@drawable/background_empty_radius_bottom"
+        android:padding="1dp"
+        android:weightSum="2">
+
+        <LinearLayout
+            android:id="@+id/buttonAnnuler"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_clear"
+                android:backgroundTint="@color/rouge"
+                android:layout_gravity="center"
+                android:layout_centerHorizontal="true" />
+
+            <TextView
+                android:id="@+id/TitreAnnulation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Annuler"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/noir"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/bleu_fonce_alcyons"/>
+
+        <LinearLayout
+            android:id="@+id/buttonOk"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_check_circle"
+                android:backgroundTint="@color/bleu_clair_alcyons"
+                android:layout_gravity="center"
+                android:layout_centerHorizontal="true" />
+
+            <TextView
+                android:id="@+id/TitreConfirmation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Confirmer"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/noir"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

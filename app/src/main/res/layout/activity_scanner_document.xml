@@ -86,7 +86,7 @@
             android:layout_margin="10dp"
             android:focusable="true"
             android:textColor="@color/blanc"
-            android:background="@drawable/background_scanner_preparation"
+            android:background="@drawable/background_cadre_vert_fond_noir"
             android:textSize="18dp"
             android:text=""/>
 

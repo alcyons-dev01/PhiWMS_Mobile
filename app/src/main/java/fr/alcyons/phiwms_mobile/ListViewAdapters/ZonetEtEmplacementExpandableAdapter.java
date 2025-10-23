@@ -92,7 +92,7 @@ public class ZonetEtEmplacementExpandableAdapter extends BaseExpandableListAdapt
         Depot_Zone CoursesFull = (Depot_Zone) getGroup(groupPosition);
         if (ListView == null) {
             LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            ListView = infalInflater.inflate(R.layout.expandable_liste_groupe_zoneetemplacement, null);
+            //ListView = infalInflater.inflate(R.layout.expandable_liste_groupe_zoneetemplacement, null);
         }
 
         TextView item = (TextView) ListView.findViewById(R.id.nomZone);

@@ -98,10 +98,10 @@ public class ReceptionAdapter extends ArrayAdapter implements Filterable {
 
         if (commandeCourant.getSituation().equals("L")) {
             viewHolder.ZoneNbColisEnAttente.setBackgroundColor(ContextCompat.getColor(context, R.color.orange2));
-            viewHolder.relative_principal.setBackground(ContextCompat.getDrawable(context, R.drawable.background_preparation_orange));
+            viewHolder.relative_principal.setBackground(ContextCompat.getDrawable(context, R.drawable.background_plein_orange_radius));
         } else {
             viewHolder.ZoneNbColisEnAttente.setBackgroundColor(ContextCompat.getColor(context, R.color.orange2));
-            viewHolder.relative_principal.setBackground(ContextCompat.getDrawable(context, R.drawable.background_preparation_bleu));
+            viewHolder.relative_principal.setBackground(ContextCompat.getDrawable(context, R.drawable.background_plein_bleu_radius));
         }
 
         List<PH_Reliquat> phReliquatList = PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(db, commandeCourant.getNumero());

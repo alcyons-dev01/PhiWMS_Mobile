@@ -57,12 +57,10 @@ import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
-import fr.alcyons.phiwms_mobile.Reception.DetailReception2025Activity;
 import fr.alcyons.phiwms_mobile.Reception.DetailReceptionActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 import static fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper.viderTableCommandes;
-import static fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper.viderTablePH_Reliquat;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -114,7 +112,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
             Commande commandeSelectionne = (Commande) commandeReceptionPUIAdapter.getItem(position);
 
             if (commandeSelectionne != null) {
-                Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPuiActivity.this, DetailReception2025Activity.class);
+                Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPuiActivity.this, DetailReceptionActivity.class);
                 Bundle serviceReceptionPui_Bundle = ServiceReceptionPuiActivity.super.getBundle();
                 serviceReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
                 serviceReceptionPui_Intent.putExtras(serviceReceptionPui_Bundle);
@@ -178,7 +176,6 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                                         ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
 
                                         commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPuiActivity.this, db, commandeList);
-                                        commandeListView.setDivider(footer);
                                         commandeListView.setAdapter(commandeReceptionPUIAdapter);
 
                                         if (commandeList.isEmpty()) {
@@ -194,7 +191,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
 
                                         invalidateOptionsMenu();
                                     } else {
-                                        Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPuiActivity.this, DetailReception2025Activity.class);
+                                        Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPuiActivity.this, DetailReceptionActivity.class);
                                         Bundle serviceReceptionPui_Bundle = ServiceReceptionPuiActivity.super.getBundle();
                                         serviceReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
                                         serviceReceptionPui_Intent.putExtras(serviceReceptionPui_Bundle);
@@ -206,7 +203,6 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
 
                                     commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPuiActivity.this, db, commandeList);
-                                    commandeListView.setDivider(footer);
                                     commandeListView.setAdapter(commandeReceptionPUIAdapter);
 
                                     if (commandeList.isEmpty()) {
@@ -227,7 +223,6 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
 
                                 commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPuiActivity.this, db, commandeList);
-                                commandeListView.setDivider(footer);
                                 commandeListView.setAdapter(commandeReceptionPUIAdapter);
 
                                 if (commandeList.isEmpty()) {
@@ -310,7 +305,6 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
 
             commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPuiActivity.this, db, commandeList);
             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
-            commandeListView.setDivider(footer);
             commandeListView.setAdapter(commandeReceptionPUIAdapter);
             invalidateOptionsMenu();
 
@@ -341,22 +335,14 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                         if (resultCount == 0) {
                             String erreur = response.getString("erreur");
                             if (erreur.equals(getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerte(ServiceReceptionPuiActivity.this, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
-                                DBOpenHelper.viderBasesDeDonnees(db);
-                                ServiceReceptionPuiActivity.this.finishAffinity();
-                                Intent intent = new Intent(ServiceReceptionPuiActivity.this, AuthentificationActivity.class);
-                                ServiceReceptionPuiActivity.this.startActivity(intent);
+                                Alerte.afficherAlerteInformation(ServiceReceptionPuiActivity.this, getLayoutInflater(), "Alerte", "Votre session de connexion est invalide, veuillez vous reconnecter", false, true);
                             } else if (erreur.equals(getString(R.string.tokenExpire))) {
-                                Alerte.afficherAlerte(ServiceReceptionPuiActivity.this, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter", "alerte");
-                                ServiceReceptionPuiActivity.this.finishAffinity();
-                                Intent intent = new Intent(ServiceReceptionPuiActivity.this, AuthentificationActivity.class);
-                                ServiceReceptionPuiActivity.this.startActivity(intent);
+                                Alerte.afficherAlerteInformation(ServiceReceptionPuiActivity.this, getLayoutInflater(), "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter", false, true);
                             } else if (erreur.contentEquals("Aucun PH_Commande trouvé")) {
                                 arreterSpinner();
-                                Alerte.afficherAlerte(ServiceReceptionPuiActivity.this, "Alerte", "Aucune réception PUI à traiter", "alerte");
-                                retourNavigation(ServiceReceptionPuiActivity.this);
+                                Alerte.afficherAlerteInformation(ServiceReceptionPuiActivity.this, getLayoutInflater(), "Erreur", "Aucune réception PUI à traiter", false, true);
                             } else {
-                                Alerte.afficherAlerte(ServiceReceptionPuiActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Reception PUI", "alerte");
+                                Alerte.afficherAlerteInformation(ServiceReceptionPuiActivity.this, getLayoutInflater(), "Erreur", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Reception PUI", false, true);
                             }
                         } else {
                             commandeJSONArray = response.getJSONArray("PH_Commandes");
@@ -399,7 +385,6 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                             commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPuiActivity.this, db, commandeList);
                             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
                             ((TextView) findViewById(R.id.titre)).setText("Réceptions");
-                            commandeListView.setDivider(footer);
                             commandeListView.setAdapter(commandeReceptionPUIAdapter);
                             invalidateOptionsMenu();
 
@@ -427,7 +412,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                 }, error -> {
                     // TODO: Handle error
                     Log.e("Volley", "Error");
-                    Alerte.afficherAlerte(ServiceReceptionPuiActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP Service Récupération Quarantaine", "alerte");
+                    Alerte.afficherAlerteInformation(ServiceReceptionPuiActivity.this, getLayoutInflater(), "Erreur", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Reception PUI", false, true);
                 }) {
             @Override
             public Map<String, String> getHeaders() {

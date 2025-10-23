@@ -13,14 +13,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.contexte.ProduitContexte;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
-import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Outils.GS1Parser;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
@@ -62,7 +59,7 @@ public class ScannerProduitActivity extends ServiceActivity {
         EditTextScanee = (EditText) findViewById(R.id.EditTextScanee);
         numDocTextView = (TextView) findViewById(R.id.numDocument);
         depot = (TextView) findViewById(R.id.depot);
-        EditTextScanee.setBackground(getResources().getDrawable(R.drawable.background_scanner_preparation));
+        EditTextScanee.setBackground(getResources().getDrawable(R.drawable.background_cadre_vert_fond_noir));
 
         //Affichage des informations de la préparation
         Depot depotdestinataire = DepotOpenHelper.getDepotParID(db, depotdestinataireid);

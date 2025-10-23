@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_plein_bleu_fonce_radius"
+    android:padding="3dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background_empty_radius"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/layouttitre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/background_empty_radius_top"
+            android:backgroundTint="@color/bleu_fonce_alcyons"
+            android:weightSum="4">
+
+            <TextView
+                android:id="@+id/numeroDocument"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textStyle="bold"
+                android:textColor="@color/blanc"
+                android:textSize="18dp"
+                android:text=""
+                android:layout_marginLeft="5dp"
+                android:padding="5dp"/>
+
+            <TextView
+                android:id="@+id/destinataire"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:textStyle="bold"
+                android:textColor="@color/blanc"
+                android:textSize="18dp"
+                android:gravity="right"
+                android:text=""
+                android:layout_marginRight="5dp"
+                android:padding="5dp"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layouttitre"
+            android:textSize="16dp"
+            android:textColor="@color/noir"
+            android:padding="5dp"
+            android:text="Un reliquat vous sera envoyé dans les 5 minutes.\n \nLes produits suivants n'ont pas été préparés dans leur intégralité :"/>
+
+        <ListView
+            android:id="@+id/listeView"
+            android:layout_below="@+id/message"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:descendantFocusability="afterDescendants">
+        </ListView>
+
+        <ImageView
+            android:id="@+id/separateur"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/listeView"
+            android:background="@color/gris_clair"/>
+
+        <LinearLayout
+            android:id="@+id/layoutBouton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp"
+            android:layout_below="@+id/separateur"
+            android:weightSum="2">
+
+            <LinearLayout
+                android:id="@+id/annuler"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="5dp"
+                android:layout_gravity="center"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/ic_cancel_white"
+                    android:layout_gravity="center"
+                    android:backgroundTint="@color/rouge"/>
+
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/gris_clair"/>
+
+            <LinearLayout
+                android:id="@+id/valider"
+                android:layout_width="0dp"
+                android:padding="5dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/ic_check_circle"
+                    android:layout_gravity="center"
+                    android:backgroundTint="@color/bleu_clair_alcyons"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -21,8 +21,6 @@ import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 
-import com.github.clans.fab.FloatingActionButton;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,7 +34,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_RetourMotifOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
@@ -47,8 +44,8 @@ import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Retour_Ligne_DestructionAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
+import fr.alcyons.phiwms_mobile.Quarantaine.DetailQuarantaineActivity;
 import fr.alcyons.phiwms_mobile.R;
-import fr.alcyons.phiwms_mobile.RetourFournisseur.DetailRetourFournisseurActivity;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 import fr.alcyons.phiwms_mobile.Services.ServiceDestructionActivity;
 
@@ -116,53 +113,32 @@ public class DetailDestructionActivity extends ServiceActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem item = menu.findItem(R.id.menuSaveCircle);
         item.setOnMenuItemClickListener(item1 -> {
-            afficherModaleCommentaire(DetailDestructionActivity.this, getLayoutInflater());
+            Alerte.afficherAlerteSaisieText(DetailDestructionActivity.this, getLayoutInflater(), "Validation destruction", "Souhaitez-vous valider la destruction ?", "Ajouter un commentaire...");
             return true;
         });
 
-        MenuItem itemCommentaire = menu.findItem(R.id.menuCommentaire);
-        itemCommentaire.setOnMenuItemClickListener(item1 -> {
-            afficherModaleCommentaireAlerte(DetailDestructionActivity.this, getLayoutInflater());
-            return true;
-        });
+        MenuItem item_commentaire = menu.findItem(R.id.menuCommentaire);
+
+        if(retourSelectionne.getCommentaire().contentEquals(""))
+        {
+            item_commentaire.getIcon().mutate().setAlpha(50);
+            item_commentaire.setOnMenuItemClickListener(null);
+        }
+        else
+        {
+            item_commentaire.getIcon().mutate().setAlpha(255);
+            item_commentaire.setOnMenuItemClickListener(item1-> {
+                Alerte.afficherAlerteInformation(DetailDestructionActivity.this, getLayoutInflater(), "Commentaire", retourSelectionne.getCommentaire(), false, false);
+                return true;
+            });
+        }
         return true;
     }
 
-    private void afficherModaleCommentaire(Context context, LayoutInflater inflater) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View layout = inflater.inflate(R.layout.alerte_commentaire, null);
-        TextView titre = layout.findViewById(R.id.messageFin);
-        EditText editCommentaire = layout.findViewById(R.id.commentaire);
-        LinearLayout buttonAnnuler = layout.findViewById(R.id.buttonAnnuler);
-        LinearLayout buttonValider = layout.findViewById(R.id.buttonOk);
-        titre.setText("Souhaitez-vous valider la destruction ?");
-        builder.setView(layout);
-        final AlertDialog alertDialog = builder.create();
-        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
-        alertDialog.setCancelable(false);
-        if (alertDialog.getWindow() != null) {
-            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
-
-        alertDialog.show();
-
-        editCommentaire.setText(retourSelectionne.getCommentaire());
-
-        buttonAnnuler.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alertDialog.dismiss();
-            }
-        });
-
-        buttonValider.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                commentaire = editCommentaire.getText().toString();
-                validerDestruction();
-                alertDialog.dismiss();
-            }
-        });
+    @Override
+    public void retourSaisieText(String text) {
+        commentaire = text;
+        validerDestruction();
     }
 
     private void validerDestruction() {
@@ -181,7 +157,7 @@ public class DetailDestructionActivity extends ServiceActivity {
             motif = Alerte.afficherAlerteListView(DetailDestructionActivity.this, "Sélectionner le motif", retourMotifStringList);
         }
         if (motif == null) {
-            Alerte.afficherAlerte(DetailDestructionActivity.this, "Alerte", "Motif invalide", "alerte");
+            Alerte.afficherAlerteInformation(DetailDestructionActivity.this, getLayoutInflater(), "Alerte", "Motif invalide", false, false);
             return;
         }
 
@@ -234,7 +210,7 @@ public class DetailDestructionActivity extends ServiceActivity {
         }
         // Si une erreur est survenue, on annule tout
         if (compteurReussite != adapter.retour_Lignes.size()) {
-            Alerte.afficherAlerte(DetailDestructionActivity.this, "Alerte", "une erreur est survenue, aucun traitement ne sera effectué", "alerte");
+            Alerte.afficherAlerteInformation(DetailDestructionActivity.this, getLayoutInflater(), "Alerte", "une erreur est survenue, aucun traitement ne sera effectué", false, false);
             ElementASynchroniserOpenHelper.viderTableElementASynchroniser(db);
             DetailDestructionActivity.this.finish();
             return;
@@ -252,26 +228,5 @@ public class DetailDestructionActivity extends ServiceActivity {
         detailDestructionIntent.putExtras(detailDestructionBundle);
         DetailDestructionActivity.this.startActivity(detailDestructionIntent);
         DetailDestructionActivity.this.finish();
-    }
-
-    private void afficherModaleCommentaireAlerte(Context context, LayoutInflater inflater)
-    {
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
-        View layout = inflater.inflate(R.layout.alerte, null);
-
-        LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
-        TextView messageTextView = (TextView) layout.findViewById(R.id.messageFin);
-        TextView titreTextView = (TextView) layout.findViewById(R.id.titre);
-        titreTextView.setText("Commentaire");
-        messageTextView.setText(retourSelectionne.getCommentaire());
-        builder.setView(layout);
-
-        final androidx.appcompat.app.AlertDialog alertDialog = builder.create();
-        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
-        alertDialog.show();
-
-        zoneok.setOnClickListener(v -> {
-            alertDialog.dismiss();
-        });
     }
 }

@@ -385,7 +385,7 @@ public class DetailDotationPleinVideActivity extends ServiceAvecConnexionActivit
 
     public void afficherAlerteConfirmation(Context context, LayoutInflater inflater) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View layout = inflater.inflate(R.layout.alerte_commentaire, null);
+        View layout = inflater.inflate(R.layout.alerte_saisie_text, null);
 
         LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
         LinearLayout buttonAnnuler = (LinearLayout) layout.findViewById(R.id.buttonAnnuler);

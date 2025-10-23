@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:layout_marginTop="5dp"
-        android:background="@drawable/background_preparation_vert">
+        android:background="@drawable/background_plein_vert_radius">
 
         <LinearLayout
             android:id="@+id/zone_info_reception"

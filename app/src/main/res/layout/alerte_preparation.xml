@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/background_alerte_preparation_composition">
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_plein_bleu_fonce_radius"
+    android:padding="2dp">
 
     <TextView
         android:id="@+id/titre"
@@ -11,13 +12,17 @@
         android:text="COMPOSITION"
         android:gravity="center"
         android:textSize="18sp"
-        android:textColor="@android:color/black"
+        android:textColor="@color/blanc"
+        android:background="@drawable/background_empty_radius_top"
+        android:backgroundTint="@color/bleu_fonce_alcyons"
         android:textStyle="bold"
         android:padding="10dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:background="@drawable/background_empty_radius_bottom"
         android:orientation="vertical">
 
         <LinearLayout
@@ -204,8 +209,13 @@
 
             </LinearLayout>
 
-
         </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gris_clair"
+            android:layout_marginTop="10dp"/>
 
         <LinearLayout
             android:id="@+id/fermerAlerteLinearLayout"
@@ -214,8 +224,6 @@
             android:layout_weight="1"
             android:orientation="horizontal"
             android:gravity="center"
-            android:layout_marginTop="40dp"
-            android:layout_marginBottom="20dp"
             android:weightSum="2">
 
 
@@ -223,6 +231,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:paddingVertical="5dp"
                 android:gravity="center">
 
                 <ImageView
@@ -238,13 +247,14 @@
             <ImageView
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
-                android:background="@color/bleu_fonce_alcyons"/>
+                android:background="@color/gris_clair"/>
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center">
+                android:gravity="center"
+                android:paddingVertical="5dp">
 
                 <ImageView
                     android:id="@+id/ok"

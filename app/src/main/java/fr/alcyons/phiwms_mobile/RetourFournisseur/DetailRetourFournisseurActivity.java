@@ -1,24 +1,18 @@
 package fr.alcyons.phiwms_mobile.RetourFournisseur;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Base64;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -26,11 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.NonNull;
 
-import com.github.clans.fab.FloatingActionButton;
-
-import java.io.ByteArrayOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,7 +32,6 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
@@ -53,7 +42,6 @@ import fr.alcyons.phiwms_mobile.ListViewAdapters.Retour_Ligne_RetourFournisseurA
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.Dialogue;
 import fr.alcyons.phiwms_mobile.R;
-import fr.alcyons.phiwms_mobile.Reception.DetailReception2025Activity;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 import fr.alcyons.phiwms_mobile.Services.ServiceRetourFournisseurActivity;
 
@@ -117,7 +105,7 @@ public class DetailRetourFournisseurActivity extends ServiceActivity {
         }
 
         if (compteurReussite != adapter.retour_Lignes.size()) {
-            Alerte.afficherAlerte(DetailRetourFournisseurActivity.this, "Alerte", "Une erreur est survenue, aucun traitement ne sera effectué.", "alerte");
+            Alerte.afficherAlerteInformation(DetailRetourFournisseurActivity.this, getLayoutInflater(), "Alerte", "Une erreur est survenue, aucun traitement ne sera effectué.", false, false);
             ElementASynchroniserOpenHelper.viderTableElementASynchroniser(db);
             DetailRetourFournisseurActivity.this.finish();
             return;
@@ -187,47 +175,15 @@ public class DetailRetourFournisseurActivity extends ServiceActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem item = menu.findItem(R.id.menuSaveCircle);
         item.setOnMenuItemClickListener(item1 -> {
-            afficherModaleCommentaire(DetailRetourFournisseurActivity.this, getLayoutInflater());
+            Alerte.afficherAlerteSaisieText(DetailRetourFournisseurActivity.this, getLayoutInflater(), "Commentaire", "Souhaitez-vous valider le retour Fournisseur", "Ajouter un commentaire...");
             return true;
         });
         return true;
     }
 
-    private void afficherModaleCommentaire(Context context, LayoutInflater inflater)
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View layout = inflater.inflate(R.layout.alerte_commentaire, null);
-        TextView titre = layout.findViewById(R.id.messageFin);
-        EditText editCommentaire = layout.findViewById(R.id.commentaire);
-        LinearLayout buttonAnnuler = layout.findViewById(R.id.buttonAnnuler);
-        LinearLayout buttonValider = layout.findViewById(R.id.buttonOk);
-        titre.setText("Souhaitez-vous valider le retour fournisseur ?");
-        builder.setView(layout);
-        final AlertDialog alertDialog = builder.create();
-        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
-        alertDialog.setCancelable(false);
-        if (alertDialog.getWindow() != null) {
-            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
-
-        alertDialog.show();
-
-        editCommentaire.setText(retourSelectionne.getCommentaire());
-
-        buttonAnnuler.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alertDialog.dismiss();
-            }
-        });
-
-        buttonValider.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                commentaire = editCommentaire.getText().toString();
-                validerRetourFournisseur();
-                alertDialog.dismiss();
-            }
-        });
+    @Override
+    public void retourSaisieText(String text) {
+        commentaire = text;
+        validerRetourFournisseur();
     }
 }

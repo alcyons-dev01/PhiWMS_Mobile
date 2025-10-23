@@ -132,13 +132,13 @@ public class ServiceAvecConnexionActivity extends ServiceActivity {
         }
     }
 
-    public void retourNavigation(Context context)
+    @Override
+    public void retourService(Bundle bundle)
     {
         Intent intent = new Intent(context, NavigationActivity.class);
         Bundle extras = new Bundle();
         extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
         intent.putExtras(extras);
         context.startActivity(intent);
-        ((Activity)context).finish();
     }
 }

@@ -3,14 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@android:color/white">
+    android:background="@drawable/background_plein_vert_radius"
+    android:paddingRight="5dp"
+    android:paddingTop="5dp">
 
     <RelativeLayout
         android:id="@+id/layoutPrincipal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="5dp">
+        android:layout_height="wrap_content">
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -18,14 +18,13 @@
             android:layout_height="wrap_content"
             android:indeterminate="true"
             android:layout_centerInParent="true"
-            android:visibility="gone"
-            android:indeterminateTint="@color/blanc"/>
+            android:visibility="gone"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/background_retour_pui"
+            android:background="@drawable/background_empty_radius"
             android:padding="5dp">
 
 
@@ -178,7 +177,7 @@
                     android:layout_marginRight="5dp"
                     android:layout_gravity="center"
                     android:layout_marginTop="2dp"
-                    android:background="@drawable/background_preparation_emplacement_vert">
+                    android:background="@drawable/background_plein_vert_radius">
 
                     <TextView
                         android:id="@+id/textEmplacement"
