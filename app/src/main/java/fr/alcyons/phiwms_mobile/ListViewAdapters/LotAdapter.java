@@ -116,14 +116,14 @@ public class LotAdapter extends RecyclerView.Adapter<LotAdapter.LotViewHolder> {
             if(Integer.parseInt(holder.qteSaisie.getText().toString()) == 0)
             {
                 holder.layout_qte_saisie_lot_preparation.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_orange));
-                holder.layoutPrincipal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_orange));
+                holder.layoutPrincipal.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_orange));
                 holder.layoutStock.setVisibility(View.VISIBLE);
                 holder.separateur.setBackgroundColor(context.getResources().getColor(R.color.orange, null));
             }
             else
             {
                 holder.layout_qte_saisie_lot_preparation.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_vert));
-                holder.layoutPrincipal.setBackground(context.getResources().getDrawable(R.drawable.background_detail_preparation_vert));
+                holder.layoutPrincipal.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_vert));
                 holder.separateur.setBackgroundColor(context.getResources().getColor(R.color.vert, null));
                 holder.layoutStock.setVisibility(View.INVISIBLE);
             }

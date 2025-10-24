@@ -1,11 +1,19 @@
 package fr.alcyons.phiwms_mobile.Stock;
 
+import static com.google.android.gms.vision.L.TAG;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -15,39 +23,49 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 
-import com.github.clans.fab.FloatingActionButton;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.StockOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.Classes.Stock;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Liste_ReferenceAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.R;
-import fr.alcyons.phiwms_mobile.ServiceActivity;
+import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
-public class ListeReferenceActivity extends ServiceActivity {
-
+public class ListeReferenceActivity extends ServiceAvecConnexionActivity {
     Liste_ReferenceAdapter listeReferenceAdapter;
     List<Produit> listProduit;
     String tri_choisi;
     ArrayAdapter<CharSequence> Spinneradapter;
-
     Spinner optionTri;
     ListView referenceListeView;
-
-    FloatingActionButton boutonRechercheDataMatrix;
-
     PackageManager pm;
+    Depot depotCourant;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,23 +79,13 @@ public class ListeReferenceActivity extends ServiceActivity {
         referenceListeView = (ListView) findViewById(R.id.listeView);
         optionTri = (Spinner) findViewById(R.id.optionTri);
         listProduit = new ArrayList<>();
-
-        listProduit = ProduitOpenHelper.getAllProduits(db);
-        listeReferenceAdapter = new Liste_ReferenceAdapter(ListeReferenceActivity.this, db, listProduit);
-        referenceListeView.setAdapter(listeReferenceAdapter);
-        referenceListeView.setDivider(footer);
-        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listProduit.size()));
-        boutonRechercheDataMatrix = ((FloatingActionButton) findViewById(R.id.boutonRechercheDataMatrix));
-
+        depotCourant = DepotOpenHelper.getDepotParID(db, intent.getExtras().getInt("depotUID_Selectionne"));
         tri_choisi= "Désignation";
-        Spinneradapter = ArrayAdapter.createFromResource(this, R.array.option_tri_reference, android.R.layout.simple_spinner_item);
+        Spinneradapter = ArrayAdapter.createFromResource(this, R.array.option_tri_reference, R.layout.spinner_item);
         Spinneradapter.setDropDownViewResource(R.layout.spinner_item);
         optionTri.setAdapter(Spinneradapter);
 
-        if (tri_choisi != null) {
-            int spinnerPosition = Spinneradapter.getPosition(tri_choisi);
-            optionTri.setSelection(spinnerPosition);
-        }
+
         optionTri.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
             @Override
@@ -118,6 +126,32 @@ public class ListeReferenceActivity extends ServiceActivity {
     public void onResume() {
         super.onResume();
 
+        //* Code nécessaire afin de réaliser une requête à l' API *//*
+        if (statutConnexion && passageParOnCreate)
+        {
+            if (!swipeRefreshLayout.isRefreshing()) {
+                afficherSpinner(ListeReferenceActivity.this, LayoutInflater.from(ListeReferenceActivity.this));
+            }
+
+            RequestQueue requestQueueDestructionUtilisateur = Volley.newRequestQueue(ListeReferenceActivity.this);
+            String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteStocks + "depot/" + depotCourant.getDepot_Reference()+"/stock";
+
+
+            JsonObjectRequest obreq = getObjectRequest(urlRequete);
+            requestQueueDestructionUtilisateur.add(obreq);
+        }
+        else
+        {
+            listProduit = ProduitOpenHelper.getAllProduits(db);
+            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listProduit.size()));
+            listeReferenceAdapter = new Liste_ReferenceAdapter(ListeReferenceActivity.this, db, listProduit, depotCourant);
+            referenceListeView.setAdapter(listeReferenceAdapter);
+            if (tri_choisi != null) {
+                int spinnerPosition = Spinneradapter.getPosition(tri_choisi);
+                optionTri.setSelection(spinnerPosition);
+            }
+        }
+
         referenceListeView.setOnItemClickListener((parent, view, position, id) -> {
             Produit produitSelectionne = (Produit) listeReferenceAdapter.getItem(position);
 
@@ -128,35 +162,72 @@ public class ListeReferenceActivity extends ServiceActivity {
             Intent serviceControleRetours_Intent = new Intent(ListeReferenceActivity.this, DetailStockActivity.class);
             serviceControleRetours_Intent.putExtras(serviceStock_Bundle);
             ListeReferenceActivity.this.startActivity(serviceControleRetours_Intent);
-            ListeReferenceActivity.this.finish();
         });
 
-        boutonRechercheDataMatrix.setOnClickListener(v -> {
+    }
 
+    @SuppressLint("SetTextI18n")
+    @NonNull
+    private JsonObjectRequest getObjectRequest(String urlRequete) {
+        return new JsonObjectRequest
+                (Request.Method.GET, urlRequete, null, response -> {
+                    try {
+                        int resultCount = response.getInt("resultCount");
+                        if (resultCount == 0) {
+                            String erreur = response.getString("erreur");
+                            if (erreur.equals(getString(R.string.tokenInvalide))) {
+                                Alerte.afficherAlerteInformation(ListeReferenceActivity.this, getLayoutInflater(), "Alerte", "Votre session de connexion est invalide, veuillez vous reconnecter", false, true);
+                            } else if (erreur.equals(getString(R.string.tokenExpire))) {
+                                Alerte.afficherAlerteInformation(ListeReferenceActivity.this, getLayoutInflater(), "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter", false, true);
+                            } else if (erreur.contentEquals("Aucun PH_Commande trouvé")) {
+                                arreterSpinner();
+                                Alerte.afficherAlerteInformation(ListeReferenceActivity.this, getLayoutInflater(), "Erreur", "Aucune réception PUI à traiter", false, true);
+                            } else {
+                                Alerte.afficherAlerteInformation(ListeReferenceActivity.this, getLayoutInflater(), "Erreur", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Stock", false, true);
+                            }
+                        } else {
+                            JSONArray stockJSONArray = response.getJSONArray("PH_Stocks");
+                            StockOpenHelper.viderTableStocksDepot(db, depotCourant.getDepot_Reference());
 
-            Intent rechercheProduitIntent;
-            Bundle rechercheProduiBundle = ListeReferenceActivity.super.getBundle();
-            rechercheProduiBundle.putBoolean("isBoutonSuppressionExistant", true);
+                            for (int i = 0; i < stockJSONArray.length(); i++) {
+                                JSONObject stockJSONObject = stockJSONArray.getJSONObject(i);
 
-            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
-            {
-                rechercheProduitIntent = new Intent(ListeReferenceActivity.this, ScannerSearchOnlyActivity.class);
+                                Stock stock_temp = new Stock(stockJSONObject);
+
+                                long row_id = StockOpenHelper.insererUnStockEnBDD(db, stock_temp);
+                            }
+
+                            passageParOnCreate = false;
+
+                            listProduit = ProduitOpenHelper.getAllProduits(db);
+                            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listProduit.size()));
+                            listeReferenceAdapter = new Liste_ReferenceAdapter(ListeReferenceActivity.this, db, listProduit, depotCourant);
+                            referenceListeView.setAdapter(listeReferenceAdapter);
+                            if (tri_choisi != null) {
+                                int spinnerPosition = Spinneradapter.getPosition(tri_choisi);
+                                optionTri.setSelection(spinnerPosition);
+                            }
+                            invalidateOptionsMenu();
+
+                            new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
+                        }
+                    }
+                    catch (Throwable t)
+                    {
+                        Log.e(TAG, "Error JSON", t);
+                    }
+                }, error -> {
+                    // TODO: Handle error
+                    Log.e("Volley", "Error");
+                    Alerte.afficherAlerteInformation(ListeReferenceActivity.this, getLayoutInflater(), "Erreur", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Stock", false, true);
+                }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Authorization", utilisateurConnecte.getToken());
+                return headers;
             }
-            else
-            {
-                if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
-                {
-                    rechercheProduitIntent = new Intent(ListeReferenceActivity.this, BarcodeCaptureActivity.class);
-                }
-                else
-                {
-                    rechercheProduitIntent = new Intent(ListeReferenceActivity.this, ScannerSearchOnlyActivity.class);
-                }
-            }
-
-            rechercheProduitIntent.putExtras(rechercheProduiBundle);
-            ListeReferenceActivity.this.startActivityForResult(rechercheProduitIntent, CodesEchangesActivites.RETOUR_CODE_GS1);
-        });
+        };
     }
 
     @Override
@@ -227,6 +298,9 @@ public class ListeReferenceActivity extends ServiceActivity {
     public void onClickTriDesignation()
     {
         tri_choisi = "Désignation";
+        if( listeReferenceAdapter == null ) {
+            return;
+        }
         listeReferenceAdapter.produitList.sort(Comparator.comparing(Produit::getDesignation_interne));
         listeReferenceAdapter.notifyDataSetChanged();
     }
@@ -234,6 +308,9 @@ public class ListeReferenceActivity extends ServiceActivity {
     public void onClickTriCategorie()
     {
         tri_choisi = "Catégorie";
+        if( listeReferenceAdapter == null ) {
+            return;
+        }
         listeReferenceAdapter.produitList.sort(Comparator.comparing(Produit::getCategorie));
         listeReferenceAdapter.notifyDataSetChanged();
     }
@@ -241,14 +318,59 @@ public class ListeReferenceActivity extends ServiceActivity {
     public void onClickTriFournisseur()
     {
         tri_choisi = "Fournisseur";
+        if( listeReferenceAdapter == null ) {
+            return;
+        }
         listeReferenceAdapter.produitList.sort(Comparator.comparing(Produit::getFournisseur));
         listeReferenceAdapter.notifyDataSetChanged();
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        //Récupération du menu
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_action, menu);
+        menu.findItem(R.id.menuDatamatrix).setVisible(true);
+        return true;
     }
 
     // Nécessaire afin d'avoir l'item Search
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.prepareOptionsMenu(menu, listeReferenceAdapter, null, "Désignation produit...");
+        MenuItem item = menu.findItem(R.id.menuDatamatrix);
+        item.setOnMenuItemClickListener(item1 -> {
+            lancerScan();
+            return true;
+        });
         return true;
+    }
+
+    private void lancerScan()
+    {
+        Intent rechercheProduitIntent;
+        Bundle rechercheProduiBundle = ListeReferenceActivity.super.getBundle();
+        rechercheProduiBundle.putBoolean("isBoutonSuppressionExistant", true);
+
+        if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
+        {
+            rechercheProduitIntent = new Intent(ListeReferenceActivity.this, ScannerSearchOnlyActivity.class);
+        }
+        else
+        {
+            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
+            {
+                rechercheProduitIntent = new Intent(ListeReferenceActivity.this, BarcodeCaptureActivity.class);
+            }
+            else
+            {
+                rechercheProduitIntent = new Intent(ListeReferenceActivity.this, ScannerSearchOnlyActivity.class);
+            }
+        }
+
+        rechercheProduitIntent.putExtras(rechercheProduiBundle);
+        ListeReferenceActivity.this.startActivityForResult(rechercheProduitIntent, CodesEchangesActivites.RETOUR_CODE_GS1);
     }
 }

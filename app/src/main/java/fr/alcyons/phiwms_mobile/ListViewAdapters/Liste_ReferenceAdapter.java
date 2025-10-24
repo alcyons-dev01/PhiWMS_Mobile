@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.StockOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Stock;
 import fr.alcyons.phiwms_mobile.R;
@@ -27,8 +28,9 @@ public class Liste_ReferenceAdapter extends ArrayAdapter implements Filterable {
     Context context;
     SQLiteDatabase db;
     ReferenceFilter referenceFilter;
+    Depot depotCourant;
 
-    public Liste_ReferenceAdapter(Context context, SQLiteDatabase database, List<Produit> produitList) {
+    public Liste_ReferenceAdapter(Context context, SQLiteDatabase database, List<Produit> produitList, Depot depotCourant) {
         super(context, 0, produitList);
         this.context = context;
         this.db = database;
@@ -38,6 +40,7 @@ public class Liste_ReferenceAdapter extends ArrayAdapter implements Filterable {
         this.produitDeBaseList = new ArrayList<>();
         this.produitDeBaseList.addAll(produitList);
         this.referenceFilter = null;
+        this.depotCourant = depotCourant;
     }
 
     @Override
@@ -59,12 +62,10 @@ public class Liste_ReferenceAdapter extends ArrayAdapter implements Filterable {
         Produit produit = (Produit) getItem(position);
 
         if (produit != null) {
-            List<Stock> stockList = StockOpenHelper.getStockByProduit(db, produit);
+            Stock stockCourant = StockOpenHelper.getStockByProduitEtDepot(db, produit, depotCourant);
 
-            if (!stockList.isEmpty()) {
-                double aDouble = stockList.get(0).getQuantite_Actuelle();
-                int qteActuelle = (int) aDouble;
-                viewHolder.StockTheorique.setText(String.valueOf(qteActuelle));
+            if (stockCourant != null) {
+                viewHolder.StockTheorique.setText(String.valueOf((int)stockCourant.getQuantite_Actuelle()));
             }
             else
             {

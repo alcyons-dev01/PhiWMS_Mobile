@@ -41,9 +41,7 @@ public class DepotSelecteurMultipleActivity extends ServiceActivity {
     List<Depot> depotList;
     List<Depot> depotPuiList;
     List<Depot> depotPufList;
-    List<Depot> depotPadList;
 
-    TextView nbElementInAdapterTextView;
     FloatingActionButton boutonGeolocalisation;
 
     int depotNombre = 0;
@@ -80,62 +78,58 @@ public class DepotSelecteurMultipleActivity extends ServiceActivity {
         depotList = new ArrayList<>();
 
         if (depotType.contentEquals("all")) {
-            depotParentList.add("PUI");
             depotPuiList = DepotOpenHelper.getDepotsParType(db, "PUI");
+            depotParentList.add("PUI");
             depotParentListItems.put("PUI", depotPuiList);
             depotList.addAll(depotPuiList);
         }
 
         if(depotType.contentEquals("pufpad"))
         {
-            depotParentList.add("PUF");
             depotPufList = DepotOpenHelper.getDepotsParType(db, "PUF");
+            depotParentList.add(depotPufList.size()+" Unités fonctionnelles");
             depotParentListItems.put("PUF", depotPufList);
             depotList.addAll(depotPufList);
 
-            depotParentList.add("PAD");
+            /*depotParentList.add("PAD");
             depotPadList = DepotOpenHelper.getDepotsParType(db, "PAD");
             depotParentListItems.put("PAD", depotPadList);
-            depotList.addAll(depotPadList);
+            depotList.addAll(depotPadList);*/
         }
 
         if(depotType.contentEquals("puf"))
         {
-            depotParentList.add("PUF");
             depotPufList = DepotOpenHelper.getDepotsParType(db, "PUF");
+            depotParentList.add(depotPufList.size()+" Unités fonctionnelles");
             depotParentListItems.put("PUF", depotPufList);
             depotList.addAll(depotPufList);
         }
 
-        if(depotType.contentEquals("pad"))
+        /*if(depotType.contentEquals("pad"))
         {
             depotParentList.add("PAD");
             depotPadList = DepotOpenHelper.getDepotsParType(db, "PAD");
             depotParentListItems.put("PAD", depotPadList);
             depotList.addAll(depotPadList);
-        }
+        }*/
 
         if (depotType.contentEquals("tous")) {
             depotParentList.add("PUI");
             depotPuiList = DepotOpenHelper.getDepotsParType(db, "PUI");
             depotParentListItems.put("PUI", depotPuiList);
             depotList.addAll(depotPuiList);
-            depotParentList.add("PUF");
             depotPufList = DepotOpenHelper.getDepotsParType(db, "PUF");
+            depotParentList.add(depotPufList.size()+" Unités fonctionnelles");
             depotParentListItems.put("PUF", depotPufList);
             depotList.addAll(depotPufList);
-            depotParentList.add("PAD");
+            /* depotParentList.add("PAD");
             depotPadList = DepotOpenHelper.getDepotsParType(db, "PAD");
             depotParentListItems.put("PAD", depotPadList);
-            depotList.addAll(depotPadList);
+            depotList.addAll(depotPadList);*/
         }
 
         nbDepotType = depotParentList.size();
-
-        nbElementInAdapterTextView = findViewById(R.id.nbElementInAdapter);
         depotNombre = depotList.size();
-        nbElementInAdapterTextView.setText(String.valueOf(depotNombre));
-
         depotExpandablelistView = findViewById(R.id.expandableListViewDepot);
 
         depotExpandableListAdapter = new DepotExpandableListAdapter(this, depotParentList, depotParentListItems, utilisateurConnecte);
@@ -202,11 +196,10 @@ public class DepotSelecteurMultipleActivity extends ServiceActivity {
                     depotPuiList = new ArrayList<>();
 
                 }
-                depotParentList.add("PUF");
                 depotPufList = new ArrayList<>();
 
-                depotParentList.add("PAD");
-                depotPadList = new ArrayList<>();
+                //depotParentList.add("PAD");
+                //depotPadList = new ArrayList<>();
 
                 for (DepotOpenHelper.CustomObject customObject : depotLesPlusProche) {
                     Depot depotLePlusProche = DepotOpenHelper.getDepotParID(db, customObject.getKey());
@@ -214,8 +207,9 @@ public class DepotSelecteurMultipleActivity extends ServiceActivity {
                         depotPuiList.add(depotLePlusProche);
                     } else if (depotLePlusProche.getStructure().contentEquals("PUF")) {
                         depotPufList.add(depotLePlusProche);
+                        depotParentList.add(depotPufList.size()+" Unités fonctionnelles");
                     } else if (depotLePlusProche.getStructure().contentEquals("PAD")) {
-                        depotPadList.add(depotLePlusProche);
+                        //depotPadList.add(depotLePlusProche);
                     }
                 }
                 if (depotType.contentEquals("all")) {
@@ -224,13 +218,9 @@ public class DepotSelecteurMultipleActivity extends ServiceActivity {
                 }
                 depotParentListItems.put("PUF", depotPufList);
                 depotList.addAll(depotPufList);
-                depotParentListItems.put("PAD", depotPadList);
-                depotList.addAll(depotPadList);
-
-                nbElementInAdapterTextView = findViewById(R.id.nbElementInAdapter);
+                //depotParentListItems.put("PAD", depotPadList);
+                //depotList.addAll(depotPadList);
                 depotNombre = depotList.size();
-                nbElementInAdapterTextView.setText(String.valueOf(depotNombre));
-
                 depotExpandablelistView = findViewById(R.id.expandableListView);
 
                 depotExpandableListAdapter = new DepotExpandableListAdapter(DepotSelecteurMultipleActivity.this, depotParentList, depotParentListItems, utilisateurConnecte);
@@ -274,10 +264,6 @@ public class DepotSelecteurMultipleActivity extends ServiceActivity {
                 depotExpandablelistView.setAdapter(depotExpandableListAdapter);
                 //expand all Groups
                 expandAll();
-
-                if (nbElementInAdapterTextView != null) {
-                    nbElementInAdapterTextView.setText(String.valueOf(expandableListAdapterCount()));
-                }
                 return false;
             }
 
@@ -298,27 +284,18 @@ public class DepotSelecteurMultipleActivity extends ServiceActivity {
 
         searchView.setOnCloseListener(() -> {
             searchView.setQuery("", true);
-            if (nbElementInAdapterTextView != null) {
-                nbElementInAdapterTextView.setText(String.valueOf(expandableListAdapterCount()));
-            }
             return false;
         });
 
         MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
-                if (nbElementInAdapterTextView != null) {
-                    nbElementInAdapterTextView.setText(String.valueOf(expandableListAdapterCount()));
-                }
                 collapseAll();
                 return true;  // Return true to collapse action view
             }
 
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
-                if (nbElementInAdapterTextView != null) {
-                    nbElementInAdapterTextView.setText(String.valueOf(expandableListAdapterCount()));
-                }
                 expandAll();
                 return true;  // Return true to expand action view
             }
@@ -337,15 +314,5 @@ public class DepotSelecteurMultipleActivity extends ServiceActivity {
         for (int i = 0; i < nbDepotType; i++) {
             depotExpandablelistView.collapseGroup(i);
         }
-    }
-
-    private int expandableListAdapterCount() {
-        int itemCount = 0;
-        int gourpCount = depotExpandableListAdapter.getGroupCount();
-        for (int i = 0; i < gourpCount; i++) {
-            itemCount = itemCount + depotExpandableListAdapter.getChildrenCount(i);
-        }
-
-        return itemCount;
     }
 }

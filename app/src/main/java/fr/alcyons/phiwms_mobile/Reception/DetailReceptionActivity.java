@@ -61,8 +61,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
-import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReception2025Activity;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReception2025_V2Activity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
@@ -280,11 +280,11 @@ public class DetailReceptionActivity extends ServiceActivity {
             Bundle listeLotReception_Bundle = new Bundle();
             if(android.os.Build.MANUFACTURER.contains("Zebra Technologies")  || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
             {
-                listeLotReception_Intent = new Intent(DetailReceptionActivity.this, ScannerReception2025_V2Activity.class);
+                listeLotReception_Intent = new Intent(DetailReceptionActivity.this, ScannerReceptionActivity.class);
             }
             else
             {
-                listeLotReception_Intent = new Intent(DetailReceptionActivity.this, BarcodeReception2025Activity.class);
+                listeLotReception_Intent = new Intent(DetailReceptionActivity.this, BarcodeReceptionActivity.class);
             }
 
             listeLotReception_Bundle.putString("contexte", String.valueOf(R.string.scannerContextReceptionListe));

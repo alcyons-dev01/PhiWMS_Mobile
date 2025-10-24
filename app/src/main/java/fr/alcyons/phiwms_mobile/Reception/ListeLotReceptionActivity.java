@@ -37,8 +37,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReception2025Activity;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReception2025_V2Activity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
@@ -161,11 +161,11 @@ public class ListeLotReceptionActivity extends ServiceActivity {
 
                 if(android.os.Build.MANUFACTURER.contains("Zebra Technologies")  || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
                 {
-                    listeLotReception_Intent = new Intent(ListeLotReceptionActivity.this, ScannerReception2025_V2Activity.class);
+                    listeLotReception_Intent = new Intent(ListeLotReceptionActivity.this, ScannerReceptionActivity.class);
                 }
                 else
                 {
-                    listeLotReception_Intent = new Intent(ListeLotReceptionActivity.this, BarcodeReception2025Activity.class);
+                    listeLotReception_Intent = new Intent(ListeLotReceptionActivity.this, BarcodeReceptionActivity.class);
                 }
 
                 listeLotReception_Bundle.putInt("ReceptionID", commandeSelectionne.getID_commande());

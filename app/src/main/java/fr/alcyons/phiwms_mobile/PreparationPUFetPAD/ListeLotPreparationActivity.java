@@ -3,14 +3,11 @@ package fr.alcyons.phiwms_mobile.PreparationPUFetPAD;
 import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LISTE_LOTS;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,8 +29,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
-import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparation2025Activity;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparation2025_V2Activity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
@@ -331,11 +328,11 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
         int index = -1;
         MAJListeLot();
 
-        Intent listeLotPreparation_Intent = new Intent(ListeLotPreparationActivity.this, BarcodePreparation2025Activity.class);
+        Intent listeLotPreparation_Intent = new Intent(ListeLotPreparationActivity.this, BarcodePreparationActivity.class);
         //gestion du zebra
         if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
         {
-            listeLotPreparation_Intent = new Intent(ListeLotPreparationActivity.this, ScannerPreparation2025_V2Activity.class);
+            listeLotPreparation_Intent = new Intent(ListeLotPreparationActivity.this, ScannerPreparationActivity.class);
         }
 
         List<PH_Preparation_Ligne> listePhPreparationLigne = new ArrayList<>();

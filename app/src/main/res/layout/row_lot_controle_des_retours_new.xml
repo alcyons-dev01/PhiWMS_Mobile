@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:background="@drawable/background_detail_preparation_orange"
+        android:background="@drawable/background_cadre_orange"
         android:orientation="horizontal"
         android:padding="5dp"
         android:weightSum="4">
@@ -202,7 +202,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:background="@drawable/background_detail_preparation_rouge"
+        android:background="@drawable/background_cadre_rouge"
         android:orientation="horizontal"
         android:padding="5dp"
         android:visibility="gone">

@@ -75,12 +75,12 @@ public class PhReassortAdapter extends ArrayAdapter {
 
             if(PreparationLigneCourant.getQte_StockSaisie() == -1)
             {
-                viewHolder.separateur_iv.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_gestion_statut_action_soumis, null));
+                viewHolder.separateur_iv.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_plein_bleu_radius, null));
                 viewHolder.qte_a_preparer.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.bleu_clair_alcyons,null));
             }
             else
             {
-                viewHolder.separateur_iv.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_gestion_statut_action_valider, null));
+                viewHolder.separateur_iv.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_plein_vert_radius, null));
                 viewHolder.qte_a_preparer.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.vert,null));
             }
 

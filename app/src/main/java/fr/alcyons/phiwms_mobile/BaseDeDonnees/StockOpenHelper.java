@@ -24,6 +24,10 @@ public class StockOpenHelper extends DBOpenHelper {
         db.delete(Constantes.TABLE_STOCK, null, null);
     }
 
+    public static void viderTableStocksDepot(SQLiteDatabase db, String depotReference) {
+        db.delete(Constantes.TABLE_STOCK, Constantes.CLE_COL_DEPOT_REFERENCE_STOCK+ "=?", new String[]{depotReference});
+    }
+
 
     public static long insererUnStockEnBDD(SQLiteDatabase db, Stock stock) {
         // Récupération des éléments du dépot

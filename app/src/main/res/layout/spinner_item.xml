@@ -6,6 +6,8 @@
     android:layout_height="wrap_content"
     android:textSize="18dp"
     android:gravity="left"
-    android:padding="5dip"
+    android:padding="10dp"
+    android:text="TEST"
+    android:textColor="@color/bleu_fonce_alcyons"
     style="@style/mySpinnerItemStyle"
     />

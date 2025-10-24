@@ -40,7 +40,14 @@ public class DepotExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     public Object getChild(int groupPosition, int childPosition) {
-        return Objects.requireNonNull(depotParentListItems.get(depotTypeList.get(groupPosition))).get(childPosition);
+        if(depotTypeList.get(groupPosition).contentEquals("PUI"))
+        {
+            return Objects.requireNonNull(depotParentListItems.get("PUI")).get(childPosition);
+        }
+        else
+        {
+            return Objects.requireNonNull(depotParentListItems.get("PUF")).get(childPosition);
+        }
     }
 
     public long getChildId(int groupPosition, int childPosition) {
@@ -96,7 +103,14 @@ public class DepotExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     public int getChildrenCount(int groupPosition) {
-        return Objects.requireNonNull(depotParentListItems.get(depotTypeList.get(groupPosition))).size();
+        if(depotTypeList.get(groupPosition).contentEquals("PUI"))
+        {
+            return Objects.requireNonNull(depotParentListItems.get("PUI")).size();
+        }
+        else
+        {
+            return Objects.requireNonNull(depotParentListItems.get("PUF")).size();
+        }
     }
 
     public Object getGroup(int groupPosition) {

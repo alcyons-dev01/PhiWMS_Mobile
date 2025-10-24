@@ -94,7 +94,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
         android:orientation="vertical"
-        android:background="@drawable/background_detail_preparation_vert">
+        android:background="@drawable/background_cadre_vert">
 
         <TextView
             android:layout_width="match_parent"

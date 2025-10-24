@@ -62,12 +62,12 @@ public class DemandeParticuliereAdapater extends RecyclerView.Adapter<DemandePar
 
         if(listQuantite.get(position) == 0)
         {
-            holder.separateur.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_gestion_statut_action_soumis, null));
+            holder.separateur.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_plein_bleu_radius, null));
             holder.qte_demander.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.bleu_clair_alcyons,null));
         }
         else
         {
-            holder.separateur.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_gestion_statut_action_valider, null));
+            holder.separateur.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_plein_vert_radius, null));
             holder.qte_demander.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.vert,null));
         }
 
@@ -128,12 +128,12 @@ public class DemandeParticuliereAdapater extends RecyclerView.Adapter<DemandePar
 
         if(quantite > 0)
         {
-            holder.separateur.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_gestion_statut_action_valider, null));
+            holder.separateur.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_plein_vert_radius, null));
             holder.qte_demander.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.vert,null));
         }
         else
         {
-            holder.separateur.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_gestion_statut_action_soumis, null));
+            holder.separateur.setBackground(ResourcesCompat.getDrawable(context.getResources(),R.drawable.background_plein_bleu_radius, null));
             holder.qte_demander.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.bleu_clair_alcyons,null));
         }
         holder.linearLigneProduit.setBackground(context.getResources().getDrawable(R.drawable.background_element_list_droit, null));

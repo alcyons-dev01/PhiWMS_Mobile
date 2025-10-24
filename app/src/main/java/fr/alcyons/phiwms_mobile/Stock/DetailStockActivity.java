@@ -6,12 +6,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 
@@ -32,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
@@ -159,22 +155,13 @@ public class DetailStockActivity extends ServiceAvecConnexionActivity {
                             if (resultCount == 0) {
                                 String erreur = response.getString("erreur");
                                 if (erreur.equals(getString(R.string.tokenInvalide))) {
-                                    Alerte.afficherAlerte(DetailStockActivity.this, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
-                                    DBOpenHelper.viderBasesDeDonnees(db);
-                                    DetailStockActivity.this.finishAffinity();
-                                    listeStockIntent = new Intent(DetailStockActivity.this, AuthentificationActivity.class);
-                                    DetailStockActivity.this.startActivity(listeStockIntent);
+                                    Alerte.afficherAlerteInformation(DetailStockActivity.this, getLayoutInflater(), "Alerte", "Votre session de connexion est invalide, veuillez vous reconnecter", false, true);
                                 } else if (erreur.equals(getString(R.string.tokenExpire))) {
-                                    Alerte.afficherAlerte(DetailStockActivity.this, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter", "alerte");
-                                    DetailStockActivity.this.finishAffinity();
-                                    listeStockIntent = new Intent(DetailStockActivity.this, AuthentificationActivity.class);
-                                    DetailStockActivity.this.startActivity(listeStockIntent);
+                                    Alerte.afficherAlerteInformation(DetailStockActivity.this, getLayoutInflater(), "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter", false, true);
                                 } else if (erreur.equals("Aucun PH_Stock trouvé")) {
-                                    Toast toast = Toast.makeText(DetailStockActivity.this, "Aucun Stock trouvé", Toast.LENGTH_SHORT);
-                                    toast.setGravity(Gravity.CENTER, 0, 0);
-                                    toast.show();
+                                    Alerte.afficherAlerteInformation(DetailStockActivity.this, getLayoutInflater(), "Information", "Aucun stock trouvé pour cette référence", true, false);
                                 } else {
-                                    Alerte.afficherAlerte(DetailStockActivity.this, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete liste stock", "alerte");
+                                    Alerte.afficherAlerteInformation(DetailStockActivity.this, getLayoutInflater(), "Erreur", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Stock lot emplacement", false, true);
                                 }
                             } else {
                                 stockJSONArray = response.getJSONArray("PH_Stocks");
@@ -220,12 +207,6 @@ public class DetailStockActivity extends ServiceAvecConnexionActivity {
                                     stockLotEmplacementLightList = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByStock(db, stockList.get(0));
                                     stockLotEmplacementAdapter = new Stock_Lot_EmplacementAdapter(DetailStockActivity.this, stockLotEmplacementLightList);
                                     stockLotEmplacementLightListView.setAdapter(stockLotEmplacementAdapter);
-                                    stockLotEmplacementLightListView.setDivider(footer);
-
-                                    if(stockLotEmplacementLightList.isEmpty())
-                                    {
-                                        ((TextView) findViewById(R.id.aucunStock)).setVisibility(View.VISIBLE);
-                                    }
 
                                     invalidateOptionsMenu();
                                     new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
@@ -238,7 +219,7 @@ public class DetailStockActivity extends ServiceAvecConnexionActivity {
                     },
                     error -> {
                         Log.e("Volley", "Error");
-                        Alerte.afficherAlerte(DetailStockActivity.this, "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP liste stock", "alerte");
+                        Alerte.afficherAlerteInformation(DetailStockActivity.this, getLayoutInflater(), "Erreur", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Stock lot emplacement", false, true);
                     }
             ) {
                 @Override
@@ -264,13 +245,6 @@ public class DetailStockActivity extends ServiceAvecConnexionActivity {
                 stockLotEmplacementLightList = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByStock(db, stockList.get(0));
                 stockLotEmplacementAdapter = new Stock_Lot_EmplacementAdapter(DetailStockActivity.this, stockLotEmplacementLightList);
                 stockLotEmplacementLightListView.setAdapter(stockLotEmplacementAdapter);
-                stockLotEmplacementLightListView.setDivider(footer);
-
-                if(stockLotEmplacementLightList.isEmpty())
-                {
-                    ((TextView) findViewById(R.id.aucunStock)).setVisibility(View.VISIBLE);
-                }
-
                 invalidateOptionsMenu();
             }
         }

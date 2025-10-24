@@ -31,10 +31,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeGraphic;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparation2025Activity;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReception2025Activity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
 
 /**
  * A view which renders a series of custom graphics to be overlayed on top of an associated preview
@@ -193,7 +192,7 @@ public class GraphicOverlay<T extends GraphicOverlay.Graphic> extends View {
                     }
                     else if(activityName.contentEquals("BarcodePreparation2025Activity"))
                     {
-                        ((BarcodePreparation2025Activity) getContext()).onTap(getMeasuredWidth() / 2, getMeasuredHeight() / 2);
+                        ((BarcodePreparationActivity) getContext()).onTap(getMeasuredWidth() / 2, getMeasuredHeight() / 2);
                     }
                     else if(activityName.contentEquals("BarcodeReceptionActivity"))
                     {
@@ -201,7 +200,7 @@ public class GraphicOverlay<T extends GraphicOverlay.Graphic> extends View {
                     }
                     else if(activityName.contentEquals("BarcodeReception2025Activity"))
                     {
-                        ((BarcodeReception2025Activity) getContext()).onTap(getMeasuredWidth() / 2, getMeasuredHeight() / 2);
+                        ((BarcodeReceptionActivity) getContext()).onTap(getMeasuredWidth() / 2, getMeasuredHeight() / 2);
                     }
                     //}
                 }

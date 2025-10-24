@@ -72,7 +72,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="@drawable/background_encadrer_vert"
+            android:background="@drawable/background_cadre_vert"
             android:weightSum="10"
             android:layout_gravity="center"
             android:padding="10dp"

@@ -332,14 +332,7 @@
 
     <!-- Scanner Activity -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparation2025Activity"
-        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:windowSoftInputMode="stateHidden"
-        android:configChanges="orientation|keyboardHidden"/>
-
-    <activity
-        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparation2025_V2Activity"
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
@@ -411,7 +404,7 @@
 
     <!-- Barcode Preparation Activity -->
     <activity
-        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparation2025Activity"
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
@@ -420,21 +413,14 @@
     <!-- Barcode Réception Activity -->
 
     <activity
-        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReception2025Activity"
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation|keyboardHidden"/>
 
     <activity
-        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReception2025Activity"
-        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:windowSoftInputMode="stateHidden"
-        android:configChanges="orientation|keyboardHidden"/>
-
-    <activity
-        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReception2025_V2Activity"
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
@@ -508,7 +494,7 @@
 
     <activity
         android:name="fr.alcyons.phiwms_mobile.Stock.ListeReferenceActivity"
-        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation|keyboardHidden"/>
