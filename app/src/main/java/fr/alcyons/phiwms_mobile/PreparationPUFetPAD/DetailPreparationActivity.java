@@ -970,7 +970,6 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
             ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.getId(), "PH_Preparation_Ligne", lignecourante.get_UID(), "", 0, (int)lignecourante.getQte_preparer(), lignecourante.getProduitDesignation());
             ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne);
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, actionUtilisateur_ligne.getPhiMR4UUID(), actionUtilisateur_ligne.getId(), DBOpenHelper.ActionsEAS.AJOUT);
-
         }
 
         List<PH_Serialisation> list_serialisation = PH_SerialisationOpenHelper.getAllPH_SerialisationByMvtId(db, String.valueOf(ph_preparation_Selectionne.getUID()));
