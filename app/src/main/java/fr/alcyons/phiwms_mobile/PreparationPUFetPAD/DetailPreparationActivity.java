@@ -346,6 +346,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                                     Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Aucune ligne trouvée", "alerte");
                                 }
                             } else {
+                                Stock_Lot_EmplacementLightOpenHelper.viderTableStock_Lot_EmplacementsSansSerie(db);
                                 JSONArray ph_preparationLigne_JSONArray = response.getJSONArray("PH_Preparation_Ligne");
                                 for (int k = 0; k < ph_preparationLigne_JSONArray.length(); k++) {
                                     JSONObject ph_preparationLigne_JSONObject = ph_preparationLigne_JSONArray.getJSONObject(k);
@@ -397,6 +398,16 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                                                     liste_lot.add(stockLotEmplacement.getLot());
                                                 }
                                             }
+
+                                            for (PH_Preparation_Ligne ligne_courante : lignes_preparer) {
+                                                //on recherche le lot en base de données, si il est présent on ne fait rien, sinon on supprime le ph_preparation_ligne
+                                                Stock_Lot_Emplacement_Light stockTemp = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByLotPeremptionEtDepotEmplacement(db, ligne_courante.getLotNumero(), ligne_courante.getPeremptionDate(), depotOrigine, ligne_courante.getEmplacementParDefaut());
+                                                if(stockTemp == null)
+                                                {
+                                                    PH_Preparation_LigneOpenHelper.supprimerUnPhPreparationLigne(db, ligne_courante);
+                                                }
+                                            }
+
                                         }
                                     }
                                 }

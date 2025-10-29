@@ -24,6 +24,10 @@ public class Stock_Lot_EmplacementLightOpenHelper extends DBOpenHelper {
         db.delete(Constantes.TABLE_STOCK_LOT_EMPLACEMENT, null, null);
     }
 
+    public static void viderTableStock_Lot_EmplacementsSansSerie(SQLiteDatabase db) {
+        db.delete(Constantes.TABLE_STOCK_LOT_EMPLACEMENT, Constantes.CLE_COL_SERIE+" = \"\"", null);
+    }
+
     public static long insererUnStock_Lot_EmplacementEnBDD(SQLiteDatabase db, Stock_Lot_Emplacement_Light stock_lot_emplacement) {
         // Récupération des éléments du dépot
         ContentValues contentValues = new ContentValues();
