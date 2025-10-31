@@ -28,6 +28,8 @@ import android.widget.TextView;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -41,6 +43,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.StockUtilisesOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
@@ -50,11 +53,13 @@ import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.Classes.StockUtilises;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeEmplacementCreationActivity;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.GS1Parser;
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparationActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
@@ -719,6 +724,18 @@ public class ScannerPreparationActivity extends ServiceActivity {
 
     private void enregistrementPreparationLigne(PH_Preparation_Ligne ph_preparationLigneCorrespondant, Stock_Lot_Emplacement_Light stockLotEmplacementLight)
     {
+        if(stockLotEmplacementLight.getQte_Preparer() > 0)
+        {
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedDateTime = now.format(formatter);
+            PH_Preparation preparationtemp = PH_PreparationOpenHelper.getPH_PreparationByID(db, ph_preparationLigneCorrespondant.getPreparationID());
+            StockUtilises stockUtilises = new StockUtilises(String.valueOf(preparationID), stockLotEmplacementLight.getProduit_Code(), stockLotEmplacementLight.get_UID(), stockLotEmplacementLight.getLot(), stockLotEmplacementLight.getPeremptionDate(), preparationtemp.getDepotOrigineID(), stockLotEmplacementLight.getZone(), stockLotEmplacementLight.getEmplacement(), stockLotEmplacementLight.getQte_Preparer(), utilisateurConnecte.getId(), formattedDateTime, utilisateurConnecte.getEtablissementId());
+            StockUtilisesOpenHelper.insererUnStockUtilisesEnBDD(db, stockUtilises);
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, StockUtilisesOpenHelper.Constantes.TABLE_STOCK_UTILISE, stockUtilises.getphiwms_mobileUUID(), stockUtilises.getphiwms_mobileUUID(), DBOpenHelper.ActionsEAS.AJOUT);
+            ElementASynchroniserOpenHelper.toutSynchroniser(ScannerPreparationActivity.this, db, utilisateurConnecte, false);
+        }
+
         /* on supprime les lignes déjà enregistrer qui ne sont pas les lignes de bases */
         int GlobalAPreparer = ph_preparationLigneCorrespondant.getQte_Demander();
         PH_Preparation_Ligne ph_preparationLigneCourant = null;

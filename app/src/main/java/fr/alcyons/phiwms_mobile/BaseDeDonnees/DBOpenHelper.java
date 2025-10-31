@@ -1,6 +1,7 @@
 package fr.alcyons.phiwms_mobile.BaseDeDonnees;
 
 import static fr.alcyons.phiwms_mobile.BaseDeDonnees.ImprimanteEtiquetteOpenHelper.Constantes.TABLE_IMPRIMANTE_ETIQUETTE;
+import static fr.alcyons.phiwms_mobile.BaseDeDonnees.StockUtilisesOpenHelper.Constantes.TABLE_STOCK_UTILISE;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -62,6 +63,7 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         db.delete(EVENTOpenHelper.Constantes.TABLE_EVENT, null, null);
         db.delete(PH_Demande_MotifOpenHelper.Constantes.TABLE_DEMANDE_MOTIF, null, null);
         db.delete(TABLE_IMPRIMANTE_ETIQUETTE, null, null);
+        db.delete(TABLE_STOCK_UTILISE, null, null);
     }
 
     @Override
@@ -111,6 +113,7 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         db.execSQL(EVENTOpenHelper.Constantes.CREATION_TABLE_EVENT);
         db.execSQL(PH_Demande_MotifOpenHelper.Constantes.CREATION_TABLE_DEMANDE_MOTIF);
         db.execSQL(ImprimanteEtiquetteOpenHelper.Constantes.CREATION_TABLE_IMPRIMANTE_ETIQUETTE);
+        db.execSQL(StockUtilisesOpenHelper.Constantes.CREATION_TABLE_STOCK_UTILISE);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -126,6 +129,24 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
                 + TABLE_IMPRIMANTE_ETIQUETTE + "'", null);
         if (ImprimanteEtiquetteExisteCursor.getCount() == 0) {
             db.execSQL(ImprimanteEtiquetteOpenHelper.Constantes.CREATION_TABLE_IMPRIMANTE_ETIQUETTE);
+        }
+
+        Cursor StockUtiliseExisteCursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"
+                + TABLE_STOCK_UTILISE + "'", null);
+        if (StockUtiliseExisteCursor.getCount() == 0) {
+            db.execSQL(StockUtilisesOpenHelper.Constantes.CREATION_TABLE_STOCK_UTILISE);
+        }
+
+        Cursor stockUtiliserIdStockCursor = db.rawQuery("SELECT * FROM " + TABLE_STOCK_UTILISE, null);
+        int stockUtiliserIdStockColumn = stockUtiliserIdStockCursor.getColumnIndex("idStock");
+        if (stockUtiliserIdStockColumn < 0) {
+            db.execSQL("ALTER TABLE " + TABLE_STOCK_UTILISE + " ADD COLUMN idStock INTEGER");
+        }
+
+        Cursor stockUtiliserEtablissementIdStockCursor = db.rawQuery("SELECT * FROM " + TABLE_STOCK_UTILISE, null);
+        int stockUtiliserEtablissementIdStockColumn = stockUtiliserEtablissementIdStockCursor.getColumnIndex("Etablissement_ID");
+        if (stockUtiliserEtablissementIdStockColumn < 0) {
+            db.execSQL("ALTER TABLE " + TABLE_STOCK_UTILISE + " ADD COLUMN Etablissement_ID INTEGER");
         }
     }
 
@@ -227,7 +248,7 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         public static final String uriRequeteDemandeMotif = "ph_demande_motif/";
         public static final String uriZebraImprimer = "zebrawebservice/imprimer";
         public static final String uriImprimanteEtiquette = "imprimanteEtiquette/";
-
+        public static final String uriStockUtilises = "stock_utilises/";
     }
 
     public static class ActionsEAS {

@@ -23,6 +23,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,15 +33,19 @@ import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.StockUtilisesOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.Classes.StockUtilises;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.LotAdapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.LotAdapter_V2;
@@ -55,7 +61,6 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
     RecyclerView recyclerView;
     Depot depot;
     Produit produit;
-    //Lot_PreparationAdapter lotPreparationAdapter;
     LotAdapter_V2 adapter;
     boolean camera_first;
     PackageManager pm;
@@ -220,6 +225,17 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
                 {
                     listeStockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepotSerie(db, produit, depot);
                 }
+
+                //on recherche la ligne de stock utilisé pour la supprimer aussi
+                StockUtilises stockUtilises = StockUtilisesOpenHelper.getStockUtiliserByStockIdAndUser(db, stock_courant.get_UID(), utilisateurConnecte.getId());
+
+                if(stockUtilises != null)
+                {
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, StockUtilisesOpenHelper.Constantes.TABLE_STOCK_UTILISE, stockUtilises.getphiwms_mobileUUID(), stockUtilises.getphiwms_mobileUUID(), DBOpenHelper.ActionsEAS.SUPPR);
+                    ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotPreparationActivity.this, db, utilisateurConnecte, false);
+                    StockUtilisesOpenHelper.supprimerUnStockUtilise(db, stockUtilises);
+                }
+
                 adapter.notifyItemChanged(position);
 
                 MAJVisuel();
@@ -466,6 +482,18 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
                     listeZonesIntent.putExtras(listeZonesBundle);
                     ListeLotPreparationActivity.this.startActivityForResult(listeZonesIntent, CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT);
                 }
+
+                if(quantite_stock_selectionne > 0)
+                {
+                    LocalDateTime now = LocalDateTime.now();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    String formattedDateTime = now.format(formatter);
+                    StockUtilises stockUtilises = new StockUtilises(String.valueOf(ph_preparation.getUID()), produit.getID_produit(), courant.get_UID(), courant.getLot(), courant.getPeremptionDate(), depot.getDepot_UID(), courant.getZone(), courant.getEmplacement(), quantite_stock_selectionne, utilisateurConnecte.getId(), formattedDateTime, utilisateurConnecte.getEtablissementId());
+                    StockUtilisesOpenHelper.insererUnStockUtilisesEnBDD(db, stockUtilises);
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, StockUtilisesOpenHelper.Constantes.TABLE_STOCK_UTILISE, stockUtilises.getphiwms_mobileUUID(), stockUtilises.getphiwms_mobileUUID(), DBOpenHelper.ActionsEAS.AJOUT);
+                    ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotPreparationActivity.this, db, utilisateurConnecte, false);
+                }
+
                 enregistrementPreparationLigne(ph_preparation_ligne_base, courant);
                 MAJVisuel();
             }

@@ -69,6 +69,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.StockUtilisesOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne;
@@ -79,6 +80,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne_Preparation_Adapte;
 import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.Classes.StockUtilises;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.AlertePreparationAdapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.PH_Preparation_Ligne_PreparationLotAdapter2025_V2;
@@ -347,11 +349,12 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                                 }
                             } else {
                                 Stock_Lot_EmplacementLightOpenHelper.viderTableStock_Lot_EmplacementsSansSerie(db);
+                                StockUtilisesOpenHelper.viderTableStockUtiliser(db);
                                 JSONArray ph_preparationLigne_JSONArray = response.getJSONArray("PH_Preparation_Ligne");
                                 for (int k = 0; k < ph_preparationLigne_JSONArray.length(); k++) {
                                     JSONObject ph_preparationLigne_JSONObject = ph_preparationLigne_JSONArray.getJSONObject(k);
                                     JSONArray phStockLotEmplacement_JSONArray = ph_preparationLigne_JSONObject.getJSONArray("ph_stock_lot_emplacements");
-
+                                    JSONArray stockUtilises_JSONArray = ph_preparationLigne_JSONObject.getJSONArray("stock_utilises");
                                     for (int y = 0; y < phStockLotEmplacement_JSONArray.length(); y++) {
                                         Stock_Lot_Emplacement_Light stock_lot_emplacement_light = new Stock_Lot_Emplacement_Light(phStockLotEmplacement_JSONArray.getJSONObject(y));
                                         Stock_Lot_Emplacement_Light stock_lot_emplacement_bdd = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, stock_lot_emplacement_light.get_UID());
@@ -366,6 +369,21 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                                             if(stock_lot_emplacement_bdd.getQte() != stock_lot_emplacement_light.getQte())
                                             {
                                                 Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_lot_emplacement_light);
+                                            }
+                                        }
+                                    }
+
+                                    for (int z = 0; z < stockUtilises_JSONArray.length(); z++) {
+                                        StockUtilises stockUtilisesTemp = new StockUtilises(stockUtilises_JSONArray.getJSONObject(z));
+                                        StockUtilisesOpenHelper.insererUnStockUtilisesEnBDD(db, stockUtilisesTemp);
+
+                                        if(stockUtilisesTemp.getUserId() != utilisateurConnecte.getId())
+                                        {
+                                            Stock_Lot_Emplacement_Light stockCourantTemp = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, stockUtilisesTemp.getStockId());
+                                            if(stockCourantTemp != null)
+                                            {
+                                                stockCourantTemp.setQte(stockCourantTemp.getQte() - stockUtilisesTemp.getQuantite());
+                                                Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockCourantTemp);
                                             }
                                         }
                                     }

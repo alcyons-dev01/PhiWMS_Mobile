@@ -44,6 +44,7 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Service;
+import fr.alcyons.phiwms_mobile.Classes.StockUtilises;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.Classes.TableTrace;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
@@ -151,6 +152,9 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                 break;
             case ServiceOpenHelper.Constantes.TABLE_SERVICE:
                 url += ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriRequeteServices;
+                break;
+            case StockUtilisesOpenHelper.Constantes.TABLE_STOCK_UTILISE:
+                url += ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriStockUtilises;
                 break;
         }
         return url;
@@ -308,6 +312,16 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                         body.put("ph_commande", commandeJSONObject);
                     }
                     break;
+                case StockUtilisesOpenHelper.Constantes.TABLE_STOCK_UTILISE:
+                    StockUtilises stockUtilises = StockUtilisesOpenHelper.getStockUtiliserByPhiWMSUUID(db, element.getIdDansTableConcernee());
+                    if (stockUtilises == null) {
+                        return;
+                    }
+                    JSONObject stockUtiliseJSONObject = stockUtilises.toJson();
+                    if (stockUtiliseJSONObject != null) {
+                        body.put("stock_utilises", stockUtiliseJSONObject);
+                    }
+                    break;
                 case PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT:
                     PH_Reliquat phReliquat = PH_ReliquatOpenHelper.getPH_ReliquatByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
                     if (phReliquat == null) {
@@ -396,7 +410,6 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         final int finalAncien_id_action = ancien_id_action;
         JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.POST, urlRequete, body, new Response.Listener<JSONObject>() {
             @Override
@@ -453,6 +466,10 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                                 break;
                             case Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE:
                                 contentValues.put(Retour_LigneOpenHelper.Constantes.CLE_COL__UID_RETOUR_LIGNE, nouvelId);
+                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + element.getIdDansTableConcernee(), null);
+                                break;
+                            case StockUtilisesOpenHelper.Constantes.TABLE_STOCK_UTILISE:
+                                contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, nouvelId);
                                 rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + element.getIdDansTableConcernee(), null);
                                 break;
                             case PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION:
@@ -621,6 +638,9 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                     break;
                 case ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE:
                     body.put("ActionUtilisateur_Ligne", listeId);
+                    break;
+                case StockUtilisesOpenHelper.Constantes.TABLE_STOCK_UTILISE:
+                    body.put("stock_utilises", listeId);
                     break;
             }
         } catch (JSONException e) {
