@@ -922,12 +922,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         //Gestion des objets graphique
         numeroPreparation.setText("#"+ph_preparation_Selectionne.getUID());
 
-        Depot depotDestinataireAlerte = DepotOpenHelper.getDepotParID(db, ph_preparation_Selectionne.getDepotDestinataireID());
-        String textDepotAlerte = depotDestinataireAlerte.getDepot_Reference();
-        if(utilisateurConnecte.getIdentifiant().toLowerCase().contentEquals("alcyons") && depotDestinataireAlerte.getStructure().contentEquals("PAD"))
-        {
-            textDepotAlerte = "Patient - "+depotDestinataireAlerte.getPAD_IPP();
-        }
+        String textDepotAlerte = ph_preparation_Selectionne.getDepotDestinataireReference();
         depotDestinataire.setText(textDepotAlerte);
 
         builder.setView(view);
