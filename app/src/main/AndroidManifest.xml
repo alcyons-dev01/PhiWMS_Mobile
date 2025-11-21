@@ -651,6 +651,35 @@
             android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation|keyboardHidden"/>
 
+        <!-- Inventaire Général -->
+        <activity
+            android:name="fr.alcyons.phiwms_mobile.Services.ServiceInventaireGeneralActivity"
+            android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|keyboardHidden"/>
+
+        <!-- Inventaire Partiel -->
+        <activity
+            android:name="fr.alcyons.phiwms_mobile.Services.ServiceInventairePartielActivity"
+            android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|keyboardHidden"/>
+
+        <activity
+            android:name="fr.alcyons.phiwms_mobile.Inventaire.DetailInventaireActivity"
+            android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|keyboardHidden"/>
+        <activity
+            android:name="fr.alcyons.phiwms_mobile.Inventaire.ListeLotInventaireActivity"
+            android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|keyboardHidden"/>
+
     </application>
 
 </manifest>

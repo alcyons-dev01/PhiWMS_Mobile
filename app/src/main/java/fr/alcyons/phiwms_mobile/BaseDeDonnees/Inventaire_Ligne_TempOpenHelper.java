@@ -47,6 +47,8 @@ public class Inventaire_Ligne_TempOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_LOT_INVENTAIRE_LIGNE_TEMP, inventaire_ligne_temp.getLot());
         contentValues.put(Constantes.CLE_COL_PEREMPTIONDATE_INVENTAIRE_LIGNE_TEMP, inventaire_ligne_temp.getPeremptionDate());
         contentValues.put(Constantes.CLE_COL__UID_INVENTAIRE_LIGNE_TEMP, inventaire_ligne_temp.get_UID());
+        contentValues.put(Constantes.CLE_COL_INVENTAIRE_DATE_INVENTAIRE_LIGNE_TEMP, inventaire_ligne_temp.getInventaireDate());
+        contentValues.put(Constantes.CLE_COL_SYNCHRONISER_INVENTAIRE_LIGNE_TEMP, inventaire_ligne_temp.isSynchroniser());
 
         // Insertion du dépot en BDD
         long rowId = db.insert(Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, null, contentValues);
@@ -85,6 +87,8 @@ public class Inventaire_Ligne_TempOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_LOT_INVENTAIRE_LIGNE_TEMP, inventaire_ligne_temp.getLot());
         contentValues.put(Constantes.CLE_COL_PEREMPTIONDATE_INVENTAIRE_LIGNE_TEMP, inventaire_ligne_temp.getPeremptionDate());
         contentValues.put(Constantes.CLE_COL__UID_INVENTAIRE_LIGNE_TEMP, inventaire_ligne_temp.get_UID());
+        contentValues.put(Constantes.CLE_COL_INVENTAIRE_DATE_INVENTAIRE_LIGNE_TEMP, inventaire_ligne_temp.getInventaireDate());
+        contentValues.put(Constantes.CLE_COL_SYNCHRONISER_INVENTAIRE_LIGNE_TEMP, inventaire_ligne_temp.isSynchroniser());
 
         return db.update(Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(inventaire_ligne_temp.getPhiMR4UUID())});
     }
@@ -97,6 +101,47 @@ public class Inventaire_Ligne_TempOpenHelper extends DBOpenHelper {
         List<Inventaire_Ligne_Temp> inventaireLigneTempList = new ArrayList<>();
 
         Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_INVENTAIRE_LIGNE_TEMP + " WHERE " + Constantes.CLE_COL_DEPOTREFERENCE_INVENTAIRE_LIGNE_TEMP + "=?", new String[]{depot.getDepot_Reference()});
+
+        while (cursor.moveToNext()) {
+            inventaireLigneTempList.add(new Inventaire_Ligne_Temp(cursor));
+        }
+
+        cursor.close();
+        cursor = null;
+        return inventaireLigneTempList;
+    }
+
+    public static List<Inventaire_Ligne_Temp> getAllInventaireLigneTempByInventaire(SQLiteDatabase db, int inventaireId) {
+        List<Inventaire_Ligne_Temp> inventaireLigneTempList = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_INVENTAIRE_LIGNE_TEMP + " WHERE " + Constantes.CLE_COL_INVENTAIRE_ID_INVENTAIRE_LIGNE_TEMP + "=?", new String[]{String.valueOf(inventaireId)});
+
+        while (cursor.moveToNext()) {
+            inventaireLigneTempList.add(new Inventaire_Ligne_Temp(cursor));
+        }
+
+        cursor.close();
+        cursor = null;
+        return inventaireLigneTempList;
+    }
+
+    public static List<Inventaire_Ligne_Temp> getAllInventaireLigneTempByInventaireEtZone(SQLiteDatabase db, int inventaireId, String zone) {
+        List<Inventaire_Ligne_Temp> inventaireLigneTempList = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_INVENTAIRE_LIGNE_TEMP + " WHERE " + Constantes.CLE_COL_INVENTAIRE_ID_INVENTAIRE_LIGNE_TEMP + "=? AND "+Constantes.CLE_COL_ZONE_INVENTAIRE_LIGNE_TEMP+" =? ORDER BY "+Constantes.CLE_COL_DESIGNATION_INVENTAIRE_LIGNE_TEMP, new String[]{String.valueOf(inventaireId), zone});
+
+        while (cursor.moveToNext()) {
+            inventaireLigneTempList.add(new Inventaire_Ligne_Temp(cursor));
+        }
+
+        cursor.close();
+        cursor = null;
+        return inventaireLigneTempList;
+    }
+    public static List<Inventaire_Ligne_Temp> getAllInventaireLigneTempByInventaireEtZoneEtProduit(SQLiteDatabase db, int inventaireId, String zone, int produitID) {
+        List<Inventaire_Ligne_Temp> inventaireLigneTempList = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_INVENTAIRE_LIGNE_TEMP + " WHERE " + Constantes.CLE_COL_INVENTAIRE_ID_INVENTAIRE_LIGNE_TEMP + "=? AND "+Constantes.CLE_COL_ZONE_INVENTAIRE_LIGNE_TEMP+" =? AND "+Constantes.CLE_COL_PRODUITID_INVENTAIRE_LIGNE_TEMP+"=? ORDER BY "+Constantes.CLE_COL_LOT_INVENTAIRE_LIGNE_TEMP, new String[]{String.valueOf(inventaireId), zone, String.valueOf(produitID)});
 
         while (cursor.moveToNext()) {
             inventaireLigneTempList.add(new Inventaire_Ligne_Temp(cursor));
@@ -208,7 +253,13 @@ public class Inventaire_Ligne_TempOpenHelper extends DBOpenHelper {
         public static final int NUM_COL_PRODUITID_INVENTAIRE_LIGNE_TEMP = 26;
         public static final String TYPE_COL_PRODUITID_INVENTAIRE_LIGNE_TEMP = "INTEGER";
 
+        public static final String CLE_COL_INVENTAIRE_DATE_INVENTAIRE_LIGNE_TEMP = "inventaireDate";
+        public static final int NUM_COL_INVENTAIRE_DATE_INVENTAIRE_LIGNE_TEMP = 27;
+        public static final String TYPE_COL_INVENTAIRE_DATE_INVENTAIRE_LIGNE_TEMP = "TEXT";
 
+        public static final String CLE_COL_SYNCHRONISER_INVENTAIRE_LIGNE_TEMP = "synchroniser";
+        public static final int NUM_COL_SYNCHRONISER_INVENTAIRE_LIGNE_TEMP = 28;
+        public static final String TYPE_COL_SYNCHRONISER_INVENTAIRE_LIGNE_TEMP = "INTEGER";
         public static final String CREATION_TABLE_INVENTAIRE_LIGNE_TEMP = "CREATE TABLE " + Constantes.TABLE_INVENTAIRE_LIGNE_TEMP
                 + "("
                 + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
@@ -237,7 +288,9 @@ public class Inventaire_Ligne_TempOpenHelper extends DBOpenHelper {
                 + Constantes.CLE_COL_LOT_INVENTAIRE_LIGNE_TEMP + " " + Constantes.TYPE_COL_LOT_INVENTAIRE_LIGNE_TEMP + " ,"
                 + Constantes.CLE_COL_PEREMPTIONDATE_INVENTAIRE_LIGNE_TEMP + " " + Constantes.TYPE_COL_PEREMPTIONDATE_INVENTAIRE_LIGNE_TEMP + " ,"
                 + Constantes.CLE_COL__UID_INVENTAIRE_LIGNE_TEMP + " " + Constantes.TYPE_COL__UID_INVENTAIRE_LIGNE_TEMP + ","
-                + Constantes.CLE_COL_PRODUITID_INVENTAIRE_LIGNE_TEMP + " " + Constantes.TYPE_COL_PRODUITID_INVENTAIRE_LIGNE_TEMP
+                + Constantes.CLE_COL_PRODUITID_INVENTAIRE_LIGNE_TEMP + " " + Constantes.TYPE_COL_PRODUITID_INVENTAIRE_LIGNE_TEMP + ","
+                + Constantes.CLE_COL_INVENTAIRE_DATE_INVENTAIRE_LIGNE_TEMP + " " + Constantes.TYPE_COL_INVENTAIRE_DATE_INVENTAIRE_LIGNE_TEMP + ","
+                + Constantes.CLE_COL_SYNCHRONISER_INVENTAIRE_LIGNE_TEMP + " " + Constantes.TYPE_COL_SYNCHRONISER_INVENTAIRE_LIGNE_TEMP
                 + ");";
     }
 }

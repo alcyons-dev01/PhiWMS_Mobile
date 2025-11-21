@@ -31,6 +31,10 @@ public class Inventaire implements Serializable, Comparable {
     private int NBLignes;
     private double Valeur_TTC;
     private double Valeur_PUMP_TTC;
+
+    private String ouvertureDate;
+    private String clotureDate;
+
     private int phiwms_mobileUUID = -1;
     public Inventaire(Cursor cursor) {
         this.Inventaire_ID = cursor.getInt(InventaireOpenHelper.Constantes.NUM_COL_INVENTAIRE_ID_INVENTAIRE);
@@ -50,7 +54,30 @@ public class Inventaire implements Serializable, Comparable {
         this.NBLignes = cursor.getInt(InventaireOpenHelper.Constantes.NUM_COL_NBLIGNES_INVENTAIRE);
         this.Valeur_TTC = cursor.getDouble(InventaireOpenHelper.Constantes.NUM_COL_VALEUR_TTC_INVENTAIRE);
         this.Valeur_PUMP_TTC = cursor.getDouble(InventaireOpenHelper.Constantes.NUM_COL_VALEUR_PUMP_TTC_INVENTAIRE);
+        this.ouvertureDate = cursor.getString(InventaireOpenHelper.Constantes.NUM_COL_OUVERTURE_DATE);
+        this.clotureDate = cursor.getString(InventaireOpenHelper.Constantes.NUM_COL_CLOTURE_DATE);
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
+    }
+    public Inventaire(JSONObject jsonObject) {
+        this.Inventaire_ID = jsonObject.optInt("Inventaire_ID");
+        this.Cycle = jsonObject.optString("Cycle");
+        this.InventaireDate = jsonObject.optString("InventaireDate");
+        this.cycleDateDebut = jsonObject.optString("cycleDateDebut");
+        this._SYS_DT_MAJ = jsonObject.optString("_SYS_DT_MAJ");
+        this._SYS_USER_MAJ = jsonObject.optString("_SYS_USER_MAJ");
+        this._SYS_HEURE_MAJ = jsonObject.optString("_SYS_HEURE_MAJ");
+        this.cycleDateFin = jsonObject.optString("cycleDateFin");
+        this.clotureActive = jsonObject.optBoolean("clotureActive");
+        this.objet = jsonObject.optString("objet");
+        this.Mode_Comptabilisation = jsonObject.optString("Mode_Comptabilisation");
+        this.depotReference = jsonObject.optString("depotReference");
+        this.depotNom = jsonObject.optString("depotNom");
+        this.operateur = jsonObject.optString("operateur");
+        this.NBLignes =jsonObject.optInt("NBLignes");
+        this.Valeur_TTC = jsonObject.optDouble("Valeur_TTC");
+        this.Valeur_PUMP_TTC = jsonObject.optDouble("Valeur_PUMP_TTC");
+        this.clotureDate = jsonObject.optString("clotureDate");
+        this.ouvertureDate = jsonObject.optString("ouvertureDate");
     }
 
     public int getPhiMR4UUID() {
@@ -125,14 +152,6 @@ public class Inventaire implements Serializable, Comparable {
         this.cycleDateFin = cycleDateFin;
     }
 
-    public Boolean getClotureActive() {
-        return clotureActive;
-    }
-
-    public void setClotureActive(Boolean clotureActive) {
-        this.clotureActive = clotureActive;
-    }
-
     public String getObjet() {
         return objet;
     }
@@ -195,6 +214,30 @@ public class Inventaire implements Serializable, Comparable {
 
     public void setValeur_PUMP_TTC(double valeur_PUMP_TTC) {
         Valeur_PUMP_TTC = valeur_PUMP_TTC;
+    }
+
+    public boolean isClotureActive() {
+        return clotureActive;
+    }
+
+    public void setClotureActive(boolean clotureActive) {
+        this.clotureActive = clotureActive;
+    }
+
+    public String getOuvertureDate() {
+        return ouvertureDate;
+    }
+
+    public void setOuvertureDate(String ouvertureDate) {
+        this.ouvertureDate = ouvertureDate;
+    }
+
+    public String getClotureDate() {
+        return clotureDate;
+    }
+
+    public void setClotureDate(String clotureDate) {
+        this.clotureDate = clotureDate;
     }
 
     @Override

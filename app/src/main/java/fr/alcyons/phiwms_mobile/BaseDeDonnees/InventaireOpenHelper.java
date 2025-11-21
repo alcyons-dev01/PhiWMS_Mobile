@@ -6,12 +6,51 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Inventaire;
+import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp;
+import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 
 public class InventaireOpenHelper extends DBOpenHelper {
 
     public InventaireOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
+    }
+
+    public static void supprimerInventaire(SQLiteDatabase db, Inventaire inventaire) {
+        db.delete(Constantes.TABLE_INVENTAIRE, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(inventaire.getPhiMR4UUID())});
+    }
+
+    public static List<Inventaire> getAllInventaire(SQLiteDatabase db) {
+        List<Inventaire> inventaireList = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_INVENTAIRE, null);
+
+        while (cursor.moveToNext()) {
+            Inventaire inventaire = new Inventaire(cursor);
+            inventaireList.add(inventaire);
+        }
+        cursor.close();
+        cursor = null;
+        return inventaireList;
+    }
+
+    public static Inventaire getInventaireById(SQLiteDatabase db, int inventaireID) {
+        Inventaire inventaire = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_INVENTAIRE + " WHERE "+Constantes.CLE_COL_INVENTAIRE_ID_INVENTAIRE+" = ?", new String[]{String.valueOf(inventaireID)});
+
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+            inventaire = new Inventaire(cursor);
+        }
+        cursor.close();
+        cursor = null;
+        return inventaire;
     }
 
     public static long insererUnInventaireEnBDD(SQLiteDatabase db, Inventaire inventaire) {
@@ -24,7 +63,7 @@ public class InventaireOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL__SYS_USER_MAJ_INVENTAIRE, inventaire.get_SYS_USER_MAJ());
         contentValues.put(Constantes.CLE_COL__SYS_HEURE_MAJ_INVENTAIRE, inventaire.get_SYS_HEURE_MAJ());
         contentValues.put(Constantes.CLE_COL_CYCLEDATEFIN_INVENTAIRE, inventaire.getCycleDateFin());
-        contentValues.put(Constantes.CLE_COL_CLOTUREACTIVE_INVENTAIRE, inventaire.getClotureActive());
+        contentValues.put(Constantes.CLE_COL_CLOTUREACTIVE_INVENTAIRE, inventaire.isClotureActive());
         contentValues.put(Constantes.CLE_COL_OBJET_INVENTAIRE, inventaire.getObjet());
         contentValues.put(Constantes.CLE_COL_MODE_COMPTABILISATION_INVENTAIRE, inventaire.getMode_Comptabilisation());
         contentValues.put(Constantes.CLE_COL_DEPOTREFERENCE_INVENTAIRE, inventaire.getDepotReference());
@@ -33,6 +72,8 @@ public class InventaireOpenHelper extends DBOpenHelper {
         contentValues.put(Constantes.CLE_COL_NBLIGNES_INVENTAIRE, inventaire.getNBLignes());
         contentValues.put(Constantes.CLE_COL_VALEUR_TTC_INVENTAIRE, inventaire.getValeur_TTC());
         contentValues.put(Constantes.CLE_COL_VALEUR_PUMP_TTC_INVENTAIRE, inventaire.getValeur_PUMP_TTC());
+        contentValues.put(Constantes.CLE_COL_OUVERTURE_DATE, inventaire.getOuvertureDate());
+        contentValues.put(Constantes.CLE_COL_CLOTURE_DATE, inventaire.getClotureDate());
 
         long rowID = db.insert(Constantes.TABLE_INVENTAIRE, null, contentValues);
 
@@ -112,7 +153,12 @@ public class InventaireOpenHelper extends DBOpenHelper {
         public static final String CLE_COL_INVENTAIRE_ID_INVENTAIRE = "Inventaire_ID";
         public static final int NUM_COL_INVENTAIRE_ID_INVENTAIRE = 17;
         public static final String TYPE_COL_INVENTAIRE_ID_INVENTAIRE = "INTEGER";
-
+        public static final String CLE_COL_OUVERTURE_DATE = "ouvertureDate";
+        public static final int NUM_COL_OUVERTURE_DATE = 18;
+        public static final String TYPE_COL_OUVERTURE_DATE = "TEXT";
+        public static final String CLE_COL_CLOTURE_DATE = "clotureDate";
+        public static final int NUM_COL_CLOTURE_DATE = 19;
+        public static final String TYPE_COL_CLOTURE_DATE = "TEXT";
 
         public static final String CREATION_TABLE_INVENTAIRE = "CREATE TABLE " + Constantes.TABLE_INVENTAIRE
                 + "("
@@ -133,7 +179,9 @@ public class InventaireOpenHelper extends DBOpenHelper {
                 + Constantes.CLE_COL_NBLIGNES_INVENTAIRE + " " + Constantes.TYPE_COL_NBLIGNES_INVENTAIRE + " ,"
                 + Constantes.CLE_COL_VALEUR_TTC_INVENTAIRE + " " + Constantes.TYPE_COL_VALEUR_TTC_INVENTAIRE + " ,"
                 + Constantes.CLE_COL_VALEUR_PUMP_TTC_INVENTAIRE + " " + Constantes.TYPE_COL_VALEUR_PUMP_TTC_INVENTAIRE + ","
-                + Constantes.CLE_COL_INVENTAIRE_ID_INVENTAIRE + " " + Constantes.TYPE_COL_INVENTAIRE_ID_INVENTAIRE
+                + Constantes.CLE_COL_INVENTAIRE_ID_INVENTAIRE + " " + Constantes.TYPE_COL_INVENTAIRE_ID_INVENTAIRE + ","
+                + Constantes.CLE_COL_OUVERTURE_DATE + " " + Constantes.TYPE_COL_OUVERTURE_DATE + ","
+                + Constantes.CLE_COL_CLOTURE_DATE + " " + Constantes.TYPE_COL_CLOTURE_DATE
                 + ");";
     }
 }

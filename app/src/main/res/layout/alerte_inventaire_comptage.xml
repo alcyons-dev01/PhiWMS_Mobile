@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/background_empty_radius">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/background_empty_radius_top"
+            android:backgroundTint="@color/bleu_fonce_alcyons"
+            android:weightSum="1">
+
+            <TextView
+                android:id="@+id/designationReference_TV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Confirmation"
+                android:textSize="20sp"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:padding="10dp"
+                android:layout_marginLeft="20dp"/>
+
+            <ImageView
+                android:id="@+id/quitterModale_IV"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/ic_clear"
+                android:layout_gravity="center"
+                android:layout_marginRight="20dp"/>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp"
+            android:padding="5dp"
+            android:weightSum="4">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Zone"
+                android:textSize="14sp"
+                android:gravity="left"
+                android:textColor="@color/noir"/>
+
+            <TextView
+                android:id="@+id/zoneLot_TV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text=""
+                android:textSize="16sp"
+                android:gravity="left"
+                android:textColor="@color/noir"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            android:weightSum="4">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Place"
+                android:textSize="14sp"
+                android:gravity="left"
+                android:textColor="@color/noir"/>
+
+            <TextView
+                android:id="@+id/emplacementLot_TV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text=""
+                android:textSize="16sp"
+                android:gravity="left"
+                android:textColor="@color/noir"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bleu_fonce_alcyons"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            android:weightSum="4">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Lot"
+                android:textSize="14sp"
+                android:gravity="left"
+                android:textColor="@color/noir"/>
+
+            <EditText
+                android:id="@+id/numeroLot_ET"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text=""
+                android:textSize="16sp"
+                android:background="@drawable/background_cadre_bleu"
+                android:gravity="left"
+                android:paddingVertical="5dp"
+                android:paddingHorizontal="10dp"
+                android:inputType="text"
+                android:textColor="@color/noir"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:padding="5dp"
+            android:weightSum="4">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Exp."
+                android:textSize="14sp"
+                android:gravity="left"
+                android:textColor="@color/noir"/>
+
+            <EditText
+                android:id="@+id/dateExpirationLot_ET"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text=""
+                android:textSize="16sp"
+                android:background="@drawable/background_cadre_bleu"
+                android:gravity="left"
+                android:paddingVertical="5dp"
+                android:paddingHorizontal="10dp"
+                android:inputType="date"
+                android:textColor="@color/noir"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bleu_fonce_alcyons"
+            android:layout_marginTop="10dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <LinearLayout
+                android:id="@+id/layoutCartonFermer_LL"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@color/vertTransparent">
+
+                <TextView
+                    android:id="@+id/textCartonFermer_TV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Carton fermé"
+                    android:textSize="20dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textColor="@color/noir"
+                    android:padding="10dp"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/bleu_fonce_alcyons"/>
+
+            <LinearLayout
+                android:id="@+id/layoutCartonOuvert_LL"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Carton ouvert\n(x1)"
+                    android:textSize="20dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textColor="@color/noir"
+                    android:padding="10dp"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bleu_fonce_alcyons"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:padding="5dp"
+            android:weightSum="5">
+
+            <LinearLayout
+                android:id="@+id/layoutMoins_LL"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_gravity="center">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/minus_circle"
+                    android:layout_gravity="center"/>
+
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/bleu_fonce_alcyons"/>
+
+            <EditText
+                android:id="@+id/quantiteComptee_ET"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="24dp"
+                android:gravity="center"
+                android:text="45"
+                android:textColor="@color/noir"
+                android:layout_weight="3"/>
+
+
+            <ImageView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/bleu_fonce_alcyons"/>
+
+            <LinearLayout
+                android:id="@+id/layoutPlus_LL"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_gravity="center">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/ic_plus"
+                    android:layout_gravity="center" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bleu_fonce_alcyons"
+            android:layout_marginBottom="5dp"/>
+
+        <LinearLayout
+            android:id="@+id/layoutValider_LL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/ic_check_circle"
+                    android:backgroundTint="@color/bleu_clair_alcyons"
+                    android:layout_gravity="center"
+                    android:layout_centerHorizontal="true" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

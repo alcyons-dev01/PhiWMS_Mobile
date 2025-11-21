@@ -46,6 +46,9 @@ public class Inventaire_Ligne_Temp implements Serializable, Comparable {
     private int _UID;
     private int phiwms_mobileUUID = -1;
 
+    private String inventaireDate;
+    private boolean synchroniser;
+
     public Inventaire_Ligne_Temp(Cursor cursor) {
         this.produitID = cursor.getInt(Inventaire_Ligne_TempOpenHelper.Constantes.NUM_COL_PRODUITID_INVENTAIRE_LIGNE_TEMP);
         this.produitReference = cursor.getString(Inventaire_Ligne_TempOpenHelper.Constantes.NUM_COL_PRODUITREFERENCE_INVENTAIRE_LIGNE_TEMP);
@@ -73,7 +76,40 @@ public class Inventaire_Ligne_Temp implements Serializable, Comparable {
         this.lot = cursor.getString(Inventaire_Ligne_TempOpenHelper.Constantes.NUM_COL_LOT_INVENTAIRE_LIGNE_TEMP);
         this.PeremptionDate = cursor.getString(Inventaire_Ligne_TempOpenHelper.Constantes.NUM_COL_PEREMPTIONDATE_INVENTAIRE_LIGNE_TEMP);
         this._UID = cursor.getInt(Inventaire_Ligne_TempOpenHelper.Constantes.NUM_COL__UID_INVENTAIRE_LIGNE_TEMP);
+        this.inventaireDate = cursor.getString(Inventaire_Ligne_TempOpenHelper.Constantes.NUM_COL_INVENTAIRE_DATE_INVENTAIRE_LIGNE_TEMP);
+        this.synchroniser = OutilsGestionClasses.recupererBooleen(cursor, Inventaire_Ligne_TempOpenHelper.Constantes.NUM_COL_SYNCHRONISER_INVENTAIRE_LIGNE_TEMP);
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
+    }
+
+    public Inventaire_Ligne_Temp(JSONObject jsonObject) {
+        this.produitID = jsonObject.optInt("produitID");
+        this.produitReference = jsonObject.optString("produitReference");
+        this.fournisseurNom = jsonObject.optString("fournisseurNom");
+        this.categorie = jsonObject.optString("categorie");
+        this.designation = jsonObject.optString("designation");
+        this.stockTheorique = jsonObject.optDouble("stockTheorique");
+        this.stockPhysique = jsonObject.optDouble("stockPhysique");
+        this.depotReference = jsonObject.optString("depotReference");
+        this._SYS_DT_MAJ = jsonObject.optString("_SYS_DT_MAJ");
+        this._SYS_HEURE_MAJ = jsonObject.optString("_SYS_HEURE_MAJ");
+        this._SYS_USER_MAJ = jsonObject.optString("_SYS_USER_MAJ");
+        this.zone = jsonObject.optString("zone");
+        this.Inventaire_ID = jsonObject.optInt("Inventaire_ID");
+        this._NePasImprimer = jsonObject.optBoolean("_NePasImprimer");
+        this.PUHT = jsonObject.optDouble("PUHT");
+        this.tvaTx = jsonObject.optDouble("tvaTx");
+        this.suspendu = jsonObject.optBoolean("suspendu");
+        this.valeurTTC = jsonObject.optDouble("valeurTTC");
+        this.ecart = jsonObject.optDouble("ecart");
+        this.unite = jsonObject.optString("unite");
+        this.Cond_Achat = jsonObject.optDouble("Cond_Achat");
+        this.classe = jsonObject.optString("classe");
+        this.emplacement = jsonObject.optString("emplacement");
+        this.lot = jsonObject.optString("lot");
+        this.PeremptionDate = jsonObject.optString("PeremptionDate");
+        this._UID = jsonObject.optInt("_UID");
+        this.inventaireDate = jsonObject.optString("inventaireDate");
+        this.synchroniser = jsonObject.optBoolean("synchroniser");
     }
 
     public Inventaire_Ligne_Temp(Produit produit, Map<String, String> gs1Decoupe, Depot depot) {
@@ -361,6 +397,22 @@ public class Inventaire_Ligne_Temp implements Serializable, Comparable {
         this._UID = _UID;
     }
 
+    public String getInventaireDate() {
+        return inventaireDate;
+    }
+
+    public void setInventaireDate(String inventaireDate) {
+        this.inventaireDate = inventaireDate;
+    }
+
+    public boolean isSynchroniser() {
+        return synchroniser;
+    }
+
+    public void setSynchroniser(boolean synchroniser) {
+        this.synchroniser = synchroniser;
+    }
+
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
@@ -422,6 +474,7 @@ public class Inventaire_Ligne_Temp implements Serializable, Comparable {
             jsonObject.put("emplacement", emplacement);
             jsonObject.put("lot", lot);
             jsonObject.put("PeremptionDate", PeremptionDate);
+            jsonObject.put("inventaireDate", inventaireDate);
             jsonObject.put("_UID", _UID);
         } catch (JSONException e) {
             e.printStackTrace();

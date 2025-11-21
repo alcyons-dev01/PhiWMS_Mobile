@@ -1,6 +1,8 @@
 package fr.alcyons.phiwms_mobile.BaseDeDonnees;
 
 import static fr.alcyons.phiwms_mobile.BaseDeDonnees.ImprimanteEtiquetteOpenHelper.Constantes.TABLE_IMPRIMANTE_ETIQUETTE;
+import static fr.alcyons.phiwms_mobile.BaseDeDonnees.InventaireOpenHelper.Constantes.TABLE_INVENTAIRE;
+import static fr.alcyons.phiwms_mobile.BaseDeDonnees.Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP;
 import static fr.alcyons.phiwms_mobile.BaseDeDonnees.StockUtilisesOpenHelper.Constantes.TABLE_STOCK_UTILISE;
 
 import android.content.Context;
@@ -32,8 +34,8 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         db.delete(Commande_LigneOpenHelper.Constantes.TABLE_COMMANDE_LIGNE, null, null);
         db.delete(FournisseurOpenHelper.Constantes.TABLE_FOURNISSEUR, null, null);
         db.delete(Inventaire_LigneOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE, null, null);
-        db.delete(Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, null, null);
-        db.delete(InventaireOpenHelper.Constantes.TABLE_INVENTAIRE, null, null);
+        db.delete(TABLE_INVENTAIRE_LIGNE_TEMP, null, null);
+        db.delete(TABLE_INVENTAIRE, null, null);
         db.delete(PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, null, null);
         db.delete(PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, null, null);
         db.delete(RetourOpenHelper.Constantes.TABLE_RETOUR, null, null);
@@ -147,6 +149,30 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         int stockUtiliserEtablissementIdStockColumn = stockUtiliserEtablissementIdStockCursor.getColumnIndex("Etablissement_ID");
         if (stockUtiliserEtablissementIdStockColumn < 0) {
             db.execSQL("ALTER TABLE " + TABLE_STOCK_UTILISE + " ADD COLUMN Etablissement_ID INTEGER");
+        }
+
+        Cursor inventaireOuvertureDateCursor = db.rawQuery("SELECT * FROM " + TABLE_INVENTAIRE, null);
+        int inventaireOuvertureDateColumn = inventaireOuvertureDateCursor.getColumnIndex("ouvertureDate");
+        if (inventaireOuvertureDateColumn < 0) {
+            db.execSQL("ALTER TABLE " + TABLE_INVENTAIRE + " ADD COLUMN ouvertureDate TEXT");
+        }
+
+        Cursor inventaireClotureDateCursor = db.rawQuery("SELECT * FROM " + TABLE_INVENTAIRE, null);
+        int inventaireClotureDateColumn = inventaireClotureDateCursor.getColumnIndex("clotureDate");
+        if (inventaireClotureDateColumn < 0) {
+            db.execSQL("ALTER TABLE " + TABLE_INVENTAIRE + " ADD COLUMN clotureDate TEXT");
+        }
+
+        Cursor inventaireDateCursor = db.rawQuery("SELECT * FROM " + TABLE_INVENTAIRE_LIGNE_TEMP, null);
+        int inventaireDateColumn = inventaireDateCursor.getColumnIndex("inventaireDate");
+        if (inventaireDateColumn < 0) {
+            db.execSQL("ALTER TABLE " + TABLE_INVENTAIRE_LIGNE_TEMP + " ADD COLUMN inventaireDate TEXT");
+        }
+
+        Cursor inventaireLigneTempSynchroniserCursor = db.rawQuery("SELECT * FROM " + TABLE_INVENTAIRE_LIGNE_TEMP, null);
+        int inventaireLigneTempSynchroniserColumn = inventaireLigneTempSynchroniserCursor.getColumnIndex("synchroniser");
+        if (inventaireLigneTempSynchroniserColumn < 0) {
+            db.execSQL("ALTER TABLE " + TABLE_INVENTAIRE_LIGNE_TEMP + " ADD COLUMN synchroniser INTEGER");
         }
     }
 
