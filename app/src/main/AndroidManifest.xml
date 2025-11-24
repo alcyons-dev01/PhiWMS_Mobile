@@ -680,6 +680,13 @@
             android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation|keyboardHidden"/>
 
+        <activity
+            android:name="fr.alcyons.phiwms_mobile.Inventaire.CreationLotManuelleActivity"
+            android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|keyboardHidden"/>
+
     </application>
 
 </manifest>

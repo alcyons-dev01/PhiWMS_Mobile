@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    android:paddingBottom="5dp">
 
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -107,9 +108,25 @@
             android:layout_height="match_parent"
             android:nestedScrollingEnabled="false"
             android:layout_marginTop="10dp"
+            android:layout_marginBottom="65dp"
             android:background="@drawable/background_empty_radius_top"
             android:padding="5dp"
             android:layout_below="@+id/lancerScan"/>
+
+        <Button
+            android:id="@+id/btnAjoutManuel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ajoutez un lot"
+            android:background="@drawable/background_plein_bleu_radius"
+            android:backgroundTint="@color/bleu_clair_alcyons"
+            android:layout_marginHorizontal="50dp"
+            android:layout_marginBottom="10dp"
+            android:layout_alignParentEnd="true"
+            android:textColor="@color/blanc"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:layout_alignParentBottom="true"/>
 
     </RelativeLayout>
 

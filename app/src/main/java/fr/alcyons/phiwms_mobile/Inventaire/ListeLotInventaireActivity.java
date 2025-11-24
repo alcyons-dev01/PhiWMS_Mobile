@@ -2,6 +2,7 @@ package fr.alcyons.phiwms_mobile.Inventaire;
 
 
 import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LISTE_LOTS;
+import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LOT;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -31,6 +33,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
@@ -42,9 +45,13 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Inventaire;
 import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.DetailControleDesRetoursActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.InventaireLigneTempAdapter;
+import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.Reception.CreationLotManuelReceptionActivity;
+import fr.alcyons.phiwms_mobile.Reception.ListeLotReceptionActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
@@ -54,6 +61,7 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
     String zoneCourante;
     RecyclerView recyclerView;
     InventaireLigneTempAdapter adapter;
+    Inventaire_Ligne_Temp nouvelInventaireLigneTemp;
     Context context;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,11 +72,6 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
         inventaireCourant = InventaireOpenHelper.getInventaireById(db, intent.getExtras().getInt("inventaireId"));
         zoneCourante = intent.getExtras().getString("zoneSelectionne");
         produitCourant = ProduitOpenHelper.getProduitByID(db, intent.getExtras().getInt("produitId"));
-
-        inventaireLigneTempList = Inventaire_Ligne_TempOpenHelper.getAllInventaireLigneTempByInventaireEtZoneEtProduit(db, inventaireCourant.getInventaire_ID(), zoneCourante, produitCourant.getID_produit());
-
-        ((TextView) findViewById(R.id.produitDesgination)).setText(inventaireLigneTempList.get(0).getDesignation());
-        ((TextView) findViewById(R.id.inventaireCourant)).setText("#"+inventaireCourant.getInventaire_ID()+" - "+inventaireCourant.getObjet());
 
         ((LinearLayout) findViewById(R.id.lancerScan)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,12 +89,34 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
         divider.setDrawable(ContextCompat.getDrawable(ListeLotInventaireActivity.this, R.drawable.recycler_divider));
         recyclerView.addItemDecoration(divider);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        ((Button) findViewById(R.id.btnAjoutManuel)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Bundle clicBoutonAjouterManuellement_Bundle = ListeLotInventaireActivity.super.getBundle();
+                clicBoutonAjouterManuellement_Bundle.putInt("produitCourantId", produitCourant.getID_produit());
+                clicBoutonAjouterManuellement_Bundle.putInt("inventaireId", inventaireCourant.getInventaire_ID());
+                clicBoutonAjouterManuellement_Bundle.putInt("inventaireLigneTempId", inventaireLigneTempList.get(0).getPhiMR4UUID());
+                clicBoutonAjouterManuellement_Bundle.putString("zoneCourante", zoneCourante);
+                clicBoutonAjouterManuellement_Bundle.putString("emplacementDefaut", inventaireLigneTempList.get(0).getEmplacement());
+
+
+                Intent clicBoutonAjouterManuellement_Intent = new Intent(ListeLotInventaireActivity.this, CreationLotManuelleActivity.class);
+                clicBoutonAjouterManuellement_Intent.putExtras(clicBoutonAjouterManuellement_Bundle);
+                ListeLotInventaireActivity.this.startActivityForResult(clicBoutonAjouterManuellement_Intent, RETOUR_LOT);
+            }
+        });
     }
 
     @Override
     public void onResume() {
         super.onResume();
         invalidateOptionsMenu();
+
+        inventaireLigneTempList = Inventaire_Ligne_TempOpenHelper.getAllInventaireLigneTempByInventaireEtZoneEtProduit(db, inventaireCourant.getInventaire_ID(), zoneCourante, produitCourant.getID_produit());
+
+        ((TextView) findViewById(R.id.produitDesgination)).setText(inventaireLigneTempList.get(0).getDesignation());
+        ((TextView) findViewById(R.id.inventaireCourant)).setText("#"+inventaireCourant.getInventaire_ID()+" - "+inventaireCourant.getObjet());
 
         adapter = new InventaireLigneTempAdapter(inventaireLigneTempList, position -> {
             Toast.makeText(this, "Supprimer " + inventaireLigneTempList.get(position), Toast.LENGTH_SHORT).show();
@@ -120,6 +145,9 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
                 case CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH:
 
 
+                    onResume();
+                    break;
+                case RETOUR_LOT:
                     onResume();
                     break;
             }
@@ -292,21 +320,65 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
         layoutValider_LL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
-                courant.setStockPhysique(Integer.parseInt(quantiteComptee_ET.getText().toString()));
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                String dateDuJour = sdf.format(new Date());
-                courant.setInventaireDate(dateDuJour);
-                Inventaire_Ligne_TempOpenHelper.mettreAJourInventaireLigneTemp(db, courant);
+                //vérification du numéro de lot et de la date de péremption
+                String numeroLotTemp = numeroLot_ET.getText().toString().trim();
+                String dateExpirationLotTemp = dateExpirationLot_ET.getText().toString().trim();
 
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, courant.getPhiMR4UUID(), courant.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
-                ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotInventaireActivity.this, db, utilisateurConnecte, false);
+                String[] dateParts = dateExpirationLotTemp.split("/");
+                if(dateParts.length == 3)
+                    dateExpirationLotTemp = dateParts[2]+"-"+dateParts[1]+"-"+dateParts[0];
 
-                if (viewHolder instanceof InventaireLigneTempAdapter.InventaireLigneTempViewHolder) {
-                    InventaireLigneTempAdapter.InventaireLigneTempViewHolder monViewHolder = (InventaireLigneTempAdapter.InventaireLigneTempViewHolder) viewHolder;
-                    monViewHolder.qteStockPhysique.setText(quantiteComptee_ET.getText().toString());
-                    adapter.notifyItemChanged(position);
+                if(!courant.getPeremptionDate().contentEquals(dateExpirationLotTemp))
+                {
+                    //mise à 0 de l'inventaireLigneTemp courant
+                    courant.setStockPhysique(0);
+                    courant.setInventaireDate("null");
+                    Inventaire_Ligne_TempOpenHelper.mettreAJourInventaireLigneTemp(db, courant);
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, courant.getPhiMR4UUID(), courant.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
+                    ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotInventaireActivity.this, db, utilisateurConnecte, false);
+                    nouvelInventaireLigneTemp = courant;
+                    nouvelInventaireLigneTemp.set_UID(getIdInventaireLigneTemp());
+                    nouvelInventaireLigneTemp.setLot(numeroLotTemp);
+                    nouvelInventaireLigneTemp.setPeremptionDate(dateExpirationLotTemp);
+                    nouvelInventaireLigneTemp.setStockPhysique(Integer.parseInt(quantiteComptee_ET.getText().toString()));
+                    nouvelInventaireLigneTemp.setInventaireDate(getDateDuJour());
+                    Alerte.afficherAlerteConfirmation(ListeLotInventaireActivity.this, getLayoutInflater(), getBundle(), "La date de péremption a été modifiée. Une nouvelle ligne va être créer.\nSouhaitez vous confirmer ?", false, true, ListeLotInventaireActivity.this);
                     alertDialog.dismiss();
+                }
+                else if(!courant.getLot().contentEquals(numeroLotTemp))
+                {
+                    //mise à 0 de l'inventaireLigneTemp courant
+                    courant.setStockPhysique(0);
+                    courant.setInventaireDate("null");
+                    Inventaire_Ligne_TempOpenHelper.mettreAJourInventaireLigneTemp(db, courant);
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, courant.getPhiMR4UUID(), courant.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
+                    ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotInventaireActivity.this, db, utilisateurConnecte, false);
+
+                    nouvelInventaireLigneTemp = courant;
+                    nouvelInventaireLigneTemp.set_UID(getIdInventaireLigneTemp());
+                    nouvelInventaireLigneTemp.setLot(numeroLotTemp);
+                    nouvelInventaireLigneTemp.setPeremptionDate(dateExpirationLotTemp);
+                    nouvelInventaireLigneTemp.setStockPhysique(Integer.parseInt(quantiteComptee_ET.getText().toString()));
+                    nouvelInventaireLigneTemp.setInventaireDate(getDateDuJour());
+                    Alerte.afficherAlerteConfirmation(ListeLotInventaireActivity.this, getLayoutInflater(), getBundle(), "Le numéro de lot a été modifié. Une nouvelle ligne va être créer.\nSouhaitez vous confirmer ?", false, true, ListeLotInventaireActivity.this);
+                    alertDialog.dismiss();
+                }
+                else
+                {
+                    RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
+                    courant.setStockPhysique(Integer.parseInt(quantiteComptee_ET.getText().toString()));
+                    courant.setInventaireDate(getDateDuJour());
+                    Inventaire_Ligne_TempOpenHelper.mettreAJourInventaireLigneTemp(db, courant);
+
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, courant.getPhiMR4UUID(), courant.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
+                    ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotInventaireActivity.this, db, utilisateurConnecte, false);
+
+                    if (viewHolder instanceof InventaireLigneTempAdapter.InventaireLigneTempViewHolder) {
+                        InventaireLigneTempAdapter.InventaireLigneTempViewHolder monViewHolder = (InventaireLigneTempAdapter.InventaireLigneTempViewHolder) viewHolder;
+                        monViewHolder.qteStockPhysique.setText(quantiteComptee_ET.getText().toString());
+                        adapter.notifyItemChanged(position);
+                        alertDialog.dismiss();
+                    }
                 }
             }
         });
@@ -317,5 +389,34 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
                 alertDialog.dismiss();
             }
         });
+    }
+
+    @Override
+    public void confirmationService()
+    {
+        //création du nouvel inventaireLigneTemp
+        Inventaire_Ligne_TempOpenHelper.insererUnInventaire_Ligne_TempEnBDD(db, nouvelInventaireLigneTemp);
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, nouvelInventaireLigneTemp.getPhiMR4UUID(), nouvelInventaireLigneTemp.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+        ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotInventaireActivity.this, db, utilisateurConnecte, false);
+        nouvelInventaireLigneTemp = null;
+        onResume();
+    }
+
+    private int getIdInventaireLigneTemp()
+    {
+        Random randominventairelignetemp = new Random();
+        int inventairelignetempid = randominventairelignetemp.nextInt();
+        if(inventairelignetempid > 0)
+            inventairelignetempid= inventairelignetempid*-1;
+
+        return inventairelignetempid;
+    }
+
+    private String getDateDuJour()
+    {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String dateDuJour = sdf.format(new Date());
+
+        return dateDuJour;
     }
 }

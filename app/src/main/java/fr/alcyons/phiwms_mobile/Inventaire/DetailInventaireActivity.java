@@ -1,5 +1,7 @@
 package fr.alcyons.phiwms_mobile.Inventaire;
 
+import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LOT;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -23,15 +26,13 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.InventaireOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Inventaire_Ligne_TempOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
 import fr.alcyons.phiwms_mobile.Classes.Inventaire;
 import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp;
-import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.DetailInventaireAdapter;
-import fr.alcyons.phiwms_mobile.Outils.Alerte;
-import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparationActivity;
 import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.Reception.CreationLotManuelReceptionActivity;
+import fr.alcyons.phiwms_mobile.Reception.ListeLotReceptionActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
@@ -196,15 +197,16 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
         super.onCreateOptionsMenu(menu);
         //Récupération du menu
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_preparation_detail, menu);
+        inflater.inflate(R.menu.menu_action, menu);
+
+        valider_item = menu.findItem(R.id.menuSaveCircle).setVisible(true);
+        verificationEtatInvtentaire();
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.prepareOptionsMenu(menu, null, null, "Désignation référence");
-
-        valider_item = menu.findItem(R.id.boutonValider);
         valider_item.setOnMenuItemClickListener(menuItem -> {
             Random randomaction = new Random();
             int actionId = randomaction.nextInt();
