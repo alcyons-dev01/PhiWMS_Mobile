@@ -12,15 +12,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerInventaireActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
@@ -68,6 +71,19 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
                 serviceInventaire_Bundle.putInt("inventaireId", inventaireCourant.getInventaire_ID());
                 serviceInventaire_Bundle.putString("zoneSelectionne", zoneCourante);
                 serviceInventaire_Bundle.putInt("produitId", Integer.parseInt(ligneSelectionnee[5]));
+                serviceInventaire_Intent.putExtras(serviceInventaire_Bundle);
+                DetailInventaireActivity.this.startActivity(serviceInventaire_Intent);
+            }
+        });
+
+        ((LinearLayout) findViewById(R.id.lancerScan)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent serviceInventaire_Intent = new Intent(DetailInventaireActivity.this, ScannerInventaireActivity.class);
+                Bundle serviceInventaire_Bundle = DetailInventaireActivity.super.getBundle();
+                serviceInventaire_Bundle.putInt("inventaireID", inventaireCourant.getInventaire_ID());
+                serviceInventaire_Bundle.putString("zoneSelectionne", zoneCourante);
+                serviceInventaire_Bundle.putSerializable("inventaireLigneTempList", (Serializable) inventaireLigneTempList);
                 serviceInventaire_Intent.putExtras(serviceInventaire_Bundle);
                 DetailInventaireActivity.this.startActivity(serviceInventaire_Intent);
             }

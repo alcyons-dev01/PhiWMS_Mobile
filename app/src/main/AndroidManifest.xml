@@ -339,6 +339,13 @@
         android:configChanges="orientation|keyboardHidden"/>
 
     <activity
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerInventaireActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerRetourActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
