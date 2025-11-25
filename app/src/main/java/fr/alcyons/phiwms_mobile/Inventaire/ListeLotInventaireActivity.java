@@ -157,8 +157,6 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
         if (data != null) {
             switch (requestCode) {
                 case CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH:
-
-
                     onResume();
                     break;
                 case RETOUR_LOT:
