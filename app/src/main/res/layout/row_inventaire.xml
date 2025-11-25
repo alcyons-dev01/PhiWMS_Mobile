@@ -5,17 +5,18 @@
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/layoutPrincipal_LL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@drawable/background_element_liste"
-        android:padding="2dp"
+        android:background="@drawable/background_cadre_bleu"
         tools:ignore="MissingConstraints">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:padding="3dp"
             android:weightSum="2">
 
             <TextView
@@ -53,6 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:padding="3dp"
             android:weightSum="7">
 
             <TextView

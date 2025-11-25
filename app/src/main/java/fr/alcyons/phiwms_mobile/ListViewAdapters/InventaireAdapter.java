@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +55,7 @@ public class InventaireAdapter extends ArrayAdapter implements Filterable {
             viewHolder.depotInventaire_TV = (TextView) convertView.findViewById(R.id.depotInventaire_TV);
             viewHolder.inventaireLigneCompte_TV = (TextView) convertView.findViewById(R.id.inventaireLigneCompte_TV);
             viewHolder.inventaireLigneTotal_TV = (TextView) convertView.findViewById(R.id.inventaireLigneTotal_TV);
+            viewHolder.layoutPrincipal_LL = (LinearLayout) convertView.findViewById(R.id.layoutPrincipal_LL);
             convertView.setTag(viewHolder);
         }
 
@@ -61,6 +63,13 @@ public class InventaireAdapter extends ArrayAdapter implements Filterable {
 
         if (inventaire != null) {
             viewHolder.statutInventaire_TV.setText(inventaire[6]);
+
+            if(inventaire[6].contentEquals("Saisie complète"))
+            {
+                viewHolder.layoutPrincipal_LL.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_vert));
+                viewHolder.statutInventaire_TV.setTextColor(context.getResources().getColor(R.color.vert));
+            }
+
             viewHolder.codeInventaire_TV.setText("#"+inventaire[2]);
 
             viewHolder.zoneInventaire_TV.setText(inventaire[0]);
@@ -135,6 +144,7 @@ public class InventaireAdapter extends ArrayAdapter implements Filterable {
         public TextView depotInventaire_TV;
         public TextView inventaireLigneCompte_TV;
         public TextView inventaireLigneTotal_TV;
+        public LinearLayout layoutPrincipal_LL;
     }
 }
 

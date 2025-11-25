@@ -444,7 +444,7 @@ public class ServiceInventairePartielActivity extends ServiceAvecConnexionActivi
                 if(zonePrecedente.contentEquals(inventaireLigneTemp.getZone()))
                 {
                     nbLigneZone = nbLigneZone + 1;
-                    if(!inventaireLigneTemp.getInventaireDate().contentEquals("") && !inventaireLigneTemp.getInventaireDate().contentEquals("null"))
+                    if(!inventaireLigneTemp.getInventaireDate().contentEquals("") && !inventaireLigneTemp.getInventaireDate().contentEquals("null") && !inventaireLigneTemp.getInventaireDate().contentEquals("0000-00-00"))
                         nbLigneZoneSaisie = nbLigneZoneSaisie + 1;
 
                     if(compteur == inventaireLigneTempList.size())
@@ -477,17 +477,19 @@ public class ServiceInventairePartielActivity extends ServiceAvecConnexionActivi
                         ligneInventaire[4] = inventaire.getClotureDate();
                         ligneInventaire[5] = String.valueOf(nbLigneZoneSaisie);
                         if(nbLigneZoneSaisie == nbLigneZone)
-                            ligneInventaire[6] = "Saisie complère";
+                            ligneInventaire[6] = "Saisie complète";
                         else
                             ligneInventaire[6] = "À saisir";
 
                         listeInventaire.add(ligneInventaire);
-
-                        nbLigneZone = 1;
                         nbLigneZoneSaisie = 0;
+
+                        if(!inventaireLigneTemp.getInventaireDate().contentEquals("") && !inventaireLigneTemp.getInventaireDate().contentEquals("null") && !inventaireLigneTemp.getInventaireDate().contentEquals("0000-00-00"))
+                            nbLigneZoneSaisie = nbLigneZoneSaisie + 1;
                         ligneInventaire = new String[7];
                     }
 
+                    nbLigneZone = 1;
                     zonePrecedente = inventaireLigneTemp.getZone();
                 }
             }

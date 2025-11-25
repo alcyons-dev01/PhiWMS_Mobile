@@ -94,9 +94,55 @@
                     android:background="@drawable/ic_datamatrix"/>
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/layoutProgressBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginVertical="10dp"
+                android:layout_marginHorizontal="5dp"
+                android:weightSum="10">
+
+                <TextView
+                    android:id="@+id/nbReferenceInventorie_TV"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textColor="@color/bleu_clair_alcyons"
+                    android:textStyle="bold"
+                    android:textSize="18dp"
+                    android:layout_gravity="center"
+                    android:text="1"/>
+
+                <ProgressBar
+                    android:id="@+id/progressBarInventaire_PB"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="8"
+                    android:layout_gravity="center"
+                    android:background="@drawable/background_empty_radius"
+                    android:backgroundTint="@color/bleu_clair_alcyons_transparent"
+                    android:progressDrawable="@drawable/progress_bar_background"/>
+
+                <TextView
+                    android:id="@+id/nbReferenceTotal_TV"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:textColor="@color/bleu_clair_alcyons"
+                    android:textStyle="bold"
+                    android:textSize="18dp"
+                    android:text="2"/>
+
+            </LinearLayout>
+
             <ListView
                 android:id="@+id/listeView"
-                android:layout_below="@id/lancerScan"
+                android:layout_below="@id/layoutProgressBar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:descendantFocusability="afterDescendants"
@@ -104,9 +150,8 @@
                 android:paddingRight="10dp"
                 android:transcriptMode="alwaysScroll"
                 android:layout_marginBottom="10dp"
-                android:layout_marginTop="10dp"
                 android:divider="@android:color/transparent"
-                android:dividerHeight="10dp"/>
+                android:dividerHeight="5dp"/>
 
         </LinearLayout>
 

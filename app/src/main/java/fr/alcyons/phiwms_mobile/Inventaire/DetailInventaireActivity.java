@@ -5,6 +5,7 @@ import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LOT;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.io.Serializable;
@@ -46,7 +48,6 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
     String zoneCourante;
     ListView inventaireListView;
     DetailInventaireAdapter adapter;
-
     MenuItem valider_item;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +100,7 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
 
         List<String[]> tabInventaireLigneTemp = new ArrayList<>();
 
-        String[] tabTemp = new String[8];
+        String[] tabTemp = new String[10];
         int compteur = 0;
         String produitPrecedent = "";
         int qteStockTheorique = 0;
@@ -108,12 +109,15 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
         String reference = "";
         String fournisseur = "";
         String idProduit = "";
+        int nbLigne = 0;
+        int nbLigneSaisie = 0;
         boolean complet = true;
         for (Inventaire_Ligne_Temp ligne : inventaireLigneTempList) {
             compteur++;
 
             if (ligne.getDesignation().contentEquals(produitPrecedent))
             {
+                nbLigne++;
                 if(compteur == inventaireLigneTempList.size())
                 {
                     if(!ligne.getInventaireDate().contentEquals("") && !ligne.getInventaireDate().contentEquals("null")  && !ligne.getInventaireDate().contentEquals("0000-00-00"))
@@ -121,6 +125,7 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
                         if(qteStockSaisie == -1)
                             qteStockSaisie = 0;
                         qteStockSaisie += ligne.getStockPhysique();
+                        nbLigneSaisie ++;
                     }
                     else
                     {
@@ -134,6 +139,8 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
                     tabTemp[4] = String.valueOf(qteStockSaisie);
                     tabTemp[5] = idProduit;
                     tabTemp[6] = String.valueOf(complet);
+                    tabTemp[7] = String.valueOf(nbLigne);
+                    tabTemp[8] = String.valueOf(nbLigneSaisie);
 
                     tabInventaireLigneTemp.add(tabTemp);
                 }
@@ -145,6 +152,7 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
                         if(qteStockSaisie == -1)
                             qteStockSaisie = 0;
                         qteStockSaisie += ligne.getStockPhysique();
+                        nbLigneSaisie ++;
                     }
                     else
                     {
@@ -163,6 +171,8 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
                     tabTemp[4] = String.valueOf(qteStockSaisie);
                     tabTemp[5] = idProduit;
                     tabTemp[6] = String.valueOf(complet);
+                    tabTemp[7] = String.valueOf(nbLigne);
+                    tabTemp[8] = String.valueOf(nbLigneSaisie);
 
                     tabInventaireLigneTemp.add(tabTemp);
                 }
@@ -172,15 +182,18 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
                 reference = ligne.getProduitReference();
                 fournisseur = ligne.getFournisseurNom();
                 idProduit = String.valueOf(ligne.getProduitID());
-                tabTemp = new String[8];
+                tabTemp = new String[10];
                 qteStockTheorique = 0;
                 qteStockSaisie = -1;
+                nbLigne = 1;
+                nbLigneSaisie = 0;
                 qteStockTheorique += ligne.getStockTheorique();
                 if(!ligne.getInventaireDate().contentEquals("") && !ligne.getInventaireDate().contentEquals("null") && !ligne.getInventaireDate().contentEquals("0000-00-00"))
                 {
                     if(qteStockSaisie == -1)
                         qteStockSaisie = 0;
                     qteStockSaisie += ligne.getStockPhysique();
+                    nbLigneSaisie ++;
                 }
                 else
                 {
@@ -196,6 +209,8 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
                     tabTemp[4] = String.valueOf(qteStockSaisie);
                     tabTemp[5] = idProduit;
                     tabTemp[6] = String.valueOf(complet);
+                    tabTemp[7] = String.valueOf(nbLigne);
+                    tabTemp[8] = String.valueOf(nbLigneSaisie);
 
                     tabInventaireLigneTemp.add(tabTemp);
                 }
@@ -238,7 +253,7 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        super.prepareOptionsMenu(menu, null, null, "Désignation référence");
+        super.prepareOptionsMenu(menu, adapter, null, "Désignation référence, inventaire non complet,...");
         valider_item.setOnMenuItemClickListener(menuItem -> {
             Random randomaction = new Random();
             int actionId = randomaction.nextInt();
@@ -261,11 +276,15 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
     public void verificationEtatInvtentaire()
     {
         boolean inventaireComplet = true;
+        int nbReferenceInventorie = 0;
         for (Inventaire_Ligne_Temp ligne : inventaireLigneTempList) {
             if(ligne.getInventaireDate().contentEquals("") || ligne.getInventaireDate().contentEquals("null") || ligne.getInventaireDate().contentEquals("0000-00-00"))
             {
                 inventaireComplet = false;
-                break;
+            }
+            else
+            {
+                nbReferenceInventorie++;
             }
         }
 
@@ -275,6 +294,16 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
                 valider_item.setVisible(true);
             else
                 valider_item.setVisible(false);
+        }
+
+        ((TextView) findViewById(R.id.nbReferenceInventorie_TV)).setText(String.valueOf(nbReferenceInventorie));
+        ((TextView) findViewById(R.id.nbReferenceTotal_TV)).setText(String.valueOf(inventaireLigneTempList.size()));
+        ((ProgressBar) findViewById(R.id.progressBarInventaire_PB)).setMax(inventaireLigneTempList.size());
+        ((ProgressBar) findViewById(R.id.progressBarInventaire_PB)).setProgress(nbReferenceInventorie);
+
+        if(inventaireComplet)
+        {
+            ((ProgressBar) findViewById(R.id.progressBarInventaire_PB)).setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.vert)));
         }
     }
 }

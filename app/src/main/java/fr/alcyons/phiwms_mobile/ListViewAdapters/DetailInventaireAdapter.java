@@ -8,7 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.core.content.res.ResourcesCompat;
@@ -53,6 +56,11 @@ public class DetailInventaireAdapter extends ArrayAdapter {
             viewHolder.fournisseurProduit = (TextView) convertView.findViewById(R.id.fournisseurProduit);
             viewHolder.stockSaisie = (TextView) convertView.findViewById(R.id.stockSaisie);
             viewHolder.imageStatutSaisie_IV = (ImageView) convertView.findViewById(R.id.imageStatutSaisie_IV);
+            viewHolder.layoutPrincipal_LL = (LinearLayout) convertView.findViewById(R.id.layoutPrincipal_LL);
+            viewHolder.progressBarReference_PB = (ProgressBar) convertView.findViewById(R.id.progressBarReference_PB);
+            /*viewHolder.layoutArrierePlan_LL = (LinearLayout) convertView.findViewById(R.id.layoutArrierePlan_LL);
+            viewHolder.arrierePlanLotCompte_V = (View) convertView.findViewById(R.id.arrierePlanLotCompte_V);
+            viewHolder.arrierePlanLotNonCompte_V = (View) convertView.findViewById(R.id.arrierePlanLotNonCompte_V);*/
             convertView.setTag(viewHolder);
         }
 
@@ -60,16 +68,30 @@ public class DetailInventaireAdapter extends ArrayAdapter {
         viewHolder.nomProduit.setText(inventaireLigneTemp[1]);
         viewHolder.refProduit.setText(inventaireLigneTemp[0]);
         viewHolder.fournisseurProduit.setText(inventaireLigneTemp[2]);
+        viewHolder.progressBarReference_PB.setMax(Integer.parseInt(inventaireLigneTemp[7]));
+        viewHolder.progressBarReference_PB.setProgress(Integer.parseInt(inventaireLigneTemp[8]));
+        /*viewHolder.layoutArrierePlan_LL.setWeightSum(Float.parseFloat(inventaireLigneTemp[7]));
+        LinearLayout.LayoutParams lParams = (LinearLayout.LayoutParams) viewHolder.arrierePlanLotCompte_V.getLayoutParams();
+        lParams.weight = Float.parseFloat(inventaireLigneTemp[8]);
+        viewHolder.arrierePlanLotCompte_V.setLayoutParams(lParams);
+
+        LinearLayout.LayoutParams lParamsbis = (LinearLayout.LayoutParams) viewHolder.arrierePlanLotNonCompte_V.getLayoutParams();
+        lParamsbis.weight = Float.parseFloat(inventaireLigneTemp[7]) - Float.parseFloat(inventaireLigneTemp[8]);
+        viewHolder.arrierePlanLotNonCompte_V.setLayoutParams(lParamsbis);*/
 
         if(inventaireLigneTemp[6].contentEquals("true"))
         {
             viewHolder.imageStatutSaisie_IV.setBackground(context.getResources().getDrawable(R.drawable.ic_check_circle_green,null));
             ViewCompat.setBackgroundTintList(viewHolder.imageStatutSaisie_IV, ColorStateList.valueOf(context.getResources().getColor(R.color.vert, null)));
+            viewHolder.layoutPrincipal_LL.setBackground(context.getDrawable(R.drawable.background_cadre_vert));
+            viewHolder.progressBarReference_PB.setProgressTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.vert)));
         }
         else
         {
             viewHolder.imageStatutSaisie_IV.setBackground(context.getResources().getDrawable(R.drawable.ic_edit_black,null));
             ViewCompat.setBackgroundTintList(viewHolder.imageStatutSaisie_IV, ColorStateList.valueOf(context.getResources().getColor(R.color.bleu_clair_alcyons, null)));
+            viewHolder.layoutPrincipal_LL.setBackground(context.getDrawable(R.drawable.background_cadre_bleu));
+            viewHolder.progressBarReference_PB.setProgressTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.bleu_clair_alcyons)));
         }
 
         if(Integer.parseInt(inventaireLigneTemp[4]) == -1)
@@ -99,6 +121,11 @@ public class DetailInventaireAdapter extends ArrayAdapter {
         public TextView fournisseurProduit;
         public TextView stockSaisie;
         public ImageView imageStatutSaisie_IV;
+        public LinearLayout layoutPrincipal_LL;
+        /*public LinearLayout layoutArrierePlan_LL;
+        public View arrierePlanLotCompte_V;
+        public View arrierePlanLotNonCompte_V;*/
+        ProgressBar progressBarReference_PB;
     }
 
     @Override
@@ -113,25 +140,31 @@ public class DetailInventaireAdapter extends ArrayAdapter {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
 
-           /* String chaineToSearch = Normalizer.normalize(constraint.toString().toLowerCase(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+            String chaineToSearch = Normalizer.normalize(constraint.toString().toLowerCase(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
             FilterResults filterResults = new FilterResults();
 
             inventaireLigneTempList.clear();
 
-            for (Inventaire_Ligne_Temp inventaireLigneTemp : inventaireLigneTempListBase) {
+            for (String[] inventaireLigneTemp : inventaireLigneTempListBase) {
                 inventaireLigneTempList.add(inventaireLigneTemp);
             }
 
             if (chaineToSearch != null && chaineToSearch.toString().length() > 0) {
 
-                List<Inventaire_Ligne_Temp> inventaireLigneTempTrouveList = new ArrayList<>();
+                List<String[]> inventaireLigneTempTrouveList = new ArrayList<>();
 
-                for (Inventaire_Ligne_Temp inventaireLigneTempCourant : inventaireLigneTempList) {
+                for (String[] inventaireLigneTempCourant : inventaireLigneTempList) {
                     // Vérifie le début du premier mot
-                    String produitDesignation = Normalizer.normalize(inventaireLigneTempCourant.getDesignation().toLowerCase(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+                    String produitDesignation = Normalizer.normalize(inventaireLigneTempCourant[1].toLowerCase(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+                    boolean complet = Boolean.parseBoolean(inventaireLigneTempCourant[6]);
                     if (produitDesignation.startsWith(chaineToSearch)) {
                         inventaireLigneTempTrouveList.add(inventaireLigneTempCourant);
-                    } else {
+                    }
+                    else if(chaineToSearch.contentEquals("-1") && !complet)
+                    {
+                        inventaireLigneTempTrouveList.add(inventaireLigneTempCourant);
+                    }
+                    else {
                         // Vérifie le début de chaque mot
                         final String[] words = produitDesignation.split(" ");
                         for (String word : words) {
@@ -149,15 +182,14 @@ public class DetailInventaireAdapter extends ArrayAdapter {
                 filterResults.values = inventaireLigneTempListBase;
                 filterResults.count = inventaireLigneTempListBase.size();
             }
-            return filterResults;*/
-            return new FilterResults();
+            return filterResults;
         }
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             inventaireLigneTempList.clear();
             if (results.values != null) {
-                for (Inventaire_Ligne_Temp inventaireLigneTemp : (List<Inventaire_Ligne_Temp>) results.values) {
+                for (String[] inventaireLigneTemp : (List<String[]>) results.values) {
                     add(inventaireLigneTemp);
                 }
             }
