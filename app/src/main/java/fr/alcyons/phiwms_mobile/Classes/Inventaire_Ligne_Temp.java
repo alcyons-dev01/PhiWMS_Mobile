@@ -171,6 +171,35 @@ public class Inventaire_Ligne_Temp implements Serializable, Comparable {
         }
     }
 
+    public Inventaire_Ligne_Temp(Inventaire_Ligne_Temp inventaireLigneTemp) {
+        this.produitID = inventaireLigneTemp.getProduitID();
+        this.produitReference = inventaireLigneTemp.getProduitReference();
+        this.fournisseurNom = inventaireLigneTemp.getFournisseurNom();
+        this.categorie = inventaireLigneTemp.getCategorie();
+        this.designation = inventaireLigneTemp.getDesignation();
+        this.stockTheorique = 0;
+        this.stockPhysique = 0;
+        this.depotReference = inventaireLigneTemp.getDepotReference();
+        this._SYS_DT_MAJ = "";
+        this._SYS_HEURE_MAJ = "";
+        this._SYS_USER_MAJ = "";
+        this.Inventaire_ID = inventaireLigneTemp.getInventaire_ID();
+        this._NePasImprimer = false;
+        this.PUHT = inventaireLigneTemp.getPUHT();
+        this.tvaTx = inventaireLigneTemp.getTvaTx();
+        this.suspendu = false;
+        this.valeurTTC = 0;
+        this.ecart = 0;
+        this.unite = "";
+        this.Cond_Achat = inventaireLigneTemp.getCond_Achat();
+        this.classe = "";
+        this.lot = "";
+        this.PeremptionDate = "";
+        this._UID = 0;
+        this.zone = inventaireLigneTemp.getZone();
+        this.emplacement = inventaireLigneTemp.getEmplacement();
+    }
+
     public String getGS1(SQLiteDatabase db) {
         Produit produit = ProduitOpenHelper.getProduitByID(db, produitID);
         String new_gs1 = produit.getGTIN() + "17" + getPeremptionDate().substring(2).replace("-", "") + "10" + lot;

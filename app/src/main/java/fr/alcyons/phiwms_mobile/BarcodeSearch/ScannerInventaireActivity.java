@@ -305,7 +305,12 @@ public class ScannerInventaireActivity extends ServiceActivity {
 
                                     if(lotPresent)
                                     {
-                                        int qteProgress = (int)inventaireLigneTempCourant.getStockPhysique()+1;
+                                        if(inventaireLigneTempCourant.getStockPhysique() == -1 || inventaireLigneTempCourant.getInventaireDate().contentEquals("") || inventaireLigneTempCourant.getInventaireDate().contentEquals("null") || inventaireLigneTempCourant.getInventaireDate().contentEquals("0000-00-00"))
+                                            inventaireLigneTempCourant.setStockPhysique(1);
+                                        else
+                                            inventaireLigneTempCourant.setStockPhysique(inventaireLigneTempCourant.getStockPhysique()+1);
+
+                                        int qteProgress = (int)inventaireLigneTempCourant.getStockPhysique();
                                         ((ProgressBar) findViewById(R.id.progressBarQuantite)).setMax((int)inventaireLigneTempCourant.getStockTheorique());
                                         ((ProgressBar) findViewById(R.id.progressBarQuantite)).setProgress(qteProgress);
                                         ((TextView) findViewById(R.id.designationValidation)).setText(inventaireLigneTempCourant.getDesignation());
@@ -314,11 +319,6 @@ public class ScannerInventaireActivity extends ServiceActivity {
                                         ((TextView) findViewById(R.id.peremptionValidation)).setText(date_peremption_courant);
                                         ((TextView) findViewById(R.id.emplacementValidation)).setText(inventaireLigneTempCourant.getEmplacement());
                                         ((LinearLayout) findViewById(R.id.layoutIconeValidation)).setVisibility(View.VISIBLE);
-
-                                        if(inventaireLigneTempCourant.getStockPhysique() == -1)
-                                            inventaireLigneTempCourant.setStockPhysique(1);
-                                        else
-                                            inventaireLigneTempCourant.setStockPhysique(inventaireLigneTempCourant.getStockPhysique()+1);
 
                                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                                         String dateDuJour = sdf.format(new Date());
@@ -365,6 +365,8 @@ public class ScannerInventaireActivity extends ServiceActivity {
                                         ((LinearLayout) findViewById(R.id.layoutProduitInconnu)).setVisibility(View.INVISIBLE);
                                     }
                                 }, 3000);
+                                produitCourant = null;
+                                reinitialisationInterface();
                             }
 
                         }
@@ -413,38 +415,6 @@ public class ScannerInventaireActivity extends ServiceActivity {
         super.onBackPressed();
         findViewById(R.id.boutonFermeture).performClick();
     }
-
-    public void afficherSnackBar(String message) {
-        final InputMethodManager imm = (InputMethodManager) ScannerInventaireActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-
-        Snackbar snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>" + message + "</b>", 0), Snackbar.LENGTH_LONG);
-        @SuppressLint("RestrictedApi") Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
-        if(message.contentEquals("Produit déjà préparé en intégralité"))
-        {
-            layout.setBackgroundColor(getResources().getColor(R.color.vert3, null));
-        }
-        else
-        {
-            layout.setBackgroundColor(getResources().getColor(R.color.rouge2, null));
-        }
-
-        TextView textView = (TextView) layout.findViewById(com.google.android.material.R.id.snackbar_text);
-        textView.setGravity(Gravity.CENTER_HORIZONTAL);
-        textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-
-        FrameLayout snackBarView = (FrameLayout) snackbar.getView();
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackBarView.getLayoutParams();
-        params.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
-        params.setMargins(0, 50, 0, 0);
-        snackBarView.setLayoutParams(params);
-        snackbar.show();
-
-        InputMethodManager imme = (InputMethodManager) ScannerInventaireActivity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        imme.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
-    }
-
     private void reinitialisationInterface()
     {
         ((LinearLayout) findViewById(R.id.layoutIconeValidation)).postDelayed(new Runnable() {
@@ -457,6 +427,7 @@ public class ScannerInventaireActivity extends ServiceActivity {
                 ((TextView) findViewById(R.id.peremptionValidation)).setText("");
                 ((TextView) findViewById(R.id.emplacementValidation)).setText("");
                 ((TextView) findViewById(R.id.serieValidation)).setText("");
+                produitCourant = null;
             }
         }, 1500);
     }
@@ -483,7 +454,7 @@ public class ScannerInventaireActivity extends ServiceActivity {
             @Override
             public void onClick(View v) {
                 //Création action utilisateur
-                Inventaire_Ligne_Temp nouvelInventaireLigneTemp = inventaireLigneTemp;
+                Inventaire_Ligne_Temp nouvelInventaireLigneTemp = new Inventaire_Ligne_Temp(inventaireLigneTemp);
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                 String dateDuJour = sdf.format(new Date());
                 Random randominventairelignetemp = new Random();
@@ -494,12 +465,14 @@ public class ScannerInventaireActivity extends ServiceActivity {
                 nouvelInventaireLigneTemp.set_UID(inventairelignetempid);
                 nouvelInventaireLigneTemp.setInventaireDate(dateDuJour);
                 nouvelInventaireLigneTemp.setStockPhysique(1);
+                nouvelInventaireLigneTemp.setStockTheorique(1);
                 nouvelInventaireLigneTemp.setLot(lot);
                 nouvelInventaireLigneTemp.setPeremptionDate(peremptionDate);
 
                 Inventaire_Ligne_TempOpenHelper.insererUnInventaire_Ligne_TempEnBDD(db, nouvelInventaireLigneTemp);
                 ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, nouvelInventaireLigneTemp.getPhiMR4UUID(), nouvelInventaireLigneTemp.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
                 ElementASynchroniserOpenHelper.toutSynchroniser(ScannerInventaireActivity.this, db, utilisateurConnecte, false);
+                inventaireLigneTempList.add(nouvelInventaireLigneTemp);
                 alertDialog.dismiss();
 
                 ((ProgressBar) findViewById(R.id.progressBarQuantite)).setMax(1);
@@ -521,8 +494,6 @@ public class ScannerInventaireActivity extends ServiceActivity {
                 ((TextView) findViewById(R.id.EmplacementLotProduit)).setVisibility(View.GONE);
                 ((ImageView) findViewById(R.id.ImageViewEmplacement)).setVisibility(View.GONE);
                 ((TextView) findViewById(R.id.EmplacementLotProduit)).setText("");
-                ((ImageView) findViewById(R.id.ImageViewProduit)).setVisibility(View.GONE);
-                ((ImageView) findViewById(R.id.ImageViewEmplacement)).setVisibility(View.VISIBLE);
                 emplacement_courant = null;
                 alertDialog.dismiss();
             }

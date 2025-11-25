@@ -73,11 +73,12 @@
             android:layout_width="match_parent"
             android:layout_height="50sp"
             android:background="@drawable/background_empty_radius_top"
-            android:backgroundTint="@color/rouge"
+            android:backgroundTint="@color/bleu_clair_alcyons"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:paddingTop="2dp"
             android:paddingBottom="2dp"
+            android:layout_marginTop="10dp"
             android:weightSum="4">
 
             <TextView
@@ -89,7 +90,7 @@
                 android:gravity="center_vertical"
                 android:layout_weight="4"
                 android:textColor="#FFFFFF"
-                android:textSize="30sp"
+                android:textSize="24sp"
                 android:paddingStart="10dp"
                 android:textStyle="bold" />
 

@@ -36,6 +36,7 @@ import java.util.Objects;
 import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerInventaireActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
@@ -104,6 +105,19 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
                 Intent clicBoutonAjouterManuellement_Intent = new Intent(ListeLotInventaireActivity.this, CreationLotManuelleActivity.class);
                 clicBoutonAjouterManuellement_Intent.putExtras(clicBoutonAjouterManuellement_Bundle);
                 ListeLotInventaireActivity.this.startActivityForResult(clicBoutonAjouterManuellement_Intent, RETOUR_LOT);
+            }
+        });
+
+        ((LinearLayout) findViewById(R.id.lancerScan)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent serviceInventaire_Intent = new Intent(ListeLotInventaireActivity.this, ScannerInventaireActivity.class);
+                Bundle serviceInventaire_Bundle = ListeLotInventaireActivity.super.getBundle();
+                serviceInventaire_Bundle.putInt("inventaireID", inventaireCourant.getInventaire_ID());
+                serviceInventaire_Bundle.putString("zoneSelectionne", zoneCourante);
+                serviceInventaire_Bundle.putSerializable("inventaireLigneTempList", (Serializable) inventaireLigneTempList);
+                serviceInventaire_Intent.putExtras(serviceInventaire_Bundle);
+                ListeLotInventaireActivity.this.startActivityForResult(serviceInventaire_Intent, CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH);
             }
         });
     }

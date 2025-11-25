@@ -33,6 +33,7 @@ import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
 import fr.alcyons.phiwms_mobile.Classes.Inventaire;
 import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.DetailInventaireAdapter;
+import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.Reception.CreationLotManuelReceptionActivity;
 import fr.alcyons.phiwms_mobile.Reception.ListeLotReceptionActivity;
@@ -85,7 +86,7 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
                 serviceInventaire_Bundle.putString("zoneSelectionne", zoneCourante);
                 serviceInventaire_Bundle.putSerializable("inventaireLigneTempList", (Serializable) inventaireLigneTempList);
                 serviceInventaire_Intent.putExtras(serviceInventaire_Bundle);
-                DetailInventaireActivity.this.startActivity(serviceInventaire_Intent);
+                DetailInventaireActivity.this.startActivityForResult(serviceInventaire_Intent, CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH);
             }
         });
     }
@@ -206,6 +207,21 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
 
         invalidateOptionsMenu();
         verificationEtatInvtentaire();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data != null) {
+            switch (requestCode) {
+                case CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH:
+
+
+                    onResume();
+                    break;
+            }
+        }
+        invalidateOptionsMenu();
     }
 
     @Override

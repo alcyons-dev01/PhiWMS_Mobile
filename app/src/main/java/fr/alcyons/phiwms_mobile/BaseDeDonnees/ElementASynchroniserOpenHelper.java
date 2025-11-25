@@ -488,7 +488,8 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                                 rowId = db.delete(InventaireOpenHelper.Constantes.TABLE_INVENTAIRE, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
                                 break;
                             case Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP:
-                                rowId = db.delete(Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
+                                rowId = nouvelId;
+                                //rowId = db.delete(Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
                                 break;
                             case CommandeOpenHelper.Constantes.TABLE_COMMANDE:
                                 rowId = db.delete(CommandeOpenHelper.Constantes.TABLE_COMMANDE, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
