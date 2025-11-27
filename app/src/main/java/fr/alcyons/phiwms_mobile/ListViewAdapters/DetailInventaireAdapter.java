@@ -58,9 +58,6 @@ public class DetailInventaireAdapter extends ArrayAdapter {
             viewHolder.imageStatutSaisie_IV = (ImageView) convertView.findViewById(R.id.imageStatutSaisie_IV);
             viewHolder.layoutPrincipal_LL = (LinearLayout) convertView.findViewById(R.id.layoutPrincipal_LL);
             viewHolder.progressBarReference_PB = (ProgressBar) convertView.findViewById(R.id.progressBarReference_PB);
-            /*viewHolder.layoutArrierePlan_LL = (LinearLayout) convertView.findViewById(R.id.layoutArrierePlan_LL);
-            viewHolder.arrierePlanLotCompte_V = (View) convertView.findViewById(R.id.arrierePlanLotCompte_V);
-            viewHolder.arrierePlanLotNonCompte_V = (View) convertView.findViewById(R.id.arrierePlanLotNonCompte_V);*/
             convertView.setTag(viewHolder);
         }
 
@@ -70,14 +67,6 @@ public class DetailInventaireAdapter extends ArrayAdapter {
         viewHolder.fournisseurProduit.setText(inventaireLigneTemp[2]);
         viewHolder.progressBarReference_PB.setMax(Integer.parseInt(inventaireLigneTemp[7]));
         viewHolder.progressBarReference_PB.setProgress(Integer.parseInt(inventaireLigneTemp[8]));
-        /*viewHolder.layoutArrierePlan_LL.setWeightSum(Float.parseFloat(inventaireLigneTemp[7]));
-        LinearLayout.LayoutParams lParams = (LinearLayout.LayoutParams) viewHolder.arrierePlanLotCompte_V.getLayoutParams();
-        lParams.weight = Float.parseFloat(inventaireLigneTemp[8]);
-        viewHolder.arrierePlanLotCompte_V.setLayoutParams(lParams);
-
-        LinearLayout.LayoutParams lParamsbis = (LinearLayout.LayoutParams) viewHolder.arrierePlanLotNonCompte_V.getLayoutParams();
-        lParamsbis.weight = Float.parseFloat(inventaireLigneTemp[7]) - Float.parseFloat(inventaireLigneTemp[8]);
-        viewHolder.arrierePlanLotNonCompte_V.setLayoutParams(lParamsbis);*/
 
         if(inventaireLigneTemp[6].contentEquals("true"))
         {
@@ -122,9 +111,6 @@ public class DetailInventaireAdapter extends ArrayAdapter {
         public TextView stockSaisie;
         public ImageView imageStatutSaisie_IV;
         public LinearLayout layoutPrincipal_LL;
-        /*public LinearLayout layoutArrierePlan_LL;
-        public View arrierePlanLotCompte_V;
-        public View arrierePlanLotNonCompte_V;*/
         ProgressBar progressBarReference_PB;
     }
 

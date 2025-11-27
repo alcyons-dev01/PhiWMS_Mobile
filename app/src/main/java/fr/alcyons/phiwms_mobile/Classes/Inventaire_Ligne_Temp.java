@@ -198,6 +198,7 @@ public class Inventaire_Ligne_Temp implements Serializable, Comparable {
         this._UID = 0;
         this.zone = inventaireLigneTemp.getZone();
         this.emplacement = inventaireLigneTemp.getEmplacement();
+        this.synchroniser = inventaireLigneTemp.isSynchroniser();
     }
 
     public String getGS1(SQLiteDatabase db) {

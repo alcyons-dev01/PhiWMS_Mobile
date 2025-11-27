@@ -331,7 +331,7 @@ public class CreationLotManuelleActivity  extends ServiceAvecConnexionActivity {
             Toast.makeText(CreationLotManuelleActivity.this, "Tous les éléments n'ont pas été saisis.", Toast.LENGTH_SHORT).show();
         } else {
             //création de l'inventaire ligne temp
-            Inventaire_Ligne_Temp nouvelInventaireLigneTemp = inventaireLigneTempCourant;
+            Inventaire_Ligne_Temp nouvelInventaireLigneTemp = new Inventaire_Ligne_Temp(inventaireLigneTempCourant);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             String dateDuJour = sdf.format(new Date());
             Random randominventairelignetemp = new Random();

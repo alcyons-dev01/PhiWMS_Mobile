@@ -152,34 +152,26 @@
                 android:text="Exp."
                 android:textSize="14sp"
                 android:gravity="left"
-                android:textColor="@color/noir"/>
+                android:textColor="@color/noir"
+                android:layout_gravity="center"/>
 
-            <EditText
-                android:id="@+id/dateExpirationLot_ET"
+            <include
+                layout="@layout/layout_selecteur_date"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
-                android:text=""
-                android:textSize="16sp"
-                android:background="@drawable/background_cadre_bleu"
-                android:gravity="left"
-                android:paddingVertical="5dp"
-                android:paddingHorizontal="10dp"
-                android:inputType="date"
-                android:textColor="@color/noir"/>
+                android:layout_gravity="center"/>
 
         </LinearLayout>
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/bleu_fonce_alcyons"
-            android:layout_marginTop="10dp"/>
-
         <LinearLayout
+            android:id="@+id/layout_gestion_conditionnement_LL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:background="@drawable/background_cadre_bleu"
+            android:layout_marginHorizontal="5dp"
+            android:layout_marginTop="10dp"
             android:weightSum="2">
 
             <LinearLayout
@@ -188,18 +180,21 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:background="@color/vertTransparent">
+                android:backgroundTint="@color/vertTransparent"
+                android:background="@drawable/background_empty_radius_left"
+                android:layout_margin="1dp">
 
                 <TextView
                     android:id="@+id/textCartonFermer_TV"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Carton fermé"
-                    android:textSize="20dp"
+                    android:textSize="14dp"
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:textColor="@color/noir"
-                    android:padding="10dp"
+                    android:paddingVertical="5dp"
+                    android:paddingHorizontal="10dp"
                     android:textStyle="bold"/>
 
             </LinearLayout>
@@ -214,27 +209,25 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:background="@drawable/background_empty_radius_right"
+                android:layout_margin="1dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Carton ouvert\n(x1)"
-                    android:textSize="20dp"
+                    android:text="Carton ouvert (x1)"
+                    android:textSize="14dp"
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:textColor="@color/noir"
-                    android:padding="10dp"
+                    android:paddingVertical="5dp"
+                    android:paddingHorizontal="10dp"
                     android:textStyle="bold"/>
 
             </LinearLayout>
 
         </LinearLayout>
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/bleu_fonce_alcyons"/>
 
         <LinearLayout
             android:layout_width="match_parent"

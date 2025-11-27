@@ -38,6 +38,7 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -513,5 +514,56 @@ public class ServiceActivity extends MenuActivity implements RetourServiceListen
     @Override
     public void retourSaisieText(String text) {
 
+    }
+
+    public String[] getListeAnneeDatePicker()
+    {
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        int startYear = currentYear - 2;
+        int endYear = currentYear + 10;
+
+        int size = (endYear - startYear) + 1;
+        String[] tableauAnnee = new String[size];
+
+        for (int i = 0; i < size; i++) {
+            tableauAnnee[i] = String.valueOf(startYear + i);
+        }
+
+        return tableauAnnee;
+    }
+
+    public int getCurrentYear()
+    {
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        return currentYear;
+    }
+
+    public String[] getListeMoisDatePicker()
+    {
+        String[] tableauMois = new String[12];
+
+        for (int i = 0; i < 12; i++) {
+            tableauMois[i] = (i < 10) ? ("0" + (i+1)) : String.valueOf(i+1);
+        }
+
+        return tableauMois;
+    }
+
+    public String getDateDepuisMoisAnnee(String mois, String annee)
+    {
+        String dateRetourner = "";
+        int year = Integer.parseInt(annee);
+        int month = Integer.parseInt(mois); // 1 = janvier, 12 = décembre
+
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, year);
+        cal.set(Calendar.MONTH, month - 1);        // Calendar utilise 0–11
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+
+        int yyyy = cal.get(Calendar.YEAR);
+        int mm = cal.get(Calendar.MONTH) + 1;
+        int dd = cal.get(Calendar.DAY_OF_MONTH);
+
+        return String.format("%04d-%02d-%02d", yyyy, mm, dd);
     }
 }

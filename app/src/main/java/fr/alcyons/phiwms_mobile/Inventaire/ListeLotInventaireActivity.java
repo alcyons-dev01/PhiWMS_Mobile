@@ -6,6 +6,7 @@ import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LOT;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -14,10 +15,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -249,32 +252,47 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
         TextView emplacementLot_TV = view.findViewById(R.id.emplacementLot_TV);
         TextView textCartonFermer_TV = view.findViewById(R.id.textCartonFermer_TV);
         EditText numeroLot_ET = view.findViewById(R.id.numeroLot_ET);
-        EditText dateExpirationLot_ET = view.findViewById(R.id.dateExpirationLot_ET);
         EditText quantiteComptee_ET = view.findViewById(R.id.quantiteComptee_ET);
         LinearLayout layoutCartonFermer_LL = view.findViewById(R.id.layoutCartonFermer_LL);
         LinearLayout layoutCartonOuvert_LL = view.findViewById(R.id.layoutCartonOuvert_LL);
         LinearLayout layoutMoins_LL = view.findViewById(R.id.layoutMoins_LL);
         LinearLayout layoutPlus_LL = view.findViewById(R.id.layoutPlus_LL);
         LinearLayout layoutValider_LL = view.findViewById(R.id.layoutValider_LL);
+        LinearLayout layout_gestion_conditionnement_LL = view.findViewById(R.id.layout_gestion_conditionnement_LL);
         ImageView quitterModale_IV = view.findViewById(R.id.quitterModale_IV);
+
+        Spinner spinnerMoisDatePeremption_SP = view.findViewById(R.id.selecteurDateMois_SP);
+        ArrayAdapter<String> adapterMoisPeremption = new ArrayAdapter<>(ListeLotInventaireActivity.this, R.layout.spinner_date_item, getListeMoisDatePicker());
+        adapterMoisPeremption.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerMoisDatePeremption_SP.setAdapter(adapterMoisPeremption);
+
+        Spinner spinnerAnneeDatePeremption_SP = view.findViewById(R.id.selecteurDateAnnee_SP);
+        ArrayAdapter<String> adapterAnneePeremption = new ArrayAdapter<>(ListeLotInventaireActivity.this, R.layout.spinner_date_item, getListeAnneeDatePicker());
+        adapterAnneePeremption.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerAnneeDatePeremption_SP.setAdapter(adapterAnneePeremption);
+        spinnerAnneeDatePeremption_SP.setSelection(3);
 
         designationReference_TV.setText(courant.getDesignation());
         zoneLot_TV.setText(courant.getZone());
         emplacementLot_TV.setText(courant.getEmplacement());
         numeroLot_ET.setText(courant.getLot());
+        textCartonFermer_TV.setText(textCartonFermer_TV.getText()+"(x"+produitCourant.getCond_achat()+")");
 
-        if(courant.getPeremptionDate().contentEquals("null") || courant.getPeremptionDate().contentEquals("")  || courant.getInventaireDate().contentEquals("00/00/0000"))
-            dateExpirationLot_ET.setText("");
-        else
+        //gestion de la date de péremption
+        String[] tabPeremption = courant.getPeremptionDate().split("-");
+        String annee = tabPeremption[0];
+        String mois = tabPeremption[1];
+        int anneeCourante = getCurrentYear();
+        int anneeMin = anneeCourante - 2;
+        int anneeSelectionnee = Integer.parseInt(annee); // ex : 2027
+
+        spinnerMoisDatePeremption_SP.setSelection(Integer.parseInt(mois) - 1);
+        spinnerAnneeDatePeremption_SP.setSelection(anneeSelectionnee - anneeMin);
+
+        if(produitCourant.getCond_achat() == 1)
         {
-            String[] dateParts = courant.getPeremptionDate().split("-");
-            if(dateParts.length == 3)
-                dateExpirationLot_ET.setText(dateParts[2]+"/"+dateParts[1]+"/"+dateParts[0]);
-            else
-                dateExpirationLot_ET.setText(courant.getPeremptionDate());
+            layout_gestion_conditionnement_LL.setVisibility(View.GONE);
         }
-
-        textCartonFermer_TV.setText(textCartonFermer_TV.getText()+"\n(x"+produitCourant.getCond_achat()+")");
 
         if(courant.getInventaireDate().contentEquals("") || courant.getInventaireDate().contentEquals("null"))
         {
@@ -289,8 +307,8 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
             @Override
             public void onClick(View view) {
                 conditionnement[0] = produitCourant.getCond_achat();
-                layoutCartonOuvert_LL.setBackgroundColor(getResources().getColor(R.color.blanc));
-                layoutCartonFermer_LL.setBackgroundColor(getResources().getColor(R.color.vertTransparent));
+                layoutCartonOuvert_LL.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ListeLotInventaireActivity.this, R.color.blanc)));
+                layoutCartonFermer_LL.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ListeLotInventaireActivity.this, R.color.vertTransparent)));
             }
         });
 
@@ -298,8 +316,8 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
             @Override
             public void onClick(View view) {
                 conditionnement[0] = 1;
-                layoutCartonFermer_LL.setBackgroundColor(getResources().getColor(R.color.blanc));
-                layoutCartonOuvert_LL.setBackgroundColor(getResources().getColor(R.color.vertTransparent));
+                layoutCartonOuvert_LL.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ListeLotInventaireActivity.this, R.color.vertTransparent)));
+                layoutCartonFermer_LL.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ListeLotInventaireActivity.this, R.color.blanc)));
             }
         });
 
@@ -334,8 +352,9 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
             public void onClick(View view) {
                 //vérification du numéro de lot et de la date de péremption
                 String numeroLotTemp = numeroLot_ET.getText().toString().trim();
-                String dateExpirationLotTemp = dateExpirationLot_ET.getText().toString().trim();
-
+                String anneeSelection = spinnerAnneeDatePeremption_SP.getSelectedItem().toString();
+                String moisSelection = spinnerMoisDatePeremption_SP.getSelectedItem().toString();
+                String dateExpirationLotTemp = getDateDepuisMoisAnnee(moisSelection, anneeSelection);
                 String[] dateParts = dateExpirationLotTemp.split("/");
                 if(dateParts.length == 3)
                     dateExpirationLotTemp = dateParts[2]+"-"+dateParts[1]+"-"+dateParts[0];
@@ -348,7 +367,7 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
                     Inventaire_Ligne_TempOpenHelper.mettreAJourInventaireLigneTemp(db, courant);
                     ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, courant.getPhiMR4UUID(), courant.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
                     ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotInventaireActivity.this, db, utilisateurConnecte, false);
-                    nouvelInventaireLigneTemp = courant;
+                    nouvelInventaireLigneTemp = new Inventaire_Ligne_Temp(courant);
                     nouvelInventaireLigneTemp.set_UID(getIdInventaireLigneTemp());
                     nouvelInventaireLigneTemp.setLot(numeroLotTemp);
                     nouvelInventaireLigneTemp.setPeremptionDate(dateExpirationLotTemp);
@@ -366,7 +385,7 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
                     ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, courant.getPhiMR4UUID(), courant.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
                     ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotInventaireActivity.this, db, utilisateurConnecte, false);
 
-                    nouvelInventaireLigneTemp = courant;
+                    nouvelInventaireLigneTemp = new Inventaire_Ligne_Temp(courant);
                     nouvelInventaireLigneTemp.set_UID(getIdInventaireLigneTemp());
                     nouvelInventaireLigneTemp.setLot(numeroLotTemp);
                     nouvelInventaireLigneTemp.setPeremptionDate(dateExpirationLotTemp);

@@ -1,7 +1,5 @@
 package fr.alcyons.phiwms_mobile.Inventaire;
 
-import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LOT;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerInventaireActivity;
@@ -37,8 +36,6 @@ import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.DetailInventaireAdapter;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
-import fr.alcyons.phiwms_mobile.Reception.CreationLotManuelReceptionActivity;
-import fr.alcyons.phiwms_mobile.Reception.ListeLotReceptionActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
@@ -61,6 +58,28 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
 
         ((TextView) findViewById(R.id.intitule)).setText(inventaireCourant.getObjet());
         ((TextView) findViewById(R.id.zone)).setText(zoneCourante);
+
+        if(utilisateurConnecte.getIdentifiant().toUpperCase().contentEquals("ALCYONS"))
+        {
+            ((Button) findViewById(R.id.alcyonsSimulerInventaire_B)).setVisibility(View.VISIBLE);
+            ((Button) findViewById(R.id.alcyonsSimulerInventaire_B)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    inventaireLigneTempList = Inventaire_Ligne_TempOpenHelper.getAllInventaireLigneTempByInventaireEtZone(db, inventaireCourant.getInventaire_ID(), zoneCourante);
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    String dateDuJour = sdf.format(new Date());
+                    for(Inventaire_Ligne_Temp inventaireLigneTemp : inventaireLigneTempList)
+                    {
+                        inventaireLigneTemp.setStockPhysique(10);
+                        inventaireLigneTemp.setInventaireDate(dateDuJour);
+                        Inventaire_Ligne_TempOpenHelper.mettreAJourInventaireLigneTemp(db, inventaireLigneTemp);
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, inventaireLigneTemp.getPhiMR4UUID(), inventaireLigneTemp.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
+                    }
+                    ElementASynchroniserOpenHelper.toutSynchroniser(DetailInventaireActivity.this, db, utilisateurConnecte, false);
+                    onResume();
+                }
+            });
+        }
         inventaireListView = (ListView) findViewById(R.id.listeView);
 
         inventaireListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -221,7 +240,7 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
         inventaireListView.setAdapter(adapter);
 
         invalidateOptionsMenu();
-        verificationEtatInvtentaire();
+        verificationEtatInventaire();
     }
 
     @Override
@@ -247,7 +266,7 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
         inflater.inflate(R.menu.menu_action, menu);
 
         valider_item = menu.findItem(R.id.menuSaveCircle).setVisible(true);
-        verificationEtatInvtentaire();
+        verificationEtatInventaire();
         return true;
     }
 
@@ -273,7 +292,7 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
         return true;
     }
 
-    public void verificationEtatInvtentaire()
+    public void verificationEtatInventaire()
     {
         boolean inventaireComplet = true;
         int nbReferenceInventorie = 0;

@@ -155,6 +155,18 @@
 
         </LinearLayout>
 
+        <Button
+            android:id="@+id/alcyonsSimulerInventaire_B"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="30dp"
+            android:layout_marginHorizontal="50dp"
+            android:text="Simuler inventaire"
+            android:background="@color/rouge"
+            android:textColor="@color/blanc"
+            android:visibility="gone"/>
+
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
