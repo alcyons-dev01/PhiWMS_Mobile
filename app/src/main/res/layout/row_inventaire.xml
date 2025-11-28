@@ -25,6 +25,7 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="5dp"
                 android:gravity="left"
+                android:layout_gravity="center"
                 android:text="A Saisir"
                 android:textColor="@color/bleu_clair_alcyons"
                 android:textStyle="bold"
@@ -37,11 +38,31 @@
                 android:layout_height="wrap_content"
                 android:paddingRight="5dp"
                 android:gravity="right"
+                android:layout_gravity="center"
                 android:textColor="@color/noir"
                 android:textStyle="bold"
                 android:textSize="14dp"
                 android:text="Avant le 15/12/2023"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:visibility="gone"/>
+
+            <LinearLayout
+                android:id="@+id/layout_check_inventaire"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="right"
+                android:gravity="right"
+                android:paddingRight="5dp"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="right"
+                    android:background="@drawable/ic_check_circle_green"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 

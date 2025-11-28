@@ -56,6 +56,7 @@ public class InventaireAdapter extends ArrayAdapter implements Filterable {
             viewHolder.inventaireLigneCompte_TV = (TextView) convertView.findViewById(R.id.inventaireLigneCompte_TV);
             viewHolder.inventaireLigneTotal_TV = (TextView) convertView.findViewById(R.id.inventaireLigneTotal_TV);
             viewHolder.layoutPrincipal_LL = (LinearLayout) convertView.findViewById(R.id.layoutPrincipal_LL);
+            viewHolder.layout_check_inventaire = (LinearLayout) convertView.findViewById(R.id.layout_check_inventaire);
             convertView.setTag(viewHolder);
         }
 
@@ -68,6 +69,21 @@ public class InventaireAdapter extends ArrayAdapter implements Filterable {
             {
                 viewHolder.layoutPrincipal_LL.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_vert));
                 viewHolder.statutInventaire_TV.setTextColor(context.getResources().getColor(R.color.vert));
+                viewHolder.dateCloture_TV.setVisibility(View.GONE);
+                viewHolder.layout_check_inventaire.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                viewHolder.dateCloture_TV.setBackground(null);
+                // Gestion des dates
+                String dateCloture = inventaire[4];
+                String[] tabDateCloture = dateCloture.split("-");
+
+                if(tabDateCloture.length == 3)
+                    dateCloture = tabDateCloture[2] + "/" + tabDateCloture[1] + "/" + tabDateCloture[0];
+                viewHolder.dateCloture_TV.setText("Avant le " + dateCloture);
+                viewHolder.layout_check_inventaire.setVisibility(View.GONE);
+                viewHolder.dateCloture_TV.setVisibility(View.VISIBLE);
             }
 
             viewHolder.codeInventaire_TV.setText("#"+inventaire[2]);
@@ -77,14 +93,6 @@ public class InventaireAdapter extends ArrayAdapter implements Filterable {
 
             viewHolder.inventaireLigneCompte_TV.setText(String.valueOf(inventaire[5]));
             viewHolder.inventaireLigneTotal_TV.setText(String.valueOf(inventaire[1]));
-
-            // Gestion des dates
-            String dateCloture = inventaire[4];
-            String[] tabDateCloture = dateCloture.split("-");
-
-            if(tabDateCloture.length == 3)
-                dateCloture = tabDateCloture[2] + "/" + tabDateCloture[1] + "/" + tabDateCloture[0];
-            viewHolder.dateCloture_TV.setText("Avant le " + dateCloture);
 
         }
 
@@ -145,6 +153,7 @@ public class InventaireAdapter extends ArrayAdapter implements Filterable {
         public TextView inventaireLigneCompte_TV;
         public TextView inventaireLigneTotal_TV;
         public LinearLayout layoutPrincipal_LL;
+        public LinearLayout layout_check_inventaire;
     }
 }
 

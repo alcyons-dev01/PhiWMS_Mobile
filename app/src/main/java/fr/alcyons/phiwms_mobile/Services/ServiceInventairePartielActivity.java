@@ -483,12 +483,12 @@ public class ServiceInventairePartielActivity extends ServiceAvecConnexionActivi
 
                         listeInventaire.add(ligneInventaire);
                         nbLigneZoneSaisie = 0;
-
-                        if(!inventaireLigneTemp.getInventaireDate().contentEquals("") && !inventaireLigneTemp.getInventaireDate().contentEquals("null") && !inventaireLigneTemp.getInventaireDate().contentEquals("0000-00-00"))
-                            nbLigneZoneSaisie = nbLigneZoneSaisie + 1;
                         ligneInventaire = new String[7];
                     }
 
+                    if(!inventaireLigneTemp.getInventaireDate().contentEquals("") && !inventaireLigneTemp.getInventaireDate().contentEquals("null") && !inventaireLigneTemp.getInventaireDate().contentEquals("0000-00-00"))
+                        nbLigneZoneSaisie = nbLigneZoneSaisie + 1;
+                    
                     nbLigneZone = 1;
                     zonePrecedente = inventaireLigneTemp.getZone();
                 }
