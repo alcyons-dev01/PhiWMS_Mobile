@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,10 +18,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -28,7 +41,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
@@ -38,6 +53,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.StockUtilisesOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
@@ -75,6 +91,7 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
     PH_Preparation ph_preparation;
     List<Stock_Lot_Emplacement_Light> listeStockLotEmplacement;
     List<String> listelot;
+    boolean passageParScanner;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,6 +99,7 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
         context = ListeLotPreparationActivity.this;
         pm = ListeLotPreparationActivity.this.getPackageManager();
         camera_first = false;
+        passageParScanner = false;
 
         // Récupération du ph_preparation_ligne, produit, depot sélectionné
         listelot = new ArrayList<>();
@@ -132,60 +150,8 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
             }
         });
 
-        // Récupéeration des LOTS
-        listeStockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot);
-        boolean gtin_ok = !produit.getGTIN().contentEquals("");
 
-        if (!listeStockLotEmplacement.isEmpty()) {
-            Collections.sort(listeStockLotEmplacement, new Comparator<Stock_Lot_Emplacement_Light>() {
-                @Override
-                public int compare(Stock_Lot_Emplacement_Light o1, Stock_Lot_Emplacement_Light o2) {
-                    return o1.getPeremptionDate().compareTo(o2.getPeremptionDate());
-                }
-            });
 
-            for(Stock_Lot_Emplacement_Light courant: listeStockLotEmplacement)
-            {
-                listelot.add(courant.getLot());
-            }
-
-            if(!produitserialiserreception && produitsuiviserie)
-            {
-                listeStockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepotSerie(db, produit, depot);
-            }
-        }
-        else
-        {
-            Alerte.afficherAlerteInformation(ListeLotPreparationActivity.this, getLayoutInflater(), "Alerte", "Aucun lot existant pour cette référence", true, false);
-        }
-
-        recyclerView = findViewById(R.id.recyclerView);
-        int decorationCount = recyclerView.getItemDecorationCount();
-        for (int i = 0; i < decorationCount; i++) {
-            recyclerView.removeItemDecorationAt(0);
-        }
-        DividerItemDecoration divider = new DividerItemDecoration(ListeLotPreparationActivity.this, DividerItemDecoration.VERTICAL);
-        divider.setDrawable(ContextCompat.getDrawable(ListeLotPreparationActivity.this, R.drawable.recycler_divider));
-        recyclerView.addItemDecoration(divider);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        if(!gtin_ok && produitsuiviserie)
-        {
-            Alerte.afficherAlerte(ListeLotPreparationActivity.this, "Erreur", "Aucun GTIN renseigné pour le produit sélectionné, impossible d'ouvrir le scan", "alerte");
-        }
-        else
-        {
-            if(produitsuiviserie && !produitserialiserreception)
-            {
-                if(qteDejaPreparer < quantiteDemandeeBase)
-                {
-                    if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
-                    {
-                        onMenuDatamatrixClick();
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -193,68 +159,105 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
         super.onResume();
         invalidateOptionsMenu();
 
-        adapter = new LotAdapter_V2(listeStockLotEmplacement, position -> {
-            Toast.makeText(this, "Supprimer " + listeStockLotEmplacement.get(position), Toast.LENGTH_SHORT).show();
-            RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
-            if (viewHolder != null && viewHolder instanceof LotAdapter_V2.LotViewHolder) {
-                Stock_Lot_Emplacement_Light stock_courant = listeStockLotEmplacement.get(position);
-                LotAdapter_V2.LotViewHolder monViewHolder = (LotAdapter_V2.LotViewHolder) viewHolder;
-                int qte_Saisie = Integer.parseInt(monViewHolder.qteSaisie.getText().toString());
-                MAJValues(false, qte_Saisie);
-                monViewHolder.qteSaisie.setText("0");
-                stock_courant.setQte_Preparer(0);
-                Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
-                ((LotAdapter_V2.LotViewHolder) viewHolder).isSwipedOpen = false;
-                supprimerPhPreparationLigne(ph_preparation_ligne_base, stock_courant);
+        if (statutConnexion && passageParOnCreate)
+        {
+            RequestQueue requestQueue = Volley.newRequestQueue(ListeLotPreparationActivity.this);
+            String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteStock_Lot_Emplacements+"produit/"+produit.getID_produit()+"/depot/"+depot.getDepot_Reference();
 
-                listeStockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot);
-
-                Collections.sort(listeStockLotEmplacement, new Comparator<Stock_Lot_Emplacement_Light>() {
-                    @Override
-                    public int compare(Stock_Lot_Emplacement_Light o1, Stock_Lot_Emplacement_Light o2) {
-                        return o1.getPeremptionDate().compareTo(o2.getPeremptionDate());
-                    }
-                });
-
-                for(Stock_Lot_Emplacement_Light courant: listeStockLotEmplacement)
-                {
-                    listelot.add(courant.getLot());
-                }
-
-                if(!produitserialiserreception && produitsuiviserie)
-                {
-                    listeStockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepotSerie(db, produit, depot);
-                }
-
-                //on recherche la ligne de stock utilisé pour la supprimer aussi
-                StockUtilises stockUtilises = StockUtilisesOpenHelper.getStockUtiliserByStockIdAndUser(db, stock_courant.get_UID(), utilisateurConnecte.getId());
-
-                if(stockUtilises != null)
-                {
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, StockUtilisesOpenHelper.Constantes.TABLE_STOCK_UTILISE, stockUtilises.getphiwms_mobileUUID(), stockUtilises.getphiwms_mobileUUID(), DBOpenHelper.ActionsEAS.SUPPR);
-                    ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotPreparationActivity.this, db, utilisateurConnecte, false);
-                    StockUtilisesOpenHelper.supprimerUnStockUtilise(db, stockUtilises);
-                }
-
-                adapter.notifyItemChanged(position);
-
-                MAJVisuel();
-                onResume();
-            }
-
-            // Tu peux appeler confirm dialog ici
-        }, ListeLotPreparationActivity.this);
-
-        recyclerView.setAdapter(adapter);
+            JsonObjectRequest obreq = getJsonObjectRequest(urlRequete);
+            requestQueue.add(obreq);
+        }
+        else
+        {
+            gestionAdapter();
+        }
 
         if(!camera_first)
         {
            MAJVisuel();
         }
-
-        int nbColis = recupererNbColis(produit.getID_produit(), ph_preparation_ligne_base.getQte_APreparer());
-        ((TextView) findViewById(R.id.colis)).setText(String.valueOf(nbColis));
     }
+
+    @NonNull
+    private JsonObjectRequest getJsonObjectRequest(String urlRequete) {
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            int nbResultat = response.getInt("resultCount");
+                            if (nbResultat == 0) {
+                                String erreur = response.getString("erreur");
+                                if (erreur.equals(context.getString(R.string.tokenInvalide))) {
+                                    Alerte.afficherAlerte(context, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte");
+                                } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
+                                    Alerte.afficherAlerte(context, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", "alerte");;
+                                } else if (!erreur.contentEquals("Aucun PH_Stock_Lot_Emplacement trouvé")) {
+                                    Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Aucune ligne trouvée", "alerte");
+                                }
+                            } else {
+                                JSONArray ph_stockLotEmplacement_JSONArray = response.getJSONArray("PH_Stock_Lot_Emplacements");
+                                for (int k = 0; k < ph_stockLotEmplacement_JSONArray.length(); k++) {
+                                    Stock_Lot_Emplacement_Light stock_lot_emplacement_light = new Stock_Lot_Emplacement_Light(ph_stockLotEmplacement_JSONArray.getJSONObject(k));
+                                    Stock_Lot_Emplacement_Light stock_lot_emplacement_bdd = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, stock_lot_emplacement_light.get_UID());
+
+                                    if (stock_lot_emplacement_bdd == null) {
+                                        if (stock_lot_emplacement_light.getQte() >= 0) {
+                                            Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, stock_lot_emplacement_light);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if(stock_lot_emplacement_bdd.getQte() != stock_lot_emplacement_light.getQte())
+                                        {
+                                            Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_lot_emplacement_light);
+                                        }
+                                    }
+                                }
+
+                                //gestion des stocks utilisés
+                                List<StockUtilises> stockUtilisesList = StockUtilisesOpenHelper.getStockUtiliserByNotUser(db, utilisateurConnecte.getId());
+                                for (StockUtilises stockUtilisesTemp : stockUtilisesList) {
+                                    if(stockUtilisesTemp.getUserId() != utilisateurConnecte.getId())
+                                    {
+                                        Stock_Lot_Emplacement_Light stockCourantTemp = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, stockUtilisesTemp.getStockId());
+                                        if(stockCourantTemp != null)
+                                        {
+                                            stockCourantTemp.setQte(stockCourantTemp.getQte() - stockUtilisesTemp.getQuantite());
+                                            Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockCourantTemp);
+                                        }
+                                    }
+                                }
+
+                                invalidateOptionsMenu();
+                                passageParOnCreate = false;
+                                arreterSpinner();
+                                gestionAdapter();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("Volley", "Error");
+                        Alerte.afficherAlerte(ListeLotPreparationActivity.this, "Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Stock Lot Emplacement)", "alerte");
+                    }
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Authorization", utilisateurConnecte.getToken());
+                return headers;
+            }
+        };
+        obreq.setRetryPolicy(retryPolicy);
+        return obreq;
+    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -343,7 +346,7 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
     private void onMenuDatamatrixClick() {
         int index = -1;
         MAJListeLot();
-
+        passageParScanner = true;
         Intent listeLotPreparation_Intent = new Intent(ListeLotPreparationActivity.this, BarcodePreparationActivity.class);
         //gestion du zebra
         if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
@@ -628,5 +631,125 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
             if(!stockLotEmplacementLight.getSerie().contentEquals(""))
                 Stock_Lot_EmplacementLightOpenHelper.supprimerUnStockLotEmplacement(db, stockLotEmplacementLight);
         }
+    }
+
+    private void gestionListe()
+    {
+        listeStockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot);
+        boolean gtin_ok = !produit.getGTIN().contentEquals("");
+
+        if (!listeStockLotEmplacement.isEmpty()) {
+            Collections.sort(listeStockLotEmplacement, new Comparator<Stock_Lot_Emplacement_Light>() {
+                @Override
+                public int compare(Stock_Lot_Emplacement_Light o1, Stock_Lot_Emplacement_Light o2) {
+                    return o1.getPeremptionDate().compareTo(o2.getPeremptionDate());
+                }
+            });
+
+            for(Stock_Lot_Emplacement_Light courant: listeStockLotEmplacement)
+            {
+                listelot.add(courant.getLot());
+            }
+
+            if(!produitserialiserreception && produitsuiviserie)
+            {
+                listeStockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepotSerie(db, produit, depot);
+            }
+        }
+        else
+        {
+            Alerte.afficherAlerteInformation(ListeLotPreparationActivity.this, getLayoutInflater(), "Alerte", "Aucun lot existant pour cette référence", true, false);
+        }
+
+        if(!gtin_ok && produitsuiviserie)
+        {
+            Alerte.afficherAlerte(ListeLotPreparationActivity.this, "Erreur", "Aucun GTIN renseigné pour le produit sélectionné, impossible d'ouvrir le scan", "alerte");
+        }
+        else
+        {
+            if(produitsuiviserie && !produitserialiserreception)
+            {
+                if(qteDejaPreparer < quantiteDemandeeBase)
+                {
+                    if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
+                    {
+                        if(!passageParScanner)
+                            onMenuDatamatrixClick();
+                    }
+                }
+            }
+        }
+    }
+
+    private void gestionAdapter()
+    {
+        gestionListe();
+        recyclerView = findViewById(R.id.recyclerView);
+        int decorationCount = recyclerView.getItemDecorationCount();
+        for (int i = 0; i < decorationCount; i++) {
+            recyclerView.removeItemDecorationAt(0);
+        }
+        DividerItemDecoration divider = new DividerItemDecoration(ListeLotPreparationActivity.this, DividerItemDecoration.VERTICAL);
+        divider.setDrawable(ContextCompat.getDrawable(ListeLotPreparationActivity.this, R.drawable.recycler_divider));
+        recyclerView.addItemDecoration(divider);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+
+        adapter = new LotAdapter_V2(listeStockLotEmplacement, position -> {
+            Toast.makeText(this, "Supprimer " + listeStockLotEmplacement.get(position), Toast.LENGTH_SHORT).show();
+            RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
+            if (viewHolder != null && viewHolder instanceof LotAdapter_V2.LotViewHolder) {
+                Stock_Lot_Emplacement_Light stock_courant = listeStockLotEmplacement.get(position);
+                LotAdapter_V2.LotViewHolder monViewHolder = (LotAdapter_V2.LotViewHolder) viewHolder;
+                int qte_Saisie = Integer.parseInt(monViewHolder.qteSaisie.getText().toString());
+                MAJValues(false, qte_Saisie);
+                monViewHolder.qteSaisie.setText("0");
+                stock_courant.setQte_Preparer(0);
+                Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock_courant);
+                ((LotAdapter_V2.LotViewHolder) viewHolder).isSwipedOpen = false;
+                supprimerPhPreparationLigne(ph_preparation_ligne_base, stock_courant);
+
+                listeStockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(db, produit, depot);
+
+                Collections.sort(listeStockLotEmplacement, new Comparator<Stock_Lot_Emplacement_Light>() {
+                    @Override
+                    public int compare(Stock_Lot_Emplacement_Light o1, Stock_Lot_Emplacement_Light o2) {
+                        return o1.getPeremptionDate().compareTo(o2.getPeremptionDate());
+                    }
+                });
+
+                for(Stock_Lot_Emplacement_Light courant: listeStockLotEmplacement)
+                {
+                    listelot.add(courant.getLot());
+                }
+
+                if(!produitserialiserreception && produitsuiviserie)
+                {
+                    listeStockLotEmplacement = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepotSerie(db, produit, depot);
+                }
+
+                //on recherche la ligne de stock utilisé pour la supprimer aussi
+                StockUtilises stockUtilises = StockUtilisesOpenHelper.getStockUtiliserByStockIdAndUser(db, stock_courant.get_UID(), utilisateurConnecte.getId());
+
+                if(stockUtilises != null)
+                {
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, StockUtilisesOpenHelper.Constantes.TABLE_STOCK_UTILISE, stockUtilises.getphiwms_mobileUUID(), stockUtilises.getphiwms_mobileUUID(), DBOpenHelper.ActionsEAS.SUPPR);
+                    ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotPreparationActivity.this, db, utilisateurConnecte, false);
+                    StockUtilisesOpenHelper.supprimerUnStockUtilise(db, stockUtilises);
+                }
+
+                adapter.notifyItemChanged(position);
+
+                MAJVisuel();
+                onResume();
+            }
+
+            // Tu peux appeler confirm dialog ici
+        }, ListeLotPreparationActivity.this);
+
+        recyclerView.setAdapter(adapter);
+
+        int nbColis = recupererNbColis(produit.getID_produit(), ph_preparation_ligne_base.getQte_APreparer());
+        ((TextView) findViewById(R.id.colis)).setText(String.valueOf(nbColis));
     }
 }

@@ -33,6 +33,9 @@ public class Stock_Lot_Emplacement_Light implements Comparable {
         this.Qte = jsonObject.optDouble("Qte");
         this.peremptionDate = jsonObject.optString("peremptionDate");
         this.Serie = jsonObject.optString("Serie");
+
+        if(this.Serie.contentEquals("null"))
+            this.Serie = "";
     }
 
     public Stock_Lot_Emplacement_Light(double qte, String lot, String peremptionDate, String emplacement, String depot_Reference, String zone, int produit_Code, int qtePrep, String numSerie) {

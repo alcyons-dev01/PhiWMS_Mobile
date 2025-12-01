@@ -6,6 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import fr.alcyons.phiwms_mobile.Classes.Commande;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.StockUtilises;
@@ -48,6 +51,21 @@ public class StockUtilisesOpenHelper extends DBOpenHelper {
         cursor.close();
         cursor = null;
         return stockUtilises;
+    }
+
+    public static List<StockUtilises> getStockUtiliserByNotUser(SQLiteDatabase db, int userid) {
+        List<StockUtilises> stockUtilisesList = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_STOCK_UTILISE + " WHERE " + Constantes.CLE_COL_USER_ID +"!=?", new String[]{String.valueOf(userid)});
+
+        while (cursor.moveToNext()) {
+            StockUtilises stockUtilises = new StockUtilises(cursor);
+            stockUtilisesList.add(stockUtilises);
+        }
+
+        cursor.close();
+        cursor = null;
+        return stockUtilisesList;
     }
 
     public static void supprimerUnStockUtilise(SQLiteDatabase db, StockUtilises stockUtilises) {
