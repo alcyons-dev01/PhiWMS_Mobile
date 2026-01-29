@@ -159,6 +159,7 @@ public class ScannerProduitActivity extends ServiceActivity {
                         String code = result.productCode;
                         String lot = result.lotNumber;
                         String date = result.expirationDate;
+                        String dateSQLFormat = result.expirationDateSQLFormat;
                         String serie = result.serie;
                         boolean gtin = false;
                         if(!code.contentEquals(""))
@@ -179,9 +180,10 @@ public class ScannerProduitActivity extends ServiceActivity {
                         int codeEchangeActivity = 0;
 
                         scannerSearchOnlyBundle.putString("code", chaineRetourner.trim());
-                        scannerSearchOnlyBundle.putString("numLot", "");
-                        scannerSearchOnlyBundle.putString("numSerie", "");
-                        scannerSearchOnlyBundle.putString("datePeremption", "");
+                        scannerSearchOnlyBundle.putString("numLot", lot);
+                        scannerSearchOnlyBundle.putString("numSerie", serie);
+                        scannerSearchOnlyBundle.putString("datePeremption", date);
+                        scannerSearchOnlyBundle.putString("datePeremptionSqlFormat", dateSQLFormat);
                         scannerSearchOnlyBundle.putBoolean("gtin", gtin);
                         scannerSearchOnlyIntent.putExtras(scannerSearchOnlyBundle);
 

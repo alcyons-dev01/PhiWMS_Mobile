@@ -435,7 +435,7 @@ public class ScannerReceptionActivity extends ServiceActivity {
                                                     if(serialisationActive)
                                                     {
                                                         int serialisationUID = (int) Serialisation.Serialisation_Creer(utilisateurConnecte.getId(), "G110", gtin_courant_sans_ai, "GTIN", lot, date_peremption_serialisation, serie, "CDE", commandeCourante.getNumero());
-                                                        int serialisationdispenserUID = (int) Serialisation.Serialisation_Creer(utilisateurConnecte.getId(), "G120", gtin_courant_sans_ai, "GTIN", lot, date_peremption_serialisation, serie, "CDE", commandeCourante.getNumero());
+                                                        //int serialisationdispenserUID = (int) Serialisation.Serialisation_Creer(utilisateurConnecte.getId(), "G120", gtin_courant_sans_ai, "GTIN", lot, date_peremption_serialisation, serie, "CDE", commandeCourante.getNumero());
 
                                                     }
                                                     ((TextView) findViewById(R.id.serieValidation)).setText(serie);

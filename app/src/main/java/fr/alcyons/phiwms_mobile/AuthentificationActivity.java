@@ -166,10 +166,10 @@ public class AuthentificationActivity extends MainActivity {
         setContentView(R.layout.activity_authentification);
 
         //ouverture CGU
-        findViewById(R.id.versCGU).setOnClickListener(v -> {
+        /*findViewById(R.id.versCGU).setOnClickListener(v -> {
             Intent versCGU = new Intent(AuthentificationActivity.this, CguActivity.class);
             AuthentificationActivity.this.startActivity(versCGU);
-        });
+        });*/
 
         try {
             Context context = getApplicationContext();
@@ -347,47 +347,10 @@ public class AuthentificationActivity extends MainActivity {
         }
 
         //récupération IMEI telephone
-        if(!Build.MANUFACTURER.toLowerCase().contains("honeywell") && !Build.MANUFACTURER.toLowerCase().contains("google"))
-        {
-            findViewById(R.id.imageLogo).setOnClickListener(v -> {
-                TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-                if (ActivityCompat.checkSelfPermission(AuthentificationActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-                String device_id;
-
-                if(tm != null && !Build.MANUFACTURER.toLowerCase().contains("crosscall") && !Build.MANUFACTURER.toLowerCase().contains("huawei") && !Build.MANUFACTURER.toLowerCase().contains("zebra") && !Build.MANUFACTURER.toLowerCase().contains("samsung"))
-                {
-                    device_id = tm.getSubscriberId();
-                }
-                else
-                {
-                    device_id= Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-                }
-
-
-                if(device_id != null)
-                {
-                    if(device_id.contentEquals("6b3405cfd1cf57fd") || device_id.contentEquals("359467074856616") || device_id.contentEquals("42b3cc2997eab48e")|| device_id.contentEquals("283fd36870b99d52") || device_id.contentEquals("865545031537572") || device_id.contentEquals("358439079740070") || device_id.contentEquals("e76b2dc0dc33f6b2") ||device_id.contentEquals("baad6c7f647267d2")||device_id.contentEquals("66e4d0b5f734a6e7") || device_id.contentEquals("356672848915688") || device_id.contentEquals("351921588915688") || device_id.contentEquals("7db4057f77ad69c0") || device_id.contentEquals("352681302875720"))
-                    {
-                        TextView textViewIdentifiant = findViewById(R.id.identifiant);
-                        TextView textViewMotDePasse = findViewById(R.id.motDePasse);
-
-                        /*textViewIdentifiant.setText("alcyons");
-                        textViewMotDePasse.setText("65ken64btz");*/
-                    }
-                }
-
-            });
-        }
-        else if(Build.MANUFACTURER.toLowerCase().contains("google"))
-        {
-            TextView textViewIdentifiant = findViewById(R.id.identifiant);
-            TextView textViewMotDePasse = findViewById(R.id.motDePasse);
-
-            textViewIdentifiant.setText("alcyons");
-            textViewMotDePasse.setText("helpdesk");
-        }
+        findViewById(R.id.imageLogo).setOnClickListener(v -> {
+            Intent intentParametre = new Intent(AuthentificationActivity.this, ServiceParametresServeurActivity.class);
+            AuthentificationActivity.this.startActivity(intentParametre);
+        });
 
         // create class object
         gps = new GPSTracker(AuthentificationActivity.this);

@@ -19,9 +19,11 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -60,6 +62,7 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
     String messageErreur;
 
     Button testConnexionButton;
+    Spinner alcyons_choix_client;
 
     // Fonction permettant d'enregistrer les paramètres de connexion à l'API
     public void Connexion(View v) {
@@ -110,6 +113,7 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
         ipServeurEditText = (EditText) findViewById(R.id.ipServeur);
         numeroPortEditText = (EditText) findViewById(R.id.numeroPort);
         versionAPIEditText = (EditText) findViewById(R.id.versionAPI);
+        alcyons_choix_client = (Spinner) findViewById(R.id.alcyons_choix_client);
 
         // Récupération et affichage des paramètres serveurs
         if (gestionnaireParametresServeur.getNbParametresServeur(db) == 1) {
@@ -143,39 +147,59 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
         });
 
         //gestion du bouton alcyons
-        if(!Build.MANUFACTURER.contains("Zebra Technologies") && !Build.MANUFACTURER.toLowerCase().contains("lenovo") && !Build.MANUFACTURER.toLowerCase().contains("honeywell") && !Build.MANUFACTURER.toLowerCase().contains("google")) {
-            TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-            if (ActivityCompat.checkSelfPermission(ServiceParametresServeurActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            String device_id = "";
+        // simulateur google macAir Olivier : 95004b3de3fc203b
+        // Samsung XCover 5 : a964f85c6e890958
+        // HoneyWell CT37 alcyons: 57010b2fdbf2b021
+        // Samsung XCover 6 Pro : 6327572c7741bb99
+        // Galaxy Tab Active4 Pro : ca67efeec851db73
+        String device_id = Settings.Secure.getString(ServiceParametresServeurActivity.this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
-            if (tm != null && !Build.MANUFACTURER.toLowerCase().contains("huawei") && !Build.MANUFACTURER.toLowerCase().contains("samsung") && !Build.MANUFACTURER.toLowerCase().contains("lenovo")) {
-                device_id = tm.getDeviceId();
-            } else {
-                String androidId = Settings.Secure.getString(ServiceParametresServeurActivity.this.getContentResolver(), Settings.Secure.ANDROID_ID);
-                device_id = androidId;
-            }
+        if (device_id != null) {
+            if (device_id.contentEquals("95004b3de3fc203b") || device_id.contentEquals("a964f85c6e890958") || device_id.contentEquals("57010b2fdbf2b021") || device_id.contentEquals("6327572c7741bb99") || device_id.contentEquals("ca67efeec851db73")) {
+                //boutonAlcyonsParametre.setVisibility(View.VISIBLE);
+                alcyons_choix_client.setVisibility(View.VISIBLE);
+                /*boutonAlcyonsParametre.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ipServeurEditText.setText("192.81.222.83");
+                        numeroPortEditText.setText("89");
+                        versionAPIEditText.setText("1");
+                    }
+                });*/
+                alcyons_choix_client.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
-            if (device_id != null) {
-                if (device_id.contentEquals("359467074856616") || device_id.contentEquals("865545031537572") || device_id.contentEquals("358439079740070") || device_id.contentEquals("e76b2dc0dc33f6b2") || device_id.contentEquals("baad6c7f647267d2")||device_id.contentEquals("66e4d0b5f734a6e7")|| device_id.contentEquals("356672848915688") || device_id.contentEquals("351921588915688")|| device_id.contentEquals("7db4057f77ad69c0") || device_id.contentEquals("352681302875720")) {
-                    boutonAlcyonsParametre.setVisibility(View.VISIBLE);
-                    boutonAlcyonsParametre.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            ipServeurEditText.setText("192.81.222.83");
-                            numeroPortEditText.setText("89");
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                        // position 0 = "Choisir une base" → ignorée
+                        if (position == 0) {
+                            return;
+                        }
+
+                        String valeur = parent.getItemAtPosition(position).toString();
+                        int resId = getResources().getIdentifier(
+                                valeur,
+                                "string",
+                                getPackageName()
+                        );
+
+                        if (resId != 0) {
+                            String port = getString(resId);
+                            if(Integer.parseInt(port) < 100)
+                                ipServeurEditText.setText("192.81.222.83");
+                            else
+                                ipServeurEditText.setText("phiwms.alcyons.fr");
+
+                            numeroPortEditText.setText(port);
                             versionAPIEditText.setText("1");
                         }
-                    });
-                }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                        // rien à faire
+                    }
+                });
             }
         }
     }
@@ -188,7 +212,6 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
         if (nbUtilisateur == 0) {
             ParametreUtilisateurOpenHelper.insererParametreUtilisateurEnBDD(db, 0, false, false, false, "Designation", "Numéro de commande", "Categorie", "Numéro de retour", "Designation");
         }
-
 
         ((ImageView) findViewById(R.id.flecheRetour)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -203,7 +226,6 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
     public boolean checkConnectivity() {
         reponseRecue = false;
         messageErreur = "";
-        String base = "http://";
         String api = "/api/";
 
 
@@ -217,6 +239,10 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
                 throw new RuntimeException();
             }
         };
+
+        String base = "https://";
+        if(Integer.parseInt(numeroPortTest) < 100 || Integer.parseInt(numeroPortTest) == 8081)
+            base = "http://";
 
         String urlRequete = base + ipServeurTest + ":" + numeroPortTest + api + versionApiTest + "/serveur";
 

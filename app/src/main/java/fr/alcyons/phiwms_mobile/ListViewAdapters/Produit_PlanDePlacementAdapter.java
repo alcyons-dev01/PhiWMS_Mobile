@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.R;
 public class Produit_PlanDePlacementAdapter extends ArrayAdapter {
@@ -17,12 +18,14 @@ public class Produit_PlanDePlacementAdapter extends ArrayAdapter {
     public List<Produit> produits;
     public List<Produit> produitsScannes;
     Context context;
+    Depot depotCourant;
 
-    public Produit_PlanDePlacementAdapter(Context context, List<Produit> produits, List<Produit> produitsScannes) {
+    public Produit_PlanDePlacementAdapter(Context context, List<Produit> produits, List<Produit> produitsScannes, Depot depotCourant) {
         super(context, 0, produits);
         this.produits = produits;
         this.produitsScannes = produitsScannes;
         this.context = context;
+        this.depotCourant = depotCourant;
     }
 
     @Override
@@ -48,8 +51,17 @@ public class Produit_PlanDePlacementAdapter extends ArrayAdapter {
         // Affichage des valeurs du produit
         viewHolder.nom.setText(produitCourant.getDesignation_interne());
         viewHolder.refProduit.setText(produitCourant.getRef_fourni());
-        viewHolder.zonePUI.setText(produitCourant.getZone_PUI_Defaut());
-        viewHolder.emplacementPUI.setText(produitCourant.getEmplacement_PUI_Defaut());
+
+        if(depotCourant.getStructure().contentEquals("PUI"))
+        {
+            viewHolder.zonePUI.setText(produitCourant.getZone_PUI_Defaut());
+            viewHolder.emplacementPUI.setText(produitCourant.getEmplacement_PUI_Defaut());
+        }
+        else
+        {
+            viewHolder.zonePUI.setText(produitCourant.getZone_UF_Defaut());
+            viewHolder.emplacementPUI.setText(produitCourant.getEmplacement_UF_Defaut());
+        }
 
         boolean selection = false;
         for(Produit temp : produitsScannes)

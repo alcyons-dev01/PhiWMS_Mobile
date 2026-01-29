@@ -287,11 +287,14 @@ public class ParametresServeurOpenHelper extends DBOpenHelper {
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
 
-            String base = "http://";
+            String base = "https://";
             String api = "/api/";
             String ipServeur = cursor.getString(Constantes.NUM_COL_IP_SERVEUR_PARAMETRES_SERVEUR);
             String portServeur = cursor.getString(Constantes.NUM_COL_PORT_PARAMETRES_SERVEUR);
             String versionServeur = cursor.getString(Constantes.NUM_COL_VERSION_API_PARAMETRES_SERVEUR);
+
+            if(Integer.parseInt(portServeur) < 100 || Integer.parseInt(portServeur) == 8081)
+                base = "http://";
 
             urlARetourner = base + ipServeur + ":" + portServeur + api + versionServeur + "/";
         }

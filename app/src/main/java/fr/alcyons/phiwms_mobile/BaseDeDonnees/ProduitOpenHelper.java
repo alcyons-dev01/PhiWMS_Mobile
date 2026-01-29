@@ -283,6 +283,19 @@ public class ProduitOpenHelper extends DBOpenHelper {
         return produitList;
     }
 
+    public static List<Produit> getProduitsParGTINAvecSansAI(SQLiteDatabase db, String produitGTIN) {
+        List<Produit> produitList = new ArrayList<>();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + Constantes.CLE_COL_GTIN_PRODUIT + "=? OR "+Constantes.CLE_COL_GTIN_PRODUIT+" =? ", new String[]{produitGTIN, "01"+produitGTIN});
+
+        while (cursor.moveToNext()) {
+            Produit produit = new Produit(cursor);
+            produitList.add(produit);
+        }
+        cursor.close();
+        cursor = null;
+        return produitList;
+    }
+
     public static List<Produit> getProduitsByIdentification(SQLiteDatabase db, String chaineIdentifiant) {
         List<Produit> produitList = new ArrayList<>();
 

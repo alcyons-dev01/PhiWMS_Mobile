@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="liste_client_alcyons">
+        <item>Choisir une base</item>
+        <item>AAIR</item>
+        <item>ADA17</item>
+        <item>ADH</item>
+        <item>ADIVA</item>
+        <item>ADPC</item>
+        <item>AGDUC</item>
+        <item>Anider_Caen</item>
+        <item>Anider_Rouen</item>
+        <item>ARAUCO</item>
+        <item>ARPDD</item>
+        <item>ATIR</item>
+        <item>AURAD</item>
+        <item>AURAPC</item>
+        <item>AVODD</item>
+        <item>CALYDIAL</item>
+        <item>NDSG</item>
+        <item>STEER</item>
+        <item>Alcyons_HTTPS</item>
+        <item>Alcyons_HTTP</item>
+    </string-array>
+</resources>

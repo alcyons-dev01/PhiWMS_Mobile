@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ADH">1025</string>
+    <string name="AAIR">1026</string>
+    <string name="AVODD">1027</string>
+    <string name="ADIVA">1028</string>
+    <string name="ADPC">1029</string>
+    <string name="Anider_Caen">1030</string>
+    <string name="Anider_Rouen">1031</string>
+    <string name="ARAUCO">1032</string>
+    <string name="ARPDD">1033</string>
+    <string name="ATIR">1034</string>
+    <string name="AURAD">1035</string>
+    <string name="AURAPC">1036</string>
+    <string name="CALYDIAL">1037</string>
+    <string name="NDSG">1038</string>
+    <string name="STEER">1039</string>
+    <string name="AGDUC">1040</string>
+    <string name="ADA17">1041</string>
+    <string name="Alcyons_HTTPS">444</string>
+    <string name="Alcyons_HTTP">89</string>
+</resources>

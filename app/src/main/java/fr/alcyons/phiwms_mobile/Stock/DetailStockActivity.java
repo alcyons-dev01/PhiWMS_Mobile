@@ -50,11 +50,8 @@ public class DetailStockActivity extends ServiceAvecConnexionActivity {
     List<Stock> stockList;
     TextView nomDepotTextView;
     JSONArray stockJSONArray;
-
     Intent listeStockIntent;
-
     PackageManager pm;
-
     int produitid;
     Produit produitCourant;
     List<Stock_Lot_Emplacement_Light> stockLotEmplacementLightList = new ArrayList<>();

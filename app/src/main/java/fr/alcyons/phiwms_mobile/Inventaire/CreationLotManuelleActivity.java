@@ -8,6 +8,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
@@ -17,15 +18,18 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -44,6 +48,7 @@ import java.util.TimeZone;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerEmplacementActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerInventaireActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerProduitActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
@@ -65,7 +70,6 @@ public class CreationLotManuelleActivity  extends ServiceAvecConnexionActivity {
     TextView emplacementTextView;
     TextView numSerieEditText;
     TextView lotEditText;
-    TextView datePeremptionTextView;
     TextView fournisseurTextView;
     TextView qteActuelleEditText;
     ImageView datamatrix1ImageView;
@@ -75,17 +79,24 @@ public class CreationLotManuelleActivity  extends ServiceAvecConnexionActivity {
     LinearLayout validationScan;
     ImageView imageValidation;
     PackageManager pm;
-    RelativeLayout relativeQte;
+    Spinner spinnerMoisDatePeremption_SP;
+    Spinner spinnerAnneeDatePeremption_SP;
     String zonecourante_VS;
     String emplacementcourant_VS;
+    LinearLayout layoutMoins_LL;
+    LinearLayout layoutPlus_LL;
+    LinearLayout layoutCartonFermer_LL;
+    LinearLayout layoutCartonOuvert_LL;
+    TextView textCartonFermer_TV;
     Inventaire inventaire;
     Inventaire_Ligne_Temp inventaireLigneTempCourant;
+    int conditionnement;
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_creation_lot_preparation);
+        setContentView(R.layout.activity_creation_lot_manuelle);
 
         //gestion du package manager
         pm = CreationLotManuelleActivity.this.getPackageManager();
@@ -97,7 +108,6 @@ public class CreationLotManuelleActivity  extends ServiceAvecConnexionActivity {
         inventaire = InventaireOpenHelper.getInventaireById(db, intent.getExtras().getInt("inventaireId"));
         inventaireLigneTempCourant = Inventaire_Ligne_TempOpenHelper.getInventaireLigneTempByphiwms_mobileUUID(db, intent.getExtras().getInt("inventaireLigneTempId"));
 
-
         // Récupération des objets graphiques
         zoneTextView = (TextView) findViewById(R.id.zoneName);
         emplacementTextView = (TextView) findViewById(R.id.nomEmplacement);
@@ -106,42 +116,31 @@ public class CreationLotManuelleActivity  extends ServiceAvecConnexionActivity {
         fournisseurTextView = (TextView) findViewById(R.id.depotPreparation);
         lotEditText = (TextView) findViewById(R.id.numLot);
         numSerieEditText = (TextView) findViewById(R.id.numSerie);
-        datePeremptionTextView = (TextView) findViewById(R.id.datePeremption);
+        textCartonFermer_TV = (TextView) findViewById(R.id.textCartonFermer_TV);
         qteActuelleEditText = (TextView) findViewById(R.id.qteActuelle);
         datamatrix1ImageView = (ImageView) findViewById(R.id.datamatrix1);
         datamatrix2ImageView = (ImageView) findViewById(R.id.datamatrix2);
         imageValidation = (ImageView) findViewById(R.id.imageValidation);
         validationScan = (LinearLayout) findViewById(R.id.validationScan);
-        relativeQte = (RelativeLayout) findViewById(R.id.relativeQte);
+        layoutPlus_LL = (LinearLayout) findViewById(R.id.layoutPlus_LL);
+        layoutMoins_LL = (LinearLayout) findViewById(R.id.layoutMoins_LL);
+        layoutCartonFermer_LL = (LinearLayout) findViewById(R.id.layoutCartonFermer_LL);
+        layoutCartonOuvert_LL = (LinearLayout) findViewById(R.id.layoutCartonOuvert_LL);
+        spinnerMoisDatePeremption_SP = (Spinner) findViewById(R.id.selecteurDateMois_SP);
+        spinnerAnneeDatePeremption_SP = findViewById(R.id.selecteurDateAnnee_SP);
 
         ((LinearLayout) findViewById(R.id.layoutNumSerie)).setVisibility(View.GONE);
         numPreparation.setText("#"+inventaire.getInventaire_ID()+" - "+inventaire.getObjet());
         fournisseurTextView.setText(zonecourante_VS);
 
-        //gestion du produit non tracé
-        if(!produitSelectionne.isSuivi_Lot())
-        {
-            //gestion de la date
-            String currentDate = new SimpleDateFormat("yyMMdd", Locale.getDefault()).format(new Date());
+        ArrayAdapter<String> adapterMoisPeremption = new ArrayAdapter<>(CreationLotManuelleActivity.this, R.layout.spinner_date_item, getListeMoisDatePicker());
+        adapterMoisPeremption.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerMoisDatePeremption_SP.setAdapter(adapterMoisPeremption);
 
-            lotEditText.setText("Phi"+currentDate);
-            Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
-
-            int currentYear = calendar.get(Calendar.YEAR)+1;
-            int currentMonth = calendar.get(Calendar.MONTH)+1;
-            int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
-
-            String dateNextYear = currentDay+"/"+currentMonth+"/"+currentYear;
-
-            datePeremptionTextView.setText(dateNextYear);
-        }
-
-        // Définition des actions sur Click
-        datePeremptionTextView.setOnClickListener(v -> {
-            CreationLotManuelleActivity.DatePickerFragmentReception newFragment = new CreationLotManuelleActivity.DatePickerFragmentReception();
-            newFragment.setTextView(datePeremptionTextView);
-            newFragment.show((CreationLotManuelleActivity.this).getSupportFragmentManager(), "timePicker");
-        });
+        ArrayAdapter<String> adapterAnneePeremption = new ArrayAdapter<>(CreationLotManuelleActivity.this, R.layout.spinner_date_item, getListeAnneeDatePicker());
+        adapterAnneePeremption.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerAnneeDatePeremption_SP.setAdapter(adapterAnneePeremption);
+        spinnerAnneeDatePeremption_SP.setSelection(3);
 
         //on n'affiche pas le datamatrix des zones
         datamatrix1ImageView.setVisibility(View.GONE);
@@ -220,7 +219,7 @@ public class CreationLotManuelleActivity  extends ServiceAvecConnexionActivity {
         String dateDePeremption = intent.getExtras().getString("datePeremption");
         if (dateDePeremption != null) {
             @SuppressLint("SimpleDateFormat") DateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
-            @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
             String dateAAfficher = "";
             Date date;
@@ -232,7 +231,16 @@ public class CreationLotManuelleActivity  extends ServiceAvecConnexionActivity {
             } catch (ParseException e) {
                 Log.e("Parse Exception", Objects.requireNonNull(e.getMessage()));
             }
-            datePeremptionTextView.setText(dateAAfficher);
+
+            String[] tabPeremption = dateAAfficher.split("-");
+            String annee = tabPeremption[0];
+            String mois = tabPeremption[1];
+            int anneeCourante = getCurrentYear();
+            int anneeMin = anneeCourante - 2;
+            int anneeSelectionnee = Integer.parseInt(annee); // ex : 2027
+
+            spinnerMoisDatePeremption_SP.setSelection(Integer.parseInt(mois) - 1);
+            spinnerAnneeDatePeremption_SP.setSelection(anneeSelectionnee - anneeMin);
         }
 
         lotEditText.setOnClickListener(view -> {
@@ -244,46 +252,54 @@ public class CreationLotManuelleActivity  extends ServiceAvecConnexionActivity {
         //affichage de la quantité de base
         qteActuelleEditText.setText(String.valueOf(0));
 
-        relativeQte.setOnClickListener(view -> {
-            String title = produitSelectionne.getDesignation_interne();
-            String message = "Choisir une quantité: ";
-            int maxValue = 10000;
-            int value = 0;
-
-            int conditionnement = 1;
-
-            int finalConditionnement = conditionnement;
-            DialogInterface.OnClickListener onClickListener = (dialog, id) -> {
-
-                int qteApres = aNumberPicker.getValue()* finalConditionnement;
-                qteActuelleEditText.setText(String.valueOf(qteApres).trim());
-                dialog.dismiss();
-                apparitionValider();
-            };
-
-            Alerte.afficherAlerteNumberPickerAvecPas(CreationLotManuelleActivity.this, title, message, value, maxValue, onClickListener, conditionnement);
-        });
-
-
-        //on affiche des valeurs fictive si c'est alcyons qui est connecté
-        if(utilisateurConnecte.getIdentifiant().toLowerCase().contentEquals("alcyons"))
-        {
-            lotEditText.setText("LotAclyons");
-            Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
-
-            int currentYear = calendar.get(Calendar.YEAR)+1;
-            int currentMonth = calendar.get(Calendar.MONTH)+1;
-            int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
-
-            String dateNextYear = currentDay+"/"+currentMonth+"/"+currentYear;
-
-            datePeremptionTextView.setText(dateNextYear);
-        }
-
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 CreationLotManuelleActivity.this.finish();
+            }
+        });
+
+        //gestion du plus et mois
+        conditionnement = produitSelectionne.getCond_achat();
+        textCartonFermer_TV.setText("Carton fermer (x"+String.valueOf(produitSelectionne.getCond_achat())+")");
+
+        layoutCartonFermer_LL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                conditionnement = produitSelectionne.getCond_achat();
+                layoutCartonOuvert_LL.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(CreationLotManuelleActivity.this, R.color.blanc)));
+                layoutCartonFermer_LL.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(CreationLotManuelleActivity.this, R.color.vertTransparent)));
+            }
+        });
+
+        layoutCartonOuvert_LL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                conditionnement = 1;
+                layoutCartonOuvert_LL.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(CreationLotManuelleActivity.this, R.color.vertTransparent)));
+                layoutCartonFermer_LL.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(CreationLotManuelleActivity.this, R.color.blanc)));
+            }
+        });
+
+        layoutPlus_LL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int qteCourante = Integer.parseInt(qteActuelleEditText.getText().toString());
+                qteCourante += conditionnement;
+                qteActuelleEditText.setText(String.valueOf(qteCourante));
+                apparitionValider();
+            }
+        });
+
+        layoutMoins_LL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int qteCourante = Integer.parseInt(qteActuelleEditText.getText().toString());
+                qteCourante -= conditionnement;
+                if(qteCourante < 0)
+                    qteCourante = 0;
+                qteActuelleEditText.setText(String.valueOf(qteCourante));
+                apparitionValider();
             }
         });
 
@@ -327,7 +343,7 @@ public class CreationLotManuelleActivity  extends ServiceAvecConnexionActivity {
     }
 
     private void onMenuSaveClick() {
-        if (zoneTextView.getText().toString().trim().isEmpty() || emplacementTextView.getText().toString().trim().isEmpty() || lotEditText.getText().toString().trim().isEmpty() || datePeremptionTextView.getText().toString().trim().isEmpty()) {
+        if (zoneTextView.getText().toString().trim().isEmpty() || emplacementTextView.getText().toString().trim().isEmpty() || lotEditText.getText().toString().trim().isEmpty()) {
             Toast.makeText(CreationLotManuelleActivity.this, "Tous les éléments n'ont pas été saisis.", Toast.LENGTH_SHORT).show();
         } else {
             //création de l'inventaire ligne temp
@@ -343,6 +359,16 @@ public class CreationLotManuelleActivity  extends ServiceAvecConnexionActivity {
             nouvelInventaireLigneTemp.setInventaireDate(dateDuJour);
             nouvelInventaireLigneTemp.setStockPhysique(Integer.parseInt(qteActuelleEditText.getText().toString().trim()));
             nouvelInventaireLigneTemp.setLot(lotEditText.getText().toString().trim());
+
+            String anneeSelection = spinnerAnneeDatePeremption_SP.getSelectedItem().toString();
+            String moisSelection = spinnerMoisDatePeremption_SP.getSelectedItem().toString();
+            String dateExpirationLotTemp = getDateDepuisMoisAnnee(moisSelection, anneeSelection);
+            String[] dateParts = dateExpirationLotTemp.split("/");
+            if(dateParts.length == 3)
+                dateExpirationLotTemp = dateParts[2]+"-"+dateParts[1]+"-"+dateParts[0];
+
+            nouvelInventaireLigneTemp.setPeremptionDate(dateExpirationLotTemp);
+
             nouvelInventaireLigneTemp.setEmplacement(emplacementTextView.getText().toString().trim());
 
             Inventaire_Ligne_TempOpenHelper.insererUnInventaire_Ligne_TempEnBDD(db, nouvelInventaireLigneTemp);
@@ -365,47 +391,9 @@ public class CreationLotManuelleActivity  extends ServiceAvecConnexionActivity {
                 case RETOUR_LOT:
                     String code = Objects.requireNonNull(data.getExtras()).getString("code");
                     String numLot = data.getExtras().getString("numLot");
-                    String datePeremptionScanner = data.getExtras().getString("datePeremption");
+                    String datePeremptionScanner = data.getExtras().getString("datePeremptionSqlFormat");
                     if(code != null)
                     {
-                        if(numLot == null || numLot.contentEquals(""))
-                        {
-                            Map<String, String> DecoupeMap = OutilsDecodage.decouperGTIN(code);
-                            if(DecoupeMap.size()>1)
-                            {
-                                Produit produitScanne = null;
-                                List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, DecoupeMap.get(OutilsDecodage.codeGtin));
-
-                                if(produits.size() == 0)
-                                    produits = ProduitOpenHelper.getProduitsParGTIN(db, DecoupeMap.get(OutilsDecodage.codeGtinSansAi));
-
-                                if (produits.size() == 1) {
-                                    produitScanne = produits.get(0);
-                                }
-
-                                if(produitScanne == null || produitScanne.getID_produit() != produitSelectionne.getID_produit())
-                                {
-                                    numLot = null;
-                                    datePeremptionScanner = null;
-                                    lotEditText.setText("");
-                                    datePeremptionTextView.setText("");
-                                    afficherSnackBar();
-                                }
-                                else
-                                {
-                                    numLot = DecoupeMap.get(OutilsDecodage.numeroLot);
-                                    datePeremptionScanner = DecoupeMap.get(OutilsDecodage.dateDePeremption);
-                                    if(datePeremptionScanner != null)
-                                    {
-                                        String[] tab_date = datePeremptionScanner.split("-");
-                                        if(tab_date.length == 3)
-                                        {
-                                            datePeremptionScanner = tab_date[2]+"/"+tab_date[1]+"/"+tab_date[0];
-                                        }
-                                    }
-                                }
-                            }
-                        }
                         if(numLot != null)
                         {
                             lotEditText.setText(numLot);
@@ -413,7 +401,15 @@ public class CreationLotManuelleActivity  extends ServiceAvecConnexionActivity {
 
                         if(datePeremptionScanner != null)
                         {
-                            datePeremptionTextView.setText(datePeremptionScanner);
+                            String[] tabPeremption = datePeremptionScanner.split("-");
+                            String annee = tabPeremption[0];
+                            String mois = tabPeremption[1];
+                            int anneeCourante = getCurrentYear();
+                            int anneeMin = anneeCourante - 2;
+                            int anneeSelectionnee = Integer.parseInt(annee); // ex : 2027
+
+                            spinnerMoisDatePeremption_SP.setSelection(Integer.parseInt(mois) - 1);
+                            spinnerAnneeDatePeremption_SP.setSelection(anneeSelectionnee - anneeMin);
                         }
                     }
                     break;
@@ -424,10 +420,14 @@ public class CreationLotManuelleActivity  extends ServiceAvecConnexionActivity {
 
     public void apparitionValider()
     {
-        if(!lotEditText.getText().toString().contentEquals("") && !datePeremptionTextView.getText().toString().contentEquals("") && !qteActuelleEditText.getText().toString().contentEquals("0"))
+        if(!lotEditText.getText().toString().contentEquals("") && !qteActuelleEditText.getText().toString().contentEquals("0"))
         {
             validationScan.setVisibility(View.VISIBLE);
             blinkImage();
+        }
+        else
+        {
+            validationScan.setVisibility(View.GONE);
         }
     }
 

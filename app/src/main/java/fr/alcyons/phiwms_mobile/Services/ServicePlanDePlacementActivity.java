@@ -17,74 +17,60 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPlanDePlacementActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.DepotSelecteur.DepotSelecteurMultipleActivity;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.PlanDePlacement.ListeProduitsPlanDePlacementActivity;
+import fr.alcyons.phiwms_mobile.PlanDePlacement.ScanPlanDePlacementActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
+import fr.alcyons.phiwms_mobile.Stock.ListeReferenceActivity;
 
 public class ServicePlanDePlacementActivity extends ServiceActivity {
-
-    boolean firstPassage = true;
-    PackageManager pm;
-
-    List<Produit> listeProduitScannees;
+    Boolean passageOnResume;
+    Intent serviceStockIntent;
+    Bundle serviceStockBundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_service_plan_de_placement);
-        pm = ServicePlanDePlacementActivity.this.getPackageManager();
-        intent = ServicePlanDePlacementActivity.this.getIntent();
-        listeProduitScannees = new ArrayList<>();
+        passageOnResume = true;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        invalidateOptionsMenu();
-        //Lance l'activite BarcodeCaptureActivity une seule fois
-        if (firstPassage) {
-            Intent servicePlanDePlacementIntent = null;
-            Bundle servicePlanDePlacementBundle = super.getBundle();
-
-            if (android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google")) {
-                servicePlanDePlacementIntent = new Intent(ServicePlanDePlacementActivity.this, ScannerPlanDePlacementActivity.class);
-            } else {
-                servicePlanDePlacementIntent = new Intent(ServicePlanDePlacementActivity.this, BarcodeCaptureActivity.class);
-            }
-
-            servicePlanDePlacementBundle.putSerializable("ListProduitScannees", (Serializable) listeProduitScannees);
-            servicePlanDePlacementIntent.putExtras(servicePlanDePlacementBundle);
-            ServicePlanDePlacementActivity.this.startActivityForResult(servicePlanDePlacementIntent, CodesEchangesActivites.RETOUR_CODE_GS1);
-            firstPassage = false;
+        if (passageOnResume) {
+            serviceStockIntent = new Intent(ServicePlanDePlacementActivity.this, DepotSelecteurMultipleActivity.class);
+            serviceStockBundle = ServicePlanDePlacementActivity.super.getBundle();
+            serviceStockBundle.putString("depotType", "tous");
+            serviceStockIntent.putExtras(serviceStockBundle);
+            ServicePlanDePlacementActivity.this.startActivityForResult(serviceStockIntent, CodesEchangesActivites.RESULT_SELECTION_DEPOT);
         }
+        passageOnResume = true;
     }
 
     // Lorsqu'on lance une nouvelle activity avec " startActivityForResult ", action à réaliser à la fin de l'activity lancé suivant le " CodesEchangesActivites " passé
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (data == null) {
-            ServicePlanDePlacementActivity.this.finish();
-        } else {
-            switch (requestCode) {
-                case CodesEchangesActivites.RETOUR_CODE_GS1:
-                    listeProduitScannees = new ArrayList<>();
-                    listeProduitScannees.addAll((List<Produit>) data.getExtras().getSerializable("ListProduitScannes"));
-
-                    boolean placement = data.getExtras().getBoolean("placement");
-                    Intent servicePlanDePlacementIntent = servicePlanDePlacementIntent = new Intent(ServicePlanDePlacementActivity.this, ListeProduitsPlanDePlacementActivity.class);
-                    Bundle servicePlanDePlacementBundle = super.getBundle();
-                    servicePlanDePlacementBundle.putSerializable("ListProduitScannes", (Serializable) listeProduitScannees);
-                    servicePlanDePlacementBundle.putSerializable("placement", (Serializable) placement);
-                    servicePlanDePlacementIntent.putExtras(servicePlanDePlacementBundle);
-
-                    ServicePlanDePlacementActivity.this.startActivity(servicePlanDePlacementIntent);
+        switch (requestCode) {
+            case CodesEchangesActivites.RESULT_SELECTION_DEPOT: {
+                if (data != null) {
+                    int depotUID_Selectionne = data.getIntExtra("depotUID_Selectionne", 0);
+                    if (depotUID_Selectionne != 0) {
+                        passageOnResume = false;
+                        serviceStockIntent = new Intent(ServicePlanDePlacementActivity.this, ScanPlanDePlacementActivity.class);
+                        serviceStockBundle = ServicePlanDePlacementActivity.super.getBundle();
+                        serviceStockBundle.putInt("depotUID_Selectionne", depotUID_Selectionne);
+                        serviceStockIntent.putExtras(serviceStockBundle);
+                        ServicePlanDePlacementActivity.this.startActivity(serviceStockIntent);
+                    }
+                } else {
                     ServicePlanDePlacementActivity.this.finish();
-                    break;
+                }
+                break;
             }
-            invalidateOptionsMenu();
         }
     }
 }

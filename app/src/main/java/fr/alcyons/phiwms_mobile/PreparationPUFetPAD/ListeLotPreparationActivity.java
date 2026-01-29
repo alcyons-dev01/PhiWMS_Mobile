@@ -149,9 +149,6 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
                 onMenuDatamatrixClick();
             }
         });
-
-
-
     }
 
     @Override
@@ -195,6 +192,8 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
                                 } else if (!erreur.contentEquals("Aucun PH_Stock_Lot_Emplacement trouvé")) {
                                     Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Aucune ligne trouvée", "alerte");
                                 }
+                                else {
+                                 }
                             } else {
                                 JSONArray ph_stockLotEmplacement_JSONArray = response.getJSONArray("PH_Stock_Lot_Emplacements");
                                 for (int k = 0; k < ph_stockLotEmplacement_JSONArray.length(); k++) {

@@ -77,7 +77,10 @@ public class DotationGlobaleAdapter extends ArrayAdapter {
         {
             // Affichage des valeurs
             viewHolder.designation.setText(PreparationLigneCourant.getProduitDesignation());
-            viewHolder.reference.setText(PreparationLigneCourant.getProduitReference());
+            if(PreparationLigneCourant.getProduitReference().isEmpty() || PreparationLigneCourant.getProduitReference() == null || PreparationLigneCourant.getProduitReference().contentEquals("null"))
+                viewHolder.reference.setText("");
+            else
+                viewHolder.reference.setText(PreparationLigneCourant.getProduitReference());
             viewHolder.qteConditionnement.setText("(x"+ (int) PreparationLigneCourant.getProduitCondDistrib() +")");
 
             if(dotation.isCommandeAB())

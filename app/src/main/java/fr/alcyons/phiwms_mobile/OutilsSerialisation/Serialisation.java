@@ -62,14 +62,20 @@ public class Serialisation {
         if (ProductCode_SHEME_VA.contentEquals("GTIN")) {
             Produit produits = null;
             if(ProductCode_VALUE_VA.length() == 14)
+            {
                 produits = ProduitOpenHelper.getUnProduitParGTIN(db, "01" + ProductCode_VALUE_VA);
+                if(produits == null)
+                {
+                    produits = ProduitOpenHelper.getUnProduitParGTIN(db, ProductCode_VALUE_VA);
+                }
+            }
             else
                 produits = ProduitOpenHelper.getUnProduitParGTIN(db, ProductCode_VALUE_VA);
             if (produits != null)
                 ProduitUID = produits.getID_produit();
             else
             {
-                Random produitnRandom = new Random();
+                /*Random produitnRandom = new Random();
                 int produitId = produitnRandom.nextInt();
                 if (produitId > 0) {
                     produitId = produitId * -1;
@@ -77,7 +83,7 @@ public class Serialisation {
                 String gtin = "01"+ProductCode_VALUE_VA;
                 produits = new Produit(produitId, gtin, "Undefined", gtin, String.valueOf(utilisateur.getId()), gtin);
                 ProduitOpenHelper.insererUnProduitEnBDD(db, produits);
-                ProduitUID = produits.getID_produit();
+                ProduitUID = produits.getID_produit();*/
             }
         }
 

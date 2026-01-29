@@ -292,7 +292,9 @@ public class ScannerPreparationActivity extends ServiceActivity {
 
                                 //récucpération du produit avec le GTIN
                                 List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, gtin_courant);
-
+//0103400939591575 17280430 101195330A @21testSerie
+//0103400933054212 17280531 10E244193
+//0103400930129746 17270531 10AA07243A
                                 //Si la liste est vide on essaye avec le GTIN sans AI
                                 if(produits.isEmpty())
                                 {
@@ -401,7 +403,7 @@ public class ScannerPreparationActivity extends ServiceActivity {
                                                         if(serialisationActive)
                                                         {
                                                             int serialisationUID = (int) Serialisation.Serialisation_Creer(utilisateurConnecte.getId(), "G110", gtin_courant_sans_ai, "GTIN", lot, date_peremption_serialisation, serie, "DELIVRANCE", String.valueOf(preparationID));
-                                                            int serialisationdispenserUID = (int) Serialisation.Serialisation_Creer(utilisateurConnecte.getId(), "G120", gtin_courant_sans_ai, "GTIN", lot, date_peremption_serialisation, serie, "DELIVRANCE", String.valueOf(preparationID));
+                                                            //int serialisationdispenserUID = (int) Serialisation.Serialisation_Creer(utilisateurConnecte.getId(), "G120", gtin_courant_sans_ai, "GTIN", lot, date_peremption_serialisation, serie, "DELIVRANCE", String.valueOf(preparationID));
                                                         }
                                                     }
 

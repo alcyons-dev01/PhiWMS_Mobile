@@ -116,9 +116,12 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
             PH_Reassort PH_ReassortSelectionne = reassortAdapter.listeReassort.get(position);
             PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandeDemandeReassortEnInstance(db, "Réassort de service : " + PH_ReassortSelectionne.getListe(), PH_ReassortSelectionne.getDateLivraison());
 
-            Intent listeReassortService_Intent = ServiceDemandeReassortActivity.this.getListeReassortServiceIntent(phPreparationCourante, PH_ReassortSelectionne);
-            ServiceDemandeReassortActivity.this.startActivity(listeReassortService_Intent);
-            ServiceDemandeReassortActivity.this.finish();
+            if(phPreparationCourante.getStatut().contentEquals("En instance") || phPreparationCourante.getStatut().contentEquals("En cours de régularisation"))
+            {
+                Intent listeReassortService_Intent = ServiceDemandeReassortActivity.this.getListeReassortServiceIntent(phPreparationCourante, PH_ReassortSelectionne);
+                ServiceDemandeReassortActivity.this.startActivity(listeReassortService_Intent);
+                ServiceDemandeReassortActivity.this.finish();
+            }
         });
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {

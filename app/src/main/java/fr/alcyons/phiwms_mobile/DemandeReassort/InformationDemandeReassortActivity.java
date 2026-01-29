@@ -187,27 +187,34 @@ public class InformationDemandeReassortActivity  extends ServiceAvecConnexionAct
             reassortAdapter.notifyDataSetChanged();
         });
 
-        layoutBoutonEnvoyer.setOnClickListener(view -> {
-            boolean complet = true;
+        if(ph_preparation_courante.getStatut().contentEquals("En instance") || ph_preparation_courante.getStatut().contentEquals("En cours de régularisation"))
+        {
+            layoutBoutonEnvoyer.setOnClickListener(view -> {
+                boolean complet = true;
 
-            for(PH_Preparation_Ligne ph_preparation_ligne : phPreparationLigneList)
-            {
-                if(ph_preparation_ligne.getQte_StockSaisie() == -1)
+                for(PH_Preparation_Ligne ph_preparation_ligne : phPreparationLigneList)
                 {
-                    complet = false;
-                    break;
+                    if(ph_preparation_ligne.getQte_StockSaisie() == -1)
+                    {
+                        complet = false;
+                        break;
+                    }
                 }
-            }
 
-            if(complet)
-            {
-                afficherAlerteConfirmation(InformationDemandeReassortActivity.this, InformationDemandeReassortActivity.this.getLayoutInflater());
-            }
-            else
-            {
-                afficherAlerte(InformationDemandeReassortActivity.this, InformationDemandeReassortActivity.this.getLayoutInflater());
-            }
-        });
+                if(complet)
+                {
+                    afficherAlerteConfirmation(InformationDemandeReassortActivity.this, InformationDemandeReassortActivity.this.getLayoutInflater());
+                }
+                else
+                {
+                    afficherAlerte(InformationDemandeReassortActivity.this, InformationDemandeReassortActivity.this.getLayoutInflater());
+                }
+            });
+        }
+        else
+        {
+            layoutBoutonEnvoyer.setVisibility(View.GONE);
+        }
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -567,7 +574,7 @@ public class InformationDemandeReassortActivity  extends ServiceAvecConnexionAct
 
     public void enregistrerDemande(String commentaire, boolean urgente)
     {
-        ph_preparation_courante.setStatut("En attente");
+        ph_preparation_courante.setStatut("En cours de régularisation");
         ph_preparation_courante.setCommentaires(commentaire);
         ph_preparation_courante.setURGENT(urgente);
         PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, ph_preparation_courante);

@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerProduitActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
@@ -53,6 +54,7 @@ import fr.alcyons.phiwms_mobile.Classes.Stock;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Liste_ReferenceAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
+import fr.alcyons.phiwms_mobile.Outils.GS1Parser;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
@@ -234,15 +236,40 @@ public class ListeReferenceActivity extends ServiceAvecConnexionActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CodesEchangesActivites.RETOUR_CODE_GS1) {
-            if (resultCode == ListeStockActivity.RESULT_OK) {
-                String code = data.getStringExtra("code");
-
-                assert code != null;
-                if (!code.contentEquals("")) {
-                    Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(code);
-
-                    if (gs1Decoupe.size() > 1) {
-                        List<Produit> produitList = ProduitOpenHelper.getProduitsParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
+            String code = data.getStringExtra("code");
+            assert code != null;
+            if (!code.contentEquals("")) {
+                if(code.toUpperCase().startsWith("PHITAGREF:"))
+                {
+                    String[] codeDecoupe = code.split(":");
+                    if(codeDecoupe.length > 1) {
+                        String codeProduit = codeDecoupe[1];
+                        Produit produit = ProduitOpenHelper.getProduitByID(db, Integer.parseInt(codeProduit));
+                        if (produit != null) {
+                            Intent selectionProduitIntent = new Intent(ListeReferenceActivity.this, DetailStockActivity.class);
+                            Bundle selectionProduitBundle = ListeReferenceActivity.super.getBundle();
+                            selectionProduitBundle.putInt("depotUID_Selectionne", Objects.requireNonNull(intent.getExtras()).getInt("depotUID_Selectionne"));
+                            selectionProduitBundle.putInt("produitID", produit.getID_produit());
+                            selectionProduitIntent.putExtras(selectionProduitBundle);
+                            ListeReferenceActivity.this.startActivity(selectionProduitIntent);
+                        } else {
+                            Toast toast = Toast.makeText(ListeReferenceActivity.this, "Aucun produit ne correspond à ce code", Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+                        }
+                    }
+                    else {
+                        Toast toast = Toast.makeText(ListeReferenceActivity.this, "Le code fourni n'est pas un code PHITAGREF, veuillez réessayer.", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    }
+                }
+                else if(code.toUpperCase().startsWith("PHITAGTIN:"))
+                {
+                    String[] codeDecoupe = code.split(":");
+                    if(codeDecoupe.length > 1) {
+                        String codeProduit = codeDecoupe[1];
+                        List<Produit> produitList = ProduitOpenHelper.getProduitsParGTINAvecSansAI(db, codeProduit);
                         if (produitList.size() == 1) {
                             Produit produit = produitList.get(0);
                             Intent selectionProduitIntent = new Intent(ListeReferenceActivity.this, DetailStockActivity.class);
@@ -254,42 +281,43 @@ public class ListeReferenceActivity extends ServiceAvecConnexionActivity {
                         } else if (produitList.size() > 1) {
                             Alerte.afficherAlerte(ListeReferenceActivity.this, "Attention", "Un problème est survenu, impossible d'identifier le produit.", "alerte");
                         } else {
+
                             Toast toast = Toast.makeText(ListeReferenceActivity.this, "Aucun produit ne correspond à ce code", Toast.LENGTH_LONG);
                             toast.setGravity(Gravity.CENTER, 0, 0);
                             toast.show();
                         }
                     }
-                    else if(code.toUpperCase().startsWith("PHITAGREF:"))
-                    {
-                        String[] codeDecoupe = code.split(":");
-                        if(codeDecoupe.length > 1) {
-                            String codeProduit = codeDecoupe[1];
-                            Produit produit = ProduitOpenHelper.getProduitByID(db, Integer.parseInt(codeProduit));
-                            if (produit != null) {
-                                Intent selectionProduitIntent = new Intent(ListeReferenceActivity.this, DetailStockActivity.class);
-                                Bundle selectionProduitBundle = ListeReferenceActivity.super.getBundle();
-                                selectionProduitBundle.putInt("depotUID_Selectionne", Objects.requireNonNull(intent.getExtras()).getInt("depotUID_Selectionne"));
-                                selectionProduitBundle.putInt("produitID", produit.getID_produit());
-                                selectionProduitIntent.putExtras(selectionProduitBundle);
-                                ListeReferenceActivity.this.startActivity(selectionProduitIntent);
-                            } else {
-                                Toast toast = Toast.makeText(ListeReferenceActivity.this, "Aucun produit ne correspond à ce code", Toast.LENGTH_LONG);
-                                toast.setGravity(Gravity.CENTER, 0, 0);
-                                toast.show();
-                            }
-                        }
-                        else {
-                            Toast toast = Toast.makeText(ListeReferenceActivity.this, "Le code fourni n'est pas un code PHITAGREF, veuillez réessayer.", Toast.LENGTH_SHORT);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-                        }
-                    }
                     else {
-                        Toast toast = Toast.makeText(ListeReferenceActivity.this, "Le code fourni n'est pas un code GS1, veuillez réessayer.", Toast.LENGTH_SHORT);
+                        Toast toast = Toast.makeText(ListeReferenceActivity.this, "Le code fourni n'est pas un code PHITAGREF, veuillez réessayer.", Toast.LENGTH_SHORT);
                         toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
                     }
                 }
+                else
+                {
+                    List<Produit> produitList = ProduitOpenHelper.getProduitsParGTINAvecSansAI(db, code);
+                    if (produitList.size() == 1) {
+                        Produit produit = produitList.get(0);
+                        Intent selectionProduitIntent = new Intent(ListeReferenceActivity.this, DetailStockActivity.class);
+                        Bundle selectionProduitBundle = ListeReferenceActivity.super.getBundle();
+                        selectionProduitBundle.putInt("depotUID_Selectionne", Objects.requireNonNull(intent.getExtras()).getInt("depotUID_Selectionne"));
+                        selectionProduitBundle.putInt("produitID", produit.getID_produit());
+                        selectionProduitIntent.putExtras(selectionProduitBundle);
+                        ListeReferenceActivity.this.startActivity(selectionProduitIntent);
+                    } else if (produitList.size() > 1) {
+                        Alerte.afficherAlerte(ListeReferenceActivity.this, "Attention", "Un problème est survenu, impossible d'identifier le produit.", "alerte");
+                    } else {
+
+                        Toast toast = Toast.makeText(ListeReferenceActivity.this, "Aucun produit ne correspond à ce code", Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    }
+                }
+            }
+            else {
+                Toast toast = Toast.makeText(ListeReferenceActivity.this, "Le code fourni est inconnu, veuillez réessayer.", Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
             }
         }
         invalidateOptionsMenu();
@@ -356,7 +384,7 @@ public class ListeReferenceActivity extends ServiceAvecConnexionActivity {
 
         if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
         {
-            rechercheProduitIntent = new Intent(ListeReferenceActivity.this, ScannerSearchOnlyActivity.class);
+            rechercheProduitIntent = new Intent(ListeReferenceActivity.this, ScannerProduitActivity.class);
         }
         else
         {
@@ -366,7 +394,7 @@ public class ListeReferenceActivity extends ServiceAvecConnexionActivity {
             }
             else
             {
-                rechercheProduitIntent = new Intent(ListeReferenceActivity.this, ScannerSearchOnlyActivity.class);
+                rechercheProduitIntent = new Intent(ListeReferenceActivity.this, ScannerProduitActivity.class);
             }
         }
 

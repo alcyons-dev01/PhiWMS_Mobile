@@ -179,21 +179,18 @@ public class DotationAdapter extends BaseAdapter {
                 viewHolder.barreStatutDotation.setBackgroundColor(context.getResources().getColor(R.color.bleu_clair_alcyons, null));
                 viewHolder.nbProduitDotation.setTextColor(context.getResources().getColor(R.color.bleu_clair_alcyons, null));
                 viewHolder.linearQuantite.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_bleu, null));
-                viewHolder.separateurQuantite.setBackgroundColor(context.getResources().getColor(R.color.bleu_clair_alcyons, null));
             }
             else if(phPreparationCourante.getStatut().contentEquals("En cours de préparation"))
             {
                 viewHolder.barreStatutDotation.setBackgroundColor(context.getResources().getColor(R.color.rouge, null));
                 viewHolder.nbProduitDotation.setTextColor(context.getResources().getColor(R.color.rouge, null));
                 viewHolder.linearQuantite.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_rouge, null));
-                viewHolder.separateurQuantite.setBackgroundColor(context.getResources().getColor(R.color.rouge, null));
             }
             else
             {
                 viewHolder.barreStatutDotation.setBackgroundColor(context.getResources().getColor(R.color.orange, null));
                 viewHolder.nbProduitDotation.setTextColor(context.getResources().getColor(R.color.orange, null));
                 viewHolder.linearQuantite.setBackground(context.getResources().getDrawable(R.drawable.background_cadre_orange, null));
-                viewHolder.separateurQuantite.setBackgroundColor(context.getResources().getColor(R.color.orange, null));
             }
 
             if(phPreparationCourante != null)
@@ -358,7 +355,6 @@ public class DotationAdapter extends BaseAdapter {
         public TextView dateLivraison;
         public LinearLayout zoneDate;
         public LinearLayout linearQuantite;
-        public ImageView separateurQuantite;
         public void setDateLivraisonColor(String dateProchaineLivraison) {
             Date date = null;
             if(!dateProchaineLivraison.contentEquals(""))

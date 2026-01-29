@@ -34,12 +34,14 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPlanDePlacementActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne;
+import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
@@ -59,6 +61,7 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
     ListView produitListView;
     boolean passageParOnCreate;
     boolean placement;
+    Depot depotCourant;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +73,7 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
         produitListScannes.addAll((Collection<? extends Produit>) intent.getExtras().getSerializable("ListProduitScannes"));
         passageParOnCreate = true;
         placement = intent.getExtras().getBoolean("placement");
+        depotCourant = DepotOpenHelper.getDepotParID(db, intent.getExtras().getInt("depotUID"));
 
         ((LinearLayout) findViewById(R.id.linearProduitsPlaces)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,7 +106,7 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
         ((TextView) findViewById(R.id.nbPlaces)).setText(String.valueOf(ProduitOpenHelper.getNbProduitPlace(db)));
         ((TextView) findViewById(R.id.nbNonPlace)).setText(String.valueOf(ProduitOpenHelper.getNbProduitNonPlace(db)));
 
-        adapter = new Produit_PlanDePlacementAdapter(ListeProduitsPlanDePlacementActivity.this, produitList, produitListScannes);
+        adapter = new Produit_PlanDePlacementAdapter(ListeProduitsPlanDePlacementActivity.this, produitList, produitListScannes, depotCourant);
         produitListView.setAdapter(adapter);
         produitListView.setDivider(null);
 
@@ -126,7 +130,7 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
 
                 produitList = new ArrayList<>();
                 produitList.addAll(produitListScannes);
-                adapter = new Produit_PlanDePlacementAdapter(ListeProduitsPlanDePlacementActivity.this, produitList, produitListScannes);
+                adapter = new Produit_PlanDePlacementAdapter(ListeProduitsPlanDePlacementActivity.this, produitList, produitListScannes, depotCourant);
                 produitListView.setAdapter(adapter);
                 produitListView.setDivider(null);
 
@@ -312,8 +316,17 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
 
                 for(Produit produitAPlace : produitListScannes)
                 {
-                    produitAPlace.setEmplacement_PUI_Defaut(emplacementRetourne.getAdressage());
-                    produitAPlace.setZone_PUI_Defaut(zoneEmplacementRetourne.getZoneName());
+                    if(depotCourant.getStructure().contentEquals("PUI"))
+                    {
+                        produitAPlace.setEmplacement_PUI_Defaut(emplacementRetourne.getAdressage());
+                        produitAPlace.setZone_PUI_Defaut(zoneEmplacementRetourne.getZoneName());
+                    }
+                    else
+                    {
+                        produitAPlace.setEmplacement_UF_Defaut(emplacementRetourne.getAdressage());
+                        produitAPlace.setZone_UF_Defaut(zoneEmplacementRetourne.getZoneName());
+                    }
+
                     long rowId = ProduitOpenHelper.mettreAJourProduit(db, produitAPlace);
 
                     if (rowId != -1) {
