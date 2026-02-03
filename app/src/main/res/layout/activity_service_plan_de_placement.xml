@@ -6,4 +6,15 @@
     android:background="@android:color/white"
     tools:context="fr.alcyons.phiwms_mobile.Services.ServicePlanDePlacementActivity">
 
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background_empty_radius"
+        android:orientation="vertical"
+        android:layout_marginTop="5dp"
+        android:padding="15dp"
+        tools:ignore="MissingConstraints">
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -660,7 +660,7 @@
 
         <activity
             android:name="fr.alcyons.phiwms_mobile.PlanDePlacement.ScanPlanDePlacementActivity"
-            android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+            android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation|keyboardHidden"/>

@@ -3,6 +3,7 @@ package fr.alcyons.phiwms_mobile.BaseDeDonnees;
 import static fr.alcyons.phiwms_mobile.BaseDeDonnees.ImprimanteEtiquetteOpenHelper.Constantes.TABLE_IMPRIMANTE_ETIQUETTE;
 import static fr.alcyons.phiwms_mobile.BaseDeDonnees.InventaireOpenHelper.Constantes.TABLE_INVENTAIRE;
 import static fr.alcyons.phiwms_mobile.BaseDeDonnees.Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP;
+import static fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitPlaceOpenHelper.Constantes.TABLE_PRODUIT_PLACE;
 import static fr.alcyons.phiwms_mobile.BaseDeDonnees.StockUtilisesOpenHelper.Constantes.TABLE_STOCK_UTILISE;
 
 import android.content.Context;
@@ -66,6 +67,7 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         db.delete(PH_Demande_MotifOpenHelper.Constantes.TABLE_DEMANDE_MOTIF, null, null);
         db.delete(TABLE_IMPRIMANTE_ETIQUETTE, null, null);
         db.delete(TABLE_STOCK_UTILISE, null, null);
+        db.delete(TABLE_PRODUIT_PLACE, null, null);
     }
 
     @Override
@@ -116,6 +118,7 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         db.execSQL(PH_Demande_MotifOpenHelper.Constantes.CREATION_TABLE_DEMANDE_MOTIF);
         db.execSQL(ImprimanteEtiquetteOpenHelper.Constantes.CREATION_TABLE_IMPRIMANTE_ETIQUETTE);
         db.execSQL(StockUtilisesOpenHelper.Constantes.CREATION_TABLE_STOCK_UTILISE);
+        db.execSQL(ProduitPlaceOpenHelper.Constantes.CREATION_TABLE_PRODUIT_PLACE);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -173,6 +176,12 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         int inventaireLigneTempSynchroniserColumn = inventaireLigneTempSynchroniserCursor.getColumnIndex("synchroniser");
         if (inventaireLigneTempSynchroniserColumn < 0) {
             db.execSQL("ALTER TABLE " + TABLE_INVENTAIRE_LIGNE_TEMP + " ADD COLUMN synchroniser INTEGER");
+        }
+
+        Cursor ProduitPlaceExisteCursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"
+                + TABLE_PRODUIT_PLACE + "'", null);
+        if (ProduitPlaceExisteCursor.getCount() == 0) {
+            db.execSQL(ProduitPlaceOpenHelper.Constantes.CREATION_TABLE_PRODUIT_PLACE);
         }
     }
 
@@ -275,6 +284,7 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         public static final String uriZebraImprimer = "zebrawebservice/imprimer";
         public static final String uriImprimanteEtiquette = "imprimanteEtiquette/";
         public static final String uriStockUtilises = "stock_utilises/";
+        public static final String uriProduitPlace = "produitplace/";
     }
 
     public static class ActionsEAS {

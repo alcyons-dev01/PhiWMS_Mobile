@@ -131,7 +131,7 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
             Dotation DotationSelectionne = dotationAdapter.listeDotation.get(position);
             PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandeDotationGlobaleEnInstance(db, "Dotation Globale : " + DotationSelectionne.getIntitule(), DotationSelectionne.getDateLivraison());
 
-            if(phPreparationCourante.getStatut().contentEquals("En instance") || phPreparationCourante.getStatut().contentEquals("En cours de régularisation")) {
+            if(phPreparationCourante == null || phPreparationCourante.getStatut().contentEquals("En instance") || phPreparationCourante.getStatut().contentEquals("En cours de régularisation")) {
                 Intent listeDotationService_Intent = ServiceDemandeDotationGlobaleActivity.this.getListeDotationServiceIntent(DotationSelectionne, phPreparationCourante);
                 ServiceDemandeDotationGlobaleActivity.this.startActivity(listeDotationService_Intent);
                 ServiceDemandeDotationGlobaleActivity.this.finish();

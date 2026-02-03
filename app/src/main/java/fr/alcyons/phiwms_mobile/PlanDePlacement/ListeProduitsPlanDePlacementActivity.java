@@ -38,6 +38,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitPlaceOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne;
@@ -45,6 +46,7 @@ import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.Classes.Produit_Place;
 import fr.alcyons.phiwms_mobile.IdentificationParScan.DetailProduitIdentificationParScanActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Produit_PlanDePlacementAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
@@ -316,7 +318,7 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
 
                 for(Produit produitAPlace : produitListScannes)
                 {
-                    if(depotCourant.getStructure().contentEquals("PUI"))
+                    /*if(depotCourant.getStructure().contentEquals("PUI"))
                     {
                         produitAPlace.setEmplacement_PUI_Defaut(emplacementRetourne.getAdressage());
                         produitAPlace.setZone_PUI_Defaut(zoneEmplacementRetourne.getZoneName());
@@ -326,31 +328,90 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
                         produitAPlace.setEmplacement_UF_Defaut(emplacementRetourne.getAdressage());
                         produitAPlace.setZone_UF_Defaut(zoneEmplacementRetourne.getZoneName());
                     }
+                    long rowId = ProduitOpenHelper.mettreAJourProduit(db, produitAPlace);*/
 
-                    long rowId = ProduitOpenHelper.mettreAJourProduit(db, produitAPlace);
+                    boolean modificationphproduit = false;
+                    if(depotCourant.getStructure().contentEquals("PUI"))
+                    {
+                        if(produitAPlace.getZone_PUI_Defaut().toUpperCase().contentEquals("ZONE") && produitAPlace.getEmplacement_PUI_Defaut().toUpperCase().contentEquals("EMPLACEMENT"))
+                        {
+                            produitAPlace.setEmplacement_PUI_Defaut(emplacementRetourne.getAdressage());
+                            produitAPlace.setZone_PUI_Defaut(zoneEmplacementRetourne.getZoneName());
+                            modificationphproduit = true;
+                        }
+                    }
+                    else
+                    {
+                        if(produitAPlace.getZone_UF_Defaut().toUpperCase().contentEquals("ZONE") && produitAPlace.getEmplacement_UF_Defaut().toUpperCase().contentEquals("EMPLACEMENT")) {
+                            produitAPlace.setEmplacement_UF_Defaut(emplacementRetourne.getAdressage());
+                            produitAPlace.setZone_UF_Defaut(zoneEmplacementRetourne.getZoneName());
+                            modificationphproduit = true;
+                        }
+                    }
 
-                    if (rowId != -1) {
+                    if(modificationphproduit)
+                    {
+                        ProduitOpenHelper.mettreAJourProduit(db, produitAPlace);
                         ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitAPlace.getPhiMR4UUID(), produitAPlace.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
-                        Random randomaction = new Random();
-                        int actionId = randomaction.nextInt();
-                        if (actionId > 0)
-                            actionId = actionId * -1;
+
+                        Random randomactionProduit = new Random();
+                        int actionProduitId = randomactionProduit.nextInt();
+                        if (actionProduitId > 0)
+                            actionProduitId = actionProduitId * -1;
                         @SuppressLint("SimpleDateFormat") SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        Date dateAction = new Date();
-                        String date_string = parseFormat.format(dateAction);
-                        ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", produitAPlace.getID_produit(), "", "Plan de placement");
-                        ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
-                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                        Date dateActionProduit = new Date();
+                        String date_string_produit = parseFormat.format(dateActionProduit);
+                        ActionUtilisateur new_action_utilisateur_produit = new ActionUtilisateur(actionProduitId, utilisateurConnecte.getId(), date_string_produit, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", produitAPlace.getID_produit(), "", "Plan de placement");
+                        ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur_produit);
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur_produit.getPhiMR4UUID(), new_action_utilisateur_produit.getId(), DBOpenHelper.ActionsEAS.AJOUT);
 
-                        Random randomactionligne = new Random();
-                        int actionligneId = randomactionligne.nextInt();
-                        if (actionligneId > 0)
-                            actionligneId = actionligneId * -1;
+                        Random randomactionligneproduit = new Random();
+                        int actionligneProduitId = randomactionligneproduit.nextInt();
+                        if (actionligneProduitId > 0)
+                            actionligneProduitId = actionligneProduitId * -1;
 
-                        ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.getId(), "PH_Produit", produitAPlace.getID_produit(), produitAPlace.getGTIN(), 0, 0, produitAPlace.getDesignation_interne());
-                        ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne);
-                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, actionUtilisateur_ligne.getPhiMR4UUID(), actionUtilisateur_ligne.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                        ActionUtilisateur_Ligne actionUtilisateur_ligne_produit = new ActionUtilisateur_Ligne(actionligneProduitId, new_action_utilisateur_produit.getId(), "PH_Produit", produitAPlace.getID_produit(), produitAPlace.getGTIN(), 0, 0, produitAPlace.getDesignation_interne());
+                        ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne_produit);
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, actionUtilisateur_ligne_produit.getPhiMR4UUID(), actionUtilisateur_ligne_produit.getId(), DBOpenHelper.ActionsEAS.AJOUT);
                         ElementASynchroniserOpenHelper.toutSynchroniser(ListeProduitsPlanDePlacementActivity.this, db, utilisateurConnecte, false);
+                    }
+
+                    Produit_Place produitPlace = ProduitPlaceOpenHelper.getProduitPlaceParProduitDepotZonePlace(db, produitAPlace.getID_produit(), depotCourant.getDepot_UID(), zoneEmplacementRetourne.getZoneID(), emplacementRetourne.get_UID());
+                    if(produitPlace == null) {
+                        produitPlace = new Produit_Place();
+                        produitPlace.setDepotID(depotCourant.getDepot_UID());
+                        produitPlace.setProduitID(produitAPlace.getID_produit());
+                        produitPlace.setPlaceID(emplacementRetourne.get_UID());
+                        produitPlace.setZoneID(zoneEmplacementRetourne.getZoneID());
+                        produitPlace.setDepotReference(depotCourant.getDepot_Reference());
+                        produitPlace.setPlaceNom(emplacementRetourne.getAdressage());
+                        produitPlace.setZoneNom(zoneEmplacementRetourne.getZoneName());
+                        produitPlace.setProduitNom(produitAPlace.getDesignation_interne());
+                        long rowId = ProduitPlaceOpenHelper.insererProduitPlaceEnBDD(db, produitPlace);
+
+                        if (rowId != -1) {
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitPlaceOpenHelper.Constantes.TABLE_PRODUIT_PLACE, produitPlace.getPhiWMMSID(), produitPlace.getProduitID(), DBOpenHelper.ActionsEAS.AJOUT);
+                            Random randomaction = new Random();
+                            int actionId = randomaction.nextInt();
+                            if (actionId > 0)
+                                actionId = actionId * -1;
+                            @SuppressLint("SimpleDateFormat") SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            Date dateAction = new Date();
+                            String date_string = parseFormat.format(dateAction);
+                            ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", produitAPlace.getID_produit(), "", "Produit Place");
+                            ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+
+                            Random randomactionligne = new Random();
+                            int actionligneId = randomactionligne.nextInt();
+                            if (actionligneId > 0)
+                                actionligneId = actionligneId * -1;
+
+                            ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.getId(), "PH_Produit", produitAPlace.getID_produit(), produitAPlace.getGTIN(), 0, 0, produitAPlace.getDesignation_interne());
+                            ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne);
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, actionUtilisateur_ligne.getPhiMR4UUID(), actionUtilisateur_ligne.getId(), DBOpenHelper.ActionsEAS.AJOUT);
+                            ElementASynchroniserOpenHelper.toutSynchroniser(ListeProduitsPlanDePlacementActivity.this, db, utilisateurConnecte, false);
+                        }
                     }
                 }
 

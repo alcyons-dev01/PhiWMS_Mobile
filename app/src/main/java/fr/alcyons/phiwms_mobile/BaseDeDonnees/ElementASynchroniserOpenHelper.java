@@ -41,6 +41,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Utiliser;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.Classes.Produit_Place;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Service;
@@ -155,6 +156,9 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                 break;
             case StockUtilisesOpenHelper.Constantes.TABLE_STOCK_UTILISE:
                 url += ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriStockUtilises;
+                break;
+            case ProduitPlaceOpenHelper.Constantes.TABLE_PRODUIT_PLACE:
+                url += ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriProduitPlace;
                 break;
         }
         return url;
@@ -406,6 +410,17 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                         body.put("Utilisateur", utilisateur.getId());
                     }
                     break;
+                case ProduitPlaceOpenHelper.Constantes.TABLE_PRODUIT_PLACE:
+                    Produit_Place produitPlace = ProduitPlaceOpenHelper.getProduitPlaceByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
+                    if (produitPlace == null) {
+                        // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
+                        return;
+                    }
+                    JSONObject produitPlaceJSON = produitPlace.toJson();
+                    if (produitPlaceJSON != null) {
+                        body.put("ProduitPlace", produitPlaceJSON);
+                    }
+                    break;
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -528,6 +543,9 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                             case ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE:
                                 contentValues.put(ActionUtilisateur_LigneOpenHelper.Constantes.CLE_COL_ID_ACTION_UTILISATEUR_LIGNE, nouvelId);
                                 rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " = " + element.getIdDansTableConcernee(), null);
+                                break;
+                            case ProduitPlaceOpenHelper.Constantes.TABLE_PRODUIT_PLACE:
+                                rowId = nbResultats;
                                 break;
                         }
                         if (rowId == -1) {
