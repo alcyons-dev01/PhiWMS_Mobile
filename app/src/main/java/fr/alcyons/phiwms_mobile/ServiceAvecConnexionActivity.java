@@ -95,6 +95,8 @@ public class ServiceAvecConnexionActivity extends ServiceActivity {
         View layout = inflater.inflate(R.layout.progress_bar, null);
         builder.setView(layout);
         alertDialog = builder.create();
+        alertDialog.setCancelable(false);
+        alertDialog.setCanceledOnTouchOutside(false);
         Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
         alertDialog.show();
     }
@@ -103,6 +105,11 @@ public class ServiceAvecConnexionActivity extends ServiceActivity {
     {
         if(alertDialog != null)
             alertDialog.dismiss();
+    }
+
+    public boolean checkSpinner()
+    {
+        return alertDialog != null;
     }
 
     public void connexionNecessaire() {

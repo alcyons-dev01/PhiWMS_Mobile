@@ -97,7 +97,7 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
     LinearLayout layoutBoutonEnvoyer;
     TextView dateEnvoiListe_TV;
     AlertDialog alertDialog;
-
+    int nbDetailDotAttendu = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,6 +111,7 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
         // Récupération des ressources
         depot = DepotOpenHelper.getDepotParID(db, depotID);
         dotation = DotationOpenHelper.getDotationByphiwms_mobileUUID(db, dotationId);
+        nbDetailDotAttendu = Detail_DotOpenHelper.getNbDetailDot(db, dotation);
         ph_preparation_courante = PH_PreparationOpenHelper.getPH_PreparationByID(db, phpreparationid);
 
         if(ph_preparation_courante == null)
@@ -246,7 +247,7 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
                 /* Code nécessaire afin de réaliser une requête à l' API */
         if (statutConnexion && passageParOnCreate) {
 
-            if (!swipeRefreshLayout.isRefreshing()) {
+            if (!swipeRefreshLayout.isRefreshing() && !checkSpinner()) {
                 afficherSpinner(InformationDotationServiceActivity.this, LayoutInflater.from(InformationDotationServiceActivity.this));
             }
 
@@ -268,7 +269,9 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
                                 } else {
                                     Alerte.afficherAlerte(InformationDotationServiceActivity.this, "Alerte", "Aucune Dotation trouvée", "alerte");
                                 }
-                            } else {
+                            } else if(nbResultat != nbDetailDotAttendu) {
+                                onResume();
+                            }else {
                                 PH_Preparation_LigneOpenHelper.viderTablePH_Preparation_LignesParPreparation(db, ph_preparation_courante.getUID());
                                 JSONArray ph_preparationligneJson = response.getJSONArray("PH_Preparation_Lignes");
                                 for (int k = 0; k < ph_preparationligneJson.length(); k++) {
@@ -746,6 +749,8 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
             CreatePhPreparationLigneDetail(detail_dot, dotation);
         }
 
+        phpreparationid = phPreparationID;
+        getIntent().putExtra("phPreparationID", phPreparationID);
         return ph_preparation;
     }
 

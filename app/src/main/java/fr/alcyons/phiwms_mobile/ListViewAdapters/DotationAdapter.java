@@ -145,6 +145,11 @@ public class DotationAdapter extends BaseAdapter {
 
                 dateProchaineLivraison = dateFormat.format(tomorrow);
             }
+
+            if(dotationCourant.get_UID() == 100)
+            {
+                boolean stop = true;
+            }
             PH_Preparation phPreparationCourante = PH_PreparationOpenHelper.getDemandeDotationGlobaleEnInstance(db, "Dotation Globale : " + dotationCourant.getIntitule(), dateProchaineLivraison);
             int nbLigne = 0;
             if(phPreparationCourante != null)
