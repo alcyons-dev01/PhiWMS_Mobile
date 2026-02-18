@@ -54,6 +54,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Detail_DotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EVENTOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
@@ -72,6 +73,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Reassort_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.DemandeDotationGlobale.InformationDotationServiceActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.PhReassortAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.ReassortAdapter;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.R;
@@ -100,6 +102,7 @@ public class InformationDemandeReassortActivity  extends ServiceAvecConnexionAct
     LinearLayout layoutBoutonEnvoyer;
     TextView dateEnvoiListe_TV;
     AlertDialog alertDialog;
+    int nbReassortLigneAttendu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +117,8 @@ public class InformationDemandeReassortActivity  extends ServiceAvecConnexionAct
         // Récupération des ressources
         depot = DepotOpenHelper.getDepotParID(db, depotID);
         reassort = PH_ReassortOpenHelper.getPH_ReassortByphiwms_mobileUUID(db, reassortid);
+        nbReassortLigneAttendu = PH_Reassort_LigneOpenHelper.getAllPH_Reassort_LigneParPH_Reassort(db, reassort).size();
+
         ph_preparation_courante = PH_PreparationOpenHelper.getPH_PreparationByID(db, phpreparationid);
 
         if(ph_preparation_courante == null)
@@ -242,7 +247,7 @@ public class InformationDemandeReassortActivity  extends ServiceAvecConnexionAct
         /* Code nécessaire afin de réaliser une requête à l' API */
         if (statutConnexion && passageParOnCreate) {
 
-            if (!swipeRefreshLayout.isRefreshing()) {
+            if (!swipeRefreshLayout.isRefreshing() && !checkSpinner()) {
                 afficherSpinner(InformationDemandeReassortActivity.this, LayoutInflater.from(InformationDemandeReassortActivity.this));
             }
 
@@ -266,7 +271,10 @@ public class InformationDemandeReassortActivity  extends ServiceAvecConnexionAct
                                 } else {
                                     Alerte.afficherAlerte(InformationDemandeReassortActivity.this, "Alerte", "Aucune Réassort Ligne trouvée", "alerte");
                                 }
-                            } else {
+                            } else if(nbResultat != nbReassortLigneAttendu)
+                            {
+                                onResume();
+                            }else {
                                 PH_Preparation_LigneOpenHelper.viderTablePH_Preparation_LignesParPreparation(db, ph_preparation_courante.getUID());
                                 JSONArray ph_preparationligneJson = response.getJSONArray("PH_Preparation_Lignes");
                                 for (int k = 0; k < ph_preparationligneJson.length(); k++) {
@@ -718,6 +726,9 @@ public class InformationDemandeReassortActivity  extends ServiceAvecConnexionAct
         {
             CreatePhPreparationLigneDetail(reassort_ligne, reassort);
         }
+
+        phpreparationid = phPreparationID;
+        getIntent().putExtra("phPreparationID", phPreparationID);
 
         return ph_preparation;
     }

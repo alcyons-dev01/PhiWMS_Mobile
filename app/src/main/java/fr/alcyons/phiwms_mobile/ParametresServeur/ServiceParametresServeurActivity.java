@@ -155,7 +155,7 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
         String device_id = Settings.Secure.getString(ServiceParametresServeurActivity.this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
         if (device_id != null) {
-            if (device_id.contentEquals("95004b3de3fc203b") || device_id.contentEquals("a964f85c6e890958") || device_id.contentEquals("57010b2fdbf2b021") || device_id.contentEquals("6327572c7741bb99") || device_id.contentEquals("ca67efeec851db73")) {
+            if (device_id.contentEquals("95004b3de3fc203b") || device_id.contentEquals("a964f85c6e890958") || device_id.contentEquals("57010b2fdbf2b021") || device_id.contentEquals("6327572c7741bb99") || device_id.contentEquals("ca67efeec851db73") || device_id.contentEquals("80f8f5570900fcb2")) {
                 //boutonAlcyonsParametre.setVisibility(View.VISIBLE);
                 alcyons_choix_client.setVisibility(View.VISIBLE);
                 /*boutonAlcyonsParametre.setOnClickListener(new View.OnClickListener() {
