@@ -3,10 +3,14 @@ package fr.alcyons.phiwms_mobile.ListViewAdapters;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -87,12 +91,62 @@ public class LotAdapter_V2 extends RecyclerView.Adapter<LotAdapter_V2.LotViewHol
             holder.qteSaisie.setText(String.valueOf(stockcourant.getQte_Preparer()));
             holder.qteStock.setText(String.valueOf((int)stockcourant.getQte()));
 
-            holder.qteSaisie.setOnClickListener(new View.OnClickListener() {
+            holder.qteSaisie.setTag(holder);
+
+            holder.qteSaisie.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+
+                    if (hasFocus) {
+                        EditText editText = (EditText) v;
+
+                        // sélectionne tout le texte
+                        editText.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                editText.selectAll();
+                            }
+                        });
+                    }
+                }
+            });
+
+            holder.qteSaisie.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        ((ListeLotPreparationActivity) context).fermerClavierEtRelayout();
+                        if(!holder.qteSaisie.getText().toString().contentEquals(""))
+                        {
+                            // 1) enlever le focus d'abord
+                            textView.clearFocus();
+                            View root = holder.itemView.getRootView();
+                            root.requestFocus();
+
+                            // 2) fermer le clavier
+                            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                            if (imm != null) imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+
+                            int pos = holder.getAdapterPosition();
+                            if (pos != RecyclerView.NO_POSITION) {
+                                ((ListeLotPreparationActivity) context).ValiderQuantiteSaisie(position, Integer.parseInt(holder.qteSaisie.getText().toString()));
+                            }
+                        }
+
+                        return true;
+                    }
+
+                    return false;
+                }
+            });
+
+
+            /*holder.qteSaisie.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     ((ListeLotPreparationActivity) context).ClickNumberPicker(position);
                 }
-            });
+            });*/
 
             Date dateExp = null;
             DateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
@@ -193,7 +247,7 @@ public class LotAdapter_V2 extends RecyclerView.Adapter<LotAdapter_V2.LotViewHol
         public TextView nomEmplacement;
         public TextView lot;
         public TextView dateExpiration;
-        public TextView qteSaisie;
+        public EditText qteSaisie;
         public TextView labelLot;
         public TextView qteStock;
         public TextView serie;

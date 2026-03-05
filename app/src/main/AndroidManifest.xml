@@ -417,6 +417,13 @@
         android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation|keyboardHidden"/>
 
+        <activity
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoPreparation"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
     <!-- Barcode Réception Activity -->
 
     <activity

@@ -9,7 +9,7 @@
     <LinearLayout
         android:id="@+id/principal"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginRight="5dp"
         android:weightSum="5">
@@ -42,26 +42,19 @@
                 android:id="@+id/nomService"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="16dp"
-                android:textStyle="bold"
-                android:text="nomService"
-                android:maxLines="1"
-                android:ellipsize="end"
+                android:text=""
                 android:layout_marginLeft="5dp"
                 android:layout_gravity="center"
-                android:textColor="#000000" />
+                style="@style/sectiongras_style"/>
 
             <TextView
                 android:id="@+id/descriptionService"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="14dp"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:text="descriptionService"
+                android:text=""
                 android:layout_marginLeft="5dp"
                 android:layout_gravity="center"
-                android:textColor="#000000" />
+                style="@style/text1ligne_style"/>
 
 
         </LinearLayout>
@@ -72,10 +65,9 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="right|center_vertical"
-            android:textStyle="bold"
-            android:text="  "
+            android:text=""
             android:textColor="@color/bleu_clair_alcyons"
-            android:textSize="20dp"/>
+            style="@style/titre_style"/>
 
     </LinearLayout>
 

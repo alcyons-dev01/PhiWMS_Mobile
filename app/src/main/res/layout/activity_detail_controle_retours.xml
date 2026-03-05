@@ -117,7 +117,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:descendantFocusability="afterDescendants"
-                android:dividerHeight="10dp"
+                android:dividerHeight="5dp"
                 android:divider="@android:color/transparent" />
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

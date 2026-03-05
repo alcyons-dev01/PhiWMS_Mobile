@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Corps du haut-parleur -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M3,9 L3,15 L7,15 L12,20 L12,4 L7,9 Z"/>
+
+    <!-- Onde sonore petite (grisée) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#888888"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M14.5,9.5 C15.5,10.5 15.5,13.5 14.5,14.5"/>
+
+    <!-- Onde sonore moyenne (grisée) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#888888"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M17,7 C19,9 19,15 17,17"/>
+
+    <!-- Onde sonore grande (grisée) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#888888"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M19.5,4.5 C22.5,7.5 22.5,16.5 19.5,19.5"/>
+
+    <!-- Barre diagonale rouge -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF0000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M2,22 L22,2"/>
+
+</vector>

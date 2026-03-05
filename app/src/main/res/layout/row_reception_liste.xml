@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="3"
+            android:weightSum="2"
             android:padding="5dp">
 
             <TextView
@@ -25,21 +25,17 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/noir"
-                android:textStyle="bold"
-                android:textSize="15dp"
-                android:text="#SU1926294"/>
+                android:text=""
+                style="@style/sectiongras_style"/>
 
             <TextView
                 android:id="@+id/fabricant"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:textColor="@color/noir"
-                android:textStyle="bold"
-                android:textSize="15dp"
+                android:layout_weight="1"
                 android:gravity="right"
-                android:text="BAXTER"/>
+                android:text=""
+                style="@style/sectiongras_style"/>
 
 
         </LinearLayout>
@@ -78,16 +74,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text=""
-                    android:textSize="18dp"
                     android:textColor="@color/blanc"
-                    android:textStyle="bold"/>
+                    style="@style/text1lignegras_style"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text="Colis"
-                    android:textSize="16dp"
-                    android:textColor="@color/blanc"/>
+                    android:textColor="@color/blanc"
+                    style="@style/text1ligne_style"/>
 
             </LinearLayout>
 
@@ -105,16 +100,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text=""
-                    android:textSize="18dp"
                     android:textColor="@color/blanc"
-                    android:textStyle="bold"/>
+                    style="@style/text1lignegras_style"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text="Kg"
-                    android:textSize="16dp"
-                    android:textColor="@color/blanc"/>
+                    android:textColor="@color/blanc"
+                    style="@style/text1ligne_style"/>
 
             </LinearLayout>
 
@@ -133,16 +127,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text=""
-                    android:textSize="18dp"
                     android:textColor="@color/blanc"
-                    android:textStyle="bold"/>
+                    style="@style/text1lignegras_style"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text="Colis"
-                    android:textSize="16dp"
-                    android:textColor="@color/blanc"/>
+                    android:textColor="@color/blanc"
+                    style="@style/text1ligne_style"/>
 
             </LinearLayout>
 

@@ -102,7 +102,6 @@ public class DetailReceptionActivity extends ServiceActivity {
     ListView phReliquatListView;
     PH_Reliquat_ReceptionAdapter phReliquatReceptionAdapter;
     PH_Reliquat_ReceptionAdapter.PH_Reliquat_ReceptionViewHolder phReliquatReceptionViewHolder;
-
     String bonLivraison = "";
     String subject = "";
     String body = "";
@@ -113,7 +112,6 @@ public class DetailReceptionActivity extends ServiceActivity {
     String EmailCopie;
     Bitmap bonLivraisonBitmap;
     String erreur ="";
-
     boolean second_passage_photo;
     List<String> listeProduitRAL = new ArrayList<>();
     String tri_choisi;

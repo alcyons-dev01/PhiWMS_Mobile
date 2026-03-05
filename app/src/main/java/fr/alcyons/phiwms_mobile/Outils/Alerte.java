@@ -48,6 +48,7 @@ import java.util.Objects;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.DemandeDotationGlobale.InformationDotationServiceActivity;
 import fr.alcyons.phiwms_mobile.Interfaces.ConfirmationServiceListener;
 import fr.alcyons.phiwms_mobile.Interfaces.RetourServiceListener;
 import fr.alcyons.phiwms_mobile.Interfaces.SaisieTextListener;

@@ -36,6 +36,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -208,6 +210,7 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
                             JSONArray ph_preparation_JSONArray = response.getJSONArray("PH_Preparations");
                             viderTablesConcernees();
                             long rowID = 0;
+                            List<String> tempListeDepot = new ArrayList<>();
                             for (int i = 0; i < ph_preparation_JSONArray.length(); i++) {
                                 JSONObject ph_preparation_JSONObject = ph_preparation_JSONArray.getJSONObject(i);
                                 PH_Preparation ph_preparation = new PH_Preparation(ph_preparation_JSONObject);
@@ -218,8 +221,8 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
                                     Depot depotDestinataire = DepotOpenHelper.getDepotParReference(db, ph_preparation.getDepotDestinataireReference());
                                     if(depotDestinataire != null)
                                     {
-                                        if(!listeDepotLivraison.contains(depotDestinataire.getNom()))
-                                            listeDepotLivraison.add(depotDestinataire.getNom());
+                                        if(!tempListeDepot.contains(depotDestinataire.getNom()))
+                                            tempListeDepot.add(depotDestinataire.getNom());
                                     }
                                     ph_preparation_List.add(ph_preparation);
                                     ph_preparation_List_base.add(ph_preparation);
@@ -230,6 +233,9 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
                                     }
                                 }
                             }
+
+                            Collections.sort(tempListeDepot);
+                            listeDepotLivraison.addAll(tempListeDepot);
 
                             if(passageParOnCreate)
                             {

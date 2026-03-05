@@ -54,8 +54,7 @@
                     android:textColor="#FFFFFF"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    style="@style/section_style"/>
 
                 <TextView
                     android:id="@+id/nomFournisseur"
@@ -65,8 +64,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    style="@style/section_style" />
 
             </LinearLayout>
 
@@ -149,7 +147,7 @@
             android:layout_below="@+id/separateur2"
             android:descendantFocusability="afterDescendants"
             android:divider="@android:color/transparent"
-            android:dividerHeight="10dp">
+            android:dividerHeight="5dp">
 
         </ListView>
     </RelativeLayout>

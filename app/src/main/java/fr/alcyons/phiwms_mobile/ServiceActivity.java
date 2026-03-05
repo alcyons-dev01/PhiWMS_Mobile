@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -565,5 +566,19 @@ public class ServiceActivity extends MenuActivity implements RetourServiceListen
         int dd = cal.get(Calendar.DAY_OF_MONTH);
 
         return String.format("%04d-%02d-%02d", yyyy, mm, dd);
+    }
+
+    public Boolean isSoundEnabled() {
+        AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        switch (audioManager.getRingerMode()) {
+            case AudioManager.RINGER_MODE_NORMAL:
+                return true;   // Son activé
+            case AudioManager.RINGER_MODE_VIBRATE:
+                return false;  // Vibreur
+            case AudioManager.RINGER_MODE_SILENT:
+                return false;  // Silencieux
+            default:
+                return false;
+        }
     }
 }

@@ -72,6 +72,7 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.DotationGlobaleAdapter;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparationActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 import fr.alcyons.phiwms_mobile.Services.ServiceDemandeDotationGlobaleActivity;
@@ -279,6 +280,18 @@ public class InformationDotationServiceActivity extends ServiceAvecConnexionActi
                                     PH_Preparation_Ligne preparation_ligne = new PH_Preparation_Ligne(preparationligneJsonJSONObject);
                                     PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, preparation_ligne);
                                     phPreparationLigneList.add(preparation_ligne);
+                                }
+
+                                if(phPreparationLigneList.isEmpty())
+                                {
+                                    Alerte.afficherAlerte(InformationDotationServiceActivity.this, "Alerte", "Aucune Dotation Ligne synchronisée", "alerte");
+                                    Intent intent = new Intent(InformationDotationServiceActivity.this, ServiceDemandeDotationGlobaleActivity.class);
+                                    Bundle extras = new Bundle();
+                                    extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                                    extras.putInt("serviceSelectionneID", serviceActuel.getId());
+                                    intent.putExtras(extras);
+                                    InformationDotationServiceActivity.this.startActivity(intent);
+                                    InformationDotationServiceActivity.this.finish();
                                 }
                             }
 

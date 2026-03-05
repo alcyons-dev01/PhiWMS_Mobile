@@ -132,7 +132,7 @@
                 android:paddingTop="10dp"
                 android:background="@color/blanc"
                 android:divider="@android:color/transparent"
-                android:dividerHeight="10dp">
+                android:dividerHeight="5dp">
 
             </ListView>
         </RelativeLayout>

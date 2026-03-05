@@ -31,8 +31,7 @@
                     android:layout_marginLeft="5dp"
                     android:text=""
                     android:textColor="#FFFFFF"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
+                    style="@style/section_style"/>
 
                 <TextView
                     android:id="@+id/nomFournisseur"
@@ -42,8 +41,7 @@
                     android:text=""
                     android:layout_marginLeft="5dp"
                     android:textColor="#FFFFFF"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
+                    style="@style/section_style"/>
             </LinearLayout>
 
             <LinearLayout
@@ -79,11 +77,11 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/barreDeTitre"
         android:orientation="horizontal"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:weightSum="5.75"
         android:background="@drawable/background_cadre_orange"
-        android:paddingTop="3dp"
-        android:paddingHorizontal="3dp">
+        android:paddingTop="1.75dp"
+        android:paddingHorizontal="1.75dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -129,18 +127,15 @@
                         android:id="@+id/designationProduit"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="18dp"
                         android:text=""
-                        android:textColor="@color/noir"
-                        android:textStyle="bold"/>
+                        style="@style/designation_style"/>
 
                     <TextView
                         android:id="@+id/referenceProduit"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="16dp"
                         android:text=""
-                        android:textColor="@color/noir"/>
+                        style="@style/reference_style"/>
 
                 </LinearLayout>
 
@@ -181,16 +176,6 @@
 
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/liste_view_reception"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_below="@id/firstRow"
-        android:layout_above="@id/btnAjoutManuel"
-        android:layout_marginTop="10dp"
-        android:scrollbars="vertical"/>
-
     <Button
         android:id="@+id/btnAjoutManuel"
         android:layout_width="match_parent"
@@ -199,12 +184,21 @@
         android:background="@drawable/background_plein_bleu_radius"
         android:backgroundTint="@color/bleu_clair_alcyons"
         android:layout_marginHorizontal="50dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
         android:layout_alignParentEnd="true"
         android:textColor="@color/blanc"
         android:textSize="18dp"
         android:textStyle="bold"
-        android:layout_alignParentBottom="true"
-        android:visibility="invisible"/>
+        android:visibility="invisible"
+        android:layout_below="@id/firstRow"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/liste_view_reception"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_below="@id/btnAjoutManuel"
+        android:layout_marginTop="10dp"
+        android:scrollbars="vertical"/>
 
 </RelativeLayout>

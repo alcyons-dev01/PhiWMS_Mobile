@@ -87,12 +87,12 @@ public class LotAdapter extends RecyclerView.Adapter<LotAdapter.LotViewHolder> {
             holder.qteSaisie.setText(String.valueOf(lotAdapte.getQteSaisie()));
             holder.qteStock.setText(String.valueOf(lotAdapte.getQteStock()));
 
-            holder.qteSaisie.setOnClickListener(new View.OnClickListener() {
+            /*holder.qteSaisie.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     ((ListeLotPreparationActivity) context).ClickNumberPicker(position);
                 }
-            });
+            });*/
 
             Date dateExp = null;
             DateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");

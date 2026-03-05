@@ -159,7 +159,8 @@ public class HIBCParser {
         result.expirationDate = timestampToDate(timestamp);
         result.lotNumber = lot;
         result.serie = serie;
-        result.packaging = Integer.parseInt(quantite);
+        if(quantite != null && !quantite.isEmpty())
+            result.packaging = Integer.parseInt(quantite);
 
         return result;
     }

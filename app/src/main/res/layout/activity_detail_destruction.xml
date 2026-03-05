@@ -70,7 +70,7 @@
                 android:layout_height="match_parent"
                 android:descendantFocusability="afterDescendants"
                 android:divider="@android:color/transparent"
-                android:dividerHeight="10dp">
+                android:dividerHeight="5dp">
 
             </ListView>
 

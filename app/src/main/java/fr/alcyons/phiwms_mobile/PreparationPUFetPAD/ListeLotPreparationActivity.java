@@ -12,8 +12,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,6 +49,7 @@ import java.util.Map;
 import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoPreparation;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
@@ -346,7 +349,7 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
         int index = -1;
         MAJListeLot();
         passageParScanner = true;
-        Intent listeLotPreparation_Intent = new Intent(ListeLotPreparationActivity.this, BarcodePreparationActivity.class);
+        Intent listeLotPreparation_Intent = new Intent(ListeLotPreparationActivity.this, ScannerPhotoPreparation.class);
         //gestion du zebra
         if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
         {
@@ -367,7 +370,70 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
         ListeLotPreparationActivity.this.startActivityForResult(listeLotPreparation_Intent, CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH);
     }
 
-    public void ClickNumberPicker(final int position) {
+    public void ValiderQuantiteSaisie(final int position, int qteApres)
+    {
+        Stock_Lot_Emplacement_Light courant = listeStockLotEmplacement.get(position);
+        if(courant.getQte_Preparer() != qteApres)
+        {
+            int max = 0;
+            max = (int) courant.getQte();
+
+            if(courant.getQte_Preparer() > 0)
+            {
+                int qte_avant = courant.getQte_Preparer();
+                courant.setQte_Preparer(0);
+                Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, courant);
+
+                MAJVisuel();
+                MAJValues(false, qte_avant);
+            }
+
+            int reste = quantiteDemandeeBase - qteDejaPreparer;
+            if(max > reste)
+                max = reste;
+
+            if(qteApres > max)
+                qteApres = max;
+            else
+            {
+                //gestion du conditionnement
+                if(qteApres % (int)ph_preparation_ligne_base.getProduitCondDistrib() != 0)
+                {
+                    boolean confirmation = Alerte.afficherAlerte(ListeLotPreparationActivity.this, "Attention", "La quantité saisie ne correspond pas au conditionnement du produit. Souhaitez-vous arrondir au conditionnement ?", "OuiNon");
+                    if(confirmation)
+                    {
+                        qteApres = ((qteApres + (int)ph_preparation_ligne_base.getProduitCondDistrib() - 1) / (int)ph_preparation_ligne_base.getProduitCondDistrib()) * (int)ph_preparation_ligne_base.getProduitCondDistrib();
+                    }
+                }
+            }
+
+            MAJValues(true, qteApres);
+
+            courant.setQte_Preparer(qteApres);
+
+            RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
+            if (viewHolder instanceof LotAdapter_V2.LotViewHolder) {
+                LotAdapter_V2.LotViewHolder monViewHolder = (LotAdapter_V2.LotViewHolder) viewHolder;
+                monViewHolder.qteSaisie.setText((String.valueOf(qteApres)));
+                adapter.notifyItemChanged(position);
+            }
+            Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, courant);
+
+            if(qteApres == 0)
+                supprimerPhPreparationLigne(ph_preparation_ligne_base, courant);
+            else
+            {
+                PH_Preparation_Ligne ligneCourante = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByProduitLotSerieNegPreparation(db, ph_preparation_ligne_base.getProduitID(), ph_preparation_ligne_base.getPreparationID(), courant.getLot(), courant.getSerie(), courant.getEmplacement());
+                if(ligneCourante == null)
+                    enregistrementPreparationLigne(ph_preparation_ligne_base, courant);
+                else
+                    modifierPreparationLigne(ph_preparation_ligne_base, ligneCourante, courant);
+            }
+        }
+        MAJVisuel();
+    }
+
+    /*public void ClickNumberPicker(final int position) {
         Context context = ListeLotPreparationActivity.this;
         if(!produit.isSuivi_Serialisation() || produit.isSerialiser_Reception_Delivrance())
         {
@@ -443,7 +509,7 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
 
 
         }
-    };
+    };*/
 
     public void ClickLigneLot(int position)
     {
@@ -566,16 +632,9 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
         }
 
         restantAPrepaper = quantiteDemandeeBase - qteDejaPreparer;
-    }
 
-    public void fermerLigne(int position) {
-        RecyclerView.ViewHolder vh = recyclerView.findViewHolderForAdapterPosition(position);
-        if (vh != null && vh instanceof LotAdapter.LotViewHolder) {
-            ((LotAdapter.LotViewHolder) vh).contentLayout.animate()
-                    .translationX(0)
-                    .setDuration(200)
-                    .start();
-        }
+        if(restantAPrepaper == 0)
+            onMenuSaveClick();
     }
 
     private void modifierPreparationLigne(PH_Preparation_Ligne ph_preparationLigneCorrespondant, PH_Preparation_Ligne ph_preparation_ligne, Stock_Lot_Emplacement_Light stockLotEmplacementLight)
@@ -695,7 +754,6 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
 
 
         adapter = new LotAdapter_V2(listeStockLotEmplacement, position -> {
-            Toast.makeText(this, "Supprimer " + listeStockLotEmplacement.get(position), Toast.LENGTH_SHORT).show();
             RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
             if (viewHolder != null && viewHolder instanceof LotAdapter_V2.LotViewHolder) {
                 Stock_Lot_Emplacement_Light stock_courant = listeStockLotEmplacement.get(position);
@@ -751,4 +809,74 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
         int nbColis = recupererNbColis(produit.getID_produit(), ph_preparation_ligne_base.getQte_APreparer());
         ((TextView) findViewById(R.id.colis)).setText(String.valueOf(nbColis));
     }
+
+    public void fermerClavierEtRelayout() {
+        View v = getCurrentFocus();
+        if (v != null) v.clearFocus();
+
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        View decor = getWindow().getDecorView();
+        if (imm != null) imm.hideSoftInputFromWindow(decor.getWindowToken(), 0);
+
+        // force une nouvelle mesure après fermeture IME
+        View content = findViewById(android.R.id.content);
+        content.post(content::requestLayout);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+
+        if (ev.getAction() == MotionEvent.ACTION_DOWN && getCurrentFocus() instanceof EditText) {
+
+            EditText et = (EditText) getCurrentFocus();
+
+            int[] coords = new int[2];
+            et.getLocationOnScreen(coords);
+
+            float x = ev.getRawX() + et.getLeft() - coords[0];
+            float y = ev.getRawY() + et.getTop() - coords[1];
+
+            boolean outside = (x < et.getLeft() || x > et.getRight() || y < et.getTop() || y > et.getBottom());
+
+            if (outside) {
+
+                // 1) retrouver la row (itemView) qui contient l'EditText
+                View row = recyclerView.findContainingItemView(et);
+                int pos = (row != null) ? recyclerView.getChildAdapterPosition(row) : RecyclerView.NO_POSITION;
+
+                // 2) lire la quantité
+                int qte = 0;
+                String txt = et.getText().toString().trim();
+                if (!txt.isEmpty()) {
+                    try { qte = Integer.parseInt(txt); } catch (Exception ignored) {}
+                }
+
+                // 3) valider
+                if (pos != RecyclerView.NO_POSITION) {
+                    ValiderQuantiteSaisie(pos, qte);
+                }
+
+                // 4) fermer clavier + focus
+                et.clearFocus();
+
+                InputMethodManager imm =
+                        (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.hideSoftInputFromWindow(et.getWindowToken(), 0);
+                }
+
+                View decor = getWindow().getDecorView();
+                decor.post(() -> {
+                    decor.requestApplyInsets();      // important
+                    recyclerView.requestLayout();    // optionnel
+                    recyclerView.invalidate();       // optionnel
+                });
+
+                recyclerView.post(recyclerView::requestLayout);
+            }
+        }
+
+        return super.dispatchTouchEvent(ev);
+    }
+
 }

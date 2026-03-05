@@ -3,6 +3,7 @@ package fr.alcyons.phiwms_mobile.Reception;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,13 +15,18 @@ import android.os.Bundle;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -63,6 +69,7 @@ import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeZoneCreationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparationActivity;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
@@ -84,13 +91,12 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
     TextView lotEditText;
     TextView datePeremptionTextView;
     TextView fournisseurTextView;
-    TextView qteActuelleEditText;
+    EditText qteActuelleEditText;
     ImageView datamatrix1ImageView;
     ImageView datamatrix2ImageView;
     TextView labelSerie;
     TextView numPreparation;
     TextView referenceProduit;
-    LinearLayout validationScan;
     ImageView imageValidation;
     RelativeLayout relativeQte;
     Commande commandecourante;
@@ -136,11 +142,10 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
         lotEditText = (TextView) findViewById(R.id.numLot);
         numSerieEditText = (TextView) findViewById(R.id.numSerie);
         datePeremptionTextView = (TextView) findViewById(R.id.datePeremption);
-        qteActuelleEditText = (TextView) findViewById(R.id.qteActuelle);
+        qteActuelleEditText = (EditText) findViewById(R.id.qteActuelle);
         datamatrix1ImageView = (ImageView) findViewById(R.id.datamatrix1);
         datamatrix2ImageView = (ImageView) findViewById(R.id.datamatrix2);
         imageValidation = (ImageView) findViewById(R.id.imageValidation);
-        validationScan = (LinearLayout) findViewById(R.id.validationScan);
         relativeQte = (RelativeLayout) findViewById(R.id.relativeQte);
 
         //gestion du produit non tracé
@@ -358,32 +363,55 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
         qteActuelleEditText.setText(String.valueOf(qte_restante));
 
 
-        relativeQte.setOnClickListener(view -> {
-            String title = produitSelectionne.getDesignation_interne();
-            String message = "Choisir une quantité: ";
-            int maxValue = qte_restante;
-            int value = qte_restante;
-            int conditionnement = (int)produitSelectionne.getCond_Achat_Gros_volume();
+        qteActuelleEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                    @Override
+                    public void onFocusChange(View v, boolean hasFocus) {
 
-            if(conditionnement == 0 || conditionnement > qte_restante)
-                conditionnement = (int)produitSelectionne.getCond_achat();
+                        if (hasFocus) {
+                            EditText editText = (EditText) v;
 
-            if(conditionnement == 0 || conditionnement > qte_restante)
-                conditionnement = 1;
+                            // sélectionne tout le texte
+                            editText.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    editText.selectAll();
+                                }
+                            });
+                        }
+                    }
+                });
 
-            int finalConditionnement = conditionnement;
-            DialogInterface.OnClickListener onClickListener = (dialog, id) -> {
+        qteActuelleEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    int qteSaisie = Integer.parseInt(qteActuelleEditText.getText().toString());
 
-                int qteApres = aNumberPicker.getValue()* finalConditionnement;
-                qteActuelleEditText.setText(String.valueOf(qteApres).trim());
-                dialog.dismiss();
-                apparitionValider();
-            };
+                    if(qteSaisie > qte_restante)
+                        qteSaisie = qte_restante;
+                    //gestion du conditionnement
+                    if(qteSaisie % (int)reliquat_courant.getConditionnementAchat() != 0)
+                    {
+                        boolean confirmation = Alerte.afficherAlerte(CreationLotManuelReceptionActivity.this, "Attention", "La quantité saisie ne correspond pas au conditionnement du produit. Souhaitez-vous arrondir au conditionnement ?", "OuiNon");
+                        if(confirmation)
+                        {
+                            qteSaisie = ((qteSaisie + (int)reliquat_courant.getConditionnementAchat() - 1) / (int)reliquat_courant.getConditionnementAchat()) * (int)reliquat_courant.getConditionnementAchat();
+                        }
+                    }
 
-            Alerte.afficherAlerteNumberPickerAvecPas(CreationLotManuelReceptionActivity.this, title, message, value, maxValue, onClickListener, conditionnement);
+                    qteActuelleEditText.setText(String.valueOf(qteSaisie));
+
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+
+                    return true;
+                }
+
+                return false;
+            }
         });
 
-        //on affiche des valeurs fictive si c'est alcyons qui est connecté
+        //on affiche des valeurs fictives si c'est alcyons qui est connecté
         if(utilisateurConnecte.getIdentifiant().toLowerCase().contentEquals("alcyons"))
         {
             lotEditText.setText("LotAclyons");
@@ -579,7 +607,7 @@ public class CreationLotManuelReceptionActivity extends ServiceActivity {
     {
         if(!lotEditText.getText().toString().contentEquals("") && !datePeremptionTextView.getText().toString().contentEquals("") && !qteActuelleEditText.getText().toString().contentEquals("0"))
         {
-            validationScan.setVisibility(View.VISIBLE);
+            imageValidation.setVisibility(View.VISIBLE);
             blinkImage();
         }
     }

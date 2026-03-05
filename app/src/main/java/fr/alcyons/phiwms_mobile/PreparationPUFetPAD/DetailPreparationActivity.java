@@ -56,6 +56,7 @@ import java.util.Objects;
 import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoPreparation;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
@@ -274,16 +275,19 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
                 for(PH_Preparation_Ligne ph_preparationLigne : phPreparationLignes)
                 {
                     Produit produit = ProduitOpenHelper.getProduitByID(db, ph_preparationLigne.getProduitID());
-                    String zone = produit.getZone_PUI_Defaut();
-                    String emplacement = produit.getEmplacement_PUI_Defaut();
-                    String zoneemplacement = zone + "-" + emplacement;
+                    if(produit != null)
+                    {
+                        String zone = produit.getZone_PUI_Defaut();
+                        String emplacement = produit.getEmplacement_PUI_Defaut();
+                        String zoneemplacement = zone + "-" + emplacement;
 
-                    if(!listeZoneEmplacement.contains(zoneemplacement)) {
-                        listeZoneEmplacement.add(zoneemplacement);
-                        ph_preparation_ligne_preparationLotAdapter.addSectionHeaderItem(ph_preparationLigne);
+                        if(!listeZoneEmplacement.contains(zoneemplacement)) {
+                            listeZoneEmplacement.add(zoneemplacement);
+                            ph_preparation_ligne_preparationLotAdapter.addSectionHeaderItem(ph_preparationLigne);
+                        }
+
+                        ph_preparation_ligne_preparationLotAdapter.addItem(ph_preparationLigne);
                     }
-
-                    ph_preparation_ligne_preparationLotAdapter.addItem(ph_preparationLigne);
                 }
 
                 phPreparationLigne_ListView.setAdapter(ph_preparation_ligne_preparationLotAdapter);
@@ -540,16 +544,19 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         for(PH_Preparation_Ligne ph_preparationLigne : phPreparationLignes)
         {
             Produit produit = ProduitOpenHelper.getProduitByID(db, ph_preparationLigne.getProduitID());
-            String zone = produit.getZone_PUI_Defaut();
-            String emplacement = produit.getEmplacement_PUI_Defaut();
-            String zoneemplacement = zone + "-" + emplacement;
+            if(produit != null)
+            {
+                String zone = produit.getZone_PUI_Defaut();
+                String emplacement = produit.getEmplacement_PUI_Defaut();
+                String zoneemplacement = zone + "-" + emplacement;
 
-            if(!listeZoneEmplacement.contains(zoneemplacement)) {
-                listeZoneEmplacement.add(zoneemplacement);
-                ph_preparation_ligne_preparationLotAdapter.addSectionHeaderItem(ph_preparationLigne);
+                if(!listeZoneEmplacement.contains(zoneemplacement)) {
+                    listeZoneEmplacement.add(zoneemplacement);
+                    ph_preparation_ligne_preparationLotAdapter.addSectionHeaderItem(ph_preparationLigne);
+                }
+
+                ph_preparation_ligne_preparationLotAdapter.addItem(ph_preparationLigne);
             }
-
-            ph_preparation_ligne_preparationLotAdapter.addItem(ph_preparationLigne);
         }
 
         phPreparationLigne_ListView.setAdapter(ph_preparation_ligne_preparationLotAdapter);
@@ -697,7 +704,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
     }
 
     private void onMenuDatamatrixClick() {
-        Intent detailPreparation_Intent = new Intent(DetailPreparationActivity.this, BarcodePreparationActivity.class);
+        Intent detailPreparation_Intent = new Intent(DetailPreparationActivity.this, ScannerPhotoPreparation.class);
 
         List<PH_Preparation_Ligne> liste_ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesAPreparerParPHPreparation(db, ph_preparation_Selectionne);
 
@@ -708,7 +715,7 @@ public class DetailPreparationActivity extends ServiceAvecConnexionActivity {
         else
         {
             //gestion du zebra
-            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google") || android.os.Build.MANUFACTURER.toLowerCase().contains("samsung"))
+            if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google") || !android.os.Build.MANUFACTURER.toLowerCase().contains("samsung"))
             {
                 detailPreparation_Intent = new Intent(DetailPreparationActivity.this, ScannerPreparationActivity.class);
             }

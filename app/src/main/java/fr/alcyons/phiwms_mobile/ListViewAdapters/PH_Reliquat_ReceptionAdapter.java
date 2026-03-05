@@ -66,7 +66,6 @@ public class PH_Reliquat_ReceptionAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-
     @Override
     public int getItemViewType(int position) {
         return sectionHeader.contains(position) ? TYPE_HEADER : TYPE_ITEM;

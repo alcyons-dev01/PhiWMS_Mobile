@@ -136,18 +136,15 @@
                         android:id="@+id/designationProduit"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="18dp"
                         android:text=""
-                        android:textColor="@color/noir"
-                        android:textStyle="bold"/>
+                        style="@style/designation_style"/>
 
                     <TextView
                         android:id="@+id/referenceProduit"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="16dp"
                         android:text=""
-                        android:textColor="@color/noir"/>
+                        style="@style/reference_style"/>
 
                 </LinearLayout>
 

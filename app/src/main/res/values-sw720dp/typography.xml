@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TAILLE DES TEXTES POUR UNE GRANDE TABLETTE -->
+<resources>
+    <dimen name="text_base">18sp</dimen>
+    <dimen name="text_lg">20sp</dimen>
+    <dimen name="text_xl">24sp</dimen>
+    <dimen name="text_2xl">30sp</dimen>
+    <dimen name="text_4xl">42sp</dimen>
+</resources>

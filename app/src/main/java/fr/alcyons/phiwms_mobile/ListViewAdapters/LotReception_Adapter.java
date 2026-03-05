@@ -5,10 +5,14 @@ import static android.view.View.VISIBLE;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -88,12 +92,62 @@ public class LotReception_Adapter extends RecyclerView.Adapter<LotReception_Adap
                 viewHolder.nomEmplacement.setText(reliquatCourant.getEmplacement());
                 viewHolder.lot.setText(reliquatCourant.getLot());
                 viewHolder.qteSaisie.setText(String.valueOf(reliquatCourant.getQteLivraison()));
-                viewHolder.qteSaisie.setOnClickListener(new View.OnClickListener() {
+
+                viewHolder.qteSaisie.setTag(viewHolder);
+
+                viewHolder.qteSaisie.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                    @Override
+                    public void onFocusChange(View v, boolean hasFocus) {
+
+                        if (hasFocus) {
+                            EditText editText = (EditText) v;
+
+                            // sélectionne tout le texte
+                            editText.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    editText.selectAll();
+                                }
+                            });
+                        }
+                    }
+                });
+
+                viewHolder.qteSaisie.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                    @Override
+                    public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                        if (actionId == EditorInfo.IME_ACTION_DONE) {
+                            ((ListeLotReceptionActivity) context).fermerClavierEtRelayout();
+                            if(!viewHolder.qteSaisie.getText().toString().contentEquals(""))
+                            {
+                                // 1) enlever le focus d'abord
+                                textView.clearFocus();
+                                View root = viewHolder.itemView.getRootView();
+                                root.requestFocus();
+
+                                // 2) fermer le clavier
+                                InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                                if (imm != null) imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+
+                                int pos = viewHolder.getAdapterPosition();
+                                if (pos != RecyclerView.NO_POSITION) {
+                                    ((ListeLotReceptionActivity) context).validerQuantiteReception(position, reliquatCourant, Integer.parseInt(viewHolder.qteSaisie.getText().toString()));
+                                }
+                            }
+
+                            return true;
+                        }
+
+                        return false;
+                    }
+                });
+
+                /*viewHolder.qteSaisie.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         ((ListeLotReceptionActivity) context).ClickNumberPicker(viewHolder.getAdapterPosition(), reliquatCourant);
                     }
-                });
+                });*/
 
                 String datePeremption = reliquatCourant.getPeremptionDate();
                 String[] datePeremptionTab = datePeremption.split("-");

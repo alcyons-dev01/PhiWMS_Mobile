@@ -10,37 +10,43 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/bleu_fonce_alcyons"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:weightSum="2">
 
-        <TextView
-            android:id="@+id/numPreparation"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:textColor="#FFFFFF"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            android:text=""
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="72dp"/>
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="2">
+            <TextView
+                android:id="@+id/numPreparation"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:textColor="#FFFFFF"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="72dp"
+                style="@style/section_style"/>
 
-        <TextView
-            android:id="@+id/depotPreparation"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:textColor="#FFFFFF"
-            android:textSize="17sp"
-            android:gravity="left"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="72dp"
-            android:textStyle="bold"
-            android:text=""/>
+            <TextView
+                android:id="@+id/depotPreparation"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:textColor="#FFFFFF"
+                android:gravity="left"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="72dp"
+                style="@style/section_style"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imageValidation"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/ic_check_circle"/>
 
     </LinearLayout>
 
@@ -59,30 +65,26 @@
             android:id="@+id/nomProduit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ProduitDesignation"
-            android:textColor="@android:color/black"
-            android:textSize="17sp"
+            android:text=""
             android:layout_marginRight="15dp"
             android:layout_marginLeft="5dp"
-            android:textStyle="bold" />
+            style="@style/designation_style"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="2"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="2dp">
 
             <TextView
                 android:id="@+id/referenceProduit"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="ProduitReference"
-                android:textColor="@android:color/black"
-                android:textSize="15sp"
-                android:layout_marginRight="15dp"
-                android:layout_marginLeft="5dp" />
+                android:text=""
+                android:layout_marginLeft="5dp"
+                style="@style/reference_style"/>
 
         </LinearLayout>
 
@@ -108,11 +110,10 @@
             android:layout_height="wrap_content"
             android:background="@color/vert"
             android:textColor="@color/blanc"
-            android:textStyle="bold"
-            android:textSize="16dp"
             android:gravity="center"
             android:padding="5dp"
-            android:text="LOT AJOUTER"/>
+            android:text="LOT AJOUTER"
+            style="@style/sectiongras_style"/>
 
         <LinearLayout
             android:id="@+id/zonePlacementLot"
@@ -143,18 +144,15 @@
                         android:layout_height="wrap_content"
                         android:text="Zone"
                         android:textColor="@color/bleu_clair_alcyons"
-                        android:textStyle="bold"
                         android:layout_marginLeft="5dp"
-                        android:textSize="24dp"/>
+                        style="@style/sectiongras_style"/>
 
                     <TextView
                         android:id="@+id/zoneName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="text"
-                        android:textSize="24dp"
-                        android:textColor="@android:color/black"
-                        android:textStyle="bold" />
+                        style="@style/sectiongras_style"/>
 
                 </LinearLayout>
 
@@ -169,18 +167,15 @@
                         android:layout_height="wrap_content"
                         android:text="Place"
                         android:textColor="@color/bleu_clair_alcyons"
-                        android:textStyle="bold"
-                        android:textSize="24dp" />
+                        android:layout_marginLeft="5dp"
+                        style="@style/sectiongras_style" />
 
                     <TextView
                         android:id="@+id/nomEmplacement"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
                         android:inputType="text"
-                        android:textSize="24dp"
-                        android:textColor="@android:color/black"
-                        android:textStyle="bold"  />
+                        style="@style/sectiongras_style" />
 
 
                 </LinearLayout>
@@ -199,8 +194,8 @@
 
                 <ImageView
                     android:id="@+id/datamatrix1"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:layout_gravity="center"
                     android:clickable="true"
                     android:contentDescription="@string/datamatrix"
@@ -243,19 +238,18 @@
 
                     <TextView
                         android:id="@+id/labelSerie"
-                        android:layout_width="60dp"
+                        android:layout_width="70dp"
                         android:layout_height="wrap_content"
                         android:text="Série"
-                        android:textColor="@color/noir"
-                        android:textStyle="bold"
-                        android:textSize="20dp"/>
+                        android:layout_marginLeft="5dp"
+                        style="@style/sectiongras_style"/>
 
                     <TextView
                         android:id="@+id/numSerie"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="16dp"
-                        android:hint="Ajouter un numéro de série"/>
+                        android:hint="Numéro de série"
+                        style="@style/section_style"/>
 
 
                 </LinearLayout>
@@ -267,19 +261,18 @@
                     android:layout_marginBottom="10dp">
 
                     <TextView
-                        android:layout_width="60dp"
+                        android:layout_width="70dp"
                         android:layout_height="wrap_content"
                         android:text="Lot"
-                        android:textSize="20dp"
-                        android:textStyle="bold"
-                        android:textColor="@color/noir"/>
+                        android:layout_marginLeft="5dp"
+                        style="@style/sectiongras_style"/>
 
                     <TextView
                         android:id="@+id/numLot"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="16dp"
-                        android:hint="Ajouter un numéro Lot"/>
+                        android:hint="Numéro de Lot"
+                        style="@style/section_style"/>
 
                 </LinearLayout>
 
@@ -290,12 +283,11 @@
 
 
                     <TextView
-                        android:layout_width="60dp"
+                        android:layout_width="70dp"
                         android:layout_height="wrap_content"
                         android:text="Exp. "
-                        android:textColor="@color/noir"
-                        android:textStyle="bold"
-                        android:textSize="20dp"/>
+                        android:layout_marginLeft="5dp"
+                        style="@style/sectiongras_style"/>
 
                     <TextView
                         android:id="@+id/datePeremption"
@@ -319,8 +311,8 @@
 
                 <ImageView
                     android:id="@+id/datamatrix2"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:layout_gravity="center"
                     android:clickable="true"
                     android:contentDescription="@string/datamatrix"
@@ -343,30 +335,29 @@
         <RelativeLayout
             android:id="@+id/relativeQte"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="40dp"
             android:weightSum="3"
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="50dp"
+                android:layout_width="70dp"
                 android:layout_height="match_parent"
                 android:text="Qté"
                 android:gravity="center_vertical"
-                android:textSize="14dp"
-                android:textStyle="bold"
-                android:textColor="@color/noir"/>
+                android:layout_marginLeft="5dp"
+                style="@style/sectiongras_style"/>
 
-            <TextView
+            <EditText
                 android:id="@+id/qteActuelle"
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="match_parent"
                 android:layout_alignParentRight="true"
-                android:textColor="@android:color/black"
-                android:textStyle="bold"
-                android:text="0"
-                android:textSize="25dp"
                 android:layout_marginRight="30dp"
-                android:gravity="center_vertical" />
+                android:inputType="number"
+                android:text=""
+                android:gravity="center_vertical|center_horizontal"
+                android:imeOptions="actionDone"
+                style="@style/sectiongras_style" />
 
 
         </RelativeLayout>
@@ -374,24 +365,5 @@
     </LinearLayout>
 
     </ScrollView>
-
-    <LinearLayout
-        android:id="@+id/validationScan"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="5dp"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="15dp"
-        android:gravity="right"
-        android:visibility="visible">
-
-        <ImageView
-            android:id="@+id/imageValidation"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/ic_check_circle"/>
-
-    </LinearLayout>
 
 </RelativeLayout>

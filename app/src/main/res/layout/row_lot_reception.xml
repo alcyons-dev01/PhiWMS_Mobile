@@ -34,7 +34,7 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
     android:layout_height="wrap_content"
     android:clickable="true"
     android:focusable="true"
-    android:descendantFocusability="blocksDescendants"
+    android:descendantFocusability="afterDescendants"
     android:background="@android:color/white">
 
     <LinearLayout
@@ -68,10 +68,9 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text="emplacement"
-                    android:textSize="15dp"
                     android:gravity="center"
                     android:textColor="@color/blanc"
-                    android:textStyle="bold" />
+                    style="@style/sectiongras_style"/>
 
             </LinearLayout>
 
@@ -102,9 +101,8 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
                         android:paddingRight="10dp"
-                        android:textColor="@color/noir"
-                        android:textStyle="bold"
-                        android:text=""/>
+                        android:text=""
+                        style="@style/text1lignegras_style"/>
 
                 </LinearLayout>
 
@@ -127,7 +125,8 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
                         android:layout_marginRight="5dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="00/00/0000"/>
+                        android:text="00/00/0000"
+                        style="@style/text1ligne_style"/>
 
                 </LinearLayout>
 
@@ -151,8 +150,8 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
                         android:layout_marginRight="5dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textStyle="bold"
-                        android:text=""/>
+                        android:text=""
+                        style="@style/text1lignegras_style"/>
 
                 </LinearLayout>
 
@@ -160,24 +159,22 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
 
             <LinearLayout
                 android:id="@+id/layout_qte_saisie_lot_preparation"
-                android:layout_width="wrap_content"
+                android:layout_width="48dp"
                 android:layout_height="match_parent"
                 android:background="@drawable/background_cadre_orange"
                 android:orientation="vertical"
                 android:layout_marginRight="5dp">
 
-                <TextView
+                <EditText
                     android:id="@+id/qteSaisie"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="2000"
+                    android:text=""
                     android:textColor="@color/noir"
-                    android:textSize="20dp"
-                    android:textStyle="bold"
-                    android:layout_margin="5dp"/>
-
-
+                    android:inputType="number"
+                    android:imeOptions="actionDone"
+                    style="@style/sectiongras_style"/>
             </LinearLayout>
 
         </LinearLayout>

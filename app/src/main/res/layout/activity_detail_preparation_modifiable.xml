@@ -54,7 +54,7 @@
                 android:text=""
                 android:textColor="#FFFFFF"
                 android:layout_marginLeft="5dp"
-                android:textSize="17sp"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -64,7 +64,7 @@
                 android:text=""
                 android:layout_marginLeft="5dp"
                 android:textColor="#FFFFFF"
-                android:textSize="17sp"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
             </LinearLayout>
@@ -122,7 +122,7 @@
             android:transcriptMode="alwaysScroll"
             android:layout_marginBottom="10dp"
             android:divider="@android:color/transparent"
-            android:dividerHeight="10dp"/>
+            android:dividerHeight="5dp"/>
 
 
     </RelativeLayout>

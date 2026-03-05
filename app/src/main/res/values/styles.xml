@@ -63,4 +63,89 @@
         <item name="android:datePickerMode">spinner</item>
         <item name="android:calendarViewShown">false</item>
     </style>
+
+    <!-- Gestion des styles de text -->
+    <style name="designation_style">
+        <item name="android:textSize">@dimen/text_lg</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/noir</item>
+    </style>
+
+    <style name="reference_style">
+        <item name="android:textSize">@dimen/text_base</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/noir</item>
+    </style>
+
+    <style name="titre_style">
+        <item name="android:textSize">@dimen/text_2xl</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/noir</item>
+    </style>
+
+    <style name="soustitre_style">
+        <item name="android:textSize">@dimen/text_xl</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/noir</item>
+    </style>
+
+    <style name="soustitregras_style">
+        <item name="android:textSize">@dimen/text_xl</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/noir</item>
+    </style>
+
+    <style name="section_style">
+        <item name="android:textSize">@dimen/text_lg</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/noir</item>
+    </style>
+
+    <style name="sectiongras_style">
+        <item name="android:textSize">@dimen/text_lg</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/noir</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="text1ligne_style">
+        <item name="android:textSize">@dimen/text_base</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/noir</item>
+    </style>
+
+    <style name="text2ligne_style">
+        <item name="android:textSize">@dimen/text_base</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/noir</item>
+    </style>
+
+    <style name="text1lignegras_style">
+        <item name="android:textSize">@dimen/text_base</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/noir</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="text2lignegras_style">
+        <item name="android:textSize">@dimen/text_base</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/noir</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

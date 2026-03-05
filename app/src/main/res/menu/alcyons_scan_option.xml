@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_gs1"
+        android:title="GS1" />
+
+    <item
+        android:id="@+id/action_gs1_part1"
+        android:title="GS1 Partie 1" />
+
+    <item
+        android:id="@+id/action_gs1_part2"
+        android:title="GS1 Partie 2" />
+
+    <item
+        android:id="@+id/action_hibc"
+        android:title="HIBC" />
+
+    <item
+        android:id="@+id/action_hibc_part1"
+        android:title="HIBC Partie 1" />
+
+    <item
+        android:id="@+id/action_hibc_part2"
+        android:title="HIBC Partie 2" />
+
+    <item
+        android:id="@+id/action_gtin"
+        android:title="PHITAGTIN" />
+
+    <item
+        android:id="@+id/action_ref"
+        android:title="PHITAGREF" />
+
+    <item
+        android:id="@+id/action_pvref"
+        android:title="PHITAGPVREF" />
+
+    <item
+        android:id="@+id/action_place"
+        android:title="PHITAGPLACE" />
+
+    <item
+        android:id="@+id/action_codeinconnu"
+        android:title="Code inconnu" />
+
+</menu>
