@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/ListeDesignationProduitScanner"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:orientation="vertical"
+        android:background="@color/noir"
+        android:layout_alignParentBottom="true">
+
+        <ListView
+            android:id="@+id/ListViewDesignation"
+            android:layout_width="match_parent"
+            android:layout_height="150dp" />
+
+        <Button
+            android:id="@+id/boutonPlacerReferences"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/blanc"
+            android:background="@drawable/background_plein_bleu_radius"
+            android:text="Placer les x références"
+            android:visibility="visible"/>
+    </LinearLayout>
+
+</RelativeLayout>

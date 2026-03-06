@@ -310,6 +310,21 @@ public class ProduitOpenHelper extends DBOpenHelper {
         return produitList;
     }
 
+    public static Produit getUnProduitsByIdentification(SQLiteDatabase db, String chaineIdentifiant) {
+        Produit produit = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE (" + Constantes.CLE_COL_GTIN_PRODUIT + "=? OR " + Constantes.CLE_COL_GTIN_PRODUIT + "=? OR "+Constantes.CLE_COL_CODE_INCONNU+"=?) AND "+Constantes.CLE_COL_ARRET_COMMANDE_PRODUIT+" != 1 ", new String[]{chaineIdentifiant, "01"+chaineIdentifiant, chaineIdentifiant});
+
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+            produit = new Produit(cursor);
+        }
+        cursor.close();
+        cursor = null;
+
+        return produit;
+    }
+
     public static Produit getUnProduitParGTIN(SQLiteDatabase db, String produitGTIN) {
         Produit produit = null;
         Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + Constantes.CLE_COL_GTIN_PRODUIT + "=?", new String[]{produitGTIN});

@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerEmplacementActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoEmplacement;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPlanDePlacementActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
@@ -254,8 +255,19 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
 
     public void lancerScan() {
         passageParOnCreate = true;
+
         Intent listeProduitsPlanDePlacementIntent = new Intent(ListeProduitsPlanDePlacementActivity.this, ScannerPlanDePlacementActivity.class);
+        if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
+        {
+            listeProduitsPlanDePlacementIntent = new Intent(ListeProduitsPlanDePlacementActivity.this, ScannerPlanDePlacementActivity.class);
+        }
+        else
+        {
+            listeProduitsPlanDePlacementIntent = new Intent(ListeProduitsPlanDePlacementActivity.this, ScannerPhotoEmplacement.class);
+        }
+
         Bundle servicePlanDePlacementBundle = super.getBundle();
+
         servicePlanDePlacementBundle.putSerializable("ListProduitScannes", (Serializable) produitListScannes);
         listeProduitsPlanDePlacementIntent.putExtras(servicePlanDePlacementBundle);
         ListeProduitsPlanDePlacementActivity.this.startActivityForResult(listeProduitsPlanDePlacementIntent, CodesEchangesActivites.RETOUR_CODE_GS1);

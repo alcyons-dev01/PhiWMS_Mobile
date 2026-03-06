@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Objects;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoEmplacement;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoReception;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPlanDePlacementActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
@@ -136,7 +138,6 @@ public class ScanPlanDePlacementActivity extends ServiceAvecConnexionActivity {
                             } else if (!erreur.contentEquals("Aucun ProduitPlace trouvé")) {
                                 Alerte.afficherAlerteInformation(ScanPlanDePlacementActivity.this, getLayoutInflater(), "Erreur", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Préparation PUF", false, true);
                             } else {
-                                arreterSpinner();
                                 if (firstPassage) {
                                     Intent servicePlanDePlacementIntent = null;
                                     Bundle servicePlanDePlacementBundle = super.getBundle();
@@ -144,7 +145,7 @@ public class ScanPlanDePlacementActivity extends ServiceAvecConnexionActivity {
                                     if (android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google")) {
                                         servicePlanDePlacementIntent = new Intent(ScanPlanDePlacementActivity.this, ScannerPlanDePlacementActivity.class);
                                     } else {
-                                        servicePlanDePlacementIntent = new Intent(ScanPlanDePlacementActivity.this, BarcodeCaptureActivity.class);
+                                        servicePlanDePlacementIntent = new Intent(ScanPlanDePlacementActivity.this, ScannerPhotoEmplacement.class);
                                     }
 
                                     servicePlanDePlacementBundle.putSerializable("ListProduitScannees", (Serializable) listeProduitScannees);
@@ -152,6 +153,7 @@ public class ScanPlanDePlacementActivity extends ServiceAvecConnexionActivity {
                                     servicePlanDePlacementIntent.putExtras(servicePlanDePlacementBundle);
                                     ScanPlanDePlacementActivity.this.startActivityForResult(servicePlanDePlacementIntent, CodesEchangesActivites.RETOUR_CODE_GS1);
                                     firstPassage = false;
+                                    arreterSpinner();
                                 }
                             }
                         } else {
@@ -171,7 +173,7 @@ public class ScanPlanDePlacementActivity extends ServiceAvecConnexionActivity {
                                 if (android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google")) {
                                     servicePlanDePlacementIntent = new Intent(ScanPlanDePlacementActivity.this, ScannerPlanDePlacementActivity.class);
                                 } else {
-                                    servicePlanDePlacementIntent = new Intent(ScanPlanDePlacementActivity.this, BarcodeCaptureActivity.class);
+                                    servicePlanDePlacementIntent = new Intent(ScanPlanDePlacementActivity.this, ScannerPhotoEmplacement.class);
                                 }
 
                                 servicePlanDePlacementBundle.putSerializable("ListProduitScannees", (Serializable) listeProduitScannees);

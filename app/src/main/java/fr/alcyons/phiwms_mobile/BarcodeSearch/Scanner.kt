@@ -78,11 +78,7 @@ abstract class Scanner : ServiceActivity() {
         }
 
         btnExit.setOnClickListener {
-            val data = Intent().apply {
-                //putExtra("result", tvCode.text?.toString().orEmpty())
-            }
-            setResult(RESULT_OK, data)
-            finish()
+            quitterActivite()
         }
 
         if(utilisateurConnecte.identifiant.uppercase(getDefault()).contentEquals("ALCYONS"))
@@ -267,6 +263,15 @@ abstract class Scanner : ServiceActivity() {
 
     protected open fun onCodeScanned(code: String) {
         // par défaut : rien, les classes filles peuvent surcharger
+    }
+
+    protected open fun quitterActivite() {
+        // par défaut : rien, les classes filles peuvent surcharger
+        val data = Intent().apply {
+            //putExtra("result", tvCode.text?.toString().orEmpty())
+        }
+        setResult(RESULT_OK, data)
+        finish()
     }
 
     override fun onResume() {
