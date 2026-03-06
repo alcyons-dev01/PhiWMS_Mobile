@@ -17,7 +17,7 @@ android {
         targetSdk 34
 
         versionCode getVersionCode()
-        versionName "3.26.03.05"
+        versionName "3.26.03.06"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true

@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoReception;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
@@ -156,7 +157,7 @@ public class ListeLotReceptionActivity extends ServiceActivity {
                 }
                 else
                 {
-                    listeLotReception_Intent = new Intent(ListeLotReceptionActivity.this, BarcodeReceptionActivity.class);
+                    listeLotReception_Intent = new Intent(ListeLotReceptionActivity.this, ScannerPhotoReception.class);
                 }
 
                 listeLotReception_Bundle.putInt("ReceptionID", commandeSelectionne.getID_commande());

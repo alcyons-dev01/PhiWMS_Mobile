@@ -169,14 +169,15 @@ class ScannerPhotoPreparation : Scanner() {
 
                                     //on peut modifier la quantité
                                     val qteProgress = qtePreparer + conditionnement.toInt()
-                                    (findViewById<View?>(R.id.progressBarQuantite) as ProgressBar).max = qteDemander
-                                    (findViewById<View?>(R.id.progressBarQuantite) as ProgressBar).progress = qteProgress
-                                    (findViewById<View?>(R.id.designationValidation) as TextView).text = designationProduit
-                                    (findViewById<View?>(R.id.quantiteValidation) as TextView).text = "$qteProgress / $qteDemander"
-                                    (findViewById<View?>(R.id.lotValidation) as TextView).text = numeroLotIdentification
-                                    (findViewById<View?>(R.id.peremptionValidation) as TextView).text = peremptionIdentification
-                                    (findViewById<View?>(R.id.emplacementValidation) as TextView).text = stockcourant.emplacement
-
+                                    withContext(Dispatchers.Main) {
+                                        (findViewById<View?>(R.id.progressBarQuantite) as ProgressBar).max = qteDemander
+                                        (findViewById<View?>(R.id.progressBarQuantite) as ProgressBar).progress = qteProgress
+                                        (findViewById<View?>(R.id.designationValidation) as TextView).text = designationProduit
+                                        (findViewById<View?>(R.id.quantiteValidation) as TextView).text = "$qteProgress / $qteDemander"
+                                        (findViewById<View?>(R.id.lotValidation) as TextView).text = numeroLotIdentification
+                                        (findViewById<View?>(R.id.peremptionValidation) as TextView).text = peremptionIdentification
+                                        (findViewById<View?>(R.id.emplacementValidation) as TextView).text = stockcourant.emplacement
+                                    }
                                     if (!numeroSerieIdentification.contentEquals("")) {
                                         (findViewById<View?>(R.id.layoutSerieValidation) as LinearLayout).visibility = View.VISIBLE
                                         (findViewById<View?>(R.id.serieValidation) as TextView).text = numeroSerieIdentification

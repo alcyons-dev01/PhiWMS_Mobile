@@ -417,7 +417,7 @@
         android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation|keyboardHidden"/>
 
-        <activity
+    <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoPreparation"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
@@ -435,6 +435,13 @@
 
     <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoReception"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
