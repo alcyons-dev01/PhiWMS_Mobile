@@ -54,7 +54,7 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
 
         if (intent.getExtras().getString("codeGS1") != null) {
             final String codeGS1 = intent.getExtras().getString("codeGS1");
-            listeAAfficher = ProduitOpenHelper.getProduitsParGTIN(db, codeGS1);
+            listeAAfficher = ProduitOpenHelper.getProduitsParGTINAvecSansAI(db, codeGS1);
 
             if(listeAAfficher.isEmpty())
             {

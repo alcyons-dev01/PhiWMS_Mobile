@@ -11,6 +11,7 @@ import androidx.activity.OnBackPressedCallback;
 import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerIdentificationProduit;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerProduitActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
@@ -67,7 +68,7 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
                 if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
                 {
                     // Si on passe pour la première fois, on lance l'activité de décodage.
-                    Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, BarcodeCaptureActivity.class);
+                    Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ScannerIdentificationProduit.class);
                     Bundle extras = ServiceIdentificationParScanActivity.super.getBundle();
                     extras.putBoolean("isBoutonSuppressionExistant", true);
                     newIntent.putExtras(extras);
