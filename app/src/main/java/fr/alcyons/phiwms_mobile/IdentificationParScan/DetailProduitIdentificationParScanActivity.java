@@ -75,7 +75,7 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
 
         if(!codeComplet.contentEquals(""))
         {
-            if(produitSelectionne.getGTIN().contentEquals(codeComplet) || produitSelectionne.getCodeInconnue().contentEquals(codeComplet))
+            if(produitSelectionne.getGTIN().contentEquals("01"+codeComplet) || produitSelectionne.getGTIN().contentEquals(codeComplet) || produitSelectionne.getCodeInconnue().contentEquals(codeComplet))
             {
                 ((TextView) findViewById(R.id.codeGS1)).setText(codeComplet);
                 ((TextView) findViewById(R.id.referenceIdentifie)).setVisibility(View.VISIBLE);

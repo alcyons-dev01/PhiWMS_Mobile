@@ -154,10 +154,9 @@ class ScannerPhotoPreparation : Scanner() {
                             if(lotpresent)
                             {
                                 //on récupère la fiche de stock concernée
-                                var stockcourant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByLotPeremptionEtDepot(db, numeroLotIdentification, peremptionIdentification,
-                                    DepotOpenHelper.getDepotPUI(db))
+                                var stockcourant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByLotPeremptionEtDepot(db, numeroLotIdentification, peremptionIdentification, DepotOpenHelper.getDepotPUI(db))
 
-                                if(stockcourant != null)
+                                if(stockcourant != null && stockcourant.produit_Code == produit?.iD_produit)
                                 {
                                     //si le produit est serialisé, on vérifie qu'il n'a pas encore été scanné
                                     val serialisation : Boolean = produit?.isSuivi_Serialisation == false
