@@ -191,7 +191,7 @@ class ScannerPhotoReception  : Scanner() {
                                     withContext(Dispatchers.Main) {
                                         (findViewById<View?>(R.id.layoutFondValidation) as LinearLayout).visibility = View.VISIBLE
 
-                                        delay(500)
+                                        delay(250)
 
                                         (findViewById<View?>(R.id.layoutFondValidation) as LinearLayout).visibility = View.GONE
                                         (findViewById<View?>(R.id.lotValidation) as TextView).text = ""

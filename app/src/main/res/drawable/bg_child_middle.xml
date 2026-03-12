@@ -1,0 +1,48 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Fond -->
+    <item>
+        <shape>
+            <solid android:color="#FFFFFF"/>
+        </shape>
+    </item>
+
+    <!-- Bordure gauche -->
+    <item android:width="1dp" android:gravity="left">
+        <shape>
+            <solid android:color="#2AA7FF"/>
+        </shape>
+    </item>
+
+    <!-- Bordure droite -->
+    <item android:width="1dp" android:gravity="right">
+        <shape>
+            <solid android:color="#2AA7FF"/>
+        </shape>
+    </item>
+
+    <!-- Masque bordure haut -->
+    <item
+        android:top="1dp"
+        android:left="1dp"
+        android:right="1dp"
+        android:height="1dp"
+        android:gravity="top">
+        <shape>
+            <solid android:color="#FFFFFF"/>
+        </shape>
+    </item>
+
+    <!-- Masque bordure bas -->
+    <item
+        android:bottom="1dp"
+        android:left="1dp"
+        android:right="1dp"
+        android:height="1dp"
+        android:gravity="bottom">
+        <shape>
+            <solid android:color="#FFFFFF"/>
+        </shape>
+    </item>
+
+</layer-list>

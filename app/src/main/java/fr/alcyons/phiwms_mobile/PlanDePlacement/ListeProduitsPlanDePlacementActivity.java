@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -25,8 +26,11 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerEmplacementActivity;
@@ -50,6 +54,7 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Produit_Place;
 import fr.alcyons.phiwms_mobile.IdentificationParScan.DetailProduitIdentificationParScanActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Produit_PlanDePlacementAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.Produit_PlanDePlacement_V2Adapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
@@ -59,31 +64,37 @@ import fr.alcyons.phiwms_mobile.Services.ServicePlanDePlacementActivity;
 public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
 
     Produit_PlanDePlacementAdapter adapter;
+    Produit_PlanDePlacement_V2Adapter adapterV2;
     List<Produit> produitList = new ArrayList<>();
     List<Produit> produitListScannes = new ArrayList<>();
     ListView produitListView;
+    ArrayList<String> mapProduitPlace;
     boolean passageParOnCreate;
     boolean placement;
     Depot depotCourant;
+    ExpandableListView expandableListView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_liste_produit_plan_placement);
-
+        mapProduitPlace = new ArrayList<>();
         // Récupération de la liste_view à remplir
         produitListView = (ListView) findViewById(R.id.listeView);
-        produitList = ProduitOpenHelper.getProduitPlace(db);
+        expandableListView = findViewById(R.id.expandableListView);
         produitListScannes.addAll((Collection<? extends Produit>) intent.getExtras().getSerializable("ListProduitScannes"));
         passageParOnCreate = true;
         placement = intent.getExtras().getBoolean("placement");
         depotCourant = DepotOpenHelper.getDepotParID(db, intent.getExtras().getInt("depotUID"));
+
+        gestionListeProduit(true);
 
         ((LinearLayout) findViewById(R.id.linearProduitsPlaces)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ((LinearLayout) findViewById(R.id.linearProduitsPlaces)).setAlpha(1);
                 ((LinearLayout) findViewById(R.id.linearProduitNonPlaces)).setAlpha(0.5F);
-                produitList = ProduitOpenHelper.getProduitPlace(db);
+                //produitList = ProduitOpenHelper.getProduitPlace(db);
+                gestionListeProduit(true);
                 onResume();
             }
         });
@@ -93,7 +104,8 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
             public void onClick(View v) {
                 ((LinearLayout) findViewById(R.id.linearProduitsPlaces)).setAlpha(0.5F);
                 ((LinearLayout) findViewById(R.id.linearProduitNonPlaces)).setAlpha(1);
-                produitList = ProduitOpenHelper.getProduitNonPlace(db);
+                //produitList = ProduitOpenHelper.getProduitNonPlace(db);
+                gestionListeProduit(false);
                 onResume();
             }
         });
@@ -109,8 +121,11 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
         ((TextView) findViewById(R.id.nbPlaces)).setText(String.valueOf(ProduitOpenHelper.getNbProduitPlace(db)));
         ((TextView) findViewById(R.id.nbNonPlace)).setText(String.valueOf(ProduitOpenHelper.getNbProduitNonPlace(db)));
 
-        adapter = new Produit_PlanDePlacementAdapter(ListeProduitsPlanDePlacementActivity.this, produitList, produitListScannes, depotCourant);
-        produitListView.setAdapter(adapter);
+        /*adapter = new Produit_PlanDePlacementAdapter(db, ListeProduitsPlanDePlacementActivity.this, mapProduitPlace, produitListScannes, depotCourant);
+        produitListView.setAdapter(adapter);*/
+        adapterV2 = new Produit_PlanDePlacement_V2Adapter(db, this, mapProduitPlace, produitListScannes, depotCourant, ((Button) findViewById(R.id.boutonAction)));
+
+        expandableListView.setAdapter(adapterV2);
         produitListView.setDivider(null);
 
         if(!placement)
@@ -133,14 +148,24 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
 
                 produitList = new ArrayList<>();
                 produitList.addAll(produitListScannes);
-                adapter = new Produit_PlanDePlacementAdapter(ListeProduitsPlanDePlacementActivity.this, produitList, produitListScannes, depotCourant);
-                produitListView.setAdapter(adapter);
+                mapProduitPlace = new ArrayList<>();
+                for(Produit produitTemp : produitListScannes)
+                {
+                    String cleZonePlace = produitTemp.getID_produit()+"_"+produitTemp.getZone_PUI_Defaut()+"_"+produitTemp.getEmplacement_PUI_Defaut();
+                    if(!mapProduitPlace.contains(cleZonePlace))
+                        mapProduitPlace.add(cleZonePlace);
+                }
+                /*adapter = new Produit_PlanDePlacementAdapter(db, ListeProduitsPlanDePlacementActivity.this, mapProduitPlace, produitListScannes, depotCourant);
+                produitListView.setAdapter(adapter);*/
+                adapterV2 = new Produit_PlanDePlacement_V2Adapter(db, ListeProduitsPlanDePlacementActivity.this, mapProduitPlace, produitListScannes, depotCourant, ((Button) findViewById(R.id.boutonAction)));
+
+                expandableListView.setAdapter(adapterV2);
                 produitListView.setDivider(null);
 
                 ((Button) findViewById(R.id.boutonRetour)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        placement = false;
+                        //placement = false;
                         gestionClickProduit();
                         ((Button) findViewById(R.id.boutonAction)).setVisibility(View.VISIBLE);
                         ((LinearLayout) findViewById(R.id.layoutboutonplacement)).setVisibility(View.VISIBLE);
@@ -152,7 +177,7 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
                 ((Button) findViewById(R.id.boutonPlacer)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        placement = true;
+                        //placement = true;
                         Intent listeProduitsPlanDePlacementIntent = new Intent(ListeProduitsPlanDePlacementActivity.this, ScannerEmplacementActivity.class);
                         Bundle servicePlanDePlacementBundle = ListeProduitsPlanDePlacementActivity.this.getBundle();
                         listeProduitsPlanDePlacementIntent.putExtras(servicePlanDePlacementBundle);
@@ -275,38 +300,35 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
 
     private void gestionClickProduit()
     {
-        produitListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        /*produitListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Produit produit = produitList.get(position);
-                if(produit.getEmplacement_PUI_Defaut().contentEquals("EMPLACEMENT"))
+                boolean suppression = false;
+                int index = 0;
+                for(Produit temp : produitListScannes)
                 {
-                    boolean suppression = false;
-                    int index = 0;
-                    for(Produit temp : produitListScannes)
+                    if(temp.getID_produit() == produit.getID_produit())
                     {
-                        if(temp.getID_produit() == produit.getID_produit())
-                        {
-                            produitListScannes.remove(index);
-                            suppression = true;
-                            break;
-                        }
-
-                        index ++;
+                        produitListScannes.remove(index);
+                        suppression = true;
+                        break;
                     }
 
-                    if(!suppression)
-                        produitListScannes.add(produitList.get(position));
-                    if(produitListScannes.size() > 0)
-                        ((Button) findViewById(R.id.boutonAction)).setVisibility(View.VISIBLE);
-                    else
-                        ((Button) findViewById(R.id.boutonAction)).setVisibility(View.GONE);
-
-                    ((Button) findViewById(R.id.boutonAction)).setText("Placer les "+produitListScannes.size()+" références");
-                    adapter.notifyDataSetChanged();
+                    index ++;
                 }
+
+                if(!suppression)
+                    produitListScannes.add(produitList.get(position));
+                if(produitListScannes.size() > 0)
+                    ((Button) findViewById(R.id.boutonAction)).setVisibility(View.VISIBLE);
+                else
+                    ((Button) findViewById(R.id.boutonAction)).setVisibility(View.GONE);
+
+                ((Button) findViewById(R.id.boutonAction)).setText("Placer les "+produitListScannes.size()+" références");
+                adapter.notifyDataSetChanged();
             }
-        });
+        });*/
     }
 
     public void afficherAlerteConfirmation(Context context, LayoutInflater inflater, Depot_Emplacement emplacementRetourne, Depot_Zone zoneEmplacementRetourne) {
@@ -330,64 +352,6 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
 
                 for(Produit produitAPlace : produitListScannes)
                 {
-                    /*if(depotCourant.getStructure().contentEquals("PUI"))
-                    {
-                        produitAPlace.setEmplacement_PUI_Defaut(emplacementRetourne.getAdressage());
-                        produitAPlace.setZone_PUI_Defaut(zoneEmplacementRetourne.getZoneName());
-                    }
-                    else
-                    {
-                        produitAPlace.setEmplacement_UF_Defaut(emplacementRetourne.getAdressage());
-                        produitAPlace.setZone_UF_Defaut(zoneEmplacementRetourne.getZoneName());
-                    }
-                    long rowId = ProduitOpenHelper.mettreAJourProduit(db, produitAPlace);*/
-
-                    boolean modificationphproduit = false;
-                    if(depotCourant.getStructure().contentEquals("PUI"))
-                    {
-                        if(produitAPlace.getZone_PUI_Defaut().toUpperCase().contentEquals("ZONE") && produitAPlace.getEmplacement_PUI_Defaut().toUpperCase().contentEquals("EMPLACEMENT"))
-                        {
-                            produitAPlace.setEmplacement_PUI_Defaut(emplacementRetourne.getAdressage());
-                            produitAPlace.setZone_PUI_Defaut(zoneEmplacementRetourne.getZoneName());
-                            modificationphproduit = true;
-                        }
-                    }
-                    else
-                    {
-                        if(produitAPlace.getZone_UF_Defaut().toUpperCase().contentEquals("ZONE") && produitAPlace.getEmplacement_UF_Defaut().toUpperCase().contentEquals("EMPLACEMENT")) {
-                            produitAPlace.setEmplacement_UF_Defaut(emplacementRetourne.getAdressage());
-                            produitAPlace.setZone_UF_Defaut(zoneEmplacementRetourne.getZoneName());
-                            modificationphproduit = true;
-                        }
-                    }
-
-                    if(modificationphproduit)
-                    {
-                        ProduitOpenHelper.mettreAJourProduit(db, produitAPlace);
-                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT, produitAPlace.getPhiMR4UUID(), produitAPlace.getID_produit(), DBOpenHelper.ActionsEAS.MAJ);
-
-                        Random randomactionProduit = new Random();
-                        int actionProduitId = randomactionProduit.nextInt();
-                        if (actionProduitId > 0)
-                            actionProduitId = actionProduitId * -1;
-                        @SuppressLint("SimpleDateFormat") SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        Date dateActionProduit = new Date();
-                        String date_string_produit = parseFormat.format(dateActionProduit);
-                        ActionUtilisateur new_action_utilisateur_produit = new ActionUtilisateur(actionProduitId, utilisateurConnecte.getId(), date_string_produit, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", produitAPlace.getID_produit(), "", "Plan de placement");
-                        ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur_produit);
-                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur_produit.getPhiMR4UUID(), new_action_utilisateur_produit.getId(), DBOpenHelper.ActionsEAS.AJOUT);
-
-                        Random randomactionligneproduit = new Random();
-                        int actionligneProduitId = randomactionligneproduit.nextInt();
-                        if (actionligneProduitId > 0)
-                            actionligneProduitId = actionligneProduitId * -1;
-
-                        ActionUtilisateur_Ligne actionUtilisateur_ligne_produit = new ActionUtilisateur_Ligne(actionligneProduitId, new_action_utilisateur_produit.getId(), "PH_Produit", produitAPlace.getID_produit(), produitAPlace.getGTIN(), 0, 0, produitAPlace.getDesignation_interne());
-                        ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne_produit);
-                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, actionUtilisateur_ligne_produit.getPhiMR4UUID(), actionUtilisateur_ligne_produit.getId(), DBOpenHelper.ActionsEAS.AJOUT);
-                        ElementASynchroniserOpenHelper.toutSynchroniser(ListeProduitsPlanDePlacementActivity.this, db, utilisateurConnecte, false);
-                    }
-
                     Produit_Place produitPlace = ProduitPlaceOpenHelper.getProduitPlaceParProduitDepotZonePlace(db, produitAPlace.getID_produit(), depotCourant.getDepot_UID(), zoneEmplacementRetourne.getZoneID(), emplacementRetourne.get_UID());
                     if(produitPlace == null) {
                         produitPlace = new Produit_Place();
@@ -448,4 +412,55 @@ public class ListeProduitsPlanDePlacementActivity extends ServiceActivity {
         });
     }
 
+    private void gestionListeProduit(boolean getproduitplace)
+    {
+        mapProduitPlace = new ArrayList<>();
+        produitList = new ArrayList<>();
+        if(getproduitplace)
+        {
+            produitList = ProduitOpenHelper.getProduitPlace(db);
+
+            for(Produit produitCourant : produitList)
+            {
+                String cleZonePlace = produitCourant.getID_produit()+"_"+produitCourant.getZone_PUI_Defaut()+"_"+produitCourant.getEmplacement_PUI_Defaut();
+                if(!mapProduitPlace.contains(cleZonePlace))
+                    mapProduitPlace.add(cleZonePlace);
+            }
+
+            List<Produit_Place> listeProduitPlace = ProduitPlaceOpenHelper.getProduitPlaceByDepot(db, depotCourant);
+
+            for(Produit_Place produitPlaceCourant : listeProduitPlace)
+            {
+                Produit produitTemp = ProduitOpenHelper.getProduitByID(db, produitPlaceCourant.getProduitID());
+                String cleZonePlace = produitTemp.getID_produit()+"_"+produitPlaceCourant.getZoneNom()+"_"+produitPlaceCourant.getPlaceNom();
+                if(!mapProduitPlace.contains(cleZonePlace))
+                    mapProduitPlace.add(cleZonePlace);
+            }
+        }
+        else
+        {
+            produitList = ProduitOpenHelper.getProduitNonPlace(db);
+
+            for(Produit produitCourant : produitList)
+            {
+                String cleZonePlace = produitCourant.getID_produit()+"_"+produitCourant.getZone_PUI_Defaut()+"_"+produitCourant.getEmplacement_PUI_Defaut();
+                if(!mapProduitPlace.contains(cleZonePlace))
+                    mapProduitPlace.add(cleZonePlace);
+            }
+        }
+
+        mapProduitPlace.sort((s1, s2) -> {
+
+            int i1 = s1.indexOf('_');
+            int i2 = s2.indexOf('_');
+
+            int id1 = Integer.parseInt(s1.substring(0, i1));
+            int id2 = Integer.parseInt(s2.substring(0, i2));
+
+            String d1 = ProduitOpenHelper.getProduitByID(db, id1).getDesignation_interne();
+            String d2 = ProduitOpenHelper.getProduitByID(db, id2).getDesignation_interne();
+
+            return d1.compareToIgnoreCase(d2);
+        });
+    }
 }

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#F8F8F8"
+    android:clipToPadding="false">
+
+    <LinearLayout
+        android:id="@+id/linearChildRoot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="5dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/nomZonePUI"
+            style="@style/text1ligne_style"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/bleu_clair_alcyons" />
+
+        <TextView
+            android:id="@+id/nomEmplacementPUI"
+            style="@style/text1ligne_style"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+</FrameLayout>

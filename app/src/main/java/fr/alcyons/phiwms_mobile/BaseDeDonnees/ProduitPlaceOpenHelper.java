@@ -18,9 +18,13 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
+import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.Produit_Place;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
@@ -34,6 +38,21 @@ public class ProduitPlaceOpenHelper extends DBOpenHelper {
 
     public static void viderTableProduitPlace(SQLiteDatabase db) {
         db.delete(Constantes.TABLE_PRODUIT_PLACE, null, null);
+    }
+
+    public static List<Produit_Place> getProduitPlaceByDepot(SQLiteDatabase db, Depot depot)
+    {
+        List<Produit_Place> listProduitPlace = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT_PLACE + " WHERE "+ Constantes.CLE_COL_ID_DEPOT_PRODUIT_PLACE+"=? ", new String[]{String.valueOf(depot.getDepot_UID())});
+
+        while (cursor.moveToNext()) {
+            listProduitPlace.add(new Produit_Place(cursor));
+        }
+        cursor.close();
+        cursor = null;
+
+        return listProduitPlace;
     }
 
     public static long insererProduitPlaceEnBDD(SQLiteDatabase db, Produit_Place objet) {
