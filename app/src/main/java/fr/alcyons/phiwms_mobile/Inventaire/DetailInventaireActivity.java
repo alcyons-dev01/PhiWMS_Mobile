@@ -3,6 +3,7 @@ package fr.alcyons.phiwms_mobile.Inventaire;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.Menu;
@@ -25,6 +26,7 @@ import java.util.Locale;
 import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerInventaireActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoInventaire;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
@@ -37,6 +39,7 @@ import fr.alcyons.phiwms_mobile.ListViewAdapters.DetailInventaireAdapter;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceIdentificationParScanActivity;
 
 public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
     Context context;
@@ -46,11 +49,13 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
     ListView inventaireListView;
     DetailInventaireAdapter adapter;
     MenuItem valider_item;
+    PackageManager pm;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_inventaire);
         context = DetailInventaireActivity.this;
+        pm = DetailInventaireActivity.this.getPackageManager();
 
         // Récupération de l'inventaire courant depuis les extras de l'intent
         inventaireCourant = InventaireOpenHelper.getInventaireById(db, intent.getExtras().getInt("inventaireId"));
@@ -100,7 +105,22 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
         ((LinearLayout) findViewById(R.id.lancerScan)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent serviceInventaire_Intent = new Intent(DetailInventaireActivity.this, ScannerInventaireActivity.class);
+                Intent serviceInventaire_Intent = null;
+                if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google")) {
+                    serviceInventaire_Intent = new Intent(DetailInventaireActivity.this, ScannerInventaireActivity.class);
+                }
+                else
+                {
+                    if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
+                    {
+                       serviceInventaire_Intent = new Intent(DetailInventaireActivity.this, ScannerPhotoInventaire.class);
+                    }
+                    else
+                    {
+                       serviceInventaire_Intent = new Intent(DetailInventaireActivity.this, ScannerInventaireActivity.class);
+                    }
+                }
+
                 Bundle serviceInventaire_Bundle = DetailInventaireActivity.super.getBundle();
                 serviceInventaire_Bundle.putInt("inventaireID", inventaireCourant.getInventaire_ID());
                 serviceInventaire_Bundle.putString("zoneSelectionne", zoneCourante);

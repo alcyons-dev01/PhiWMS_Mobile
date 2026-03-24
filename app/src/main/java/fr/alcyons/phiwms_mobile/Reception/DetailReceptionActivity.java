@@ -63,6 +63,7 @@ import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeReceptionActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoReception;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerRafaleReception;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerReceptionActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper;
@@ -283,7 +284,7 @@ public class DetailReceptionActivity extends ServiceActivity {
             }
             else
             {
-                listeLotReception_Intent = new Intent(DetailReceptionActivity.this, ScannerPhotoReception.class);
+                listeLotReception_Intent = new Intent(DetailReceptionActivity.this, ScannerRafaleReception.class);
             }
 
             listeLotReception_Bundle.putString("contexte", String.valueOf(R.string.scannerContextReceptionListe));

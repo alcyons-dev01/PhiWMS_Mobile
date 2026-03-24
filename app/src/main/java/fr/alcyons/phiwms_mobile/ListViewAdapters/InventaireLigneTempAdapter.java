@@ -72,7 +72,7 @@ public class InventaireLigneTempAdapter extends RecyclerView.Adapter<InventaireL
         }
 
         holder.lot.setText(inventaireLigneTempCourant.getLot());
-        if(inventaireLigneTempCourant.getInventaireDate().contentEquals("") || inventaireLigneTempCourant.getInventaireDate().contentEquals("null"))
+        if(inventaireLigneTempCourant.getInventaireDate().contentEquals("0000-00-00") || inventaireLigneTempCourant.getInventaireDate().contentEquals("") || inventaireLigneTempCourant.getInventaireDate().contentEquals("null"))
         {
             holder.qteStockPhysique.setText("-1");
         }

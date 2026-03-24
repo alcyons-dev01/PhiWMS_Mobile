@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="75dp">
+
+        <ListView
+            android:id="@+id/listViewCodeScan"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:scrollbars="vertical"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="10dp"
+            android:weightSum="1">
+
+            <TextView
+                android:id="@+id/nbScan_TV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:textColor="@color/blanc"
+                android:padding="5dp"
+                android:textSize="16dp"
+                android:text=""
+                android:layout_weight="1"/>
+
+            <ImageButton
+                android:id="@+id/btnLancerTraitement_IB"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bouton_vert"
+                android:src="@drawable/ic_check"
+                android:scaleType="centerInside"
+                android:layout_gravity="center"
+                android:visibility="gone"/>
+        </LinearLayout>
+
+
+
+
+    </LinearLayout>
+
+
+
+</RelativeLayout>

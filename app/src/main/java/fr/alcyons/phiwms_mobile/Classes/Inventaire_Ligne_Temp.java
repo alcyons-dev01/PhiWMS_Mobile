@@ -506,6 +506,7 @@ public class Inventaire_Ligne_Temp implements Serializable, Comparable {
             jsonObject.put("PeremptionDate", PeremptionDate);
             jsonObject.put("inventaireDate", inventaireDate);
             jsonObject.put("_UID", _UID);
+            jsonObject.put("Synchroniser", synchroniser);
         } catch (JSONException e) {
             e.printStackTrace();
             jsonObject = null;

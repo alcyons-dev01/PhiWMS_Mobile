@@ -294,7 +294,7 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
             layout_gestion_conditionnement_LL.setVisibility(View.GONE);
         }
 
-        if(courant.getInventaireDate().contentEquals("") || courant.getInventaireDate().contentEquals("null"))
+        if(courant.getInventaireDate().contentEquals("0000-00-00") || courant.getInventaireDate().contentEquals("") || courant.getInventaireDate().contentEquals("null"))
         {
             quantiteComptee_ET.setText("0");
         }

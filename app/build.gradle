@@ -118,6 +118,13 @@ dependencies {
     implementation "androidx.preference:preference-ktx:1.2.1"
     implementation "com.github.skydoves:expandablelayout:1.0.7"
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+
+    implementation 'androidx.camera:camera-camera2:1.5.3'
+    implementation 'androidx.camera:camera-lifecycle:1.5.3'
+    implementation 'androidx.camera:camera-view:1.5.3'
+
+// ML Kit Barcode Scanning
+    implementation 'com.google.mlkit:barcode-scanning:17.3.0'
 }
 configurations {
     implementation.exclude group: 'com.google.guava', module: 'guava-jdk5'

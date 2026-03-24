@@ -359,7 +359,7 @@ public class CreationLotManuelleActivity  extends ServiceAvecConnexionActivity {
             nouvelInventaireLigneTemp.setInventaireDate(dateDuJour);
             nouvelInventaireLigneTemp.setStockPhysique(Integer.parseInt(qteActuelleEditText.getText().toString().trim()));
             nouvelInventaireLigneTemp.setLot(lotEditText.getText().toString().trim());
-
+            nouvelInventaireLigneTemp.setSynchroniser(false);
             String anneeSelection = spinnerAnneeDatePeremption_SP.getSelectedItem().toString();
             String moisSelection = spinnerMoisDatePeremption_SP.getSelectedItem().toString();
             String dateExpirationLotTemp = getDateDepuisMoisAnnee(moisSelection, anneeSelection);

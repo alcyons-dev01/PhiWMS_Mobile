@@ -14,6 +14,7 @@ import java.util.Locale
             var serie = ""
             var emplacement = ""
             var codeinconnu = ""
+            var conditionnement = 0
 
 
             if (coderecue.startsWith("01") || coderecue.startsWith("02")) {
@@ -23,6 +24,7 @@ import java.util.Locale
                 lot = resultDecoupage.lotNumber
                 peremption = resultDecoupage.expirationDateAffichage
                 serie = resultDecoupage.serie
+                conditionnement = resultDecoupage.packaging
             } else if (coderecue.startsWith("+")) {
                 val resultDecoupage: HIBCParser.HIBCResult = HIBCParser.parseHIBCCode(coderecue)
                 type = "HIBC"
@@ -30,6 +32,7 @@ import java.util.Locale
                 lot = resultDecoupage.lotNumber
                 peremption = resultDecoupage.expirationDate
                 serie = resultDecoupage.serie
+                conditionnement = resultDecoupage.packaging
             } else if (coderecue.uppercase(Locale.getDefault()).startsWith("PHITAGPLACE")) {
                 val arrayPlace = coderecue.split(":")
                 val idEmplacement = arrayPlace[arrayPlace.size - 1]
@@ -57,6 +60,7 @@ import java.util.Locale
             mapRetourner.put("serie", serie)
             mapRetourner.put("emplacement", emplacement)
             mapRetourner.put("codeinconnu", codeinconnu)
+            mapRetourner.put("conditionnement", conditionnement.toString())
 
             return mapRetourner
         }

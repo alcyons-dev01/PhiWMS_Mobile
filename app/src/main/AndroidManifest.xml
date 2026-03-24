@@ -346,6 +346,13 @@
         android:configChanges="orientation|keyboardHidden"/>
 
     <activity
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoInventaire"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.BarcodeSearch.Scanner"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+    <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerRetourActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
@@ -438,6 +445,13 @@
         android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation|keyboardHidden"/>
 
+        <activity
+        android:name="fr.alcyons.phiwms_mobile.Services.ScannerRafaleActivity"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerRafale"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
     <!-- Barcode Réception Activity -->
 
     <activity
@@ -457,6 +471,13 @@
     <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoReception"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
+
+        <activity
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerRafaleReception"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerRafale"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation|keyboardHidden"/>
