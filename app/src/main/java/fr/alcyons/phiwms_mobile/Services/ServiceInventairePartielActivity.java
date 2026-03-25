@@ -195,7 +195,7 @@ public class ServiceInventairePartielActivity extends ServiceAvecConnexionActivi
                                 Alerte.afficherAlerteInformation(ServiceInventairePartielActivity.this, getLayoutInflater(), "Erreur", "Votre session de connexion est invalide, veuillez vous reconnecter.", false, true);
                             } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                 Alerte.afficherAlerteInformation(ServiceInventairePartielActivity.this, getLayoutInflater(), "Erreur", "Votre session de connexion est expirée, veuillez vous reconnecter.", false, true);
-                            } else if (!erreur.contentEquals("Aucun inventaire trouvé")) {
+                            } else if (!erreur.contentEquals("Aucun Inventaire trouvé")) {
                                 Alerte.afficherAlerteInformation(ServiceInventairePartielActivity.this, getLayoutInflater(), "Erreur", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Inventaire Partiel", false, true);
                             } else {
                                 arreterSpinner();

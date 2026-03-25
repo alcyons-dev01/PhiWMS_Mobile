@@ -125,6 +125,20 @@ public class Inventaire_Ligne_TempOpenHelper extends DBOpenHelper {
         return inventaireLigneTempList;
     }
 
+    public static List<Inventaire_Ligne_Temp> getAllInventaireLigneTempByInventaireAndProduit(SQLiteDatabase db, int inventaireId, int produitid) {
+        List<Inventaire_Ligne_Temp> inventaireLigneTempList = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_INVENTAIRE_LIGNE_TEMP + " WHERE " + Constantes.CLE_COL_INVENTAIRE_ID_INVENTAIRE_LIGNE_TEMP + "=? AND "+Constantes.CLE_COL_PRODUITID_INVENTAIRE_LIGNE_TEMP+"=?", new String[]{String.valueOf(inventaireId), String.valueOf(produitid)});
+
+        while (cursor.moveToNext()) {
+            inventaireLigneTempList.add(new Inventaire_Ligne_Temp(cursor));
+        }
+
+        cursor.close();
+        cursor = null;
+        return inventaireLigneTempList;
+    }
+
     public static List<Inventaire_Ligne_Temp> getAllInventaireLigneTempByInventaireEtZone(SQLiteDatabase db, int inventaireId, String zone) {
         List<Inventaire_Ligne_Temp> inventaireLigneTempList = new ArrayList<>();
 

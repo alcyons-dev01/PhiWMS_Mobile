@@ -6,6 +6,7 @@ import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LOT;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -40,6 +41,7 @@ import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodePreparationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerInventaireActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoInventaire;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
@@ -67,11 +69,13 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
     InventaireLigneTempAdapter adapter;
     Inventaire_Ligne_Temp nouvelInventaireLigneTemp;
     Context context;
+    PackageManager pm;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_liste_lot_inventaire);
         context = ListeLotInventaireActivity.this;
+        pm = ListeLotInventaireActivity.this.getPackageManager();
 
         inventaireCourant = InventaireOpenHelper.getInventaireById(db, intent.getExtras().getInt("inventaireId"));
         zoneCourante = intent.getExtras().getString("zoneSelectionne");
@@ -114,11 +118,27 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
         ((LinearLayout) findViewById(R.id.lancerScan)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent serviceInventaire_Intent = new Intent(ListeLotInventaireActivity.this, ScannerInventaireActivity.class);
+                Intent serviceInventaire_Intent = null;
+                if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google")) {
+                    serviceInventaire_Intent = new Intent(ListeLotInventaireActivity.this, ScannerInventaireActivity.class);
+                }
+                else
+                {
+                    if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
+                    {
+                        serviceInventaire_Intent = new Intent(ListeLotInventaireActivity.this, ScannerPhotoInventaire.class);
+                    }
+                    else
+                    {
+                        serviceInventaire_Intent = new Intent(ListeLotInventaireActivity.this, ScannerInventaireActivity.class);
+                    }
+                }
+
                 Bundle serviceInventaire_Bundle = ListeLotInventaireActivity.super.getBundle();
                 serviceInventaire_Bundle.putInt("inventaireID", inventaireCourant.getInventaire_ID());
                 serviceInventaire_Bundle.putString("zoneSelectionne", zoneCourante);
                 serviceInventaire_Bundle.putSerializable("inventaireLigneTempList", (Serializable) inventaireLigneTempList);
+                serviceInventaire_Bundle.putInt("produitId", produitCourant.getID_produit());
                 serviceInventaire_Intent.putExtras(serviceInventaire_Bundle);
                 ListeLotInventaireActivity.this.startActivityForResult(serviceInventaire_Intent, CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH);
             }

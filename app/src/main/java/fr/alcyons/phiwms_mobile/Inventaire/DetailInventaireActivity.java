@@ -125,6 +125,7 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
                 serviceInventaire_Bundle.putInt("inventaireID", inventaireCourant.getInventaire_ID());
                 serviceInventaire_Bundle.putString("zoneSelectionne", zoneCourante);
                 serviceInventaire_Bundle.putSerializable("inventaireLigneTempList", (Serializable) inventaireLigneTempList);
+                serviceInventaire_Bundle.putInt("produitId", 0);
                 serviceInventaire_Intent.putExtras(serviceInventaire_Bundle);
                 DetailInventaireActivity.this.startActivityForResult(serviceInventaire_Intent, CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH);
             }

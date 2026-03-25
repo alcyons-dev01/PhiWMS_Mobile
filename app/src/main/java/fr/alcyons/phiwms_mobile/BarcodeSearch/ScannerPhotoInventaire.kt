@@ -38,14 +38,15 @@ class ScannerPhotoInventaire : Scanner() {
     lateinit var inventairecourant : Inventaire
     override val layoutResId: Int = R.layout.scanner
     var produit: Produit? = null
+    var produitid : Int = 0
     private var isProcessing : Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val container = findViewById<FrameLayout>(R.id.overlayContainer)
         layoutInflater.inflate(R.layout.layout_scanphoto_preparation, container, true)
 
-
         inventaireid = intent.getIntExtra("inventaireID",0)
+        produitid = intent.getIntExtra("produitId",0)
 
         if(inventaireid != 0)
         {
@@ -58,7 +59,10 @@ class ScannerPhotoInventaire : Scanner() {
     override fun onCodeScanned(code: String) {
         if(!code.contentEquals("") && !isProcessing)
         {
-            inventaireLigneList = Inventaire_Ligne_TempOpenHelper.getAllInventaireLigneTempByInventaire(db,inventaireid)
+            if(produitid == 0)
+                inventaireLigneList = Inventaire_Ligne_TempOpenHelper.getAllInventaireLigneTempByInventaire(db,inventaireid)
+            else
+                inventaireLigneList = Inventaire_Ligne_TempOpenHelper.getAllInventaireLigneTempByInventaireAndProduit(db,inventaireid, produitid)
 
             if(isSoundOn)
             {
@@ -72,9 +76,6 @@ class ScannerPhotoInventaire : Scanner() {
                 val peremptionIdentification = resultDecoupage["peremption"]
                 val tabDateSQL = peremptionIdentification?.split("/")
                 val datePeremptionSQL = tabDateSQL?.get(tabDateSQL.size-1)+"-"+tabDateSQL?.get(1)+"-"+tabDateSQL?.get(0)
-                val numeroSerieIdentification = resultDecoupage["serie"]
-                val emplacementIdentification = resultDecoupage["emplacement"]
-                val codeinconnuIdentification = resultDecoupage["codeinconnu"]
                 val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                 val dateDuJour = sdf.format(Date())
                 val produitIdentifier : List<Produit> = ProduitOpenHelper.getProduitsByIdentification(db, codeIdentification)
