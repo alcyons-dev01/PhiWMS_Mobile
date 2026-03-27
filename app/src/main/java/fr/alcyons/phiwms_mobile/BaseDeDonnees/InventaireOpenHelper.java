@@ -53,6 +53,20 @@ public class InventaireOpenHelper extends DBOpenHelper {
         return inventaire;
     }
 
+    public static Inventaire getInventaireGeneral(SQLiteDatabase db) {
+        Inventaire inventaire = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_INVENTAIRE + " WHERE "+Constantes.CLE_COL_OBJET_INVENTAIRE+" = 'Inventaire Général'", null);
+
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+            inventaire = new Inventaire(cursor);
+        }
+        cursor.close();
+        cursor = null;
+        return inventaire;
+    }
+
     public static long insererUnInventaireEnBDD(SQLiteDatabase db, Inventaire inventaire) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(Constantes.CLE_COL_INVENTAIRE_ID_INVENTAIRE, inventaire.getInventaire_ID());

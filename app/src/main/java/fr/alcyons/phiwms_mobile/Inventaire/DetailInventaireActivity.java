@@ -29,17 +29,22 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerInventaireActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoInventaire;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.InventaireOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Inventaire_Ligne_TempOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
+import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Inventaire;
 import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.DetailInventaireAdapter;
+import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 import fr.alcyons.phiwms_mobile.Services.ServiceIdentificationParScanActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceInventaireGeneralActivity;
+import fr.alcyons.phiwms_mobile.Services.ServiceInventairePartielActivity;
 
 public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
     Context context;
@@ -50,6 +55,7 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
     DetailInventaireAdapter adapter;
     MenuItem valider_item;
     PackageManager pm;
+    Depot depotCourant;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +66,7 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
         // Récupération de l'inventaire courant depuis les extras de l'intent
         inventaireCourant = InventaireOpenHelper.getInventaireById(db, intent.getExtras().getInt("inventaireId"));
         zoneCourante = intent.getExtras().getString("zoneSelectionne");
+        depotCourant = DepotOpenHelper.getDepotParReference(db, intent.getExtras().getString("depotSelectionne"));
 
         ((TextView) findViewById(R.id.intitule)).setText(inventaireCourant.getObjet());
         ((TextView) findViewById(R.id.zone)).setText(zoneCourante);
@@ -70,7 +77,7 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
             ((Button) findViewById(R.id.alcyonsSimulerInventaire_B)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    inventaireLigneTempList = Inventaire_Ligne_TempOpenHelper.getAllInventaireLigneTempByInventaireEtZone(db, inventaireCourant.getInventaire_ID(), zoneCourante);
+                    inventaireLigneTempList = Inventaire_Ligne_TempOpenHelper.getAllInventaireLigneTempByInventaireEtZoneEtDepot(db, inventaireCourant.getInventaire_ID(), zoneCourante, depotCourant.getDepot_Reference());
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                     String dateDuJour = sdf.format(new Date());
                     for(Inventaire_Ligne_Temp inventaireLigneTemp : inventaireLigneTempList)
@@ -97,6 +104,7 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
                 serviceInventaire_Bundle.putInt("inventaireId", inventaireCourant.getInventaire_ID());
                 serviceInventaire_Bundle.putString("zoneSelectionne", zoneCourante);
                 serviceInventaire_Bundle.putInt("produitId", Integer.parseInt(ligneSelectionnee[5]));
+                serviceInventaire_Bundle.putString("depotSelectionne", depotCourant.getDepot_Reference());
                 serviceInventaire_Intent.putExtras(serviceInventaire_Bundle);
                 DetailInventaireActivity.this.startActivity(serviceInventaire_Intent);
             }
@@ -136,7 +144,7 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
     public void onResume() {
         super.onResume();
         invalidateOptionsMenu();
-        inventaireLigneTempList = Inventaire_Ligne_TempOpenHelper.getAllInventaireLigneTempByInventaireEtZone(db, inventaireCourant.getInventaire_ID(), zoneCourante);
+        inventaireLigneTempList = Inventaire_Ligne_TempOpenHelper.getAllInventaireLigneTempByInventaireEtZoneEtDepot(db, inventaireCourant.getInventaire_ID(), zoneCourante, depotCourant.getDepot_Reference());
 
         List<String[]> tabInventaireLigneTemp = new ArrayList<>();
 
@@ -257,7 +265,7 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
             }
         }
 
-        adapter = new DetailInventaireAdapter(DetailInventaireActivity.this, tabInventaireLigneTemp, db);
+        //adapter = new DetailInventaireAdapter(DetailInventaireActivity.this, tabInventaireLigneTemp, db);
         inventaireListView.setAdapter(adapter);
 
         invalidateOptionsMenu();
@@ -345,5 +353,25 @@ public class DetailInventaireActivity extends ServiceAvecConnexionActivity {
         {
             ((ProgressBar) findViewById(R.id.progressBarInventaire_PB)).setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.vert)));
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = null;
+        if(inventaireCourant.getObjet().contentEquals("Inventaire Général"))
+        {
+            intent = new Intent(DetailInventaireActivity.this, ServiceInventaireGeneralActivity.class);
+        }
+        else
+        {
+            intent = new Intent(DetailInventaireActivity.this, ServiceInventairePartielActivity.class);
+        }
+
+        Bundle extras = new Bundle();
+        extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+        intent.putExtras(extras);
+        DetailInventaireActivity.this.startActivity(intent);
+        DetailInventaireActivity.this.finish();
     }
 }

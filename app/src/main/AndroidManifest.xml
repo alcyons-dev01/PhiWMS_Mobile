@@ -737,6 +737,12 @@
             android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation|keyboardHidden"/>
         <activity
+            android:name="fr.alcyons.phiwms_mobile.Inventaire.DetailInventaire_V2Activity"
+            android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|keyboardHidden"/>
+        <activity
             android:name="fr.alcyons.phiwms_mobile.Inventaire.ListeLotInventaireActivity"
             android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
             android:theme="@style/AppTheme.NoActionBar"

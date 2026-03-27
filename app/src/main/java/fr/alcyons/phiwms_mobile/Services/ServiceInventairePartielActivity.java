@@ -93,6 +93,7 @@ public class ServiceInventairePartielActivity extends ServiceAvecConnexionActivi
             Bundle serviceInventaire_Bundle = ServiceInventairePartielActivity.super.getBundle();
             serviceInventaire_Bundle.putInt("inventaireId", Integer.parseInt(inventaire_Selectionne[2]));
             serviceInventaire_Bundle.putString("zoneSelectionne", inventaire_Selectionne[0]);
+            serviceInventaire_Bundle.putString("depotSelectionne", inventaire_Selectionne[3]);
             serviceInventaire_Intent.putExtras(serviceInventaire_Bundle);
             ServiceInventairePartielActivity.this.startActivity(serviceInventaire_Intent);
         });
@@ -199,7 +200,7 @@ public class ServiceInventairePartielActivity extends ServiceAvecConnexionActivi
                                 Alerte.afficherAlerteInformation(ServiceInventairePartielActivity.this, getLayoutInflater(), "Erreur", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Inventaire Partiel", false, true);
                             } else {
                                 arreterSpinner();
-                                Alerte.afficherAlerteInformation(ServiceInventairePartielActivity.this, getLayoutInflater(), "Information", "Aucune inventaire partiel à traiter", false, true);
+                                Alerte.afficherAlerteInformation(ServiceInventairePartielActivity.this, getLayoutInflater(), "Information", "Aucun inventaire partiel à traiter", false, true);
                             }
                         } else {
                             JSONArray inventaire_JSONArray = response.getJSONArray("Inventaires");
@@ -370,56 +371,6 @@ public class ServiceInventairePartielActivity extends ServiceAvecConnexionActivi
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        /*if (requestCode == CodesEchangesActivites.RETOUR_DOCUMENT) {
-            if (data != null) {
-                String code = Objects.requireNonNull(data.getExtras()).getString("code");
-                if (code != null) {
-                    int idPreparation = 0;
-                    try {
-                        idPreparation = Integer.parseInt(code);
-                    } catch (NumberFormatException ignored) {
-                    }
-                    PH_Preparation ph_preparation_Selectionne = PH_PreparationOpenHelper.getPH_PreparationByID(db, idPreparation);
-                    if (ph_preparation_Selectionne == null) {
-                        if (!code.contentEquals("")) {
-                            afficherSnackBarPreparationPUF();
-                        }
-                        gestionAdapter();
-                        invalidateOptionsMenu();
-                    } else {
-                        Intent servicePreparationPuf_Intent = getIntent(ph_preparation_Selectionne);
-                        ServiceInventairePartielActivity.this.startActivity(servicePreparationPuf_Intent);
-                        ServiceInventairePartielActivity.this.finish();
-                    }
-                } else {
-                    gestionAdapter();
-                    invalidateOptionsMenu();
-                }
-            } else {
-                gestionAdapter();
-                invalidateOptionsMenu();
-            }
-        }*/
-    }
-
-    @NonNull
-    private Intent getIntent(PH_Preparation ph_preparation_Selectionne) {
-        Intent servicePreparationPuf_Intent = new Intent(ServiceInventairePartielActivity.this, DetailPreparationActivity.class);
-        Bundle servicePreparationPuf_Bundle = ServiceInventairePartielActivity.super.getBundle();
-        servicePreparationPuf_Bundle.putInt("ph_preparationUID_Selectionne", ph_preparation_Selectionne.getUID());
-        servicePreparationPuf_Bundle.putString("genre", "PUF");
-        servicePreparationPuf_Intent.putExtras(servicePreparationPuf_Bundle);
-        return servicePreparationPuf_Intent;
-    }
-
-    public void afficherSnackBarPreparationPUF() {
-        Snackbar snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Document scanné inconnu</b>", 0), Snackbar.LENGTH_LONG);;
-
-        @SuppressLint("RestrictedApi") Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
-        layout.setBackgroundColor(getResources().getColor(R.color.rouge2, null));
-        TextView textView = (TextView) layout.findViewById(com.google.android.material.R.id.snackbar_text);
-        textView.setTextSize(TypedValue.TYPE_STRING, 8);
-        snackbar.show();
     }
 
     private void gestionAdapter()

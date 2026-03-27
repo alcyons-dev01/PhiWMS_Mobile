@@ -539,6 +539,12 @@ public class ServiceActivity extends MenuActivity implements RetourServiceListen
         return currentYear;
     }
 
+    public int getCurrentMonth()
+    {
+        int currentYear = Calendar.getInstance().get(Calendar.MONTH);
+        return currentYear;
+    }
+
     public String[] getListeMoisDatePicker()
     {
         String[] tableauMois = new String[12];

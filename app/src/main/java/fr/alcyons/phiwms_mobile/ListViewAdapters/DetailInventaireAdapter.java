@@ -20,18 +20,21 @@ import androidx.core.view.ViewCompat;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
+
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Inventaire_Ligne_TempOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp;
+import fr.alcyons.phiwms_mobile.Inventaire.DetailInventaire_V2Activity;
 import fr.alcyons.phiwms_mobile.R;
 
 public class DetailInventaireAdapter extends ArrayAdapter {
 
-    public List<String[]> inventaireLigneTempList;
-    public List<String[]> inventaireLigneTempListBase;
+    public List<Inventaire_Ligne_Temp> inventaireLigneTempList;
+    public List<Inventaire_Ligne_Temp> inventaireLigneTempListBase;
     Context context;
     SQLiteDatabase db;
     ReferenceFilter filter;
 
-    public DetailInventaireAdapter(Context context, List<String[]> inventaireLigneTempList, SQLiteDatabase db) {
+    public DetailInventaireAdapter(Context context, List<Inventaire_Ligne_Temp> inventaireLigneTempList, SQLiteDatabase db) {
         super(context, 0, inventaireLigneTempList);
         this.inventaireLigneTempList = inventaireLigneTempList;
         this.context = context;
@@ -39,6 +42,13 @@ public class DetailInventaireAdapter extends ArrayAdapter {
         this.filter = null;
         this.inventaireLigneTempListBase = new ArrayList<>();
         this.inventaireLigneTempListBase.addAll(inventaireLigneTempList);
+    }
+
+    public void updateList(List<Inventaire_Ligne_Temp> newList) {
+        this.inventaireLigneTempList.clear();
+        this.inventaireLigneTempList.addAll(newList);
+        this.inventaireLigneTempListBase.clear();
+        this.inventaireLigneTempListBase.addAll(newList);
     }
 
     @Override
@@ -57,46 +67,39 @@ public class DetailInventaireAdapter extends ArrayAdapter {
             viewHolder.stockSaisie = (TextView) convertView.findViewById(R.id.stockSaisie);
             viewHolder.imageStatutSaisie_IV = (ImageView) convertView.findViewById(R.id.imageStatutSaisie_IV);
             viewHolder.layoutPrincipal_LL = (LinearLayout) convertView.findViewById(R.id.layoutPrincipal_LL);
+            viewHolder.layoutAjoutManuelle = (LinearLayout) convertView.findViewById(R.id.layoutAjoutManuelle);
+            viewHolder.layoutDetail = (LinearLayout) convertView.findViewById(R.id.layoutDetail);
             viewHolder.progressBarReference_PB = (ProgressBar) convertView.findViewById(R.id.progressBarReference_PB);
             convertView.setTag(viewHolder);
         }
 
-        String[] inventaireLigneTemp = (String[]) getItem(position);
-        viewHolder.nomProduit.setText(inventaireLigneTemp[1]);
-        viewHolder.refProduit.setText(inventaireLigneTemp[0]);
-        viewHolder.fournisseurProduit.setText(inventaireLigneTemp[2]);
-        viewHolder.progressBarReference_PB.setMax(Integer.parseInt(inventaireLigneTemp[7]));
-        viewHolder.progressBarReference_PB.setProgress(Integer.parseInt(inventaireLigneTemp[8]));
+        Inventaire_Ligne_Temp inventaireLigneTemp = (Inventaire_Ligne_Temp) getItem(position);
+        viewHolder.nomProduit.setText(inventaireLigneTemp.getDesignation());
+        viewHolder.refProduit.setText(inventaireLigneTemp.getProduitReference());
+        viewHolder.fournisseurProduit.setText(inventaireLigneTemp.getFournisseurNom());
+        viewHolder.progressBarReference_PB.setVisibility(View.GONE);
 
-        if(inventaireLigneTemp[6].contentEquals("true"))
-        {
-            viewHolder.imageStatutSaisie_IV.setBackground(context.getResources().getDrawable(R.drawable.ic_check_circle_green,null));
-            ViewCompat.setBackgroundTintList(viewHolder.imageStatutSaisie_IV, ColorStateList.valueOf(context.getResources().getColor(R.color.vert, null)));
-            viewHolder.layoutPrincipal_LL.setBackground(context.getDrawable(R.drawable.background_cadre_vert));
-            viewHolder.progressBarReference_PB.setProgressTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.vert)));
-        }
-        else
-        {
-            viewHolder.imageStatutSaisie_IV.setBackground(context.getResources().getDrawable(R.drawable.ic_edit_black,null));
-            ViewCompat.setBackgroundTintList(viewHolder.imageStatutSaisie_IV, ColorStateList.valueOf(context.getResources().getColor(R.color.bleu_clair_alcyons, null)));
-            viewHolder.layoutPrincipal_LL.setBackground(context.getDrawable(R.drawable.background_cadre_bleu));
-            viewHolder.progressBarReference_PB.setProgressTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.bleu_clair_alcyons)));
-        }
-
-        if(Integer.parseInt(inventaireLigneTemp[4]) == -1)
+        int qteStockPhysique = Inventaire_Ligne_TempOpenHelper.getQteInventorieByInventaireProduitZoneDepot(db, inventaireLigneTemp.getInventaire_ID(), inventaireLigneTemp.getProduitID(), inventaireLigneTemp.getZone(), inventaireLigneTemp.getDepotReference());
+        if(qteStockPhysique == -1)
         {
             viewHolder.stockSaisie.setText("-1");
             viewHolder.stockSaisie.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.rouge,null));
         }
         else
         {
-            viewHolder.stockSaisie.setText(inventaireLigneTemp[4]);
+            viewHolder.stockSaisie.setText(String.valueOf(qteStockPhysique));
             viewHolder.stockSaisie.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.vert,null));
         }
+
+        viewHolder.layoutAjoutManuelle.setOnClickListener(view -> ((DetailInventaire_V2Activity)context).ajoutManuel(position));
+
+        viewHolder.layoutDetail.setOnClickListener(view -> ((DetailInventaire_V2Activity)context).versDetail(position));
+
+        viewHolder.stockSaisie.setOnClickListener(view -> ((DetailInventaire_V2Activity)context).versDetail(position));
         return convertView;
     }
 
-    public void replaceData(List<String[]> nouveaux) {
+    public void replaceData(List<Inventaire_Ligne_Temp> nouveaux) {
         inventaireLigneTempListBase.clear();
         inventaireLigneTempListBase.addAll(nouveaux);
         inventaireLigneTempList.clear();
@@ -111,6 +114,8 @@ public class DetailInventaireAdapter extends ArrayAdapter {
         public TextView stockSaisie;
         public ImageView imageStatutSaisie_IV;
         public LinearLayout layoutPrincipal_LL;
+        public LinearLayout layoutAjoutManuelle;
+        public LinearLayout layoutDetail;
         ProgressBar progressBarReference_PB;
     }
 
@@ -131,22 +136,21 @@ public class DetailInventaireAdapter extends ArrayAdapter {
 
             inventaireLigneTempList.clear();
 
-            for (String[] inventaireLigneTemp : inventaireLigneTempListBase) {
+            for (Inventaire_Ligne_Temp inventaireLigneTemp : inventaireLigneTempListBase) {
                 inventaireLigneTempList.add(inventaireLigneTemp);
             }
 
             if (chaineToSearch != null && chaineToSearch.toString().length() > 0) {
 
-                List<String[]> inventaireLigneTempTrouveList = new ArrayList<>();
+                List<Inventaire_Ligne_Temp> inventaireLigneTempTrouveList = new ArrayList<>();
 
-                for (String[] inventaireLigneTempCourant : inventaireLigneTempList) {
+                for (Inventaire_Ligne_Temp inventaireLigneTempCourant : inventaireLigneTempList) {
                     // Vérifie le début du premier mot
-                    String produitDesignation = Normalizer.normalize(inventaireLigneTempCourant[1].toLowerCase(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
-                    boolean complet = Boolean.parseBoolean(inventaireLigneTempCourant[6]);
+                    String produitDesignation = Normalizer.normalize(inventaireLigneTempCourant.getDesignation().toLowerCase(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
                     if (produitDesignation.startsWith(chaineToSearch)) {
                         inventaireLigneTempTrouveList.add(inventaireLigneTempCourant);
                     }
-                    else if(chaineToSearch.contentEquals("-1") && !complet)
+                    else if(chaineToSearch.contentEquals("-1"))
                     {
                         inventaireLigneTempTrouveList.add(inventaireLigneTempCourant);
                     }

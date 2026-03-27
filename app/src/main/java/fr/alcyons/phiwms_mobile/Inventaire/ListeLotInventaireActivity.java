@@ -44,10 +44,12 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerInventaireActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoInventaire;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPreparationActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.InventaireOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Inventaire_Ligne_TempOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Inventaire;
 import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
@@ -70,6 +72,8 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
     Inventaire_Ligne_Temp nouvelInventaireLigneTemp;
     Context context;
     PackageManager pm;
+    Depot depotCourant;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +84,7 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
         inventaireCourant = InventaireOpenHelper.getInventaireById(db, intent.getExtras().getInt("inventaireId"));
         zoneCourante = intent.getExtras().getString("zoneSelectionne");
         produitCourant = ProduitOpenHelper.getProduitByID(db, intent.getExtras().getInt("produitId"));
+        depotCourant = DepotOpenHelper.getDepotParReference(db, intent.getExtras().getString("depotSelectionne"));
 
         ((LinearLayout) findViewById(R.id.lancerScan)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,7 +106,8 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
         ((Button) findViewById(R.id.btnAjoutManuel)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Bundle clicBoutonAjouterManuellement_Bundle = ListeLotInventaireActivity.super.getBundle();
+                onClickLigne(0, true);
+                /*Bundle clicBoutonAjouterManuellement_Bundle = ListeLotInventaireActivity.super.getBundle();
                 clicBoutonAjouterManuellement_Bundle.putInt("produitCourantId", produitCourant.getID_produit());
                 clicBoutonAjouterManuellement_Bundle.putInt("inventaireId", inventaireCourant.getInventaire_ID());
                 clicBoutonAjouterManuellement_Bundle.putInt("inventaireLigneTempId", inventaireLigneTempList.get(0).getPhiMR4UUID());
@@ -111,7 +117,7 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
 
                 Intent clicBoutonAjouterManuellement_Intent = new Intent(ListeLotInventaireActivity.this, CreationLotManuelleActivity.class);
                 clicBoutonAjouterManuellement_Intent.putExtras(clicBoutonAjouterManuellement_Bundle);
-                ListeLotInventaireActivity.this.startActivityForResult(clicBoutonAjouterManuellement_Intent, RETOUR_LOT);
+                ListeLotInventaireActivity.this.startActivityForResult(clicBoutonAjouterManuellement_Intent, RETOUR_LOT);*/
             }
         });
 
@@ -150,28 +156,35 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
         super.onResume();
         invalidateOptionsMenu();
 
-        inventaireLigneTempList = Inventaire_Ligne_TempOpenHelper.getAllInventaireLigneTempByInventaireEtZoneEtProduit(db, inventaireCourant.getInventaire_ID(), zoneCourante, produitCourant.getID_produit());
+        inventaireLigneTempList = Inventaire_Ligne_TempOpenHelper.getAllInventaireLigneTempByInventaireEtZoneEtProduitEtDepot(db, inventaireCourant.getInventaire_ID(), zoneCourante, produitCourant.getID_produit(), depotCourant.getDepot_Reference());
 
-        ((TextView) findViewById(R.id.produitDesgination)).setText(inventaireLigneTempList.get(0).getDesignation());
-        ((TextView) findViewById(R.id.inventaireCourant)).setText("#"+inventaireCourant.getInventaire_ID()+" - "+inventaireCourant.getObjet());
+        if(inventaireLigneTempList.isEmpty())
+        {
+            onBackPressed();
+        }
+        else
+        {
+            ((TextView) findViewById(R.id.produitDesgination)).setText(inventaireLigneTempList.get(0).getDesignation());
+            ((TextView) findViewById(R.id.inventaireCourant)).setText("#"+inventaireCourant.getInventaire_ID()+" - "+inventaireCourant.getObjet());
 
-        adapter = new InventaireLigneTempAdapter(inventaireLigneTempList, position -> {
-            Toast.makeText(this, "Supprimer " + inventaireLigneTempList.get(position), Toast.LENGTH_SHORT).show();
-            RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
-            if (viewHolder != null && viewHolder instanceof InventaireLigneTempAdapter.InventaireLigneTempViewHolder) {
+            adapter = new InventaireLigneTempAdapter(inventaireLigneTempList, position -> {
+                Toast.makeText(this, "Supprimer " + inventaireLigneTempList.get(position), Toast.LENGTH_SHORT).show();
+                RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
+                if (viewHolder != null && viewHolder instanceof InventaireLigneTempAdapter.InventaireLigneTempViewHolder) {
 
-                Inventaire_Ligne_Temp courant = inventaireLigneTempList.get(position);
-                courant.setStockPhysique(-1);
-                courant.setInventaireDate("null");
-                Inventaire_Ligne_TempOpenHelper.mettreAJourInventaireLigneTemp(db, courant);
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, courant.getPhiMR4UUID(), courant.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
-                ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotInventaireActivity.this, db, utilisateurConnecte, false);
-                adapter.notifyItemChanged(position);
-                onResume();
-            }
-        }, ListeLotInventaireActivity.this);
+                    Inventaire_Ligne_Temp courant = inventaireLigneTempList.get(position);
+                    courant.setStockPhysique(-1);
+                    courant.setInventaireDate("null");
+                    Inventaire_Ligne_TempOpenHelper.mettreAJourInventaireLigneTemp(db, courant);
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, courant.getPhiMR4UUID(), courant.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
+                    ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotInventaireActivity.this, db, utilisateurConnecte, false);
+                    adapter.notifyItemChanged(position);
+                    onResume();
+                }
+            }, ListeLotInventaireActivity.this);
 
-        recyclerView.setAdapter(adapter);
+            recyclerView.setAdapter(adapter);
+        }
     }
 
     @Override
@@ -258,7 +271,7 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
         ListeLotInventaireActivity.this.startActivityForResult(listeLotInventaireLigneTemp_Intent, CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH);
     }
 
-    public void onClickLigne(final int position) {
+    public void onClickLigne(final int position, boolean ajout) {
 
         Inventaire_Ligne_Temp courant = inventaireLigneTempList.get(position);
         Produit produitCourant = ProduitOpenHelper.getProduitByID(db, courant.getProduitID());
@@ -279,6 +292,8 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
         LinearLayout layoutPlus_LL = view.findViewById(R.id.layoutPlus_LL);
         LinearLayout layoutValider_LL = view.findViewById(R.id.layoutValider_LL);
         LinearLayout layout_gestion_conditionnement_LL = view.findViewById(R.id.layout_gestion_conditionnement_LL);
+        LinearLayout linearLayoutLot = view.findViewById(R.id.linearLayoutLot);
+        LinearLayout linearLayoutPeremption = view.findViewById(R.id.linearLayoutPeremption);
         ImageView quitterModale_IV = view.findViewById(R.id.quitterModale_IV);
 
         Spinner spinnerMoisDatePeremption_SP = view.findViewById(R.id.selecteurDateMois_SP);
@@ -297,6 +312,28 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
         emplacementLot_TV.setText(courant.getEmplacement());
         numeroLot_ET.setText(courant.getLot());
         textCartonFermer_TV.setText(textCartonFermer_TV.getText()+"(x"+produitCourant.getCond_achat()+")");
+
+        if(!produitCourant.isSuivi_Lot())
+        {
+            linearLayoutLot.setVisibility(View.GONE);
+            numeroLot_ET.setText("LOT NON TRACE");
+        }
+        else
+        {
+            if(ajout)
+            {
+                numeroLot_ET.setText("");
+            }
+            else
+            {
+                numeroLot_ET.setText(courant.getLot());
+            }
+        }
+
+        if(!produitCourant.isPeremption())
+        {
+            linearLayoutPeremption.setVisibility(View.GONE);
+        }
 
         //gestion de la date de péremption
         String[] tabPeremption = courant.getPeremptionDate().split("-");
@@ -323,42 +360,30 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
             quantiteComptee_ET.setText(String.valueOf((int)courant.getStockPhysique()));
         }
 
-        layoutCartonFermer_LL.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                conditionnement[0] = produitCourant.getCond_achat();
-                layoutCartonOuvert_LL.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ListeLotInventaireActivity.this, R.color.blanc)));
-                layoutCartonFermer_LL.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ListeLotInventaireActivity.this, R.color.vertTransparent)));
-            }
+        layoutCartonFermer_LL.setOnClickListener(view6 -> {
+            conditionnement[0] = produitCourant.getCond_achat();
+            layoutCartonOuvert_LL.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ListeLotInventaireActivity.this, R.color.blanc)));
+            layoutCartonFermer_LL.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ListeLotInventaireActivity.this, R.color.vertTransparent)));
         });
 
-        layoutCartonOuvert_LL.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                conditionnement[0] = 1;
-                layoutCartonOuvert_LL.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ListeLotInventaireActivity.this, R.color.vertTransparent)));
-                layoutCartonFermer_LL.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ListeLotInventaireActivity.this, R.color.blanc)));
-            }
+        layoutCartonOuvert_LL.setOnClickListener(view5 -> {
+            conditionnement[0] = 1;
+            layoutCartonOuvert_LL.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ListeLotInventaireActivity.this, R.color.vertTransparent)));
+            layoutCartonFermer_LL.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ListeLotInventaireActivity.this, R.color.blanc)));
         });
 
-        layoutPlus_LL.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int qteActuelle = Integer.parseInt(quantiteComptee_ET.getText().toString());
-                qteActuelle += conditionnement[0];
-                quantiteComptee_ET.setText(String.valueOf(qteActuelle));
-            }
+        layoutPlus_LL.setOnClickListener(view4 -> {
+            int qteActuelle = Integer.parseInt(quantiteComptee_ET.getText().toString());
+            qteActuelle += conditionnement[0];
+            quantiteComptee_ET.setText(String.valueOf(qteActuelle));
         });
 
-        layoutMoins_LL.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int qteActuelle = Integer.parseInt(quantiteComptee_ET.getText().toString());
-                qteActuelle -= conditionnement[0];
-                if(qteActuelle < 0)
-                    qteActuelle = 0;
-                quantiteComptee_ET.setText(String.valueOf(qteActuelle));
-            }
+        layoutMoins_LL.setOnClickListener(view3 -> {
+            int qteActuelle = Integer.parseInt(quantiteComptee_ET.getText().toString());
+            qteActuelle -= conditionnement[0];
+            if(qteActuelle < 0)
+                qteActuelle = 0;
+            quantiteComptee_ET.setText(String.valueOf(qteActuelle));
         });
 
         builder.setView(view);
@@ -367,79 +392,51 @@ public class ListeLotInventaireActivity  extends ServiceAvecConnexionActivity {
         alertDialog.show();
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-        layoutValider_LL.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //vérification du numéro de lot et de la date de péremption
-                String numeroLotTemp = numeroLot_ET.getText().toString().trim();
+        layoutValider_LL.setOnClickListener(view2 -> {
+            //vérification du numéro de lot et de la date de péremption
+            String numeroLotTemp = numeroLot_ET.getText().toString().trim();
+            String dateExpirationLotTemp = "";
+            if(numeroLotTemp.contentEquals("LOT NON TRACE")) {
+                dateExpirationLotTemp = "0000-00-00";
+            }
+            else {
                 String anneeSelection = spinnerAnneeDatePeremption_SP.getSelectedItem().toString();
                 String moisSelection = spinnerMoisDatePeremption_SP.getSelectedItem().toString();
-                String dateExpirationLotTemp = getDateDepuisMoisAnnee(moisSelection, anneeSelection);
+                dateExpirationLotTemp = getDateDepuisMoisAnnee(moisSelection, anneeSelection);
                 String[] dateParts = dateExpirationLotTemp.split("/");
                 if(dateParts.length == 3)
                     dateExpirationLotTemp = dateParts[2]+"-"+dateParts[1]+"-"+dateParts[0];
-
-                if(!courant.getPeremptionDate().contentEquals(dateExpirationLotTemp))
-                {
-                    //mise à 0 de l'inventaireLigneTemp courant
-                    courant.setStockPhysique(0);
-                    courant.setInventaireDate("null");
-                    Inventaire_Ligne_TempOpenHelper.mettreAJourInventaireLigneTemp(db, courant);
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, courant.getPhiMR4UUID(), courant.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
-                    ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotInventaireActivity.this, db, utilisateurConnecte, false);
-                    nouvelInventaireLigneTemp = new Inventaire_Ligne_Temp(courant);
-                    nouvelInventaireLigneTemp.set_UID(getIdInventaireLigneTemp());
-                    nouvelInventaireLigneTemp.setLot(numeroLotTemp);
-                    nouvelInventaireLigneTemp.setPeremptionDate(dateExpirationLotTemp);
-                    nouvelInventaireLigneTemp.setStockPhysique(Integer.parseInt(quantiteComptee_ET.getText().toString()));
-                    nouvelInventaireLigneTemp.setInventaireDate(getDateDuJour());
-                    Alerte.afficherAlerteConfirmation(ListeLotInventaireActivity.this, getLayoutInflater(), getBundle(), "La date de péremption a été modifiée. Une nouvelle ligne va être créer.\nSouhaitez vous confirmer ?", false, true, ListeLotInventaireActivity.this);
-                    alertDialog.dismiss();
-                }
-                else if(!courant.getLot().contentEquals(numeroLotTemp))
-                {
-                    //mise à 0 de l'inventaireLigneTemp courant
-                    courant.setStockPhysique(0);
-                    courant.setInventaireDate("null");
-                    Inventaire_Ligne_TempOpenHelper.mettreAJourInventaireLigneTemp(db, courant);
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, courant.getPhiMR4UUID(), courant.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
-                    ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotInventaireActivity.this, db, utilisateurConnecte, false);
-
-                    nouvelInventaireLigneTemp = new Inventaire_Ligne_Temp(courant);
-                    nouvelInventaireLigneTemp.set_UID(getIdInventaireLigneTemp());
-                    nouvelInventaireLigneTemp.setLot(numeroLotTemp);
-                    nouvelInventaireLigneTemp.setPeremptionDate(dateExpirationLotTemp);
-                    nouvelInventaireLigneTemp.setStockPhysique(Integer.parseInt(quantiteComptee_ET.getText().toString()));
-                    nouvelInventaireLigneTemp.setInventaireDate(getDateDuJour());
-                    Alerte.afficherAlerteConfirmation(ListeLotInventaireActivity.this, getLayoutInflater(), getBundle(), "Le numéro de lot a été modifié. Une nouvelle ligne va être créer.\nSouhaitez vous confirmer ?", false, true, ListeLotInventaireActivity.this);
-                    alertDialog.dismiss();
-                }
-                else
-                {
-                    RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
-                    courant.setStockPhysique(Integer.parseInt(quantiteComptee_ET.getText().toString()));
-                    courant.setInventaireDate(getDateDuJour());
-                    Inventaire_Ligne_TempOpenHelper.mettreAJourInventaireLigneTemp(db, courant);
-
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, courant.getPhiMR4UUID(), courant.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
-                    ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotInventaireActivity.this, db, utilisateurConnecte, false);
-
-                    if (viewHolder instanceof InventaireLigneTempAdapter.InventaireLigneTempViewHolder) {
-                        InventaireLigneTempAdapter.InventaireLigneTempViewHolder monViewHolder = (InventaireLigneTempAdapter.InventaireLigneTempViewHolder) viewHolder;
-                        monViewHolder.qteStockPhysique.setText(quantiteComptee_ET.getText().toString());
-                        adapter.notifyItemChanged(position);
-                        alertDialog.dismiss();
-                    }
-                }
             }
+
+
+            Inventaire_Ligne_Temp nouvelInventaireLigneTemp = Inventaire_Ligne_TempOpenHelper.getInventaireLigneByProduitLotPeremptionZoneDepot(db,courant.getInventaire_ID(), courant.getProduitID(), numeroLotTemp, dateExpirationLotTemp, courant.getZone(), depotCourant.getDepot_Reference());
+
+            if(nouvelInventaireLigneTemp == null) {
+                nouvelInventaireLigneTemp = new Inventaire_Ligne_Temp(courant);
+                nouvelInventaireLigneTemp.set_UID(getIdInventaireLigneTemp());
+                nouvelInventaireLigneTemp.setLot(numeroLotTemp);
+                nouvelInventaireLigneTemp.setPeremptionDate(dateExpirationLotTemp);
+                nouvelInventaireLigneTemp.setStockPhysique(Integer.parseInt(quantiteComptee_ET.getText().toString()));
+                nouvelInventaireLigneTemp.setInventaireDate(getDateDuJour());
+                Inventaire_Ligne_TempOpenHelper.insererUnInventaire_Ligne_TempEnBDD(db, nouvelInventaireLigneTemp);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, nouvelInventaireLigneTemp.getPhiMR4UUID(), nouvelInventaireLigneTemp.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
+                ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotInventaireActivity.this, db, utilisateurConnecte, false);
+            }
+            else
+            {
+                nouvelInventaireLigneTemp.setStockPhysique(Integer.parseInt(quantiteComptee_ET.getText().toString()));
+                nouvelInventaireLigneTemp.setInventaireDate(getDateDuJour());
+                Inventaire_Ligne_TempOpenHelper.mettreAJourInventaireLigneTemp(db, nouvelInventaireLigneTemp);
+
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP, nouvelInventaireLigneTemp.getPhiMR4UUID(), nouvelInventaireLigneTemp.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
+                ElementASynchroniserOpenHelper.toutSynchroniser(ListeLotInventaireActivity.this, db, utilisateurConnecte, false);
+            }
+
+            alertDialog.dismiss();
+            onResume();
         });
 
-        quitterModale_IV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alertDialog.dismiss();
-            }
-        });
+        quitterModale_IV.setOnClickListener(view1 -> alertDialog.dismiss());
     }
 
     @Override

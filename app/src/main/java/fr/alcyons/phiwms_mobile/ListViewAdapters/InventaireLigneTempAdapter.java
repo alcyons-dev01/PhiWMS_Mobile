@@ -85,7 +85,7 @@ public class InventaireLigneTempAdapter extends RecyclerView.Adapter<InventaireL
         holder.qteStockPhysique.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((ListeLotInventaireActivity) context).onClickLigne(position);
+                ((ListeLotInventaireActivity) context).onClickLigne(position, false);
             }
         });
 
@@ -98,8 +98,13 @@ public class InventaireLigneTempAdapter extends RecyclerView.Adapter<InventaireL
             try {
                 if(inventaireLigneTempCourant.getPeremptionDate().length() == 10)
                 {
-                    dateExp = dateDecodeur.parse(inventaireLigneTempCourant.getPeremptionDate().substring(0, 10));
-                    holder.dateExpiration.setText(dateFormat.format(dateExp));
+                    if(datePeremption.contentEquals("0000-00-00"))
+                        holder.dateExpiration.setText("00/00/0000");
+                    else
+                    {
+                        dateExp = dateDecodeur.parse(inventaireLigneTempCourant.getPeremptionDate().substring(0, 10));
+                        holder.dateExpiration.setText(dateFormat.format(dateExp));
+                    }
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -139,7 +144,7 @@ public class InventaireLigneTempAdapter extends RecyclerView.Adapter<InventaireL
             holder.layoutPrincipal.setClickable(true);
             holder.layoutPrincipal.setOnClickListener(v -> {
                 v.setEnabled(false); // désactive pour éviter un second clic
-                ((ListeLotInventaireActivity) context).onClickLigne(position);
+                ((ListeLotInventaireActivity) context).onClickLigne(position, false);
 
                 // optionnel : réactiver après un délai
                 v.postDelayed(() -> v.setEnabled(true), 500);
