@@ -36,6 +36,11 @@ import fr.alcyons.phiwms_mobile.R
 import fr.alcyons.phiwms_mobile.ServiceActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Paint
 
 abstract class ScannerRafale : ServiceActivity() {
 
@@ -174,7 +179,7 @@ abstract class ScannerRafale : ServiceActivity() {
             val imageAnalyzer = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_YUV_420_888)
-                .setTargetResolution(android.util.Size(1280, 720))
+                .setTargetResolution(android.util.Size(1920, 1080))
                 .build()
                 .also {
                     it.setAnalyzer(scanExecutor) { imageProxy ->
@@ -196,31 +201,44 @@ abstract class ScannerRafale : ServiceActivity() {
 
     @androidx.camera.core.ExperimentalGetImage
     private fun analyzeImage(imageProxy: ImageProxy) {
-        val mediaImage = imageProxy.image ?: run {
-            imageProxy.close()
-            return
+        val mediaImage = imageProxy.image ?: run { imageProxy.close(); return }
+
+        val bitmap = imageProxy.toBitmap()
+        val rotation = imageProxy.imageInfo.rotationDegrees
+
+        val normalImage = InputImage.fromBitmap(bitmap, rotation)
+        val invertedImage = InputImage.fromBitmap(invertBitmap(bitmap), rotation)
+
+        var completed = 0
+        var resultHandled = false
+
+        val onComplete = {
+            completed++
+            if (completed == 2) imageProxy.close()
         }
 
-        val inputImage = InputImage.fromMediaImage(
-            mediaImage,
-            imageProxy.imageInfo.rotationDegrees
-        )
+        fun processImage(input: InputImage) {
+            barcodeScanner.process(input)
+                .addOnSuccessListener { barcodes ->
+                    if (!resultHandled) {
+                        barcodes.forEach { barcode ->
+                            val raw = barcode.rawValue ?: return@forEach
+                            val normalized = normalize(raw)
+                            val assembled = if (normalized.uppercase().startsWith("PHITAG"))
+                                normalized
+                            else
+                                handleSplitScan(raw) ?: return@forEach
 
-        barcodeScanner.process(inputImage)
-            .addOnSuccessListener { barcodes ->
-                barcodes.forEach { barcode ->
-                    val raw = barcode.rawValue ?: return@forEach
-                    val normalized = normalize(raw)
-                    val assembled = if (normalized.uppercase().startsWith("PHITAG"))
-                        normalized
-                    else
-                        handleSplitScan(raw) ?: return@forEach
-
-                    runOnUiThread { onCodeScanned(assembled) }
+                            resultHandled = true
+                            runOnUiThread { onCodeScanned(assembled) }
+                        }
+                    }
                 }
-            }
-            .addOnFailureListener { e -> Log.e("Scanner", "Erreur ML Kit", e) }
-            .addOnCompleteListener { imageProxy.close() }
+                .addOnCompleteListener { onComplete() }
+        }
+
+        processImage(normalImage)
+        processImage(invertedImage)
     }
 
     private fun normalize(raw: String): String {
@@ -293,6 +311,23 @@ abstract class ScannerRafale : ServiceActivity() {
     override fun isSoundEnabled(): Boolean {
         val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         return audioManager.ringerMode == AudioManager.RINGER_MODE_NORMAL
+    }
+
+    private fun invertBitmap(src: Bitmap): Bitmap {
+        val inv = src.copy(Bitmap.Config.ARGB_8888, true)
+        val canvas = Canvas(inv)
+        val paint = Paint()
+        val matrixColorFilter = ColorMatrixColorFilter(ColorMatrix().apply {
+            set(floatArrayOf(
+                -1f,  0f,  0f, 0f, 255f,
+                0f, -1f,  0f, 0f, 255f,
+                0f,  0f, -1f, 0f, 255f,
+                0f,  0f,  0f, 1f,   0f
+            ))
+        })
+        paint.colorFilter = matrixColorFilter
+        canvas.drawBitmap(src, 0f, 0f, paint)
+        return inv
     }
 
     protected open fun getAlreadyScannedSet(): Set<String> = emptySet()
