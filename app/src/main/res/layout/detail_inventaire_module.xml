@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <RelativeLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white">
+
+        <!-- Barre de titre -->
+        <LinearLayout
+            android:id="@+id/barreDeTitre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:background="@color/bleu_fonce_alcyons"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/zone"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:paddingStart="5dp"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/layoutProgressBar"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:orientation="vertical"
+                android:layout_marginVertical="5dp"
+                android:layout_marginHorizontal="5dp">
+
+                <ProgressBar
+                    android:id="@+id/progressBarInventaire_PB"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/background_empty_radius"
+                    android:backgroundTint="@color/bleu_clair_alcyons_transparent"
+                    android:progressDrawable="@drawable/progress_bar_background"
+                    android:progressTint="@color/bleu_clair_alcyons"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Contenu scrollable -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/barreDeTitre"
+            android:fillViewport="true"
+            android:padding="12dp"
+            android:background="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- CARTE SCANNER -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#FFFFFF">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/lancerScan"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="14dp"
+                            android:background="@color/bleu_fonce_alcyons">
+
+                            <ImageView
+                                android:id="@+id/iconLancerScan"
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:layout_gravity="center_vertical"
+                                android:src="@drawable/ic_datamatrix"
+                                android:layout_marginEnd="10dp"
+                                app:tint="#FFFFFF"/>
+
+                            <TextView
+                                android:id="@+id/textLancerScan"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:text="SCANNER"
+                                android:layout_weight="1"
+                                android:textColor="#FFFFFF"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.1" />
+
+                            <ImageView
+                                android:id="@+id/chevronScan"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/chevron_down_24dp"
+                                app:tint="#FFFFFF"/>
+
+                        </LinearLayout>
+
+                        <View
+                            android:id="@+id/separateurScan"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#EEEEEE"
+                            android:visibility="gone"/>
+
+                        <androidx.fragment.app.FragmentContainerView
+                            android:id="@+id/scannerContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:visibility="gone"/>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- CARTE CHERCHER -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#FFFFFF">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/lancerRecherhe"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="14dp"
+                            android:background="@color/bleu_fonce_alcyons">
+
+                            <ImageView
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:layout_gravity="center_vertical"
+                                android:src="@drawable/ic_search"
+                                android:layout_marginEnd="10dp"
+                                app:tint="#FFFFFF"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:text="CHERCHER"
+                                android:layout_weight="1"
+                                android:textColor="#FFFFFF"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.1" />
+
+                            <ImageView
+                                android:id="@+id/chevronRecherche"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/chevron_down_24dp"
+                                app:tint="#FFFFFF"/>
+
+                        </LinearLayout>
+
+                        <View
+                            android:id="@+id/separateurRecherche"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#EEEEEE"
+                            android:visibility="gone"/>
+
+                        <androidx.fragment.app.FragmentContainerView
+                            android:id="@+id/rechercheContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone"/>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- CARTE À COMPTER -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#FFFFFF">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/aCompter_LL"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="14dp"
+                            android:background="@color/bleu_fonce_alcyons">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:text="À COMPTER"
+                                android:layout_weight="1"
+                                android:textColor="#FFFFFF"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.1" />
+
+                            <TextView
+                                android:id="@+id/nbReferenceACompter_TV"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=""
+                                android:textColor="#FFFFFF"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:background="#44FFFFFF"
+                                android:paddingHorizontal="10dp"
+                                android:paddingVertical="2dp"
+                                android:layout_marginEnd="10dp"/>
+
+                            <ImageView
+                                android:id="@+id/chevronACompter"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/chevron_down_24dp"
+                                app:tint="#FFFFFF"/>
+
+                        </LinearLayout>
+
+                        <View
+                            android:id="@+id/separateurACompter"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#EEEEEE"
+                            android:visibility="gone"/>
+
+                        <androidx.fragment.app.FragmentContainerView
+                            android:id="@+id/referenceACompterContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="300dp"
+                            android:visibility="gone"/>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- CARTE COMPTER -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#FFFFFF">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/compter_LL"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="14dp"
+                            android:background="@color/bleu_fonce_alcyons">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:text="COMPTER"
+                                android:layout_weight="1"
+                                android:textColor="#FFFFFF"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.1" />
+
+                            <TextView
+                                android:id="@+id/nbReferenceCompter_TV"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=""
+                                android:textColor="#FFFFFF"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:background="#44FFFFFF"
+                                android:paddingHorizontal="10dp"
+                                android:paddingVertical="2dp"
+                                android:layout_marginEnd="10dp"/>
+
+                            <ImageView
+                                android:id="@+id/chevronCompter"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/chevron_down_24dp"
+                                app:tint="#FFFFFF"/>
+
+                        </LinearLayout>
+
+                        <View
+                            android:id="@+id/separateurCompter"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#EEEEEE"
+                            android:visibility="gone"/>
+
+                        <androidx.fragment.app.FragmentContainerView
+                            android:id="@+id/referenceCompterContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="300dp"
+                            android:visibility="gone"/>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Detail container flottant -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/detailContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:visibility="gone"
+            android:elevation="8dp"
+            android:background="@android:color/transparent"/>
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

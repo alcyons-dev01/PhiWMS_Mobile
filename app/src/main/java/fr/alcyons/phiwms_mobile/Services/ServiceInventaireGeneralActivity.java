@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -55,6 +56,9 @@ import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.Inventaire.DetailInventaireActivity;
 import fr.alcyons.phiwms_mobile.Inventaire.DetailInventaire_V2Activity;
+import fr.alcyons.phiwms_mobile.Inventaire.DetailInventaire_V3;
+import fr.alcyons.phiwms_mobile.Inventaire.InventaireZoneActivity;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.DepotAdapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.InventaireAdapter;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
@@ -65,15 +69,10 @@ import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 public class ServiceInventaireGeneralActivity extends ServiceAvecConnexionActivity {
     Context context;
     PackageManager pm;
-    List<Inventaire_Ligne_Temp> inventaireLigneTempList;
-    ListView inventaireListView;
-    InventaireAdapter inventaireAdapter;
+    ListView depotListView;
+    DepotAdapter depotAdapter;
     boolean connexionDirecte;
-    List<String> listeDepotInventaire;
-    ArrayAdapter<String> spinnerArrayAdapter;
-    Spinner spinner;
-    List<Inventaire_Ligne_Temp> inventaireLigneTempListBase;
-    Inventaire inventaireCourant;
+    ArrayList<Depot> arrayDepot;
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,21 +80,25 @@ public class ServiceInventaireGeneralActivity extends ServiceAvecConnexionActivi
         setContentView(R.layout.activity_liste_refresh);
         pm = ServiceInventaireGeneralActivity.this.getPackageManager();
         context = ServiceInventaireGeneralActivity.this;
+        ((LinearLayout) findViewById(R.id.triListe)).setVisibility(View.GONE);
 
         // Gestion de la listView
-        inventaireListView = (ListView) findViewById(R.id.listeView);
-        inventaireListView.setOnItemClickListener((parent, view, position, id) -> {
-            String[] inventaire_Selectionne = (String[]) inventaireAdapter.getItem(position);
-
-            Intent serviceInventaire_Intent = new Intent(ServiceInventaireGeneralActivity.this, DetailInventaire_V2Activity.class);
-            Bundle serviceInventaire_Bundle = ServiceInventaireGeneralActivity.super.getBundle();
-            serviceInventaire_Bundle.putInt("inventaireId", Integer.parseInt(inventaire_Selectionne[2]));
-            serviceInventaire_Bundle.putString("zoneSelectionne", inventaire_Selectionne[0]);
-            serviceInventaire_Bundle.putString("depotSelectionne", inventaire_Selectionne[7]);
-            serviceInventaire_Intent.putExtras(serviceInventaire_Bundle);
-            ServiceInventaireGeneralActivity.this.startActivity(serviceInventaire_Intent);
+        depotListView = (ListView) findViewById(R.id.listeView);
+        depotListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Inventaire inventaireGeneral = InventaireOpenHelper.getInventaireGeneral(db);
+                Depot depotSelectionne = arrayDepot.get(position);
+                Intent serviceInventaire_Intent = new Intent(ServiceInventaireGeneralActivity.this, InventaireZoneActivity.class);
+                Bundle serviceInventaire_Bundle = ServiceInventaireGeneralActivity.super.getBundle();
+                serviceInventaire_Bundle.putInt("inventaireId", inventaireGeneral.getInventaire_ID());
+                serviceInventaire_Bundle.putInt("depotId", depotSelectionne.getDepot_UID());
+                serviceInventaire_Intent.putExtras(serviceInventaire_Bundle);
+                ServiceInventaireGeneralActivity.this.startActivity(serviceInventaire_Intent);
+            }
         });
 
+        arrayDepot = new ArrayList<>();
         connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(db);
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -114,73 +117,21 @@ public class ServiceInventaireGeneralActivity extends ServiceAvecConnexionActivi
     @Override
     public void onResume() {
         super.onResume();
-        inventaireLigneTempList = new ArrayList<>();
-        inventaireLigneTempListBase = new ArrayList<>();
-        listeDepotInventaire = new ArrayList<>();
-        listeDepotInventaire.add("Tous");
         /* Code nécessaire afin de réaliser une requête à l' API */
         if (statutConnexion && passageParOnCreate && !connexionDirecte) {
             if (!swipeRefreshLayout.isRefreshing()) {
                 afficherSpinner(ServiceInventaireGeneralActivity.this, LayoutInflater.from(ServiceInventaireGeneralActivity.this));
             }
             RequestQueue requestQueue = Volley.newRequestQueue(ServiceInventaireGeneralActivity.this);
-            String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteInventaireGeneral;
+            String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteInventaireGeneral+"/depot";
 
             JsonObjectRequest obreq = getJsonObjectRequest(urlRequete);
             requestQueue.add(obreq);
         }
         else
         {
-            Inventaire inventaireGeneral = InventaireOpenHelper.getInventaireGeneral(db);
-
-            if (inventaireGeneral == null) {
-                if(connexionDirecte)
-                {
-                    Intent retourVersServiceConnexionDirectIntent = getRetourVersServiceConnexionDirectIntent();
-                    ServiceInventaireGeneralActivity.this.startActivity(retourVersServiceConnexionDirectIntent);
-                    ServiceInventaireGeneralActivity.this.finish();
-                }
-                else
-                {
-                    connexionNecessaire();
-                    return;
-                }
-            }
-            else
-            {
-                inventaireLigneTempList =Inventaire_Ligne_TempOpenHelper.getInventaireInfoById(db, inventaireGeneral.getInventaire_ID());
-                inventaireLigneTempListBase = Inventaire_Ligne_TempOpenHelper.getInventaireInfoById(db, inventaireGeneral.getInventaire_ID());
-                passageParOnCreate = false;
-                if(connexionDirecte)
-                {
-                    //lancerScan();
-                    /* Code nécessaire à l'affichage de la liste */
-                    gestionAdapter();
-                    invalidateOptionsMenu();
-                    connexionDirecte = !connexionDirecte;
-                }
-                else
-                {
-                    gestionAdapter();
-                }
-            }
-
-            spinner = (Spinner) findViewById(R.id.optionTri);
-
             invalidateOptionsMenu();
         }
-    }
-
-    @NonNull
-    private Intent getRetourVersServiceConnexionDirectIntent() {
-        Intent retourVersServiceConnexionDirectIntent = new Intent(ServiceInventaireGeneralActivity.this, ServiceConnexionDirecteActivity.class);
-        Bundle retourVersServiceConnexionDirectBundle = new Bundle();
-        retourVersServiceConnexionDirectBundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-        retourVersServiceConnexionDirectBundle.putBoolean("snackBar", true);
-        retourVersServiceConnexionDirectBundle.putString("nomService", "Préparation");
-
-        retourVersServiceConnexionDirectIntent.putExtras(retourVersServiceConnexionDirectBundle);
-        return retourVersServiceConnexionDirectIntent;
     }
 
     @NonNull
@@ -202,90 +153,31 @@ public class ServiceInventaireGeneralActivity extends ServiceAvecConnexionActivi
                                 Alerte.afficherAlerteInformation(ServiceInventaireGeneralActivity.this, getLayoutInflater(), "Information", "Aucun inventaire général à traiter", false, true);
                             }
                         } else {
-                            // 1. Construire une Map depotRef -> Depot une seule fois (évite N requêtes BDD)
-                            Map<String, Depot> depotCache = new HashMap<>();
+                            InventaireOpenHelper.viderTableInventaire(db);
+                            JSONArray inventaireArray = response.getJSONArray("Inventaire");
 
-                            JSONArray inventaire_JSONArray = response.getJSONArray("Inventaires");
-                            viderTablesConcernees();
+                            for(int i = 0; i < inventaireArray.length(); i++)
+                            {
+                                Inventaire inventaire = new Inventaire(inventaireArray.getJSONObject(i));
+                                InventaireOpenHelper.insererUnInventaireEnBDD(db, inventaire);
+                            }
 
-                            for (int i = 0; i < inventaire_JSONArray.length(); i++) {
-                                JSONObject inventaire_JSONObject = inventaire_JSONArray.getJSONObject(i);
-                                inventaireCourant = new Inventaire(inventaire_JSONObject);
-                                long rowID = InventaireOpenHelper.insererUnInventaireEnBDD(db, inventaireCourant);
+                            JSONArray depotId = response.getJSONArray("DepotId");
+                            for(int j = 0; j < depotId.length(); j++)
+                            {
+                                int depotIdInt = depotId.getInt(j);
+                                Depot depot = DepotOpenHelper.getDepotParID(db, depotIdInt);
 
-                                if (rowID == -1) continue; // simplifie l'imbrication
-
-                                JSONArray lignesArray = inventaire_JSONObject.getJSONArray("inventaire_ligne_temp");
-                                for (int k = 0; k < lignesArray.length(); k++) {
-                                    Inventaire_Ligne_Temp ligne = new Inventaire_Ligne_Temp(lignesArray.getJSONObject(k));
-                                    Inventaire_Ligne_TempOpenHelper.insererUnInventaire_Ligne_TempEnBDD(db, ligne);
-
-                                    // Mise en cache du dépôt si pas encore chargé
-                                    String ref = ligne.getDepotReference();
-                                    if (!depotCache.containsKey(ref)) {
-                                        Depot depot = DepotOpenHelper.getDepotParReference(db, ref);
-                                        if (depot != null) depotCache.put(ref, depot);
-                                    }
-
-                                    Depot depot = depotCache.get(ref);
-                                    if (depot != null && !listeDepotInventaire.contains(depot.getNom())) {
-                                        listeDepotInventaire.add(depot.getNom());
-                                    }
+                                if(depot != null)
+                                {
+                                    arrayDepot.add(depot);
                                 }
                             }
 
-                            // 2. Charger les lignes une seule fois
-                            inventaireLigneTempListBase = Inventaire_Ligne_TempOpenHelper
-                                    .getInventaireInfoById(db, inventaireCourant.getInventaire_ID());
-                            inventaireLigneTempList = new ArrayList<>(inventaireLigneTempListBase);
-
-                            // 3. Pré-indexer les lignes par nom de dépôt (évite la boucle dans le listener)
-                            Map<String, List<Inventaire_Ligne_Temp>> lignesParDepot = new HashMap<>();
-                            for (Inventaire_Ligne_Temp ligne : inventaireLigneTempListBase) {
-                                Depot depot = depotCache.get(ligne.getDepotReference());
-                                if (depot != null) {
-                                    lignesParDepot
-                                            .computeIfAbsent(depot.getNom(), k -> new ArrayList<>())
-                                            .add(ligne);
-                                }
-                            }
-
-                            if (passageParOnCreate) {
-                                gestionAdapter();
-                                invalidateOptionsMenu();
-                            }
-
-// 4. Setup spinner simplifié
-                            spinner = findViewById(R.id.optionTri);
-                            spinnerArrayAdapter = new ArrayAdapter<>(this,
-                                    android.R.layout.simple_spinner_dropdown_item, listeDepotInventaire);
-                            spinner.setAdapter(spinnerArrayAdapter);
-
-                            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                boolean isFirstSelection = true;
-
-                                @Override
-                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                    if (isFirstSelection) { isFirstSelection = false; return; }
-
-                                    TextView tv = (TextView) parent.getChildAt(0);
-                                    if (tv != null) tv.setVisibility(View.INVISIBLE);
-
-                                    String depot = spinner.getItemAtPosition(position).toString();
-
-                                    // Lecture directe depuis la Map — plus de boucle BDD
-                                    inventaireLigneTempList = depot.equals("Tous")
-                                            ? new ArrayList<>(inventaireLigneTempListBase)
-                                            : lignesParDepot.getOrDefault(depot, new ArrayList<>());
-
-                                    gestionAdapter();
-                                }
-
-                                @Override
-                                public void onNothingSelected(AdapterView<?> arg0) {}
-                            });
-
+                            arrayDepot.sort(Comparator.comparing(Depot::getNom));
+                            gestionAdapter();
                             passageParOnCreate = false;
+                            arreterSpinner();
                             new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
                         }
                     } catch (JSONException e) {
@@ -301,31 +193,18 @@ public class ServiceInventaireGeneralActivity extends ServiceAvecConnexionActivi
             public Map<String, String> getHeaders() {
                 HashMap<String, String> headers = new HashMap<>();
                 headers.put("Authorization", utilisateurConnecte.getToken());
+                headers.put("EtablissementId", String.valueOf(utilisateurConnecte.getEtablissementId()));
+                headers.put("UserId", String.valueOf(utilisateurConnecte.getId()));
                 return headers;
             }
         };
         return obreq;
     }
 
-    public void viderTablesConcernees() {
-        for (Inventaire inventaire : InventaireOpenHelper.getAllInventaire(db))
-        {
-            for (Inventaire_Ligne_Temp inventaireLigneTemp : Inventaire_Ligne_TempOpenHelper.getAllInventaireLigneTempByInventaire(db, inventaire.getInventaire_ID()))
-            {
-                Inventaire_Ligne_TempOpenHelper.supprimerInventaireLigneTempEnBDD(db, inventaireLigneTemp);
-            }
-            InventaireOpenHelper.supprimerInventaire(db, inventaire);
-        }
-    }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        super.prepareOptionsMenu(menu, inventaireAdapter, null, "Rechercher...");
-        MenuItem item = menu.findItem(R.id.menuDatamatrix);
-        item.setOnMenuItemClickListener(item1 -> {
-            lancerScan();
-            return true;
-        });
+        super.prepareOptionsMenu(menu, depotAdapter, null, "Rechercher...");
         return true;
     }
     @Override
@@ -334,40 +213,8 @@ public class ServiceInventaireGeneralActivity extends ServiceAvecConnexionActivi
         //Récupération du menu
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_action, menu);
-        menu.findItem(R.id.menuDatamatrix).setVisible(true);
+        menu.findItem(R.id.menuDatamatrix).setVisible(false);
         return true;
-    }
-    public void lancerScan()
-    {
-        Bundle scanDocumentBundle = ServiceInventaireGeneralActivity.super.getBundle();
-        scanDocumentBundle.putString("contexte", String.valueOf(R.string.scannerContexteDocument));
-        scanDocumentBundle.putBoolean("isBoutonSuppressionExistant", true);
-        Intent scanDocumentIntent = null;
-        if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell") || Build.MANUFACTURER.toLowerCase().contains("google"))
-        {
-            scanDocumentIntent = new Intent(ServiceInventaireGeneralActivity.this, ScannerDocumentActivity.class);
-            scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteDocument);
-            scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'une préparation");
-            scanDocumentBundle.putString("Context", "Preparation");
-        }
-        else
-        {
-            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
-            {
-                scanDocumentIntent = new Intent(ServiceInventaireGeneralActivity.this, BarcodeCaptureActivity.class);
-                scanDocumentBundle.putBoolean("modeRafale", false);
-            }
-            else
-            {
-                scanDocumentIntent = new Intent(ServiceInventaireGeneralActivity.this, ScannerDocumentActivity.class);
-                scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteDocument);
-                scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'une préparation");
-                scanDocumentBundle.putString("Context", "Preparation");
-            }
-        }
-
-        scanDocumentIntent.putExtras(scanDocumentBundle);
-        ServiceInventaireGeneralActivity.this.startActivityForResult(scanDocumentIntent, CodesEchangesActivites.RETOUR_DOCUMENT);
     }
 
     @Override
@@ -377,102 +224,13 @@ public class ServiceInventaireGeneralActivity extends ServiceAvecConnexionActivi
 
     private void gestionAdapter()
     {
-        View dialogView = ServiceInventaireGeneralActivity.this.getLayoutInflater().inflate(R.layout.progressbar_modale, null);
-        ProgressBar progressBar = dialogView.findViewById(R.id.progressBar);
-        TextView tvProgress = dialogView.findViewById(R.id.tvProgress);
-
-        progressBar.setMax(inventaireLigneTempList.size());
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(ServiceInventaireGeneralActivity.this);
-        builder.setView(dialogView);
-        builder.setCancelable(false);
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-
-        List<String[]> listeInventaire = new ArrayList<>();
-
-        inventaireLigneTempList.sort(Comparator.comparing(Inventaire_Ligne_Temp::getDepotReference).thenComparing(Inventaire_Ligne_Temp::getZone));
-
-        new Thread(() -> {
-            String zonePrecedente = "";
-            String depotPrecedent = "";
-            String depotReferencePrecedent = "";
-            int nbLigneZone = 0;
-            int nbLigneZoneSaisie = 0;
-            String[] ligneInventaire = new String[8];
-
-            for (int i = 0; i < inventaireLigneTempList.size(); i++) {
-                final int progress = i + 1;
-
-                runOnUiThread(() -> {
-                    progressBar.setProgress(progress);
-                    tvProgress.setText(progress + " / " + inventaireLigneTempList.size());
-                });
-                Inventaire_Ligne_Temp inventaireLigneTemp = inventaireLigneTempList.get(i);
-                boolean estDernierElement = (i == inventaireLigneTempList.size() - 1);
-
-                inventaireCourant = InventaireOpenHelper.getInventaireById(db, inventaireLigneTemp.getInventaire_ID());
-                Depot depotCourant = DepotOpenHelper.getDepotParReference(db, inventaireLigneTemp.getDepotReference());
-
-                boolean memeDepot = depotPrecedent.contentEquals(depotCourant.getNom());
-                boolean memeZone  = zonePrecedente.contentEquals(inventaireLigneTemp.getZone());
-                boolean dateSaisie = !inventaireLigneTemp.getInventaireDate().contentEquals("")
-                        && !inventaireLigneTemp.getInventaireDate().contentEquals("null")
-                        && !inventaireLigneTemp.getInventaireDate().contentEquals("0000-00-00");
-
-                // Changement de zone ou de dépôt : on flush la ligne précédente
-                if ((!memeDepot || !memeZone) && nbLigneZone != 0) {
-                    ligneInventaire[0] = zonePrecedente;
-                    ligneInventaire[1] = String.valueOf(nbLigneZone);
-                    ligneInventaire[2] = String.valueOf(inventaireLigneTemp.getInventaire_ID());
-                    ligneInventaire[3] = depotPrecedent;
-                    ligneInventaire[4] = inventaireCourant.getClotureDate();
-                    ligneInventaire[5] = String.valueOf(nbLigneZoneSaisie);
-                    ligneInventaire[6] = (nbLigneZoneSaisie == nbLigneZone) ? "Saisie complète" : "À saisir";
-                    ligneInventaire[7] = depotReferencePrecedent;
-
-                    listeInventaire.add(ligneInventaire);
-                    ligneInventaire = new String[8];
-                    nbLigneZone = 0;
-                    nbLigneZoneSaisie = 0;
-                }
-
-                // Mise à jour des compteurs pour l'élément courant
-                nbLigneZone++;
-                if (Inventaire_Ligne_TempOpenHelper.isInventaireLigneTempCompte(db, inventaireLigneTemp.getInventaire_ID(), inventaireLigneTemp.getZone(), inventaireLigneTemp.getProduitID(), inventaireLigneTemp.getDepotReference())) nbLigneZoneSaisie++;
-
-                zonePrecedente  = inventaireLigneTemp.getZone();
-                depotPrecedent  = depotCourant.getNom();
-                depotReferencePrecedent = depotCourant.getDepot_Reference();
-
-                // Dernier élément : on flush
-                if (estDernierElement && nbLigneZone != 0) {
-                    ligneInventaire[0] = zonePrecedente;
-                    ligneInventaire[1] = String.valueOf(nbLigneZone);
-                    ligneInventaire[2] = String.valueOf(inventaireLigneTemp.getInventaire_ID());
-                    ligneInventaire[3] = depotCourant.getNom();
-                    ligneInventaire[4] = inventaireCourant.getClotureDate();
-                    ligneInventaire[5] = String.valueOf(nbLigneZoneSaisie);
-                    ligneInventaire[6] = (nbLigneZoneSaisie == nbLigneZone) ? "Saisie complète" : "À saisir";
-                    ligneInventaire[7] = depotReferencePrecedent;
-
-                    listeInventaire.add(ligneInventaire);
-                }
-            }
-
-            runOnUiThread(() -> {
-                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeDepotInventaire.size()-1));
-                ((TextView) findViewById(R.id.titre)).setText("dépôt à inventorier");
-                inventaireAdapter = new InventaireAdapter(ServiceInventaireGeneralActivity.this, db, listeInventaire, utilisateurConnecte);
-                inventaireListView.setAdapter(inventaireAdapter);
-                alertDialog.dismiss();
-            });
-        }).start();
-
-        if (inventaireLigneTempList.isEmpty()) {
-            vide = true;
-            nomServiceVide = "Inventaire Général";
-            ServiceInventaireGeneralActivity.this.finish();
+        if(depotAdapter == null) {
+            depotAdapter = new DepotAdapter(ServiceInventaireGeneralActivity.this, arrayDepot, utilisateurConnecte);
         }
+
+        depotListView.setAdapter(depotAdapter);
+
+        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(arrayDepot.size()));
+        ((TextView) findViewById(R.id.titre)).setText("Dépôts à inventorier");
     }
 }

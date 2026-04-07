@@ -15,8 +15,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textAlignment="center"
+            android:padding="5dp"
             android:entries="@array/liste_mois_spinner_date"
-            android:background="@drawable/background_cadre_bleu"/>
+            android:background="@android:color/transparent"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -33,7 +34,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:textAlignment="center"
-            android:background="@drawable/background_cadre_bleu"/>
+            android:padding="5dp"
+            android:background="@android:color/transparent"/>
 
     </LinearLayout>
 

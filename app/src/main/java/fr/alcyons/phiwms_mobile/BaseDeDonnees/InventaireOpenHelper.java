@@ -25,6 +25,10 @@ public class InventaireOpenHelper extends DBOpenHelper {
         db.delete(Constantes.TABLE_INVENTAIRE, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(inventaire.getPhiMR4UUID())});
     }
 
+    public static void viderTableInventaire(SQLiteDatabase db) {
+        db.delete(Constantes.TABLE_INVENTAIRE, null, null);
+    }
+
     public static List<Inventaire> getAllInventaire(SQLiteDatabase db) {
         List<Inventaire> inventaireList = new ArrayList<>();
 

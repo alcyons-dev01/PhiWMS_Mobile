@@ -243,6 +243,34 @@ public class ProduitOpenHelper extends DBOpenHelper {
         return produit;
     }
 
+    public static Produit getUnProduitByDesignation(SQLiteDatabase db, String designation)
+    {
+        Produit produit = null;
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT + " = '"+designation+"'", new String[]{});
+
+        if(cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            produit = new Produit(cursor);
+        }
+        cursor.close();
+        cursor = null;
+        return produit;
+    }
+
+    public static List<String> getProduitByDesignation(SQLiteDatabase db, String designation)
+    {
+        List<String> produitList = new ArrayList<>();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT + " LIKE '"+designation+"%'", new String[]{});
+
+        while (cursor.moveToNext()) {
+            Produit produit = new Produit(cursor);
+            produitList.add(produit.getDesignation_interne());
+        }
+        cursor.close();
+        cursor = null;
+        return produitList;
+    }
+
     public static List<Produit> getProduitsNonIdentifier(SQLiteDatabase db) {
         List<Produit> produitList = new ArrayList<>();
         Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + Constantes.CLE_COL_GTIN_PRODUIT + "= \"\" AND "+Constantes.CLE_COL_CODE_INCONNU+"= \"\" AND "+Constantes.CLE_COL_ARRET_COMMANDE_PRODUIT+" != 1 ORDER BY "+Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT, new String[]{});

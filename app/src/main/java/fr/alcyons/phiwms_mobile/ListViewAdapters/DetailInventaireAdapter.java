@@ -3,6 +3,7 @@ package fr.alcyons.phiwms_mobile.ListViewAdapters;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
 
@@ -24,6 +26,7 @@ import java.util.List;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Inventaire_Ligne_TempOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp;
 import fr.alcyons.phiwms_mobile.Inventaire.DetailInventaire_V2Activity;
+import fr.alcyons.phiwms_mobile.Inventaire.DetailInventaire_V3;
 import fr.alcyons.phiwms_mobile.R;
 
 public class DetailInventaireAdapter extends ArrayAdapter {
@@ -33,6 +36,16 @@ public class DetailInventaireAdapter extends ArrayAdapter {
     Context context;
     SQLiteDatabase db;
     ReferenceFilter filter;
+    private int selectedPosition = -1;
+
+    public void setSelectedPosition(int position) {
+        this.selectedPosition = position;
+        notifyDataSetChanged();
+    }
+
+    public int getSelectedPosition() {
+        return selectedPosition;
+    }
 
     public DetailInventaireAdapter(Context context, List<Inventaire_Ligne_Temp> inventaireLigneTempList, SQLiteDatabase db) {
         super(context, 0, inventaireLigneTempList);
@@ -64,12 +77,12 @@ public class DetailInventaireAdapter extends ArrayAdapter {
             viewHolder.nomProduit = (TextView) convertView.findViewById(R.id.nomProduit);
             viewHolder.refProduit = (TextView) convertView.findViewById(R.id.refProduit);
             viewHolder.fournisseurProduit = (TextView) convertView.findViewById(R.id.fournisseurProduit);
-            viewHolder.stockSaisie = (TextView) convertView.findViewById(R.id.stockSaisie);
+            /*viewHolder.stockSaisie = (TextView) convertView.findViewById(R.id.stockSaisie);
             viewHolder.imageStatutSaisie_IV = (ImageView) convertView.findViewById(R.id.imageStatutSaisie_IV);
             viewHolder.layoutPrincipal_LL = (LinearLayout) convertView.findViewById(R.id.layoutPrincipal_LL);
             viewHolder.layoutAjoutManuelle = (LinearLayout) convertView.findViewById(R.id.layoutAjoutManuelle);
             viewHolder.layoutDetail = (LinearLayout) convertView.findViewById(R.id.layoutDetail);
-            viewHolder.progressBarReference_PB = (ProgressBar) convertView.findViewById(R.id.progressBarReference_PB);
+            viewHolder.progressBarReference_PB = (ProgressBar) convertView.findViewById(R.id.progressBarReference_PB);*/
             convertView.setTag(viewHolder);
         }
 
@@ -91,11 +104,17 @@ public class DetailInventaireAdapter extends ArrayAdapter {
             viewHolder.stockSaisie.setTextColor(ResourcesCompat.getColor(context.getResources(), R.color.vert,null));
         }
 
-        viewHolder.layoutAjoutManuelle.setOnClickListener(view -> ((DetailInventaire_V2Activity)context).ajoutManuel(position));
-
-        viewHolder.layoutDetail.setOnClickListener(view -> ((DetailInventaire_V2Activity)context).versDetail(position));
-
-        viewHolder.stockSaisie.setOnClickListener(view -> ((DetailInventaire_V2Activity)context).versDetail(position));
+        if (position == selectedPosition) {
+            ViewCompat.setBackgroundTintList(
+                    viewHolder.layoutPrincipal_LL,
+                    ColorStateList.valueOf(ContextCompat.getColor(context, R.color.bleu_clair_alcyons_transparent))
+            );
+        } else {
+            ViewCompat.setBackgroundTintList(
+                    viewHolder.layoutPrincipal_LL,
+                    null
+            );
+        }
         return convertView;
     }
 

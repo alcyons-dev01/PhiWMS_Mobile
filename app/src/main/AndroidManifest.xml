@@ -736,11 +736,25 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation|keyboardHidden"/>
+
+        <activity
+            android:name="fr.alcyons.phiwms_mobile.Inventaire.InventaireZoneActivity"
+            android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|keyboardHidden"/>
         <activity
             android:name="fr.alcyons.phiwms_mobile.Inventaire.DetailInventaire_V2Activity"
             android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|keyboardHidden"/>
+
+        <activity
+            android:name="fr.alcyons.phiwms_mobile.Inventaire.DetailInventaire_V3"
+            android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize"
             android:configChanges="orientation|keyboardHidden"/>
         <activity
             android:name="fr.alcyons.phiwms_mobile.Inventaire.ListeLotInventaireActivity"
