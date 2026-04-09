@@ -44,17 +44,6 @@
             android:layout_weight="1"/>
 
         <ImageButton
-            android:id="@+id/btnAlcyons"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="16dp"
-            android:background="@drawable/bouton_alcyons"
-            android:src="@drawable/ic_setting"
-            android:contentDescription="Alcyons"
-            android:scaleType="centerInside"/>
-
-        <ImageButton
             android:id="@+id/btnActiveSon"
             android:layout_width="48dp"
             android:layout_height="48dp"

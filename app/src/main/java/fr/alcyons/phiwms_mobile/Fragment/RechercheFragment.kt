@@ -1,5 +1,6 @@
 package fr.alcyons.phiwms_mobile.Fragment
 
+import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.text.Editable
@@ -15,17 +16,19 @@ import androidx.fragment.app.Fragment
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
 import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp
 import fr.alcyons.phiwms_mobile.Inventaire.DetailInventaire_V3
+import fr.alcyons.phiwms_mobile.Inventaire.Fragment.ACompterFragment
 import fr.alcyons.phiwms_mobile.R
 
 class RechercheFragment : Fragment() {
-    interface OnElementSelectionnéListener {
-        fun onElementSelectionne(element: Inventaire_Ligne_Temp) // ou ton type d'objet
+    interface OnElementRechercheListener {
+        fun onElementRechercher(element: Int) // ou ton type d'objet
     }
+
     private lateinit var barreDeRecherche: EditText
     private lateinit var resultatsLV: ListView
     private lateinit var effacerRechercher_IV: ImageView
     private lateinit var adapter: ArrayAdapter<String> // ou ton adapter custom
-    private var listener: OnElementSelectionnéListener? = null
+    private var listener: OnElementRechercheListener? = null
     private lateinit var db: SQLiteDatabase // ton type de BDD
 
     companion object {
@@ -38,7 +41,22 @@ class RechercheFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = context as? RechercheFragment.OnElementRechercheListener
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
+    }
+
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_recherche, container, false)
     }
 
@@ -50,7 +68,8 @@ class RechercheFragment : Fragment() {
         effacerRechercher_IV = view.findViewById(R.id.effacerRechercher_IV)
         resultatsLV.isNestedScrollingEnabled = true
         // Liste vide au départ
-        adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, mutableListOf())
+        adapter =
+            ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, mutableListOf())
         resultatsLV.adapter = adapter
         db = (requireActivity() as DetailInventaire_V3).db
 
@@ -75,15 +94,15 @@ class RechercheFragment : Fragment() {
         resultatsLV.setOnItemClickListener { _, _, position, _ ->
             val elementSelectionne = adapter.getItem(position)
 
+            val produitIdentifier = ProduitOpenHelper.getUnProduitByDesignation(db, elementSelectionne)
 
-            //elementSelectionne?.let { listener?.onElementSelectionne(it) }
+            if(produitIdentifier != null)
+                elementSelectionne?.let { listener?.onElementRechercher(produitIdentifier.iD_produit) }
         }
     }
 
     private fun lancerRecherche(query: String) {
-        // Lancer ta requête BDD ici (Room, SQLite...)
-        // Exemple fictif :
-        val resultats = ProduitOpenHelper.getProduitByDesignation(db, query) // à remplacer
+        val resultats = ProduitOpenHelper.getProduitByDesignation(db, query)
 
         adapter.clear()
         adapter.addAll(resultats)

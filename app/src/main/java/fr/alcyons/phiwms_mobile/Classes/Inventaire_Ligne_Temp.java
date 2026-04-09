@@ -7,7 +7,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Inventaire_Ligne_TempOpenHelper;
@@ -16,6 +20,8 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses;
 
 import static fr.alcyons.phiwms_mobile.Outils.OutilsGestionClasses.recupererBooleen;
+import static kotlin.random.RandomKt.Random;
+
 public class Inventaire_Ligne_Temp implements Serializable, Comparable {
 
     private int produitID;
@@ -48,6 +54,7 @@ public class Inventaire_Ligne_Temp implements Serializable, Comparable {
 
     private String inventaireDate;
     private boolean synchroniser;
+    private int etablissement_uid;
 
     public Inventaire_Ligne_Temp(Cursor cursor) {
         this.produitID = cursor.getInt(Inventaire_Ligne_TempOpenHelper.Constantes.NUM_COL_PRODUITID_INVENTAIRE_LIGNE_TEMP);
@@ -78,6 +85,7 @@ public class Inventaire_Ligne_Temp implements Serializable, Comparable {
         this._UID = cursor.getInt(Inventaire_Ligne_TempOpenHelper.Constantes.NUM_COL__UID_INVENTAIRE_LIGNE_TEMP);
         this.inventaireDate = cursor.getString(Inventaire_Ligne_TempOpenHelper.Constantes.NUM_COL_INVENTAIRE_DATE_INVENTAIRE_LIGNE_TEMP);
         this.synchroniser = OutilsGestionClasses.recupererBooleen(cursor, Inventaire_Ligne_TempOpenHelper.Constantes.NUM_COL_SYNCHRONISER_INVENTAIRE_LIGNE_TEMP);
+        this.etablissement_uid = cursor.getInt(Inventaire_Ligne_TempOpenHelper.Constantes.NUM_COL_ETABLISSEMENTUID_INVENTAIRE_LIGNE_TEMP);
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
@@ -110,6 +118,7 @@ public class Inventaire_Ligne_Temp implements Serializable, Comparable {
         this._UID = jsonObject.optInt("_UID");
         this.inventaireDate = jsonObject.optString("inventaireDate");
         this.synchroniser = jsonObject.optBoolean("synchroniser");
+        this.etablissement_uid = jsonObject.optInt("Etablissement_UID");
     }
 
     public Inventaire_Ligne_Temp(Produit produit, Map<String, String> gs1Decoupe, Depot depot) {
@@ -199,6 +208,40 @@ public class Inventaire_Ligne_Temp implements Serializable, Comparable {
         this.zone = inventaireLigneTemp.getZone();
         this.emplacement = inventaireLigneTemp.getEmplacement();
         this.synchroniser = inventaireLigneTemp.isSynchroniser();
+        this.etablissement_uid = inventaireLigneTemp.getEtablissement_uid();
+    }
+
+    public Inventaire_Ligne_Temp(int produitId, int inventaire_ID)
+    {
+        this.produitID = produitId;
+        this.Inventaire_ID = inventaire_ID;
+    }
+
+    public  Inventaire_Ligne_Temp(Produit produit, int inventaire_ID, Depot depotCourant, Utilisateur utilisateur, String zone)
+    {
+        Random randominventairelignetemp = new Random();
+        int inventairelignetempid = randominventairelignetemp.nextInt();
+        if (inventairelignetempid > 0) inventairelignetempid *= -1;
+
+        this._UID = inventairelignetempid;
+        this.produitID = produit.getID_produit();
+        this.designation = produit.getDesignation_interne();
+        this.categorie = produit.getCategorie();
+        this.fournisseurNom = produit.getFournisseur();
+        this.produitReference = produit.getRef_fourni();
+        this.depotReference = depotCourant.getDepot_Reference();
+        this._SYS_DT_MAJ = getDateDuJour();
+        this._SYS_HEURE_MAJ = getHeureDuJour();
+        this._SYS_USER_MAJ = utilisateur.getIdentifiant();
+        this.zone = zone;
+        this.Cond_Achat = produit.getCond_achat();
+        this.classe = String.valueOf(produit.getClasse_numero());
+        this.stockPhysique = (double) -1;
+        this.lot = "";
+        this.synchroniser = false;
+        this.PeremptionDate = "0000-00-00";
+        this.Inventaire_ID = inventaire_ID;
+        this.etablissement_uid = utilisateur.getEtablissementId();
     }
 
     public String getGS1(SQLiteDatabase db) {
@@ -443,6 +486,14 @@ public class Inventaire_Ligne_Temp implements Serializable, Comparable {
         this.synchroniser = synchroniser;
     }
 
+    public int getEtablissement_uid() {
+        return etablissement_uid;
+    }
+
+    public void setEtablissement_uid(int etablissementUid) {
+        this.etablissement_uid = etablissementUid;
+    }
+
     @Override
     public boolean equals(Object obj) {
         boolean valeurARetourner = false;
@@ -507,11 +558,20 @@ public class Inventaire_Ligne_Temp implements Serializable, Comparable {
             jsonObject.put("inventaireDate", inventaireDate);
             jsonObject.put("_UID", _UID);
             jsonObject.put("Synchroniser", synchroniser);
+            jsonObject.put("Etablissement_UID", etablissement_uid);
         } catch (JSONException e) {
             e.printStackTrace();
             jsonObject = null;
         }
 
         return jsonObject;
+    }
+
+    private String getDateDuJour() {
+        return new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+    }
+
+    private String getHeureDuJour() {
+        return new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
     }
 }

@@ -148,7 +148,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="#FFF8E1"
+            android:background="#C8E6C9"
             android:paddingHorizontal="12dp"
             android:paddingVertical="8dp">
 

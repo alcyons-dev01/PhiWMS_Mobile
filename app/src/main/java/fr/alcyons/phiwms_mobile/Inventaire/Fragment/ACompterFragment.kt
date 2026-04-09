@@ -13,13 +13,13 @@ import fr.alcyons.phiwms_mobile.Inventaire.Adapter.ACompterAdapter
 import fr.alcyons.phiwms_mobile.R
 
 class ACompterFragment : Fragment() {
-    interface OnElementSelectionnéListener {
+    interface OnElementSelectionneListener {
         fun onElementSelectionne(element: Inventaire_Ligne_Temp) // ou ton type d'objet
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        listener = context as? ACompterFragment.OnElementSelectionnéListener
+        listener = context as? ACompterFragment.OnElementSelectionneListener
     }
 
     override fun onDetach() {
@@ -28,7 +28,7 @@ class ACompterFragment : Fragment() {
     }
 
     private lateinit var liste_inventaireLigneTemp_LV: ListView
-    private var listener: OnElementSelectionnéListener? = null
+    private var listener: OnElementSelectionneListener? = null
     private lateinit var db: SQLiteDatabase // ton type de BDD
     private lateinit var adapter: ACompterAdapter
 

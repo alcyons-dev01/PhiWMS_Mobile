@@ -4,15 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/background_empty_radius_top"
     android:elevation="8dp">
 
     <!-- Header : Désignation -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/background_empty_radius_top"
-        android:backgroundTint="@color/bleu_fonce_alcyons"
+        android:background="@color/bleu_fonce_alcyons"
         android:padding="14dp">
 
         <TextView
@@ -25,6 +23,27 @@
             android:gravity="center"
             android:maxLines="3"
             android:ellipsize="end"/>
+
+    </LinearLayout>
+
+    <!-- Bandeau nouvelle référence -->
+    <LinearLayout
+        android:id="@+id/bandeauNouvelleReference_LL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#C62828"
+        android:padding="8dp"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nouvelle référence inventoriée"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"/>
 
     </LinearLayout>
 
@@ -159,70 +178,14 @@
 
         </LinearLayout>
 
-        <!-- Quantité -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="0dp"
-            app:cardBackgroundColor="#E8EAF6">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Quantité"
-                    android:textColor="@color/bleu_fonce_alcyons"
-                    android:textSize="10sp"
-                    android:alpha="0.6"
-                    android:layout_marginBottom="6dp"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:id="@+id/layoutMoins_LL"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:background="@drawable/minus_circle"/>
-
-                    <EditText
-                        android:id="@+id/quantiteComptee_ET"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:inputType="number"
-                        android:textColor="@color/bleu_fonce_alcyons"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:background="@android:color/transparent"/>
-
-                    <ImageView
-                        android:id="@+id/layoutPlus_LL"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:background="@drawable/ic_plus"/>
-
-                </LinearLayout>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
         <!-- Carton fermé / Carton ouvert -->
         <androidx.cardview.widget.CardView
+            android:id="@+id/layoutCarton_CV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="8dp"
             app:cardElevation="0dp"
+            android:layout_marginBottom="10dp"
             app:cardBackgroundColor="#E8EAF6">
 
             <LinearLayout
@@ -276,6 +239,63 @@
 
                 </LinearLayout>
 
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Quantité -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#E8EAF6">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Quantité"
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textSize="10sp"
+                    android:alpha="0.6"
+                    android:layout_marginBottom="6dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:id="@+id/layoutMoins_LL"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/minus_circle"/>
+
+                    <EditText
+                        android:id="@+id/quantiteComptee_ET"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:inputType="number"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:background="@android:color/transparent"/>
+
+                    <ImageView
+                        android:id="@+id/layoutPlus_LL"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/ic_plus"/>
+
+                </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

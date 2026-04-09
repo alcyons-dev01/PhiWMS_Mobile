@@ -522,6 +522,7 @@ public class Alerte {
             }
         });
     }
+
     public static void afficherAlerteConfirmation(Context context, LayoutInflater inflater, final Bundle bundle, String message, boolean retourService, boolean confirmation, Activity activity)
     {
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
@@ -558,6 +559,7 @@ public class Alerte {
 
         buttonAnnuler.setOnClickListener(v -> alertDialog.dismiss());
     }
+
 
     public static void afficherAlerteTripleChoix(Context context, LayoutInflater inflater, final Bundle bundle, String titre, String message, String text1, String text2, String text3, Activity activity)
     {

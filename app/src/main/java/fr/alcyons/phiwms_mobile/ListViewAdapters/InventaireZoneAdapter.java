@@ -71,7 +71,7 @@ public class InventaireZoneAdapter  extends ArrayAdapter implements Filterable {
         if (inventaire != null) {
             String nomZone = inventaire.optString("zone");
             int nbTotalLigne = inventaire.optInt("nb_total");
-            int nbLigneSaisie = inventaire.optInt("nb_stock_saisie");
+            int nbLigneSaisie = inventaire.optInt("nb_stock_saisi");
 
             if(nbLigneSaisie == nbTotalLigne)
             {
@@ -100,8 +100,8 @@ public class InventaireZoneAdapter  extends ArrayAdapter implements Filterable {
 
             viewHolder.zoneInventaire_TV.setText(nomZone);
             viewHolder.depotInventaire_TV.setText(depot.getNom());
-            viewHolder.inventaireLigneCompte_TV.setText(String.valueOf(Inventaire_Ligne_TempOpenHelper.getILTCompte(db, inventaireCourant.getInventaire_ID(), nomZone, depot.getDepot_Reference())));
-            viewHolder.inventaireLigneTotal_TV.setText(String.valueOf(Inventaire_Ligne_TempOpenHelper.getILTTotal(db, inventaireCourant.getInventaire_ID(), nomZone, depot.getDepot_Reference())));
+            viewHolder.inventaireLigneCompte_TV.setText(String.valueOf(nbLigneSaisie));
+            viewHolder.inventaireLigneTotal_TV.setText(String.valueOf(nbTotalLigne));
         }
 
         return convertView;

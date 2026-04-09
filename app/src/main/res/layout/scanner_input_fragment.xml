@@ -1,0 +1,111 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/noir">
+
+    <!-- EditText centré -->
+    <LinearLayout
+        android:id="@+id/layoutEditText_LL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingHorizontal="10dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/descriptionCode_TV"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintVertical_bias="0.5">
+
+        <EditText
+            android:id="@+id/scannerInput_ET"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/cadre_bleu"
+            android:padding="10dp"
+            android:textColor="@color/blanc"
+            android:gravity="center"
+            android:text=""/>
+
+    </LinearLayout>
+
+    <!-- Description sous l'EditText -->
+    <TextView
+        android:id="@+id/descriptionCode_TV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="@color/blanc"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:paddingHorizontal="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/layoutEditText_LL"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintVertical_chainStyle="packed"/>
+
+    <!-- Fond validation -->
+    <LinearLayout
+        android:id="@+id/layoutFondValidation"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/vert"
+        android:orientation="vertical"
+        android:alpha="0.7"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <!-- Barre du haut avec boutons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnActiveSon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:background="@drawable/bouton_son_actif"
+            android:src="@drawable/ic_sound_active"
+            android:contentDescription="Alcyons"
+            android:scaleType="centerInside"/>
+
+        <ImageButton
+            android:id="@+id/btnInactiveSon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:background="@drawable/bouton_son_inactif"
+            android:src="@drawable/ic_sound_disable"
+            android:contentDescription="Alcyons"
+            android:scaleType="centerInside"
+            android:visibility="gone"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <ImageButton
+            android:id="@+id/btnClose"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/bouton_close"
+            android:src="@drawable/ic_close"
+            android:contentDescription="Quitter le scan"/>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

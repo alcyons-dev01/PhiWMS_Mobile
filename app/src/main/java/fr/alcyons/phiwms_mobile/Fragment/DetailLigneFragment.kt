@@ -1,42 +1,53 @@
 package fr.alcyons.phiwms_mobile.Fragment
 
-import android.content.res.ColorStateList
+import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
 import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp
-import fr.alcyons.phiwms_mobile.Classes.Produit
 import fr.alcyons.phiwms_mobile.Inventaire.DetailInventaire_V3
+import fr.alcyons.phiwms_mobile.Outils.Alerte
 import fr.alcyons.phiwms_mobile.R
 import java.util.Calendar
+import java.util.Objects
 
 class DetailLigneFragment : Fragment() {
 
     var onFermer: (() -> Unit)? = null
-    var onValider: ((qte: Int, lot: String, datePeremption: String) -> Unit)? = null
+    var onValider: ((ligne: Inventaire_Ligne_Temp, ajout:Boolean) -> Unit)? = null
     private lateinit var db: SQLiteDatabase // ton type de BDD
+    var nouvelleCreation: Boolean = false
+
+    var lotPrecedent: String = ""
 
     companion object {
         private const val ARG_LIGNE = "ligne"
 
-        fun newInstance(ligne: Inventaire_Ligne_Temp?) = DetailLigneFragment().apply {
-            arguments = Bundle().apply {
-                putSerializable(ARG_LIGNE, ligne)
+        fun newInstance(ligne: Inventaire_Ligne_Temp?, nouvelleCreation: Boolean = false) =
+            DetailLigneFragment().apply {
+                arguments = Bundle().apply {
+                    putSerializable(ARG_LIGNE, ligne)
+                }
+                this.nouvelleCreation = nouvelleCreation
             }
-        }
     }
 
     override fun onCreateView(
@@ -89,24 +100,60 @@ class DetailLigneFragment : Fragment() {
         val quantiteCompteeET = view.findViewById<EditText>(R.id.quantiteComptee_ET)
 
         //gestion du conditionnment
-        textCartonFermerTV.text = textCartonFermerTV.getText().toString() + " (x" + ligne.cond_Achat.toInt() + ")"
+        textCartonFermerTV.text =
+            textCartonFermerTV.getText().toString() + " (x" + ligne.cond_Achat.toInt() + ")"
         layoutCartonFermerLL.setOnClickListener { _: View? ->
             conditionnement = ligne.cond_Achat.toInt()
-            layoutCartonFermerLL.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.bleu_fonce_alcyons))
-            layoutCartonOuvertLL.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.transparent))
+            layoutCartonFermerLL.setBackgroundColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.bleu_fonce_alcyons
+                )
+            )
+            layoutCartonOuvertLL.setBackgroundColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    android.R.color.transparent
+                )
+            )
             textCartonFermerTV.setTextColor(ContextCompat.getColor(requireContext(), R.color.blanc))
-            textCartonOuvert_TV.setTextColor(ContextCompat.getColor(requireContext(), R.color.bleu_fonce_alcyons))
+            textCartonOuvert_TV.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.bleu_fonce_alcyons
+                )
+            )
         }
         layoutCartonOuvertLL.setOnClickListener { _: View? ->
             conditionnement = 1
-            layoutCartonOuvertLL.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.bleu_fonce_alcyons))
-            layoutCartonFermerLL.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.transparent))
-            textCartonFermerTV.setTextColor(ContextCompat.getColor(requireContext(), R.color.bleu_fonce_alcyons))
-            textCartonOuvert_TV.setTextColor(ContextCompat.getColor(requireContext(), R.color.blanc))
+            layoutCartonOuvertLL.setBackgroundColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.bleu_fonce_alcyons
+                )
+            )
+            layoutCartonFermerLL.setBackgroundColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    android.R.color.transparent
+                )
+            )
+            textCartonFermerTV.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.bleu_fonce_alcyons
+                )
+            )
+            textCartonOuvert_TV.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.blanc
+                )
+            )
         }
         layoutPlusLL.setOnClickListener { _: View? ->
             var qteActuelle = quantiteCompteeET.text.toString().toInt()
-            if(qteActuelle == -1)
+            if (qteActuelle == -1)
                 qteActuelle = 0
             qteActuelle += conditionnement
             quantiteCompteeET.setText(qteActuelle.toString())
@@ -118,6 +165,11 @@ class DetailLigneFragment : Fragment() {
             quantiteCompteeET.setText(qteActuelle.toString())
         }
 
+        if (ligne.cond_Achat.toInt() == 1) {
+            conditionnement = 1
+            view.findViewById<CardView>(R.id.layoutCarton_CV).visibility = View.GONE
+        }
+
         //gestion de la date de péremption
         adapterMoisPeremption.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerMoisDatePeremptionSP.adapter = adapterMoisPeremption
@@ -125,7 +177,7 @@ class DetailLigneFragment : Fragment() {
         spinnerAnneeDatePeremptionSP.adapter = adapterAnneePeremption
         spinnerAnneeDatePeremptionSP.setSelection(3)
 
-        if (!ligne.peremptionDate.isNullOrEmpty() && ligne.peremptionDate != "0000-00-00") {
+        if (!ligne.peremptionDate.isNullOrEmpty() && ligne.peremptionDate != "0000-00-00" && !nouvelleCreation) {
             val parts = ligne.peremptionDate.split("-")
             val annee = parts[0] // "2026"
             val mois = parts[1].toInt() - 1 // "04" → index 3 (0-based)
@@ -140,9 +192,7 @@ class DetailLigneFragment : Fragment() {
             if (positionAnnee != -1) {
                 spinnerAnneeDatePeremptionSP.setSelection(positionAnnee)
             }
-        }
-        else
-        {
+        } else {
             view.findViewById<CardView>(R.id.layoutDatePeremption_CV).visibility = View.INVISIBLE
         }
 
@@ -150,33 +200,63 @@ class DetailLigneFragment : Fragment() {
         view.findViewById<TextView>(R.id.emplacementLot_TV).text = ligne.emplacement
         view.findViewById<TextView>(R.id.designationReference_TV).text = ligne.designation
         view.findViewById<EditText>(R.id.numeroLot_ET).setText(ligne.lot.toString())
+        lotPrecedent = ligne.lot
         quantiteCompteeET.setText(ligne.stockPhysique.toInt().toString())
 
         //gestion du suivi de lot et de péremption
         val produit = ProduitOpenHelper.getProduitByID(db, ligne.produitID)
-        if(!produit.isSuivi_Lot && !produit.isPeremption)
-        {
-            view.findViewById<CardView>(R.id.layoutLotPeremption_LL).visibility = View.GONE
-        }
-        else
-        {
-            if(!produit.isSuivi_Lot)
-            {
+        if (!produit.isSuivi_Lot && !produit.isPeremption) {
+            view.findViewById<LinearLayout>(R.id.layoutLotPeremption_LL).visibility = View.GONE
+        } else {
+            if (!produit.isSuivi_Lot) {
                 view.findViewById<EditText>(R.id.numeroLot_ET).isFocusable = false
-                if(!produit.isPeremption)
-                    view.findViewById<CardView>(R.id.layoutDatePeremption_CV).visibility = View.INVISIBLE
-            }
+                if (!produit.isPeremption)
+                    view.findViewById<CardView>(R.id.layoutDatePeremption_CV).visibility =
+                        View.INVISIBLE
+            } else
+                view.findViewById<CardView>(R.id.layoutDatePeremption_CV).visibility = View.VISIBLE
         }
 
         //gestion de la fermeture
-        view.findViewById<LinearLayout>(R.id.layoutFermer_LL).setOnClickListener { onFermer?.invoke() }
+        view.findViewById<LinearLayout>(R.id.layoutFermer_LL)
+            .setOnClickListener { onFermer?.invoke() }
+
+        //gestion du bandeau nouvelle création
+        if (nouvelleCreation)
+            view.findViewById<LinearLayout>(R.id.bandeauNouvelleReference_LL).visibility =
+                View.VISIBLE
 
         //gestion de la validation
         view.findViewById<LinearLayout>(R.id.layoutValider_LL).setOnClickListener {
-            val qte  = quantiteCompteeET.text.toString().toIntOrNull() ?: 0
-            val lot  = view.findViewById<EditText>(R.id.numeroLot_ET).text.toString().trim()
-            val date = "2025-01-01" // récupérez depuis vos spinners
-            onValider?.invoke(qte, lot, date)
+            val qte = quantiteCompteeET.text.toString().toIntOrNull() ?: 0
+            val lot = view.findViewById<EditText>(R.id.numeroLot_ET).text.toString().trim()
+
+            val moisIndex = spinnerMoisDatePeremptionSP.selectedItemPosition + 1 // 1-based
+            val annee = spinnerAnneeDatePeremptionSP.selectedItem.toString()
+            // Dernier jour du mois sélectionné
+            val calendar = Calendar.getInstance()
+            calendar.set(Calendar.YEAR, annee.toInt())
+            calendar.set(Calendar.MONTH, moisIndex - 1) // Calendar est 0-based
+            calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+            val moisFormate = String.format("%02d", moisIndex)
+            val jour = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+            val datePeremption = "$annee-$moisFormate-$jour"
+
+            ligne.lot = lot
+            ligne.stockPhysique = qte.toDouble()
+            ligne.peremptionDate = datePeremption
+
+            var ajout : Boolean = false
+
+            if(lot != lotPrecedent)
+            {
+                demandeConfirmation(layoutInflater) { resultat ->
+                    ajout = resultat
+                    onValider?.invoke(ligne, ajout)
+                }
+            }
+            else
+                onValider?.invoke(ligne, ajout)
         }
     }
 
@@ -203,5 +283,35 @@ class DetailLigneFragment : Fragment() {
         }
 
         return tableauAnnee
+    }
+
+    fun demandeConfirmation(inflater: LayoutInflater, onResultat: (Boolean) -> Unit) {
+        val builder = context?.let { AlertDialog.Builder(it) }
+        val layout = inflater.inflate(R.layout.alerte_confirmation, null)
+
+        val zoneok = layout.findViewById<LinearLayout>(R.id.buttonOk)
+        val buttonAnnuler = layout.findViewById<LinearLayout>(R.id.buttonAnnuler)
+        val messageTextView = layout.findViewById<TextView>(R.id.messageFin)
+
+        messageTextView.text = "Souhaitez-vous modifier ou ajouter le lot ?"
+        layout.findViewById<TextView>(R.id.TitreAnnulation).text = "Modifier"
+        layout.findViewById<TextView>(R.id.TitreConfirmation).text = "Ajouter"
+
+        builder?.setView(layout)
+
+        val alertDialog = builder?.create()
+        alertDialog?.window?.setGravity(Gravity.CENTER)
+        alertDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        alertDialog?.show()
+
+        zoneok.setOnClickListener {
+            alertDialog?.dismiss()
+            onResultat(true)
+        }
+
+        buttonAnnuler.setOnClickListener {
+            alertDialog?.dismiss()
+            onResultat(false)
+        }
     }
 }

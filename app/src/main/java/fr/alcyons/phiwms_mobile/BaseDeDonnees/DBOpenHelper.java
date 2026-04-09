@@ -183,6 +183,12 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         if (ProduitPlaceExisteCursor.getCount() == 0) {
             db.execSQL(ProduitPlaceOpenHelper.Constantes.CREATION_TABLE_PRODUIT_PLACE);
         }
+
+        Cursor inventaireLigneTempEtablissementUIDCursor = db.rawQuery("SELECT * FROM " + TABLE_INVENTAIRE_LIGNE_TEMP, null);
+        int inventaireLigneTempEtablissementUIDColumn = inventaireLigneTempEtablissementUIDCursor.getColumnIndex("Etablissement_UID");
+        if (inventaireLigneTempEtablissementUIDColumn < 0) {
+            db.execSQL("ALTER TABLE " + TABLE_INVENTAIRE_LIGNE_TEMP + " ADD COLUMN Etablissement_UID INTEGER");
+        }
     }
 
     public SQLiteDatabase

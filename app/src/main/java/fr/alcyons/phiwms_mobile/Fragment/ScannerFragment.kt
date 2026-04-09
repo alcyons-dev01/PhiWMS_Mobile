@@ -28,7 +28,6 @@ class ScannerFragment : Fragment() {
 
     private lateinit var barcodeView: DecoratedBarcodeView
     private lateinit var btnFlash: ImageButton
-    private lateinit var btnAlcyons: ImageButton
     private lateinit var btnActiveSon: ImageButton
     private lateinit var btnInactiveSon: ImageButton
     private lateinit var btnClose: ImageButton
@@ -42,7 +41,7 @@ class ScannerFragment : Fragment() {
     private val windowMs = 1000L
     private val scannerScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    val toneGenerator = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100)
+    private var toneGenerator: ToneGenerator? = null
 
     // Callback vers l'activité parente
     var onCodeScanned: ((String) -> Unit)? = null
@@ -57,10 +56,10 @@ class ScannerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        toneGenerator = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100)
 
         barcodeView   = view.findViewById(R.id.barcodeView)
         btnFlash      = view.findViewById(R.id.btnFlash)
-        btnAlcyons    = view.findViewById(R.id.btnAlcyons)
         btnActiveSon  = view.findViewById(R.id.btnActiveSon)
         btnInactiveSon= view.findViewById(R.id.btnInactiveSon)
         btnClose      = view.findViewById(R.id.btnClose)
@@ -83,19 +82,6 @@ class ScannerFragment : Fragment() {
             isSoundOn = true
             btnInactiveSon.visibility = View.GONE
             btnActiveSon.visibility = View.VISIBLE
-        }
-
-        // Bouton debug Alcyons (optionnel, adaptez selon vos besoins)
-        btnAlcyons.setOnClickListener { v ->
-            val popup = PopupMenu(requireContext(), v)
-            popup.menuInflater.inflate(R.menu.alcyons_scan_option, popup.menu)
-            popup.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.action_gs1 -> { fireCode("01076401510872961721123110ABCDEF"); true }
-                    else -> false
-                }
-            }
-            popup.show()
         }
 
         val formats = listOf(
@@ -127,7 +113,7 @@ class ScannerFragment : Fragment() {
                 else
                     handleSplitScan(texte) ?: return
 
-                if (isSoundOn) toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 150)
+                if (isSoundOn) toneGenerator?.startTone(ToneGenerator.TONE_PROP_BEEP, 150)
                 fireCode(code)
             }
         })
@@ -175,5 +161,7 @@ class ScannerFragment : Fragment() {
 
     override fun onResume()  { super.onResume();  barcodeView.resume() }
     override fun onPause()   { super.onPause();   barcodeView.pause()  }
-    override fun onDestroy() { super.onDestroy(); toneGenerator.release() }
+    override fun onDestroy() { super.onDestroy();     super.onDestroy()
+        toneGenerator?.release()
+        toneGenerator = null }
 }

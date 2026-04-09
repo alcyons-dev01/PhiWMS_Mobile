@@ -12,12 +12,12 @@ import fr.alcyons.phiwms_mobile.Inventaire.Adapter.ACompterAdapter
 import fr.alcyons.phiwms_mobile.R
 
 class CompterFragment : Fragment() {
-    interface OnElementSelectionnéListener {
+    interface OnElementSelectionneListener {
         fun onElementSelectionne(element: Inventaire_Ligne_Temp) // ou ton type d'objet
     }
 
     private lateinit var liste_inventaireLigneTemp_LV: ListView
-    private var listener: OnElementSelectionnéListener? = null
+    private var listener: OnElementSelectionneListener? = null
     private lateinit var db: SQLiteDatabase // ton type de BDD
     private lateinit var adapter: ACompterAdapter
 
