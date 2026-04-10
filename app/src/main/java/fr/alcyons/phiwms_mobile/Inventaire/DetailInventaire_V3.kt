@@ -174,8 +174,7 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
             }
         }
 
-        if(utilisateurConnecte.identifiant.uppercase().contentEquals("ALCYONS"))
-        {
+        if (utilisateurConnecte.identifiant.uppercase().contentEquals("ALCYONS")) {
             btnSimulationInventaire_CV.visibility = View.VISIBLE
             btnSimulationInventaire_CV.setOnClickListener {
                 val dialogView = layoutInflater.inflate(R.layout.progressbar_modale, null)
@@ -244,9 +243,7 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
                     }
                 }
             }
-        }
-        else
-        {
+        } else {
             btnSimulationInventaire_CV.visibility = View.GONE
         }
     }
@@ -552,7 +549,8 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
         searchInput_ET.requestFocus()
 
         // Ouvre le clavier
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+        val imm =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
         imm.showSoftInput(searchInput_ET, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
 
         // Écoute la saisie et lance la recherche dans le fragment
@@ -579,7 +577,8 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
         searchInput_ET.text.clear()
 
         // Ferme le clavier
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+        val imm =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
         imm.hideSoftInputFromWindow(searchInput_ET.windowToken, 0)
     }
 
@@ -633,8 +632,8 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
             }
 
             aCompterVisible = true
-        } else{
-            if(idProduit != 0)
+        } else {
+            if (idProduit != 0)
                 ajouterInventaireLigneTemp(idProduit)
         }
     }
@@ -752,7 +751,13 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
                 frag.onValider = { ligne, ajout ->
                     if (ajout) {
                         // L'utilisateur a choisi Ajouter
-                        ajouterInventaireLigneTemp(ligne.produitID, ligne.lot, ligne.peremptionDate, false, ligne.stockPhysique.toInt())
+                        ajouterInventaireLigneTemp(
+                            ligne.produitID,
+                            ligne.lot,
+                            ligne.peremptionDate,
+                            false,
+                            ligne.stockPhysique.toInt()
+                        )
                     } else {
                         // L'utilisateur a choisi Modifier
                         enregistrerLigneInventaire(ligne)
@@ -946,19 +951,17 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
             depotCourant!!.getDepot_Reference()
         )
 
-        if(nbCompteInventaire == nbTotalInventaire)
-        {
+        if (nbCompteInventaire == nbTotalInventaire) {
             btnSimulationInventaire_CV.visibility = View.GONE
             btnValiderInventaire_CV.visibility = View.VISIBLE
             btnValiderInventaire_LL.setOnClickListener {
                 demandeConfirmationValidation(layoutInflater) { resultat ->
-                    if(resultat)
+                    if (resultat)
                         validerInventaire()
                 }
             }
-        }
-        else{
-            if(utilisateurConnecte.identifiant.uppercase().contentEquals("ALCYONS"))
+        } else {
+            if (utilisateurConnecte.identifiant.uppercase().contentEquals("ALCYONS"))
                 btnSimulationInventaire_CV.visibility = View.VISIBLE
             btnValiderInventaire_CV.visibility = View.GONE
         }
@@ -998,7 +1001,7 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
         nouvelInventaireLigneTemp.peremptionDate = peremption
         nouvelInventaireLigneTemp.stockPhysique = qte.toDouble()
 
-        if(qte != -1)
+        if (qte != -1)
             nouvelInventaireLigneTemp.inventaireDate = getDateDuJour()
 
         Inventaire_Ligne_TempOpenHelper.insererUnInventaire_Ligne_TempEnBDD(
@@ -1019,10 +1022,9 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
             false
         )
 
-        if(ouvrirDetail)
+        if (ouvrirDetail)
             ouvrirDetailFragment(nouvelInventaireLigneTemp, true)
-        else
-        {
+        else {
             fermerDetailFragment()
             rafraichirListe()
             ouvrirScanner()
