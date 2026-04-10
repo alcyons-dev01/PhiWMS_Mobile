@@ -63,32 +63,57 @@ class RechercheFragment : Fragment() {
 
         resultatsLV = view.findViewById(R.id.liste_reference_LV)
         resultatsLV.isNestedScrollingEnabled = true
-        // Liste vide au départ
+
         adapter =
             ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, mutableListOf())
         resultatsLV.adapter = adapter
         db = (requireActivity() as DetailInventaire_V3).db
 
-        // Clic sur un élément de la liste
         resultatsLV.setOnItemClickListener { _, _, position, _ ->
             val elementSelectionne = adapter.getItem(position)
-
-            val produitIdentifier = ProduitOpenHelper.getUnProduitByDesignation(db, elementSelectionne)
-
-            if(produitIdentifier != null)
+            val produitIdentifier =
+                ProduitOpenHelper.getUnProduitByDesignation(db, elementSelectionne)
+            if (produitIdentifier != null)
                 elementSelectionne?.let { listener?.onElementRechercher(produitIdentifier.iD_produit) }
         }
     }
 
-     fun lancerRecherche(query: String) {
+    fun lancerRecherche(query: String) {
         val resultats = ProduitOpenHelper.getProduitByDesignation(db, query)
-
         adapter.clear()
         adapter.addAll(resultats)
         adapter.notifyDataSetChanged()
+
+        resultatsLV.post {
+            // Vérifie que le fragment est bien attaché avant de continuer
+            if (!isAdded || context == null) return@post
+
+            val maxHauteur = (300 * resources.displayMetrics.density).toInt()
+
+            if (adapter.count == 0) return@post
+
+            val premierItem = adapter.getView(0, null, resultatsLV)
+            premierItem.measure(
+                View.MeasureSpec.makeMeasureSpec(resultatsLV.width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            )
+            val hauteurItem = premierItem.measuredHeight
+            var hauteurTotale = hauteurItem * adapter.count
+            hauteurTotale += resultatsLV.dividerHeight * (adapter.count - 1)
+
+            resultatsLV.layoutParams.height = hauteurTotale.coerceAtMost(maxHauteur)
+            resultatsLV.requestLayout()
+
+            (activity as? DetailInventaire_V3)?.ajusterHauteurRecherche(
+                hauteurTotale.coerceAtMost(maxHauteur)
+            )
+        }
     }
 
     fun viderListe() {
         adapter.clear()
+        resultatsLV.layoutParams.height = 0
+        resultatsLV.requestLayout()
+        (activity as? DetailInventaire_V3)?.ajusterHauteurRecherche(0)
     }
 }

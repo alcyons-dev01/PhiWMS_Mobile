@@ -260,7 +260,7 @@ public class ProduitOpenHelper extends DBOpenHelper {
     public static List<String> getProduitByDesignation(SQLiteDatabase db, String designation)
     {
         List<String> produitList = new ArrayList<>();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT + " LIKE '"+designation+"%'", new String[]{});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT + " LIKE '%"+designation+"%'", new String[]{});
 
         while (cursor.moveToNext()) {
             Produit produit = new Produit(cursor);

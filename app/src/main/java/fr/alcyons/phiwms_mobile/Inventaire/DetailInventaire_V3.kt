@@ -153,7 +153,6 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
         effacerRecherche_IV.setOnClickListener {
             searchInput_ET.text.clear()
             fermerRecherche()
-            cacherSearchInput()
         }
 
         aCompter_LL.setOnClickListener {
@@ -502,8 +501,8 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
             false
         rechercheContainer.apply {
             layoutParams = (layoutParams as LinearLayout.LayoutParams).also {
-                it.height = (300 * resources.displayMetrics.density).toInt() // 300dp en pixels
-                it.weight = 0f // on n'utilise pas le weight
+                it.height = LinearLayout.LayoutParams.WRAP_CONTENT
+                it.weight = 0f
             }
             visibility = View.VISIBLE
             translationY = -resources.displayMetrics.heightPixels.toFloat()
@@ -541,6 +540,7 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
     }
 
     private fun afficherSearchInput() {
+        rechercheVisible = true
         // Bascule TextView → EditText dans le header
         findViewById<ImageView>(R.id.chevronRecherche).visibility = View.GONE
         textChercher_TV.visibility = View.GONE
@@ -560,7 +560,7 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
             override fun afterTextChanged(s: android.text.Editable?) {
                 val query = s.toString().trim()
                 if (query.isNotEmpty()) {
-                    if (!rechercheVisible) ouvrirRecherche()
+                    ouvrirRecherche()
                     rechercheFragment?.lancerRecherche(query)
                 } else {
                     rechercheFragment?.viderListe()
@@ -1106,5 +1106,12 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
             alertDialog?.dismiss()
             onResultat(false)
         }
+    }
+
+    fun ajusterHauteurRecherche(hauteur: Int) {
+        rechercheContainer.layoutParams = (rechercheContainer.layoutParams as LinearLayout.LayoutParams).also {
+            it.height = if (hauteur == 0) 0 else LinearLayout.LayoutParams.WRAP_CONTENT
+        }
+        rechercheContainer.requestLayout()
     }
 }
