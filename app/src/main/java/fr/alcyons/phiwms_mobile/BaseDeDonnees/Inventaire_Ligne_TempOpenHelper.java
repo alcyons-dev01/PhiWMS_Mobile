@@ -267,7 +267,7 @@ public class Inventaire_Ligne_TempOpenHelper extends DBOpenHelper {
     public static List<Inventaire_Ligne_Temp> getInventaireLigneTempACompterByInventaireEtZoneEtDepotInventorie(SQLiteDatabase db, int inventaireId, String zone, String depotReference) {
         List<Inventaire_Ligne_Temp> inventaireLigneTempList = new ArrayList<>();
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_INVENTAIRE_LIGNE_TEMP + " WHERE " + Constantes.CLE_COL_INVENTAIRE_ID_INVENTAIRE_LIGNE_TEMP + "=? AND "+Constantes.CLE_COL_ZONE_INVENTAIRE_LIGNE_TEMP+" =? AND "+Constantes.CLE_COL_DEPOTREFERENCE_INVENTAIRE_LIGNE_TEMP+" =? AND "+Constantes.CLE_COL_STOCKPHYSIQUE_INVENTAIRE_LIGNE_TEMP+" < 0 ORDER BY "+Constantes.CLE_COL_DEPOTREFERENCE_INVENTAIRE_LIGNE_TEMP+", "+Constantes.CLE_COL_DESIGNATION_INVENTAIRE_LIGNE_TEMP, new String[]{String.valueOf(inventaireId), zone, depotReference});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_INVENTAIRE_LIGNE_TEMP + " WHERE " + Constantes.CLE_COL_INVENTAIRE_ID_INVENTAIRE_LIGNE_TEMP + "=? AND "+Constantes.CLE_COL_ZONE_INVENTAIRE_LIGNE_TEMP+" LIKE '"+zone+"' AND "+Constantes.CLE_COL_DEPOTREFERENCE_INVENTAIRE_LIGNE_TEMP+" =? AND "+Constantes.CLE_COL_STOCKPHYSIQUE_INVENTAIRE_LIGNE_TEMP+" < 0 ORDER BY "+Constantes.CLE_COL_DEPOTREFERENCE_INVENTAIRE_LIGNE_TEMP+", "+Constantes.CLE_COL_DESIGNATION_INVENTAIRE_LIGNE_TEMP, new String[]{String.valueOf(inventaireId), depotReference});
 
         while (cursor.moveToNext()) {
             inventaireLigneTempList.add(new Inventaire_Ligne_Temp(cursor));
@@ -281,7 +281,7 @@ public class Inventaire_Ligne_TempOpenHelper extends DBOpenHelper {
     public static List<Inventaire_Ligne_Temp> getInventaireLigneTempACompterByInventaireEtZoneEtDepotInventoriProduit(SQLiteDatabase db, int inventaireId, String zone, String depotReference, int idProduit) {
         List<Inventaire_Ligne_Temp> inventaireLigneTempList = new ArrayList<>();
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_INVENTAIRE_LIGNE_TEMP + " WHERE " + Constantes.CLE_COL_INVENTAIRE_ID_INVENTAIRE_LIGNE_TEMP + "=? AND "+Constantes.CLE_COL_ZONE_INVENTAIRE_LIGNE_TEMP+" =? AND "+Constantes.CLE_COL_DEPOTREFERENCE_INVENTAIRE_LIGNE_TEMP+" =? AND "+Constantes.CLE_COL_PRODUITID_INVENTAIRE_LIGNE_TEMP+"=? AND "+Constantes.CLE_COL_STOCKPHYSIQUE_INVENTAIRE_LIGNE_TEMP+" < 0 ORDER BY "+Constantes.CLE_COL_DEPOTREFERENCE_INVENTAIRE_LIGNE_TEMP+", "+Constantes.CLE_COL_DESIGNATION_INVENTAIRE_LIGNE_TEMP, new String[]{String.valueOf(inventaireId), zone, depotReference, String.valueOf(idProduit)});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_INVENTAIRE_LIGNE_TEMP + " WHERE " + Constantes.CLE_COL_INVENTAIRE_ID_INVENTAIRE_LIGNE_TEMP + "=? AND "+Constantes.CLE_COL_ZONE_INVENTAIRE_LIGNE_TEMP+" LIKE '"+zone+"' AND "+Constantes.CLE_COL_DEPOTREFERENCE_INVENTAIRE_LIGNE_TEMP+" =? AND "+Constantes.CLE_COL_PRODUITID_INVENTAIRE_LIGNE_TEMP+"=? AND "+Constantes.CLE_COL_STOCKPHYSIQUE_INVENTAIRE_LIGNE_TEMP+" < 0 ORDER BY "+Constantes.CLE_COL_DEPOTREFERENCE_INVENTAIRE_LIGNE_TEMP+", "+Constantes.CLE_COL_DESIGNATION_INVENTAIRE_LIGNE_TEMP, new String[]{String.valueOf(inventaireId), depotReference, String.valueOf(idProduit)});
 
         while (cursor.moveToNext()) {
             inventaireLigneTempList.add(new Inventaire_Ligne_Temp(cursor));

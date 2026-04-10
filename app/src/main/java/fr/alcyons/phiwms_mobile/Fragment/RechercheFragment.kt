@@ -24,9 +24,7 @@ class RechercheFragment : Fragment() {
         fun onElementRechercher(element: Int) // ou ton type d'objet
     }
 
-    private lateinit var barreDeRecherche: EditText
     private lateinit var resultatsLV: ListView
-    private lateinit var effacerRechercher_IV: ImageView
     private lateinit var adapter: ArrayAdapter<String> // ou ton adapter custom
     private var listener: OnElementRechercheListener? = null
     private lateinit var db: SQLiteDatabase // ton type de BDD
@@ -63,32 +61,13 @@ class RechercheFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        barreDeRecherche = view.findViewById(R.id.barreDeRecherche_ET)
         resultatsLV = view.findViewById(R.id.liste_reference_LV)
-        effacerRechercher_IV = view.findViewById(R.id.effacerRechercher_IV)
         resultatsLV.isNestedScrollingEnabled = true
         // Liste vide au départ
         adapter =
             ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, mutableListOf())
         resultatsLV.adapter = adapter
         db = (requireActivity() as DetailInventaire_V3).db
-
-        effacerRechercher_IV.setOnClickListener { barreDeRecherche.text.clear() }
-
-        // Écoute la frappe dans la barre de recherche
-        barreDeRecherche.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable?) {
-                val query = s.toString().trim()
-                if (query.isNotEmpty()) {
-                    lancerRecherche(query)
-                } else {
-                    adapter.clear() // Vide la liste si le champ est vide
-                }
-            }
-        })
 
         // Clic sur un élément de la liste
         resultatsLV.setOnItemClickListener { _, _, position, _ ->
@@ -101,11 +80,15 @@ class RechercheFragment : Fragment() {
         }
     }
 
-    private fun lancerRecherche(query: String) {
+     fun lancerRecherche(query: String) {
         val resultats = ProduitOpenHelper.getProduitByDesignation(db, query)
 
         adapter.clear()
         adapter.addAll(resultats)
         adapter.notifyDataSetChanged()
+    }
+
+    fun viderListe() {
+        adapter.clear()
     }
 }

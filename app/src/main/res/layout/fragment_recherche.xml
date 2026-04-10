@@ -4,42 +4,6 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
-        android:id="@+id/layout_barre_recherche_LL"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="1"
-        android:background="@drawable/cadre_gris"
-        android:layout_margin="5dp">
-
-        <EditText
-            android:id="@+id/barreDeRecherche_ET"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Rechercher une référence"
-            android:layout_margin="2dp"/>
-
-        <ImageView
-            android:id="@+id/effacerRechercher_IV"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="center"
-            android:background="@drawable/ic_clear"
-            android:layout_marginEnd="10dp"
-            android:backgroundTint="@color/noir"/>
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="center"
-            android:background="@drawable/ic_search"
-            android:layout_marginEnd="10dp"
-            android:backgroundTint="@color/noir"/>
-
-    </LinearLayout>
-
     <ListView
         android:id="@+id/liste_reference_LV"
         android:layout_width="match_parent"

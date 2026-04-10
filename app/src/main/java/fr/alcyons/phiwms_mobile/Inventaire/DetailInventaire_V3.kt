@@ -6,16 +6,20 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -64,6 +68,9 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
     private lateinit var lancerRecherhe: LinearLayout
     private lateinit var aCompter_LL: LinearLayout
     private lateinit var compter_LL: LinearLayout
+    private lateinit var btnValiderInventaire_LL: LinearLayout
+    private lateinit var btnValiderInventaire_CV: CardView
+    private lateinit var btnSimulationInventaire_CV: CardView
     private var adapter: DetailInventaireAdapter? = null
     private var valider_item: MenuItem? = null
     private var scannerFragment: Fragment? = null
@@ -80,6 +87,10 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
     private var alerteVisible = false
     private var positionSelectionnee = -1
     private var hauteurDetailFragment = 0
+
+    private lateinit var textChercher_TV: TextView
+    private lateinit var searchInput_ET: EditText
+    private lateinit var effacerRecherche_IV: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,6 +119,12 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
         lancerRecherhe = findViewById(R.id.lancerRecherhe)
         aCompter_LL = findViewById(R.id.aCompter_LL)
         compter_LL = findViewById(R.id.compter_LL)
+        btnValiderInventaire_LL = findViewById(R.id.btnValiderInventaire_LL)
+        btnValiderInventaire_CV = findViewById(R.id.btnValiderInventaire_CV)
+        btnSimulationInventaire_CV = findViewById(R.id.btnSimulationInventaire_CV)
+        textChercher_TV = findViewById(R.id.textChercher_TV)
+        searchInput_ET = findViewById(R.id.searchInput_ET)
+        effacerRecherche_IV = findViewById(R.id.effacerRecherche_IV)
 
         // Dans onCreate(), après setContentView
         val frameContenu = findViewById<RelativeLayout>(R.id.frameLayout)
@@ -129,8 +146,14 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
                 fermerRecherche()
             } else {
                 fermerFragment()
-                ouvrirRecherche()
+                afficherSearchInput()
             }
+        }
+
+        effacerRecherche_IV.setOnClickListener {
+            searchInput_ET.text.clear()
+            fermerRecherche()
+            cacherSearchInput()
         }
 
         aCompter_LL.setOnClickListener {
@@ -149,6 +172,82 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
                 fermerFragment()
                 ouvrirCompter()
             }
+        }
+
+        if(utilisateurConnecte.identifiant.uppercase().contentEquals("ALCYONS"))
+        {
+            btnSimulationInventaire_CV.visibility = View.VISIBLE
+            btnSimulationInventaire_CV.setOnClickListener {
+                val dialogView = layoutInflater.inflate(R.layout.progressbar_modale, null)
+                val progressBar = dialogView.findViewById<ProgressBar>(R.id.progressBar)
+                val tvProgress = dialogView.findViewById<TextView>(R.id.tvProgress)
+
+                val dialog = AlertDialog.Builder(this)
+                    .setView(dialogView)
+                    .setCancelable(false)
+                    .create()
+
+                dialog.show()
+
+                val liste = ArrayList(
+                    Inventaire_Ligne_TempOpenHelper
+                        .getInventaireLigneTempACompterByInventaireEtZoneEtDepotInventorie(
+                            db,
+                            inventaireCourant!!.getInventaire_ID(),
+                            zoneCourante,
+                            depotCourant!!.getDepot_Reference()
+                        )
+                )
+
+                progressBar.max = liste.size
+
+                // Thread de traitement
+                lifecycleScope.launch(Dispatchers.IO) {
+                    liste.forEachIndexed { index, inventaireLigne ->
+                        val progression = index + 1
+
+                        inventaireLigne.stockPhysique = 10.toDouble()
+                        inventaireLigne.inventaireDate = getDateDuJour()
+
+                        Inventaire_Ligne_TempOpenHelper.mettreAJourInventaireLigneTemp(
+                            db,
+                            inventaireLigne
+                        )
+
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
+                            db,
+                            Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP,
+                            inventaireLigne.getPhiMR4UUID(),
+                            inventaireLigne.get_UID(),
+                            DBOpenHelper.ActionsEAS.MAJ
+                        )
+
+                        ElementASynchroniserOpenHelper.toutSynchroniser(
+                            this@DetailInventaire_V3,
+                            db,
+                            utilisateurConnecte,
+                            false
+                        )
+
+                        // Mise à jour de l'UI sur le thread principal
+                        withContext(Dispatchers.Main) {
+                            progressBar.progress = progression
+                            tvProgress.text = "$progression / ${liste.size}"
+                            rafraichirListe()
+                        }
+                    }
+
+                    // Fermeture de la modale sur le thread principal
+                    withContext(Dispatchers.Main) {
+                        dialog.dismiss()
+                        btnSimulationInventaire_CV.visibility = View.GONE
+                    }
+                }
+            }
+        }
+        else
+        {
+            btnSimulationInventaire_CV.visibility = View.GONE
         }
     }
 
@@ -313,27 +412,6 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        super.onCreateOptionsMenu(menu)
-        menuInflater.inflate(R.menu.menu_action, menu)
-        valider_item = menu.findItem(R.id.menuSaveCircle).apply { isVisible = true }
-        verificationEtatInventaire()
-        return true
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        super.prepareOptionsMenu(
-            menu, adapter, null,
-            "Désignation référence, inventaire non complet,..."
-        )
-
-        valider_item?.setOnMenuItemClickListener {
-            validerInventaire()
-            true
-        }
-        return true
-    }
-
     override fun onElementSelectionne(element: Inventaire_Ligne_Temp) {
         fermerFragment()
         ouvrirDetailFragment(element)
@@ -444,6 +522,7 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
     }
 
     private fun fermerRecherche() {
+        cacherSearchInput()
         findViewById<androidx.core.widget.NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled =
             true
         rechercheContainer.animate()
@@ -462,6 +541,46 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
             }.start()
 
         rechercheVisible = false
+    }
+
+    private fun afficherSearchInput() {
+        // Bascule TextView → EditText dans le header
+        findViewById<ImageView>(R.id.chevronRecherche).visibility = View.GONE
+        textChercher_TV.visibility = View.GONE
+        searchInput_ET.visibility = View.VISIBLE
+        effacerRecherche_IV.visibility = View.VISIBLE
+        searchInput_ET.requestFocus()
+
+        // Ouvre le clavier
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+        imm.showSoftInput(searchInput_ET, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+
+        // Écoute la saisie et lance la recherche dans le fragment
+        searchInput_ET.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                val query = s.toString().trim()
+                if (query.isNotEmpty()) {
+                    if (!rechercheVisible) ouvrirRecherche()
+                    rechercheFragment?.lancerRecherche(query)
+                } else {
+                    rechercheFragment?.viderListe()
+                }
+            }
+        })
+    }
+
+    private fun cacherSearchInput() {
+        findViewById<ImageView>(R.id.chevronRecherche).visibility = View.VISIBLE
+        textChercher_TV.visibility = View.VISIBLE
+        searchInput_ET.visibility = View.GONE
+        effacerRecherche_IV.visibility = View.GONE
+        searchInput_ET.text.clear()
+
+        // Ferme le clavier
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+        imm.hideSoftInputFromWindow(searchInput_ET.windowToken, 0)
     }
 
     /**
@@ -514,8 +633,10 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
             }
 
             aCompterVisible = true
-        } else
-            ajouterInventaireLigneTemp(idProduit)
+        } else{
+            if(idProduit != 0)
+                ajouterInventaireLigneTemp(idProduit)
+        }
     }
 
     private fun fermerACompter() {
@@ -745,7 +866,6 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
         }
     }
 
-
     private fun rafraichirListe() {
         findViewById<TextView>(R.id.nbReferenceACompter_TV).text =
             Inventaire_Ligne_TempOpenHelper.getILTACompte(
@@ -796,7 +916,7 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
             "En attente",
             inventaireCourant!!.getInventaire_ID(),
             "",
-            "Inventaire Partiel à traiter"
+            "Inventaire General à traiter"
         )
 
         ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, newAction)
@@ -808,26 +928,39 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
             DBOpenHelper.ActionsEAS.AJOUT
         )
         ElementASynchroniserOpenHelper.toutSynchroniser(this, db, utilisateurConnecte, false)
-        finish()
+
+        onBackPressed()
     }
 
     fun verificationEtatInventaire() {
-        val produitIdList = mutableListOf<Int>()
-        var nbReferenceInventorie = 0
+        val nbTotalInventaire = Inventaire_Ligne_TempOpenHelper.getILTTotal(
+            db,
+            inventaireCourant!!.getInventaire_ID(),
+            zoneCourante,
+            depotCourant!!.getDepot_Reference()
+        )
+        val nbCompteInventaire = Inventaire_Ligne_TempOpenHelper.getILTCompte(
+            db,
+            inventaireCourant!!.getInventaire_ID(),
+            zoneCourante,
+            depotCourant!!.getDepot_Reference()
+        )
 
-        for (ligne in inventaireLigneTempList) {
-            if (!produitIdList.contains(ligne.getProduitID())) {
-                produitIdList.add(ligne.getProduitID())
-                val qte = Inventaire_Ligne_TempOpenHelper
-                    .getQteInventorieByInventaireProduitZoneDepot(
-                        db,
-                        ligne.getInventaire_ID(),
-                        ligne.getProduitID(),
-                        ligne.getZone(),
-                        ligne.getDepotReference()
-                    )
-                if (qte >= 0) nbReferenceInventorie++
+        if(nbCompteInventaire == nbTotalInventaire)
+        {
+            btnSimulationInventaire_CV.visibility = View.GONE
+            btnValiderInventaire_CV.visibility = View.VISIBLE
+            btnValiderInventaire_LL.setOnClickListener {
+                demandeConfirmationValidation(layoutInflater) { resultat ->
+                    if(resultat)
+                        validerInventaire()
+                }
             }
+        }
+        else{
+            if(utilisateurConnecte.identifiant.uppercase().contentEquals("ALCYONS"))
+                btnSimulationInventaire_CV.visibility = View.VISIBLE
+            btnValiderInventaire_CV.visibility = View.GONE
         }
     }
 
@@ -864,6 +997,9 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
         nouvelInventaireLigneTemp.lot = lot
         nouvelInventaireLigneTemp.peremptionDate = peremption
         nouvelInventaireLigneTemp.stockPhysique = qte.toDouble()
+
+        if(qte != -1)
+            nouvelInventaireLigneTemp.inventaireDate = getDateDuJour()
 
         Inventaire_Ligne_TempOpenHelper.insererUnInventaire_Ligne_TempEnBDD(
             db,
@@ -937,6 +1073,36 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
         layout.findViewById<LinearLayout>(R.id.buttonOk).setOnClickListener {
             alertDialog.dismiss()
             onDismiss() // ← remet alerteVisible à false
+        }
+    }
+
+    fun demandeConfirmationValidation(inflater: LayoutInflater, onResultat: (Boolean) -> Unit) {
+        val builder = context?.let { AlertDialog.Builder(it) }
+        val layout = inflater.inflate(R.layout.alerte_confirmation, null)
+
+        val zoneok = layout.findViewById<LinearLayout>(R.id.buttonOk)
+        val buttonAnnuler = layout.findViewById<LinearLayout>(R.id.buttonAnnuler)
+        val messageTextView = layout.findViewById<TextView>(R.id.messageFin)
+
+        messageTextView.text = "Souhaitez-vous valider l'inventaire de cette zone ?"
+        layout.findViewById<TextView>(R.id.TitreAnnulation).text = "Non"
+        layout.findViewById<TextView>(R.id.TitreConfirmation).text = "Oui"
+
+        builder?.setView(layout)
+
+        val alertDialog = builder?.create()
+        alertDialog?.window?.setGravity(Gravity.CENTER)
+        alertDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        alertDialog?.show()
+
+        zoneok.setOnClickListener {
+            alertDialog?.dismiss()
+            onResultat(true)
+        }
+
+        buttonAnnuler.setOnClickListener {
+            alertDialog?.dismiss()
+            onResultat(false)
         }
     }
 }

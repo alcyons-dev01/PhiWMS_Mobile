@@ -233,25 +233,6 @@ public class InventaireZoneActivity extends ServiceAvecConnexionActivity {
         }
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.prepareOptionsMenu(menu, inventaireZoneAdapter, null, "Rechercher...");
-        MenuItem item = menu.findItem(R.id.menuDatamatrix);
-        item.setOnMenuItemClickListener(item1 -> {
-            lancerScan();
-            return true;
-        });
-        return true;
-    }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        //Récupération du menu
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_action, menu);
-        menu.findItem(R.id.menuDatamatrix).setVisible(true);
-        return true;
-    }
     public void lancerScan()
     {
         Bundle scanDocumentBundle = InventaireZoneActivity.super.getBundle();
