@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:backgroundTint="@android:color/white">
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="#F0F4FF">
 
-    <RelativeLayout
-        android:id="@+id/relative_principal"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dp"
-        android:background="@drawable/background_plein_vert_radius">
+        android:orientation="vertical">
 
+        <!-- Header : Numéro commande + Fabricant -->
         <LinearLayout
             android:id="@+id/zone_info_reception"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="2"
-            android:padding="5dp">
+            android:background="@color/bleu_fonce_alcyons"
+            android:padding="12dp">
 
             <TextView
                 android:id="@+id/numCommande"
@@ -26,121 +29,162 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text=""
-                style="@style/sectiongras_style"/>
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/fabricant"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="right"
+                android:gravity="end"
                 android:text=""
-                style="@style/sectiongras_style"/>
-
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold"/>
 
         </LinearLayout>
 
+        <!-- Corps : Date + Badges -->
         <LinearLayout
             android:id="@+id/zone_detail_reception"
-            android:layout_below="@+id/zone_info_reception"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="@color/blanc"
-            android:layout_marginLeft="8dp"
+            android:background="#F0F4FF"
+            android:padding="10dp"
             android:weightSum="5">
 
+            <!-- Date livraison -->
             <TextView
                 android:id="@+id/livraisonPrevueDate"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:textColor="@color/vert"
                 android:text="02/03/2020"
-                android:textSize="16dp"
-                android:paddingLeft="15dp"/>
+                android:textColor="@color/bleu_fonce_alcyons"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:gravity="center_vertical"/>
 
-
-            <LinearLayout
+            <!-- Badge Colis total -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="@color/bleu_clair_alcyons"
-                android:padding="5dp">
+                android:layout_marginStart="4dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/bleu_clair_alcyons">
 
-                <TextView
-                    android:id="@+id/nbColisTotal"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text=""
-                    android:textColor="@color/blanc"
-                    style="@style/text1lignegras_style"/>
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="6dp"
+                    android:gravity="center">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="Colis"
-                    android:textColor="@color/blanc"
-                    style="@style/text1ligne_style"/>
+                    <TextView
+                        android:id="@+id/nbColisTotal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Colis"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="10sp"
+                        android:gravity="center"/>
 
-            <LinearLayout
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Badge Poids -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="@color/bleu_clair_alcyons"
-                android:padding="5dp"
-                android:layout_marginLeft="2dp">
+                android:layout_marginStart="4dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/bleu_clair_alcyons">
 
-                <TextView
-                    android:id="@+id/poidsTotal"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text=""
-                    android:textColor="@color/blanc"
-                    style="@style/text1lignegras_style"/>
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="6dp"
+                    android:gravity="center">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="Kg"
-                    android:textColor="@color/blanc"
-                    style="@style/text1ligne_style"/>
+                    <TextView
+                        android:id="@+id/poidsTotal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Kg"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="10sp"
+                        android:gravity="center"/>
 
-            <LinearLayout
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Badge Colis en attente -->
+            <androidx.cardview.widget.CardView
                 android:id="@+id/ZoneNbColisEnAttente"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="@color/orange2"
-                android:padding="5dp"
-                android:layout_marginLeft="2dp">
+                android:layout_marginStart="4dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FFF8E1">
 
-                <TextView
-                    android:id="@+id/nbColisAttente"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text=""
-                    android:textColor="@color/blanc"
-                    style="@style/text1lignegras_style"/>
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="6dp"
+                    android:gravity="center">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="Colis"
-                    android:textColor="@color/blanc"
-                    style="@style/text1ligne_style"/>
+                    <TextView
+                        android:id="@+id/nbColisAttente"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="#000000"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Colis"
+                        android:textColor="#F57F17"
+                        android:textSize="10sp"
+                        android:gravity="center"/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
         </LinearLayout>
 
-    </RelativeLayout>
+    </LinearLayout>
 
-</RelativeLayout>
+</androidx.cardview.widget.CardView>

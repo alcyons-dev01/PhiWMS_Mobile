@@ -14,6 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
 import java.text.DateFormat;
@@ -84,7 +85,7 @@ public class ReceptionAdapter extends ArrayAdapter implements Filterable {
             viewHolder.nbColisAttente = (TextView) convertView.findViewById(R.id.nbColisAttente);
             viewHolder.poidsTotal = (TextView) convertView.findViewById(R.id.poidsTotal);
             viewHolder.zone_info_reception = (LinearLayout) convertView.findViewById(R.id.zone_info_reception);
-            viewHolder.ZoneNbColisEnAttente = (LinearLayout) convertView.findViewById(R.id.ZoneNbColisEnAttente);
+            viewHolder.ZoneNbColisEnAttente = (CardView) convertView.findViewById(R.id.ZoneNbColisEnAttente);
             viewHolder.relative_principal = (RelativeLayout) convertView.findViewById(R.id.relative_principal);
             convertView.setTag(viewHolder);
         }
@@ -97,11 +98,9 @@ public class ReceptionAdapter extends ArrayAdapter implements Filterable {
         viewHolder.numCommande.setText("#"+commandeCourant.getNumero());
 
         if (commandeCourant.getSituation().equals("L")) {
-            viewHolder.ZoneNbColisEnAttente.setBackgroundColor(ContextCompat.getColor(context, R.color.orange2));
-            viewHolder.relative_principal.setBackground(ContextCompat.getDrawable(context, R.drawable.background_plein_orange_radius));
+            viewHolder.zone_info_reception.setBackgroundColor(ContextCompat.getColor(context, R.color.orange2));
         } else {
-            viewHolder.ZoneNbColisEnAttente.setBackgroundColor(ContextCompat.getColor(context, R.color.orange2));
-            viewHolder.relative_principal.setBackground(ContextCompat.getDrawable(context, R.drawable.background_plein_bleu_radius));
+            viewHolder.zone_info_reception.setBackgroundColor(ContextCompat.getColor(context, R.color.bleu_clair_alcyons));
         }
 
         List<PH_Reliquat> phReliquatList = PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(db, commandeCourant.getNumero());
@@ -223,7 +222,7 @@ public class ReceptionAdapter extends ArrayAdapter implements Filterable {
         public RelativeLayout relative_principal;
         public TextView nbColisAttente;
         public LinearLayout zone_info_reception;
-        public LinearLayout ZoneNbColisEnAttente;
+        public CardView ZoneNbColisEnAttente;
         public TextView nbColisTotal;
         public TextView poidsTotal;
 
