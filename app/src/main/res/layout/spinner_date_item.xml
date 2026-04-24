@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:ellipsize="marquee"
     android:gravity="center"
-    android:textSize="16sp"
+    android:textSize="14sp"
     android:paddingVertical="5dp"
     android:paddingHorizontal="10dp"
     android:textColor="@color/bleu_fonce_alcyons"

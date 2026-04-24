@@ -13,8 +13,10 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ListView
 import androidx.fragment.app.Fragment
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
 import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp
+import fr.alcyons.phiwms_mobile.Interfaces.DatabaseProvider
 import fr.alcyons.phiwms_mobile.Inventaire.DetailInventaire_V3
 import fr.alcyons.phiwms_mobile.Inventaire.Fragment.ACompterFragment
 import fr.alcyons.phiwms_mobile.R
@@ -67,7 +69,7 @@ class RechercheFragment : Fragment() {
         adapter =
             ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, mutableListOf())
         resultatsLV.adapter = adapter
-        db = (requireActivity() as DetailInventaire_V3).db
+        db = (requireActivity() as DatabaseProvider).db
 
         resultatsLV.setOnItemClickListener { _, _, position, _ ->
             val elementSelectionne = adapter.getItem(position)
@@ -78,8 +80,15 @@ class RechercheFragment : Fragment() {
         }
     }
 
-    fun lancerRecherche(query: String) {
-        val resultats = ProduitOpenHelper.getProduitByDesignation(db, query)
+    fun lancerRecherche(query: String, typeDoc : String = "",numDoc : String = "") {
+        var resultats = listOf<String>()
+        when(typeDoc)
+        {
+            "reception"->  resultats = PH_ReliquatOpenHelper.getDesignationReliquatByNumero(db, query, numDoc)
+            "preparation"-> resultats = ProduitOpenHelper.getProduitByDesignation(db, query)
+            else -> resultats = ProduitOpenHelper.getProduitByDesignation(db, query)
+        }
+
         adapter.clear()
         adapter.addAll(resultats)
         adapter.notifyDataSetChanged()

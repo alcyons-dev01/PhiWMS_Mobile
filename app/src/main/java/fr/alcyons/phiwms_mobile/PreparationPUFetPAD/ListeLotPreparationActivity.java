@@ -99,7 +99,7 @@ public class ListeLotPreparationActivity extends ServiceAvecConnexionActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_liste_lot_prepration);
-        context = ListeLotPreparationActivity.this;
+        context = ListeLotPreparationActivity.this.peekAvailableContext();
         pm = ListeLotPreparationActivity.this.getPackageManager();
         camera_first = false;
         passageParScanner = false;

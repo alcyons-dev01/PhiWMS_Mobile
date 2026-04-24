@@ -1,5 +1,6 @@
 package fr.alcyons.phiwms_mobile.Reception.Fragment
 
+import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,6 +15,11 @@ import fr.alcyons.phiwms_mobile.Reception.Adapter.DetailReceptionAdapter
 class ReceptionnerFragment : Fragment() {
     interface OnElementSelectionneListener {
         fun onElementSelectionne(element: PH_Reliquat) // ou ton type d'objet
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = context as? ReceptionnerFragment.OnElementSelectionneListener
     }
 
     private lateinit var liste_PH_Reliquat_LV: ListView

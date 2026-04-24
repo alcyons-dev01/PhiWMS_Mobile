@@ -8,9 +8,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -24,27 +21,17 @@ import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.android.volley.Response
-import com.android.volley.VolleyError
-import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
-import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur
 import fr.alcyons.phiwms_mobile.Classes.Commande
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat
 import fr.alcyons.phiwms_mobile.Classes.Produit
 import fr.alcyons.phiwms_mobile.Fragment.RechercheFragment
 import fr.alcyons.phiwms_mobile.Fragment.ScannerFragment
 import fr.alcyons.phiwms_mobile.Fragment.ScannerInputFragment
-import fr.alcyons.phiwms_mobile.Inventaire.InventaireZoneActivity
-import fr.alcyons.phiwms_mobile.Outils.Alerte
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites
 import fr.alcyons.phiwms_mobile.Outils.GestionCodeScanne
 import fr.alcyons.phiwms_mobile.R
@@ -53,17 +40,13 @@ import fr.alcyons.phiwms_mobile.Reception.Fragment.AReceptionnerFragment
 import fr.alcyons.phiwms_mobile.Reception.Fragment.DetailFragment
 import fr.alcyons.phiwms_mobile.Reception.Fragment.ReceptionnerFragment
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity
+import fr.alcyons.phiwms_mobile.Services.ServiceReceptionPuiActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONException
-import org.json.JSONObject
 import java.text.SimpleDateFormat
-import java.util.ArrayList
 import java.util.Date
-import java.util.HashMap
 import java.util.Locale
-import java.util.Objects
 import java.util.Random
 
 class DetailReception_V2 : ServiceAvecConnexionActivity(),
@@ -84,7 +67,6 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     private lateinit var receptionner_LL: LinearLayout
     private lateinit var btnValiderReception_LL: LinearLayout
     private lateinit var btnValiderReception_CV: CardView
-    private lateinit var btnSimulationReception_CV: CardView
     private var adapter: DetailReceptionAdapter? = null
     private var scannerFragment: Fragment? = null
     private var rechercheFragment: RechercheFragment? = null
@@ -112,7 +94,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
 
         // Récupération des données de l'intent
         receptionCourant = CommandeOpenHelper.getCommandeByID(
-            db, intent.extras!!.getInt("commandeId")
+            db, intent.extras!!.getInt("commandeID_Selectionne")
         )
 
         // Binding des vues
@@ -130,7 +112,6 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         receptionner_LL = findViewById(R.id.receptionner_LL)
         btnValiderReception_LL = findViewById(R.id.btnValiderReception_LL)
         btnValiderReception_CV = findViewById(R.id.btnValiderReception_CV)
-        btnSimulationReception_CV = findViewById(R.id.btnSimulationReception_CV)
         textChercher_TV = findViewById(R.id.textChercher_TV)
         searchInput_ET = findViewById(R.id.searchInput_ET)
         effacerRecherche_IV = findViewById(R.id.effacerRecherche_IV)
@@ -181,177 +162,32 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                 ouvrirCompter()
             }
         }
-
-        if (utilisateurConnecte.identifiant.uppercase().contentEquals("ALCYONS")) {
-            btnSimulationReception_CV.visibility = View.VISIBLE
-            btnSimulationReception_CV.setOnClickListener {
-                val dialogView = layoutInflater.inflate(R.layout.progressbar_modale, null)
-                val progressBar = dialogView.findViewById<ProgressBar>(R.id.progressBar)
-                val tvProgress = dialogView.findViewById<TextView>(R.id.tvProgress)
-
-                val dialog = AlertDialog.Builder(this)
-                    .setView(dialogView)
-                    .setCancelable(false)
-                    .create()
-
-                dialog.show()
-
-                val liste = ArrayList(
-                    PH_ReliquatOpenHelper
-                        .getPH_ReliquatBaseByCommandeNumero(
-                            db,
-                            receptionCourant.numero
-                        )
-                )
-
-                progressBar.max = liste.size
-
-                // Thread de traitement
-                lifecycleScope.launch(Dispatchers.IO) {
-                    liste.forEachIndexed { index, inventaireLigne ->
-                        val progression = index + 1
-
-                        /*inventaireLigne.stockPhysique = 10.toDouble()
-                        inventaireLigne.inventaireDate = getDateDuJour()
-
-                        Inventaire_Ligne_TempOpenHelper.mettreAJourInventaireLigneTemp(
-                            db,
-                            inventaireLigne
-                        )
-
-                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
-                            db,
-                            Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP,
-                            inventaireLigne.getPhiMR4UUID(),
-                            inventaireLigne.get_UID(),
-                            DBOpenHelper.ActionsEAS.MAJ
-                        )
-
-                        ElementASynchroniserOpenHelper.toutSynchroniser(
-                            this@DetailReception_V2,
-                            db,
-                            utilisateurConnecte,
-                            false
-                        )*/
-
-                        // Mise à jour de l'UI sur le thread principal
-                        withContext(Dispatchers.Main) {
-                            progressBar.progress = progression
-                            tvProgress.text = "$progression / ${liste.size}"
-                            rafraichirListe()
-                        }
-                    }
-
-                    // Fermeture de la modale sur le thread principal
-                    withContext(Dispatchers.Main) {
-                        dialog.dismiss()
-                        btnSimulationReception_CV.visibility = View.GONE
-                    }
-                }
-            }
-        } else {
-            btnSimulationReception_CV.visibility = View.GONE
-        }
     }
 
     override fun onResume() {
         super.onResume()
-        if (statutConnexion && passageParOnCreate) {
-            afficherSpinner(
-                this@DetailReception_V2,
-                LayoutInflater.from(this@DetailReception_V2)
-            )
-            val requestQueue = Volley.newRequestQueue(this@DetailReception_V2)
-            val urlRequete = ""
 
-            val obreq: JsonObjectRequest = getJsonObjectRequest(urlRequete)
-            requestQueue.add<JSONObject?>(obreq)
-        }
-    }
+        //on récupère les ph_reliquat de base
+        val listeReliquatBase = PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(db, receptionCourant.numero)
 
-    private fun getJsonObjectRequest(urlRequete: String?): JsonObjectRequest {
-        val obreq: JsonObjectRequest = object : JsonObjectRequest(
-            Method.GET, urlRequete, null,
-            Response.Listener { response: JSONObject? ->
-                try {
-                    val resultCount = response!!.getInt("resultCount")
-                    if (resultCount == 0) {
-                        val erreur = response.getString("erreur")
-                        if (erreur == context.getString(R.string.tokenInvalide)) {
-                            Alerte.afficherAlerteInformation(
-                                this@DetailReception_V2,
-                                getLayoutInflater(),
-                                "Erreur",
-                                "Votre session de connexion est invalide, veuillez vous reconnecter.",
-                                false,
-                                true
-                            )
-                        } else if (erreur == context.getString(R.string.tokenExpire)) {
-                            Alerte.afficherAlerteInformation(
-                                this@DetailReception_V2,
-                                getLayoutInflater(),
-                                "Erreur",
-                                "Votre session de connexion est expirée, veuillez vous reconnecter.",
-                                false,
-                                true
-                            )
-                        } else if (!erreur.contentEquals("Aucun Inventaire trouvé")) {
-                            Alerte.afficherAlerteInformation(
-                                this@DetailReception_V2,
-                                getLayoutInflater(),
-                                "Erreur",
-                                "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Inventaire Général",
-                                false,
-                                true
-                            )
-                        } else {
-                            arreterSpinner()
-                            Alerte.afficherAlerteInformation(
-                                this@DetailReception_V2,
-                                getLayoutInflater(),
-                                "Information",
-                                "Aucun inventaire général à traiter",
-                                false,
-                                true
-                            )
-                        }
-                    } else {
-
-                        arreterSpinner()
-                        ouvrirScanner()
-                        if (passageParOnCreate) {
-                            invalidateOptionsMenu()
-                        }
-
-                        passageParOnCreate = false
-                        Handler(Looper.getMainLooper()).postDelayed(
-                            Runnable { this.arreterSpinner() },
-                            500
-                        )
-                    }
-                } catch (e: JSONException) {
-                    Log.e("JSON Exception", Objects.requireNonNull<String?>(e.message))
-                }
-            },
-            Response.ErrorListener { error: VolleyError? ->
-                Log.e("Volley", "Error")
-                Alerte.afficherAlerteInformation(
-                    this@DetailReception_V2,
-                    getLayoutInflater(),
-                    "Erreur",
-                    "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Inventaire Général",
-                    false,
-                    true
-                )
+        for(reliquatBase in listeReliquatBase)
+        {
+            //on récupère les reliquats négatif du reliquat courant
+            val listeReliquatNegByProduit = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, receptionCourant.numero, reliquatBase.produitID)
+            for(reliquatNeg in listeReliquatNegByProduit)
+            {
+                reliquatBase.qteReliquat_X -= reliquatNeg.qteLivraison
             }
-        ) {
-            override fun getHeaders(): MutableMap<String?, String?> {
-                val headers = HashMap<String?, String?>()
-                headers.put("Authorization", utilisateurConnecte.getToken())
-                return headers
-            }
+
+            PH_ReliquatOpenHelper.mettreAJourUnPHReliquat(db, reliquatBase)
         }
-        return obreq
+
+        val nbReliquatTotal = PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(db, receptionCourant.numero).size
+        val nbReliquatPreparer = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumero(db, receptionCourant.numero).size
+        findViewById<TextView>(R.id.nbReferenceAReceptionner_TV).text = nbReliquatTotal.toString()
+        findViewById<TextView>(R.id.nbReferenceReceptionner_TV).text = nbReliquatPreparer.toString()
+        findViewById<ProgressBar>(R.id.progressBarReception_PB).max = PH_ReliquatOpenHelper.getNbReliquatBaseByCommande(db, receptionCourant.numero)
+        findViewById<ProgressBar>(R.id.progressBarReception_PB).progress = nbReliquatPreparer
     }
 
     @Deprecated("Deprecated in Java")
@@ -370,7 +206,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         else {
             val intent = Intent(
                 this,
-                InventaireZoneActivity::class.java
+                ServiceReceptionPuiActivity::class.java
             )
             intent.putExtras(Bundle().apply {
                 putInt("utilisateurConnecteID", utilisateurConnecte.getId())
@@ -535,7 +371,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                 val query = s.toString().trim()
                 if (query.isNotEmpty()) {
                     ouvrirRecherche()
-                    rechercheFragment?.lancerRecherche(query)
+                    rechercheFragment?.lancerRecherche(query, "reception", receptionCourant.numero)
                 } else {
                     rechercheFragment?.viderListe()
                 }
@@ -570,19 +406,19 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                 )
             )
         } else {
-            /*liste.add(
+            liste.add(
                 PH_ReliquatOpenHelper.getPH_ReliquatByUnIdProduitetNumero(
                     db,
                     idProduit,
                     receptionCourant.numero
                 )
-            )*/
+            )
         }
 
         if (liste.isNotEmpty()) {
             val frag = AReceptionnerFragment.newInstance(liste)
             supportFragmentManager.beginTransaction()
-                .replace(R.id.referenceACompterContainer, frag)
+                .replace(R.id.referenceAReceptionnerContainer, frag)
                 .commitNow()
 
             referenceAReceptionnerContainer.apply {
@@ -600,9 +436,6 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
             }
 
             aCompterVisible = true
-        } else {
-            if (idProduit != 0)
-                ajouterInventaireLigneTemp(idProduit)
         }
     }
 
@@ -666,7 +499,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
             // Crée le fragment avec la liste
             val frag = ReceptionnerFragment.newInstance(liste)
             supportFragmentManager.beginTransaction()
-                .replace(R.id.referenceCompterContainer, frag)
+                .replace(R.id.referenceReceptionnerContainer, frag)
                 .commitNow()
 
             CompterVisible = true
@@ -696,7 +529,6 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
 
     private fun ouvrirDetailFragment(
         ligne: PH_Reliquat?,
-        nouvelleCreation: Boolean = false
     ) {
         lifecycleScope.launch(Dispatchers.Main) {
             val fragmentDejaOuvert =
@@ -707,24 +539,32 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                 ligne?.let { detailFragment?.mettreAJourLigne(it) }
             } else {
                 // ─── Fragment fermé : on l'ouvre normalement ───
-                val frag = DetailFragment.newInstance(ligne, nouvelleCreation)
+                val produit = ProduitOpenHelper.getProduitByID(db, ligne?.produitID ?: 0)
+                val frag = DetailFragment.newInstance(ligne, produit)
                     .also { detailFragment = it }
                 frag.onFermer = { fermerDetailFragment() }
 
                 frag.onValider = { ligne, ajout ->
-                    if (ajout) {
-                        // L'utilisateur a choisi Ajouter
-                        ajouterInventaireLigneTemp(
-                            ligne.produitID,
-                            ligne.lot,
-                            ligne.peremptionDate,
-                            false,
-                            ligne.qteLivraison.toInt()
-                        )
-                    } else {
-                        // L'utilisateur a choisi Modifier
-                        enregistrerPhReliquat(ligne)
+                    if(ligne == null)
+                    {
+                        ElementASynchroniserOpenHelper.toutSynchroniser(this@DetailReception_V2, db, utilisateurConnecte, false)
+                        fermerDetailFragment()
+                        rafraichirListe()
+                        ouvrirScanner()
                     }
+                    else
+                    {
+                        if (ajout) {
+                            // L'utilisateur a choisi Ajouter
+                            ajouterPHReliquat(
+                                ligne
+                            )
+                        } else {
+                            // L'utilisateur a choisi Modifier
+                            enregistrerPhReliquat(ligne)
+                        }
+                    }
+
                 }
 
                 supportFragmentManager.beginTransaction()
@@ -796,6 +636,10 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                 if (!produitIdentifier.isEmpty() && produitIdentifier.size == 1) {
                     val produit = produitIdentifier[0]
 
+                    val reliquatcourant = PH_ReliquatOpenHelper.getPH_ReliquatByUnIdProduitetNumero(db, produit.iD_produit, receptionCourant.numero)
+
+                    if(reliquatcourant != null)
+                        ouvrirDetailFragment(reliquatcourant)
                     /*val inventaireLigneTemp = Inventaire_Ligne_TempOpenHelper
                         .getInventaireLigneByProduitLotPeremptionZoneDepot(
                             db,
@@ -834,38 +678,12 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     }
 
     private fun rafraichirListe() {
-        /*findViewById<TextView>(R.id.nbReferenceACompter_TV).text =
-            Inventaire_Ligne_TempOpenHelper.getILTACompte(
-                db,
-                inventaireCourant!!.getInventaire_ID(),
-                zoneCourante,
-                depotCourant!!.getDepot_Reference()
-            ).toString()
-        findViewById<TextView>(R.id.nbReferenceCompter_TV).text =
-            Inventaire_Ligne_TempOpenHelper.getILTCompte(
-                db,
-                inventaireCourant!!.getInventaire_ID(),
-                zoneCourante,
-                depotCourant!!.getDepot_Reference()
-            ).toString()
-
-        findViewById<ProgressBar>(R.id.progressBarInventaire_PB).max =
-            Inventaire_Ligne_TempOpenHelper.getILTTotal(
-                db,
-                inventaireCourant!!.getInventaire_ID(),
-                zoneCourante,
-                depotCourant!!.getDepot_Reference()
-            )
-        findViewById<ProgressBar>(R.id.progressBarInventaire_PB).progress =
-            Inventaire_Ligne_TempOpenHelper.getILTCompte(
-                db,
-                inventaireCourant!!.getInventaire_ID(),
-                zoneCourante,
-                depotCourant!!.getDepot_Reference()
-            )*/
-
-        invalidateOptionsMenu()
-        verificationEtatInventaire()
+        val nbReliquatTotal = PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(db, receptionCourant.numero).size
+        val nbReliquatPreparer = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumero(db, receptionCourant.numero).size
+        findViewById<TextView>(R.id.nbReferenceAReceptionner_TV).text = nbReliquatTotal.toString()
+        findViewById<TextView>(R.id.nbReferenceReceptionner_TV).text = nbReliquatPreparer.toString()
+        findViewById<ProgressBar>(R.id.progressBarReception_PB).max = PH_ReliquatOpenHelper.getNbReliquatBaseByCommande(db, receptionCourant.numero)
+        findViewById<ProgressBar>(R.id.progressBarReception_PB).progress = nbReliquatPreparer
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -938,73 +756,44 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         ouvrirCompter(idProduit)
     }
 
-    private fun ajouterInventaireLigneTemp(
-        idProduit: Int,
-        lot: String = "",
-        peremption: String = "",
-        ouvrirDetail: Boolean = true,
-        qte: Int = -1
+    private fun ajouterPHReliquat(
+        nouveauReliquat : PH_Reliquat
     ) {
-        /*val produit = ProduitOpenHelper.getProduitByID(db, idProduit)
-        val nouvelInventaireLigneTemp = Inventaire_Ligne_Temp(
-            produit,
-            inventaireCourant?.inventaire_ID ?: 0,
-            depotCourant,
-            utilisateurConnecte,
-            zoneCourante
-        )
+        //on regarde si un reliquat existe déjà avec ces informations
+        if (receptionCourant.ref_Depot_Dest.contains("-PAD")) {
+            nouveauReliquat.setZone("RECEPTION")
+            nouveauReliquat.setEmplacement("RECEPTION-" + receptionCourant.numero + "-" + receptionCourant.patient_identite)
+        }
 
-        if (depotCourant?.structure == "PUI")
-            nouvelInventaireLigneTemp.emplacement = produit.emplacement_PUI_Defaut
-        else
-            nouvelInventaireLigneTemp.emplacement = produit.emplacement_UF_Defaut
+        val rowID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, nouveauReliquat)
+        if (rowID != -1L) {
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
+                db,
+                PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT,
+                nouveauReliquat.phiMR4UUID,
+                nouveauReliquat.reliquat_UID,
+                DBOpenHelper.ActionsEAS.AJOUT
+            )
+            ElementASynchroniserOpenHelper.toutSynchroniser(
+                this@DetailReception_V2,
+                db,
+                utilisateurConnecte,
+                false
+            )
 
-        nouvelInventaireLigneTemp.lot = lot
-        nouvelInventaireLigneTemp.peremptionDate = peremption
-        nouvelInventaireLigneTemp.stockPhysique = qte.toDouble()
-
-        if (qte != -1)
-            nouvelInventaireLigneTemp.inventaireDate = getDateDuJour()
-
-        Inventaire_Ligne_TempOpenHelper.insererUnInventaire_Ligne_TempEnBDD(
-            db,
-            nouvelInventaireLigneTemp
-        )
-        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
-            db,
-            Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP,
-            nouvelInventaireLigneTemp.getPhiMR4UUID(),
-            nouvelInventaireLigneTemp.get_UID(),
-            DBOpenHelper.ActionsEAS.AJOUT
-        )
-        ElementASynchroniserOpenHelper.toutSynchroniser(
-            this@DetailReception_V2,
-            db,
-            utilisateurConnecte,
-            false
-        )
-
-        if (ouvrirDetail)
-            ouvrirDetailFragment(nouvelInventaireLigneTemp, true)
-        else {
             fermerDetailFragment()
             rafraichirListe()
             ouvrirScanner()
-        }*/
+        }
     }
 
-    private fun enregistrerPhReliquat(inventaireLigne: PH_Reliquat) {
-        /*inventaireLigne.inventaireDate = getDateDuJour()
-        Inventaire_Ligne_TempOpenHelper.mettreAJourInventaireLigneTemp(
-            db,
-            inventaireLigne
-        )
-
+    private fun enregistrerPhReliquat(phReliquat: PH_Reliquat) {
+        PH_ReliquatOpenHelper.mettreAJourUnPHReliquat(db, phReliquat)
         ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
             db,
-            Inventaire_Ligne_TempOpenHelper.Constantes.TABLE_INVENTAIRE_LIGNE_TEMP,
-            inventaireLigne.getPhiMR4UUID(),
-            inventaireLigne.get_UID(),
+            PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT,
+            phReliquat.phiMR4UUID,
+            phReliquat.reliquat_UID,
             DBOpenHelper.ActionsEAS.MAJ
         )
         ElementASynchroniserOpenHelper.toutSynchroniser(
@@ -1016,7 +805,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
 
         fermerDetailFragment()
         rafraichirListe()
-        ouvrirScanner()*/
+        ouvrirScanner()
     }
 
     private fun afficherAlerteAvecCallback(titre: String, message: String, onDismiss: () -> Unit) {

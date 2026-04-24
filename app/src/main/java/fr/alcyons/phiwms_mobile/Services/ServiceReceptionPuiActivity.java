@@ -58,6 +58,7 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.Reception.DetailReceptionActivity;
+import fr.alcyons.phiwms_mobile.Reception.DetailReception_V2;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
 import static fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper.viderTableCommandes;
@@ -112,7 +113,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
             Commande commandeSelectionne = (Commande) commandeReceptionPUIAdapter.getItem(position);
 
             if (commandeSelectionne != null) {
-                Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPuiActivity.this, DetailReceptionActivity.class);
+                Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPuiActivity.this, DetailReception_V2.class);
                 Bundle serviceReceptionPui_Bundle = ServiceReceptionPuiActivity.super.getBundle();
                 serviceReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
                 serviceReceptionPui_Intent.putExtras(serviceReceptionPui_Bundle);
@@ -191,7 +192,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
 
                                         invalidateOptionsMenu();
                                     } else {
-                                        Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPuiActivity.this, DetailReceptionActivity.class);
+                                        Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPuiActivity.this, DetailReception_V2.class);
                                         Bundle serviceReceptionPui_Bundle = ServiceReceptionPuiActivity.super.getBundle();
                                         serviceReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
                                         serviceReceptionPui_Intent.putExtras(serviceReceptionPui_Bundle);
@@ -365,6 +366,10 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
 
                                     PH_Reliquat reliquatCourant = new PH_Reliquat((phReliquatJSONArray.getJSONObject(j)));
 
+                                    //on verifie la présente du reliquat en base
+                                    PH_Reliquat reliquat_bdd = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquatCourant.getReliquat_UID());
+                                    if(reliquat_bdd != null)
+                                        PH_ReliquatOpenHelper.supprimerUnPHReliquat(db, reliquat_bdd);
 
                                     long phReliquatPHiMR4ID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, reliquatCourant);
                                     if (phReliquatPHiMR4ID != -1) {

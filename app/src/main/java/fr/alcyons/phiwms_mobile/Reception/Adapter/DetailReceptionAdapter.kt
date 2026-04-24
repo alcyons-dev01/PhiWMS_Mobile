@@ -18,7 +18,7 @@ class DetailReceptionAdapter (
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view = convertView ?: LayoutInflater.from(context)
-            .inflate(R.layout.row_detail_inventaire, parent, false)
+            .inflate(R.layout.row_a_receptionner, parent, false)
 
         val item = liste[position]
 
@@ -27,8 +27,11 @@ class DetailReceptionAdapter (
         val fournisseurProduit = view.findViewById<TextView>(R.id.fournisseurProduit)
         val lotProduit         = view.findViewById<TextView>(R.id.lotProduit)
         val peremptionProduit  = view.findViewById<TextView>(R.id.peremptionProduit)
-        val quantiteProduit = view.findViewById<TextView>(R.id.quantiteProduit)
-        val bandeauStockSaisie_LL = view.findViewById<LinearLayout>(R.id.bandeauStockSaisie_LL)
+        val quantiteReceptionne = view.findViewById<TextView>(R.id.quantiteReceptionne)
+        val quantiteAReceptionner = view.findViewById<TextView>(R.id.quantiteAReceptionner)
+        val informationLot_LL = view.findViewById<LinearLayout>(R.id.InformationLot_LL)
+        val bandeauQteAReceptionner = view.findViewById<LinearLayout>(R.id.bandeauQteAReceptionner)
+        val bandeauQteReceptionner = view.findViewById<LinearLayout>(R.id.bandeauQteReceptionner)
 
         nomProduit.text         = item.designationCourte
         refProduit.text         = item.produit_Reference
@@ -51,13 +54,19 @@ class DetailReceptionAdapter (
             peremptionProduit.text = "${parts[1]}/${parts[0].substring(2)}"
         }
 
-        if(item.qteLivraison.toInt() > 0)
+        if(item.reliquat_UID < 0)
         {
-            bandeauStockSaisie_LL.visibility = View.VISIBLE
-            quantiteProduit.text = item.qteLivraison.toInt().toString()
+            bandeauQteReceptionner.visibility = View.VISIBLE
+            informationLot_LL.visibility = View.VISIBLE
+            bandeauQteAReceptionner.visibility = View.GONE
+            quantiteReceptionne.text = item.qteLivraison.toInt().toString()
         }
-        else
-            bandeauStockSaisie_LL.visibility = View.GONE
+        else{
+            bandeauQteReceptionner.visibility = View.GONE
+            informationLot_LL.visibility = View.GONE
+            bandeauQteAReceptionner.visibility = View.VISIBLE
+            quantiteAReceptionner.text = item.qteReliquat_X.toString()
+        }
 
         return view
     }

@@ -513,7 +513,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                                 rowId = nouvelId;
                                 //contentValues.put(PH_ReliquatOpenHelper.Constantes.CLE_COL_RELIQUAT_UID_PH_RELIQUAT, nouvelId);
                                 //rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + element.getIdDansTableConcernee(), null);
-                                rowId = db.delete(PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
+                                //rowId = db.delete(PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});
                                 break;
                             case PH_UtiliserOpenHelper.Constantes.TABLE_PH_UTILISER:
                                 rowId = db.delete(PH_UtiliserOpenHelper.Constantes.TABLE_PH_UTILISER, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=?", new String[]{String.valueOf(element.getIdDansTableConcernee())});

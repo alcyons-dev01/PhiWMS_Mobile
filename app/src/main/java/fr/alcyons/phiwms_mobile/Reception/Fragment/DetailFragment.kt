@@ -17,32 +17,37 @@ import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat
+import fr.alcyons.phiwms_mobile.Classes.Produit
+import fr.alcyons.phiwms_mobile.Outils.Alerte
 import fr.alcyons.phiwms_mobile.R
 import fr.alcyons.phiwms_mobile.Reception.DetailReception_V2
 import java.util.Calendar
+import java.util.Random
 
 class DetailFragment : Fragment() {
 
     var onFermer: (() -> Unit)? = null
-    var onValider: ((ligne: PH_Reliquat, ajout:Boolean) -> Unit)? = null
-    private lateinit var db: SQLiteDatabase // ton type de BDD
-    var nouvelleCreation: Boolean = false
+    var onValider: ((ligne: PH_Reliquat?, ajout:Boolean) -> Unit)? = null
 
-    var lotPrecedent: String = ""
+    private lateinit var db: SQLiteDatabase // ton type de BDD
+
+    lateinit var produit : Produit
 
     companion object {
         private const val ARG_LIGNE = "ligne"
 
-        fun newInstance(ligne: PH_Reliquat?, nouvelleCreation: Boolean = false) =
+        fun newInstance(reliquatBase: PH_Reliquat?, produit : Produit) =
             DetailFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable(ARG_LIGNE, ligne)
+                    putSerializable(ARG_LIGNE, reliquatBase)
                 }
-                this.nouvelleCreation = nouvelleCreation
+                this.produit = produit
             }
     }
 
@@ -67,18 +72,15 @@ class DetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         db = (requireActivity() as DetailReception_V2).db
 
-        val ligne = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val reliquatBase = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getSerializable(ARG_LIGNE, PH_Reliquat::class.java)
         } else {
             @Suppress("DEPRECATION")
             arguments?.getSerializable(ARG_LIGNE) as? PH_Reliquat
         } ?: return
 
-        var conditionnement: Int = ligne.conditionnementAchat.toInt()
-        val layoutCartonFermerLL = view.findViewById<LinearLayout>(R.id.layoutCartonFermer_LL)
-        val layoutCartonOuvertLL = view.findViewById<LinearLayout>(R.id.layoutCartonOuvert_LL)
-        val textCartonFermerTV = view.findViewById<TextView>(R.id.textCartonFermer_TV)
-        val textCartonOuvert_TV = view.findViewById<TextView>(R.id.textCartonOuvert_TV)
+        var conditionnement: Int = reliquatBase.conditionnementAchat
+        val layoutCarton_CV = view.findViewById<CardView>(R.id.layoutCarton_CV)
         val layoutMoinsLL = view.findViewById<ImageView>(R.id.layoutMoins_LL)
         val layoutPlusLL = view.findViewById<ImageView>(R.id.layoutPlus_LL)
         val spinnerMoisDatePeremptionSP = view.findViewById<Spinner>(R.id.selecteurDateMois_SP)
@@ -95,63 +97,46 @@ class DetailFragment : Fragment() {
         )
         val quantiteCompteeET = view.findViewById<EditText>(R.id.quantiteComptee_ET)
 
+        //gestion des données
+        if(reliquatBase.emplacement == "")
+        {
+            view.findViewById<TextView>(R.id.emplacementLot_TV).text = reliquatBase.emplacement
+        }
+        else
+        {
+            view.findViewById<TextView>(R.id.emplacementLot_TV).text = produit.emplacement_PUI_Defaut
+        }
+
+        view.findViewById<TextView>(R.id.designationReference_TV).text = reliquatBase.designationCourte
+        var reliquatBaseReception = reliquatBase
+        if(reliquatBase.reliquat_UID < 0)
+        {
+            //on remet en place la quantité qui sera modifié après coup
+            reliquatBaseReception = PH_ReliquatOpenHelper.getPH_ReliquatBaseByUnIdProduitetNumero(db, reliquatBase.produitID, reliquatBase.commandeNumero)
+
+            reliquatBaseReception.qteReliquat_X += reliquatBase.qteLivraison
+            PH_ReliquatOpenHelper.mettreAJourUnPHReliquat(db, reliquatBaseReception)
+
+            view.findViewById<EditText>(R.id.numeroLot_ET).setText(reliquatBase.lot.toString())
+            quantiteCompteeET.setText(reliquatBase.qteLivraison.toString())
+        }
+        else
+        {
+            view.findViewById<EditText>(R.id.numeroLot_ET).setText("")
+            quantiteCompteeET.setText("0")
+        }
+
         //gestion du conditionnment
-        textCartonFermerTV.text =
-            textCartonFermerTV.getText().toString() + " (x" + ligne.conditionnementAchat.toInt() + ")"
-        layoutCartonFermerLL.setOnClickListener { _: View? ->
-            conditionnement = ligne.conditionnementAchat.toInt()
-            layoutCartonFermerLL.setBackgroundColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.bleu_fonce_alcyons
-                )
-            )
-            layoutCartonOuvertLL.setBackgroundColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    android.R.color.transparent
-                )
-            )
-            textCartonFermerTV.setTextColor(ContextCompat.getColor(requireContext(), R.color.blanc))
-            textCartonOuvert_TV.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.bleu_fonce_alcyons
-                )
-            )
-        }
-        layoutCartonOuvertLL.setOnClickListener { _: View? ->
-            conditionnement = 1
-            layoutCartonOuvertLL.setBackgroundColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.bleu_fonce_alcyons
-                )
-            )
-            layoutCartonFermerLL.setBackgroundColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    android.R.color.transparent
-                )
-            )
-            textCartonFermerTV.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.bleu_fonce_alcyons
-                )
-            )
-            textCartonOuvert_TV.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.blanc
-                )
-            )
-        }
+        layoutCarton_CV.visibility = View.GONE
         layoutPlusLL.setOnClickListener { _: View? ->
             var qteActuelle = quantiteCompteeET.text.toString().toInt()
             if (qteActuelle == -1)
                 qteActuelle = 0
+
             qteActuelle += conditionnement
+
+            if(qteActuelle > reliquatBaseReception.qteReliquat_X)
+                qteActuelle = reliquatBaseReception.qteReliquat_X
             quantiteCompteeET.setText(qteActuelle.toString())
         }
         layoutMoinsLL.setOnClickListener { _: View? ->
@@ -161,11 +146,6 @@ class DetailFragment : Fragment() {
             quantiteCompteeET.setText(qteActuelle.toString())
         }
 
-        if (ligne.conditionnementAchat.toInt() == 1) {
-            conditionnement = 1
-            view.findViewById<CardView>(R.id.layoutCarton_CV).visibility = View.GONE
-        }
-
         //gestion de la date de péremption
         adapterMoisPeremption.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerMoisDatePeremptionSP.adapter = adapterMoisPeremption
@@ -173,8 +153,8 @@ class DetailFragment : Fragment() {
         spinnerAnneeDatePeremptionSP.adapter = adapterAnneePeremption
         spinnerAnneeDatePeremptionSP.setSelection(3)
 
-        if (!ligne.peremptionDate.isNullOrEmpty() && ligne.peremptionDate != "0000-00-00" && !nouvelleCreation) {
-            val parts = ligne.peremptionDate.split("-")
+        if (!reliquatBase.peremptionDate.isNullOrEmpty() && reliquatBase.peremptionDate != "0000-00-00") {
+            val parts = reliquatBase.peremptionDate.split("-")
             val annee = parts[0] // "2026"
             val mois = parts[1].toInt() - 1 // "04" → index 3 (0-based)
 
@@ -192,15 +172,9 @@ class DetailFragment : Fragment() {
             view.findViewById<CardView>(R.id.layoutDatePeremption_CV).visibility = View.INVISIBLE
         }
 
-        //gestion des données
-        view.findViewById<TextView>(R.id.emplacementLot_TV).text = ligne.emplacement
-        view.findViewById<TextView>(R.id.designationReference_TV).text = ligne.designationCourte
-        view.findViewById<EditText>(R.id.numeroLot_ET).setText(ligne.lot.toString())
-        lotPrecedent = ligne.lot
-        quantiteCompteeET.setText(ligne.qteLivraison.toInt().toString())
 
         //gestion du suivi de lot et de péremption
-        val produit = ProduitOpenHelper.getProduitByID(db, ligne.produitID)
+        val produit = ProduitOpenHelper.getProduitByID(db, reliquatBase.produitID)
         if (!produit.isSuivi_Lot && !produit.isPeremption) {
             view.findViewById<LinearLayout>(R.id.layoutLotPeremption_LL).visibility = View.GONE
         } else {
@@ -215,45 +189,143 @@ class DetailFragment : Fragment() {
 
         //gestion de la fermeture
         view.findViewById<LinearLayout>(R.id.layoutFermer_LL)
-            .setOnClickListener { onFermer?.invoke() }
+            .setOnClickListener {
+                if(reliquatBase.reliquat_UID < 0)
+                {
+                    //on remet en place la quantité qui sera modifié après coup
+                    var reliquatBaseReception = PH_ReliquatOpenHelper.getPH_ReliquatBaseByUnIdProduitetNumero(db, reliquatBase.produitID, reliquatBase.commandeNumero)
 
-        //gestion du bandeau nouvelle création
-        if (nouvelleCreation)
-            view.findViewById<LinearLayout>(R.id.bandeauNouvelleReference_LL).visibility =
-                View.VISIBLE
+                    reliquatBaseReception.qteReliquat_X -= reliquatBase.qteLivraison
+                    PH_ReliquatOpenHelper.mettreAJourUnPHReliquat(db, reliquatBaseReception)
+                }
 
-        //gestion de la validation
-        view.findViewById<LinearLayout>(R.id.layoutValider_LL).setOnClickListener {
-            val qte = quantiteCompteeET.text.toString().toIntOrNull() ?: 0
-            val lot = view.findViewById<EditText>(R.id.numeroLot_ET).text.toString().trim()
+                onFermer?.invoke()
+            }
 
-            val moisIndex = spinnerMoisDatePeremptionSP.selectedItemPosition + 1 // 1-based
-            val annee = spinnerAnneeDatePeremptionSP.selectedItem.toString()
-            // Dernier jour du mois sélectionné
-            val calendar = Calendar.getInstance()
-            calendar.set(Calendar.YEAR, annee.toInt())
-            calendar.set(Calendar.MONTH, moisIndex - 1) // Calendar est 0-based
-            calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
-            val moisFormate = String.format("%02d", moisIndex)
-            val jour = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-            val datePeremption = "$annee-$moisFormate-$jour"
+        //gestion du bouton valider
+        view.findViewById<LinearLayout>(R.id.layoutValider_LL)
+            .setOnClickListener {
+                val quantite = quantiteCompteeET.text.toString().toInt()
 
-            ligne.lot = lot
-            ligne.qteLivraison = qte
-            ligne.peremptionDate = datePeremption
+                if(quantite == 0 && reliquatBase.reliquat_UID > 0)
+                {
+                    Alerte.afficherAlerteInformation(
+                        context,
+                        LayoutInflater.from(context),
+                        "Erreur",
+                        "Veuillez saisir une quantité supérieur à 0",
+                        false,
+                        false
+                    )
+                }
+                else if(quantite == 0 && reliquatBase.reliquat_UID < 0)
+                {
+                    demandeConfirmation(LayoutInflater.from(context)) {
+                        if (it) {
+                            PH_ReliquatOpenHelper.supprimerUnPHReliquat(db, reliquatBase)
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
+                                db,
+                                PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT,
+                                reliquatBase.getPhiMR4UUID(),
+                                reliquatBase.getReliquat_UID(),
+                                DBOpenHelper.ActionsEAS.SUPPR
+                            )
 
-            var ajout : Boolean = false
+                            onValider?.invoke(null, true)
+                        }
+                    }
+                }
+                else
+                {
+                    var lot = view.findViewById<EditText>(R.id.numeroLot_ET).text.toString().trim()
 
-            if(lot != lotPrecedent)
-            {
-                demandeConfirmation(layoutInflater) { resultat ->
-                    ajout = resultat
-                    onValider?.invoke(ligne, ajout)
+                    if (produit.isSuivi_Lot && lot.isEmpty()) {
+                        Alerte.afficherAlerteInformation(
+                            context,
+                            LayoutInflater.from(context),
+                            "Erreur",
+                            "Veuillez saisir un numéro de lot",
+                            false,
+                            false
+                        )
+                    } else {
+                        reliquatBaseReception.qteReliquat_X-=quantite
+                        PH_ReliquatOpenHelper.mettreAJourUnPHReliquat(db, reliquatBaseReception)
+
+                        if (!produit.isSuivi_Lot)
+                            lot = "LOT NON TRACÉ"
+
+                        val moisIndex =
+                            spinnerMoisDatePeremptionSP.selectedItemPosition + 1 // 1-based
+                        val annee = spinnerAnneeDatePeremptionSP.selectedItem.toString()
+                        // Dernier jour du mois sélectionné
+                        val calendar = Calendar.getInstance()
+                        calendar.set(Calendar.YEAR, annee.toInt())
+                        calendar.set(Calendar.MONTH, moisIndex - 1) // Calendar est 0-based
+                        calendar.set(
+                            Calendar.DAY_OF_MONTH,
+                            calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+                        )
+                        val moisFormate = String.format("%02d", moisIndex)
+                        val jour = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+                        var datePeremption = "$annee-$moisFormate-$jour"
+
+                        if (!produit.isPeremption)
+                            datePeremption = "0000-00-00"
+
+                        val serie = ""
+
+                        val reliquatliste =
+                            PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(
+                                db,
+                                reliquatBase.commandeNumero,
+                                reliquatBase.produitID
+                            )
+                        var phReliquatCourant: PH_Reliquat = reliquatBase
+
+                        var existe = false
+
+                        for (reliquatcourant in reliquatliste) {
+                            if (reliquatcourant.getLot().trim { it <= ' ' }.contentEquals(
+                                    lot
+                                        .trim { it <= ' ' }) && reliquatcourant.getPeremptionDate()
+                                    .trim { it <= ' ' }.contentEquals(datePeremption)
+                            ) {
+                                phReliquatCourant = reliquatcourant
+                                existe = true
+                            }
+                        }
+
+                        if (existe) {
+                            if(reliquatBase.reliquat_UID < 0)
+                                phReliquatCourant.qteLivraison = quantite
+                            else
+                                phReliquatCourant.qteLivraison += quantite
+                            onValider?.invoke(phReliquatCourant, false)
+                        } else {
+                            val randomreliquat = Random()
+                            var reliquatId = randomreliquat.nextInt()
+                            if (reliquatId > 0) reliquatId = reliquatId * -1
+
+                            phReliquatCourant.setReliquat_UID(reliquatId)
+                            val numeroLot = lot
+                            val zoneName = reliquatBase.zone
+                            val emplacementName = reliquatBase.emplacement
+                            val numero_Serie = serie
+
+                            phReliquatCourant.lot = numeroLot.trim { it <= ' ' }
+                            phReliquatCourant.serie = numero_Serie.trim { it <= ' ' }
+                            phReliquatCourant.peremptionDate = datePeremption.trim { it <= ' ' }
+                            phReliquatCourant.qteLivraison = quantite
+                            phReliquatCourant.scanValue = ""
+                            phReliquatCourant.bL_Numero = ""
+
+                            onValider?.invoke(phReliquatCourant, true)
+                        }
+                    }
                 }
             }
-            else
-                onValider?.invoke(ligne, ajout)
-        }
+
     }
 
     fun getListeMoisDatePicker(): Array<String?> {
@@ -289,9 +361,9 @@ class DetailFragment : Fragment() {
         val buttonAnnuler = layout.findViewById<LinearLayout>(R.id.buttonAnnuler)
         val messageTextView = layout.findViewById<TextView>(R.id.messageFin)
 
-        messageTextView.text = "Souhaitez-vous modifier ou ajouter le lot ?"
-        layout.findViewById<TextView>(R.id.TitreAnnulation).text = "Modifier"
-        layout.findViewById<TextView>(R.id.TitreConfirmation).text = "Ajouter"
+        messageTextView.text = "Souhaitez-vous supprimer le lot ?"
+        layout.findViewById<TextView>(R.id.TitreAnnulation).text = "Annuler"
+        layout.findViewById<TextView>(R.id.TitreConfirmation).text = "Confirmer"
 
         builder?.setView(layout)
 

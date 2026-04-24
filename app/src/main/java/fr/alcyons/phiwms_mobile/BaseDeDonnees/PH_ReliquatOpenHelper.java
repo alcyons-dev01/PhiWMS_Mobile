@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
+import fr.alcyons.phiwms_mobile.Classes.Produit;
 
 public class PH_ReliquatOpenHelper extends DBOpenHelper {
 
@@ -197,6 +198,21 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
         return phReliquat;
     }
 
+    public static PH_Reliquat getPH_ReliquatBaseByUnIdProduitetNumero(SQLiteDatabase db, Integer id_produit, String NumeroCommande) {
+        PH_Reliquat phReliquat = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_RELIQUAT + " WHERE " + Constantes.CLE_COL_PRODUITID_PH_RELIQUAT + "=? AND "+Constantes.CLE_COL_COMMANDENUMERO_PH_RELIQUAT+"=? AND "+Constantes.CLE_COL_RELIQUAT_UID_PH_RELIQUAT+">0", new String[]{String.valueOf(id_produit), NumeroCommande});
+
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+            phReliquat = new PH_Reliquat(cursor);
+        }
+        cursor.close();
+        cursor = null;
+
+        return phReliquat;
+    }
+
     public static PH_Reliquat getPH_ReliquatByUnIdProduitetNumeroEtLotEtPeremptionEtSerieEtZoneEtEmplacement(SQLiteDatabase db, Integer id_produit, String NumeroCommande, String numLot, String datePeremption, String serie, String zone, String emplacement) {
         PH_Reliquat phReliquat = null;
 
@@ -241,13 +257,30 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
         while (cursor.moveToNext()) {
             PH_Reliquat phReliquat = new PH_Reliquat(cursor);
 
-            if (phReliquat.getcommandeNumero().contentEquals(num) && phReliquat.getReliquat_UID() > 0) {
+            if (phReliquat.getcommandeNumero().contentEquals(num) && phReliquat.getReliquat_UID() > 0 && phReliquat.getQteReliquat_X() > 0) {
                 phReliquatList.add(phReliquat);
             }
         }
         cursor.close();
         cursor = null;
         return phReliquatList;
+    }
+
+    public static int getNbReliquatBaseByCommande(SQLiteDatabase db, String num) {
+        int tailleListe = 0;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_RELIQUAT, null);
+
+        while (cursor.moveToNext()) {
+            PH_Reliquat phReliquat = new PH_Reliquat(cursor);
+
+            if (phReliquat.getcommandeNumero().contentEquals(num) && phReliquat.getReliquat_UID() > 0) {
+                tailleListe ++;
+            }
+        }
+        cursor.close();
+        cursor = null;
+        return tailleListe;
     }
 
     public static List<PH_Reliquat> getPH_ReliquatBase(SQLiteDatabase db) {
@@ -313,6 +346,20 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
         cursor = null;
 
         return phReliquat;
+    }
+
+    public static List<String> getDesignationReliquatByNumero(SQLiteDatabase db, String designation, String numreception)
+    {
+        List<String> produitList = new ArrayList<>();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_RELIQUAT + " WHERE " + Constantes.CLE_COL_COMMANDENUMERO_PH_RELIQUAT + " = '"+numreception+"' AND "+ Constantes.CLE_COL_DESIGNATIONCOURTE_PH_RELIQUAT +" LIKE '%"+designation+"%'", new String[]{});
+
+        while (cursor.moveToNext()) {
+            PH_Reliquat produit = new PH_Reliquat(cursor);
+            produitList.add(produit.getDesignationCourte());
+        }
+        cursor.close();
+        cursor = null;
+        return produitList;
     }
 
     public static void supprimerUnPhReliquat(SQLiteDatabase db, PH_Reliquat ph_reliquat) {

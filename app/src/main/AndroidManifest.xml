@@ -144,6 +144,11 @@
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.Reception.DetailReception_V2"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
 
     <activity
         android:name="fr.alcyons.phiwms_mobile.Reception.CreationLotManuelReceptionActivity"
