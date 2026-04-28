@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
@@ -15,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -30,6 +28,7 @@ import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,10 +40,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerDocumentActivity;
-
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
@@ -60,66 +57,78 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
-public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
-    List<Retour> listeRetours;
-    ListView listViewRetours;
-    RetourAdapter adapter;
-    PackageManager pm;
+
+public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
+{
+    // OTHERS
     JSONArray retoursJson;
-    boolean connexionDirecte;
+    List<Retour> listeRetours;
+    PackageManager pm;
     ActivityResultLauncher<Intent> resultScanDocument;
+    boolean connexionDirecte;
+
+    // UI
+    RetourAdapter adapter;
+    ListView listViewRetours;
+
+
     @SuppressLint("SetTextI18n")
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    @Override protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_liste_refresh);
-        pm = ServiceDestructionActivity.this.getPackageManager();
-        // Affichage des informations de base
+        this.pm = ServiceDestructionActivity.this.getPackageManager();
 
-        ((LinearLayout) findViewById(R.id.triListe)).setVisibility(ListView.GONE);
+        // Affichage des informations de base
+        this.findViewById(R.id.triListe).setVisibility(ListView.GONE);
 
         // Gestion de la listView
-        listViewRetours = findViewById(R.id.listeView);
-        listViewRetours.setOnItemClickListener((parent, view, position, id) -> {
-            Retour retourSelectionne = (Retour) adapter.getItem(position);
+        this.listViewRetours = this.findViewById(R.id.listeView);
+        this.listViewRetours.setOnItemClickListener((parent, view, position, id) -> {
+            Retour retourSelectionne = (Retour) this.adapter.getItem(position);
 
             Intent newIntent = new Intent(ServiceDestructionActivity.this, DetailDestructionActivity.class);
-            Bundle extras = ServiceDestructionActivity.super.getBundle();
             assert retourSelectionne != null;
+
+            Bundle extras = ServiceDestructionActivity.super.getBundle();
             extras.putInt("retourSelectionneID", retourSelectionne.get_UID());
             newIntent.putExtras(extras);
             ServiceDestructionActivity.this.startActivity(newIntent);
             ServiceDestructionActivity.this.finish();
         });
 
-        connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(db);
+        this.connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(this.db);
 
-        resultScanDocument = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
+        this.resultScanDocument = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                     Intent data = result.getData();
-                    if (result.getResultCode() == CodesEchangesActivites.RESULT_OK) {
-                        if (data != null) {
+                    if (result.getResultCode() == CodesEchangesActivites.RESULT_OK)
+                    {
+                        if (data != null)
+                        {
                             String code = Objects.requireNonNull(data.getExtras()).getString("code");
-                            if (code != null) {
-                                Retour retourSelectionne = RetourOpenHelper.getRetourByNumero(db, code);
-                                if (retourSelectionne == null) {
-                                    if (!code.contentEquals("")) {
-                                        afficherSnackBarDestruction();
-                                    }
-                                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
+                            if (code != null)
+                            {
+                                Retour retourSelectionne = RetourOpenHelper.getRetourByNumero(this.db, code);
+                                if (retourSelectionne == null)
+                                {
+                                    if (!code.contentEquals("")) { this.afficherSnackBarDestruction(); }
+
+                                    ((TextView) this.findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
                                     adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours, utilisateurConnecte);
                                     listViewRetours.setDivider(footer);
                                     listViewRetours.setAdapter(adapter);
 
-                                    if (listeRetours.isEmpty()) {
-                                        vide = true;
-                                        nomServiceVide = "Destruction";
+                                    if (this.listeRetours.isEmpty())
+                                    {
+                                        ServiceDestructionActivity.vide = true;
+                                        ServiceDestructionActivity.nomServiceVide = "Destruction";
                                         ServiceDestructionActivity.this.finish();
                                     }
 
-                                    invalidateOptionsMenu();
-                                } else {
+                                    this.invalidateOptionsMenu();
+                                }
+                                else
+                                {
                                     Intent newIntent = new Intent(ServiceDestructionActivity.this, DetailDestructionActivity.class);
                                     Bundle extras = ServiceDestructionActivity.super.getBundle();
                                     extras.putInt("retourSelectionneID", retourSelectionne.get_UID());
@@ -128,41 +137,52 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
                                     ServiceDestructionActivity.this.startActivity(newIntent);
                                     ServiceDestructionActivity.this.finish();
                                 }
-                            } else {
-                                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
-                                ((TextView) findViewById(R.id.titre)).setText("Demandes de destruction");
-                                adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours, utilisateurConnecte);
-                                listViewRetours.setDivider(footer);
-                                listViewRetours.setAdapter(adapter);
 
-                                if (listeRetours.isEmpty()) {
-                                    vide = true;
-                                    nomServiceVide = "Destruction";
+                            }
+                            else
+                            {
+                                ((TextView) this.findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(this.listeRetours.size()));
+                                ((TextView) this.findViewById(R.id.titre)).setText("Demandes de destruction");
+
+                                this.adapter = new RetourAdapter(ServiceDestructionActivity.this, this.db, this.listeRetours, this.utilisateurConnecte);
+                                this.listViewRetours.setDivider(this.footer);
+                                this.listViewRetours.setAdapter(this.adapter);
+
+                                if (this.listeRetours.isEmpty())
+                                {
+                                    ServiceDestructionActivity.vide = true;
+                                    ServiceDestructionActivity.nomServiceVide = "Destruction";
                                     ServiceDestructionActivity.this.finish();
                                 }
 
-                                invalidateOptionsMenu();
+                                this.invalidateOptionsMenu();
                             }
-                        } else {
-                            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
-                            ((TextView) findViewById(R.id.titre)).setText("Demandes de destruction");
-                            adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours, utilisateurConnecte);
-                            listViewRetours.setDivider(footer);
-                            listViewRetours.setAdapter(adapter);
+                        }
+                        else
+                        {
+                            ((TextView) this.findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(this.listeRetours.size()));
+                            ((TextView) this.findViewById(R.id.titre)).setText("Demandes de destruction");
 
-                            if (listeRetours.isEmpty()) {
-                                vide = true;
-                                nomServiceVide = "Destruction";
+                            this.adapter = new RetourAdapter(ServiceDestructionActivity.this, this.db, this.listeRetours, this.utilisateurConnecte);
+                            this.listViewRetours.setDivider(this.footer);
+                            this.listViewRetours.setAdapter(this.adapter);
+
+                            if (this.listeRetours.isEmpty())
+                            {
+                                ServiceDestructionActivity.vide = true;
+                                ServiceDestructionActivity.nomServiceVide = "Destruction";
                                 ServiceDestructionActivity.this.finish();
                             }
 
-                            invalidateOptionsMenu();
+                            this.invalidateOptionsMenu();
                         }
                     }
-                });
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
+        });
+
+        this.getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true)
+        {
+            @Override public void handleOnBackPressed()
+            {
                 Intent intent = new Intent(ServiceDestructionActivity.this, NavigationActivity.class);
                 Bundle extras = new Bundle();
                 extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
@@ -172,26 +192,30 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
             }
         });
     }
-    @Override
-    public void onResume() {
+
+    @Override public void onResume()
+    {
         super.onResume();
-        if (statutConnexion && passageParOnCreate && !connexionDirecte) {
 
-            if (!swipeRefreshLayout.isRefreshing()) {
-                afficherSpinner(ServiceDestructionActivity.this, LayoutInflater.from(ServiceDestructionActivity.this));
-            }
-      
+        if (ServiceDestructionActivity.statutConnexion && this.passageParOnCreate && !this.connexionDirecte)
+        {
+
+            if (!this.swipeRefreshLayout.isRefreshing()) { this.afficherSpinner(ServiceDestructionActivity.this, LayoutInflater.from(ServiceDestructionActivity.this)); }
+
+            this.listeRetours = new ArrayList<>();
+
             RequestQueue requestQueueDestructionUtilisateur = Volley.newRequestQueue(ServiceDestructionActivity.this);
-
-            listeRetours = new ArrayList<>();
             String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteDestruction;
-
             JsonObjectRequest obreq = getJsonObjectRequest(urlRequete);
             requestQueueDestructionUtilisateur.add(obreq);
-        } else {
-            listeRetours = RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(db, getString(R.string.statutEncours), getString(R.string.DestructionDemandee));
-            if (listeRetours.isEmpty()) {
-                if(connexionDirecte)
+
+        }
+        else
+        {
+            this.listeRetours = RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(this.db, getString(R.string.statutEncours), getString(R.string.DestructionDemandee));
+            if (this.listeRetours.isEmpty())
+            {
+                if(this.connexionDirecte)
                 {
                     Intent retourVersServiceConnexionDirectIntent = getRetourVersServiceConnexionDirectIntent();
                     ServiceDestructionActivity.this.startActivity(retourVersServiceConnexionDirectIntent);
@@ -199,171 +223,180 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
                 }
                 else
                 {
-                    connexionNecessaire();
+                    this.connexionNecessaire();
                     return;
                 }
             }
             else
             {
-                passageParOnCreate = false;
-                if(connexionDirecte)
-                {
-                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
-                    ((TextView) findViewById(R.id.titre)).setText("Demandes de destruction");
-                    adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours, utilisateurConnecte);
-                    listViewRetours.setDivider(footer);
-                    listViewRetours.setAdapter(adapter);
+                this.passageParOnCreate = false;
 
-                    if (listeRetours.isEmpty()) {
-                        vide = true;
-                        nomServiceVide = "Destruction";
+                if(this.connexionDirecte)
+                {
+                    ((TextView) this.findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(this.listeRetours.size()));
+                    ((TextView) this.findViewById(R.id.titre)).setText("Demandes de destruction");
+
+                    this.adapter = new RetourAdapter(ServiceDestructionActivity.this, this.db, this.listeRetours, this.utilisateurConnecte);
+                    this.listViewRetours.setDivider(this.footer);
+                    this.listViewRetours.setAdapter(this.adapter);
+
+                    if (this.listeRetours.isEmpty())
+                    {
+                        ServiceDestructionActivity.vide = true;
+                        ServiceDestructionActivity.nomServiceVide = "Destruction";
                         ServiceDestructionActivity.this.finish();
                     }
 
-                    invalidateOptionsMenu();
-                    connexionDirecte = !connexionDirecte;
+                    this.connexionDirecte = !this.connexionDirecte;
+                    this.invalidateOptionsMenu();
                 }
             }
         }
 
-        invalidateOptionsMenu();
+        this.invalidateOptionsMenu();
     }
-    @NonNull
-    private Intent getRetourVersServiceConnexionDirectIntent() {
+
+    @NonNull private Intent getRetourVersServiceConnexionDirectIntent()
+    {
         Intent retourVersServiceConnexionDirectIntent = new Intent(ServiceDestructionActivity.this, ServiceConnexionDirecteActivity.class);
         Bundle retourVersServiceConnexionDirectBundle = new Bundle();
-        retourVersServiceConnexionDirectBundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+        retourVersServiceConnexionDirectBundle.putInt("utilisateurConnecteID", this.utilisateurConnecte.getId());
         retourVersServiceConnexionDirectBundle.putBoolean("snackBar", true);
         retourVersServiceConnexionDirectBundle.putString("nomService", "Destruction");
-
         retourVersServiceConnexionDirectIntent.putExtras(retourVersServiceConnexionDirectBundle);
+
         return retourVersServiceConnexionDirectIntent;
     }
-    @NonNull
-    private JsonObjectRequest getJsonObjectRequest(String urlRequete) {
+    @NonNull private JsonObjectRequest getJsonObjectRequest(String urlRequete)
+    {
         // Takes the response from the JSON request
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
-                response -> {
-                    try {
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null, response -> {
+                    try
+                    {
                         int nbResultat = response.getInt("resultCount");
-                        if (nbResultat == 0) {
+                        if (nbResultat == 0)
+                        {
                             String string = response.getString("erreur");
-                            if (string.equals(getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerteInformation(ServiceDestructionActivity.this, getLayoutInflater(), "Alerte", "Votre session a expirée, veuillez vous reconnecter.", false, true);
-                            } else {
-                                arreterSpinner();
-                                vide = true;
-                                nomServiceVide = "Destruction";
-                                retourNavigation();
+                            if (string.equals(getString(R.string.tokenInvalide))) { Alerte.afficherAlerteInformation(ServiceDestructionActivity.this, getLayoutInflater(), "Alerte", "Votre session a expirée, veuillez vous reconnecter.", false, true); }
+                            else
+                            {
+                                this.arreterSpinner();
+                                ServiceDestructionActivity.vide = true;
+                                ServiceDestructionActivity.nomServiceVide = "Destruction";
+                                this.retourNavigation();
                             }
-                        } else {
-                            retoursJson = response.getJSONArray("PH_Retours");
-                            viderTablesConcernees();
-                            for (int i = 0; i < retoursJson.length(); i++) {
-                                JSONObject retourJson = retoursJson.getJSONObject(i);
+                        }
+                        else
+                        {
+                            this.viderTablesConcernees();
+
+                            this.retoursJson = response.getJSONArray("PH_Retours");
+
+                            for (int i = 0; i < this.retoursJson.length(); i++)
+                            {
+                                JSONObject retourJson = this.retoursJson.getJSONObject(i);
                                 Retour retour = new Retour(retourJson);
 
-                                if (retour.getEn_Attente_de().equals(getString(R.string.DestructionDemandee)) && retour.getStatut().equals(getString(R.string.statutEncours))) {
-                                    listeRetours.add(retour);
-                                    long rowID = RetourOpenHelper.insererUnRetourEnBDD(db, retour);
-                                    if (rowID != -1) {
+                                if (retour.getEn_Attente_de().equals(getString(R.string.DestructionDemandee)) && retour.getStatut().equals(getString(R.string.statutEncours)))
+                                {
+                                    this.listeRetours.add(retour);
+                                    long rowID = RetourOpenHelper.insererUnRetourEnBDD(this.db, retour);
+                                    if (rowID != -1)
+                                    {
                                         JSONArray retourLignesJson = retourJson.getJSONArray("ph_retour_ligne");
-
-                                        for (int k = 0; k < retourLignesJson.length(); k++) {
-                                            Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(db, new Retour_Ligne(retourLignesJson.getJSONObject(k)));
-                                        }
+                                        for (int k = 0; k < retourLignesJson.length(); k++) { Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(this.db, new Retour_Ligne(retourLignesJson.getJSONObject(k))); }
                                     }
                                 }
                             }
 
-                            if (listeRetours.isEmpty()) {
-                                vide = true;
-                                nomServiceVide = "Destruction";
+                            if (this.listeRetours.isEmpty())
+                            {
+                                ServiceDestructionActivity.vide = true;
+                                ServiceDestructionActivity.nomServiceVide = "Destruction";
                                 ServiceDestructionActivity.this.finish();
                             }
                             else
                             {
-                                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
-                                ((TextView) findViewById(R.id.titre)).setText("Demandes de destruction");
-                                adapter = new RetourAdapter(ServiceDestructionActivity.this, db, listeRetours, utilisateurConnecte);
-                                listViewRetours.setDivider(footer);
-                                listViewRetours.setAdapter(adapter);
-                                invalidateOptionsMenu();
-                                passageParOnCreate = false;
+                                ((TextView) this.findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(this.listeRetours.size()));
+                                ((TextView) this.findViewById(R.id.titre)).setText("Demandes de destruction");
+
+                                this.adapter = new RetourAdapter(ServiceDestructionActivity.this, this.db, this.listeRetours, this.utilisateurConnecte);
+                                this.listViewRetours.setDivider(this.footer);
+                                this.listViewRetours.setAdapter(this.adapter);
+
+                                this.passageParOnCreate = false;
+                                this.invalidateOptionsMenu();
                             }
+
                             new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
                     }
+                    catch (JSONException e) { e.printStackTrace(); }
                 },
                 error -> {
                     Log.e("Volley", "Error");
                     Alerte.afficherAlerteInformation(ServiceDestructionActivity.this, getLayoutInflater(),"Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Destruction)", false, true);
                 }
-        ) {
+        )
+        {
 
             /**
              * Passing some request headers
              */
-            @Override
-            public Map<String, String> getHeaders() {
+            @Override public Map<String, String> getHeaders()
+            {
                 HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", utilisateurConnecte.getToken());
+                headers.put("Authorization", ServiceDestructionActivity.this.utilisateurConnecte.getToken());
                 return headers;
             }
         };
+
         obreq.setRetryPolicy(new RetryPolicy() {
-            @Override
-            public int getCurrentTimeout() {
-                return 50000;
-            }
-
-            @Override
-            public int getCurrentRetryCount() {
-                return 50000;
-            }
-
-            @Override
-            public void retry(VolleyError error) {
-
-            }
+            @Override public int getCurrentTimeout() { return 50000; }
+            @Override public int getCurrentRetryCount() { return 50000; }
+            @Override public void retry(VolleyError error) {}
         });
+
         return obreq;
     }
-    public void viderTablesConcernees() {
-        for (Retour retour : RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(db, getString(R.string.statutEncours), getString(R.string.DestructionDemandee))
-                ) {
-            List<Retour_Ligne> retourLignes = Retour_LigneOpenHelper.getAllRetourLignesByRetour(db, retour);
-            for (Retour_Ligne retourLigne : retourLignes
-                    ) {
-                Retour_LigneOpenHelper.supprimerUnRetourLigne(db, retourLigne);
-            }
-            RetourOpenHelper.supprimerUnRetour(db, retour);
+
+    public void viderTablesConcernees()
+    {
+        for (Retour retour : RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(this.db, getString(R.string.statutEncours), getString(R.string.DestructionDemandee)))
+        {
+            List<Retour_Ligne> retourLignes = Retour_LigneOpenHelper.getAllRetourLignesByRetour(this.db, retour);
+            for (Retour_Ligne retourLigne : retourLignes) { Retour_LigneOpenHelper.supprimerUnRetourLigne(this.db, retourLigne); }
+            RetourOpenHelper.supprimerUnRetour(this.db, retour);
         }
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.prepareOptionsMenu(menu, adapter, null, "Produit, Intitulé, N°...");
+    @Override public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        super.prepareOptionsMenu(menu, this.adapter, null, "Produit, Intitulé, N°...");
+
         MenuItem item = menu.findItem(R.id.menuDatamatrix);
         item.setOnMenuItemClickListener(item1 -> true);
 
         MenuItem itemScan = menu.findItem(R.id.menuDatamatrix);
         itemScan.setOnMenuItemClickListener(menuItem -> {
-            lancerScan();
+            this.lancerScan();
             return true;
         });
+
         return true;
     }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+
+    @Override public boolean onCreateOptionsMenu(Menu menu)
+    {
         super.onCreateOptionsMenu(menu);
+
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_action, menu);
         menu.findItem(R.id.menuDatamatrix).setVisible(true);
+
         return true;
     }
+
     public void lancerScan()
     {
         Bundle scanDocumentBundle = ServiceDestructionActivity.super.getBundle();
@@ -379,10 +412,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
         }
         else
         {
-            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
-            {
-                scanDocumentIntent = new Intent(ServiceDestructionActivity.this, BarcodeCaptureActivity.class);
-            }
+            if(this.pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) { scanDocumentIntent = new Intent(ServiceDestructionActivity.this, BarcodeCaptureActivity.class); }
             else
             {
                 scanDocumentIntent = new Intent(ServiceDestructionActivity.this, ScannerDocumentActivity.class);
@@ -392,12 +422,14 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity {
         }
 
         scanDocumentIntent.putExtras(scanDocumentBundle);
-        resultScanDocument.launch(scanDocumentIntent);
+        this.resultScanDocument.launch(scanDocumentIntent);
     }
-    public void afficherSnackBarDestruction() {
+    public void afficherSnackBarDestruction()
+    {
         Snackbar snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Document scanné inconnu</b>", 0), Snackbar.LENGTH_LONG);
 
-        @SuppressLint("RestrictedApi") Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
+        @SuppressLint("RestrictedApi")
+        Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
         layout.setBackgroundColor(getResources().getColor(R.color.rouge2, null));
         TextView textView = layout.findViewById(com.google.android.material.R.id.snackbar_text);
         textView.setTextSize(TypedValue.TYPE_STRING, 8);
