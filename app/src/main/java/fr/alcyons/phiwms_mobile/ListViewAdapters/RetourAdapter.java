@@ -16,14 +16,11 @@ import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
-import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.R;
-import okhttp3.internal.Util;
 
 public class RetourAdapter extends ArrayAdapter implements Filterable {
 
@@ -62,7 +59,7 @@ public class RetourAdapter extends ArrayAdapter implements Filterable {
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_retour, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_retour_destruction, parent, false);
         }
 
         RetourViewHolder viewHolder = (RetourViewHolder) convertView.getTag();
