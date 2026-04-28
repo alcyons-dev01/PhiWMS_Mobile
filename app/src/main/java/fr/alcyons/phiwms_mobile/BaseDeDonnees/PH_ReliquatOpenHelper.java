@@ -198,6 +198,22 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
         return phReliquat;
     }
 
+    public static PH_Reliquat getPH_ReliquatByUnIdProduitetNumeroLotSerie(SQLiteDatabase db, Integer id_produit, String NumeroCommande, String lot, String serie) {
+        PH_Reliquat phReliquat = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_RELIQUAT + " WHERE " + Constantes.CLE_COL_PRODUITID_PH_RELIQUAT + "=? AND "+Constantes.CLE_COL_COMMANDENUMERO_PH_RELIQUAT+"=? AND "+Constantes.CLE_COL_LOT_PH_RELIQUAT +"=? AND "+Constantes.CLE_COL_SERIE +"=?", new String[]{String.valueOf(id_produit), NumeroCommande, lot, serie});
+
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+            phReliquat = new PH_Reliquat(cursor);
+        }
+
+        cursor.close();
+        cursor = null;
+
+        return phReliquat;
+    }
+
     public static PH_Reliquat getPH_ReliquatBaseByUnIdProduitetNumero(SQLiteDatabase db, Integer id_produit, String NumeroCommande) {
         PH_Reliquat phReliquat = null;
 
