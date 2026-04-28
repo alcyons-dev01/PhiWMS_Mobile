@@ -1,3 +1,8 @@
+# User defined
+.gradle/
+/local.properties
+.idea/
+
 # Built application files
 *.apk
 *.ap_
