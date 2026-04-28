@@ -205,7 +205,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
             this.listeRetours = new ArrayList<>();
 
             RequestQueue requestQueueDestructionUtilisateur = Volley.newRequestQueue(ServiceDestructionActivity.this);
-            String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteDestruction;
+            String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(this.db) + DBOpenHelper.Urls.uriRequeteDestruction;
             JsonObjectRequest obreq = getJsonObjectRequest(urlRequete);
             requestQueueDestructionUtilisateur.add(obreq);
 
