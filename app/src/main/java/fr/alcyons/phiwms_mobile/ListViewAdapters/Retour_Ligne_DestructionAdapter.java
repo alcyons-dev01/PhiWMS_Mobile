@@ -23,31 +23,31 @@ import fr.alcyons.phiwms_mobile.R;
 public class Retour_Ligne_DestructionAdapter extends ArrayAdapter
 {
     // OTHERS
-    public List<Retour_Ligne> retour_Lignes;
+    private final List<Retour_Ligne> mRetour_Lignes;
 
     // UI
-    Context context;
-    public List<Retour_LigneViewHolder> retourLigneViewHolderList;
+    final Context mContext;
+    private final List<Retour_LigneViewHolder> retourLigneViewHolderList;
 
-    public Retour_Ligne_DestructionAdapter(Context context, List<Retour_Ligne> retour_Lignes)
+    public Retour_Ligne_DestructionAdapter(final Context context, final List<Retour_Ligne> retour_Lignes)
     {
         super(context, 0, retour_Lignes);
 
-        this.retour_Lignes = retour_Lignes;
-        this.context = context;
+        this.mRetour_Lignes = retour_Lignes;
+        this.mContext = context;
 
         this.retourLigneViewHolderList = new ArrayList<>();
-        for (int i = 0; i < retour_Lignes.size(); i++)
+        for (int i = 0; i < this.mRetour_Lignes.size(); i++)
         {
-            Retour_LigneViewHolder viewHolder = new Retour_LigneViewHolder();
+            final Retour_LigneViewHolder viewHolder = new Retour_LigneViewHolder();
             this.retourLigneViewHolderList.add(viewHolder);
         }
     }
 
     @NonNull
-    @Override public View getView(final int position, View convertView, @NonNull ViewGroup parent)
+    @Override public View getView(final int position, View convertView, @NonNull final ViewGroup parent)
     {
-        final Retour_LigneViewHolder viewHolder = retourLigneViewHolderList.get(position);
+        final Retour_LigneViewHolder viewHolder = this.retourLigneViewHolderList.get(position);
 
         convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_retour_ligne_destruction, parent, false);
 
@@ -67,7 +67,7 @@ public class Retour_Ligne_DestructionAdapter extends ArrayAdapter
         viewHolder.designation.setText(retour_LigneCourant.getProduit_Designation());
         viewHolder.referenceProduit.setText(retour_LigneCourant.getProduit_Reference());
         viewHolder.fournisseur.setText(retour_LigneCourant.getProduit_Fournisseur());
-        viewHolder.qteRetourner.setText(retour_LigneCourant.getQte_Retourner() == 0 ? "" : String.valueOf((int) retour_LigneCourant.getQte_Retourner()));
+        viewHolder.qteRetourner.setText((double) 0 == retour_LigneCourant.getQte_Retourner() ? "" : String.valueOf((int) retour_LigneCourant.getQte_Retourner()));
         viewHolder.lot.setText(retour_LigneCourant.getLot_Retourner());
 
         //gestion du numéro de série
@@ -80,18 +80,18 @@ public class Retour_Ligne_DestructionAdapter extends ArrayAdapter
 
         Date date = null;
         String dateAAfficher = "";
-        DateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
+        final DateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
         try
         {
-            if (retour_LigneCourant.getPeremptionDate().length() >= 10 && !retour_LigneCourant.getPeremptionDate().contentEquals("0000-00-00"))
+            if (10 <= retour_LigneCourant.getPeremptionDate().length() && !retour_LigneCourant.getPeremptionDate().contentEquals("0000-00-00"))
             {
                 date = dateDecodeur.parse(retour_LigneCourant.getPeremptionDate().substring(0, 10));
-                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                assert date != null;
+                final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                assert null != date;
                 dateAAfficher = dateFormat.format(date);
             }
         }
-        catch (ParseException e) { e.printStackTrace(); }
+        catch (final ParseException e) { e.printStackTrace(); }
 
         viewHolder.datePeremption.setText(dateAAfficher);
         viewHolder.setDatePeremptionColor(date);
@@ -101,30 +101,30 @@ public class Retour_Ligne_DestructionAdapter extends ArrayAdapter
 
     public class Retour_LigneViewHolder
     {
-        public TextView designation;
-        public TextView referenceProduit;
-        public TextView fournisseur;
-        public TextView qteRetourner;
-        public TextView lot;
-        public TextView datePeremption;
-        public TextView serie;
-        public TextView labelSerie;
+        public TextView designation = null;
+        public TextView referenceProduit = null;
+        public TextView fournisseur = null;
+        TextView qteRetourner = null;
+        public TextView lot = null;
+        public TextView datePeremption = null;
+        public TextView serie = null;
+        public TextView labelSerie = null;
 
-        public void setDatePeremptionColor(Date date)
+        public void setDatePeremptionColor(final Date date)
         {
-            if (date != null)
+            if (null != date)
             {
 
-                Date dateDuJour = new Date();
-                long diff = dateDuJour.getTime() - date.getTime();
-                int delai = (int) (diff / (1000 * 60 * 60 * 24));
+                final Date dateDuJour = new Date();
+                final long diff = dateDuJour.getTime() - date.getTime();
+                final int delai = (int) (diff / (long) (1000 * 60 * 60 * 24));
 
-                int delai30jours = -30;
-                int delai60jours = -60;
+                final int delai30jours = -30;
+                final int delai60jours = -60;
 
-                if (delai >= delai30jours) { this.datePeremption.setTextColor(Retour_Ligne_DestructionAdapter.this.context.getResources().getColor(R.color.rouge2)); }
-                else if (delai >= delai60jours) { this.datePeremption.setTextColor(Retour_Ligne_DestructionAdapter.this.context.getResources().getColor(R.color.orange2)); }
-                else { this.datePeremption.setTextColor(Retour_Ligne_DestructionAdapter.this.context.getResources().getColor(R.color.vert)); }
+                if (delai30jours <= delai) { this.datePeremption.setTextColor(Retour_Ligne_DestructionAdapter.this.mContext.getResources().getColor(R.color.rouge2)); }
+                else if (delai60jours <= delai) { this.datePeremption.setTextColor(Retour_Ligne_DestructionAdapter.this.mContext.getResources().getColor(R.color.orange2)); }
+                else { this.datePeremption.setTextColor(Retour_Ligne_DestructionAdapter.this.mContext.getResources().getColor(R.color.vert)); }
             }
             else { this.datePeremption.setTextColor(Color.BLACK); }
 
