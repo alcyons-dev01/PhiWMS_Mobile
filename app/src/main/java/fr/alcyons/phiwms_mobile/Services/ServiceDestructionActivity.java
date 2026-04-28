@@ -22,6 +22,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -255,7 +256,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
 
     private void handleDocumentScanResult(final Intent data)
     {
-        final String scannedCode = this.extractScannedCode(data);
+        final String scannedCode = ServiceDestructionActivity.extractScannedCode(data);
         if (null == scannedCode)
         {
             this.displayRetoursOrClose();
@@ -273,7 +274,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
         this.displayRetoursOrClose();
     }
 
-    private String extractScannedCode(final Intent data)
+    @Nullable private static String extractScannedCode(final Intent data)
     {
         if (null == data || null == data.getExtras()) { return null; }
         return Objects.requireNonNull(data.getExtras()).getString("code");
@@ -344,7 +345,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
 
     private boolean isDestructionRetourInProgress(final Retour retour) { return this.getString(R.string.DestructionDemandee).equals(retour.getEn_Attente_de()) && this.getString(R.string.statutEncours).equals(retour.getStatut()); }
 
-    public final void clearConcernedTables()
+    private final void clearConcernedTables()
     {
         for (final Retour retour : RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(this.db, this.getString(R.string.statutEncours), this.getString(R.string.DestructionDemandee)))
         {
@@ -381,7 +382,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
         return true;
     }
 
-    public void launchScan()
+    private void launchScan()
     {
         final Bundle scanDocumentBundle = ServiceDestructionActivity.super.getBundle();
         scanDocumentBundle.putString("contexte", String.valueOf(R.string.scannerContexteDocument));
