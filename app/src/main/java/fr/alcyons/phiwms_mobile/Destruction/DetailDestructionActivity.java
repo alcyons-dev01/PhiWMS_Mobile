@@ -171,7 +171,7 @@ public class DetailDestructionActivity extends ServiceActivity
 
         final ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, this.utilisateurConnecte.getId(), date_string, this.serviceActuel.getId(), this.utilisateurConnecte.getEtablissementId(), "En attente", this.retourSelectionne.get_UID(), "", "Destruction");
         ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(this.db, new_action_utilisateur);
-        for (final Retour_Ligne retourLigne : this.adapter.retour_Lignes)
+        for (final Retour_Ligne retourLigne : this.adapter.mRetour_Lignes)
         {
             retourLigne.setQte_Retourner((double) 0 == retourLigne.getQte_Retourner() ? retourLigne.getQte_Demander() : retourLigne.getQte_Retourner());
 
@@ -191,7 +191,7 @@ public class DetailDestructionActivity extends ServiceActivity
         }
 
         // Si tous les retoursLignes ont bien été mis à jour, on met à jour le retour
-        if (compteurReussite == this.adapter.retour_Lignes.size())
+        if (compteurReussite == this.adapter.mRetour_Lignes.size())
         {
             final String intitule = this.retourSelectionne.getIntitule();
             this.retourSelectionne.setIntitule(intitule.replace(this.getString(R.string.DestructionDemandee), this.getString(R.string.DestructionEffectuee)));
@@ -210,7 +210,7 @@ public class DetailDestructionActivity extends ServiceActivity
         }
 
         // Si une erreur est survenue, on annule tout
-        if (compteurReussite != this.adapter.retour_Lignes.size())
+        if (compteurReussite != this.adapter.mRetour_Lignes.size())
         {
             Alerte.afficherAlerteInformation(DetailDestructionActivity.this, this.getLayoutInflater(), "Alerte", "une erreur est survenue, aucun traitement ne sera effectué", false, false);
             ElementASynchroniserOpenHelper.viderTableElementASynchroniser(this.db);

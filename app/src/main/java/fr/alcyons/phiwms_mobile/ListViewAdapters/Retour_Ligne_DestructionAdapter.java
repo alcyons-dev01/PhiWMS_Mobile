@@ -23,7 +23,7 @@ import fr.alcyons.phiwms_mobile.R;
 public class Retour_Ligne_DestructionAdapter extends ArrayAdapter
 {
     // OTHERS
-    private final List<Retour_Ligne> mRetour_Lignes;
+    public final List<Retour_Ligne> mRetour_Lignes;
 
     // UI
     final Context mContext;
