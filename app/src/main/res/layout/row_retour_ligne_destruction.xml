@@ -1,70 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:backgroundTint="@android:color/white"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="4dp"
+    android:layout_marginVertical="2dp"
+    app:cardBackgroundColor="#FFF4F4"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
 
     <LinearLayout
         android:id="@+id/layoutPrincipal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:background="@drawable/background_cadre_rouge"
-        android:orientation="horizontal"
-        android:padding="5dp"
-        android:weightSum="4">
+        android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:background="@drawable/background_empty_radius"
-            android:padding="5dp"
-            android:orientation="vertical">
+            android:background="@color/rouge2"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="12dp">
 
+            <TextView
+                android:id="@+id/designationProduit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="Designation"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp">
 
                 <TextView
-                    android:id="@+id/designationProduit"
-                    android:layout_width="match_parent"
+                    android:id="@+id/QteRetourner"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:gravity="center_vertical"
-                    android:paddingRight="5dp"
-                    android:text="Designation"
-                    android:textColor="@android:color/black"
+                    android:minWidth="48dp"
+                    android:gravity="center"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
+                    android:text=""
+                    android:textColor="@color/rouge2"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
+            </androidx.cardview.widget.CardView>
 
-            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFF4F4"
+            android:orientation="vertical"
+            android:padding="12dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="3">
-
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/referenceProduit"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="ReferenceProduit" />
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="ReferenceProduit"
+                    android:textColor="@color/noir"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/nomFournisseur"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:text="ddd"
-                    android:gravity="right"
-                    android:layout_marginRight="10dp"
-                    android:textSize="15dp"
-                    android:textColor="@color/noir" />
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:gravity="end"
+                    android:maxLines="1"
+                    android:text="Fournisseur"
+                    android:textColor="@color/noir"
+                    android:textSize="14sp" />
 
             </LinearLayout>
 
@@ -72,139 +102,138 @@
                 android:id="@+id/layoutGauche"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
                 android:orientation="horizontal"
-                android:weightSum="7">
+                android:weightSum="3">
 
-                <LinearLayout
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/zoneLot"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="7"
-                    android:orientation="vertical">
+                    android:layout_weight="1"
+                    android:layout_marginEnd="2dp"
+                    app:cardBackgroundColor="@android:color/white"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="0dp">
 
                     <LinearLayout
-                        android:id="@+id/zoneLot"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:orientation="vertical"
+                        android:padding="8dp">
 
                         <TextView
                             android:id="@+id/labelLot"
-                            android:layout_width="35dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
+                            android:gravity="center"
                             android:text="Lot"
-                            android:textColor="@color/noir"/>
+                            android:textColor="@color/rouge2"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/lotRetourne"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
-                            android:paddingRight="10dp"
+                            android:layout_marginTop="4dp"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:text=""
                             android:textColor="@color/noir"
-                            android:textStyle="bold"
-                            android:text=""/>
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
 
                     </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/zoneSerie"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="1dp"
+                    app:cardBackgroundColor="@android:color/white"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="0dp">
 
                     <LinearLayout
-                        android:id="@+id/zoneSerie"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:orientation="vertical"
+                        android:padding="8dp">
 
                         <TextView
                             android:id="@+id/labelSerie"
-                            android:layout_width="35dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
+                            android:gravity="center"
                             android:text="Série"
-                            android:textColor="@color/noir"/>
+                            android:textColor="@color/rouge2"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/numSerie"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
-                            android:paddingRight="10dp"
+                            android:layout_marginTop="4dp"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:text=""
                             android:textColor="@color/noir"
-                            android:textStyle="bold"
-                            android:text=""/>
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
 
                     </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/zoneDate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="2dp"
+                    app:cardBackgroundColor="@android:color/white"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="0dp">
 
                     <LinearLayout
-                        android:id="@+id/zoneDate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:orientation="vertical"
+                        android:padding="8dp">
 
                         <TextView
                             android:id="@+id/labelDate"
-                            android:layout_width="35dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
+                            android:gravity="center"
                             android:text="Exp"
-                            android:textColor="@color/noir"/>
+                            android:textColor="@color/rouge2"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/datePeremption"
-                            android:gravity="right"
-                            android:layout_gravity="right"
-                            android:layout_marginRight="5dp"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="00/00/0000"/>
+                            android:layout_marginTop="4dp"
+                            android:gravity="center"
+                            android:text="00/00/0000"
+                            android:textColor="@color/noir"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
 
                     </LinearLayout>
-
-
-
-                </LinearLayout>
+                </androidx.cardview.widget.CardView>
 
             </LinearLayout>
 
-
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_gravity="center_horizontal|center_vertical">
-
-
-            <LinearLayout
-                android:id="@+id/layout_qte_saisie_lot_preparation"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/background_cadre_rouge"
-                android:orientation="vertical"
-                android:layout_marginRight="15dp"
-                android:layout_marginTop="5dp">
-
-                <TextView
-                    android:id="@+id/QteRetourner"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="@color/noir"
-                    android:textSize="20dp"
-                    android:textStyle="bold"/>
-
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-
-
-
 
     </LinearLayout>
 
-</RelativeLayout>
-
+</androidx.cardview.widget.CardView>
