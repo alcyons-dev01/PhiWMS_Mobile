@@ -51,7 +51,14 @@ import fr.alcyons.phiwms_mobile.Reception.Fragment.ADetruireFragment
 
 class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElementRechercheListener, RechercheAdjustable
 {
-    // OTHERS
+    companion object {
+        private const val ANIMATION_DURATION_MS = 300
+        private const val SCANNER_HEIGHT_DP = 300
+        private const val ALPHA_DISABLED = 50
+        private const val ALPHA_ENABLED = 255
+    }
+
+    // Data
     private var commentaire: String? = null
     private var retourSelectionne: Retour? = null
     private var listRetourLignes: MutableList<Retour_Ligne?>? = null
@@ -59,8 +66,6 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
     // UI
     private var listViewRetourLignes: ListView? = null
     private var adapter: Retour_Ligne_DestructionAdapter? = null
-
-    // TMP
     private var scannerContainer: FragmentContainerView? = null
     private var rechercheContainer: FragmentContainerView? = null
     private var referenceADetruireContainer: FragmentContainerView? = null
@@ -74,9 +79,12 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
     private var searchInput_ET: EditText? = null
     private var effacerRecherche_IV: ImageView? = null
 
+    // Fragments
     private var scannerFragment: Fragment? = null
     private var rechercheFragment: RechercheFragment? = null
     private var aDetruireFragment: ADetruireFragment? = null
+
+    // State
     private var isScannerOpen: Boolean = false
     private var isSearchOpen: Boolean = false
     private var isACompterOpen: Boolean = false
@@ -86,69 +94,91 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
         super.onCreate(savedInstanceState)
         this.setContentView(R.layout.activity_detail_destruction)
 
-        // Récupération des variables globales
-        this.retourSelectionne = RetourOpenHelper.getRetourByID(this.db, Objects.requireNonNull<Bundle?>(this.intent.getExtras()).getInt("retourSelectionneID"))
-
-        this.bindViews()
-        this.setListeners()
-
+        this.initializeData()
+        this.initializeUI()
+        this.setupEventListeners()
         this.setupOnBackPressedCallback()
     }
+    
+    private fun initializeData() { this.retourSelectionne = RetourOpenHelper.getRetourByID(this.db, Objects.requireNonNull<Bundle?>(this.intent.extras).getInt("retourSelectionneID")) }
+    
+    private fun initializeUI()
+    {
+        this.bindViews()
+        this.updateUI()
+    }
+    
+    private fun updateUI() { this.findViewById<TextView>(R.id.numero).text = this.retourSelectionne?.numero?.trim() ?: "" }
 
     public override fun onResume()
     {
         super.onResume()
         this.invalidateOptionsMenu()
 
-        // Affichage des constantes
-        this.findViewById<TextView>(R.id.numero).text = (this.retourSelectionne ?: return).numero.trim { it <= ' ' }
-
-        // Récupération en BDD locale de la liste des retourLignes
-        this.listRetourLignes = Retour_LigneOpenHelper.getAllRetourLignesByRetour(this.db, this.retourSelectionne)
-        this.adapter = Retour_Ligne_DestructionAdapter(this@DetailDestructionActivity, this.listRetourLignes)
-
-        // Affichage du nombre de retourLignes
-        val nbRetourLignes = (this.listRetourLignes ?: emptyList()).size
-        this.findViewById<TextView>(R.id.nbReferenceADetruire_TV).text = nbRetourLignes.toString()
+        this.loadData()
+        this.updateUI()
+        this.updateListView()
+    }
+    
+    private fun loadData() { this.listRetourLignes = Retour_LigneOpenHelper.getAllRetourLignesByRetour(db, retourSelectionne) }
+    
+    private fun updateListView()
+    {
+        this.adapter = Retour_Ligne_DestructionAdapter(this, this.listRetourLignes)
+        
+        val itemCount = this.listRetourLignes?.size ?: 0
+        findViewById<TextView>(R.id.nbReferenceADetruire_TV).text = itemCount.toString()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean
     {
         super.onCreateOptionsMenu(menu)
 
-        val inflater = this.menuInflater
-        inflater.inflate(R.menu.menu_action, menu)
+        this.menuInflater.inflate(R.menu.menu_action, menu)
+        this.configureMenuItems(menu)
+        
+        return true
+    }
+    
+    private fun configureMenuItems(menu: Menu)
+    {
         menu.findItem(R.id.menuSaveCircle).isVisible = true
         menu.findItem(R.id.menuCommentaire).isVisible = true
-
-        return true
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean
     {
-        val item = menu.findItem(R.id.menuSaveCircle)
-        item.setOnMenuItemClickListener { item1: MenuItem? ->
-            Alerte.afficherAlerteSaisieText(this@DetailDestructionActivity, this.layoutInflater, "Validation destruction", "Souhaitez-vous valider la destruction ?", "Ajouter un commentaire...")
+        this.setupSaveMenuItem(menu)
+        this.setupCommentMenuItem(menu)
+        return true
+    }
+    
+    private fun setupSaveMenuItem(menu: Menu)
+    {
+        val saveItem = menu.findItem(R.id.menuSaveCircle)
+        saveItem.setOnMenuItemClickListener {
+            Alerte.afficherAlerteSaisieText(this, this.layoutInflater, "Validation destruction", "Souhaitez-vous valider la destruction ?", "Ajouter un commentaire...")
             true
         }
-
-        val item_commentaire = menu.findItem(R.id.menuCommentaire)
-
-        if (this.retourSelectionne!!.commentaire.contentEquals(""))
+    }
+    
+    private fun setupCommentMenuItem(menu: Menu)
+    {
+        val commentItem = menu.findItem(R.id.menuCommentaire)
+        
+        if (this.retourSelectionne?.commentaire?.isEmpty() == true)
         {
-            item_commentaire.icon!!.mutate().alpha = 50
-            item_commentaire.setOnMenuItemClickListener(null)
+            commentItem.icon?.mutate()?.alpha = DetailDestructionActivity.ALPHA_DISABLED
+            commentItem.setOnMenuItemClickListener(null)
         }
         else
         {
-            item_commentaire.icon!!.mutate().alpha = 255
-            item_commentaire.setOnMenuItemClickListener { item1: MenuItem? ->
-                Alerte.afficherAlerteInformation(this@DetailDestructionActivity, this.layoutInflater, "Commentaire", this.retourSelectionne!!.commentaire, false, false)
+            commentItem.icon?.mutate()?.alpha = DetailDestructionActivity.ALPHA_ENABLED
+            commentItem.setOnMenuItemClickListener {
+                Alerte.afficherAlerteInformation(this, this.layoutInflater, "Commentaire", this.retourSelectionne?.commentaire ?: "", false, false)
                 true
             }
         }
-
-        return true
     }
 
     override fun retourSaisieText(text: String?)
@@ -177,105 +207,152 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
 
     private fun validerDestruction()
     {
-        var compteurReussite = 0
-
-        //MAJ du User qui as mis à jour le retour
-        (this.retourSelectionne ?: return).syS_USER_MAJ = this.utilisateurConnecte.identifiant
-
-        var motif = (this.retourSelectionne ?: return).motif
-        if (motif.contentEquals(""))
+        val retour = this.retourSelectionne ?: return
+        
+        if (!validateAndSetMotif(retour)) return
+        
+        val actionUtilisateur = this.createActionUtilisateur()
+        val successCount = this.processRetourLignes(actionUtilisateur)
+        
+        if (successCount == this.adapter?.mRetour_Lignes?.size)
         {
-            val ph_retourMotifListe = PH_RetourMotifOpenHelper.getAllPH_RetourMotif(this.db)
-            val retourMotifStringList: MutableList<String?> = ArrayList<String?>()
-            for (ph_retourMotif in ph_retourMotifListe) { retourMotifStringList.add(ph_retourMotif.motifRetour) }
-            motif = Alerte.afficherAlerteListView(this@DetailDestructionActivity, "Sélectionner le motif", retourMotifStringList)
+            this.updateRetourAfterValidation(retour)
+            this.finalizeDestruction(actionUtilisateur)
         }
-
-        if (null == motif)
+        else { this.handleDestructionError() }
+    }
+    
+    private fun validateAndSetMotif(retour: Retour): Boolean
+    {
+        retour.syS_USER_MAJ = this.utilisateurConnecte.identifiant
+        
+        var motif = retour.motif
+        if (motif.isEmpty()) { motif = this.promptUserForMotif() }
+        
+        if (motif == null)
         {
-            Alerte.afficherAlerteInformation(this@DetailDestructionActivity, this.layoutInflater, "Alerte", "Motif invalide", false, false)
-            return
+            Alerte.afficherAlerteInformation(this, this.layoutInflater, "Alerte", "Motif invalide", false, false)
+            return false
         }
-
-        (this.retourSelectionne ?: return).motif = motif.trim { it <= ' ' }
-
-        val random = Random()
-        var actionId = random.nextInt()
-        if (0 < actionId) actionId *= -1
-
-        @SuppressLint("SimpleDateFormat") val parseFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        
+        retour.motif = motif.trim()
+        return true
+    }
+    
+    private fun promptUserForMotif(): String?
+    {
+        val motifList = PH_RetourMotifOpenHelper.getAllPH_RetourMotif(this.db)
+        val motifStringList = motifList.map { it.motifRetour }
+        return Alerte.afficherAlerteListView(this, "Sélectionner le motif", motifStringList)
+    }
+    
+    private fun createActionUtilisateur(): ActionUtilisateur
+    {
+        val actionId = this.generateNegativeRandomId()
         val dateDestruction = Date()
-        val date_string = parseFormat.format(dateDestruction)
-
-        val new_action_utilisateur = ActionUtilisateur(actionId, this.utilisateurConnecte.id, date_string, this.serviceActuel.id, this.utilisateurConnecte.etablissementId, "En attente", (this.retourSelectionne ?: return)._UID, "", "Destruction")
-        ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(this.db, new_action_utilisateur)
-        for (retourLigne in (this.adapter ?: return).mRetour_Lignes)
+        val dateString = this.formatDateTime(dateDestruction)
+        
+        return ActionUtilisateur(actionId, this.utilisateurConnecte.id, dateString, this.serviceActuel.id, this.utilisateurConnecte.etablissementId, "En attente", this.retourSelectionne?._UID!!, "", "Destruction")
+    }
+    
+    private fun generateNegativeRandomId(): Int
+    {
+        val random = Random()
+        val id = random.nextInt()
+        return if (id > 0) -id else id
+    }
+    
+    private fun formatDateTime(date: Date): String
+    {
+        @SuppressLint("SimpleDateFormat")
+        val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        return format.format(date)
+    }
+    
+    private fun processRetourLignes(actionUtilisateur: ActionUtilisateur): Int
+    {
+        var successCount = 0
+        
+        for (retourLigne in this.adapter?.mRetour_Lignes ?: emptyList()) { if (this.processRetourLigne(retourLigne, actionUtilisateur)) { successCount++ } }
+        
+        return successCount
+    }
+    
+    private fun processRetourLigne(retourLigne: Retour_Ligne, actionUtilisateur: ActionUtilisateur): Boolean
+    {
+        retourLigne.qte_Retourner = if (retourLigne.qte_Retourner == 0.0) { retourLigne.qte_Demander } else { retourLigne.qte_Retourner }
+        
+        // Update retour ligne
+        val rowId = Retour_LigneOpenHelper.mettreAJourUnRetourLigne(db, retourLigne)
+        if (rowId != -1L)
         {
-            retourLigne.qte_Retourner = if (0.0 == retourLigne.qte_Retourner) retourLigne.qte_Demander else retourLigne.qte_Retourner
-
-            val rowID = Retour_LigneOpenHelper.mettreAJourUnRetourLigne(this.db, retourLigne)
-            if (-1L != rowID)
-            {
-                compteurReussite++
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(this.db, Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE, retourLigne.phiMR4UUID, retourLigne._UID, DBOpenHelper.ActionsEAS.MAJ)
-            }
-
-            val randomactionligne = Random()
-            var actionligneId = randomactionligne.nextInt()
-            if (0 < actionligneId) actionligneId *= -1
-
-            val actionUtilisateur_ligne = ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.id, "Retour Ligne", retourLigne._UID, "", 0, retourLigne.qte_Retourner.toInt(), retourLigne.produit_Designation)
-            ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(this.db, actionUtilisateur_ligne)
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(this.db, Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE, retourLigne.phiMR4UUID, retourLigne._UID, DBOpenHelper.ActionsEAS.MAJ)
+            
+            // Create action utilisateur ligne
+            this.createActionUtilisateurLigne(actionUtilisateur, retourLigne)
+            return true
         }
+        
+        return false
+    }
+    
+    private fun createActionUtilisateurLigne(actionUtilisateur: ActionUtilisateur, retourLigne: Retour_Ligne)
+    {
+        val actionLigneId = generateNegativeRandomId()
+        val actionLigne = ActionUtilisateur_Ligne(actionLigneId, actionUtilisateur.id, "Retour Ligne", retourLigne._UID, "", 0, retourLigne.qte_Retourner.toInt(), retourLigne.produit_Designation)
+        ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(this.db, actionLigne)
+    }
+    
+    private fun updateRetourAfterValidation(retour: Retour)
+    {
+        val oldIntitule = retour.intitule
+        retour.intitule = oldIntitule.replace(getString(R.string.DestructionDemandee), getString(R.string.DestructionEffectuee))
+        retour.en_Attente_de = getString(R.string.DestructionEffectuee)
+        retour.commentaire = commentaire
+        
+        val date = Date()
+        @SuppressLint("SimpleDateFormat")
+        val dateFormat = SimpleDateFormat("dd-MM-yyyy")
+        retour.date_retour = dateFormat.format(date)
+        
+        val rowId = RetourOpenHelper.mettreAJourRetour(this.db, retour)
+        if (rowId != -1L) { ElementASynchroniserOpenHelper.ajouterElementASynchroniser(this.db, RetourOpenHelper.Constantes.TABLE_RETOUR, retour.phiMR4UUID, retour._UID, DBOpenHelper.ActionsEAS.MAJ) }
+    }
+    
+    private fun finalizeDestruction(actionUtilisateur: ActionUtilisateur)
+    {
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(this.db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, actionUtilisateur.phiMR4UUID, actionUtilisateur.id, DBOpenHelper.ActionsEAS.AJOUT)
+        
+        Toast.makeText(this, "Destruction effectuée", Toast.LENGTH_SHORT).show()
+        
+        if (statutConnexion) { ElementASynchroniserOpenHelper.toutSynchroniser(this, this.db, this.utilisateurConnecte, true) }
 
-        // Si tous les retoursLignes ont bien été mis à jour, on met à jour le retour
-        if (compteurReussite == (this.adapter ?: return).mRetour_Lignes.size)
-        {
-            val intitule = (this.retourSelectionne ?: return).intitule
-            (this.retourSelectionne ?: return).intitule = intitule.replace(this.getString(R.string.DestructionDemandee), this.getString(R.string.DestructionEffectuee))
-            (this.retourSelectionne ?: return).en_Attente_de = this.getString(R.string.DestructionEffectuee)
-            (this.retourSelectionne ?: return).commentaire = this.commentaire
-
-            val date = Date()
-            @SuppressLint("SimpleDateFormat") val dateFormat: DateFormat = SimpleDateFormat("dd-MM-yyyy")
-            (this.retourSelectionne ?: return).date_retour = dateFormat.format(date)
-
-            val rowID = RetourOpenHelper.mettreAJourRetour(this.db, this.retourSelectionne)
-            if (-1L != rowID) { ElementASynchroniserOpenHelper.ajouterElementASynchroniser(this.db, RetourOpenHelper.Constantes.TABLE_RETOUR, (this.retourSelectionne ?: return).phiMR4UUID, (this.retourSelectionne ?: return)._UID, DBOpenHelper.ActionsEAS.MAJ) }
-            else { compteurReussite = 0 }
-        }
-
-        // Si une erreur est survenue, on annule tout
-        if (compteurReussite != (this.adapter ?: return).mRetour_Lignes.size)
-        {
-            Alerte.afficherAlerteInformation(this@DetailDestructionActivity, this.layoutInflater, "Alerte", "une erreur est survenue, aucun traitement ne sera effectué", false, false)
-            ElementASynchroniserOpenHelper.viderTableElementASynchroniser(this.db)
-            this@DetailDestructionActivity.finish()
-
-            return
-        }
-
-        // Si possible, on tente de tout mettre à jour en BDD distante directement
-        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(this.db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.phiMR4UUID, new_action_utilisateur.id, DBOpenHelper.ActionsEAS.AJOUT)
-        Toast.makeText(this@DetailDestructionActivity, "Destruction effectuée", Toast.LENGTH_SHORT).show()
-        if (statutConnexion) { ElementASynchroniserOpenHelper.toutSynchroniser(this@DetailDestructionActivity, this.db, this.utilisateurConnecte, true) }
-
-        val detailDestructionIntent = Intent(this@DetailDestructionActivity, ServiceDestructionActivity::class.java)
-        val detailDestructionBundle = super@DetailDestructionActivity.getBundle()
-        detailDestructionIntent.putExtras(detailDestructionBundle)
-        this@DetailDestructionActivity.startActivity(detailDestructionIntent)
-        this@DetailDestructionActivity.finish()
+        this.navigateToServiceDestruction()
+    }
+    
+    private fun handleDestructionError()
+    {
+        Alerte.afficherAlerteInformation(this, this.layoutInflater, "Alerte", "une erreur est survenue, aucun traitement ne sera effectué", false, false)
+        ElementASynchroniserOpenHelper.viderTableElementASynchroniser(this.db)
+        finish()
+    }
+    
+    private fun navigateToServiceDestruction()
+    {
+        val intent = Intent(this, ServiceDestructionActivity::class.java)
+        intent.putExtras(super.getBundle())
+        this.startActivity(intent)
+        this.finish()
     }
 
     private fun bindViews()
     {
-        this.listViewRetourLignes = this.findViewById<ListView?>(R.id.listeView)
-
         this.scannerContainer = this.findViewById<FragmentContainerView?>(R.id.scannerContainer)
-
         this.rechercheContainer = this.findViewById<FragmentContainerView?>(R.id.rechercheContainer)
         this.referenceADetruireContainer = this.findViewById<FragmentContainerView?>(R.id.referenceADetruireContainer)
         this.detailContainer = this.findViewById<FragmentContainerView?>(R.id.detailContainer)
+
+        this.listViewRetourLignes = this.findViewById<ListView?>(R.id.listeView)
 
         this.lancerScan = this.findViewById<LinearLayout?>(R.id.lancerScan)
         this.lancerRecherhe = this.findViewById<LinearLayout?>(R.id.lancerRecherhe)
@@ -287,33 +364,50 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
         this.effacerRecherche_IV = this.findViewById<ImageView?>(R.id.effacerRecherche_IV)
     }
 
-    private fun setListeners()
+    private fun setupEventListeners()
     {
-        (this.lancerScan ?: return).setOnClickListener {
-            if (this.isScannerOpen) { this.closeScanner() }
+        this.setupScannerClickListener()
+        this.setupSearchClickListener()
+        this.setupClearSearchClickListener()
+        this.setupADetruireClickListener()
+    }
+    
+    private fun setupScannerClickListener()
+    {
+        this.lancerScan?.setOnClickListener {
+            if (isScannerOpen) closeScanner()
             else
             {
                 this.closeOpenedFragments()
                 this.openScanner()
             }
         }
-
-        (this.lancerRecherhe ?: return).setOnClickListener {
-            if (this.isSearchOpen) { this.closeSearch() }
+    }
+    
+    private fun setupSearchClickListener()
+    {
+        this.lancerRecherhe?.setOnClickListener {
+            if (this.isSearchOpen) this.closeSearch()
             else
             {
-                this.closeOpenedFragments()
-                this.showSearchInput()
+                closeOpenedFragments()
+                showSearchInput()
             }
         }
-
-        (this.effacerRecherche_IV ?: return).setOnClickListener {
-            (this.searchInput_ET ?: return@setOnClickListener).setText("")
+    }
+    
+    private fun setupClearSearchClickListener()
+    {
+        this.effacerRecherche_IV?.setOnClickListener {
+            this.searchInput_ET?.setText("")
             this.closeSearch()
         }
-
-        (this.aDetruire_LL ?: return).setOnClickListener {
-            if (this.isACompterOpen) { this.closeACompter() }
+    }
+    
+    private fun setupADetruireClickListener()
+    {
+        this.aDetruire_LL?.setOnClickListener {
+            if (this.isACompterOpen) this.closeACompter()
             else
             {
                 this.closeOpenedFragments()
@@ -322,71 +416,97 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
         }
     }
 
-    private fun choisirFragmentScanner(): Fragment
+    private fun createScannerFragment(): Fragment
     {
-        // Vérifie si c'est un Zebra ou Honeywell
-        if (this.estScannerProfessionnel()) { return ScannerInputFragment() }
-
-        // Vérifie si l'appareil a une caméra
-        return if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) { ScannerFragment() }
-        else { ScannerInputFragment() }
+        return when
+        {
+            this.isProfessionalScanner() -> ScannerInputFragment()
+            this.hasCamera() -> ScannerFragment()
+            else -> ScannerInputFragment()
+        }
     }
-
-    private fun estScannerProfessionnel(): Boolean
+    
+    private fun isProfessionalScanner(): Boolean
     {
-        val fabricant = Build.MANUFACTURER.uppercase()
-        val modele = Build.MODEL.uppercase()
-        return fabricant.contains("ZEBRA") ||
-                fabricant.contains("HONEYWELL") ||
-                modele.contains("TC") || // Zebra TC series
-                modele.contains("MC") || // Zebra MC series
-                modele.contains("CK") || // Honeywell CK series
-                modele.contains("CT") || // Honeywell CT series
-                modele.contains("CN")  // Honeywell CN series
+        val manufacturer = Build.MANUFACTURER.uppercase()
+        val model = Build.MODEL.uppercase()
+        
+        return manufacturer.contains("ZEBRA") ||
+                manufacturer.contains("HONEYWELL") ||
+                model.contains("TC") || // Zebra TC series
+                model.contains("MC") || // Zebra MC series
+                model.contains("CK") || // Honeywell CK series
+                model.contains("CT") || // Honeywell CT series
+                model.contains("CN")  // Honeywell CN series
     }
+    
+    private fun hasCamera(): Boolean { return this.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY) }
+
 
     private fun openScanner()
     {
-        this.scannerContainer.apply {
-            (this ?: return@apply).layoutParams = (this.layoutParams as LinearLayout.LayoutParams).also {
-                it.height = (300 * resources.displayMetrics.density).toInt()
+        this.scannerContainer?.let { container ->
+            this.animateContainerOpen(container, SCANNER_HEIGHT_DP)
+            val fragment = createScannerFragment().also { this.scannerFragment = it }
+            this.setupScannerFragmentCallbacks(fragment)
+            this.replaceFragment(R.id.scannerContainer, fragment)
+        }
+
+        this.isScannerOpen = true
+    }
+    
+    private fun animateContainerOpen(container: FragmentContainerView, heightDp: Int)
+    {
+        container.apply {
+            this.layoutParams = (this.layoutParams as LinearLayout.LayoutParams).also {
+                it.height = (heightDp * resources.displayMetrics.density).toInt()
                 it.weight = 0f
             }
             this.visibility = View.VISIBLE
             this.translationY = -resources.displayMetrics.heightPixels.toFloat()
-            this.animate().translationY(0f).setDuration(300).start()
+            this.animate().translationY(0f).setDuration(ANIMATION_DURATION_MS.toLong()).start()
         }
-
-        val frag = choisirFragmentScanner().also { this.scannerFragment = it }
-
-        when (frag) {
-            is ScannerInputFragment -> {
-                frag.onCodeScanned = { code -> this.handleScannedCode(code) }
-                frag.onCloseRequested = { closeScanner() }
-            }
-
-            is ScannerFragment -> {
-                frag.onCodeScanned = { code -> this.handleScannedCode(code) }
-                frag.onCloseRequested = { closeScanner() }
-            }
-        }
-
-        this.supportFragmentManager.beginTransaction().replace(R.id.scannerContainer, frag).commit()
-
-        this.isScannerOpen = true
     }
+    
+    private fun setupScannerFragmentCallbacks(fragment: Fragment)
+    {
+        when (fragment)
+        {
+            is ScannerInputFragment -> {
+                fragment.onCodeScanned = { code -> this.handleScannedCode(code) }
+                fragment.onCloseRequested = { this.closeScanner() }
+            }
+            is ScannerFragment -> {
+                fragment.onCodeScanned = { code -> this.handleScannedCode(code) }
+                fragment.onCloseRequested = { this.closeScanner() }
+            }
+        }
+    }
+    
+    private fun replaceFragment(containerId: Int, fragment: Fragment) { this.supportFragmentManager.beginTransaction().replace(containerId, fragment).commit() }
 
     private fun closeScanner()
     {
-        (scannerContainer ?: return).animate().translationY(-(this.scannerContainer ?: return).height.toFloat()).setDuration(300).withEndAction {
-            (this.scannerContainer ?: return@withEndAction).visibility = View.GONE
-            (this.scannerContainer ?: return@withEndAction).layoutParams = ((this.scannerContainer ?: return@withEndAction).layoutParams as LinearLayout.LayoutParams).also { it.height = 0 }
-            this.scannerFragment?.let { frag: Fragment -> this.supportFragmentManager.beginTransaction().remove(frag).commit() }
-            this.scannerFragment = null
-        }.start()
+        this.scannerContainer?.let { container ->
+            this.animateContainerClose(container) {
+                this.removeFragment(this.scannerFragment)
+                this.scannerFragment = null
+            }
+        }
 
         this.isScannerOpen = false
     }
+    
+    private fun animateContainerClose(container: FragmentContainerView, onComplete: () -> Unit)
+    {
+        container.animate().translationY(-container.height.toFloat()).setDuration(ANIMATION_DURATION_MS.toLong()).withEndAction {
+            container.visibility = View.GONE
+            container.layoutParams = (container.layoutParams as LinearLayout.LayoutParams).also { it.height = 0 }
+            onComplete()
+        }.start()
+    }
+    
+    private fun removeFragment(fragment: Fragment?) { fragment?.let { frag -> this.supportFragmentManager.beginTransaction().remove(frag).commit() } }
 
     internal fun openSearch()
     {
