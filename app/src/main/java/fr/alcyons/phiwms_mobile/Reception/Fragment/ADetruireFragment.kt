@@ -74,4 +74,10 @@ class ADetruireFragment : Fragment()
             this.listener?.onElementSelectionne(elementSelectionne)
         }
     }
+
+    fun scrollToPosition(position: Int)
+    {
+        if (position < 0 || position >= this.adapter.count) return
+        this.liste_RetourLigne_LV.smoothScrollToPosition(position)
+    }
 }

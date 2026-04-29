@@ -154,6 +154,22 @@ public class Retour_LigneOpenHelper extends DBOpenHelper {
         return retourLigne;
     }
 
+    public static List<String> getSimilarDesignationsProduitsWithRetourUid(SQLiteDatabase db, String designationProduit, String retourUid)
+    {
+        List<String> similarDesignationsProduits = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_RETOUR_LIGNE + " WHERE " + Constantes.CLE_COL_PRODUIT_DESIGNATION_RETOUR_LIGNE + " LIKE ? AND " + Constantes.CLE_COL_RETOUR_UID_RETOUR_LIGNE + " = ?", new String[]{"%"+designationProduit+"%", retourUid});
+
+        while (cursor.moveToNext()) {
+            Retour_Ligne retourLigne = new Retour_Ligne(cursor);
+            similarDesignationsProduits.add(retourLigne.getProduit_Designation());
+        }
+
+        cursor.close();
+        cursor = null;
+        return similarDesignationsProduits;
+    }
+
     public static Retour_Ligne getRetourLigneByID(SQLiteDatabase db, int id) {
         Retour_Ligne retourLigne = null;
         Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_RETOUR_LIGNE + " WHERE  " + Constantes.CLE_COL__UID_RETOUR_LIGNE + "=?", new String[]{String.valueOf(id)});

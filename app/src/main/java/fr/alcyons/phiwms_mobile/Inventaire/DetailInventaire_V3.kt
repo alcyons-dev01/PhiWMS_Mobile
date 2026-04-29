@@ -29,6 +29,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.*
 import fr.alcyons.phiwms_mobile.Classes.*
+import fr.alcyons.phiwms_mobile.Interfaces.RechercheAdjustable
 import fr.alcyons.phiwms_mobile.Fragment.DetailLigneFragment
 import fr.alcyons.phiwms_mobile.Fragment.RechercheFragment
 import fr.alcyons.phiwms_mobile.Fragment.ScannerFragment
@@ -52,7 +53,7 @@ import java.util.*
 
 class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
     RechercheFragment.OnElementRechercheListener, ACompterFragment.OnElementSelectionneListener,
-    CompterFragment.OnElementSelectionneListener {
+    CompterFragment.OnElementSelectionneListener, RechercheAdjustable {
 
     private lateinit var context: Context
     private var inventaireCourant: Inventaire? = null
@@ -1108,7 +1109,7 @@ class DetailInventaire_V3 : ServiceAvecConnexionActivity(),
         }
     }
 
-    fun ajusterHauteurRecherche(hauteur: Int) {
+    override fun ajusterHauteurRecherche(hauteur: Int) {
         rechercheContainer.layoutParams = (rechercheContainer.layoutParams as LinearLayout.LayoutParams).also {
             it.height = if (hauteur == 0) 0 else LinearLayout.LayoutParams.WRAP_CONTENT
         }

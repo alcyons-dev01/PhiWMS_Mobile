@@ -46,9 +46,10 @@ import java.util.Date
 import java.util.Objects
 import java.util.Random
 import androidx.core.widget.NestedScrollView
+import fr.alcyons.phiwms_mobile.Interfaces.RechercheAdjustable
 import fr.alcyons.phiwms_mobile.Reception.Fragment.ADetruireFragment
 
-class DetailDestructionActivity : ServiceActivity()
+class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElementRechercheListener, RechercheAdjustable
 {
     // OTHERS
     private var commentaire: String? = null
@@ -91,14 +92,6 @@ class DetailDestructionActivity : ServiceActivity()
         this.bindViews()
         this.setListeners()
 
-        // Affichage des constantes
-        this.findViewById<TextView>(R.id.numero).text = (this.retourSelectionne ?: return).numero.trim { it <= ' ' }
-
-        // Gestion de la ListView
-
-        //listViewRetourLignes.setDivider(footer);
-        ///this.listViewRetourLignes!!.setItemsCanFocus(true)
-
         this.setupOnBackPressedCallback()
     }
 
@@ -107,10 +100,16 @@ class DetailDestructionActivity : ServiceActivity()
         super.onResume()
         this.invalidateOptionsMenu()
 
+        // Affichage des constantes
+        this.findViewById<TextView>(R.id.numero).text = (this.retourSelectionne ?: return).numero.trim { it <= ' ' }
+
         // Récupération en BDD locale de la liste des retourLignes
         this.listRetourLignes = Retour_LigneOpenHelper.getAllRetourLignesByRetour(this.db, this.retourSelectionne)
         this.adapter = Retour_Ligne_DestructionAdapter(this@DetailDestructionActivity, this.listRetourLignes)
-        (this.listViewRetourLignes ?: return).adapter = this.adapter
+
+        // Affichage du nombre de retourLignes
+        val nbRetourLignes = (this.listRetourLignes ?: emptyList()).size
+        this.findViewById<TextView>(R.id.nbReferenceADetruire_TV).text = nbRetourLignes.toString()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean
@@ -156,6 +155,24 @@ class DetailDestructionActivity : ServiceActivity()
     {
         this.commentaire = text
         this.validerDestruction()
+    }
+
+    override fun onElementRechercher(element: Int) { this.scrollToItemOrDisplayAlert(element) }
+
+    private fun scrollToItemOrDisplayAlert(idProduit: Int)
+    {
+        val position = (this.listRetourLignes ?: emptyList()).indexOfFirst { retourLigne -> retourLigne?.code_produit == idProduit }
+
+        if (position >= 0)
+        {
+            if (!this.isACompterOpen)
+            {
+                this.closeOpenedFragments()
+                this.openACompter()
+            }
+            this.aDetruireFragment?.scrollToPosition(position)
+        }
+        else { Alerte.afficherAlerteInformation(this@DetailDestructionActivity, this.layoutInflater, "Produit non trouvé", "Ce produit n'est pas dans la liste de destruction", false, false) }
     }
 
     private fun validerDestruction()
@@ -415,7 +432,7 @@ class DetailDestructionActivity : ServiceActivity()
                 if (query.isNotEmpty())
                 {
                     this@DetailDestructionActivity.openSearch()
-                    this@DetailDestructionActivity.rechercheFragment?.lancerRecherche(query, "destruction", (this@DetailDestructionActivity.retourSelectionne ?: return).numero)
+                    this@DetailDestructionActivity.rechercheFragment?.lancerRecherche(query, "destruction", (this@DetailDestructionActivity.retourSelectionne ?: return)._UID.toString())
                 }
                 else { this@DetailDestructionActivity.rechercheFragment?.viderListe() }
             }
@@ -449,8 +466,6 @@ class DetailDestructionActivity : ServiceActivity()
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow((this.searchInput_ET ?: return).windowToken, 0)
     }
-
-    private fun handleScannedCode(scannedCode: String) {}
 
     private fun openACompter()
     {
@@ -489,6 +504,11 @@ class DetailDestructionActivity : ServiceActivity()
         if (this.isACompterOpen) this.closeACompter()
     }
 
+    private fun handleScannedCode(scannedCode: String)
+    {
+        // analyser le code et en fonction, récupérer l'idProduit correspondant, puis appeler scrollToItemOrDisplayAlert(idProduit)
+    }
+
     private fun setupOnBackPressedCallback()
     {
         val callback = object : OnBackPressedCallback(true) {
@@ -502,5 +522,11 @@ class DetailDestructionActivity : ServiceActivity()
             }
         }
         this.onBackPressedDispatcher.addCallback(this, callback)
+    }
+
+    override fun ajusterHauteurRecherche(hauteur: Int)
+    {
+        (this.rechercheContainer ?: return).layoutParams = ((this.rechercheContainer ?: return).layoutParams as LinearLayout.LayoutParams).also { it.height = if (hauteur == 0) 0 else LinearLayout.LayoutParams.WRAP_CONTENT }
+        (this.rechercheContainer ?: return).requestLayout()
     }
 }

@@ -48,11 +48,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.Random
+import fr.alcyons.phiwms_mobile.Interfaces.RechercheAdjustable
 
 class DetailReception_V2 : ServiceAvecConnexionActivity(),
     RechercheFragment.OnElementRechercheListener,
     AReceptionnerFragment.OnElementSelectionneListener,
-    ReceptionnerFragment.OnElementSelectionneListener {
+    ReceptionnerFragment.OnElementSelectionneListener, RechercheAdjustable {
 
     private lateinit var receptionCourant: Commande
     private lateinit var context: Context
@@ -859,7 +860,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         }
     }
 
-    fun ajusterHauteurRecherche(hauteur: Int) {
+    override fun ajusterHauteurRecherche(hauteur: Int) {
         rechercheContainer.layoutParams =
             (rechercheContainer.layoutParams as LinearLayout.LayoutParams).also {
                 it.height = if (hauteur == 0) 0 else LinearLayout.LayoutParams.WRAP_CONTENT

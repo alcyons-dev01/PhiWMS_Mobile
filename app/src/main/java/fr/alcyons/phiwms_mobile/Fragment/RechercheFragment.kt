@@ -3,22 +3,18 @@ package fr.alcyons.phiwms_mobile.Fragment
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.ImageView
 import android.widget.ListView
 import androidx.fragment.app.Fragment
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper
 import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp
 import fr.alcyons.phiwms_mobile.Interfaces.DatabaseProvider
-import fr.alcyons.phiwms_mobile.Inventaire.DetailInventaire_V3
-import fr.alcyons.phiwms_mobile.Inventaire.Fragment.ACompterFragment
+import fr.alcyons.phiwms_mobile.Interfaces.RechercheAdjustable
 import fr.alcyons.phiwms_mobile.R
 
 class RechercheFragment : Fragment() {
@@ -86,6 +82,7 @@ class RechercheFragment : Fragment() {
         {
             "reception"->  resultats = PH_ReliquatOpenHelper.getDesignationReliquatByNumero(db, query, numDoc)
             "preparation"-> resultats = ProduitOpenHelper.getProduitByDesignation(db, query)
+            "destruction" -> resultats = Retour_LigneOpenHelper.getSimilarDesignationsProduitsWithRetourUid(db, query, numDoc)
             else -> resultats = ProduitOpenHelper.getProduitByDesignation(db, query)
         }
 
@@ -113,9 +110,7 @@ class RechercheFragment : Fragment() {
             resultatsLV.layoutParams.height = hauteurTotale.coerceAtMost(maxHauteur)
             resultatsLV.requestLayout()
 
-            (activity as? DetailInventaire_V3)?.ajusterHauteurRecherche(
-                hauteurTotale.coerceAtMost(maxHauteur)
-            )
+            (activity as? RechercheAdjustable)?.ajusterHauteurRecherche(hauteurTotale.coerceAtMost(maxHauteur))
         }
     }
 
@@ -123,6 +118,6 @@ class RechercheFragment : Fragment() {
         adapter.clear()
         resultatsLV.layoutParams.height = 0
         resultatsLV.requestLayout()
-        (activity as? DetailInventaire_V3)?.ajusterHauteurRecherche(0)
+        (activity as? RechercheAdjustable)?.ajusterHauteurRecherche(0)
     }
 }
