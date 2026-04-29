@@ -155,7 +155,7 @@ public class ServiceParametresServeurActivity extends AppCompatActivity {
         String device_id = Settings.Secure.getString(ServiceParametresServeurActivity.this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
         if (device_id != null) {
-            if (device_id.contentEquals("0db4cceba9d4085b") || device_id.contentEquals("00de9a1ef0755a92") || device_id.contentEquals("7c9ff7c3df4bc9e0") || device_id.contentEquals("95004b3de3fc203b") || device_id.contentEquals("a964f85c6e890958") || device_id.contentEquals("57010b2fdbf2b021") || device_id.contentEquals("6327572c7741bb99") || device_id.contentEquals("ca67efeec851db73") || device_id.contentEquals("80f8f5570900fcb2") || device_id.contentEquals("08f1ad94f577e406")) {
+            if (device_id.contentEquals("66daff2c2aa90621") || device_id.contentEquals("0db4cceba9d4085b") || device_id.contentEquals("00de9a1ef0755a92") || device_id.contentEquals("7c9ff7c3df4bc9e0") || device_id.contentEquals("95004b3de3fc203b") || device_id.contentEquals("a964f85c6e890958") || device_id.contentEquals("57010b2fdbf2b021") || device_id.contentEquals("6327572c7741bb99") || device_id.contentEquals("ca67efeec851db73") || device_id.contentEquals("80f8f5570900fcb2") || device_id.contentEquals("08f1ad94f577e406")) {
                 //boutonAlcyonsParametre.setVisibility(View.VISIBLE);
                 alcyons_choix_client.setVisibility(View.VISIBLE);
                 /*boutonAlcyonsParametre.setOnClickListener(new View.OnClickListener() {
