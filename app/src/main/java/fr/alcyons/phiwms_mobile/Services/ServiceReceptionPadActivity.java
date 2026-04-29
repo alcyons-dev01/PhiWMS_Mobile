@@ -63,6 +63,7 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.Reception.DetailReceptionActivity;
+import fr.alcyons.phiwms_mobile.Reception.DetailReception_V2;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
 
@@ -101,7 +102,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                 Commande commandeSelectionne = (Commande) commandeReceptionPADAdapter.getItem(position);
 
                 if (commandeSelectionne != null) {
-                    Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPadActivity.this, DetailReceptionActivity.class);
+                    Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPadActivity.this, DetailReception_V2.class);
 
                     Bundle serviceReceptionPui_Bundle = ServiceReceptionPadActivity.super.getBundle();
                     serviceReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
@@ -154,7 +155,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
 
                                     invalidateOptionsMenu();
                                 } else {
-                                    Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPadActivity.this, DetailReceptionActivity.class);
+                                    Intent serviceReceptionPui_Intent = new Intent(ServiceReceptionPadActivity.this, DetailReception_V2.class);
                                     Bundle serviceReceptionPui_Bundle = ServiceReceptionPadActivity.super.getBundle();
                                     serviceReceptionPui_Bundle.putInt("commandeID_Selectionne", commandeSelectionne.getID_commande());
                                     serviceReceptionPui_Intent.putExtras(serviceReceptionPui_Bundle);
