@@ -371,7 +371,8 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
 
         while (cursor.moveToNext()) {
             PH_Reliquat produit = new PH_Reliquat(cursor);
-            produitList.add(produit.getDesignationCourte());
+            if(!produitList.contains(produit.getDesignationCourte()))
+                produitList.add(produit.getDesignationCourte());
         }
         cursor.close();
         cursor = null;

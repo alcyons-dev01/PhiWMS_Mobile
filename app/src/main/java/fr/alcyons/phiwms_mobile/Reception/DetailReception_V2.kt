@@ -168,19 +168,19 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
 
         aReceptionner_LL.setOnClickListener {
             if (aCompterVisible) {
-                fermerACompter()
+                fermerAReceptionner()
             } else {
                 fermerFragment()
-                ouvrirACompter()
+                ouvrirAReceptionner()
             }
         }
 
         receptionner_LL.setOnClickListener {
             if (CompterVisible) {
-                fermerCompter()
+                fermerReceptionner()
             } else {
                 fermerFragment()
-                ouvrirCompter()
+                ouvrirReceptionner()
             }
         }
     }
@@ -423,7 +423,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     /**
      * A COMPTER
      */
-    private fun ouvrirACompter(idProduit: Int = 0) {
+    private fun ouvrirAReceptionner(idProduit: Int = 0) {
         var liste: ArrayList<PH_Reliquat> = arrayListOf()
 
         if (idProduit == 0) {
@@ -435,7 +435,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
             )
         } else {
             liste.add(
-                PH_ReliquatOpenHelper.getPH_ReliquatByUnIdProduitetNumero(
+                PH_ReliquatOpenHelper.getPH_ReliquatBaseByUnIdProduitetNumero(
                     db,
                     idProduit,
                     receptionCourant.numero
@@ -467,7 +467,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         }
     }
 
-    private fun fermerACompter() {
+    private fun fermerAReceptionner() {
         findViewById<androidx.core.widget.NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled =
             true
         referenceAReceptionnerContainer.animate()
@@ -491,7 +491,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     /**
      * COMPTER
      */
-    private fun ouvrirCompter(idProduit: Int = 0) {
+    private fun ouvrirReceptionner(idProduit: Int = 0) {
         var liste: ArrayList<PH_Reliquat>
 
         if (idProduit == 0) {
@@ -534,7 +534,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         }
     }
 
-    private fun fermerCompter() {
+    private fun fermerReceptionner() {
         findViewById<androidx.core.widget.NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled =
             true
         referenceReceptionnerContainer.animate()
@@ -631,8 +631,8 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     private fun fermerFragment() {
         if (scannerVisible) fermerScanner()
         if (rechercheVisible) fermerRecherche()
-        if (aCompterVisible) fermerACompter()
-        if (CompterVisible) fermerCompter()
+        if (aCompterVisible) fermerAReceptionner()
+        if (CompterVisible) fermerReceptionner()
         if (detailVisible) fermerDetailFragment()
     }
 
@@ -872,8 +872,8 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
 
     override fun onElementRechercher(idProduit: Int) {
         fermerRecherche()
-        ouvrirACompter(idProduit)
-        ouvrirCompter(idProduit)
+        ouvrirAReceptionner(idProduit)
+        ouvrirReceptionner(idProduit)
     }
 
     private fun ajouterPHReliquat(
