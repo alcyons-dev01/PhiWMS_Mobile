@@ -1,14 +1,16 @@
 package fr.alcyons.phiwms_mobile.Destruction
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -19,19 +21,15 @@ import androidx.activity.OnBackPressedCallback
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
-import androidx.lifecycle.lifecycleScope
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_RetourMotifOpenHelper
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne
-import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat
 import fr.alcyons.phiwms_mobile.Classes.Retour
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne
 import fr.alcyons.phiwms_mobile.Fragment.RechercheFragment
@@ -40,18 +38,15 @@ import fr.alcyons.phiwms_mobile.Fragment.ScannerInputFragment
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Retour_Ligne_DestructionAdapter
 import fr.alcyons.phiwms_mobile.Outils.Alerte
 import fr.alcyons.phiwms_mobile.R
-import fr.alcyons.phiwms_mobile.Reception.Fragment.AReceptionnerFragment
-import fr.alcyons.phiwms_mobile.Reception.Fragment.DetailFragment
 import fr.alcyons.phiwms_mobile.ServiceActivity
 import fr.alcyons.phiwms_mobile.Services.ServiceDestructionActivity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Objects
 import java.util.Random
-import androidx.core.view.isVisible
+import androidx.core.widget.NestedScrollView
+import fr.alcyons.phiwms_mobile.Reception.Fragment.ADetruireFragment
 
 class DetailDestructionActivity : ServiceActivity()
 {
@@ -80,7 +75,7 @@ class DetailDestructionActivity : ServiceActivity()
 
     private var scannerFragment: Fragment? = null
     private var rechercheFragment: RechercheFragment? = null
-    private var aReceptionnerFragment: AReceptionnerFragment? = null
+    private var aDetruireFragment: ADetruireFragment? = null
     private var isScannerOpen: Boolean = false
     private var isSearchOpen: Boolean = false
     private var isACompterOpen: Boolean = false
@@ -310,7 +305,6 @@ class DetailDestructionActivity : ServiceActivity()
         }
     }
 
-
     private fun choisirFragmentScanner(): Fragment
     {
         // Vérifie si c'est un Zebra ou Honeywell
@@ -379,7 +373,7 @@ class DetailDestructionActivity : ServiceActivity()
 
     internal fun openSearch()
     {
-        this.findViewById<androidx.core.widget.NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled = false
+        this.findViewById<NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled = false
         this.rechercheContainer.apply {
             (this ?: return@apply).layoutParams = (this.layoutParams as LinearLayout.LayoutParams).also {
                 it.height = LinearLayout.LayoutParams.WRAP_CONTENT
@@ -408,20 +402,20 @@ class DetailDestructionActivity : ServiceActivity()
         (searchInput_ET ?: return).requestFocus()
 
         // Ouvre le clavier
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
-        imm.showSoftInput(searchInput_ET, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(searchInput_ET, InputMethodManager.SHOW_IMPLICIT)
 
         // Écoute la saisie et lance la recherche dans le fragment
-        (searchInput_ET ?: return).addTextChangedListener(object : android.text.TextWatcher {
+        (searchInput_ET ?: return).addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: android.text.Editable?)
+            override fun afterTextChanged(s: Editable?)
             {
                 val query = s.toString().trim()
                 if (query.isNotEmpty())
                 {
                     this@DetailDestructionActivity.openSearch()
-                    this@DetailDestructionActivity.rechercheFragment?.lancerRecherche(query, "reception", receptionCourant.numero)
+                    this@DetailDestructionActivity.rechercheFragment?.lancerRecherche(query, "destruction", (this@DetailDestructionActivity.retourSelectionne ?: return).numero)
                 }
                 else { this@DetailDestructionActivity.rechercheFragment?.viderListe() }
             }
@@ -432,7 +426,7 @@ class DetailDestructionActivity : ServiceActivity()
     {
         this.hideSearchInput()
 
-        this.findViewById<androidx.core.widget.NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled = true
+        this.findViewById<NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled = true
         (this.rechercheContainer ?: return).animate().translationY(-(this.rechercheContainer ?: return).height.toFloat()).setDuration(300).withEndAction {
             (this.rechercheContainer ?: return@withEndAction).visibility = View.GONE
             (this.rechercheContainer ?: return@withEndAction).layoutParams = ((this.rechercheContainer ?: return@withEndAction).layoutParams as LinearLayout.LayoutParams).also { it.height = 0 }
@@ -452,46 +446,37 @@ class DetailDestructionActivity : ServiceActivity()
         (searchInput_ET ?: return).text.clear()
 
         // Ferme le clavier
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow((this.searchInput_ET ?: return).windowToken, 0)
     }
 
-    private fun openACompter(idProduit: Int = 0)
+    private fun handleScannedCode(scannedCode: String) {}
+
+    private fun openACompter()
     {
-        var liste: ArrayList<PH_Reliquat> = arrayListOf()
-
-        if (idProduit == 0) { liste = ArrayList(PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(this.db, receptionCourant.numero)) }
-        else { liste.add(PH_ReliquatOpenHelper.getPH_ReliquatByUnIdProduitetNumero(this.db, idProduit, receptionCourant.numero)) }
-
-        if (liste.isNotEmpty())
-        {
-            val frag = AReceptionnerFragment.newInstance(liste)
-            this.supportFragmentManager.beginTransaction().replace(R.id.referenceAReceptionnerContainer, frag).commitNow()
-
-            this.referenceADetruireContainer.apply {
-                (this ?: return@apply).layoutParams = (this.layoutParams as LinearLayout.LayoutParams).also {
-                    it.height = LinearLayout.LayoutParams.WRAP_CONTENT
-                    it.weight = 0f
-                }
-                this.visibility = View.VISIBLE
-                this.translationY = 0f // Plus d'animation de translation
-                this.alpha = 0f // Animation en fondu à la place
-                this.animate().alpha(1f).setDuration(300).start()
+        this.referenceADetruireContainer.apply {
+            (this ?: return@apply).layoutParams = (this.layoutParams as LinearLayout.LayoutParams).also {
+                it.height = LinearLayout.LayoutParams.WRAP_CONTENT
+                it.weight = 0f
             }
-
-            this.isACompterOpen = true
+            this.visibility = View.VISIBLE
+            this.translationY = -resources.displayMetrics.heightPixels.toFloat()
+            this.animate().translationY(0f).setDuration(300).start()
         }
+
+        val frag = ADetruireFragment.newInstance(this.listRetourLignes as ArrayList<Retour_Ligne>).also { aDetruireFragment = it }
+        this.supportFragmentManager.beginTransaction().replace(R.id.referenceADetruireContainer, frag).commitNow()
+
+        this.isACompterOpen = true
     }
 
     private fun closeACompter()
     {
-        this.findViewById<androidx.core.widget.NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled = true
-
         (this.referenceADetruireContainer ?: return).animate().translationY(-(this.referenceADetruireContainer ?: return).height.toFloat()).setDuration(300).withEndAction {
             (this.referenceADetruireContainer ?: return@withEndAction).visibility = View.GONE
-            (this.referenceADetruireContainer ?: return@withEndAction).layoutParams = ((referenceADetruireContainer ?: return@withEndAction).layoutParams as LinearLayout.LayoutParams).also { it.height = 0 }
-            this.aReceptionnerFragment?.let { frag -> this.supportFragmentManager.beginTransaction().remove(frag).commit() }
-            this.aReceptionnerFragment = null
+            (this.referenceADetruireContainer ?: return@withEndAction).layoutParams = ((this.referenceADetruireContainer ?: return@withEndAction).layoutParams as LinearLayout.LayoutParams).also { it.height = 0 }
+            this.aDetruireFragment?.let { frag -> supportFragmentManager.beginTransaction().remove(frag).commit() }
+            this.aDetruireFragment = null
         }.start()
 
         this.isACompterOpen = false
@@ -499,12 +484,10 @@ class DetailDestructionActivity : ServiceActivity()
 
     private fun closeOpenedFragments()
     {
-        if (this.isScannerOpen) this.closeScanner()
+        if (this.isScannerOpen) closeScanner()
         if (this.isSearchOpen) this.closeSearch()
         if (this.isACompterOpen) this.closeACompter()
     }
-
-    private fun handleScannedCode(scannedCode: String) {}
 
     private fun setupOnBackPressedCallback()
     {
