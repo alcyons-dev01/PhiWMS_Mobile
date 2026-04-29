@@ -86,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:descendantFocusability="afterDescendants"
                 android:divider="@android:color/transparent"
-                android:dividerHeight="5dp">
+                android:dividerHeight="12dp">
 
             </ListView>
 

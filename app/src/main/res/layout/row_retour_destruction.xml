@@ -16,7 +16,7 @@
 
         <!-- Header : Numéro + Motif -->
         <LinearLayout
-            android:id="@+id/zone_info_reception"
+            android:id="@+id/zone_info_destruction"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -48,13 +48,14 @@
 
         <!-- Corps : Dépôt origine, Intitulé + Badge Somme Produit -->
         <LinearLayout
-            android:id="@+id/zone_detail_reception"
+            android:id="@+id/zone_detail_destruction"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="#F0F4FF"
+            android:background="#FFF4F4"
             android:padding="10dp"
-            android:weightSum="5">
+            android:weightSum="5"
+            android:gravity="center_vertical">
 
             <!-- Dépôt origine et Intitulé -->
             <LinearLayout
@@ -62,7 +63,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="4"
                 android:orientation="vertical"
-                android:padding="5dp">
+                android:padding="5dp"
+                android:gravity="center_vertical">
 
                 <TextView
                     android:id="@+id/depotOrigine"

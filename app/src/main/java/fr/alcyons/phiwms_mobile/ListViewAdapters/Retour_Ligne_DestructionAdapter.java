@@ -49,7 +49,7 @@ public class Retour_Ligne_DestructionAdapter extends ArrayAdapter
     {
         final Retour_LigneViewHolder viewHolder = this.retourLigneViewHolderList.get(position);
 
-        convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_retour_ligne_destruction, parent, false);
+        convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_a_detruire, parent, false);
 
         // Récupération des objets graphiques
         viewHolder.designation = convertView.findViewById(R.id.designationProduit);
@@ -69,14 +69,8 @@ public class Retour_Ligne_DestructionAdapter extends ArrayAdapter
         viewHolder.fournisseur.setText(retour_LigneCourant.getProduit_Fournisseur());
         viewHolder.qteRetourner.setText((double) 0 == retour_LigneCourant.getQte_Retourner() ? "" : String.valueOf((int) retour_LigneCourant.getQte_Retourner()));
         viewHolder.lot.setText(retour_LigneCourant.getLot_Retourner());
-
         //gestion du numéro de série
-        if(retour_LigneCourant.getSerie_Retourner().contentEquals(""))
-        {
-            viewHolder.serie.setVisibility(View.GONE);
-            viewHolder.labelSerie.setVisibility(View.GONE);
-        }
-        else { viewHolder.lot.setText(retour_LigneCourant.getSerie_Retourner()); }
+        viewHolder.lot.setText(retour_LigneCourant.getSerie_Retourner());
 
         Date date = null;
         String dateAAfficher = "";

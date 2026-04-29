@@ -314,7 +314,6 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
     private void configureAdapter()
     {
         this.adapter = new RetourAdapter(ServiceDestructionActivity.this, this.db, this.retours, this.utilisateurConnecte);
-        this.listViewRetours.setDivider(this.footer);
         this.listViewRetours.setAdapter(this.adapter);
     }
 

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="#F0F4FF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Contenu principal avec padding -->
+        <LinearLayout
+            android:id="@+id/layoutPrincipal_LL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <!-- Désignation -->
+            <TextView
+                android:id="@+id/designationProduit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Designation produit longue sur plusieurs lignes si besoin"
+                android:textStyle="bold"
+                android:maxLines="3"
+                android:ellipsize="end"
+                android:textColor="@color/bleu_fonce_alcyons"
+                android:textSize="15sp"
+                android:layout_marginBottom="6dp"/>
+
+            <!-- Séparateur -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/bleu_clair_alcyons_transparent"
+                android:layout_marginBottom="6dp"/>
+
+            <!-- Ligne 2 : Référence + Fournisseur -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="6dp">
+
+                <TextView
+                    android:id="@+id/referenceProduit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="REF-001234"
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textSize="11sp"
+                    android:alpha="0.7"/>
+
+                <TextView
+                    android:id="@+id/nomFournisseur"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:text="Fournisseur"
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textSize="11sp"
+                    android:alpha="0.7"/>
+
+            </LinearLayout>
+
+            <!-- Séparateur -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/bleu_clair_alcyons_transparent"
+                android:layout_marginBottom="6dp"/>
+
+            <!-- Ligne 3 : Lot + Série + Date péremption -->
+            <LinearLayout
+                android:id="@+id/InformationLot_LL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <!-- Lot -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/labelLot"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lot"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="10sp"
+                        android:alpha="0.6"/>
+
+                    <TextView
+                        android:id="@+id/lotRetourne"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="LOT-2024-001"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="14sp"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+                <!-- Série -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/labelSerie"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Série"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="10sp"
+                        android:alpha="0.6"/>
+
+                    <TextView
+                        android:id="@+id/numSerie"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SER-001"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="14sp"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+
+                <!-- Date péremption -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="end">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Péremption"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="10sp"
+                        android:alpha="0.6"/>
+
+                    <TextView
+                        android:id="@+id/datePeremption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12/2026"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="14sp"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Bandeau quantité à détruire — EN DEHORS du padding, collé en bas -->
+        <LinearLayout
+            android:id="@+id/bandeauQteADetruire"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#C62828"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Quantité à détruire"
+                android:textColor="#000000"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="center_vertical"/>
+
+            <TextView
+                android:id="@+id/QteRetourner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="#000000"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="center_vertical"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
