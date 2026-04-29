@@ -246,11 +246,7 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
 
         int taille_liste = ph_preparation_List.size();
         /* Code nécessaire à l'affichage de la liste */
-        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(taille_liste));
-        if(depot != null)
-            ((TextView) findViewById(R.id.titre)).setText(depot.getNom());
-        else
-            ((TextView) findViewById(R.id.titre)).setText("");
+
     }
 
     @Override

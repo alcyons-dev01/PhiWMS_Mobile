@@ -112,13 +112,6 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                                         afficherSnackBarRetourPUI();
                                     }
                                     /* Code nécessaire à l'affichage de la liste */
-                                    int size_liste = retourList.size();
-                                    String titre = "Retours PUI demandés";
-                                    if (size_liste < 2)
-                                        titre = "Retour PUI demandé";
-
-                                    ((TextView) findViewById(R.id.titre)).setText(titre);
-                                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                                     adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
                                     retourListView.setAdapter(adapter);
 
@@ -139,14 +132,6 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                                     ServiceRetourPUIActivity.this.finish();
                                 }
                             } else {
-                                /* Code nécessaire à l'affichage de la liste */
-                                int size_liste = retourList.size();
-                                String titre = "Retours PUI demandés";
-                                if (size_liste < 2)
-                                    titre = "Retour PUI demandé";
-
-                                ((TextView) findViewById(R.id.titre)).setText(titre);
-                                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                                 adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
                                 retourListView.setAdapter(adapter);
 
@@ -161,12 +146,6 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                             }
                         } else {
                             /* Code nécessaire à l'affichage de la liste */
-                            int size_liste = retourList.size();
-                            String titre = "Retours PUI demandés";
-                            if (size_liste < 2)
-                                titre = "Retour PUI demandé";
-
-                            ((TextView) findViewById(R.id.titre)).setText(titre);
                             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                             adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
                             retourListView.setAdapter(adapter);
@@ -242,14 +221,6 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                 if(connexionDirecte)
                 {
                     /* Code nécessaire à l'affichage de la liste */
-                    int size_liste = retourList.size();
-                    String titre = "Retours PUI demandés";
-                    if(size_liste < 2)
-                        titre = "Retour PUI demandé";
-
-                    ((TextView) findViewById(R.id.titre)).setText(titre);
-                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                    ((TextView) findViewById(R.id.titre)).setText("Retours PUI demandés");
                     adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
                     retourListView.setAdapter(adapter);
 
@@ -319,14 +290,6 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                             }
                             else
                             {
-                                int size_liste = retourList.size();
-                                String titre = "Retours PUI demandés";
-                                if(size_liste < 2)
-                                    titre = "Retour PUI demandé";
-
-                                ((TextView) findViewById(R.id.titre)).setText(titre);
-                                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                                ((TextView) findViewById(R.id.titre)).setText("Retours PUI demandés");
                                 adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
                                 retourListView.setAdapter(adapter);
                                 new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);

@@ -19,6 +19,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -33,6 +35,7 @@ import org.json.JSONObject;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +53,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Commande;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
+import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.ReceptionAdapter;
@@ -75,18 +79,20 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
     JSONArray commandeJSONArray;
     JSONArray phReliquatJSONArray;
     List<Commande> commandeList;
+    List<Commande> commandeListBase;
     Depot depotPUI;
     boolean connexionDirecte;
     ReceptionAdapter commandeReceptionPUIAdapter;
     ListView commandeListView;
     PackageManager pm;
     ActivityResultLauncher<Intent> resultScanDocument;
-    Spinner optionTri;
 
+    ArrayAdapter<String> autoCompleteAdapter;
+    AutoCompleteTextView autoComplete;
+    List<String> listeFournisseurReception;
     @SuppressLint("SetTextI18n")
     private void initObjetGraphique()
     {
-        optionTri = (Spinner) findViewById(R.id.optionTri);
         commandeListView = findViewById(R.id.listeView);
         pm = ServiceReceptionPuiActivity.this.getPackageManager();
     }
@@ -98,14 +104,6 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
 
         //initialisation des objets graphque
         initObjetGraphique();
-
-        //gestion du spinner de tri
-        tri_choisi= ParametreUtilisateurOpenHelper.getChoixTriReception(db);
-        if(tri_choisi == null)
-        {
-            ParametreUtilisateurOpenHelper.mettreAJourTriReception(db, 0, "Numéro de commande");
-            tri_choisi = ParametreUtilisateurOpenHelper.getChoixTriReception(db);
-        }
 
         depotPUI = DepotOpenHelper.getDepotPUI(db);
 
@@ -119,44 +117,6 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                 serviceReceptionPui_Intent.putExtras(serviceReceptionPui_Bundle);
                 ServiceReceptionPuiActivity.this.startActivity(serviceReceptionPui_Intent);
                 ServiceReceptionPuiActivity.this.finish();
-            }
-        });
-
-        optionTri.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            boolean isFirstSelection = true; // drapeau pour ignorer le premier appel
-
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (isFirstSelection) {
-                    isFirstSelection = false; // on consomme le premier appel
-                    return; // ne rien faire au lancement
-                }
-
-                if (((TextView) parent.getChildAt(0)) != null) {
-                    ((TextView) parent.getChildAt(0)).setVisibility(View.INVISIBLE);
-                }
-                tri_choisi = optionTri.getItemAtPosition(position).toString();
-                ParametreUtilisateurOpenHelper.mettreAJourTriReception(db, 0, tri_choisi);
-
-                switch (tri_choisi)
-                {
-                    case "Numéro de commande":
-                        onClickTriNumero();
-                        break;
-
-                    case "Date de livraison":
-                        onClickTriDate();
-                        break;
-
-                    case "Fournisseur":
-                        onClickTriFournisseur();
-                        break;
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
 
@@ -174,10 +134,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                                     if (commandeSelectionne == null) {
                                         afficherSnackBarPreparationReceptionPUI();
                                         /* Code nécessaire à l'affichage de la liste */
-                                        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
-
-                                        commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPuiActivity.this, db, commandeList);
-                                        commandeListView.setAdapter(commandeReceptionPUIAdapter);
+                                        gestionAdapter();
 
                                         if (commandeList.isEmpty()) {
                                             vide = true;
@@ -201,10 +158,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                                     }
                                 } else {
                                     /* Code nécessaire à l'affichage de la liste */
-                                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
-
-                                    commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPuiActivity.this, db, commandeList);
-                                    commandeListView.setAdapter(commandeReceptionPUIAdapter);
+                                    gestionAdapter();
 
                                     if (commandeList.isEmpty()) {
                                         vide = true;
@@ -220,11 +174,7 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                                     invalidateOptionsMenu();
                                 }
                             } else {
-                                /* Code nécessaire à l'affichage de la liste */
-                                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
-
-                                commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPuiActivity.this, db, commandeList);
-                                commandeListView.setAdapter(commandeReceptionPUIAdapter);
+                                gestionAdapter();
 
                                 if (commandeList.isEmpty()) {
                                     vide = true;
@@ -260,6 +210,9 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
         super.onResume();
 
         commandeList = new ArrayList<>();
+        commandeListBase = new ArrayList<>();
+        listeFournisseurReception = new ArrayList<>();
+        listeFournisseurReception.add("Tous les fournisseurs");
 
         //* Code nécessaire afin de réaliser une requête à l' API *//*
         if (statutConnexion && passageParOnCreate && !connexionDirecte)
@@ -304,25 +257,8 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                 }
             }
 
-            commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPuiActivity.this, db, commandeList);
-            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
-            commandeListView.setAdapter(commandeReceptionPUIAdapter);
+            initialiserAutoComplete();
             invalidateOptionsMenu();
-
-            switch (tri_choisi)
-            {
-                case "Numéro de commande":
-                    onClickTriNumero();
-                    break;
-
-                case "Date de livraison":
-                    onClickTriDate();
-                    break;
-
-                case "Fournisseur":
-                    onClickTriFournisseur();
-                    break;
-            }
         }
     }
 
@@ -358,6 +294,9 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
 
                                 Commande commandeCourant = new Commande(commandeJSONObject);
 
+                                if(!listeFournisseurReception.contains(commandeCourant.getFournisseur()))
+                                    listeFournisseurReception.add(commandeCourant.getFournisseur());
+
                                 phReliquatJSONArray = commandeJSONObject.getJSONArray("ph_reliquat");
 
                                 boolean phReliquatPresent = false;
@@ -381,32 +320,16 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
                                     long rowID = CommandeOpenHelper.insererUneCommandeEnBDD(db, commandeCourant);
                                     if (rowID != -1) {
                                         commandeList.add(commandeCourant);
+                                        commandeListBase.add(commandeCourant);
                                     }
                                 }
                             }
 
                             passageParOnCreate = false;
 
-                            commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPuiActivity.this, db, commandeList);
-                            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(commandeList.size()));
-                            ((TextView) findViewById(R.id.titre)).setText("Réceptions");
-                            commandeListView.setAdapter(commandeReceptionPUIAdapter);
                             invalidateOptionsMenu();
-
-                            switch (tri_choisi)
-                            {
-                                case "Numéro de commande":
-                                    onClickTriNumero();
-                                    break;
-
-                                case "Date de livraison":
-                                    onClickTriDate();
-                                    break;
-
-                                case "Fournisseur":
-                                    onClickTriFournisseur();
-                                    break;
-                            }
+                            initialiserAutoComplete();
+                            gestionAdapter();
                             new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
                         }
                     }
@@ -428,6 +351,69 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
         };
     }
 
+    private void initialiserAutoComplete() {
+        autoComplete = findViewById(R.id.listeFiltre);
+        String premierElement = listeFournisseurReception.get(0);
+
+        // Trie la liste sans le premier élément
+        List<String> sansPremiereEntree = listeFournisseurReception.subList(1, listeFournisseurReception.size());
+        Collections.sort(sansPremiereEntree);
+
+        // Reconstruit la liste avec le premier élément en tête
+        listeFournisseurReception = new ArrayList<>();
+        listeFournisseurReception.add(premierElement);
+        listeFournisseurReception.addAll(sansPremiereEntree);
+
+        autoCompleteAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_depot, listeFournisseurReception);
+        autoComplete.setAdapter(autoCompleteAdapter);
+        autoComplete.setThreshold(100); // Empêche le filtrage automatique
+
+        // Affiche le premier élément par défaut
+        if (!listeFournisseurReception.isEmpty()) {
+            autoComplete.setText(listeFournisseurReception.get(0), false);
+        }
+
+        // Hauteur = 1/3 de l'écran
+        int hauteurEcran = getResources().getDisplayMetrics().heightPixels;
+        autoComplete.setDropDownHeight(hauteurEcran / 3);
+        int dpToPx = (int) (12 * getResources().getDisplayMetrics().density);
+        autoComplete.post(() -> autoComplete.setDropDownWidth(findViewById(R.id.listeFiltre_LL).getWidth() - dpToPx));
+        autoComplete.setDropDownBackgroundResource(android.R.color.white);
+
+        // Ouvre la liste au clic
+        autoComplete.setOnClickListener(v -> autoComplete.showDropDown());
+
+        // Chevron ouvre aussi la liste
+        findViewById(R.id.chevronFiltre).setOnClickListener(v -> autoComplete.showDropDown());
+
+        // Gère la sélection
+        autoComplete.setOnItemClickListener((parent, view, position, id) -> {
+            String fournisseur = listeFournisseurReception.get(position);
+            autoComplete.setText(fournisseur, false);
+            autoComplete.dismissDropDown();
+
+            commandeList = new ArrayList<>();
+
+            if (fournisseur.contentEquals("Tous les fournisseurs")) {
+                commandeList.addAll(commandeListBase);
+            } else {
+                for (Commande commande_courant : commandeListBase) {
+                    if (commande_courant.getFournisseur().contentEquals(fournisseur)) {
+                        commandeList.add(commande_courant);
+                    }
+                }
+            }
+
+            gestionAdapter();
+        });
+    }
+
+    private void gestionAdapter()
+    {
+        commandeList.sort(Comparator.comparing(Commande::getNumero));
+        commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPuiActivity.this, db, commandeList);
+        commandeListView.setAdapter(commandeReceptionPUIAdapter);
+    }
 
     @NonNull
     private Intent getRetourVersServiceConnexionDirectIntent() {
@@ -504,32 +490,5 @@ public class ServiceReceptionPuiActivity extends ServiceAvecConnexionActivity {
         TextView textView = layout.findViewById(com.google.android.material.R.id.snackbar_text);
         textView.setTextSize(TypedValue.TYPE_STRING, 8);
         snackbar.show();
-    }
-
-    public void onClickTriNumero()
-    {
-        tri_choisi = "Numéro de commande";
-        commandeList.sort(Comparator.comparing(Commande::getNumero));
-
-        commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPuiActivity.this, db, commandeList);
-        commandeListView.setAdapter(commandeReceptionPUIAdapter);
-    }
-
-    public void onClickTriDate()
-    {
-        tri_choisi = "Date de livraison";
-        commandeList.sort(Comparator.comparing(Commande::getDate_Liv));
-
-        commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPuiActivity.this, db, commandeList);
-        commandeListView.setAdapter(commandeReceptionPUIAdapter);
-    }
-
-    public void onClickTriFournisseur()
-    {
-        tri_choisi = "Fournisseur";
-        commandeList.sort(Comparator.comparing(Commande::getFournisseur));
-
-        commandeReceptionPUIAdapter = new ReceptionAdapter(ServiceReceptionPuiActivity.this, db, commandeList);
-        commandeListView.setAdapter(commandeReceptionPUIAdapter);
     }
 }

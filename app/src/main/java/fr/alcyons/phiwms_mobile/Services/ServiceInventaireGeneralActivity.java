@@ -80,7 +80,6 @@ public class ServiceInventaireGeneralActivity extends ServiceAvecConnexionActivi
         setContentView(R.layout.activity_liste_refresh);
         pm = ServiceInventaireGeneralActivity.this.getPackageManager();
         context = ServiceInventaireGeneralActivity.this;
-        ((LinearLayout) findViewById(R.id.triListe)).setVisibility(View.GONE);
 
         // Gestion de la listView
         depotListView = (ListView) findViewById(R.id.listeView);
@@ -229,8 +228,5 @@ public class ServiceInventaireGeneralActivity extends ServiceAvecConnexionActivi
         }
 
         depotListView.setAdapter(depotAdapter);
-
-        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(arrayDepot.size()));
-        ((TextView) findViewById(R.id.titre)).setText("Dépôts à inventorier");
     }
 }

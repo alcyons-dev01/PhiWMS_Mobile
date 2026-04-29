@@ -671,9 +671,6 @@ public class ServiceDemandePleinVideActivity extends ServiceAvecConnexionActivit
         dotationListView.setDivider(footer);
         dotationListView.setAdapter(pleinVideAdapter);
 
-
-
-        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(liste_plein_vide.size()));
         passageOnResume = true;
         new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
     }
