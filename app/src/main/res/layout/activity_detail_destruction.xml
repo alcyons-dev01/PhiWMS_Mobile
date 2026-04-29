@@ -329,6 +329,18 @@
 
         </androidx.core.widget.NestedScrollView>
 
+        <!-- Bouton toujours visible en bas -->
+        <Button
+            android:id="@+id/boutonAction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/scrollView"
+            android:text="Confirmer la destruction"
+            android:textColor="@color/blanc"
+            android:layout_margin="10dp"
+            android:background="@drawable/background_plein_bleu_radius"
+            android:visibility="visible"/>
+
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

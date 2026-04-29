@@ -10,6 +10,7 @@ import android.text.TextWatcher
 import android.view.Menu
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -77,6 +78,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
     private var textChercher_TV: TextView? = null
     private var searchInput_ET: EditText? = null
     private var effacerRecherche_IV: ImageView? = null
+    private var actionButton: Button? = null
 
     // Fragments
     private var scannerFragment: Fragment? = null
@@ -361,6 +363,8 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
         this.textChercher_TV = this.findViewById<TextView?>(R.id.textChercher_TV)
         this.searchInput_ET = this.findViewById<EditText?>(R.id.searchInput_ET)
         this.effacerRecherche_IV = this.findViewById<ImageView?>(R.id.effacerRecherche_IV)
+
+        this.actionButton = this.findViewById<Button>(R.id.boutonAction)
     }
 
     private fun setupEventListeners()
@@ -369,6 +373,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
         this.setupSearchClickListener()
         this.setupClearSearchClickListener()
         this.setupADetruireClickListener()
+        this.setupActionButtonClickListener()
     }
     
     private fun setupScannerClickListener()
@@ -414,6 +419,8 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
             }
         }
     }
+
+    private fun setupActionButtonClickListener() { this.actionButton?.setOnClickListener { Alerte.afficherAlerteSaisieText(this, this.layoutInflater, "Validation destruction", "Souhaitez-vous valider la destruction ?", "Ajouter un commentaire...") } }
 
     private fun createScannerFragment(): Fragment
     {
