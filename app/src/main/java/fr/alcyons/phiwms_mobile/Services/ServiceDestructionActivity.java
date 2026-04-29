@@ -308,7 +308,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
     private void updateCountersAndTitle()
     {
         ((TextView) this.findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(this.retours.size()));
-        ((TextView) this.findViewById(R.id.titre)).setText(SCREEN_TITLE);
+        ((TextView) this.findViewById(R.id.titre)).setText(ServiceDestructionActivity.SCREEN_TITLE);
     }
 
     private void configureAdapter()
@@ -320,7 +320,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
     private void markServiceAsEmpty()
     {
         MenuActivity.vide = Boolean.TRUE;
-        MenuActivity.nomServiceVide = SERVICE_NAME;
+        MenuActivity.nomServiceVide = ServiceDestructionActivity.SERVICE_NAME;
     }
 
     private void hydrateRetoursFromResponse(final JSONArray retoursJsonArray) throws JSONException
