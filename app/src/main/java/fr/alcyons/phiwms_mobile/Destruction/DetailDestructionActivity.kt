@@ -49,7 +49,8 @@ import java.util.Random
 
 class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElementRechercheListener, RechercheAdjustable
 {
-    companion object {
+    companion object
+    {
         private const val ANIMATION_DURATION_MS = 300
         private const val SCANNER_HEIGHT_DP = 300
         private const val ALPHA_DISABLED = 50

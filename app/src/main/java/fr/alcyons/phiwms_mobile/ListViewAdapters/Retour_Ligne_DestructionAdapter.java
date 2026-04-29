@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -60,6 +61,7 @@ public class Retour_Ligne_DestructionAdapter extends ArrayAdapter
         viewHolder.datePeremption = convertView.findViewById(R.id.datePeremption);
         viewHolder.serie = convertView.findViewById(R.id.numSerie);
         viewHolder.labelSerie = convertView.findViewById(R.id.labelSerie);
+        viewHolder.bandeauQteADetruire = convertView.findViewById(R.id.bandeauQteADetruire);
 
         final Retour_Ligne retour_LigneCourant = (Retour_Ligne) getItem(position);
 
@@ -71,6 +73,7 @@ public class Retour_Ligne_DestructionAdapter extends ArrayAdapter
         viewHolder.lot.setText(retour_LigneCourant.getLot_Retourner());
         //gestion du numéro de série
         viewHolder.lot.setText(retour_LigneCourant.getSerie_Retourner());
+        viewHolder.bandeauQteADetruire.setVisibility(View.VISIBLE);
 
         Date date = null;
         String dateAAfficher = "";
@@ -103,6 +106,7 @@ public class Retour_Ligne_DestructionAdapter extends ArrayAdapter
         public TextView datePeremption = null;
         public TextView serie = null;
         public TextView labelSerie = null;
+        public LinearLayout bandeauQteADetruire = null;
 
         public void setDatePeremptionColor(final Date date)
         {
