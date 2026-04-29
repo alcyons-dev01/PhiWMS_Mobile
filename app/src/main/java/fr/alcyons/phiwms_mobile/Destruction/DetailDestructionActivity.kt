@@ -40,7 +40,7 @@ import fr.alcyons.phiwms_mobile.Interfaces.RechercheAdjustable
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Retour_Ligne_DestructionAdapter
 import fr.alcyons.phiwms_mobile.Outils.Alerte
 import fr.alcyons.phiwms_mobile.R
-import fr.alcyons.phiwms_mobile.Reception.Fragment.ADetruireFragment
+import fr.alcyons.phiwms_mobile.Destruction.Fragment.ADetruireFragment
 import fr.alcyons.phiwms_mobile.ServiceActivity
 import fr.alcyons.phiwms_mobile.Services.ServiceDestructionActivity
 import java.text.SimpleDateFormat

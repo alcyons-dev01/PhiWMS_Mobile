@@ -1,4 +1,5 @@
-package fr.alcyons.phiwms_mobile.Reception.Fragment
+package fr.alcyons.phiwms_mobile.Destruction.Fragment
+
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import androidx.fragment.app.Fragment
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Retour_Ligne_DestructionAdapter
 import fr.alcyons.phiwms_mobile.R
+
 class ADetruireFragment : Fragment()
 {
     companion object
@@ -35,7 +37,8 @@ class ADetruireFragment : Fragment()
         this.listener = null
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? { return inflater.inflate(R.layout.fragment_adetruire, container, false) }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? { return inflater.inflate(
+        R.layout.fragment_adetruire, container, false) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
