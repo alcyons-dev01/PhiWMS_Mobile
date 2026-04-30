@@ -43,6 +43,7 @@ import fr.alcyons.phiwms_mobile.Outils.Alerte
 import fr.alcyons.phiwms_mobile.Outils.GestionCodeScanne
 import fr.alcyons.phiwms_mobile.R
 import fr.alcyons.phiwms_mobile.Destruction.Fragment.ADetruireFragment
+import fr.alcyons.phiwms_mobile.Interfaces.ScanDebounce
 import fr.alcyons.phiwms_mobile.ServiceActivity
 import fr.alcyons.phiwms_mobile.Services.ServiceDestructionActivity
 import java.text.SimpleDateFormat
@@ -489,6 +490,8 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
                 fragment.onCloseRequested = { this.closeScanner() }
             }
         }
+
+        (fragment as ScanDebounce).setScanDebounce(750L)
     }
     
     private fun replaceFragment(containerId: Int, fragment: Fragment) { this.supportFragmentManager.beginTransaction().replace(containerId, fragment).commit() }
