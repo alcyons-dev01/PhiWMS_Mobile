@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -20,7 +19,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.cardview.widget.CardView
-import androidx.core.os.postDelayed
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
@@ -51,7 +49,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Objects
 import java.util.Random
-import java.util.logging.Handler
 
 class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElementRechercheListener, RechercheAdjustable
 {
@@ -61,7 +58,6 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
         private const val SCANNER_HEIGHT_DP = 300
         private const val ALPHA_DISABLED = 50
         private const val ALPHA_ENABLED = 255
-        private const val SCAN_DEBOUNCE_MS: Long = 1000L
     }
 
     // Data
@@ -95,9 +91,6 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
     private var isScannerOpen: Boolean = false
     private var isSearchOpen: Boolean = false
     private var isACompterOpen: Boolean = false
-
-    // OTHERS
-    private var mLastScanTime: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -641,14 +634,6 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
 
     private fun handleScannedCode(scannedCode: String)
     {
-        val currentTime = System.currentTimeMillis()
-        if (currentTime - this.mLastScanTime < DetailDestructionActivity.SCAN_DEBOUNCE_MS)
-        {
-            Log.d("DetailDestructionActivity", "Scan ignored due to debounce")
-            return
-        }
-        this.mLastScanTime = currentTime
-
         val resultDecoupage: HashMap<String, String> = GestionCodeScanne.decoupageCode(scannedCode)
         val codeIdentification = resultDecoupage["code"] ?: ""
 

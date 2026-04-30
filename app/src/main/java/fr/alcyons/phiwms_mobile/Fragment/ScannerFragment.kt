@@ -3,6 +3,7 @@ package fr.alcyons.phiwms_mobile.Fragment
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
+import fr.alcyons.phiwms_mobile.Interfaces.ScanDebounce
 import fr.alcyons.phiwms_mobile.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +26,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ScannerFragment : Fragment() {
+class ScannerFragment : Fragment(), ScanDebounce
+{
 
     private lateinit var barcodeView: DecoratedBarcodeView
     private lateinit var btnFlash: ImageButton
@@ -40,6 +43,10 @@ class ScannerFragment : Fragment() {
     private var part1Time: Long = 0L
     private val windowMs = 1000L
     private val scannerScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    // ScanDebounce interface implementation
+    override var mLastScanTime: Long = 0
+    override var mScanDebounceMS: Long = 1000L
 
     private var toneGenerator: ToneGenerator? = null
 
@@ -97,7 +104,14 @@ class ScannerFragment : Fragment() {
             DefaultDecoderFactory(formats, null, null, Intents.Scan.MIXED_SCAN)
 
         barcodeView.decodeContinuous(object : BarcodeCallback {
-            override fun barcodeResult(result: BarcodeResult) {
+            override fun barcodeResult(result: BarcodeResult)
+            {
+                if (shouldDebounceScan())
+                {
+                    Log.d("ScannerInputFragment", "Scan ignored because debounced")
+                    return
+                }
+
                 scannerScope.launch {
                     withContext(Dispatchers.Main) {
                         layoutFondValidation.visibility = View.VISIBLE
