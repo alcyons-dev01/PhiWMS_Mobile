@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.Menu
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -132,57 +131,6 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
         
         val itemCount = this.listRetourLignes?.size ?: 0
         findViewById<TextView>(R.id.nbReferenceADetruire_TV).text = itemCount.toString()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean
-    {
-        super.onCreateOptionsMenu(menu)
-
-        this.menuInflater.inflate(R.menu.menu_action, menu)
-        this.configureMenuItems(menu)
-        
-        return true
-    }
-    
-    private fun configureMenuItems(menu: Menu)
-    {
-        menu.findItem(R.id.menuSaveCircle).isVisible = true
-        menu.findItem(R.id.menuCommentaire).isVisible = true
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu): Boolean
-    {
-        this.setupSaveMenuItem(menu)
-        this.setupCommentMenuItem(menu)
-        return true
-    }
-    
-    private fun setupSaveMenuItem(menu: Menu)
-    {
-        val saveItem = menu.findItem(R.id.menuSaveCircle)
-        saveItem.setOnMenuItemClickListener {
-            Alerte.afficherAlerteSaisieText(this, this.layoutInflater, "Validation destruction", "Souhaitez-vous valider la destruction ?", "Ajouter un commentaire...")
-            true
-        }
-    }
-    
-    private fun setupCommentMenuItem(menu: Menu)
-    {
-        val commentItem = menu.findItem(R.id.menuCommentaire)
-        
-        if (this.retourSelectionne?.commentaire?.isEmpty() == true)
-        {
-            commentItem.icon?.mutate()?.alpha = DetailDestructionActivity.ALPHA_DISABLED
-            commentItem.setOnMenuItemClickListener(null)
-        }
-        else
-        {
-            commentItem.icon?.mutate()?.alpha = DetailDestructionActivity.ALPHA_ENABLED
-            commentItem.setOnMenuItemClickListener {
-                Alerte.afficherAlerteInformation(this, this.layoutInflater, "Commentaire", this.retourSelectionne?.commentaire ?: "", false, false)
-                true
-            }
-        }
     }
 
     override fun retourSaisieText(text: String?)

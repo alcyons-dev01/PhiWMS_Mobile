@@ -137,7 +137,7 @@
                         android:id="@+id/numSerie"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="SER-001"
+                        android:text=""
                         android:textColor="@color/bleu_fonce_alcyons"
                         android:textSize="14sp"
                         android:textStyle="bold"/>

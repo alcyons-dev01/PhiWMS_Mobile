@@ -14,7 +14,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -46,10 +47,12 @@ import java.util.Objects;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerDocumentActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
@@ -66,7 +69,6 @@ import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
 {
     private static final String SERVICE_NAME = "Destruction";
-    private static final String SCREEN_TITLE = "Demandes de destruction";
 
     // OTHERS
     private List<Retour> retours = null;
@@ -77,6 +79,10 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
     // UI
     private RetourAdapter adapter = null;
     private ListView listViewRetours = null;
+    private List<String> listeDepotLivraison;
+    private ArrayAdapter<String> autoCompleteAdapter;
+    private AutoCompleteTextView autoComplete;
+    private List<Retour> retours_base;
 
     @SuppressLint("SetTextI18n")
     @Override protected void onCreate(final Bundle savedInstanceState)
@@ -85,9 +91,6 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
         this.setContentView(R.layout.activity_liste_refresh);
 
         this.packageManager = this.getPackageManager();
-
-        // Affichage des informations de base
-        this.findViewById(R.id.triListe).setVisibility(View.GONE);
 
         // Gestion de la listView
         this.listViewRetours = this.findViewById(R.id.listeView);
@@ -143,6 +146,9 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
     {
         this.showSpinnerIfNeeded();
         this.retours = new ArrayList<>();
+        this.retours_base = new ArrayList<>();
+        this.listeDepotLivraison = new ArrayList<>();
+        this.listeDepotLivraison.add("Tous");
 
         final RequestQueue requestQueueDestructionUtilisateur = Volley.newRequestQueue(ServiceDestructionActivity.this);
         final String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(this.db) + DBOpenHelper.Urls.uriRequeteDestruction;
@@ -155,6 +161,21 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
     private void loadRetoursFromLocalDatabase()
     {
         this.retours = RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(this.db, this.getString(R.string.statutEncours), this.getString(R.string.DestructionDemandee));
+        this.retours_base = new ArrayList<>(this.retours);
+
+        for (int i = 0; i < this.retours_base.size(); i++) { final Retour retour = this.retours_base.get(i); }
+        this.listeDepotLivraison = new ArrayList<>();
+        this.listeDepotLivraison.add("Tous");
+        
+        // Populate depot list from local retours
+        for (final Retour retour : this.retours_base)
+        {
+            String[] intitule_tab = retour.getIntitule().split(":");
+            String depot_origine = intitule_tab[0];
+            if(retour.getRef_Depot_Origine().contains("-PAD-") && this.utilisateurConnecte.getIdentifiant().toLowerCase().contains("alcyons")) { depot_origine = "XXX-PAD-XXX"; }
+            if (!this.listeDepotLivraison.contains(depot_origine)) { this.listeDepotLivraison.add(depot_origine); }
+        }
+
         if (this.retours.isEmpty())
         {
             this.handleNoLocalRetours();
@@ -162,6 +183,61 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
         }
 
         this.handleAvailableLocalRetours();
+        this.initializeAutoComplete();
+    }
+
+    private void initializeAutoComplete() {
+        Log.d("ServiceDestruction", "Initializing autoComplete with depot list: " + this.listeDepotLivraison.toString());
+        this.autoComplete = this.findViewById(R.id.listeFiltre);
+
+        // Sort the list but keep "Tous" at the first position
+        this.listeDepotLivraison.sort((a, b) -> {
+            if (a.equals("Tous")) return -1;
+            if (b.equals("Tous")) return 1;
+            return a.compareTo(b);
+        });
+
+        this.autoCompleteAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_depot, this.listeDepotLivraison);
+        this.autoComplete.setAdapter(this.autoCompleteAdapter);
+        this.autoComplete.setThreshold(100);
+
+        if (!this.listeDepotLivraison.isEmpty()) { this.autoComplete.setText(this.listeDepotLivraison.get(0), false); }
+
+        final int hauteurEcran = this.getResources().getDisplayMetrics().heightPixels;
+        this.autoComplete.setDropDownHeight(hauteurEcran / 3);
+        this.autoComplete.setDropDownBackgroundResource(android.R.color.white);
+
+        this.autoComplete.post(() -> {
+            final int dpToPx = (int) (12.0F * this.getResources().getDisplayMetrics().density);
+            this.autoComplete.setDropDownWidth(findViewById(R.id.listeFiltre_LL).getWidth() - dpToPx);
+        });
+
+        this.autoComplete.setOnClickListener(v -> this.autoComplete.showDropDown());
+
+        this.findViewById(R.id.chevronFiltre).setOnClickListener(v -> this.autoComplete.showDropDown());
+
+        this.autoComplete.setOnItemClickListener((parent, view, position, id) -> {
+            final String depotNom = this.listeDepotLivraison.get(position);
+            this.autoComplete.setText(depotNom, false);
+            this.autoComplete.dismissDropDown();
+
+            this.retours = new ArrayList<>();
+
+            if (depotNom.contentEquals("Tous")) { this.retours.addAll(this.retours_base); }
+            else
+            {
+                for (final Retour retour_courant : this.retours_base)
+                {
+                    String[] intitule_tab = retour_courant.getIntitule().split(":");
+                    String depot_origine = intitule_tab[0];
+                    if(retour_courant.getRef_Depot_Origine().contains("-PAD-") && this.utilisateurConnecte.getIdentifiant().toLowerCase().contains("alcyons")) { depot_origine = "XXX-PAD-XXX"; }
+
+                    if (depot_origine.contentEquals(depotNom)) { this.retours.add(retour_courant); }
+                }
+            }
+
+            this.configureAdapter();
+        });
     }
 
     private void handleNoLocalRetours()
@@ -221,6 +297,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
                     this.clearConcernedTables();
                     this.hydrateRetoursFromResponse(response.getJSONArray("PH_Retours"));
                     this.displayRetoursOrClose();
+                    this.initializeAutoComplete();
                     this.passageParOnCreate = false;
 
                     new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500L);
@@ -292,7 +369,6 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
 
     private void displayRetoursOrClose()
     {
-        this.updateCountersAndTitle();
         this.configureAdapter();
 
         if (this.retours.isEmpty())
@@ -303,12 +379,6 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
         }
 
         this.invalidateOptionsMenu();
-    }
-
-    private void updateCountersAndTitle()
-    {
-        ((TextView) this.findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(this.retours.size()));
-        ((TextView) this.findViewById(R.id.titre)).setText(ServiceDestructionActivity.SCREEN_TITLE);
     }
 
     private void configureAdapter()
@@ -334,8 +404,14 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
             if (!this.isDestructionRetourInProgress(retour)) { continue; }
 
             this.retours.add(retour);
+            this.retours_base.add(retour);  // Also add to base list for filtering
             final long rowId = RetourOpenHelper.insererUnRetourEnBDD(this.db, retour);
             if (-1L == rowId) { continue; }
+
+            String[] intitule_tab = retour.getIntitule().split(":");
+            String depot_origine = intitule_tab[0];
+            if(retour.getRef_Depot_Origine().contains("-PAD-") && this.utilisateurConnecte.getIdentifiant().toLowerCase().contains("alcyons")) { depot_origine = "XXX-PAD-XXX"; }
+            this.listeDepotLivraison.add(depot_origine);
 
             final JSONArray retourLignesJson = retourJson.getJSONArray("ph_retour_ligne");
             for (int indexLigne = 0; indexLigne < retourLignesJson.length(); indexLigne++) { Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(this.db, new Retour_Ligne(retourLignesJson.getJSONObject(indexLigne))); }

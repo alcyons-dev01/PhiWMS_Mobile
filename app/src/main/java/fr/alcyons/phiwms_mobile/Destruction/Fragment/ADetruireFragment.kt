@@ -68,6 +68,8 @@ class ADetruireFragment : Fragment()
             var hauteurTotale = hauteurItem * this.adapter.count
             // Ajoute la hauteur des dividers
             hauteurTotale += this.liste_RetourLigne_LV.dividerHeight * (adapter.count - 1)
+            // Ajoute le padding (top + bottom)
+            hauteurTotale += (this.liste_RetourLigne_LV.paddingTop + this.liste_RetourLigne_LV.paddingBottom)
             this.liste_RetourLigne_LV.layoutParams.height = hauteurTotale.coerceAtMost(maxHauteur)
             this.liste_RetourLigne_LV.requestLayout()
         }
