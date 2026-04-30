@@ -91,7 +91,6 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
 
         phPreparationList = new ArrayList<>();
 
-        ((TextView) findViewById(R.id.titre)).setText("Réassort de service");
         lancerScan = findViewById(R.id.lancerScan);
         textLancerScan = findViewById(R.id.textLancerScan);
         iconLancerScan = findViewById(R.id.iconLancerScan);

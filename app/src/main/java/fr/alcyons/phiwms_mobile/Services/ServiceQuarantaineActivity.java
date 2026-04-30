@@ -86,7 +86,6 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
         setContentView(R.layout.activity_liste_refresh);
         context = ServiceQuarantaineActivity.this;
         pm = ServiceQuarantaineActivity.this.getPackageManager();
-        ((LinearLayout) findViewById(R.id.triListe)).setVisibility(View.GONE);
         SYS_User_Rules sys_user_rules = SYS_User_RulesOpenHelper.getSYS_User_RulesByUser(db, utilisateurConnecte.getId());
 
         if(!sys_user_rules.isQuarantaine_Autoriser())
@@ -323,8 +322,6 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                                 ServiceQuarantaineActivity.this.finish();
                             } else {
                                 if (passageParOnCreate) {
-                                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                                    ((TextView) findViewById(R.id.titre)).setText("Demandes de quarantaine");
                                     retourList.sort(Comparator.comparing(Retour::getDate_retour));
                                     retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
                                     //retourListView.setDivider(footer);

@@ -89,10 +89,6 @@ public class ServiceMedicamentAuLivretActivity extends ServiceActivity {
             medicamentList = ProduitOpenHelper.getAllMedicaments(db);
         }
 
-        // Afficher le nombre de médicaments
-        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(medicamentList.size()));
-        ((TextView) findViewById(R.id.titre)).setText("Médicaments au livret");
-
         // Création de l'adapter et Affichage de la liste
         medicamentAdapter = new MedicamentAdapter(ServiceMedicamentAuLivretActivity.this, medicamentList);
         medicamentListView = (ListView) findViewById(R.id.listeView);

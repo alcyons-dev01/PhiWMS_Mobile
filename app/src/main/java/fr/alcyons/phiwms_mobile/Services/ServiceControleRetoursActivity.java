@@ -74,9 +74,6 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
     ListView retourListView;
     RetourAdapter retourAdapter;
     PackageManager pm;
-    Spinner optionTri;
-    LinearLayout triListe;
-    String tri_choisi;
     boolean connexionDirecte;
     ActivityResultLauncher<Intent> resultScanDocument;
     @SuppressLint("SetTextI18n")
@@ -87,9 +84,6 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         retourList = new ArrayList<>();
         context = ServiceControleRetoursActivity.this;
         pm = ServiceControleRetoursActivity.this.getPackageManager();
-        optionTri = findViewById(R.id.optionTri);
-        triListe = findViewById(R.id.triListe);
-        triListe.setVisibility(View.VISIBLE);
 
         // Initialisation de la liste et de l'action sur l'un de ses items
         retourListView = findViewById(R.id.listeView);
@@ -106,54 +100,6 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
             ServiceControleRetoursActivity.this.finish();
         });
 
-        //gestion du spinner de tri
-        tri_choisi= ParametreUtilisateurOpenHelper.getChoixTriRetour(db);
-        if(tri_choisi == null)
-        {
-            ParametreUtilisateurOpenHelper.mettreAJourTriRetour(db, 0, "Numéro de retour");
-            tri_choisi = ParametreUtilisateurOpenHelper.getChoixTriRetour(db);
-        }
-
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.option_tri_retour, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(R.layout.spinner_item);
-        optionTri.setAdapter(adapter);
-        optionTri.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
-            boolean isFirstSelection = true; // drapeau pour ignorer le premier appel
-
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (isFirstSelection) {
-                    isFirstSelection = false; // on consomme le premier appel
-                    return; // ne rien faire au lancement
-                }
-                if (((TextView) parent.getChildAt(0)) != null) {
-                    ((TextView) parent.getChildAt(0)).setVisibility(View.INVISIBLE);
-                }
-                tri_choisi = optionTri.getItemAtPosition(position).toString();
-                ParametreUtilisateurOpenHelper.mettreAJourTriRetour(db, 0, tri_choisi);
-                switch (tri_choisi)
-                {
-                    case "Numéro de retour":
-                        onClickTriNumero();
-                        break;
-
-                    case "Date de retour":
-                        onClickTriDate();
-                        break;
-
-                    case "Dépôt Origine":
-                        onClickTriDepot();
-                        break;
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
         connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(db);
 
         resultScanDocument = registerForActivityResult(
@@ -168,7 +114,6 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                                 if (retourSelectionne == null) {
                                     afficherSnackBarControleDesRetours();
                                     /* Code nécessaire à l'affichage de la liste */
-                                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                                     retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
                                     // Permet d'enlever le séparateur entre deux éléments d'une listeView
                                     retourListView.setDivider(footer);
@@ -194,7 +139,6 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                                 }
                             } else {
                                 /* Code nécessaire à l'affichage de la liste */
-                                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                                 retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
                                 // Permet d'enlever le séparateur entre deux éléments d'une listeView
                                 retourListView.setDivider(footer);
@@ -212,7 +156,6 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                             }
                         } else {
                             /* Code nécessaire à l'affichage de la liste */
-                            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                             retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
                             // Permet d'enlever le séparateur entre deux éléments d'une listeView
                             retourListView.setDivider(footer);
@@ -274,7 +217,6 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                 if(connexionDirecte)
                 {
                     /* Code nécessaire à l'affichage de la liste */
-                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                     retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
                     // Permet d'enlever le séparateur entre deux éléments d'une listeView
                     retourListView.setDivider(footer);
@@ -359,8 +301,6 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
 
                             //lancerScan();
                             /* Code nécessaire à l'affichage de la liste */
-                            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                            ((TextView) findViewById(R.id.titre)).setText("Demandes de retour");
                             retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
                             // Permet d'enlever le séparateur entre deux éléments d'une listeView
                             retourListView.setDivider(footer);
@@ -373,20 +313,8 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                             }
                             else
                             {
-                                switch (tri_choisi)
-                                {
-                                    case "Numéro de retour":
-                                        onClickTriNumero();
-                                        break;
+                                onClickTriNumero();
 
-                                    case "Date de retour":
-                                        onClickTriDate();
-                                        break;
-
-                                    case "Dépôt Origine":
-                                        onClickTriDepot();
-                                        break;
-                                }
                                 invalidateOptionsMenu();
                             }
                             passageParOnCreate = false;
@@ -487,7 +415,6 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
     }
     public void onClickTriNumero()
     {
-        tri_choisi = "Numéro de retour";
         retourList.sort(Comparator.comparing(Retour::getNumero));
 
         retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
@@ -497,7 +424,6 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
 
     public void onClickTriDate()
     {
-        tri_choisi = "Date de retour";
         retourList.sort((o1, o2) -> o1.getDate_retour().compareTo(o2.getDate_retour()));
 
         retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
@@ -507,7 +433,6 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
 
     public void onClickTriDepot()
     {
-        tri_choisi = "Dépôt Origine";
         retourList.sort(Comparator.comparing(Retour::getRef_Depot_Origine));
 
         retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);

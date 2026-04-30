@@ -83,7 +83,6 @@ public class InventaireZoneActivity extends ServiceAvecConnexionActivity {
         setContentView(R.layout.activity_liste_refresh);
         pm = InventaireZoneActivity.this.getPackageManager();
         context = InventaireZoneActivity.this;
-        ((LinearLayout) findViewById(R.id.triListe)).setVisibility(View.GONE);
 
         // Gestion de la listView
         inventaireListView = (ListView) findViewById(R.id.listeView);
@@ -103,7 +102,6 @@ public class InventaireZoneActivity extends ServiceAvecConnexionActivity {
 
         depotSelectionne = DepotOpenHelper.getDepotParID(db, intent.getExtras().getInt("depotId"));
         inventaireCourant = InventaireOpenHelper.getInventaireById(db, intent.getExtras().getInt("inventaireId"));
-        ((TextView) findViewById(R.id.titre)).setText(depotSelectionne.getNom());
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override

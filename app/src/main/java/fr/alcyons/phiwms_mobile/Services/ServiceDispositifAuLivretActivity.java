@@ -87,10 +87,6 @@ public class ServiceDispositifAuLivretActivity extends ServiceActivity {
             dispositifList = ProduitOpenHelper.getAllDispositifs(db);
         }
 
-        // Afficher le nombre de dispositifs
-        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(dispositifList.size()));
-        ((TextView) findViewById(R.id.titre)).setText("Dispositif Médical");
-
         // Création de l'adapter
         dispositifAdapter = new DispositifAdapter(ServiceDispositifAuLivretActivity.this, dispositifList);
 
