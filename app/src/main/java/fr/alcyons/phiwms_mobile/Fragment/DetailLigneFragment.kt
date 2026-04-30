@@ -226,6 +226,11 @@ class DetailLigneFragment : Fragment() {
             view.findViewById<LinearLayout>(R.id.bandeauNouvelleReference_LL).visibility =
                 View.VISIBLE
 
+        if(ligne.depotReference.contains("PUF"))
+        {
+            view.findViewById<LinearLayout>(R.id.layoutLotPeremption_LL).visibility = View.GONE
+        }
+
         //gestion de la validation
         view.findViewById<LinearLayout>(R.id.layoutValider_LL).setOnClickListener {
             val qte = quantiteCompteeET.text.toString().toIntOrNull() ?: 0
@@ -242,9 +247,18 @@ class DetailLigneFragment : Fragment() {
             val jour = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
             val datePeremption = "$annee-$moisFormate-$jour"
 
-            ligne.lot = lot
+            /*if(ligne.depotReference.contains("PUF"))
+            {
+                ligne.lot = ""
+                ligne.peremptionDate = "0000-00-00"
+            }
+            else
+            {
+                ligne.lot = lot
+                ligne.peremptionDate = datePeremption
+            }*/
+
             ligne.stockPhysique = qte.toDouble()
-            ligne.peremptionDate = datePeremption
 
             var ajout : Boolean = false
 
