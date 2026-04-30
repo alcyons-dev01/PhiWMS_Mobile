@@ -173,7 +173,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
             String[] intitule_tab = retour.getIntitule().split(":");
             String depot_origine = intitule_tab[0];
             if(retour.getRef_Depot_Origine().contains("-PAD-") && this.utilisateurConnecte.getIdentifiant().toLowerCase().contains("alcyons")) { depot_origine = "XXX-PAD-XXX"; }
-            this.listeDepotLivraison.add(depot_origine);
+            if (!this.listeDepotLivraison.contains(depot_origine)) { this.listeDepotLivraison.add(depot_origine); }
         }
 
         if (this.retours.isEmpty())
@@ -231,13 +231,12 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
                     String[] intitule_tab = retour_courant.getIntitule().split(":");
                     String depot_origine = intitule_tab[0];
                     if(retour_courant.getRef_Depot_Origine().contains("-PAD-") && this.utilisateurConnecte.getIdentifiant().toLowerCase().contains("alcyons")) { depot_origine = "XXX-PAD-XXX"; }
-                    this.listeDepotLivraison.add(depot_origine);
 
                     if (depot_origine.contentEquals(depotNom)) { this.retours.add(retour_courant); }
                 }
             }
 
-            this.displayRetoursOrClose();
+            this.configureAdapter();
         });
     }
 
@@ -405,6 +404,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
             if (!this.isDestructionRetourInProgress(retour)) { continue; }
 
             this.retours.add(retour);
+            this.retours_base.add(retour);  // Also add to base list for filtering
             final long rowId = RetourOpenHelper.insererUnRetourEnBDD(this.db, retour);
             if (-1L == rowId) { continue; }
 
