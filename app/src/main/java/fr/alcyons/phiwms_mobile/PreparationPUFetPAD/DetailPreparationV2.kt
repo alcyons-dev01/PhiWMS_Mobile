@@ -514,7 +514,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
             )*/
         }
 
-        if (liste.isNotEmpty()) {
+        /*if (liste.isNotEmpty()) {
             // Affiche le container
             referencePreparerContainer.apply {
                 layoutParams = (layoutParams as LinearLayout.LayoutParams).also {
@@ -533,7 +533,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
                 .commitNow()
 
             preparerVisible = true
-        }
+        }*/
     }
 
     private fun fermerReceptionner() {
