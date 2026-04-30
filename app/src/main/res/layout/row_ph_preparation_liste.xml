@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:backgroundTint="@android:color/white"
-    android:padding="5dp">
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="#F0F4FF">
 
-    <RelativeLayout
-        android:id="@+id/relative_principal"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/background_plein_vert_radius">
+        android:orientation="vertical">
 
+        <!-- Header : Date + Urgent -->
         <LinearLayout
             android:id="@+id/zoneDateLivraisonPrevue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
+            android:background="@color/bleu_fonce_alcyons"
+            android:padding="12dp"
             android:gravity="center_vertical"
-            android:layout_alignParentTop="true"
             android:weightSum="2">
 
             <TextView
@@ -30,122 +30,126 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="left|center_vertical"
-                android:layout_gravity="center_vertical"
-                android:textSize="16dp"
                 android:text=""
-                android:textColor="@android:color/black" />
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:gravity="center_vertical"/>
 
             <TextView
                 android:id="@+id/preparationUrgente"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="right"
-                android:textSize="20dp"
+                android:gravity="end"
                 android:text="URGENT"
-                android:layout_gravity="center_vertical"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="@color/rouge"
+                android:textColor="#FF5252"
                 android:visibility="gone"/>
 
         </LinearLayout>
 
-
+        <!-- Corps -->
         <LinearLayout
+            android:id="@+id/cartePreparation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_below="@+id/zoneDateLivraisonPrevue"
-            android:background="@drawable/background_empty_radius_bottom"
-            android:layout_marginLeft="8dp">
+            android:background="#F0F4FF"
+            android:padding="10dp"
+            android:gravity="center_vertical">
 
+            <!-- Zone gauche : Dépôt + UID + Origine -->
             <LinearLayout
                 android:id="@+id/zoneGauche"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
                 android:layout_weight="4"
+                android:layout_gravity="center_vertical"
                 android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/depotNom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/uidPHPreparation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textSize="13sp"
+                    android:alpha="0.8"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/origine"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textSize="12sp"
+                    android:alpha="0.6"
+                    android:maxLines="2"
+                    android:ellipsize="end"/>
+
+            </LinearLayout>
+
+            <!-- Séparateur -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/bleu_clair_alcyons_transparent"
+                android:layout_marginHorizontal="8dp"/>
+
+            <!-- Zone droite : Nb à préparer — centré verticalement -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/zoneDroite"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/bleu_fonce_alcyons">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/depotNom"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="5"
-                        android:text=""
-                        android:textSize="18dp"
-                        android:textColor="@android:color/black"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/uidPHPreparation"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="18dp"
-                        android:textColor="@android:color/black" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/origine"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="14dp"
-                        android:maxLines="2"
-                        android:ellipsize="end"
-                        android:textColor="@android:color/black" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <ImageView
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="@color/gris_fonce"/>
-
-            <LinearLayout
-                android:id="@+id/zoneDroite"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/nbAPreparer"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:orientation="vertical"
                     android:gravity="center"
-                    android:text=""
-                    android:textStyle="bold"
-                    android:textColor="@color/noir"
-                    android:textSize="22dp"/>
+                    android:padding="8dp">
 
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/nbAPreparer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="#FFFFFF"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="À préparer"
+                        android:textColor="#AAAAFF"
+                        android:textSize="10sp"
+                        android:gravity="center"/>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
 
         </LinearLayout>
 
+    </LinearLayout>
 
-    </RelativeLayout>
-
-</RelativeLayout>
+</androidx.cardview.widget.CardView>

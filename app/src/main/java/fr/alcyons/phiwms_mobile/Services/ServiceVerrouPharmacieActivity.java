@@ -265,8 +265,6 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
                             {
                                 if(passageParOnCreate)
                                 {
-                                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(phPreparationList.size()));
-                                    ((TextView) findViewById(R.id.titre)).setText("Verrous");
                                     phPreparationList.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
 
                                     phPreparationAdapter = new PH_PreparationAdapter(ServiceVerrouPharmacieActivity.this, db, phPreparationList, utilisateurConnecte);

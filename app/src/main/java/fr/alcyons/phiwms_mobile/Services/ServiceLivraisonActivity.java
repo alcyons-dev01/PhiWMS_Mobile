@@ -85,7 +85,6 @@ public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
         listeDepotLivraison = new ArrayList<>();
         listeDepotLivraison.add("Tous");
         //Gestion de la listView
-        ((TextView) findViewById(R.id.titre)).setText("Livraisons");
         ph_preparation_ListView = findViewById(R.id.listeView);
         ph_preparation_ListView.setOnItemClickListener((parent, view, position, id) -> {
 
@@ -188,8 +187,6 @@ public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
             titre = "Livraison";
 
         /* Code nécessaire à l'affichage de la liste */
-        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(taille_liste));
-        ((TextView) findViewById(R.id.titre)).setText(titre);
 
         if (ph_preparation_List.isEmpty()) {
             vide = true;
@@ -261,8 +258,6 @@ public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
                         titre = "Livraison";
 
                     /* Code nécessaire à l'affichage de la liste */
-                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(taille_liste));
-                    ((TextView) findViewById(R.id.titre)).setText(titre);
                 }
 
                 @Override

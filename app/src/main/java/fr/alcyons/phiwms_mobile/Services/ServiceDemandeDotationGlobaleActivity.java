@@ -104,9 +104,6 @@ public class ServiceDemandeDotationGlobaleActivity extends ServiceAvecConnexionA
         phPreparationList = new ArrayList<>();
         // Récupération du dépot sélectionné
 
-        // Affichage des informations de base
-        ((TextView) findViewById(R.id.titre)).setText("Dotation Globale");
-
         // Récupération et initialisation de l'action de la listView
         dotationListView = findViewById(R.id.listeView);
         lancerScan = findViewById(R.id.lancerScan);

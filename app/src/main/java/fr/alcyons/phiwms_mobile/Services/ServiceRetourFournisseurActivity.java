@@ -90,7 +90,6 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
             ServiceRetourFournisseurActivity.this.finish();
         });
 
-        ((LinearLayout) findViewById(R.id.triListe)).setVisibility(ListView.GONE);
 
         connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(db);
 
@@ -108,8 +107,6 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                                         afficherSnackBarRetourFournisseur();
                                     }
                                     /* Code nécessaire à l'affichage de la liste */
-                                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
-                                    ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur");
                                     adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
                                     
                                     listViewRetours.setAdapter(adapter);
@@ -210,9 +207,6 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                 passageParOnCreate = false;
                 if(connexionDirecte)
                 {
-                    /* Code nécessaire à l'affichage de la liste */
-                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
-                    ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur");
                     adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
                     
                     listViewRetours.setAdapter(adapter);
@@ -273,9 +267,6 @@ public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivi
                             }
                             else
                             {
-                                /* Code nécessaire à l'affichage de la liste */
-                                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
-                                ((TextView) findViewById(R.id.titre)).setText("Retours Fournisseur");
                                 adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
                                 
                                 listViewRetours.setAdapter(adapter);

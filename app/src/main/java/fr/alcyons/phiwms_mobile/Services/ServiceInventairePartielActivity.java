@@ -446,8 +446,6 @@ public class ServiceInventairePartielActivity extends ServiceAvecConnexionActivi
             }
         }
 
-        ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(inventaireList.size()));
-        ((TextView) findViewById(R.id.titre)).setText("Inventaire(s) en cours");
         inventaireAdapter = new InventaireAdapter(ServiceInventairePartielActivity.this, db, listeInventaire, utilisateurConnecte);
         // Permet d'enlever le séparateur entre deux éléments d'une listeView
         //ph_preparation_ListView.setDivider(footer);

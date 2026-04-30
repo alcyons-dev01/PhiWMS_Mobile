@@ -30,6 +30,8 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper
@@ -37,6 +39,8 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne
 import fr.alcyons.phiwms_mobile.Classes.Commande
+import fr.alcyons.phiwms_mobile.Classes.PH_Preparation
+import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat
 import fr.alcyons.phiwms_mobile.Classes.Produit
 import fr.alcyons.phiwms_mobile.Fragment.RechercheFragment
@@ -48,12 +52,15 @@ import fr.alcyons.phiwms_mobile.Outils.GestionCodeScanne
 import fr.alcyons.phiwms_mobile.Outils.Mail
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotos
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.Adapter.DetailPreparationAdapter
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.Fragment.DetailFragment
 import fr.alcyons.phiwms_mobile.R
 import fr.alcyons.phiwms_mobile.Reception.Adapter.DetailReceptionAdapter
 import fr.alcyons.phiwms_mobile.Reception.Fragment.AReceptionnerFragment
-import fr.alcyons.phiwms_mobile.Reception.Fragment.DetailFragment
 import fr.alcyons.phiwms_mobile.Reception.Fragment.ReceptionnerFragment
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity
+import fr.alcyons.phiwms_mobile.Services.ServicePreparationPadActivity
+import fr.alcyons.phiwms_mobile.Services.ServicePreparationPufActivity
 import fr.alcyons.phiwms_mobile.Services.ServiceReceptionPadActivity
 import fr.alcyons.phiwms_mobile.Services.ServiceReceptionPuiActivity
 import kotlinx.coroutines.Dispatchers
@@ -65,36 +72,33 @@ import java.util.Date
 import java.util.Locale
 import java.util.Objects
 import java.util.Random
-import fr.alcyons.phiwms_mobile.Interfaces.RechercheAdjustable
 
-class DetailReception_V2 : ServiceAvecConnexionActivity(),
-    RechercheFragment.OnElementRechercheListener,
-    AReceptionnerFragment.OnElementSelectionneListener,
-    ReceptionnerFragment.OnElementSelectionneListener, RechercheAdjustable {
+class DetailPreparationV2 : ServiceAvecConnexionActivity(),
+    RechercheFragment.OnElementRechercheListener {
 
-    private lateinit var receptionCourant: Commande
+    private lateinit var preparationCourante: PH_Preparation
     private lateinit var context: Context
     private lateinit var scannerContainer: androidx.fragment.app.FragmentContainerView
     private lateinit var rechercheContainer: androidx.fragment.app.FragmentContainerView
-    private lateinit var referenceAReceptionnerContainer: androidx.fragment.app.FragmentContainerView
-    private lateinit var referenceReceptionnerContainer: androidx.fragment.app.FragmentContainerView
+    private lateinit var referenceAPreparerContainer: androidx.fragment.app.FragmentContainerView
+    private lateinit var referencePreparerContainer: androidx.fragment.app.FragmentContainerView
     private lateinit var detailContainer: androidx.fragment.app.FragmentContainerView
     private lateinit var lancerScan: LinearLayout
     private lateinit var lancerRecherhe: LinearLayout
-    private lateinit var aReceptionner_LL: LinearLayout
-    private lateinit var receptionner_LL: LinearLayout
-    private lateinit var btnValiderReception_LL: LinearLayout
-    private lateinit var btnValiderReception_CV: CardView
-    private var adapter: DetailReceptionAdapter? = null
+    private lateinit var aPreparer_LL: LinearLayout
+    private lateinit var preparer_LL: LinearLayout
+    private lateinit var btnValiderPreparation_LL: LinearLayout
+    private lateinit var btnValiderPreparation_CV: CardView
+    private var adapter: DetailPreparationAdapter? = null
     private var scannerFragment: Fragment? = null
     private var rechercheFragment: RechercheFragment? = null
-    private var aReceptionnerFragment: AReceptionnerFragment? = null
-    private var receptionnerFragment: ReceptionnerFragment? = null
+    private var aPreparerFragment: AReceptionnerFragment? = null
+    private var preparerFragment: ReceptionnerFragment? = null
     private var detailFragment: DetailFragment? = null
     private var scannerVisible = false
     private var rechercheVisible = false
-    private var aCompterVisible = false
-    private var CompterVisible = false
+    private var aPreparerVisible = false
+    private var preparerVisible = false
     private var detailVisible = false
     private var scannerProcessing = false
     private var alerteVisible = false
@@ -105,35 +109,32 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     private lateinit var searchInput_ET: EditText
     private lateinit var effacerRecherche_IV: ImageView
     var body = ""
-    var bonLivraisonPhotoName = ""
-    var subject = ""
-    var bonLivraisonBitmap = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.detail_reception_module)
+        setContentView(R.layout.detail_preparation_module)
         context = this
 
         // Récupération des données de l'intent
-        receptionCourant = CommandeOpenHelper.getCommandeByID(
-            db, intent.extras!!.getInt("commandeID_Selectionne")
+        preparationCourante = PH_PreparationOpenHelper.getPH_PreparationByID(
+            db, intent.extras!!.getInt("ph_preparationUID_Selectionne")
         )
 
         // Binding des vues
-        findViewById<TextView>(R.id.commandeNumero).text = receptionCourant.numero
+        findViewById<TextView>(R.id.preparationNumero).text = preparationCourante.uid.toString()
 
         scannerContainer = findViewById(R.id.scannerContainer)
         rechercheContainer = findViewById(R.id.rechercheContainer)
-        referenceAReceptionnerContainer = findViewById(R.id.referenceAReceptionnerContainer)
-        referenceReceptionnerContainer = findViewById(R.id.referenceReceptionnerContainer)
+        referenceAPreparerContainer = findViewById(R.id.referenceAPreparerContainer)
+        referencePreparerContainer = findViewById(R.id.referencePreparerContainer)
         detailContainer = findViewById(R.id.detailContainer)
 
         lancerScan = findViewById(R.id.lancerScan)
         lancerRecherhe = findViewById(R.id.lancerRecherhe)
-        aReceptionner_LL = findViewById(R.id.aReceptionner_LL)
-        receptionner_LL = findViewById(R.id.receptionner_LL)
-        btnValiderReception_LL = findViewById(R.id.btnValiderReception_LL)
-        btnValiderReception_CV = findViewById(R.id.btnValiderReception_CV)
+        aPreparer_LL = findViewById(R.id.aPreparer_LL)
+        preparer_LL = findViewById(R.id.preparer_LL)
+        btnValiderPreparation_LL = findViewById(R.id.btnValiderPreparation_LL)
+        btnValiderPreparation_CV = findViewById(R.id.btnValiderPreparation_CV)
         textChercher_TV = findViewById(R.id.textChercher_TV)
         searchInput_ET = findViewById(R.id.searchInput_ET)
         effacerRecherche_IV = findViewById(R.id.effacerRecherche_IV)
@@ -167,8 +168,8 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
             fermerRecherche()
         }
 
-        aReceptionner_LL.setOnClickListener {
-            if (aCompterVisible) {
+        aPreparer_LL.setOnClickListener {
+            if (aPreparerVisible) {
                 fermerAReceptionner()
             } else {
                 fermerFragment()
@@ -176,8 +177,8 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
             }
         }
 
-        receptionner_LL.setOnClickListener {
-            if (CompterVisible) {
+        preparer_LL.setOnClickListener {
+            if (preparerVisible) {
                 fermerReceptionner()
             } else {
                 fermerFragment()
@@ -190,7 +191,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         super.onResume()
 
         //on récupère les ph_reliquat de base
-        val listeReliquatBase = PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(db, receptionCourant.numero)
+        /*val listeReliquatBase = PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(db, receptionCourant.numero)
 
         for(reliquatBase in listeReliquatBase)
         {
@@ -222,9 +223,9 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                     if(receptionner(receptionCourant))
                         validerReception()
                     else
-                        Alerte.afficherAlerteInformation(this@DetailReception_V2, layoutInflater, "Erreur", "Une erreur est survenue", false, false)
+                        Alerte.afficherAlerteInformation(this@DetailPreparationV2, layoutInflater, "Erreur", "Une erreur est survenue", false, false)
             }
-        }
+        }*/
 
         ouvrirScanner()
     }
@@ -247,10 +248,10 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         }
     }
 
-    override fun onElementSelectionne(element: PH_Reliquat) {
+    /*override fun onElementSelectionne(element: PH_Preparation_Ligne) {
         fermerFragment()
         ouvrirDetailFragment(element)
-    }
+    }*/
 
     /**
      * SCANNER
@@ -400,7 +401,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                 val query = s.toString().trim()
                 if (query.isNotEmpty()) {
                     ouvrirRecherche()
-                    rechercheFragment?.lancerRecherche(query, "reception", receptionCourant.numero)
+                    rechercheFragment?.lancerRecherche(query, "preparation", preparationCourante.uid.toString())
                 } else {
                     rechercheFragment?.viderListe()
                 }
@@ -428,20 +429,20 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         var liste: ArrayList<PH_Reliquat> = arrayListOf()
 
         if (idProduit == 0) {
-            liste = ArrayList(
+            /*liste = ArrayList(
                 PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(
                     db,
                     receptionCourant.numero
                 )
-            )
+            )*/
         } else {
-            liste.add(
+            /*liste.add(
                 PH_ReliquatOpenHelper.getPH_ReliquatBaseByUnIdProduitetNumero(
                     db,
                     idProduit,
                     receptionCourant.numero
                 )
-            )
+            )*/
         }
 
         if (liste.isNotEmpty()) {
@@ -450,7 +451,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                 .replace(R.id.referenceAReceptionnerContainer, frag)
                 .commitNow()
 
-            referenceAReceptionnerContainer.apply {
+            referenceAPreparerContainer.apply {
                 layoutParams = (layoutParams as LinearLayout.LayoutParams).also {
                     it.height = LinearLayout.LayoutParams.WRAP_CONTENT
                     it.weight = 0f
@@ -464,29 +465,29 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                     .start()
             }
 
-            aCompterVisible = true
+            aPreparerVisible = true
         }
     }
 
     private fun fermerAReceptionner() {
         findViewById<androidx.core.widget.NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled =
             true
-        referenceAReceptionnerContainer.animate()
-            .translationY(-referenceAReceptionnerContainer.height.toFloat())
+        referenceAPreparerContainer.animate()
+            .translationY(-referenceAPreparerContainer.height.toFloat())
             .setDuration(300)
             .withEndAction {
-                referenceAReceptionnerContainer.visibility = View.GONE
-                referenceAReceptionnerContainer.layoutParams =
-                    (referenceAReceptionnerContainer.layoutParams as LinearLayout.LayoutParams).also {
+                referenceAPreparerContainer.visibility = View.GONE
+                referenceAPreparerContainer.layoutParams =
+                    (referenceAPreparerContainer.layoutParams as LinearLayout.LayoutParams).also {
                         it.height = 0
                     }
-                aReceptionnerFragment?.let { frag ->
+                aPreparerFragment?.let { frag ->
                     supportFragmentManager.beginTransaction().remove(frag).commit()
                 }
-                aReceptionnerFragment = null
+                aPreparerFragment = null
             }.start()
 
-        aCompterVisible = false
+        aPreparerVisible = false
     }
 
     /**
@@ -496,26 +497,26 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         var liste: ArrayList<PH_Reliquat>
 
         if (idProduit == 0) {
-            liste = ArrayList(
+            /*liste = ArrayList(
                 PH_ReliquatOpenHelper
                     .getPH_ReliquatNegByCommandeNumero(
                         db,
                         receptionCourant.numero
                     )
-            )
+            )*/
         } else {
-            liste = ArrayList(
+            /*liste = ArrayList(
                 PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(
                     db,
                     receptionCourant.numero,
                     idProduit
                 )
-            )
+            )*/
         }
 
         if (liste.isNotEmpty()) {
             // Affiche le container
-            referenceReceptionnerContainer.apply {
+            referencePreparerContainer.apply {
                 layoutParams = (layoutParams as LinearLayout.LayoutParams).also {
                     it.height = (400 * resources.displayMetrics.density).toInt()
                     it.weight = 0f
@@ -531,33 +532,33 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                 .replace(R.id.referenceReceptionnerContainer, frag)
                 .commitNow()
 
-            CompterVisible = true
+            preparerVisible = true
         }
     }
 
     private fun fermerReceptionner() {
         findViewById<androidx.core.widget.NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled =
             true
-        referenceReceptionnerContainer.animate()
-            .translationY(-referenceReceptionnerContainer.height.toFloat())
+        referencePreparerContainer.animate()
+            .translationY(-referencePreparerContainer.height.toFloat())
             .setDuration(300)
             .withEndAction {
-                referenceReceptionnerContainer.visibility = View.GONE
-                referenceReceptionnerContainer.layoutParams =
-                    (referenceReceptionnerContainer.layoutParams as LinearLayout.LayoutParams).also {
+                referencePreparerContainer.visibility = View.GONE
+                referencePreparerContainer.layoutParams =
+                    (referencePreparerContainer.layoutParams as LinearLayout.LayoutParams).also {
                         it.height = 0
                     }
-                receptionnerFragment?.let { frag ->
+                preparerFragment?.let { frag ->
                     supportFragmentManager.beginTransaction().remove(frag).commit()
                 }
-                receptionnerFragment = null
+                preparerFragment = null
             }.start()
 
-        CompterVisible = false
+        preparerVisible = false
     }
 
     private fun ouvrirDetailFragment(
-        ligne: PH_Reliquat?,
+        ligne: PH_Preparation_Ligne?,
     ) {
         lifecycleScope.launch(Dispatchers.Main) {
             val fragmentDejaOuvert =
@@ -576,7 +577,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                 frag.onValider = { ligne, ajout ->
                     if(ligne == null)
                     {
-                        ElementASynchroniserOpenHelper.toutSynchroniser(this@DetailReception_V2, db, utilisateurConnecte, false)
+                        ElementASynchroniserOpenHelper.toutSynchroniser(this@DetailPreparationV2, db, utilisateurConnecte, false)
                         fermerDetailFragment()
                         rafraichirListe()
                         ouvrirScanner()
@@ -585,12 +586,12 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                     {
                         if (ajout) {
                             // L'utilisateur a choisi Ajouter
-                            ajouterPHReliquat(
+                            ajouterPHPreparationLigne(
                                 ligne
                             )
                         } else {
                             // L'utilisateur a choisi Modifier
-                            enregistrerPhReliquat(ligne)
+                            enregistrerPhPreparationLigne(ligne)
                         }
                     }
 
@@ -632,8 +633,8 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     private fun fermerFragment() {
         if (scannerVisible) fermerScanner()
         if (rechercheVisible) fermerRecherche()
-        if (aCompterVisible) fermerAReceptionner()
-        if (CompterVisible) fermerReceptionner()
+        if (aPreparerVisible) fermerAReceptionner()
+        if (preparerVisible) fermerReceptionner()
         if (detailVisible) fermerDetailFragment()
     }
 
@@ -666,7 +667,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                 if (!produitIdentifier.isEmpty() && produitIdentifier.size == 1) {
                     val produit = produitIdentifier[0]
 
-                    var reliquatcourant = PH_ReliquatOpenHelper.getPH_ReliquatByUnIdProduitetNumeroLotSerie(db, produit.iD_produit, receptionCourant.numero, numeroLotIdentification, numeroSerieIdentification)
+                    /*var reliquatcourant = PH_ReliquatOpenHelper.getPH_ReliquatByUnIdProduitetNumeroLotSerie(db, produit.iD_produit, receptionCourant.numero, numeroLotIdentification, numeroSerieIdentification)
 
                     if(reliquatcourant != null)
                     {
@@ -725,7 +726,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                                 }
                             }
                         }
-                    }
+                    }*/
                 } else {
                     withContext(Dispatchers.Main) {
                         alerteVisible = true // ← on lève le flag avant d'afficher
@@ -745,7 +746,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     }
 
     private fun rafraichirListe() {
-        val nbReliquatTotal = PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(db, receptionCourant.numero).size
+        /*val nbReliquatTotal = PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(db, receptionCourant.numero).size
         val nbReliquatPreparer = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumero(db, receptionCourant.numero).size
         findViewById<TextView>(R.id.nbReferenceAReceptionner_TV).text = nbReliquatTotal.toString()
         findViewById<TextView>(R.id.nbReferenceReceptionner_TV).text = nbReliquatPreparer.toString()
@@ -755,118 +756,8 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         if(nbReliquatPreparer > 0)
             findViewById<CardView>(R.id.btnValiderReception_CV).visibility = View.VISIBLE
         else
-            findViewById<CardView>(R.id.btnValiderReception_CV).visibility = View.GONE
+            findViewById<CardView>(R.id.btnValiderReception_CV).visibility = View.GONE*/
     }
-
-    @SuppressLint("SimpleDateFormat")
-    private fun validerReception() {
-
-
-        //on check la connexion à internet pour l'envoie du mail
-        val internet: Boolean = checkInternetConnection()
-        if (!internet) {
-            Alerte.afficherAlerte(
-                this@DetailReception_V2,
-                "Erreur",
-                "Aucune connexion internet détectée, aucun envoi de mail possible",
-                "alerte"
-            )
-        } else {
-            //Construction mail
-            @SuppressLint("SimpleDateFormat") var dateFormat =
-                SimpleDateFormat("dd/MM/yyyy hh:mm:ss")
-            var dateDuJour = Date()
-            var date = dateFormat.format(dateDuJour)
-            val depotdest =
-                DepotOpenHelper.getDepotParReference(db, receptionCourant.ref_Depot_Dest)
-            var depot_destinataire = ""
-            if (depotdest != null) {
-                depot_destinataire = depotdest.getNom()
-            }
-
-             subject =
-                "PhiWMS Mobile - " + depot_destinataire + " - " + receptionCourant.fournisseur + " - Réception PUI N°" + receptionCourant.numero + " - " + date
-
-            if (receptionCourant.ref_Depot_Dest.contains("-PAD")) subject =
-                "PhiWMS Mobile - " + depot_destinataire + " - " + receptionCourant.fournisseur + " - Réception PAD N°" + receptionCourant.numero + " - " + date
-
-            if (bonLivraisonBitmap != null) {
-                body = "Madame, Monsieur, \n \n" +
-                        "La réception N°" + receptionCourant.numero+ " a été réalisée par " + utilisateurConnecte.nom + " " + utilisateurConnecte.prenom + ". \n" +
-                        "Le numéro de bon de livraison saisi est le suivant : " + receptionCourant.blNumero + "\n\n" +
-                        "Vous pourrez trouver ci-joint le bon de livraison. \n\n" +
-                        "Cordialement, \n\n" +
-                        "L'équipe Phi \n\n" +
-                        "Ceci est un message automatique merci de ne pas répondre"
-            } else {
-                body = "Madame, Monsieur, \n \n" +
-                        "La réception N°" + receptionCourant.numero + " a été réalisée par " + utilisateurConnecte.nom + " " + utilisateurConnecte.prenom + ". \n" +
-                        "Le numéro de bon de livraison saisi est le suivant : " + receptionCourant.blNumero + "\n\n" +
-                        "Cordialement, \n\n" +
-                        "L'équipe Phi \n\n" +
-                        "Ceci est un message automatique merci de ne pas répondre"
-            }
-
-
-            //Sauvegarde de la signature dans une image
-            if (bonLivraisonBitmap != null) {
-                dateFormat = SimpleDateFormat("yyyyMMdd")
-                dateDuJour = Date()
-                date = dateFormat.format(dateDuJour)
-
-                bonLivraisonPhotoName =
-                    receptionCourant.numero + "_" + date + "_ReceptionPuiBonLivraison"
-
-                OutilsGestionPhotos.verifyStoragePermissions(this@DetailReception_V2)
-            }
-
-            // Récupération Mail Pharmacie
-            var email = ParametresServeurOpenHelper.getMailPharmacie(db)
-            if (utilisateurConnecte.getIdentifiant().uppercase(Locale.getDefault())
-                    .contentEquals("ALCYONS")
-            ) {
-                email = "dev01@alcyons.fr"
-            }
-            afficherAlerteConfirmationMail(
-                this@DetailReception_V2,
-                LayoutInflater.from(this@DetailReception_V2),
-                email
-            )
-        }
-    }
-
-    fun afficherAlerteConfirmationMail(context: Context, inflater: LayoutInflater, email: String?) {
-        val builder = AlertDialog.Builder(context)
-        val layout = inflater.inflate(R.layout.alerte_confirmation, null)
-
-        val zoneok = layout.findViewById<View?>(R.id.buttonOk) as LinearLayout
-        val buttonAnnuler = layout.findViewById<View?>(R.id.buttonAnnuler) as LinearLayout
-        builder.setView(layout)
-
-        val alertDialog = builder.create()
-        Objects.requireNonNull<Window?>(alertDialog.getWindow()).setGravity(Gravity.CENTER)
-        alertDialog.getWindow()!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        alertDialog.show()
-
-        zoneok.setOnClickListener(View.OnClickListener { v: View? ->
-            alertDialog.dismiss()
-            try {
-                envoyerEmail(subject, body)
-            } catch (e: JSONException) {
-                throw RuntimeException(e)
-            }
-        })
-
-        buttonAnnuler.setOnClickListener(View.OnClickListener { v: View? ->
-            alertDialog.dismiss()
-            try {
-                envoyerEmail(subject, body)
-            } catch (e: JSONException) {
-                throw RuntimeException(e)
-            }
-        })
-    }
-
 
     private fun getDateDuJour(): String =
         SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
@@ -877,26 +768,22 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         ouvrirReceptionner(idProduit)
     }
 
-    private fun ajouterPHReliquat(
-        nouveauReliquat : PH_Reliquat
+    private fun ajouterPHPreparationLigne(
+        nouveauPHPL : PH_Preparation_Ligne
     ) {
-        //on regarde si un reliquat existe déjà avec ces informations
-        if (receptionCourant.ref_Depot_Dest.contains("-PAD")) {
-            nouveauReliquat.setZone("RECEPTION")
-            nouveauReliquat.setEmplacement("RECEPTION-" + receptionCourant.numero + "-" + receptionCourant.patient_identite)
-        }
 
-        val rowID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, nouveauReliquat)
+
+        val rowID = PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, nouveauPHPL)
         if (rowID != -1L) {
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
                 db,
                 PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT,
-                nouveauReliquat.phiMR4UUID,
-                nouveauReliquat.reliquat_UID,
+                nouveauPHPL.phiMR4UUID,
+                nouveauPHPL._UID,
                 DBOpenHelper.ActionsEAS.AJOUT
             )
             ElementASynchroniserOpenHelper.toutSynchroniser(
-                this@DetailReception_V2,
+                this@DetailPreparationV2,
                 db,
                 utilisateurConnecte,
                 false
@@ -908,17 +795,17 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         }
     }
 
-    private fun enregistrerPhReliquat(phReliquat: PH_Reliquat) {
-        PH_ReliquatOpenHelper.mettreAJourUnPHReliquat(db, phReliquat)
+    private fun enregistrerPhPreparationLigne(phPL: PH_Preparation_Ligne) {
+        PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, phPL)
         ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
             db,
             PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT,
-            phReliquat.phiMR4UUID,
-            phReliquat.reliquat_UID,
+            phPL.phiMR4UUID,
+            phPL._UID,
             DBOpenHelper.ActionsEAS.MAJ
         )
         ElementASynchroniserOpenHelper.toutSynchroniser(
-            this@DetailReception_V2,
+            this@DetailPreparationV2,
             db,
             utilisateurConnecte,
             false
@@ -958,7 +845,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         val buttonAnnuler = layout.findViewById<LinearLayout>(R.id.buttonAnnuler)
         val messageTextView = layout.findViewById<TextView>(R.id.messageFin)
 
-        messageTextView.text = "Souhaitez-vous valider la réception de la commande ?"
+        messageTextView.text = "Souhaitez-vous valider la préparation ?"
         layout.findViewById<TextView>(R.id.TitreAnnulation).text = "Non"
         layout.findViewById<TextView>(R.id.TitreConfirmation).text = "Oui"
 
@@ -980,7 +867,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         }
     }
 
-    override fun ajusterHauteurRecherche(hauteur: Int) {
+    fun ajusterHauteurRecherche(hauteur: Int) {
         rechercheContainer.layoutParams =
             (rechercheContainer.layoutParams as LinearLayout.LayoutParams).also {
                 it.height = if (hauteur == 0) 0 else LinearLayout.LayoutParams.WRAP_CONTENT
@@ -995,188 +882,13 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                 && cm.getActiveNetworkInfo()!!.isConnected()
     }
 
-    private fun receptionner(commande: Commande): Boolean {
-        val random = Random()
-        var actionId = random.nextInt()
-        if (actionId > 0) actionId = actionId * -1
-        @SuppressLint("SimpleDateFormat") val parseFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-        val date = Date()
-        val date_string = parseFormat.format(date)
-        var new_action_utilisateur = ActionUtilisateur(
-            actionId,
-            utilisateurConnecte.getId(),
-            date_string,
-            serviceActuel.getId(),
-            utilisateurConnecte.getEtablissementId(),
-            "En attente",
-            commande.getID_commande(),
-            "",
-            "Réception PUI"
-        )
-        if (receptionCourant.getRef_Depot_Dest().contains("-PAD")) new_action_utilisateur =
-            ActionUtilisateur(
-                actionId,
-                utilisateurConnecte.getId(),
-                date_string,
-                serviceActuel.getId(),
-                utilisateurConnecte.getEtablissementId(),
-                "En attente",
-                commande.getID_commande(),
-                "",
-                "Réception PAD"
-            )
-        ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur)
-
-        val listeReliquatBase = PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(
-            db,
-            receptionCourant.getNumero()
-        )
-        for (reliquat in listeReliquatBase) {
-            PH_ReliquatOpenHelper.supprimerUnPHReliquat(db, reliquat)
-            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
-                db,
-                PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT,
-                reliquat!!.getPhiMR4UUID(),
-                reliquat.getReliquat_UID(),
-                DBOpenHelper.ActionsEAS.SUPPR
-            )
-        }
-
-        val listeReliquat = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumero(
-            db,
-            receptionCourant.getNumero()
-        )
-        for (reliquatcourant in listeReliquat) {
-            val randomactionligne = Random()
-            var actionligneId = randomactionligne.nextInt()
-            if (actionligneId > 0) actionligneId = actionligneId * -1
-            val actionUtilisateur_ligne = ActionUtilisateur_Ligne(
-                actionligneId,
-                new_action_utilisateur.getId(),
-                "PH_Reliquat",
-                reliquatcourant.getReliquat_UID(),
-                "",
-                0,
-                reliquatcourant.getQteLivraison(),
-                reliquatcourant.getDesignationCourte()
-            )
-            ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(
-                db,
-                actionUtilisateur_ligne
-            )
-
-            PH_ReliquatOpenHelper.supprimerUnPHReliquat(db, reliquatcourant)
-        }
-
-        val list_serialisation = PH_SerialisationOpenHelper.getAllPH_SerialisationByMvtId(
-            db,
-            receptionCourant.getNumero().toString()
-        )
-        if (!list_serialisation.isEmpty()) {
-            for (serialisation in list_serialisation) {
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
-                    db,
-                    PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION,
-                    serialisation.getPhiMR4UUID(),
-                    serialisation.get_UID(),
-                    DBOpenHelper.ActionsEAS.AJOUT
-                )
-                val randomAUSeri = Random()
-                var actionSerId = randomAUSeri.nextInt()
-                if (actionSerId > 0) actionSerId = actionSerId * -1
-                val new_action_utilisateur_serialisation = ActionUtilisateur(
-                    actionSerId,
-                    utilisateurConnecte.getId(),
-                    date_string,
-                    serviceActuel.getId(),
-                    utilisateurConnecte.getEtablissementId(),
-                    "En attente",
-                    serialisation.get_UID(),
-                    "",
-                    "Serialisation"
-                )
-                ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(
-                    db,
-                    new_action_utilisateur_serialisation
-                )
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
-                    db,
-                    ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR,
-                    new_action_utilisateur_serialisation.getPhiMR4UUID(),
-                    new_action_utilisateur_serialisation.getId(),
-                    DBOpenHelper.ActionsEAS.AJOUT
-                )
-            }
-        }
-
-        commande.setSituation("RM") //R = Réception, M = Mobile
-        val rowID = CommandeOpenHelper.mettreAJourUneCommande(db, commande)
-        if (rowID != -1L) {
-            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
-                db,
-                CommandeOpenHelper.Constantes.TABLE_COMMANDE,
-                commande.getPhiMR4UUID(),
-                commande.getID_commande(),
-                DBOpenHelper.ActionsEAS.MAJ
-            )
-            //on ajoute l'action utilisateur à synchroniser à la fin
-            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
-                db,
-                ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR,
-                new_action_utilisateur.getPhiMR4UUID(),
-                new_action_utilisateur.getId(),
-                DBOpenHelper.ActionsEAS.AJOUT
-            )
-
-            // Si possible, on essaie de mettre à jour les éléments
-            ElementASynchroniserOpenHelper.toutSynchroniser(
-                this@DetailReception_V2,
-                db,
-                utilisateurConnecte,
-                true
-            )
-            return true
-        } else {
-            return false
-        }
-    }
-
-    private fun envoyerEmail(subject: String, body: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val sender = Mail(
-                    this@DetailReception_V2,
-                    "dev01@alcyons.fr",
-                    true,
-                    db,
-                    utilisateurConnecte
-                )
-
-                if (bonLivraisonPhotoName.contentEquals("")) {
-                    sender.sendMailVerification(subject, body)
-                } else {
-                    sender.sendMail(
-                        subject,
-                        body,
-                        "Documents/$bonLivraisonPhotoName.jpeg"
-                    )
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-
-        Toast.makeText(this@DetailReception_V2, "Réception effectuée", Toast.LENGTH_SHORT).show()
-        retourService(bundle)
-    }
-
     override fun retourService(bundle: Bundle) {
-        var detailReceptionIntent =
-            Intent(this@DetailReception_V2, ServiceReceptionPuiActivity::class.java)
-        if (receptionCourant.ref_Depot_Dest.contains("-PAD")) detailReceptionIntent =
-            Intent(this@DetailReception_V2, ServiceReceptionPadActivity::class.java)
-        detailReceptionIntent.putExtras(bundle)
-        this@DetailReception_V2.startActivity(detailReceptionIntent)
-        this@DetailReception_V2.finish()
+        var detailPreparationIntent =
+            Intent(this@DetailPreparationV2, ServicePreparationPufActivity::class.java)
+        if (preparationCourante.depotDestinataireReference.contains("-PAD")) detailPreparationIntent =
+            Intent(this@DetailPreparationV2, ServicePreparationPadActivity::class.java)
+        detailPreparationIntent.putExtras(bundle)
+        this@DetailPreparationV2.startActivity(detailPreparationIntent)
+        this@DetailPreparationV2.finish()
     }
 }

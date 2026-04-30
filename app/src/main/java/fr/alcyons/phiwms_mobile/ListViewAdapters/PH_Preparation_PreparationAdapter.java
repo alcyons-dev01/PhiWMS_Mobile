@@ -2,6 +2,7 @@ package fr.alcyons.phiwms_mobile.ListViewAdapters;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,8 @@ import android.widget.Filterable;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.cardview.widget.CardView;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -71,8 +74,8 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
             viewHolder.uidPHPreparation = (TextView) convertView.findViewById(R.id.uidPHPreparation);
             viewHolder.nbAPreparer = (TextView) convertView.findViewById(R.id.nbAPreparer);
             viewHolder.origine = (TextView) convertView.findViewById(R.id.origine);
-            viewHolder.relative_principal = (RelativeLayout) convertView.findViewById(R.id.relative_principal);
             viewHolder.preparationUrgente = (TextView) convertView.findViewById(R.id.preparationUrgente);
+            viewHolder.cartePreparation = (LinearLayout) convertView.findViewById(R.id.cartePreparation);
 
             convertView.setTag(viewHolder);
         }
@@ -123,6 +126,15 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
             viewHolder.uidPHPreparation.setText("#"+String.valueOf(phPreparationCourant.getUID()));
             viewHolder.origine.setText(phPreparationCourant.getListe());
 
+            if(phPreparationCourant.getStatut().contentEquals("En Reliquat"))
+            {
+                viewHolder.cartePreparation.setBackgroundColor(Color.parseColor("#FFE0D0"));
+            }
+            else
+            {
+                viewHolder.cartePreparation.setBackgroundColor(Color.parseColor("#F0F4FF"));
+            }
+
             // Gestion des dates
             Date dateLiv = null;
             DateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
@@ -141,10 +153,6 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
             }
 
             viewHolder.setDateLivraisonColor(dateLiv);
-        }
-        else
-        {
-            viewHolder.relative_principal.setVisibility(View.GONE);
         }
 
 
@@ -223,8 +231,8 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
         public TextView uidPHPreparation;
         public TextView nbAPreparer;
         public TextView origine;
-        public RelativeLayout relative_principal;
         public TextView preparationUrgente;
+        public LinearLayout cartePreparation;
 
         public void setDateLivraisonColor(Date date) {
 
@@ -237,16 +245,16 @@ public class PH_Preparation_PreparationAdapter extends ArrayAdapter implements F
                 int demain = -1;
 
                 if (delai > 0) {
-                    relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_plein_gris_radius, null));
+                    zoneDateLivraisonPrevue.setBackgroundColor(context.getResources().getColor(R.color.gris, null));
                 } else if (delai == 0) {
-                    relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_plein_rouge_radius, null));
+                    zoneDateLivraisonPrevue.setBackgroundColor(context.getResources().getColor(R.color.rouge, null));
                 } else if (delai == demain) {
-                    relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_plein_orange_radius, null));
+                    zoneDateLivraisonPrevue.setBackgroundColor(context.getResources().getColor(R.color.orange, null));
                 } else {
-                    relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_plein_vert_radius, null));
+                    zoneDateLivraisonPrevue.setBackgroundColor(context.getResources().getColor(R.color.vert, null));
                 }
             } else {
-                relative_principal.setBackground(context.getResources().getDrawable(R.drawable.background_plein_noir_radius, null));
+                zoneDateLivraisonPrevue.setBackgroundColor(context.getResources().getColor(R.color.noir, null));
             }
 
         }
