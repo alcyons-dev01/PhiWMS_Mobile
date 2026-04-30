@@ -73,7 +73,7 @@ public class Retour_Ligne_DestructionAdapter extends ArrayAdapter
         viewHolder.informationLot.setVisibility(View.VISIBLE);
         viewHolder.lot.setText(retour_LigneCourant.getLot_Retourner());
         //gestion du numéro de série
-        viewHolder.lot.setText(retour_LigneCourant.getSerie_Retourner());
+        viewHolder.serie.setText(retour_LigneCourant.getSerie_Retourner());
         viewHolder.bandeauQteADetruire.setVisibility(View.VISIBLE);
         viewHolder.qteRetourner.setText((double) 0 == retour_LigneCourant.getQte_Retourner() ? "" : String.valueOf((int) retour_LigneCourant.getQte_Retourner()));
 

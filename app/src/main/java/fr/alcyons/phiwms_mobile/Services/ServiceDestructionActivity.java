@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -66,7 +65,6 @@ import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
 {
     private static final String SERVICE_NAME = "Destruction";
-    private static final String SCREEN_TITLE = "Demandes de destruction";
 
     // OTHERS
     private List<Retour> retours = null;
@@ -85,9 +83,6 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
         this.setContentView(R.layout.activity_liste_refresh);
 
         this.packageManager = this.getPackageManager();
-
-        // Affichage des informations de base
-        this.findViewById(R.id.triListe).setVisibility(View.GONE);
 
         // Gestion de la listView
         this.listViewRetours = this.findViewById(R.id.listeView);
@@ -292,7 +287,6 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
 
     private void displayRetoursOrClose()
     {
-        this.updateCountersAndTitle();
         this.configureAdapter();
 
         if (this.retours.isEmpty())
@@ -303,12 +297,6 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
         }
 
         this.invalidateOptionsMenu();
-    }
-
-    private void updateCountersAndTitle()
-    {
-        ((TextView) this.findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(this.retours.size()));
-        ((TextView) this.findViewById(R.id.titre)).setText(ServiceDestructionActivity.SCREEN_TITLE);
     }
 
     private void configureAdapter()
