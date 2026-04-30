@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -19,6 +20,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.cardview.widget.CardView
+import androidx.core.os.postDelayed
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
@@ -27,6 +29,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_RetourMotifOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur
@@ -39,6 +42,7 @@ import fr.alcyons.phiwms_mobile.Fragment.ScannerInputFragment
 import fr.alcyons.phiwms_mobile.Interfaces.RechercheAdjustable
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Retour_Ligne_DestructionAdapter
 import fr.alcyons.phiwms_mobile.Outils.Alerte
+import fr.alcyons.phiwms_mobile.Outils.GestionCodeScanne
 import fr.alcyons.phiwms_mobile.R
 import fr.alcyons.phiwms_mobile.Destruction.Fragment.ADetruireFragment
 import fr.alcyons.phiwms_mobile.ServiceActivity
@@ -47,6 +51,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Objects
 import java.util.Random
+import java.util.logging.Handler
 
 class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElementRechercheListener, RechercheAdjustable
 {
@@ -56,6 +61,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
         private const val SCANNER_HEIGHT_DP = 300
         private const val ALPHA_DISABLED = 50
         private const val ALPHA_ENABLED = 255
+        private const val SCAN_DEBOUNCE_MS: Long = 1000L
     }
 
     // Data
@@ -90,6 +96,9 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
     private var isSearchOpen: Boolean = false
     private var isACompterOpen: Boolean = false
 
+    // OTHERS
+    private var mLastScanTime: Long = 0
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -109,7 +118,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
         this.updateUI()
     }
     
-    private fun updateUI() { this.findViewById<TextView>(R.id.numero).text = this.retourSelectionne?.numero?.trim() ?: "" }
+    private fun updateUI() { this.findViewById<TextView>(R.id.numero).text = "Numéro de retour : " + this.retourSelectionne?.numero?.trim() }
 
     public override fun onResume()
     {
@@ -324,7 +333,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
     {
         ElementASynchroniserOpenHelper.ajouterElementASynchroniser(this.db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, actionUtilisateur.phiMR4UUID, actionUtilisateur.id, DBOpenHelper.ActionsEAS.AJOUT)
         
-        Toast.makeText(this, "Destruction effectuée", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Destruction confirmée", Toast.LENGTH_SHORT).show()
         
         if (statutConnexion) { ElementASynchroniserOpenHelper.toutSynchroniser(this, this.db, this.utilisateurConnecte, true) }
 
@@ -453,7 +462,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
     {
         this.scannerContainer?.let { container ->
             this.animateContainerOpen(container, SCANNER_HEIGHT_DP)
-            val fragment = createScannerFragment().also { this.scannerFragment = it }
+            val fragment = this.createScannerFragment().also { this.scannerFragment = it }
             this.setupScannerFragmentCallbacks(fragment)
             this.replaceFragment(R.id.scannerContainer, fragment)
         }
@@ -632,7 +641,33 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
 
     private fun handleScannedCode(scannedCode: String)
     {
-        // analyser le code et en fonction, récupérer l'idProduit correspondant, puis appeler scrollToItemOrDisplayAlert(idProduit)
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - this.mLastScanTime < DetailDestructionActivity.SCAN_DEBOUNCE_MS)
+        {
+            Log.d("DetailDestructionActivity", "Scan ignored due to debounce")
+            return
+        }
+        this.mLastScanTime = currentTime
+
+        val resultDecoupage: HashMap<String, String> = GestionCodeScanne.decoupageCode(scannedCode)
+        val codeIdentification = resultDecoupage["code"] ?: ""
+
+        if (codeIdentification.isNotEmpty())
+        {
+            // Rechercher le produit dans la base de données
+            val produits = ProduitOpenHelper.getProduitsByIdentification(this.db, codeIdentification)
+
+            // Prendre le premier produit trouvé
+            if (produits.isNotEmpty())
+            {
+                val produitId = produits.first().iD_produit
+                this.scrollToItemOrDisplayAlert(produitId)
+            }
+            // Aucun produit trouvé avec ce code
+            else { Alerte.afficherAlerteInformation(this, this.layoutInflater, "Produit non trouvé", "Aucun produit trouvé pour le code scanné: $codeIdentification", false, false) }
+        }
+        // Code non reconnu
+        else { Alerte.afficherAlerteInformation(this, this.layoutInflater, "Code non reconnu", "Le code scanné n'a pas pu être analysé: $scannedCode", false, false) }
     }
 
     private fun setupOnBackPressedCallback()

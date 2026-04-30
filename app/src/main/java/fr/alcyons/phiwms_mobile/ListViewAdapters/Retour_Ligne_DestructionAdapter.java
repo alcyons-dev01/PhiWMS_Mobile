@@ -56,12 +56,13 @@ public class Retour_Ligne_DestructionAdapter extends ArrayAdapter
         viewHolder.designation = convertView.findViewById(R.id.designationProduit);
         viewHolder.referenceProduit = convertView.findViewById(R.id.referenceProduit);
         viewHolder.fournisseur = convertView.findViewById(R.id.nomFournisseur);
-        viewHolder.qteRetourner = convertView.findViewById(R.id.QteRetourner);
+        viewHolder.informationLot = convertView.findViewById(R.id.InformationLot_LL);
         viewHolder.lot = convertView.findViewById(R.id.lotRetourne);
         viewHolder.datePeremption = convertView.findViewById(R.id.datePeremption);
         viewHolder.serie = convertView.findViewById(R.id.numSerie);
         viewHolder.labelSerie = convertView.findViewById(R.id.labelSerie);
         viewHolder.bandeauQteADetruire = convertView.findViewById(R.id.bandeauQteADetruire);
+        viewHolder.qteRetourner = convertView.findViewById(R.id.QteRetourner);
 
         final Retour_Ligne retour_LigneCourant = (Retour_Ligne) getItem(position);
 
@@ -69,11 +70,12 @@ public class Retour_Ligne_DestructionAdapter extends ArrayAdapter
         viewHolder.designation.setText(retour_LigneCourant.getProduit_Designation());
         viewHolder.referenceProduit.setText(retour_LigneCourant.getProduit_Reference());
         viewHolder.fournisseur.setText(retour_LigneCourant.getProduit_Fournisseur());
-        viewHolder.qteRetourner.setText((double) 0 == retour_LigneCourant.getQte_Retourner() ? "" : String.valueOf((int) retour_LigneCourant.getQte_Retourner()));
+        viewHolder.informationLot.setVisibility(View.VISIBLE);
         viewHolder.lot.setText(retour_LigneCourant.getLot_Retourner());
         //gestion du numéro de série
         viewHolder.lot.setText(retour_LigneCourant.getSerie_Retourner());
         viewHolder.bandeauQteADetruire.setVisibility(View.VISIBLE);
+        viewHolder.qteRetourner.setText((double) 0 == retour_LigneCourant.getQte_Retourner() ? "" : String.valueOf((int) retour_LigneCourant.getQte_Retourner()));
 
         Date date = null;
         String dateAAfficher = "";
@@ -101,12 +103,13 @@ public class Retour_Ligne_DestructionAdapter extends ArrayAdapter
         public TextView designation = null;
         public TextView referenceProduit = null;
         public TextView fournisseur = null;
-        TextView qteRetourner = null;
+        public LinearLayout informationLot = null;
         public TextView lot = null;
         public TextView datePeremption = null;
         public TextView serie = null;
         public TextView labelSerie = null;
         public LinearLayout bandeauQteADetruire = null;
+        TextView qteRetourner = null;
 
         public void setDatePeremptionColor(final Date date)
         {

@@ -154,7 +154,7 @@ class ScannerFragment : Fragment() {
     private fun looksLikeHibc(s: String) = s.startsWith("+") && s[1].isLetter() && s.contains("/")
     private fun isCompleteCode(code: String): Boolean {
         val c = code.trim()
-        if (c.startsWith("01") && c.length > 16) return true
+        if ((c.startsWith("01") || c.startsWith("02")) && c.length > 16) return true
         if (looksLikeHibc(c)) return true
         return false
     }
