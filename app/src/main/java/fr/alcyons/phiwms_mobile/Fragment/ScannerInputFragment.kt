@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import fr.alcyons.phiwms_mobile.Interfaces.ScanDebounce
 import fr.alcyons.phiwms_mobile.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +27,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ScannerInputFragment : Fragment() {
+class ScannerInputFragment : Fragment(), ScanDebounce
+{
 
     private lateinit var scannerInput_ET: EditText
     private lateinit var descriptionCode_TV: TextView
@@ -40,6 +43,10 @@ class ScannerInputFragment : Fragment() {
     private var part1Time: Long = 0L
     private val windowMs = 1000L
     private val scannerScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    // ScanDebounce interface implementation
+    override var mLastScanTime: Long = 0
+    override var mScanDebounceMS: Long = 1000L
 
     val toneGenerator = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100)
 
@@ -97,7 +104,14 @@ class ScannerInputFragment : Fragment() {
         }
     }
 
-    private fun traiterCode(texte: String) {
+    private fun traiterCode(texte: String)
+    {
+        if (shouldDebounceScan())
+        {
+            Log.d("ScannerInputFragment", "Scan ignored because debounced")
+            return
+        }
+
         android.util.Log.d("CODE_BRUT", "Code reçu : '$texte'")
 
         val code = if (texte.uppercase().startsWith("PHITAG"))
@@ -267,7 +281,7 @@ class ScannerInputFragment : Fragment() {
 
     private fun isCompleteCode(code: String): Boolean {
         val c = code.trim()
-        if (c.startsWith("01") && c.length > 16) return true
+        if ((c.startsWith("01") || c.startsWith("02")) && c.length > 16) return true
         if (looksLikeHibc(c)) return true
         return false
     }
