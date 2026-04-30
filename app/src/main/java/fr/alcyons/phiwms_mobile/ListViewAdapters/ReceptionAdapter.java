@@ -86,7 +86,6 @@ public class ReceptionAdapter extends ArrayAdapter implements Filterable {
             viewHolder.poidsTotal = (TextView) convertView.findViewById(R.id.poidsTotal);
             viewHolder.zone_info_reception = (LinearLayout) convertView.findViewById(R.id.zone_info_reception);
             viewHolder.ZoneNbColisEnAttente = (CardView) convertView.findViewById(R.id.ZoneNbColisEnAttente);
-            viewHolder.relative_principal = (RelativeLayout) convertView.findViewById(R.id.relative_principal);
             convertView.setTag(viewHolder);
         }
 
@@ -219,7 +218,6 @@ public class ReceptionAdapter extends ArrayAdapter implements Filterable {
         public TextView livraisonPrevueDate;
         public TextView fabricant;
         public TextView numCommande;
-        public RelativeLayout relative_principal;
         public TextView nbColisAttente;
         public LinearLayout zone_info_reception;
         public CardView ZoneNbColisEnAttente;
