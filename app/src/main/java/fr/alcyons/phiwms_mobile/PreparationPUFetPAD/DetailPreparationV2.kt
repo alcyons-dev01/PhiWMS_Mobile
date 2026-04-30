@@ -1,6 +1,5 @@
-package fr.alcyons.phiwms_mobile.Reception
+package fr.alcyons.phiwms_mobile.PreparationPUFetPAD;
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,72 +8,77 @@ import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.view.Window
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
-import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur
-import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne
-import fr.alcyons.phiwms_mobile.Classes.Commande
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.StockUtilisesOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper
+import fr.alcyons.phiwms_mobile.Classes.Depot
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne
-import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat
 import fr.alcyons.phiwms_mobile.Classes.Produit
+import fr.alcyons.phiwms_mobile.Classes.StockUtilises
+import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light
 import fr.alcyons.phiwms_mobile.Fragment.RechercheFragment
 import fr.alcyons.phiwms_mobile.Fragment.ScannerFragment
 import fr.alcyons.phiwms_mobile.Fragment.ScannerInputFragment
+import fr.alcyons.phiwms_mobile.Interfaces.RechercheAdjustable
 import fr.alcyons.phiwms_mobile.Outils.Alerte
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites
 import fr.alcyons.phiwms_mobile.Outils.GestionCodeScanne
-import fr.alcyons.phiwms_mobile.Outils.Mail
-import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotos
-import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation
 import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.Adapter.DetailPreparationAdapter
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.Fragment.APreparerFragment
 import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.Fragment.DetailFragment
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.Fragment.PreparerFragment
 import fr.alcyons.phiwms_mobile.R
-import fr.alcyons.phiwms_mobile.Reception.Adapter.DetailReceptionAdapter
-import fr.alcyons.phiwms_mobile.Reception.Fragment.AReceptionnerFragment
-import fr.alcyons.phiwms_mobile.Reception.Fragment.ReceptionnerFragment
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity
 import fr.alcyons.phiwms_mobile.Services.ServicePreparationPadActivity
 import fr.alcyons.phiwms_mobile.Services.ServicePreparationPufActivity
-import fr.alcyons.phiwms_mobile.Services.ServiceReceptionPadActivity
-import fr.alcyons.phiwms_mobile.Services.ServiceReceptionPuiActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONException
+import org.json.JSONObject
+import java.lang.Double
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.Objects
-import java.util.Random
+import kotlin.Boolean
+import kotlin.CharSequence
+import kotlin.Comparator
+import kotlin.Deprecated
+import kotlin.Int
+import kotlin.String
+import kotlin.Unit
+import kotlin.also
+import kotlin.apply
+import kotlin.compareTo
+import kotlin.let
+import kotlin.plus
+import kotlin.toString
 
 class DetailPreparationV2 : ServiceAvecConnexionActivity(),
-    RechercheFragment.OnElementRechercheListener {
+    RechercheFragment.OnElementRechercheListener, APreparerFragment.OnElementSelectionneListener, PreparerFragment.OnElementSelectionneListener, RechercheAdjustable {
 
     private lateinit var preparationCourante: PH_Preparation
     private lateinit var context: Context
@@ -92,8 +96,8 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     private var adapter: DetailPreparationAdapter? = null
     private var scannerFragment: Fragment? = null
     private var rechercheFragment: RechercheFragment? = null
-    private var aPreparerFragment: AReceptionnerFragment? = null
-    private var preparerFragment: ReceptionnerFragment? = null
+    private var aPreparerFragment: APreparerFragment? = null
+    private var preparerFragment: PreparerFragment? = null
     private var detailFragment: DetailFragment? = null
     private var scannerVisible = false
     private var rechercheVisible = false
@@ -108,6 +112,8 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     private lateinit var textChercher_TV: TextView
     private lateinit var searchInput_ET: EditText
     private lateinit var effacerRecherche_IV: ImageView
+    private lateinit var depotOrigine : Depot
+    private lateinit var phPreparationLignes : ArrayList<PH_Preparation_Ligne>
     var body = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -119,6 +125,17 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         preparationCourante = PH_PreparationOpenHelper.getPH_PreparationByID(
             db, intent.extras!!.getInt("ph_preparationUID_Selectionne")
         )
+
+        depotOrigine = DepotOpenHelper.getDepotPUI(db)
+        phPreparationLignes =
+            PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesBaseParPHPreparation(
+                db,
+                preparationCourante
+            ) as ArrayList<PH_Preparation_Ligne>
+
+        phPreparationLignes.sortWith(Comparator { o1: PH_Preparation_Ligne?, o2: PH_Preparation_Ligne? ->
+            o2!!.produitPoids.compareTo(o1!!.produitPoids)
+        })
 
         // Binding des vues
         findViewById<TextView>(R.id.preparationNumero).text = preparationCourante.uid.toString()
@@ -170,19 +187,19 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
 
         aPreparer_LL.setOnClickListener {
             if (aPreparerVisible) {
-                fermerAReceptionner()
+                fermerAPreparer()
             } else {
                 fermerFragment()
-                ouvrirAReceptionner()
+                ouvrirAPreparer()
             }
         }
 
         preparer_LL.setOnClickListener {
             if (preparerVisible) {
-                fermerReceptionner()
+                fermerPreparer()
             } else {
                 fermerFragment()
-                ouvrirReceptionner()
+                ouvrirPreparer()
             }
         }
     }
@@ -190,42 +207,182 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     override fun onResume() {
         super.onResume()
 
-        //on récupère les ph_reliquat de base
-        /*val listeReliquatBase = PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(db, receptionCourant.numero)
+        if (statutConnexion && passageParOnCreate) {
+            val requestQueue = Volley.newRequestQueue(this@DetailPreparationV2)
+            val urlRequete =
+                ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequetePreparationDetail + preparationCourante.uid
 
-        for(reliquatBase in listeReliquatBase)
-        {
-            //on récupère les reliquats négatif du reliquat courant
-            val listeReliquatNegByProduit = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(db, receptionCourant.numero, reliquatBase.produitID)
-            for(reliquatNeg in listeReliquatNegByProduit)
-            {
-                reliquatBase.qteReliquat_X -= reliquatNeg.qteLivraison
+            val obreq: JsonObjectRequest = getJsonObjectRequest(urlRequete)
+            requestQueue.add<JSONObject?>(obreq)
+        } else {
+          gestionVisuelle()
+        }
+    }
+    private fun getJsonObjectRequest(urlRequete: String?): JsonObjectRequest {
+        val obreq = object : JsonObjectRequest(
+            Method.GET, urlRequete, null,
+            { response ->
+                try {
+                    val nbResultat = response.getInt("resultCount")
+                    if (nbResultat == 0) {
+                        val erreur = response.getString("erreur")
+                        when {
+                            erreur == context.getString(R.string.tokenInvalide) ->
+                                Alerte.afficherAlerte(context, "Alerte", "Votre session a expirée, veuillez vous reconnecter.", "alerte")
+                            erreur == context.getString(R.string.tokenExpire) ->
+                                Alerte.afficherAlerte(context, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", "alerte")
+                            !erreur.contentEquals("Aucun PH_Preparation trouvé") ->
+                                Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Aucune ligne trouvée", "alerte")
+                        }
+                    } else {
+                        Stock_Lot_EmplacementLightOpenHelper.viderTableStock_Lot_EmplacementsSansSerie(db)
+                        StockUtilisesOpenHelper.viderTableStockUtiliser(db)
+
+                        val phPreparationLigneJSONArray = response.getJSONArray("PH_Preparation_Ligne")
+
+                        for (k in 0 until phPreparationLigneJSONArray.length()) {
+                            val phPreparationLigneJSONObject = phPreparationLigneJSONArray.getJSONObject(k)
+                            val phStockLotEmplacementJSONArray = phPreparationLigneJSONObject.getJSONArray("ph_stock_lot_emplacements")
+                            val stockUtilisesJSONArray = phPreparationLigneJSONObject.getJSONArray("stock_utilises")
+
+                            for (y in 0 until phStockLotEmplacementJSONArray.length()) {
+                                val stockLotEmplacementLight = Stock_Lot_Emplacement_Light(phStockLotEmplacementJSONArray.getJSONObject(y))
+                                val stockLotEmplacementBdd = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, stockLotEmplacementLight.get_UID())
+
+                                if (stockLotEmplacementBdd == null) {
+                                    if (stockLotEmplacementLight.getQte() >= 0) {
+                                        Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, stockLotEmplacementLight)
+                                    }
+                                } else {
+                                    if (stockLotEmplacementBdd.getQte() != stockLotEmplacementLight.getQte()) {
+                                        Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockLotEmplacementLight)
+                                    }
+                                }
+                            }
+
+                            for (z in 0 until stockUtilisesJSONArray.length()) {
+                                val stockUtilisesTemp = StockUtilises(stockUtilisesJSONArray.getJSONObject(z))
+                                StockUtilisesOpenHelper.insererUnStockUtilisesEnBDD(db, stockUtilisesTemp)
+
+                                if (stockUtilisesTemp.getUserId() != utilisateurConnecte.getId()) {
+                                    val stockCourantTemp = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, stockUtilisesTemp.getStockId())
+                                    if (stockCourantTemp != null) {
+                                        stockCourantTemp.setQte(stockCourantTemp.getQte() - stockUtilisesTemp.getQuantite())
+                                        Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockCourantTemp)
+                                    }
+                                }
+                            }
+                        }
+
+                        for (phPrepLigne in phPreparationLignes) {
+                            if ((phPrepLigne.getQte_APreparer() > 0 || phPrepLigne.getQte_Demander() == phPrepLigne.getQte_preparer()) && phPrepLigne.getQte_APreparer() != 0) {
+                                val produit = ProduitOpenHelper.getProduitByID(db, phPrepLigne.getProduitID())
+
+                                if (produit != null) {
+                                    val stockLotEmplacementLightList = Stock_Lot_EmplacementLightOpenHelper
+                                        .getAllStockLotEmplacementByProduitEtDepot(db, produit, depotOrigine)
+
+                                    val lignesPreparer = PH_Preparation_LigneOpenHelper
+                                        .getAllPHPreparationLignesParPHPreparationAndProduitNeg(db, preparationCourante, phPrepLigne.getProduitID())
+
+                                    stockLotEmplacementLightList.sortWith(compareBy { it.getLot() })
+                                    stockLotEmplacementLightList.sortWith(compareBy { it.getPeremptionDate() })
+
+                                    for (stockLotEmplacement in stockLotEmplacementLightList) {
+                                        if (stockLotEmplacement.getQte() >= 0) {
+                                            stockLotEmplacement.setQte_Preparer(0)
+
+                                            for (ligneCourante in lignesPreparer) {
+                                                if (ligneCourante.getLotNumero().contentEquals(stockLotEmplacement.getLot()) &&
+                                                    ligneCourante.getEmplacementParDefaut().contentEquals(stockLotEmplacement.getEmplacement())) {
+                                                    stockLotEmplacement.setQte_Preparer(ligneCourante.getQte_preparer())
+                                                    Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockLotEmplacement)
+                                                    break
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    for (ligneCourante in lignesPreparer) {
+                                        val stockTemp = Stock_Lot_EmplacementLightOpenHelper
+                                            .getStockLotEmplacementByLotPeremptionEtDepotEmplacement(
+                                                db,
+                                                ligneCourante.getLotNumero(),
+                                                ligneCourante.getPeremptionDate(),
+                                                depotOrigine,
+                                                ligneCourante.getEmplacementParDefaut()
+                                            )
+                                        if (stockTemp == null) {
+                                            PH_Preparation_LigneOpenHelper.supprimerUnPhPreparationLigne(db, ligneCourante)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        invalidateOptionsMenu()
+                        passageParOnCreate = false
+                        arreterSpinner()
+                        gestionVisuelle()
+                    }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
+            },
+            { error ->
+                Log.e("Volley", "Error")
+                Alerte.afficherAlerte(
+                    this@DetailPreparationV2,
+                    "Erreur",
+                    "Veuillez contacter la société Alcyons (erreur Volley : Préparation PAD)",
+                    "alerte"
+                )
             }
-
-            PH_ReliquatOpenHelper.mettreAJourUnPHReliquat(db, reliquatBase)
+        ) {
+            override fun getHeaders(): MutableMap<String?, String?> {
+                return HashMap<String?, String?>().apply {
+                    put("Authorization", utilisateurConnecte.getToken())
+                }
+            }
         }
 
-        val nbReliquatTotal = PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(db, receptionCourant.numero).size
-        val nbReliquatPreparer = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumero(db, receptionCourant.numero).size
-        findViewById<TextView>(R.id.nbReferenceAReceptionner_TV).text = nbReliquatTotal.toString()
-        findViewById<TextView>(R.id.nbReferenceReceptionner_TV).text = nbReliquatPreparer.toString()
-        findViewById<ProgressBar>(R.id.progressBarReception_PB).max = PH_ReliquatOpenHelper.getNbReliquatBaseByCommande(db, receptionCourant.numero)
-        findViewById<ProgressBar>(R.id.progressBarReception_PB).progress = nbReliquatPreparer
+        obreq.setRetryPolicy(retryPolicy)
+        return obreq
+    }
 
-        if(nbReliquatPreparer > 0)
-            findViewById<CardView>(R.id.btnValiderReception_CV).visibility = View.VISIBLE
-        else
-            findViewById<CardView>(R.id.btnValiderReception_CV).visibility = View.GONE
+    fun gestionVisuelle()
+    {
+        //on récupère les ph_reliquat de base
+        val listePHPreparationLigneBase = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesBaseParPHPreparation(db, preparationCourante)
 
-        findViewById<CardView>(R.id.btnValiderReception_CV).setOnClickListener { v: View? ->
-            demandeConfirmationValidation(layoutInflater) { resultat ->
-                if (resultat)
-                    if(receptionner(receptionCourant))
-                        validerReception()
-                    else
-                        Alerte.afficherAlerteInformation(this@DetailPreparationV2, layoutInflater, "Erreur", "Une erreur est survenue", false, false)
+        for(preparationLigneBase in listePHPreparationLigneBase)
+        {
+            //on récupère les reliquats négatif du reliquat courant
+            val listePreparationLigneNegByProduit = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparationAndProduitNeg(db, preparationCourante, preparationLigneBase.produitID)
+            for(ligneNeg in listePreparationLigneNegByProduit)
+            {
+                preparationLigneBase.qte_APreparer -= ligneNeg.qte_preparer
             }
-        }*/
+
+            PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, preparationLigneBase)
+        }
+
+        val nbLigneTotal = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesBaseParPHPreparation(db, preparationCourante).size
+        val nbLignePreparer = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparationNeg(db, preparationCourante).size
+        findViewById<TextView>(R.id.nbReferenceAPreparer_TV).text = nbLigneTotal.toString()
+        findViewById<TextView>(R.id.nbReferencePreparer_TV).text = nbLignePreparer.toString()
+        findViewById<ProgressBar>(R.id.progressBarPreparation_PB).max = nbLigneTotal
+        findViewById<ProgressBar>(R.id.progressBarPreparation_PB).progress = nbLignePreparer
+
+        if(nbLignePreparer > 0)
+            findViewById<CardView>(R.id.btnValiderPreparation_CV).visibility = View.VISIBLE
+        else
+            findViewById<CardView>(R.id.btnValiderPreparation_CV).visibility = View.GONE
+
+        findViewById<CardView>(R.id.btnValiderPreparation_CV).setOnClickListener { v: View? ->
+            demandeConfirmationValidation(layoutInflater) { resultat ->
+            }
+        }
 
         ouvrirScanner()
     }
@@ -247,11 +404,6 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
             retourService(bundle)
         }
     }
-
-    /*override fun onElementSelectionne(element: PH_Preparation_Ligne) {
-        fermerFragment()
-        ouvrirDetailFragment(element)
-    }*/
 
     /**
      * SCANNER
@@ -423,32 +575,32 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     }
 
     /**
-     * A COMPTER
+     * A préparer
      */
-    private fun ouvrirAReceptionner(idProduit: Int = 0) {
-        var liste: ArrayList<PH_Reliquat> = arrayListOf()
+    private fun ouvrirAPreparer(idProduit: Int = 0) {
+        var liste: ArrayList<PH_Preparation_Ligne> = arrayListOf()
 
         if (idProduit == 0) {
-            /*liste = ArrayList(
-                PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(
+            liste = ArrayList(
+                PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesBaseParPHPreparation(
                     db,
-                    receptionCourant.numero
+                    preparationCourante
                 )
-            )*/
+            )
         } else {
-            /*liste.add(
-                PH_ReliquatOpenHelper.getPH_ReliquatBaseByUnIdProduitetNumero(
+            liste.add(
+                PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneBaseByPreparationAndIdProduit(
                     db,
-                    idProduit,
-                    receptionCourant.numero
+                    preparationCourante,
+                    idProduit
                 )
-            )*/
+            )
         }
 
         if (liste.isNotEmpty()) {
-            val frag = AReceptionnerFragment.newInstance(liste)
+            val frag = APreparerFragment.newInstance(liste)
             supportFragmentManager.beginTransaction()
-                .replace(R.id.referenceAReceptionnerContainer, frag)
+                .replace(R.id.referenceAPreparerContainer, frag)
                 .commitNow()
 
             referenceAPreparerContainer.apply {
@@ -469,7 +621,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         }
     }
 
-    private fun fermerAReceptionner() {
+    private fun fermerAPreparer() {
         findViewById<androidx.core.widget.NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled =
             true
         referenceAPreparerContainer.animate()
@@ -491,10 +643,10 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     }
 
     /**
-     * COMPTER
+     * Préparer
      */
-    private fun ouvrirReceptionner(idProduit: Int = 0) {
-        var liste: ArrayList<PH_Reliquat>
+    private fun ouvrirPreparer(idProduit: Int = 0) {
+        var liste: ArrayList<PH_Preparation_Ligne>
 
         if (idProduit == 0) {
             /*liste = ArrayList(
@@ -536,7 +688,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         }*/
     }
 
-    private fun fermerReceptionner() {
+    private fun fermerPreparer() {
         findViewById<androidx.core.widget.NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled =
             true
         referencePreparerContainer.animate()
@@ -633,8 +785,8 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     private fun fermerFragment() {
         if (scannerVisible) fermerScanner()
         if (rechercheVisible) fermerRecherche()
-        if (aPreparerVisible) fermerAReceptionner()
-        if (preparerVisible) fermerReceptionner()
+        if (aPreparerVisible) fermerAPreparer()
+        if (preparerVisible) fermerPreparer()
         if (detailVisible) fermerDetailFragment()
     }
 
@@ -764,8 +916,8 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
 
     override fun onElementRechercher(idProduit: Int) {
         fermerRecherche()
-        ouvrirAReceptionner(idProduit)
-        ouvrirReceptionner(idProduit)
+        ouvrirAPreparer(idProduit)
+        ouvrirPreparer(idProduit)
     }
 
     private fun ajouterPHPreparationLigne(
@@ -777,7 +929,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         if (rowID != -1L) {
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
                 db,
-                PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT,
+                PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE,
                 nouveauPHPL.phiMR4UUID,
                 nouveauPHPL._UID,
                 DBOpenHelper.ActionsEAS.AJOUT
@@ -799,7 +951,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, phPL)
         ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
             db,
-            PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT,
+            PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE,
             phPL.phiMR4UUID,
             phPL._UID,
             DBOpenHelper.ActionsEAS.MAJ
@@ -867,7 +1019,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         }
     }
 
-    fun ajusterHauteurRecherche(hauteur: Int) {
+    override fun ajusterHauteurRecherche(hauteur: Int) {
         rechercheContainer.layoutParams =
             (rechercheContainer.layoutParams as LinearLayout.LayoutParams).also {
                 it.height = if (hauteur == 0) 0 else LinearLayout.LayoutParams.WRAP_CONTENT
@@ -890,5 +1042,10 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         detailPreparationIntent.putExtras(bundle)
         this@DetailPreparationV2.startActivity(detailPreparationIntent)
         this@DetailPreparationV2.finish()
+    }
+
+    override fun onElementSelectionne(element: PH_Preparation_Ligne) {
+        fermerFragment()
+        ouvrirDetailFragment(element)
     }
 }

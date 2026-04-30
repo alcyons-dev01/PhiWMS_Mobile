@@ -117,6 +117,20 @@ public class Stock_Lot_EmplacementLightOpenHelper extends DBOpenHelper {
         return stockLotEmplacementLightList;
     }
 
+    public static List<String> getAllStockLotEmplacementByProduitEtDepotString(SQLiteDatabase db, Produit produit, Depot depot) {
+        List<String> stockLotEmplacementLightListString = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_STOCK_LOT_EMPLACEMENT + " WHERE " + Constantes.CLE_COL_DEPOT_REFERENCE_STOCK_LOT_EMPLACEMENT + "=? and " + Constantes.CLE_COL_PRODUIT_CODE_STOCK_LOT_EMPLACEMENT + "=?", new String[]{depot.getDepot_Reference(), String.valueOf(produit.getID_produit())});
+
+        while (cursor.moveToNext()) {
+            Stock_Lot_Emplacement_Light stockLotEmplacementLight = new Stock_Lot_Emplacement_Light(cursor);
+            stockLotEmplacementLightListString.add(stockLotEmplacementLight.getLot());
+        }
+        cursor.close();
+        cursor = null;
+        return stockLotEmplacementLightListString;
+    }
+
     public static List<Stock_Lot_Emplacement_Light> getAllStockLotEmplacementByProduitEtDepotSerie(SQLiteDatabase db, Produit produit, Depot depot) {
         List<Stock_Lot_Emplacement_Light> stockLotEmplacementLightList = new ArrayList<>();
 
@@ -140,6 +154,21 @@ public class Stock_Lot_EmplacementLightOpenHelper extends DBOpenHelper {
         Stock_Lot_Emplacement_Light stockLotEmplacementLightList = null;
 
         Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_STOCK_LOT_EMPLACEMENT + " WHERE " + Constantes.CLE_COL_DEPOT_REFERENCE_STOCK_LOT_EMPLACEMENT + "=? and " + Constantes.CLE_COL_LOT_STOCK_LOT_EMPLACEMENT + "=? and " + Constantes.CLE_COL_PEREMPTIONDATE_STOCK_LOT_EMPLACEMENT + "= ?", new String[]{depot.getDepot_Reference(), lot, datePeremption});
+
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            stockLotEmplacementLightList = new Stock_Lot_Emplacement_Light(cursor);
+        }
+        cursor.close();
+        cursor = null;
+        return stockLotEmplacementLightList;
+    }
+
+
+    public static Stock_Lot_Emplacement_Light getStockByLotProduitDepot(SQLiteDatabase db, String lot, Produit produit, Depot depot) {
+        Stock_Lot_Emplacement_Light stockLotEmplacementLightList = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_STOCK_LOT_EMPLACEMENT + " WHERE " + Constantes.CLE_COL_DEPOT_REFERENCE_STOCK_LOT_EMPLACEMENT + "=? and " + Constantes.CLE_COL_LOT_STOCK_LOT_EMPLACEMENT + "=? and " + Constantes.CLE_COL_PRODUIT_CODE_STOCK_LOT_EMPLACEMENT + "= ?", new String[]{depot.getDepot_Reference(), lot, String.valueOf(produit.getID_produit())});
 
         if (cursor.getCount() > 0) {
             cursor.moveToFirst();

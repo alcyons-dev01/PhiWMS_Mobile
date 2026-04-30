@@ -297,6 +297,12 @@
         android:configChanges="orientation|screenSize"/>
 
     <activity
+        android:name="fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparationV2"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:configChanges="orientation|screenSize"/>
+
+    <activity
         android:name="fr.alcyons.phiwms_mobile.PreparationPUFetPAD.ListeLotPreparationActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"
         android:theme="@style/AppTheme.NoActionBar"

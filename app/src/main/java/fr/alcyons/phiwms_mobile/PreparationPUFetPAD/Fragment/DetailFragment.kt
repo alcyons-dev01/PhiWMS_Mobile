@@ -9,7 +9,10 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -19,16 +22,18 @@ import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne
 import fr.alcyons.phiwms_mobile.Classes.Produit
 import fr.alcyons.phiwms_mobile.Outils.Alerte
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparationV2
 import fr.alcyons.phiwms_mobile.R
-import fr.alcyons.phiwms_mobile.Reception.DetailReception_V2
 import java.util.Calendar
 import java.util.Random
 
@@ -43,6 +48,10 @@ class DetailFragment : Fragment() {
 
     lateinit var preparationCourante : PH_Preparation
 
+    var listeLotDisponible: MutableList<String>? = null
+    var autoCompleteAdapter: ArrayAdapter<String?>? = null
+    var autoComplete: AutoCompleteTextView? = null
+
     companion object {
         private const val ARG_LIGNE = "ligne"
 
@@ -52,7 +61,6 @@ class DetailFragment : Fragment() {
                     putSerializable(ARG_LIGNE, phPLBase)
                 }
                 this.produit = produit
-                this.preparationCourante = PH_PreparationOpenHelper.getPH_PreparationByID(db, phPLBase!!.preparationID)
             }
     }
 
@@ -60,7 +68,7 @@ class DetailFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = inflater.inflate(R.layout.fragment_detail_ligne, container, false)
+    ): View = inflater.inflate(R.layout.fragment_detail_preparationligne, container, false)
 
     fun mettreAJourLigne(ligne: PH_Preparation_Ligne) {
         val view = view ?: return
@@ -75,7 +83,7 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        db = (requireActivity() as DetailReception_V2).db
+        db = (requireActivity() as DetailPreparationV2).db
 
         val preparationLigneBase = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getSerializable(ARG_LIGNE, PH_Preparation_Ligne::class.java)
@@ -83,9 +91,11 @@ class DetailFragment : Fragment() {
             @Suppress("DEPRECATION")
             arguments?.getSerializable(ARG_LIGNE) as? PH_Preparation_Ligne
         } ?: return
+        this.preparationCourante = PH_PreparationOpenHelper.getPH_PreparationByID(db, preparationLigneBase.preparationID)
 
         var conditionnement: Int = preparationLigneBase.produitCondDistrib.toInt()
-        val layoutCarton_CV = view.findViewById<CardView>(R.id.layoutCarton_CV)
+        val layoutListeLot_LL = view.findViewById<LinearLayout>(R.id.layoutListeLot_LL)
+        val layoutLotPeremption_LL = view.findViewById<LinearLayout>(R.id.layoutLotPeremption_LL)
         val layoutMoinsLL = view.findViewById<ImageView>(R.id.layoutMoins_LL)
         val layoutPlusLL = view.findViewById<ImageView>(R.id.layoutPlus_LL)
         val spinnerMoisDatePeremptionSP = view.findViewById<Spinner>(R.id.selecteurDateMois_SP)
@@ -101,6 +111,78 @@ class DetailFragment : Fragment() {
             getListeAnneeDatePicker()
         )
         val quantiteCompteeET = view.findViewById<EditText>(R.id.quantiteComptee_ET)
+
+        //gestion de l'autocomplete
+        //récupération des lots disponible du produit
+        val depot = DepotOpenHelper.getDepotPUI(db);
+        listeLotDisponible = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepotString(db, produit, depot)
+        autoComplete = view.findViewById<AutoCompleteTextView?>(R.id.lot_Autocomplete)
+
+        autoCompleteAdapter = ArrayAdapter(requireContext(), R.layout.spinner_item_depot, listeLotDisponible.orEmpty())
+        autoComplete!!.setAdapter<ArrayAdapter<String?>?>(autoCompleteAdapter)
+        autoComplete!!.setThreshold(100) // Empêche le filtrage automatique
+
+        // Affiche le premier élément par défaut
+        if (!listeLotDisponible!!.isEmpty()) {
+            autoComplete!!.setText(listeLotDisponible!!.get(0), false)
+        }
+
+        // Hauteur = 1/3 de l'écran
+        val hauteurEcran = getResources().getDisplayMetrics().heightPixels
+        autoComplete!!.setDropDownHeight(hauteurEcran / 3)
+        val dpToPx = (12 * getResources().getDisplayMetrics().density).toInt()
+        autoComplete!!.post(Runnable { autoComplete!!.setDropDownWidth(view.findViewById<View?>(R.id.listeLotDisponible_LL).getWidth() - dpToPx) })
+        autoComplete!!.setDropDownBackgroundResource(android.R.color.white)
+
+        // Ouvre la liste au clic
+        autoComplete!!.setOnClickListener(View.OnClickListener { v: View? -> autoComplete!!.showDropDown() })
+
+        // Chevron ouvre aussi la liste
+        view.findViewById<View?>(R.id.chevronFiltre).setOnClickListener(View.OnClickListener { v: View? -> autoComplete!!.showDropDown() })
+
+        // Gère la sélection
+        autoComplete!!.setOnItemClickListener(OnItemClickListener { parent: AdapterView<*>?, viewAutocomplete: View?, position: Int, id: Long ->
+
+            //on récupère les informations du lot sélectionné
+            val lotSelectionne = parent!!.getItemAtPosition(position).toString()
+            val stockSelectionne = Stock_Lot_EmplacementLightOpenHelper.getStockByLotProduitDepot(db, lotSelectionne, produit, depot)
+
+            //on affiche le lot et la date de péremption
+            view.findViewById<EditText>(R.id.numeroLot_ET).setText(stockSelectionne.lot)
+            view.findViewById<TextView>(R.id.emplacementLot_TV).text = stockSelectionne.emplacement
+            val parts = stockSelectionne.peremptionDate.split("-")
+            val annee = parts[0] // "2026"
+            val mois = parts[1].toInt() - 1 // "04" → index 3 (0-based)
+
+            // Règle le spinner mois (index 0-based donc avril = 3)
+            spinnerMoisDatePeremptionSP.setSelection(mois)
+
+            // Règle le spinner année en cherchant la position de l'année dans l'adapter
+            val positionAnnee = (0 until adapterAnneePeremption.count).indexOfFirst {
+                adapterAnneePeremption.getItem(it) == annee
+            }
+            if (positionAnnee != -1) {
+                spinnerAnneeDatePeremptionSP.setSelection(positionAnnee)
+            }
+
+            layoutListeLot_LL.visibility = View.GONE
+            layoutLotPeremption_LL.visibility = View.VISIBLE
+
+            //gestion du maximum a preparer
+
+            //ajouter une ligne ajout de lot
+
+            //dans les lignes affichées mettre la date de péremption et l'emplacement 
+
+            //au clic sur le lot on réouvre la liste
+            layoutLotPeremption_LL.setOnClickListener {
+                layoutListeLot_LL.visibility = View.VISIBLE
+                layoutLotPeremption_LL.visibility = View.GONE
+                view.findViewById<View?>(R.id.chevronFiltre).performClick()
+            }
+
+        })
+
 
         //gestion des données
         if(preparationLigneBase.emplacementParDefaut == "")
@@ -133,7 +215,6 @@ class DetailFragment : Fragment() {
         }
 
         //gestion du conditionnment
-        layoutCarton_CV.visibility = View.GONE
         layoutPlusLL.setOnClickListener { _: View? ->
             var qteActuelle = quantiteCompteeET.text.toString().toInt()
             if (qteActuelle == -1)
