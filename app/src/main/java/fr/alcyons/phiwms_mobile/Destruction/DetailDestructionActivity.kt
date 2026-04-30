@@ -255,8 +255,11 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
         val actionId = this.generateNegativeRandomId()
         val dateDestruction = Date()
         val dateString = this.formatDateTime(dateDestruction)
-        
-        return ActionUtilisateur(actionId, this.utilisateurConnecte.id, dateString, this.serviceActuel.id, this.utilisateurConnecte.etablissementId, "En attente", this.retourSelectionne?._UID!!, "", "Destruction")
+
+        val resultingActionUtilisateur: ActionUtilisateur = ActionUtilisateur(actionId, this.utilisateurConnecte.id, dateString, this.serviceActuel.id, this.utilisateurConnecte.etablissementId, "En attente", this.retourSelectionne?._UID!!, "", "Destruction")
+        ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(this.db, resultingActionUtilisateur)
+
+        return resultingActionUtilisateur
     }
     
     private fun generateNegativeRandomId(): Int
