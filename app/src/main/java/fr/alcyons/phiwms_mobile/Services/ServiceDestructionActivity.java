@@ -186,8 +186,8 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
         this.initializeAutoComplete();
     }
 
-    private void initializeAutoComplete() {
-        Log.d("ServiceDestruction", "Initializing autoComplete with depot list: " + this.listeDepotLivraison.toString());
+    private void initializeAutoComplete()
+    {
         this.autoComplete = this.findViewById(R.id.listeFiltre);
 
         // Sort the list but keep "Tous" at the first position
