@@ -38,6 +38,10 @@ public class Stock_Lot_Emplacement_Light implements Comparable {
             this.Serie = "";
     }
 
+    public Stock_Lot_Emplacement_Light() {
+
+    }
+
     public Stock_Lot_Emplacement_Light(double qte, String lot, String peremptionDate, String emplacement, String depot_Reference, String zone, int produit_Code, int qtePrep, String numSerie) {
         this.Qte = qte;
         this.Lot = lot;
@@ -180,5 +184,9 @@ public class Stock_Lot_Emplacement_Light implements Comparable {
         } else {
             return this.get_UID() > ((Stock_Lot_Emplacement_Light) obj).get_UID() ? 1 : -1;
         }
+    }
+
+    public String toString() {
+        return "";
     }
 }

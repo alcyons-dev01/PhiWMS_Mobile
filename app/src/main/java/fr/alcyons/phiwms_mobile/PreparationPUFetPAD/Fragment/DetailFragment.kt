@@ -1,5 +1,6 @@
 package fr.alcyons.phiwms_mobile.PreparationPUFetPAD.Fragment
 
+import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -9,8 +10,8 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
-import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
@@ -31,11 +32,15 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelp
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne
 import fr.alcyons.phiwms_mobile.Classes.Produit
+import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light
 import fr.alcyons.phiwms_mobile.Outils.Alerte
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.Adapter.LotAdapter
 import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparationV2
 import fr.alcyons.phiwms_mobile.R
 import java.util.Calendar
 import java.util.Random
+import androidx.core.graphics.drawable.toDrawable
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper
 
 class DetailFragment : Fragment() {
 
@@ -48,9 +53,13 @@ class DetailFragment : Fragment() {
 
     lateinit var preparationCourante : PH_Preparation
 
-    var listeLotDisponible: MutableList<String>? = null
+    var listeLotDisponible: MutableList<Stock_Lot_Emplacement_Light>? = null
     var autoCompleteAdapter: ArrayAdapter<String?>? = null
     var autoComplete: AutoCompleteTextView? = null
+
+    var maxAPreparer = 0
+
+    var nouveauLot = false
 
     companion object {
         private const val ARG_LIGNE = "ligne"
@@ -75,7 +84,7 @@ class DetailFragment : Fragment() {
         view.findViewById<TextView>(R.id.emplacementLot_TV).text = ligne.emplacementParDefaut
         view.findViewById<TextView>(R.id.designationReference_TV).text = ligne.produitDesignation
         view.findViewById<EditText>(R.id.quantiteComptee_ET)
-            .setText(ligne.qte_preparer.toInt().toString())
+            .setText(ligne.qte_preparer.toString())
         view.findViewById<EditText>(R.id.numeroLot_ET)
             .setText(ligne.lotNumero ?: "")
         // Mettez à jour les autres champs si nécessaire
@@ -93,7 +102,7 @@ class DetailFragment : Fragment() {
         } ?: return
         this.preparationCourante = PH_PreparationOpenHelper.getPH_PreparationByID(db, preparationLigneBase.preparationID)
 
-        var conditionnement: Int = preparationLigneBase.produitCondDistrib.toInt()
+        val conditionnement: Int = preparationLigneBase.produitCondDistrib.toInt()
         val layoutListeLot_LL = view.findViewById<LinearLayout>(R.id.layoutListeLot_LL)
         val layoutLotPeremption_LL = view.findViewById<LinearLayout>(R.id.layoutLotPeremption_LL)
         val layoutMoinsLL = view.findViewById<ImageView>(R.id.layoutMoins_LL)
@@ -111,78 +120,182 @@ class DetailFragment : Fragment() {
             getListeAnneeDatePicker()
         )
         val quantiteCompteeET = view.findViewById<EditText>(R.id.quantiteComptee_ET)
+        val effacerLot = view.findViewById<ImageView>(R.id.effacerLot_IV)
+
+        //gestion de la date de péremption
+        var datePeremption_String = ""
+
+        //tant que l'on a pas sélectionné de lot on ne peux pas saisir de quantité
+        quantiteCompteeET.apply {
+            isFocusable = false
+            isFocusableInTouchMode = false
+            isClickable = false
+        }
 
         //gestion de l'autocomplete
         //récupération des lots disponible du produit
         val depot = DepotOpenHelper.getDepotPUI(db);
+
+        //déclaration de la quantité max préparable
+        maxAPreparer = preparationLigneBase.qte_APreparer
+
         listeLotDisponible = Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepotString(db, produit, depot)
+        listeLotDisponible?.sortWith(compareBy { it.peremptionDate })
+
+        val ajouterLot = Stock_Lot_Emplacement_Light()
+        ajouterLot.setLot("Ajouter un lot")
+        listeLotDisponible?.add(ajouterLot)
+
+        val selectionnerLot = Stock_Lot_Emplacement_Light()
+        selectionnerLot.setLot("Sélectionner un lot")
+        listeLotDisponible?.add(0, selectionnerLot)
+
         autoComplete = view.findViewById<AutoCompleteTextView?>(R.id.lot_Autocomplete)
 
-        autoCompleteAdapter = ArrayAdapter(requireContext(), R.layout.spinner_item_depot, listeLotDisponible.orEmpty())
-        autoComplete!!.setAdapter<ArrayAdapter<String?>?>(autoCompleteAdapter)
+        val adapter = LotAdapter(requireContext(), listeLotDisponible.orEmpty())
+        autoComplete?.setAdapter(adapter)
+
+        /*autoCompleteAdapter = ArrayAdapter(requireContext(), R.layout.spinner_item_depot, listeLotDisponible.orEmpty())
+        autoComplete!!.setAdapter<ArrayAdapter<String?>?>(autoCompleteAdapter)*/
         autoComplete!!.setThreshold(100) // Empêche le filtrage automatique
 
         // Affiche le premier élément par défaut
         if (!listeLotDisponible!!.isEmpty()) {
-            autoComplete!!.setText(listeLotDisponible!!.get(0), false)
+            autoComplete!!.setText(listeLotDisponible!![0].lot, false)
         }
 
         // Hauteur = 1/3 de l'écran
-        val hauteurEcran = getResources().getDisplayMetrics().heightPixels
-        autoComplete!!.setDropDownHeight(hauteurEcran / 3)
-        val dpToPx = (12 * getResources().getDisplayMetrics().density).toInt()
-        autoComplete!!.post(Runnable { autoComplete!!.setDropDownWidth(view.findViewById<View?>(R.id.listeLotDisponible_LL).getWidth() - dpToPx) })
+        val hauteurEcran = resources.displayMetrics.heightPixels
+        autoComplete!!.dropDownHeight = hauteurEcran / 3
+        val dpToPx = (12 * resources.displayMetrics.density).toInt()
+        autoComplete!!.post(Runnable { autoComplete!!.dropDownWidth =
+            view.findViewById<View?>(R.id.listeLotDisponible_LL).getWidth() - dpToPx })
         autoComplete!!.setDropDownBackgroundResource(android.R.color.white)
 
         // Ouvre la liste au clic
         autoComplete!!.setOnClickListener(View.OnClickListener { v: View? -> autoComplete!!.showDropDown() })
 
         // Chevron ouvre aussi la liste
-        view.findViewById<View?>(R.id.chevronFiltre).setOnClickListener(View.OnClickListener { v: View? -> autoComplete!!.showDropDown() })
+        view.findViewById<View?>(R.id.chevronFiltre).setOnClickListener { v: View? -> autoComplete!!.showDropDown() }
 
         // Gère la sélection
-        autoComplete!!.setOnItemClickListener(OnItemClickListener { parent: AdapterView<*>?, viewAutocomplete: View?, position: Int, id: Long ->
+        autoComplete!!.setOnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
 
             //on récupère les informations du lot sélectionné
-            val lotSelectionne = parent!!.getItemAtPosition(position).toString()
-            val stockSelectionne = Stock_Lot_EmplacementLightOpenHelper.getStockByLotProduitDepot(db, lotSelectionne, produit, depot)
+            val stockSelectionne = listeLotDisponible!![position]
 
-            //on affiche le lot et la date de péremption
-            view.findViewById<EditText>(R.id.numeroLot_ET).setText(stockSelectionne.lot)
-            view.findViewById<TextView>(R.id.emplacementLot_TV).text = stockSelectionne.emplacement
-            val parts = stockSelectionne.peremptionDate.split("-")
-            val annee = parts[0] // "2026"
-            val mois = parts[1].toInt() - 1 // "04" → index 3 (0-based)
+            if (stockSelectionne.lot != "Sélectionner un lot") {
+                if (stockSelectionne.lot == "Ajouter un lot") {
+                    nouveauLot = true
+                    view.findViewById<LinearLayout>(R.id.bandeauNouveauLot_LL).visibility =
+                        View.VISIBLE
+                    spinnerMoisDatePeremptionSP.setSelection(0)
+                    spinnerAnneeDatePeremptionSP.setSelection(0)
+                    layoutListeLot_LL.visibility = View.GONE
+                    layoutLotPeremption_LL.visibility = View.VISIBLE
+                    view.findViewById<EditText>(R.id.numeroLot_ET).setText("")
+                    view.findViewById<TextView>(R.id.emplacementLot_TV).text =
+                        produit.emplacement_PUI_Defaut
+                    view.findViewById<EditText>(R.id.numeroLot_ET).apply {
+                        isFocusable = true
+                        isFocusableInTouchMode = true
+                        isClickable = true
+                        requestFocus()
+                        val imm =
+                            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+                    }
 
-            // Règle le spinner mois (index 0-based donc avril = 3)
-            spinnerMoisDatePeremptionSP.setSelection(mois)
+                    spinnerMoisDatePeremptionSP.apply {
+                        isEnabled = true
+                    }
+                    spinnerAnneeDatePeremptionSP.apply {
+                        isEnabled = true
+                    }
+                } else {
+                    view.findViewById<LinearLayout>(R.id.bandeauNouveauLot_LL).visibility =
+                        View.GONE
+                    //on affiche le lot et la date de péremption
+                    view.findViewById<EditText>(R.id.numeroLot_ET).setText(stockSelectionne.lot)
+                    view.findViewById<TextView>(R.id.emplacementLot_TV).text =
+                        stockSelectionne.emplacement
+                    val parts = stockSelectionne.peremptionDate.split("-")
+                    val annee = parts[0] // "2026"
+                    val mois = parts[1].toInt() - 1 // "04" → index 3 (0-based)
 
-            // Règle le spinner année en cherchant la position de l'année dans l'adapter
-            val positionAnnee = (0 until adapterAnneePeremption.count).indexOfFirst {
-                adapterAnneePeremption.getItem(it) == annee
+                    // Règle le spinner mois (index 0-based donc avril = 3)
+                    spinnerMoisDatePeremptionSP.setSelection(mois)
+
+                    // Règle le spinner année en cherchant la position de l'année dans l'adapter
+                    val positionAnnee = (0 until adapterAnneePeremption.count).indexOfFirst {
+                        adapterAnneePeremption.getItem(it) == annee
+                    }
+                    if (positionAnnee != -1) {
+                        spinnerAnneeDatePeremptionSP.setSelection(positionAnnee)
+                    }
+
+                    datePeremption_String = stockSelectionne.peremptionDate
+
+                    layoutListeLot_LL.visibility = View.GONE
+                    layoutLotPeremption_LL.visibility = View.VISIBLE
+
+                    //gestion du maximum a preparer
+                    if (maxAPreparer > stockSelectionne.qte)
+                        maxAPreparer = stockSelectionne.qte.toInt()
+
+                    view.findViewById<EditText>(R.id.numeroLot_ET).apply {
+                        isFocusable = false
+                        isFocusableInTouchMode = false
+                        isClickable = false
+                    }
+
+                    spinnerMoisDatePeremptionSP.apply {
+                        isEnabled = false
+                    }
+                    spinnerAnneeDatePeremptionSP.apply {
+                        isEnabled = false
+                    }
+                }
+
+                //au clic sur le lot on réouvre la liste
+                effacerLot.setOnClickListener {
+                    val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+                    if (imm.isAcceptingText) {
+                        // Le clavier est visible
+                        imm.hideSoftInputFromWindow(view.windowToken, 0)
+                    }
+                    view.postDelayed({
+                        layoutListeLot_LL.visibility = View.VISIBLE
+                        layoutLotPeremption_LL.visibility = View.GONE
+                        view.findViewById<View?>(R.id.chevronFiltre).performClick()
+                    }, 200)
+                }
+
+                //gestion du conditionnment
+                layoutPlusLL.setOnClickListener { _: View? ->
+                    var qteActuelle = quantiteCompteeET.text.toString().toInt()
+                    if (qteActuelle == -1)
+                        qteActuelle = 0
+
+                    qteActuelle += conditionnement
+
+                    if (qteActuelle > maxAPreparer)
+                        qteActuelle = maxAPreparer
+                    quantiteCompteeET.setText(qteActuelle.toString())
+                }
+                layoutMoinsLL.setOnClickListener { _: View? ->
+                    var qteActuelle = quantiteCompteeET.text.toString().toInt()
+                    qteActuelle -= conditionnement
+                    if (qteActuelle < 0) qteActuelle = 0
+                    quantiteCompteeET.setText(qteActuelle.toString())
+                }
+            } else {
+                layoutPlusLL.setOnClickListener(null)
+                layoutMoinsLL.setOnClickListener(null)
+                view.findViewById<EditText>(R.id.numeroLot_ET).setText("")
             }
-            if (positionAnnee != -1) {
-                spinnerAnneeDatePeremptionSP.setSelection(positionAnnee)
-            }
-
-            layoutListeLot_LL.visibility = View.GONE
-            layoutLotPeremption_LL.visibility = View.VISIBLE
-
-            //gestion du maximum a preparer
-
-            //ajouter une ligne ajout de lot
-
-            //dans les lignes affichées mettre la date de péremption et l'emplacement 
-
-            //au clic sur le lot on réouvre la liste
-            layoutLotPeremption_LL.setOnClickListener {
-                layoutListeLot_LL.visibility = View.VISIBLE
-                layoutLotPeremption_LL.visibility = View.GONE
-                view.findViewById<View?>(R.id.chevronFiltre).performClick()
-            }
-
-        })
-
+        }
 
         //gestion des données
         if(preparationLigneBase.emplacementParDefaut == "")
@@ -200,13 +313,44 @@ class DetailFragment : Fragment() {
         {
             //on remet en place la quantité qui sera modifié après coup
             val ph_preparation = PH_PreparationOpenHelper.getPH_PreparationByID(db, preparationLigneBase.preparationID)
-            preparationLigneBasePreparation = PH_Preparation_LigneOpenHelper.getUnPHPreparationLignesAPreparerParPHPreparationetProduit(db, ph_preparation,preparationLigneBase.produitID)
+            preparationLigneBasePreparation = PH_Preparation_LigneOpenHelper.getUnPHPreparationLignesBaseParPHPreparationetProduit(db, ph_preparation,preparationLigneBase.produitID)
 
             preparationLigneBasePreparation.qte_APreparer += preparationLigneBase.qte_preparer
             PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, preparationLigneBasePreparation)
 
             view.findViewById<EditText>(R.id.numeroLot_ET).setText(preparationLigneBase.lotNumero.toString())
             quantiteCompteeET.setText(preparationLigneBase.qte_preparer.toString())
+
+            layoutListeLot_LL.visibility = View.GONE
+            layoutLotPeremption_LL.visibility = View.VISIBLE
+            effacerLot.visibility = View.GONE
+
+            val stockCourant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByLotPeremptionEtDepot(db, preparationLigneBase.lotNumero, preparationLigneBase.peremptionDate, depot)
+
+            maxAPreparer = stockCourant.qte.toInt()
+
+            if(maxAPreparer > preparationLigneBasePreparation.qte_APreparer)
+                maxAPreparer = preparationLigneBasePreparation.qte_APreparer
+
+            layoutPlusLL.setOnClickListener { _: View? ->
+                var qteActuelle = quantiteCompteeET.text.toString().toInt()
+                if (qteActuelle == -1)
+                    qteActuelle = 0
+
+                qteActuelle += conditionnement
+
+                if (qteActuelle > maxAPreparer)
+                    qteActuelle = maxAPreparer
+                quantiteCompteeET.setText(qteActuelle.toString())
+            }
+            layoutMoinsLL.setOnClickListener { _: View? ->
+                var qteActuelle = quantiteCompteeET.text.toString().toInt()
+                qteActuelle -= conditionnement
+                if (qteActuelle < 0) qteActuelle = 0
+                quantiteCompteeET.setText(qteActuelle.toString())
+            }
+
+            datePeremption_String = preparationLigneBase.peremptionDate
         }
         else
         {
@@ -214,24 +358,6 @@ class DetailFragment : Fragment() {
             quantiteCompteeET.setText("0")
         }
 
-        //gestion du conditionnment
-        layoutPlusLL.setOnClickListener { _: View? ->
-            var qteActuelle = quantiteCompteeET.text.toString().toInt()
-            if (qteActuelle == -1)
-                qteActuelle = 0
-
-            qteActuelle += conditionnement
-
-            if(qteActuelle > preparationLigneBasePreparation.qte_APreparer)
-                qteActuelle = preparationLigneBasePreparation.qte_APreparer
-            quantiteCompteeET.setText(qteActuelle.toString())
-        }
-        layoutMoinsLL.setOnClickListener { _: View? ->
-            var qteActuelle = quantiteCompteeET.text.toString().toInt()
-            qteActuelle -= conditionnement
-            if (qteActuelle < 0) qteActuelle = 0
-            quantiteCompteeET.setText(qteActuelle.toString())
-        }
 
         //gestion de la date de péremption
         adapterMoisPeremption.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -281,7 +407,7 @@ class DetailFragment : Fragment() {
                 {
                     val preparationCourante = PH_PreparationOpenHelper.getPH_PreparationByID(db, preparationLigneBase.preparationID)
                     //on remet en place la quantité qui sera modifié après coup
-                    var preparationLigneBasePreparation = PH_Preparation_LigneOpenHelper.getUnPHPreparationLignesAPreparerParPHPreparationetProduit(db, preparationCourante,preparationLigneBase.produitID)
+                    val preparationLigneBasePreparation = PH_Preparation_LigneOpenHelper.getUnPHPreparationLignesAPreparerParPHPreparationetProduit(db, preparationCourante,preparationLigneBase.produitID)
 
                     preparationLigneBasePreparation.qte_APreparer -= preparationLigneBase.qte_preparer
                     PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, preparationLigneBasePreparation)
@@ -361,6 +487,9 @@ class DetailFragment : Fragment() {
                         if (!produit.isPeremption)
                             datePeremption = "0000-00-00"
 
+                        if(datePeremption_String != "")
+                            datePeremption = datePeremption_String
+
                         val serie = ""
 
                         val phPreparationLigneliste =
@@ -385,9 +514,9 @@ class DetailFragment : Fragment() {
 
                         if (existe) {
                             if(preparationLigneBase._UID < 0)
-                                phPreparationLigneCourant.qte_livrer = quantite
+                                phPreparationLigneCourant.qte_preparer = quantite
                             else
-                                phPreparationLigneCourant.qte_livrer += quantite
+                                phPreparationLigneCourant.qte_preparer += quantite
                             onValider?.invoke(phPreparationLigneCourant, false)
                         } else
                         {
@@ -404,7 +533,7 @@ class DetailFragment : Fragment() {
                             phPreparationLigneCourant.lotNumero = numeroLot.trim { it <= ' ' }
                             phPreparationLigneCourant.serieNumero = numero_Serie.trim { it <= ' ' }
                             phPreparationLigneCourant.peremptionDate = datePeremption.trim { it <= ' ' }
-                            phPreparationLigneCourant.qte_livrer = quantite
+                            phPreparationLigneCourant.qte_preparer = quantite
 
                             onValider?.invoke(phPreparationLigneCourant, true)
                         }
@@ -455,7 +584,7 @@ class DetailFragment : Fragment() {
 
         val alertDialog = builder?.create()
         alertDialog?.window?.setGravity(Gravity.CENTER)
-        alertDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        alertDialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         alertDialog?.show()
 
         zoneok.setOnClickListener {

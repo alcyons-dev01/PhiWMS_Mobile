@@ -360,6 +360,21 @@ public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
 
         Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION_LIGNE + " WHERE " + Constantes.CLE_COL_PREPARATIONID_PH_PREPARATION_LIGNE + "=? and "+Constantes.CLE_COL_QTE_APREPARER_PH_PREPARATION_LIGNE+" != 0 and "+Constantes.CLE_COL_PRODUITID_PH_PREPARATION_LIGNE+"=?", new String[]{String.valueOf(ph_preparation.getUID()), String.valueOf(codeProduit)});
 
+        if(cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            ph_preparation_ligne = new PH_Preparation_Ligne(cursor);
+        }
+
+        cursor.close();
+        cursor = null;
+        return ph_preparation_ligne;
+    }
+
+    public static PH_Preparation_Ligne getUnPHPreparationLignesBaseParPHPreparationetProduit(SQLiteDatabase db, PH_Preparation ph_preparation, int codeProduit) {
+        PH_Preparation_Ligne ph_preparation_ligne = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION_LIGNE + " WHERE " + Constantes.CLE_COL_PREPARATIONID_PH_PREPARATION_LIGNE + "=? and "+Constantes.CLE_COL__UID_PH_PREPARATION_LIGNE+" > 0 and "+Constantes.CLE_COL_PRODUITID_PH_PREPARATION_LIGNE+"=?", new String[]{String.valueOf(ph_preparation.getUID()), String.valueOf(codeProduit)});
+
         while (cursor.moveToNext()) {
             ph_preparation_ligne = new PH_Preparation_Ligne(cursor);
         }
@@ -387,7 +402,7 @@ public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
     public static PH_Preparation_Ligne getPH_Preparation_LigneBaseByPreparationAndIdProduit(SQLiteDatabase db, PH_Preparation ph_preparation, int codeProduit) {
         PH_Preparation_Ligne ph_preparation_ligne = null;
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION_LIGNE + " WHERE " + Constantes.CLE_COL_PREPARATIONID_PH_PREPARATION_LIGNE + "=? and "+Constantes.CLE_COL_PRODUITID_PH_PREPARATION_LIGNE+"=? AND "+Constantes.CLE_COL__UID_PH_PREPARATION_LIGNE+" > 0", new String[]{String.valueOf(ph_preparation.getUID()), String.valueOf(codeProduit)});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION_LIGNE + " WHERE " + Constantes.CLE_COL_PREPARATIONID_PH_PREPARATION_LIGNE + "=? and "+Constantes.CLE_COL_PRODUITID_PH_PREPARATION_LIGNE+"=? AND "+Constantes.CLE_COL__UID_PH_PREPARATION_LIGNE+" > 0 AND "+Constantes.CLE_COL_QTE_APREPARER_PH_PREPARATION_LIGNE+" > 0", new String[]{String.valueOf(ph_preparation.getUID()), String.valueOf(codeProduit)});
 
         if (cursor.getCount() >= 1) {
             cursor.moveToFirst();

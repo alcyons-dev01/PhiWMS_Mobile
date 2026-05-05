@@ -20,6 +20,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.android.volley.toolbox.JsonObjectRequest
@@ -208,6 +209,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         super.onResume()
 
         if (statutConnexion && passageParOnCreate) {
+            afficherSpinner(this@DetailPreparationV2, layoutInflater)
             val requestQueue = Volley.newRequestQueue(this@DetailPreparationV2)
             val urlRequete =
                 ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequetePreparationDetail + preparationCourante.uid
@@ -274,52 +276,6 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
                             }
                         }
 
-                        for (phPrepLigne in phPreparationLignes) {
-                            if ((phPrepLigne.getQte_APreparer() > 0 || phPrepLigne.getQte_Demander() == phPrepLigne.getQte_preparer()) && phPrepLigne.getQte_APreparer() != 0) {
-                                val produit = ProduitOpenHelper.getProduitByID(db, phPrepLigne.getProduitID())
-
-                                if (produit != null) {
-                                    val stockLotEmplacementLightList = Stock_Lot_EmplacementLightOpenHelper
-                                        .getAllStockLotEmplacementByProduitEtDepot(db, produit, depotOrigine)
-
-                                    val lignesPreparer = PH_Preparation_LigneOpenHelper
-                                        .getAllPHPreparationLignesParPHPreparationAndProduitNeg(db, preparationCourante, phPrepLigne.getProduitID())
-
-                                    stockLotEmplacementLightList.sortWith(compareBy { it.getLot() })
-                                    stockLotEmplacementLightList.sortWith(compareBy { it.getPeremptionDate() })
-
-                                    for (stockLotEmplacement in stockLotEmplacementLightList) {
-                                        if (stockLotEmplacement.getQte() >= 0) {
-                                            stockLotEmplacement.setQte_Preparer(0)
-
-                                            for (ligneCourante in lignesPreparer) {
-                                                if (ligneCourante.getLotNumero().contentEquals(stockLotEmplacement.getLot()) &&
-                                                    ligneCourante.getEmplacementParDefaut().contentEquals(stockLotEmplacement.getEmplacement())) {
-                                                    stockLotEmplacement.setQte_Preparer(ligneCourante.getQte_preparer())
-                                                    Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockLotEmplacement)
-                                                    break
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    for (ligneCourante in lignesPreparer) {
-                                        val stockTemp = Stock_Lot_EmplacementLightOpenHelper
-                                            .getStockLotEmplacementByLotPeremptionEtDepotEmplacement(
-                                                db,
-                                                ligneCourante.getLotNumero(),
-                                                ligneCourante.getPeremptionDate(),
-                                                depotOrigine,
-                                                ligneCourante.getEmplacementParDefaut()
-                                            )
-                                        if (stockTemp == null) {
-                                            PH_Preparation_LigneOpenHelper.supprimerUnPhPreparationLigne(db, ligneCourante)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
                         invalidateOptionsMenu()
                         passageParOnCreate = false
                         arreterSpinner()
@@ -375,9 +331,9 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         findViewById<ProgressBar>(R.id.progressBarPreparation_PB).progress = nbLignePreparer
 
         if(nbLignePreparer > 0)
-            findViewById<CardView>(R.id.btnValiderPreparation_CV).visibility = View.VISIBLE
+            afficherBoutonValider()
         else
-            findViewById<CardView>(R.id.btnValiderPreparation_CV).visibility = View.GONE
+            masquerBoutonValider()
 
         findViewById<CardView>(R.id.btnValiderPreparation_CV).setOnClickListener { v: View? ->
             demandeConfirmationValidation(layoutInflater) { resultat ->
@@ -588,13 +544,18 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
                 )
             )
         } else {
-            liste.add(
-                PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneBaseByPreparationAndIdProduit(
-                    db,
-                    preparationCourante,
-                    idProduit
-                )
+            val preparationLigneBaseByProduit = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneBaseByPreparationAndIdProduit(
+                db,
+                preparationCourante,
+                idProduit
             )
+            if(preparationLigneBaseByProduit != null)
+            {
+                liste.add(
+                    preparationLigneBaseByProduit
+                )
+            }
+
         }
 
         if (liste.isNotEmpty()) {
@@ -649,24 +610,12 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         var liste: ArrayList<PH_Preparation_Ligne>
 
         if (idProduit == 0) {
-            /*liste = ArrayList(
-                PH_ReliquatOpenHelper
-                    .getPH_ReliquatNegByCommandeNumero(
-                        db,
-                        receptionCourant.numero
-                    )
-            )*/
+            liste = ArrayList(PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparationNeg(db, preparationCourante))
         } else {
-            /*liste = ArrayList(
-                PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(
-                    db,
-                    receptionCourant.numero,
-                    idProduit
-                )
-            )*/
+            liste = ArrayList(PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparationAndProduitNeg(db, preparationCourante, idProduit))
         }
 
-        /*if (liste.isNotEmpty()) {
+        if (liste.isNotEmpty()) {
             // Affiche le container
             referencePreparerContainer.apply {
                 layoutParams = (layoutParams as LinearLayout.LayoutParams).also {
@@ -679,13 +628,13 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
             }
 
             // Crée le fragment avec la liste
-            val frag = ReceptionnerFragment.newInstance(liste)
+            val frag = PreparerFragment.newInstance(liste)
             supportFragmentManager.beginTransaction()
-                .replace(R.id.referenceReceptionnerContainer, frag)
+                .replace(R.id.referencePreparerContainer, frag)
                 .commitNow()
 
             preparerVisible = true
-        }*/
+        }
     }
 
     private fun fermerPreparer() {
@@ -780,14 +729,16 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
             }.start()
 
         detailVisible = false
+
+        ouvrirScanner()
     }
 
     private fun fermerFragment() {
+        if (detailVisible) fermerDetailFragment()
         if (scannerVisible) fermerScanner()
         if (rechercheVisible) fermerRecherche()
         if (aPreparerVisible) fermerAPreparer()
         if (preparerVisible) fermerPreparer()
-        if (detailVisible) fermerDetailFragment()
     }
 
     private fun traiterCodeScanne(code: String) {
@@ -898,17 +849,17 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     }
 
     private fun rafraichirListe() {
-        /*val nbReliquatTotal = PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(db, receptionCourant.numero).size
-        val nbReliquatPreparer = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumero(db, receptionCourant.numero).size
-        findViewById<TextView>(R.id.nbReferenceAReceptionner_TV).text = nbReliquatTotal.toString()
-        findViewById<TextView>(R.id.nbReferenceReceptionner_TV).text = nbReliquatPreparer.toString()
-        findViewById<ProgressBar>(R.id.progressBarReception_PB).max = PH_ReliquatOpenHelper.getNbReliquatBaseByCommande(db, receptionCourant.numero)
-        findViewById<ProgressBar>(R.id.progressBarReception_PB).progress = nbReliquatPreparer
+        val nbLigneTotal = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesBaseParPHPreparation(db, preparationCourante).size
+        val nbLignePreparer = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparationNeg(db, preparationCourante).size
+        findViewById<TextView>(R.id.nbReferenceAPreparer_TV).text = nbLigneTotal.toString()
+        findViewById<TextView>(R.id.nbReferencePreparer_TV).text = nbLignePreparer.toString()
+        findViewById<ProgressBar>(R.id.progressBarPreparation_PB).max = nbLigneTotal
+        findViewById<ProgressBar>(R.id.progressBarPreparation_PB).progress = nbLignePreparer
 
-        if(nbReliquatPreparer > 0)
-            findViewById<CardView>(R.id.btnValiderReception_CV).visibility = View.VISIBLE
+        if(nbLignePreparer > 0)
+            afficherBoutonValider()
         else
-            findViewById<CardView>(R.id.btnValiderReception_CV).visibility = View.GONE*/
+            masquerBoutonValider()
     }
 
     private fun getDateDuJour(): String =
@@ -1045,7 +996,33 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     }
 
     override fun onElementSelectionne(element: PH_Preparation_Ligne) {
-        fermerFragment()
-        ouvrirDetailFragment(element)
+        //on recherche le produit courant
+        val produit = ProduitOpenHelper.getProduitByID(db, element.produitID)
+
+        //on vérifie sur le produit est sérialiser à la préparation
+        if(produit.isSuivi_Serialisation && !produit.isSerialiser_Reception_Delivrance) {
+            Alerte.afficherAlerteInformation(
+                this@DetailPreparationV2,
+                layoutInflater,
+                "Produit sérialiser",
+                "La référence est suivie par numéro de série.\nVeuillez scanner la boite",
+                false,
+                false
+            )
+            fermerFragment()
+            ouvrirScanner()
+        }
+        else {
+            fermerFragment()
+            ouvrirDetailFragment(element)
+        }
+    }
+
+    fun afficherBoutonValider() {
+        btnValiderPreparation_CV.visibility = View.VISIBLE
+    }
+
+    fun masquerBoutonValider() {
+        btnValiderPreparation_CV.visibility = View.GONE
     }
 }
