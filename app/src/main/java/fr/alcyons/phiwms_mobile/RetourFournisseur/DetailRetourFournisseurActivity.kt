@@ -1,4 +1,4 @@
-package fr.alcyons.phiwms_mobile.Destruction
+package fr.alcyons.phiwms_mobile.RetourFournisseur
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -9,7 +9,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
+import androidx.appcompat.widget.AppCompatButton
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -17,7 +17,6 @@ import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.widget.AppCompatButton
 import androidx.cardview.widget.CardView
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
@@ -38,20 +37,20 @@ import fr.alcyons.phiwms_mobile.Fragment.RechercheFragment
 import fr.alcyons.phiwms_mobile.Fragment.ScannerFragment
 import fr.alcyons.phiwms_mobile.Fragment.ScannerInputFragment
 import fr.alcyons.phiwms_mobile.Interfaces.RechercheAdjustable
-import fr.alcyons.phiwms_mobile.ListViewAdapters.Retour_Ligne_DestructionAdapter
+import fr.alcyons.phiwms_mobile.ListViewAdapters.Retour_Ligne_RetourFournisseurAdapter
 import fr.alcyons.phiwms_mobile.Outils.Alerte
 import fr.alcyons.phiwms_mobile.Outils.GestionCodeScanne
 import fr.alcyons.phiwms_mobile.R
-import fr.alcyons.phiwms_mobile.Destruction.Fragment.ADetruireFragment
+import fr.alcyons.phiwms_mobile.RetourFournisseur.Fragment.ARetournerFournisseurFragment
 import fr.alcyons.phiwms_mobile.Interfaces.ScanDebounce
 import fr.alcyons.phiwms_mobile.ServiceActivity
-import fr.alcyons.phiwms_mobile.Services.ServiceDestructionActivity
+import fr.alcyons.phiwms_mobile.Services.ServiceRetourFournisseurActivity
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Objects
 import java.util.Random
 
-class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElementRechercheListener, RechercheAdjustable
+class DetailRetourFournisseurActivity : ServiceActivity(), RechercheFragment.OnElementRechercheListener, RechercheAdjustable
 {
     companion object
     {
@@ -68,16 +67,16 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
 
     // UI
     private var listViewRetourLignes: ListView? = null
-    private var adapter: Retour_Ligne_DestructionAdapter? = null
+    private var adapter: Retour_Ligne_RetourFournisseurAdapter? = null
     private var scannerContainer: FragmentContainerView? = null
     private var rechercheContainer: FragmentContainerView? = null
-    private var referenceADetruireContainer: FragmentContainerView? = null
+    private var referenceARetournerFournisseurContainer: FragmentContainerView? = null
     private var detailContainer: FragmentContainerView? = null
     private var lancerScan: LinearLayout? = null
     private var lancerRecherhe: LinearLayout? = null
-    private var aDetruire_LL: LinearLayout? = null
-    private var btnValiderDestruction_LL: LinearLayout? = null
-    private var btnValiderDestruction_CV: CardView? = null
+    private var aRetournerFournisseur_LL: LinearLayout? = null
+    private var btnValiderRetourFournisseur_LL: LinearLayout? = null
+    private var btnValiderRetourFournisseur_CV: CardView? = null
     private var textChercher_TV: TextView? = null
     private var searchInput_ET: EditText? = null
     private var effacerRecherche_IV: ImageView? = null
@@ -86,7 +85,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
     // Fragments
     private var scannerFragment: Fragment? = null
     private var rechercheFragment: RechercheFragment? = null
-    private var aDetruireFragment: ADetruireFragment? = null
+    private var aRetournerFournisseurFragment: ARetournerFournisseurFragment? = null
 
     // State
     private var isScannerOpen: Boolean = false
@@ -96,22 +95,22 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        this.setContentView(R.layout.activity_detail_destruction)
+        this.setContentView(R.layout.activity_detail_retour_fournisseur)
 
         this.initializeData()
         this.initializeUI()
         this.setupEventListeners()
         this.setupOnBackPressedCallback()
     }
-    
+
     private fun initializeData() { this.retourSelectionne = RetourOpenHelper.getRetourByID(this.db, Objects.requireNonNull<Bundle?>(this.intent.extras).getInt("retourSelectionneID")) }
-    
+
     private fun initializeUI()
     {
         this.bindViews()
         this.updateUI()
     }
-    
+
     private fun updateUI() { this.findViewById<TextView>(R.id.numero).text = "Numéro de retour : " + this.retourSelectionne?.numero?.trim() }
 
     public override fun onResume()
@@ -123,21 +122,21 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
         this.updateUI()
         this.updateListView()
     }
-    
+
     private fun loadData() { this.listRetourLignes = Retour_LigneOpenHelper.getAllRetourLignesByRetour(db, retourSelectionne) }
-    
+
     private fun updateListView()
     {
-        this.adapter = Retour_Ligne_DestructionAdapter(this, this.listRetourLignes)
-        
+        this.adapter = Retour_Ligne_RetourFournisseurAdapter(this, this.listRetourLignes)
+
         val itemCount = this.listRetourLignes?.size ?: 0
-        findViewById<TextView>(R.id.nbReferenceADetruire_TV).text = itemCount.toString()
+        findViewById<TextView>(R.id.nbReferenceARetournerFournisseur_TV).text = itemCount.toString()
     }
 
     override fun retourSaisieText(text: String?)
     {
         this.commentaire = text
-        this.validerDestruction()
+        this.validerRetourFournisseur()
     }
 
     override fun onElementRechercher(element: Int) { this.scrollToItemOrDisplayAlert(element) }
@@ -153,149 +152,149 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
                 this.closeOpenedFragments()
                 this.openACompter()
             }
-            this.aDetruireFragment?.scrollToPosition(position)
+            this.aRetournerFournisseurFragment?.scrollToPosition(position)
         }
-        else { Alerte.afficherAlerteInformation(this@DetailDestructionActivity, this.layoutInflater, "Produit non trouvé", "Ce produit n'est pas dans la liste de destruction", false, false) }
+        else { Alerte.afficherAlerteInformation(this@DetailRetourFournisseurActivity, this.layoutInflater, "Produit non trouvé", "Ce produit n'est pas dans la liste de retour fournisseur", false, false) }
     }
 
-    private fun validerDestruction()
+    private fun validerRetourFournisseur()
     {
         val retour = this.retourSelectionne ?: return
-        
+
         if (!validateAndSetMotif(retour)) return
-        
+
         val actionUtilisateur = this.createActionUtilisateur()
         val successCount = this.processRetourLignes(actionUtilisateur)
-        
+
         if (successCount == this.adapter?.mRetour_Lignes?.size)
         {
             this.updateRetourAfterValidation(retour)
-            this.finalizeDestruction(actionUtilisateur)
+            this.finalizeRetourFournisseur(actionUtilisateur)
         }
-        else { this.handleDestructionError() }
+        else { this.handleRetourFournisseurError() }
     }
-    
+
     private fun validateAndSetMotif(retour: Retour): Boolean
     {
         retour.syS_USER_MAJ = this.utilisateurConnecte.identifiant
-        
+
         var motif = retour.motif
         if (motif.isEmpty()) { motif = this.promptUserForMotif() }
-        
+
         if (motif == null)
         {
             Alerte.afficherAlerteInformation(this, this.layoutInflater, "Alerte", "Motif invalide", false, false)
             return false
         }
-        
+
         retour.motif = motif.trim()
         return true
     }
-    
+
     private fun promptUserForMotif(): String?
     {
         val motifList = PH_RetourMotifOpenHelper.getAllPH_RetourMotif(this.db)
         val motifStringList = motifList.map { it.motifRetour }
         return Alerte.afficherAlerteListView(this, "Sélectionner le motif", motifStringList)
     }
-    
+
     private fun createActionUtilisateur(): ActionUtilisateur
     {
         val actionId = this.generateNegativeRandomId()
-        val dateDestruction = Date()
-        val dateString = this.formatDateTime(dateDestruction)
+        val dateRetourFournisseur = Date()
+        val dateString = this.formatDateTime(dateRetourFournisseur)
 
-        val resultingActionUtilisateur: ActionUtilisateur = ActionUtilisateur(actionId, this.utilisateurConnecte.id, dateString, this.serviceActuel.id, this.utilisateurConnecte.etablissementId, "En attente", this.retourSelectionne?._UID!!, "", "Destruction")
+        val resultingActionUtilisateur: ActionUtilisateur = ActionUtilisateur(actionId, this.utilisateurConnecte.id, dateString, this.serviceActuel.id, this.utilisateurConnecte.etablissementId, "En attente", this.retourSelectionne?._UID!!, "", "Retour Frs")
         ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(this.db, resultingActionUtilisateur)
 
         return resultingActionUtilisateur
     }
-    
+
     private fun generateNegativeRandomId(): Int
     {
         val random = Random()
         val id = random.nextInt()
         return if (id > 0) -id else id
     }
-    
+
     private fun formatDateTime(date: Date): String
     {
         @SuppressLint("SimpleDateFormat")
         val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         return format.format(date)
     }
-    
+
     private fun processRetourLignes(actionUtilisateur: ActionUtilisateur): Int
     {
         var successCount = 0
-        
+
         for (retourLigne in this.adapter?.mRetour_Lignes ?: emptyList()) { if (this.processRetourLigne(retourLigne, actionUtilisateur)) { successCount++ } }
-        
+
         return successCount
     }
-    
+
     private fun processRetourLigne(retourLigne: Retour_Ligne, actionUtilisateur: ActionUtilisateur): Boolean
     {
         retourLigne.qte_Retourner = if (retourLigne.qte_Retourner == 0.0) { retourLigne.qte_Demander } else { retourLigne.qte_Retourner }
-        
+
         // Update retour ligne
         val rowId = Retour_LigneOpenHelper.mettreAJourUnRetourLigne(db, retourLigne)
         if (rowId != -1L)
         {
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(this.db, Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE, retourLigne.phiMR4UUID, retourLigne._UID, DBOpenHelper.ActionsEAS.MAJ)
-            
+
             // Create action utilisateur ligne
             this.createActionUtilisateurLigne(actionUtilisateur, retourLigne)
             return true
         }
-        
+
         return false
     }
-    
+
     private fun createActionUtilisateurLigne(actionUtilisateur: ActionUtilisateur, retourLigne: Retour_Ligne)
     {
         val actionLigneId = generateNegativeRandomId()
         val actionLigne = ActionUtilisateur_Ligne(actionLigneId, actionUtilisateur.id, "Retour Ligne", retourLigne._UID, "", 0, retourLigne.qte_Retourner.toInt(), retourLigne.produit_Designation)
         ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(this.db, actionLigne)
     }
-    
+
     private fun updateRetourAfterValidation(retour: Retour)
     {
         val oldIntitule = retour.intitule
-        retour.intitule = oldIntitule.replace(getString(R.string.DestructionDemandee), getString(R.string.DestructionEffectuee))
-        retour.en_Attente_de = getString(R.string.DestructionEffectuee)
+        retour.intitule = oldIntitule.replace(getString(R.string.RetourFRSDemande), getString(R.string.RetourFRSEffectue))
+        retour.en_Attente_de = getString(R.string.RetourFRSEffectue)
         retour.commentaire = commentaire
-        
+
         val date = Date()
         @SuppressLint("SimpleDateFormat")
         val dateFormat = SimpleDateFormat("dd-MM-yyyy")
         retour.date_retour = dateFormat.format(date)
-        
+
         val rowId = RetourOpenHelper.mettreAJourRetour(this.db, retour)
         if (rowId != -1L) { ElementASynchroniserOpenHelper.ajouterElementASynchroniser(this.db, RetourOpenHelper.Constantes.TABLE_RETOUR, retour.phiMR4UUID, retour._UID, DBOpenHelper.ActionsEAS.MAJ) }
     }
-    
-    private fun finalizeDestruction(actionUtilisateur: ActionUtilisateur)
+
+    private fun finalizeRetourFournisseur(actionUtilisateur: ActionUtilisateur)
     {
         ElementASynchroniserOpenHelper.ajouterElementASynchroniser(this.db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, actionUtilisateur.phiMR4UUID, actionUtilisateur.id, DBOpenHelper.ActionsEAS.AJOUT)
-        
-        Toast.makeText(this, "Destruction confirmée", Toast.LENGTH_SHORT).show()
-        
+
+        Toast.makeText(this, "Retour fournisseur confirmé", Toast.LENGTH_SHORT).show()
+
         if (statutConnexion) { ElementASynchroniserOpenHelper.toutSynchroniser(this, this.db, this.utilisateurConnecte, true) }
 
-        this.navigateToServiceDestruction()
+        this.navigateToServiceRetourFournisseur()
     }
-    
-    private fun handleDestructionError()
+
+    private fun handleRetourFournisseurError()
     {
         Alerte.afficherAlerteInformation(this, this.layoutInflater, "Alerte", "une erreur est survenue, aucun traitement ne sera effectué", false, false)
         ElementASynchroniserOpenHelper.viderTableElementASynchroniser(this.db)
         finish()
     }
-    
-    private fun navigateToServiceDestruction()
+
+    private fun navigateToServiceRetourFournisseur()
     {
-        val intent = Intent(this, ServiceDestructionActivity::class.java)
+        val intent = Intent(this, ServiceRetourFournisseurActivity::class.java)
         intent.putExtras(super.getBundle())
         this.startActivity(intent)
         this.finish()
@@ -305,16 +304,16 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
     {
         this.scannerContainer = this.findViewById<FragmentContainerView?>(R.id.scannerContainer)
         this.rechercheContainer = this.findViewById<FragmentContainerView?>(R.id.rechercheContainer)
-        this.referenceADetruireContainer = this.findViewById<FragmentContainerView?>(R.id.referenceADetruireContainer)
+        this.referenceARetournerFournisseurContainer = this.findViewById<FragmentContainerView?>(R.id.referenceARetournerFournisseurContainer)
         this.detailContainer = this.findViewById<FragmentContainerView?>(R.id.detailContainer)
 
         this.listViewRetourLignes = this.findViewById<ListView?>(R.id.listeView)
 
         this.lancerScan = this.findViewById<LinearLayout?>(R.id.lancerScan)
         this.lancerRecherhe = this.findViewById<LinearLayout?>(R.id.lancerRecherhe)
-        this.aDetruire_LL = this.findViewById<LinearLayout?>(R.id.aDetruire_LL)
-        this.btnValiderDestruction_LL = this.findViewById<LinearLayout?>(R.id.btnValiderDestruction_LL)
-        this.btnValiderDestruction_CV = this.findViewById<CardView?>(R.id.btnValiderDestruction_CV)
+        this.aRetournerFournisseur_LL = this.findViewById<LinearLayout?>(R.id.aRetournerFournisseur_LL)
+        this.btnValiderRetourFournisseur_LL = this.findViewById<LinearLayout?>(R.id.btnValiderRetourFournisseur_LL)
+        this.btnValiderRetourFournisseur_CV = this.findViewById<CardView?>(R.id.btnValiderRetourFournisseur_CV)
         this.textChercher_TV = this.findViewById<TextView?>(R.id.textChercher_TV)
         this.searchInput_ET = this.findViewById<EditText?>(R.id.searchInput_ET)
         this.effacerRecherche_IV = this.findViewById<ImageView?>(R.id.effacerRecherche_IV)
@@ -327,10 +326,10 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
         this.setupScannerClickListener()
         this.setupSearchClickListener()
         this.setupClearSearchClickListener()
-        this.setupADetruireClickListener()
+        this.setupARetournerFournisseurClickListener()
         this.setupActionButtonClickListener()
     }
-    
+
     private fun setupScannerClickListener()
     {
         this.lancerScan?.setOnClickListener {
@@ -342,7 +341,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
             }
         }
     }
-    
+
     private fun setupSearchClickListener()
     {
         this.lancerRecherhe?.setOnClickListener {
@@ -354,7 +353,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
             }
         }
     }
-    
+
     private fun setupClearSearchClickListener()
     {
         this.effacerRecherche_IV?.setOnClickListener {
@@ -362,10 +361,10 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
             this.closeSearch()
         }
     }
-    
-    private fun setupADetruireClickListener()
+
+    private fun setupARetournerFournisseurClickListener()
     {
-        this.aDetruire_LL?.setOnClickListener {
+        this.aRetournerFournisseur_LL?.setOnClickListener {
             if (this.isACompterOpen) this.closeACompter()
             else
             {
@@ -375,7 +374,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
         }
     }
 
-    private fun setupActionButtonClickListener() { this.actionButton?.setOnClickListener { Alerte.afficherAlerteSaisieText(this, this.layoutInflater, "Validation destruction", "Souhaitez-vous valider la destruction ?", "Ajouter un commentaire...") } }
+    private fun setupActionButtonClickListener() { this.actionButton?.setOnClickListener { Alerte.afficherAlerteSaisieText(this, this.layoutInflater, "Validation retour fournisseur", "Souhaitez-vous valider le retour fournisseur ?", "Ajouter un commentaire...") } }
 
     private fun createScannerFragment(): Fragment
     {
@@ -386,12 +385,12 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
             else -> ScannerInputFragment()
         }
     }
-    
+
     private fun isProfessionalScanner(): Boolean
     {
         val manufacturer = Build.MANUFACTURER.uppercase()
         val model = Build.MODEL.uppercase()
-        
+
         return manufacturer.contains("ZEBRA") ||
                 manufacturer.contains("HONEYWELL") ||
                 model.contains("TC") || // Zebra TC series
@@ -400,7 +399,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
                 model.contains("CT") || // Honeywell CT series
                 model.contains("CN")  // Honeywell CN series
     }
-    
+
     private fun hasCamera(): Boolean { return this.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY) }
 
 
@@ -415,7 +414,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
 
         this.isScannerOpen = true
     }
-    
+
     private fun animateContainerOpen(container: FragmentContainerView, heightDp: Int)
     {
         container.apply {
@@ -428,7 +427,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
             this.animate().translationY(0f).setDuration(ANIMATION_DURATION_MS.toLong()).start()
         }
     }
-    
+
     private fun setupScannerFragmentCallbacks(fragment: Fragment)
     {
         when (fragment)
@@ -445,7 +444,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
 
         (fragment as ScanDebounce).setScanDebounce(750L)
     }
-    
+
     private fun replaceFragment(containerId: Int, fragment: Fragment) { this.supportFragmentManager.beginTransaction().replace(containerId, fragment).commit() }
 
     private fun closeScanner()
@@ -459,7 +458,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
 
         this.isScannerOpen = false
     }
-    
+
     private fun animateContainerClose(container: FragmentContainerView, onComplete: () -> Unit)
     {
         container.animate().translationY(-container.height.toFloat()).setDuration(ANIMATION_DURATION_MS.toLong()).withEndAction {
@@ -468,7 +467,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
             onComplete()
         }.start()
     }
-    
+
     private fun removeFragment(fragment: Fragment?) { fragment?.let { frag -> this.supportFragmentManager.beginTransaction().remove(frag).commit() } }
 
     internal fun openSearch()
@@ -514,10 +513,10 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
                 val query = s.toString().trim()
                 if (query.isNotEmpty())
                 {
-                    this@DetailDestructionActivity.openSearch()
-                    this@DetailDestructionActivity.rechercheFragment?.lancerRecherche(query, "destruction", (this@DetailDestructionActivity.retourSelectionne ?: return)._UID.toString())
+                    this@DetailRetourFournisseurActivity.openSearch()
+                    this@DetailRetourFournisseurActivity.rechercheFragment?.lancerRecherche(query, "retourFournisseur", (this@DetailRetourFournisseurActivity.retourSelectionne ?: return)._UID.toString())
                 }
-                else { this@DetailDestructionActivity.rechercheFragment?.viderListe() }
+                else { this@DetailRetourFournisseurActivity.rechercheFragment?.viderListe() }
             }
         })
     }
@@ -552,7 +551,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
 
     private fun openACompter()
     {
-        this.referenceADetruireContainer.apply {
+        this.referenceARetournerFournisseurContainer.apply {
             (this ?: return@apply).layoutParams = (this.layoutParams as LinearLayout.LayoutParams).also {
                 it.height = LinearLayout.LayoutParams.WRAP_CONTENT
                 it.weight = 0f
@@ -562,19 +561,19 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
             this.animate().translationY(0f).setDuration(300).start()
         }
 
-        val frag = ADetruireFragment.newInstance(this.listRetourLignes as ArrayList<Retour_Ligne>).also { aDetruireFragment = it }
-        this.supportFragmentManager.beginTransaction().replace(R.id.referenceADetruireContainer, frag).commitNow()
+        val frag = ARetournerFournisseurFragment.newInstance(this.listRetourLignes as ArrayList<Retour_Ligne>).also { aRetournerFournisseurFragment = it }
+        this.supportFragmentManager.beginTransaction().replace(R.id.referenceARetournerFournisseurContainer, frag).commitNow()
 
         this.isACompterOpen = true
     }
 
     private fun closeACompter()
     {
-        (this.referenceADetruireContainer ?: return).animate().translationY(-(this.referenceADetruireContainer ?: return).height.toFloat()).setDuration(300).withEndAction {
-            (this.referenceADetruireContainer ?: return@withEndAction).visibility = View.GONE
-            (this.referenceADetruireContainer ?: return@withEndAction).layoutParams = ((this.referenceADetruireContainer ?: return@withEndAction).layoutParams as LinearLayout.LayoutParams).also { it.height = 0 }
-            this.aDetruireFragment?.let { frag -> supportFragmentManager.beginTransaction().remove(frag).commit() }
-            this.aDetruireFragment = null
+        (this.referenceARetournerFournisseurContainer ?: return).animate().translationY(-(this.referenceARetournerFournisseurContainer ?: return).height.toFloat()).setDuration(300).withEndAction {
+            (this.referenceARetournerFournisseurContainer ?: return@withEndAction).visibility = View.GONE
+            (this.referenceARetournerFournisseurContainer ?: return@withEndAction).layoutParams = ((this.referenceARetournerFournisseurContainer ?: return@withEndAction).layoutParams as LinearLayout.LayoutParams).also { it.height = 0 }
+            this.aRetournerFournisseurFragment?.let { frag -> supportFragmentManager.beginTransaction().remove(frag).commit() }
+            this.aRetournerFournisseurFragment = null
         }.start()
 
         this.isACompterOpen = false
@@ -615,11 +614,11 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
         val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed()
             {
-                val detailDestructionIntent = Intent(this@DetailDestructionActivity, ServiceDestructionActivity::class.java)
-                val detailDestructionBundle = super@DetailDestructionActivity.getBundle()
-                detailDestructionIntent.putExtras(detailDestructionBundle)
-                this@DetailDestructionActivity.startActivity(detailDestructionIntent)
-                this@DetailDestructionActivity.finish()
+                val detailRetourFournisseurIntent = Intent(this@DetailRetourFournisseurActivity, ServiceRetourFournisseurActivity::class.java)
+                val detailRetourFournisseurBundle = super@DetailRetourFournisseurActivity.getBundle()
+                detailRetourFournisseurIntent.putExtras(detailRetourFournisseurBundle)
+                this@DetailRetourFournisseurActivity.startActivity(detailRetourFournisseurIntent)
+                this@DetailRetourFournisseurActivity.finish()
             }
         }
         this.onBackPressedDispatcher.addCallback(this, callback)

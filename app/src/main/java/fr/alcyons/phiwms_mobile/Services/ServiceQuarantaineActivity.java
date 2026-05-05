@@ -19,8 +19,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -44,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerDocumentActivity;
 
@@ -60,7 +57,7 @@ import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.SYS_User_Rules;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourDestructionAdapter;
 
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
@@ -73,7 +70,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
     PackageManager pm;
     List<Retour> retourList;
     ListView retourListView;
-    RetourAdapter retourAdapter;
+    RetourDestructionAdapter retourDestructionAdapter;
     JSONArray retourJSONArray;
     Context context;
     boolean connexionDirecte;
@@ -98,7 +95,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
         // Gestion de la listView
         retourListView = findViewById(R.id.listeView);
         retourListView.setOnItemClickListener((parent, view, position, id) -> {
-            retourSelectionne = (Retour) retourAdapter.getItem(position);
+            retourSelectionne = (Retour) retourDestructionAdapter.getItem(position);
 
             Intent serviceQuarantaineIntent = new Intent(ServiceQuarantaineActivity.this, DetailQuarantaineActivity.class);
             Bundle serviceQuarantaineBundle = ServiceQuarantaineActivity.super.getBundle();
@@ -132,10 +129,10 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
 
                                     ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                                     retourList.sort(Comparator.comparing(Retour::getDate_retour));
-                                    retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
+                                    retourDestructionAdapter = new RetourDestructionAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
                                     //retourListView.setDivider(footer);
 
-                                    retourListView.setAdapter(retourAdapter);
+                                    retourListView.setAdapter(retourDestructionAdapter);
                                     if (retourList.isEmpty()) {
                                         vide = true;
                                         nomServiceVide = "Quarantaine";
@@ -158,10 +155,10 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
 
                                 ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                                 retourList.sort(Comparator.comparing(Retour::getDate_retour));
-                                retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
+                                retourDestructionAdapter = new RetourDestructionAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
                                 //retourListView.setDivider(footer);
 
-                                retourListView.setAdapter(retourAdapter);
+                                retourListView.setAdapter(retourDestructionAdapter);
                                 if (retourList.isEmpty()) {
                                     vide = true;
                                     nomServiceVide = "Quarantaine";
@@ -171,10 +168,10 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                         } else {
                             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
                             retourList.sort(Comparator.comparing(Retour::getDate_retour));
-                            retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
+                            retourDestructionAdapter = new RetourDestructionAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
                             //retourListView.setDivider(footer);
 
-                            retourListView.setAdapter(retourAdapter);
+                            retourListView.setAdapter(retourDestructionAdapter);
                             if (retourList.isEmpty()) {
                                 vide = true;
                                 nomServiceVide = "Quarantaine";
@@ -323,10 +320,10 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                             } else {
                                 if (passageParOnCreate) {
                                     retourList.sort(Comparator.comparing(Retour::getDate_retour));
-                                    retourAdapter = new RetourAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
+                                    retourDestructionAdapter = new RetourDestructionAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
                                     //retourListView.setDivider(footer);
 
-                                    retourListView.setAdapter(retourAdapter);
+                                    retourListView.setAdapter(retourDestructionAdapter);
                                     new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
                                 }
                                 passageParOnCreate = false;
@@ -370,7 +367,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
     }
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        super.prepareOptionsMenu(menu, retourAdapter, null, "Produit, Intitulé, N°...");
+        super.prepareOptionsMenu(menu, retourDestructionAdapter, null, "Produit, Intitulé, N°...");
         MenuItem item = menu.findItem(R.id.menuDatamatrix);
         item.setOnMenuItemClickListener(item1 -> {
             lancerScan();

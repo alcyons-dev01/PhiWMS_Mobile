@@ -85,7 +85,7 @@ public class Retour_Ligne_DestructionAdapter extends ArrayAdapter
             if (10 <= retour_LigneCourant.getPeremptionDate().length() && !retour_LigneCourant.getPeremptionDate().contentEquals("0000-00-00"))
             {
                 date = dateDecodeur.parse(retour_LigneCourant.getPeremptionDate().substring(0, 10));
-                final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                final DateFormat dateFormat = new SimpleDateFormat("MM/yy");
                 assert null != date;
                 dateAAfficher = dateFormat.format(date);
             }

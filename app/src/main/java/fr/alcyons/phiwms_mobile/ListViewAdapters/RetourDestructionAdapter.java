@@ -22,7 +22,7 @@ import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.R;
 
-public class RetourAdapter extends ArrayAdapter implements Filterable {
+public class RetourDestructionAdapter extends ArrayAdapter implements Filterable {
 
     public List<Retour> retourList;
     public List<Retour> retourDeBaseList;
@@ -31,7 +31,7 @@ public class RetourAdapter extends ArrayAdapter implements Filterable {
     SQLiteDatabase db;
     RetourFilter filter;
     Utilisateur utilisateur;
-    public RetourAdapter(Context context, SQLiteDatabase database, List<Retour> retourList, Utilisateur utilisateur) {
+    public RetourDestructionAdapter(Context context, SQLiteDatabase database, List<Retour> retourList, Utilisateur utilisateur) {
         super(context, 0, retourList);
         this.context = context;
         this.db = database;
@@ -82,7 +82,7 @@ public class RetourAdapter extends ArrayAdapter implements Filterable {
             int size = retourLigneList.size();
 
             String[] intitule_tab = retour.getIntitule().split(":");
-            String intitule_split = intitule_tab[intitule_tab.length-1];
+            String intitule_split = intitule_tab[intitule_tab.length-1].trim();
             String depot_origine = intitule_tab[0];
 
             viewHolder.sommeProduit.setText(String.valueOf(size));

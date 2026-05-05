@@ -18,12 +18,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
@@ -45,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerDocumentActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
@@ -63,7 +57,7 @@ import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.ControleDesRetours.DetailControleDesRetoursActivity;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourDestructionAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
@@ -72,7 +66,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
     Context context;
     List<Retour> retourList;
     ListView retourListView;
-    RetourAdapter retourAdapter;
+    RetourDestructionAdapter retourDestructionAdapter;
     PackageManager pm;
     boolean connexionDirecte;
     ActivityResultLauncher<Intent> resultScanDocument;
@@ -88,7 +82,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         // Initialisation de la liste et de l'action sur l'un de ses items
         retourListView = findViewById(R.id.listeView);
         retourListView.setOnItemClickListener((parent, view, position, id) -> {
-            Retour retourSelectionne = (Retour) retourAdapter.getItem(position);
+            Retour retourSelectionne = (Retour) retourDestructionAdapter.getItem(position);
 
             Bundle serviceControleRetours_Bundle = ServiceControleRetoursActivity.super.getBundle();
             assert retourSelectionne != null;
@@ -114,10 +108,10 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                                 if (retourSelectionne == null) {
                                     afficherSnackBarControleDesRetours();
                                     /* Code nécessaire à l'affichage de la liste */
-                                    retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
+                                    retourDestructionAdapter = new RetourDestructionAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
                                     // Permet d'enlever le séparateur entre deux éléments d'une listeView
                                     retourListView.setDivider(footer);
-                                    retourListView.setAdapter(retourAdapter);
+                                    retourListView.setAdapter(retourDestructionAdapter);
 
                                     if (retourList.isEmpty()) {
                                         vide = true;
@@ -139,10 +133,10 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                                 }
                             } else {
                                 /* Code nécessaire à l'affichage de la liste */
-                                retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
+                                retourDestructionAdapter = new RetourDestructionAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
                                 // Permet d'enlever le séparateur entre deux éléments d'une listeView
                                 retourListView.setDivider(footer);
-                                retourListView.setAdapter(retourAdapter);
+                                retourListView.setAdapter(retourDestructionAdapter);
 
                                 if (retourList.isEmpty()) {
                                     vide = true;
@@ -156,10 +150,10 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                             }
                         } else {
                             /* Code nécessaire à l'affichage de la liste */
-                            retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
+                            retourDestructionAdapter = new RetourDestructionAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
                             // Permet d'enlever le séparateur entre deux éléments d'une listeView
                             retourListView.setDivider(footer);
-                            retourListView.setAdapter(retourAdapter);
+                            retourListView.setAdapter(retourDestructionAdapter);
 
                             if (retourList.isEmpty()) {
                                 vide = true;
@@ -217,10 +211,10 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                 if(connexionDirecte)
                 {
                     /* Code nécessaire à l'affichage de la liste */
-                    retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
+                    retourDestructionAdapter = new RetourDestructionAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
                     // Permet d'enlever le séparateur entre deux éléments d'une listeView
                     retourListView.setDivider(footer);
-                    retourListView.setAdapter(retourAdapter);
+                    retourListView.setAdapter(retourDestructionAdapter);
 
                     if (retourList.isEmpty()) {
                         vide = true;
@@ -301,10 +295,10 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
 
                             //lancerScan();
                             /* Code nécessaire à l'affichage de la liste */
-                            retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
+                            retourDestructionAdapter = new RetourDestructionAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
                             // Permet d'enlever le séparateur entre deux éléments d'une listeView
                             retourListView.setDivider(footer);
-                            retourListView.setAdapter(retourAdapter);
+                            retourListView.setAdapter(retourDestructionAdapter);
 
                             if (retourList.isEmpty()) {
                                 vide = true;
@@ -341,7 +335,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
     }
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        super.prepareOptionsMenu(menu, retourAdapter, null, "Produit, Intitulé, N°...");
+        super.prepareOptionsMenu(menu, retourDestructionAdapter, null, "Produit, Intitulé, N°...");
         MenuItem item = menu.findItem(R.id.menuDatamatrix);
         item.setOnMenuItemClickListener(item1 -> {
             lancerScan();
@@ -417,27 +411,27 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
     {
         retourList.sort(Comparator.comparing(Retour::getNumero));
 
-        retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
+        retourDestructionAdapter = new RetourDestructionAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
         retourListView.setDivider(footer);
-        retourListView.setAdapter(retourAdapter);
+        retourListView.setAdapter(retourDestructionAdapter);
     }
 
     public void onClickTriDate()
     {
         retourList.sort((o1, o2) -> o1.getDate_retour().compareTo(o2.getDate_retour()));
 
-        retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
+        retourDestructionAdapter = new RetourDestructionAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
         retourListView.setDivider(footer);
-        retourListView.setAdapter(retourAdapter);
+        retourListView.setAdapter(retourDestructionAdapter);
     }
 
     public void onClickTriDepot()
     {
         retourList.sort(Comparator.comparing(Retour::getRef_Depot_Origine));
 
-        retourAdapter = new RetourAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
+        retourDestructionAdapter = new RetourDestructionAdapter(ServiceControleRetoursActivity.this, db, retourList, utilisateurConnecte);
         retourListView.setDivider(footer);
-        retourListView.setAdapter(retourAdapter);
+        retourListView.setAdapter(retourDestructionAdapter);
     }
 
     public void afficherSnackBarControleDesRetours() {

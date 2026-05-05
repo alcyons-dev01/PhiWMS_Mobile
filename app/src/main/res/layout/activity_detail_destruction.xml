@@ -274,7 +274,7 @@
                             android:orientation="horizontal"
                             android:gravity="center_vertical"
                             android:padding="14dp"
-                            android:background="@color/rouge">
+                            android:background="#C62828">
 
                             <TextView
                                 android:layout_width="0dp"
@@ -330,7 +330,7 @@
         </androidx.core.widget.NestedScrollView>
 
         <!-- Bouton toujours visible en bas -->
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/boutonAction"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -338,7 +338,7 @@
             android:text="Confirmer la destruction"
             android:textColor="@color/blanc"
             android:layout_margin="10dp"
-            android:background="@drawable/background_plein_bleu_radius"
+            android:background="@drawable/background_plein_vert_fonce_radius"
             android:visibility="visible"/>
 
     </RelativeLayout>

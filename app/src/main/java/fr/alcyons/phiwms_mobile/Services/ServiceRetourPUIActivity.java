@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerDocumentActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
@@ -52,7 +51,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourDestructionAdapter;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
@@ -63,7 +62,7 @@ import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
     List<Retour> retourList;
     ListView retourListView;
-    RetourAdapter adapter;
+    RetourDestructionAdapter adapter;
     PackageManager pm;
     JSONArray retourJSONArray;
     NavigationActivity navigationActivity;
@@ -112,7 +111,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                                         afficherSnackBarRetourPUI();
                                     }
                                     /* Code nécessaire à l'affichage de la liste */
-                                    adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
+                                    adapter = new RetourDestructionAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
                                     retourListView.setAdapter(adapter);
 
                                     if (retourList.isEmpty()) {
@@ -132,7 +131,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                                     ServiceRetourPUIActivity.this.finish();
                                 }
                             } else {
-                                adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
+                                adapter = new RetourDestructionAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
                                 retourListView.setAdapter(adapter);
 
                                 if (retourList.isEmpty()) {
@@ -147,7 +146,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                         } else {
                             /* Code nécessaire à l'affichage de la liste */
                             ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                            adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
+                            adapter = new RetourDestructionAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
                             retourListView.setAdapter(adapter);
 
                             if (retourList.isEmpty()) {
@@ -221,7 +220,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                 if(connexionDirecte)
                 {
                     /* Code nécessaire à l'affichage de la liste */
-                    adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
+                    adapter = new RetourDestructionAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
                     retourListView.setAdapter(adapter);
 
                     if (retourList.isEmpty()) {
@@ -290,7 +289,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                             }
                             else
                             {
-                                adapter = new RetourAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
+                                adapter = new RetourDestructionAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
                                 retourListView.setAdapter(adapter);
                                 new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
                                 passageParOnCreate = false;

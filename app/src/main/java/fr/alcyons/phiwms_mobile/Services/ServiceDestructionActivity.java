@@ -47,17 +47,15 @@ import java.util.Objects;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerDocumentActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
-import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.Destruction.DetailDestructionActivity;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourDestructionAdapter;
 import fr.alcyons.phiwms_mobile.MainActivity;
 import fr.alcyons.phiwms_mobile.MenuActivity;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
@@ -77,7 +75,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
     private boolean connexionDirecte = false;
 
     // UI
-    private RetourAdapter adapter = null;
+    private RetourDestructionAdapter adapter = null;
     private ListView listViewRetours = null;
     private List<String> listeDepotLivraison;
     private ArrayAdapter<String> autoCompleteAdapter;
@@ -383,7 +381,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
 
     private void configureAdapter()
     {
-        this.adapter = new RetourAdapter(ServiceDestructionActivity.this, this.db, this.retours, this.utilisateurConnecte);
+        this.adapter = new RetourDestructionAdapter(ServiceDestructionActivity.this, this.db, this.retours, this.utilisateurConnecte);
         this.listViewRetours.setAdapter(this.adapter);
     }
 

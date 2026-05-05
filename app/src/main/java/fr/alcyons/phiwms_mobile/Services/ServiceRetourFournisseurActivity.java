@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import com.google.android.material.snackbar.Snackbar;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
@@ -15,7 +14,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -23,6 +23,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -30,6 +31,8 @@ import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,7 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerDocumentActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
@@ -52,7 +54,9 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourFournisseurAdapter;
+import fr.alcyons.phiwms_mobile.MainActivity;
+import fr.alcyons.phiwms_mobile.MenuActivity;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
@@ -60,328 +64,433 @@ import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.RetourFournisseur.DetailRetourFournisseurActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
-public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivity {
-    List<Retour> listeRetours;
-    ListView listViewRetours;
-    RetourAdapter adapter;
-    PackageManager pm;
-    JSONArray retoursJson;
-    boolean connexionDirecte;
-    ActivityResultLauncher<Intent> resultScanDocument;
+public class ServiceRetourFournisseurActivity extends ServiceAvecConnexionActivity
+{
+    private static final String SERVICE_NAME = "Retour fournisseur";
+
+    // OTHERS
+    private List<Retour> retours = null;
+    private PackageManager packageManager = null;
+    private ActivityResultLauncher<Intent> scanDocumentLauncher = null;
+    private boolean connexionDirecte = false;
+
+    // UI
+    private RetourFournisseurAdapter adapter = null;
+    private ListView listViewRetours = null;
+    private List<String> listeDepotLivraison;
+    private ArrayAdapter<String> autoCompleteAdapter;
+    private AutoCompleteTextView autoComplete;
+    private List<Retour> retours_base;
+
     @SuppressLint("SetTextI18n")
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    @Override protected void onCreate(final Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_liste_refresh);
+        this.setContentView(R.layout.activity_liste_refresh);
 
-        // Modification du titre
-        pm = ServiceRetourFournisseurActivity.this.getPackageManager();
-        listViewRetours = findViewById(R.id.listeView);
-        listViewRetours.setOnItemClickListener((parent, view, position, id) -> {
-            Retour retourSelectionne = (Retour) adapter.getItem(position);
+        this.packageManager = this.getPackageManager();
 
-            Intent newIntent = new Intent(ServiceRetourFournisseurActivity.this, DetailRetourFournisseurActivity.class);
-            Bundle extras = ServiceRetourFournisseurActivity.super.getBundle();
-            assert retourSelectionne != null;
-            extras.putInt("retourSelectionneID", retourSelectionne.get_UID());
-
-            newIntent.putExtras(extras);
-            ServiceRetourFournisseurActivity.this.startActivity(newIntent);
-            ServiceRetourFournisseurActivity.this.finish();
+        // Gestion de la listView
+        this.listViewRetours = this.findViewById(R.id.listeView);
+        this.listViewRetours.setOnItemClickListener((parent, view, position, id) -> {
+            final Retour retourSelectionne = (Retour) this.adapter.getItem(position);
+            assert null != retourSelectionne;
+            this.openRetourDetail(retourSelectionne);
         });
 
+        this.connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(this.db).booleanValue();
 
-        connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(db);
+        this.scanDocumentLauncher = this.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            final Intent data = result.getData();
+            if (CodesEchangesActivites.RESULT_OK == result.getResultCode()) { this.handleDocumentScanResult(data); }
+        });
 
-        resultScanDocument = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    Intent data = result.getData();
-                    if (result.getResultCode() == CodesEchangesActivites.RESULT_OK) {
-                        if (data != null) {
-                            String code = Objects.requireNonNull(data.getExtras()).getString("code");
-                            if (code != null) {
-                                Retour retourSelectionne = RetourOpenHelper.getRetourByNumero(db, code);
-                                if (retourSelectionne == null) {
-                                    if (!code.contentEquals("")) {
-                                        afficherSnackBarRetourFournisseur();
-                                    }
-                                    /* Code nécessaire à l'affichage de la liste */
-                                    adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
-                                    
-                                    listViewRetours.setAdapter(adapter);
-
-                                    if (listeRetours.isEmpty()) {
-                                        vide = true;
-                                        nomServiceVide = "Retour fournisseur";
-                                        ServiceRetourFournisseurActivity.this.finish();
-                                    }
-                                    invalidateOptionsMenu();
-                                } else {
-                                    Intent newIntent = new Intent(ServiceRetourFournisseurActivity.this, DetailRetourFournisseurActivity.class);
-                                    Bundle extras = ServiceRetourFournisseurActivity.super.getBundle();
-                                    extras.putInt("retourSelectionneID", retourSelectionne.get_UID());
-
-                                    newIntent.putExtras(extras);
-                                    ServiceRetourFournisseurActivity.this.startActivity(newIntent);
-                                    ServiceRetourFournisseurActivity.this.finish();
-                                }
-                            } else {
-                                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
-                                adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
-                                
-                                listViewRetours.setAdapter(adapter);
-
-                                if (listeRetours.isEmpty()) {
-                                    vide = true;
-                                    nomServiceVide = "Retour fournisseur";
-                                    ServiceRetourFournisseurActivity.this.finish();
-                                }
-
-                                invalidateOptionsMenu();
-                            }
-                        } else {
-                            /* Code nécessaire à l'affichage de la liste */
-                            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listeRetours.size()));
-                            adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
-                            
-                            listViewRetours.setAdapter(adapter);
-
-                            if (listeRetours.isEmpty()) {
-                                vide = true;
-                                nomServiceVide = "Retour fournisseur";
-                                ServiceRetourFournisseurActivity.this.finish();
-                            }
-
-                            invalidateOptionsMenu();
-                        }
-                    }
-                });
-
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                Intent intent = new Intent(ServiceRetourFournisseurActivity.this, NavigationActivity.class);
-                Bundle extras = new Bundle();
-                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+        this.getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true)
+        {
+            @Override public void handleOnBackPressed()
+            {
+                final Intent intent = new Intent(ServiceRetourFournisseurActivity.this, NavigationActivity.class);
+                final Bundle extras = new Bundle();
+                extras.putInt("utilisateurConnecteID", ServiceRetourFournisseurActivity.this.utilisateurConnecte.getId());
                 intent.putExtras(extras);
                 ServiceRetourFournisseurActivity.this.startActivity(intent);
                 ServiceRetourFournisseurActivity.this.finish();
             }
         });
     }
-    @Override
-    public void onResume() {
+
+    @Override public void onResume()
+    {
         super.onResume();
+        this.connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(this.db).booleanValue();
+        this.refreshRetours();
+        this.invalidateOptionsMenu();
+    }
 
-        /* Code nécessaire afin de réaliser une requête à l' API */
-        if (statutConnexion && passageParOnCreate && !connexionDirecte) {
-            if (!swipeRefreshLayout.isRefreshing()) {
-                afficherSpinner(ServiceRetourFournisseurActivity.this,  LayoutInflater.from(ServiceRetourFournisseurActivity.this));;
-            }
-     
-            RequestQueue requestQueueRetourFournisseur = Volley.newRequestQueue(ServiceRetourFournisseurActivity.this);
+    private void refreshRetours()
+    {
+        if (this.shouldLoadFromServer())
+        {
+            this.loadRetoursFromServer();
+            return;
+        }
 
-            listeRetours = new ArrayList<>();
-            String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteRetourFournisseur;
+        this.loadRetoursFromLocalDatabase();
+    }
 
-            JsonObjectRequest obreq = getJsonObjectRequest(urlRequete);
-            requestQueueRetourFournisseur.add(obreq);
-        } else {
-            listeRetours = RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(db, getString(R.string.statutEncours), getString(R.string.RetourFRSDemande));
-            if (listeRetours.isEmpty()) {
-                if(connexionDirecte)
+    private boolean shouldLoadFromServer() { return MainActivity.statutConnexion && this.passageParOnCreate && !this.connexionDirecte; }
+
+    private void loadRetoursFromServer()
+    {
+        this.showSpinnerIfNeeded();
+        this.retours = new ArrayList<>();
+        this.retours_base = new ArrayList<>();
+        this.listeDepotLivraison = new ArrayList<>();
+        this.listeDepotLivraison.add("Tous");
+
+        final RequestQueue requestQueueRetourFournisseurUtilisateur = Volley.newRequestQueue(ServiceRetourFournisseurActivity.this);
+        final String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(this.db) + DBOpenHelper.Urls.uriRequeteRetourFournisseur;
+        final JsonObjectRequest obreq = this.getJsonObjectRequest(urlRequete);
+        requestQueueRetourFournisseurUtilisateur.add(obreq);
+    }
+
+    private void showSpinnerIfNeeded() { if (!this.swipeRefreshLayout.isRefreshing()) { this.afficherSpinner(ServiceRetourFournisseurActivity.this, LayoutInflater.from(ServiceRetourFournisseurActivity.this)); } }
+
+    private void loadRetoursFromLocalDatabase()
+    {
+        this.retours = RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(this.db, this.getString(R.string.statutEncours), this.getString(R.string.RetourFRSDemande));
+        this.retours_base = new ArrayList<>(this.retours);
+
+        for (int i = 0; i < this.retours_base.size(); i++) { final Retour retour = this.retours_base.get(i); }
+        this.listeDepotLivraison = new ArrayList<>();
+        this.listeDepotLivraison.add("Tous");
+
+        // Populate depot list from local retours
+        for (final Retour retour : this.retours_base)
+        {
+            String depot_origine = retour.getRef_Depot_Dest();
+            if(retour.getRef_Depot_Origine().contains("-PAD-") && this.utilisateurConnecte.getIdentifiant().toLowerCase().contains("alcyons")) { depot_origine = "XXX-PAD-XXX"; }
+            if (!this.listeDepotLivraison.contains(depot_origine)) { this.listeDepotLivraison.add(depot_origine); }
+        }
+
+        if (this.retours.isEmpty())
+        {
+            this.handleNoLocalRetours();
+            return;
+        }
+
+        this.handleAvailableLocalRetours();
+        this.initializeAutoComplete();
+    }
+
+    private void initializeAutoComplete()
+    {
+        this.autoComplete = this.findViewById(R.id.listeFiltre);
+
+        // Sort the list but keep "Tous" at the first position
+        this.listeDepotLivraison.sort((a, b) -> {
+            if (a.equals("Tous")) return -1;
+            if (b.equals("Tous")) return 1;
+            return a.compareTo(b);
+        });
+
+        this.autoCompleteAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_depot, this.listeDepotLivraison);
+        this.autoComplete.setAdapter(this.autoCompleteAdapter);
+        this.autoComplete.setThreshold(100);
+
+        if (!this.listeDepotLivraison.isEmpty()) { this.autoComplete.setText(this.listeDepotLivraison.get(0), false); }
+
+        final int hauteurEcran = this.getResources().getDisplayMetrics().heightPixels;
+        this.autoComplete.setDropDownHeight(hauteurEcran / 3);
+        this.autoComplete.setDropDownBackgroundResource(android.R.color.white);
+
+        this.autoComplete.post(() -> {
+            final int dpToPx = (int) (12.0F * this.getResources().getDisplayMetrics().density);
+            this.autoComplete.setDropDownWidth(findViewById(R.id.listeFiltre_LL).getWidth() - dpToPx);
+        });
+
+        this.autoComplete.setOnClickListener(v -> this.autoComplete.showDropDown());
+
+        this.findViewById(R.id.chevronFiltre).setOnClickListener(v -> this.autoComplete.showDropDown());
+
+        this.autoComplete.setOnItemClickListener((parent, view, position, id) -> {
+            final String depotNom = this.listeDepotLivraison.get(position);
+            this.autoComplete.setText(depotNom, false);
+            this.autoComplete.dismissDropDown();
+
+            this.retours = new ArrayList<>();
+
+            if (depotNom.contentEquals("Tous")) { this.retours.addAll(this.retours_base); }
+            else
+            {
+                for (final Retour retour_courant : this.retours_base)
                 {
-                    Intent retourVersServiceConnexionDirectIntent = getRetourVersServiceConnexionDirectIntent();
-                    ServiceRetourFournisseurActivity.this.startActivity(retourVersServiceConnexionDirectIntent);
-                    ServiceRetourFournisseurActivity.this.finish();
+                    String depot_origine = retour_courant.getRef_Depot_Dest();
+                    if(retour_courant.getRef_Depot_Origine().contains("-PAD-") && this.utilisateurConnecte.getIdentifiant().toLowerCase().contains("alcyons")) { depot_origine = "XXX-PAD-XXX"; }
+
+                    if (depot_origine.contentEquals(depotNom)) { this.retours.add(retour_courant); }
+                }
+            }
+
+            this.configureAdapter();
+        });
+    }
+
+    private void handleNoLocalRetours()
+    {
+        if (this.connexionDirecte)
+        {
+            final Intent retourVersServiceConnexionDirectIntent = this.getBackToDirectConnectionServiceIntent();
+            ServiceRetourFournisseurActivity.this.startActivity(retourVersServiceConnexionDirectIntent);
+            ServiceRetourFournisseurActivity.this.finish();
+            return;
+        }
+
+        this.connexionNecessaire();
+    }
+
+    private void handleAvailableLocalRetours()
+    {
+        this.passageParOnCreate = false;
+
+        if (!this.connexionDirecte) { return; }
+
+        this.displayRetoursOrClose();
+        this.connexionDirecte = !this.connexionDirecte;
+    }
+
+    @NonNull private Intent getBackToDirectConnectionServiceIntent()
+    {
+        final Intent retourVersServiceConnexionDirectIntent = new Intent(ServiceRetourFournisseurActivity.this, ServiceConnexionDirecteActivity.class);
+        final Bundle retourVersServiceConnexionDirectBundle = new Bundle();
+        retourVersServiceConnexionDirectBundle.putInt("utilisateurConnecteID", this.utilisateurConnecte.getId());
+        retourVersServiceConnexionDirectBundle.putBoolean("snackBar", true);
+        retourVersServiceConnexionDirectBundle.putString("nomService", SERVICE_NAME);
+        retourVersServiceConnexionDirectIntent.putExtras(retourVersServiceConnexionDirectBundle);
+
+        return retourVersServiceConnexionDirectIntent;
+    }
+    @NonNull private JsonObjectRequest getJsonObjectRequest(final String urlRequete)
+    {
+        // Takes the response from the JSON request
+        final JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null, response -> {
+            try
+            {
+                final int nbResultat = response.getInt("resultCount");
+                if (0 == nbResultat)
+                {
+                    final String chaine = response.getString("erreur");
+                    if (chaine.equals(this.getString(R.string.tokenInvalide))) { Alerte.afficherAlerteInformation(ServiceRetourFournisseurActivity.this, this.getLayoutInflater(), "Alerte", "Votre session a expirée, veuillez vous reconnecter.", false, true); }
+                    else
+                    {
+                        this.arreterSpinner();
+                        this.markServiceAsEmpty();
+                        this.retourNavigation();
+                    }
                 }
                 else
                 {
-                    connexionNecessaire();
-                    return;
+                    this.clearConcernedTables();
+                    this.hydrateRetoursFromResponse(response.getJSONArray("PH_Retours"));
+                    this.displayRetoursOrClose();
+                    this.initializeAutoComplete();
+                    this.passageParOnCreate = false;
+
+                    new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500L);
                 }
             }
-            else
-            {
-                passageParOnCreate = false;
-                if(connexionDirecte)
-                {
-                    adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
-                    
-                    listViewRetours.setAdapter(adapter);
-
-                    if (listeRetours.isEmpty()) {
-                        vide = true;
-                        nomServiceVide = "Retour fournisseur";
-                        ServiceRetourFournisseurActivity.this.finish();
-                    }
-
-                    invalidateOptionsMenu();
-                    connexionDirecte = !connexionDirecte;
-                }
-            }
-        }
-
-        invalidateOptionsMenu();
-    }
-    @NonNull
-    private JsonObjectRequest getJsonObjectRequest(String urlRequete) {
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete, null,
-                response -> {
-                    try {
-                        int nbResultat = response.getInt("resultCount");
-                        if (nbResultat == 0) {
-                            String string = response.getString("erreur");
-                            if (string.equals(getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerteInformation(ServiceRetourFournisseurActivity.this, getLayoutInflater(), "Alerte", "Votre session a expirée, veuillez vous reconnecter.", false, true);
-                            } else {
-                                arreterSpinner();
-                                vide = true;
-                                nomServiceVide = "Retour fournisseur";
-                                retourNavigation();
-                            }
-                        } else {
-                            retoursJson = response.getJSONArray("PH_Retours");
-                            viderTablesConcernees();
-                            for (int i = 0; i < retoursJson.length(); i++) {
-                                JSONObject retourJson = retoursJson.getJSONObject(i);
-                                Retour retour = new Retour(retourJson);
-
-                                if (retour.getEn_Attente_de().equals(getString(R.string.RetourFRSDemande)) && retour.getStatut().equals(getString(R.string.statutEncours))) {
-                                    listeRetours.add(retour);
-                                    long rowID = RetourOpenHelper.insererUnRetourEnBDD(db, retour);
-                                    if (rowID != -1) {
-                                        JSONArray retourLignesJson = retourJson.getJSONArray("ph_retour_ligne");
-                                        for (int k = 0; k < retourLignesJson.length(); k++) {
-                                            Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(db, new Retour_Ligne(retourLignesJson.getJSONObject(k)));
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (listeRetours.isEmpty()) {
-                                vide = true;
-                                nomServiceVide = "Retour fournisseur";
-                                ServiceRetourFournisseurActivity.this.finish();
-                            }
-                            else
-                            {
-                                adapter = new RetourAdapter(ServiceRetourFournisseurActivity.this, db, listeRetours, utilisateurConnecte);
-                                
-                                listViewRetours.setAdapter(adapter);
-
-                                invalidateOptionsMenu();
-
-                                passageParOnCreate = false;
-                            }
-                            new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                },
+            catch (final JSONException e) { e.printStackTrace(); }
+        },
                 error -> {
                     Log.e("Volley", "Error");
-                    Alerte.afficherAlerteInformation(ServiceRetourFournisseurActivity.this, getLayoutInflater(), "Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Retour Fournisseur)", false, true);
-                }
-        ) {
+                    Alerte.afficherAlerteInformation(ServiceRetourFournisseurActivity.this, this.getLayoutInflater(),"Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Retour fournisseur)", false, true);
+                })
+        {
 
             /**
              * Passing some request headers
              */
-            @Override
-            public Map<String, String> getHeaders() {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", utilisateurConnecte.getToken());
+            @Override public Map<String, String> getHeaders()
+            {
+                final Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", ServiceRetourFournisseurActivity.this.utilisateurConnecte.getToken());
                 return headers;
             }
         };
+
+        obreq.setRetryPolicy(new RetryPolicy() {
+            @Override public int getCurrentTimeout() { return 50000; }
+            @Override public int getCurrentRetryCount() { return 50000; }
+            @Override public void retry(final VolleyError error) {}
+        });
+
         return obreq;
     }
-    @NonNull
-    private Intent getRetourVersServiceConnexionDirectIntent() {
-        Intent retourVersServiceConnexionDirectIntent = new Intent(ServiceRetourFournisseurActivity.this, ServiceConnexionDirecteActivity.class);
-        Bundle retourVersServiceConnexionDirectBundle = new Bundle();
-        retourVersServiceConnexionDirectBundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-        retourVersServiceConnexionDirectBundle.putBoolean("snackBar", true);
-        retourVersServiceConnexionDirectBundle.putString("nomService", "Retour fournisseur");
 
-        retourVersServiceConnexionDirectIntent.putExtras(retourVersServiceConnexionDirectBundle);
-        return retourVersServiceConnexionDirectIntent;
+    private void handleDocumentScanResult(final Intent data)
+    {
+        final String scannedCode = ServiceRetourFournisseurActivity.extractScannedCode(data);
+        if (null == scannedCode)
+        {
+            this.displayRetoursOrClose();
+            return;
+        }
+
+        final Retour retourSelectionne = RetourOpenHelper.getRetourByNumero(this.db, scannedCode);
+        if (null != retourSelectionne)
+        {
+            this.openRetourDetail(retourSelectionne);
+            return;
+        }
+
+        if (!scannedCode.isEmpty()) { this.showUnknownDocumentSnackbar(); }
+        this.displayRetoursOrClose();
     }
-    public void viderTablesConcernees() {
-        for (Retour retour : RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(db, getString(R.string.statutEncours), getString(R.string.RetourFRSDemande))
-                ) {
-            List<Retour_Ligne> retourLignes = Retour_LigneOpenHelper.getAllRetourLignesByRetour(db, retour);
-            for (Retour_Ligne retourLigne : retourLignes
-                    ) {
-                Retour_LigneOpenHelper.supprimerUnRetourLigne(db, retourLigne);
-            }
-            RetourOpenHelper.supprimerUnRetour(db, retour);
+
+    @Nullable private static String extractScannedCode(final Intent data)
+    {
+        if (null == data || null == data.getExtras()) { return null; }
+        return Objects.requireNonNull(data.getExtras()).getString("code");
+    }
+
+    private void openRetourDetail(@NonNull final Retour retour)
+    {
+        final Intent detailIntent = new Intent(ServiceRetourFournisseurActivity.this, DetailRetourFournisseurActivity.class);
+        final Bundle extras = ServiceRetourFournisseurActivity.super.getBundle();
+        extras.putInt("retourSelectionneID", retour.get_UID());
+        detailIntent.putExtras(extras);
+        this.startActivity(detailIntent);
+        this.finish();
+    }
+
+    private void displayRetoursOrClose()
+    {
+        this.configureAdapter();
+
+        if (this.retours.isEmpty())
+        {
+            this.markServiceAsEmpty();
+            this.finish();
+            return;
+        }
+
+        this.invalidateOptionsMenu();
+    }
+
+    private void configureAdapter()
+    {
+        this.adapter = new RetourFournisseurAdapter(ServiceRetourFournisseurActivity.this, this.db, this.retours, this.utilisateurConnecte);
+        this.listViewRetours.setAdapter(this.adapter);
+    }
+
+    private void markServiceAsEmpty()
+    {
+        MenuActivity.vide = Boolean.TRUE;
+        MenuActivity.nomServiceVide = ServiceRetourFournisseurActivity.SERVICE_NAME;
+    }
+
+    private void hydrateRetoursFromResponse(final JSONArray retoursJsonArray) throws JSONException
+    {
+        this.retours.clear();
+
+        for (int indexRetour = 0; indexRetour < retoursJsonArray.length(); indexRetour++)
+        {
+            final JSONObject retourJson = retoursJsonArray.getJSONObject(indexRetour);
+            final Retour retour = new Retour(retourJson);
+            if (!this.isRetourFournisseurRetourInProgress(retour)) { continue; }
+
+            this.retours.add(retour);
+            this.retours_base.add(retour);  // Also add to base list for filtering
+            final long rowId = RetourOpenHelper.insererUnRetourEnBDD(this.db, retour);
+            if (-1L == rowId) { continue; }
+
+            String depot_origine = retour.getRef_Depot_Dest();
+            if(retour.getRef_Depot_Origine().contains("-PAD-") && this.utilisateurConnecte.getIdentifiant().toLowerCase().contains("alcyons")) { depot_origine = "XXX-PAD-XXX"; }
+            this.listeDepotLivraison.add(depot_origine);
+
+            final JSONArray retourLignesJson = retourJson.getJSONArray("ph_retour_ligne");
+            for (int indexLigne = 0; indexLigne < retourLignesJson.length(); indexLigne++) { Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(this.db, new Retour_Ligne(retourLignesJson.getJSONObject(indexLigne))); }
         }
     }
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.prepareOptionsMenu(menu, adapter, null, "Produit, Intitulé, N°...");
-        MenuItem item = menu.findItem(R.id.menuDatamatrix);
+
+    private boolean isRetourFournisseurRetourInProgress(final Retour retour) { return this.getString(R.string.RetourFRSDemande).equals(retour.getEn_Attente_de()) && this.getString(R.string.statutEncours).equals(retour.getStatut()); }
+
+    private final void clearConcernedTables()
+    {
+        for (final Retour retour : RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(this.db, this.getString(R.string.statutEncours), this.getString(R.string.RetourFRSDemande)))
+        {
+            final List<Retour_Ligne> retourLignes = Retour_LigneOpenHelper.getAllRetourLignesByRetour(this.db, retour);
+            for (final Retour_Ligne retourLigne : retourLignes) { Retour_LigneOpenHelper.supprimerUnRetourLigne(this.db, retourLigne); }
+            RetourOpenHelper.supprimerUnRetour(this.db, retour);
+        }
+    }
+
+    @Override public boolean onPrepareOptionsMenu(final Menu menu)
+    {
+        super.prepareOptionsMenu(menu, this.adapter, null, "Produit, Intitulé, N°...");
+
+        final MenuItem item = menu.findItem(R.id.menuDatamatrix);
         item.setOnMenuItemClickListener(item1 -> true);
-        MenuItem itemScan = menu.findItem(R.id.menuDatamatrix);
-        itemScan.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(@NonNull MenuItem item) {
-                lancerScan();
-                return false;
-            }
+
+        final MenuItem itemScan = menu.findItem(R.id.menuDatamatrix);
+        itemScan.setOnMenuItemClickListener(menuItem -> {
+            this.launchScan();
+            return true;
         });
+
         return true;
     }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+
+    @Override public boolean onCreateOptionsMenu(final Menu menu)
+    {
         super.onCreateOptionsMenu(menu);
-        MenuInflater inflater = getMenuInflater();
+
+        final MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_action, menu);
         menu.findItem(R.id.menuDatamatrix).setVisible(true);
+
         return true;
     }
-    public void lancerScan()
+
+    private void launchScan()
     {
-        Bundle scanDocumentBundle = ServiceRetourFournisseurActivity.super.getBundle();
+        final Bundle scanDocumentBundle = ServiceRetourFournisseurActivity.super.getBundle();
         scanDocumentBundle.putString("contexte", String.valueOf(R.string.scannerContexteDocument));
         scanDocumentBundle.putBoolean("isBoutonSuppressionExistant", true);
-        Intent scanDocumentIntent;
-        if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell") || Build.MANUFACTURER.toLowerCase().contains("google"))
-        {
-            scanDocumentIntent = new Intent(ServiceRetourFournisseurActivity.this, ScannerDocumentActivity.class);
-            scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteDocument);
-            scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'un document");
-        }
-        else
-        {
-            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
-            {
-                scanDocumentIntent = new Intent(ServiceRetourFournisseurActivity.this, BarcodeCaptureActivity.class);
-                scanDocumentBundle.putBoolean("modeRafale", false);
-            }
-            else
-            {
-                scanDocumentIntent = new Intent(ServiceRetourFournisseurActivity.this, ScannerDocumentActivity.class);
-                scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteDocument);
-                scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'un document");
-            }
-        }
+
+        final Intent scanDocumentIntent = this.createScanDocumentIntent(scanDocumentBundle);
 
         scanDocumentIntent.putExtras(scanDocumentBundle);
-        resultScanDocument.launch(scanDocumentIntent);
+        this.scanDocumentLauncher.launch(scanDocumentIntent);
     }
-    public void afficherSnackBarRetourFournisseur() {
-        Snackbar snackbar;
-        snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Document scanné inconnu</b>", 0), Snackbar.LENGTH_LONG);
 
-        @SuppressLint("RestrictedApi") Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
-        layout.setBackgroundColor(getResources().getColor(R.color.rouge2, null));
-        TextView textView = layout.findViewById(com.google.android.material.R.id.snackbar_text);
-        textView.setTextSize(TypedValue.TYPE_STRING, 8);
+    @NonNull private Intent createScanDocumentIntent(final Bundle scanDocumentBundle)
+    {
+        if (this.shouldUseDedicatedDocumentScanner())
+        {
+            scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteDocument);
+            scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'un document");
+            return new Intent(ServiceRetourFournisseurActivity.this, ScannerDocumentActivity.class);
+        }
+
+        return new Intent(ServiceRetourFournisseurActivity.this, BarcodeCaptureActivity.class);
+    }
+
+    private boolean shouldUseDedicatedDocumentScanner()
+    {
+        final String manufacturer = Build.MANUFACTURER.toLowerCase();
+        return Build.MANUFACTURER.contains("Zebra Technologies") || manufacturer.contains("honeywell") || manufacturer.contains("google") || !this.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY);
+    }
+
+    private final void showUnknownDocumentSnackbar()
+    {
+        final Snackbar snackbar = Snackbar.make(this.getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Document scanné inconnu</b>", 0), BaseTransientBottomBar.LENGTH_LONG);
+
+        @SuppressLint("RestrictedApi")
+        final Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
+        layout.setBackgroundColor(this.getResources().getColor(R.color.rouge2, null));
+        final TextView textView = layout.findViewById(com.google.android.material.R.id.snackbar_text);
+        textView.setTextSize(TypedValue.TYPE_STRING, 8.0F);
         snackbar.show();
     }
 }
