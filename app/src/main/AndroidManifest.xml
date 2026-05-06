@@ -232,7 +232,7 @@
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
 
-        <!-- Retour PUI -->
+    <!-- Retour PUI -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.Services.ServiceRetourPUIActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity"

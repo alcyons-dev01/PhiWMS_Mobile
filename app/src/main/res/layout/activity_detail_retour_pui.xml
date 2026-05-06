@@ -1,92 +1,345 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@android:color/white">
 
     <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:background="@android:color/white">
 
+        <!-- Barre de titre -->
         <LinearLayout
             android:id="@+id/barreDeTitre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
             android:background="@color/bleu_fonce_alcyons"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:padding="8dp">
 
             <TextView
-                android:id="@+id/intitule"
+                android:id="@+id/numero"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text=""
-                android:textColor="#FFFFFF"
-                android:textSize="17sp"
-                android:textStyle="bold" />
+                android:text="numéro"
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
+
+        <!-- Bouton Valider le retour PUI — déclaré AVANT le ScrollView -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btnValiderRetourPUI_CV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/scrollView"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="24dp"
+            android:elevation="6dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="#2E7D32"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/btnValiderRetourPUI_LL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Valider le retour PUI"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1"/>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Detail container flottant -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/detailContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:visibility="gone"
+            android:elevation="8dp"
+            android:background="@android:color/transparent"/>
+
+        <!-- Contenu scrollable — contraint entre la barre de titre et le bouton -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/barreDeTitre"
+            android:fillViewport="true"
+            android:padding="2dp"
+            android:background="@android:color/white">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingHorizontal="10dp"
-                android:weightSum="2">
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/motif"
-                    android:layout_width="0dp"
+                <!-- CARTE SCANNER -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text=""
-                    android:gravity="left"
-                    android:textColor="@android:color/white" />
+                    android:layout_marginBottom="5dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#FFFFFF">
 
-                <TextView
-                    android:id="@+id/numero"
-                    android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/lancerScan"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="14dp"
+                            android:background="@color/bleu_fonce_alcyons">
+
+                            <ImageView
+                                android:id="@+id/iconLancerScan"
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:layout_gravity="center_vertical"
+                                android:src="@drawable/ic_datamatrix"
+                                android:layout_marginEnd="10dp"
+                                app:tint="#FFFFFF"/>
+
+                            <TextView
+                                android:id="@+id/textLancerScan"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:text="SCANNER"
+                                android:layout_weight="1"
+                                android:textColor="#FFFFFF"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.1" />
+
+                            <ImageView
+                                android:id="@+id/chevronScan"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/chevron_down_24dp"
+                                app:tint="#FFFFFF"/>
+
+                        </LinearLayout>
+
+                        <View
+                            android:id="@+id/separateurScan"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#EEEEEE"
+                            android:visibility="gone"/>
+
+                        <androidx.fragment.app.FragmentContainerView
+                            android:id="@+id/scannerContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:visibility="gone"/>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- CARTE CHERCHER -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text=""
-                    android:gravity="right"
-                    android:textColor="@android:color/white" />
+                    android:layout_marginBottom="5dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#FFFFFF">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/lancerRecherhe"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="14dp"
+                            android:background="@color/bleu_fonce_alcyons">
+
+                            <ImageView
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:layout_gravity="center_vertical"
+                                android:src="@drawable/ic_search"
+                                android:layout_marginEnd="10dp"
+                                app:tint="#FFFFFF"/>
+
+                            <!-- TextView visible par défaut -->
+                            <TextView
+                                android:id="@+id/textChercher_TV"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:text="CHERCHER"
+                                android:layout_weight="1"
+                                android:textColor="#FFFFFF"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.1" />
+
+                            <!-- EditText caché par défaut -->
+                            <EditText
+                                android:id="@+id/searchInput_ET"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:hint="Rechercher..."
+                                android:textColor="#FFFFFF"
+                                android:textSize="16sp"
+                                android:background="@android:color/transparent"
+                                android:inputType="text"
+                                android:imeOptions="actionSearch"
+                                android:visibility="gone"/>
+
+                            <ImageView
+                                android:id="@+id/effacerRecherche_IV"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_clear"
+                                android:layout_marginEnd="8dp"
+                                app:tint="#FFFFFF"
+                                android:visibility="gone"/>
+
+                            <ImageView
+                                android:id="@+id/chevronRecherche"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/chevron_down_24dp"
+                                app:tint="#FFFFFF"/>
+
+                        </LinearLayout>
+
+                        <View
+                            android:id="@+id/separateurRecherche"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#EEEEEE"
+                            android:visibility="gone"/>
+
+                        <androidx.fragment.app.FragmentContainerView
+                            android:id="@+id/rechercheContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone"/>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- CARTE À RETOURNER PUI -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#FFFFFF">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/aRetournerPUI_LL"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="14dp"
+                            android:background="@color/bleu_clair_alcyons">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:text="À RETOURNER"
+                                android:layout_weight="1"
+                                android:textColor="#FFFFFF"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.1" />
+
+                            <TextView
+                                android:id="@+id/nbReferenceARetournerPUI_TV"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=""
+                                android:textColor="#FFFFFF"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:background="#44FFFFFF"
+                                android:paddingHorizontal="10dp"
+                                android:paddingVertical="2dp"
+                                android:layout_marginEnd="10dp"/>
+
+                            <ImageView
+                                android:id="@+id/chevronARetournerPUI"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/chevron_down_24dp"
+                                app:tint="#FFFFFF"/>
+
+                        </LinearLayout>
+
+                        <View
+                            android:id="@+id/separateurARetournerPUI"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#EEEEEE"
+                            android:visibility="gone"/>
+
+                        <androidx.fragment.app.FragmentContainerView
+                            android:id="@+id/referenceARetournerPUIContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="300dp"
+                            android:visibility="gone"/>
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
 
             </LinearLayout>
 
-        </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
-        <LinearLayout
-            android:id="@+id/temp"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/barreDeTitre"
-            android:background="@color/bleu_fonce_alcyons"
-            android:orientation="horizontal"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:weightSum="2"/>
-
-        <RelativeLayout
-            android:id="@+id/zoneListView"
+        <!-- Bouton toujours visible en bas -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/boutonAction"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/barreDeTitre"
-            android:orientation="vertical"
-            android:background="@drawable/background_empty_radius"
-            android:layout_marginTop="5dp"
-            android:padding="15dp">
-
-            <ListView
-                android:id="@+id/listeView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:descendantFocusability="afterDescendants"
-                android:dividerHeight="15dp"
-                android:divider="@android:color/transparent">
-            </ListView>
-        </RelativeLayout>
+            android:layout_below="@id/scrollView"
+            android:text="Confirmer le retour"
+            android:textColor="@color/blanc"
+            android:layout_margin="10dp"
+            android:background="@drawable/background_plein_vert_fonce_radius"
+            android:visibility="visible"/>
 
     </RelativeLayout>
 

@@ -19,14 +19,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
-import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
-import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
-import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne_RetourPUI_Adapte;
 import fr.alcyons.phiwms_mobile.R;
 
 import static android.view.View.GONE;
