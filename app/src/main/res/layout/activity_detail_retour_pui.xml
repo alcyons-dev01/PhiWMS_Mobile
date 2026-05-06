@@ -274,7 +274,7 @@
                             android:orientation="horizontal"
                             android:gravity="center_vertical"
                             android:padding="14dp"
-                            android:background="@color/bleu_clair_alcyons">
+                            android:background="@color/vert">
 
                             <TextView
                                 android:layout_width="0dp"

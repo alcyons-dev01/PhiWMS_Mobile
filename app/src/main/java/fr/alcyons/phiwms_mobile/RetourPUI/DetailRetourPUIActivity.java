@@ -338,24 +338,41 @@ public class DetailRetourPUIActivity extends ServiceActivity implements ARetourn
 
     private void openACompter()
     {
-        findViewById(R.id.referenceARetournerPUIContainer).setVisibility(View.VISIBLE);
+        View container = findViewById(R.id.referenceARetournerPUIContainer);
+        android.widget.LinearLayout.LayoutParams params = (android.widget.LinearLayout.LayoutParams) container.getLayoutParams();
+        params.height = android.widget.LinearLayout.LayoutParams.WRAP_CONTENT;
+        params.weight = 0f;
+        container.setLayoutParams(params);
+        container.setVisibility(View.VISIBLE);
+
         aRetournerPUIFragment = ARetournerPUIFragment.newInstance((ArrayList<Retour_Ligne>) retourLigneList, retourSelectionne);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.referenceARetournerPUIContainer, aRetournerPUIFragment)
                 .commit();
 
         isACompterOpen = true;
+
+        // Scroll to the container
+        androidx.core.widget.NestedScrollView scrollView = findViewById(R.id.scrollView);
+        scrollView.post(() -> {
+            scrollView.smoothScrollTo(0, container.getTop());
+        });
     }
 
     private void closeACompter()
     {
+        View container = findViewById(R.id.referenceARetournerPUIContainer);
+        container.setVisibility(View.GONE);
+        android.widget.LinearLayout.LayoutParams params = (android.widget.LinearLayout.LayoutParams) container.getLayoutParams();
+        params.height = 0;
+        params.weight = 0f;
+        container.setLayoutParams(params);
         if (aRetournerPUIFragment != null) {
             getSupportFragmentManager().beginTransaction()
                     .remove(aRetournerPUIFragment)
                     .commit();
             aRetournerPUIFragment = null;
         }
-        findViewById(R.id.referenceARetournerPUIContainer).setVisibility(View.GONE);
         isACompterOpen = false;
     }
 
