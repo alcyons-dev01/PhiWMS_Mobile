@@ -638,8 +638,8 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     private fun choisirFragmentScanner(): Fragment {
         // Vérifie si c'est un Zebra ou Honeywell
         if (estScannerProfessionnel()) {
-            //return ScannerInputFragment()
-            return ScannerFragment()
+            return ScannerInputFragment()
+            //return ScannerFragment()
         }
 
         // Vérifie si l'appareil a une caméra
@@ -680,7 +680,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
 
         scannerVisible = false
     }
-    
+
     /**
      * RECHERCHE
      */
