@@ -327,7 +327,10 @@ class DetailFragment : Fragment() {
 
             val stockCourant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByLotPeremptionEtDepot(db, preparationLigneBase.lotNumero, preparationLigneBase.peremptionDate, depot)
 
-            maxAPreparer = stockCourant.qte.toInt()
+            if(stockCourant != null)
+                maxAPreparer = stockCourant.qte.toInt()
+            else
+                maxAPreparer = preparationLigneBasePreparation.qte_APreparer
 
             if(maxAPreparer > preparationLigneBasePreparation.qte_APreparer)
                 maxAPreparer = preparationLigneBasePreparation.qte_APreparer
@@ -490,8 +493,6 @@ class DetailFragment : Fragment() {
                         if(datePeremption_String != "")
                             datePeremption = datePeremption_String
 
-                        val serie = ""
-
                         val phPreparationLigneliste =
                             PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparationNeg(
                                 db,
@@ -505,7 +506,7 @@ class DetailFragment : Fragment() {
                             if (prepaLigneCourant.lotNumero.trim { it <= ' ' }.contentEquals(
                                     lot
                                         .trim { it <= ' ' }) && prepaLigneCourant.peremptionDate
-                                    .trim { it <= ' ' }.contentEquals(datePeremption)
+                                    .trim { it <= ' ' }.contentEquals(datePeremption) && prepaLigneCourant.serieNumero == ""
                             ) {
                                 phPreparationLigneCourant = prepaLigneCourant
                                 existe = true
@@ -528,10 +529,8 @@ class DetailFragment : Fragment() {
                             val numeroLot = lot
                             val zoneName = preparationLigneBase.zoneDepot
                             val emplacementName = preparationLigneBase.emplacementParDefaut
-                            val numero_Serie = serie
 
                             phPreparationLigneCourant.lotNumero = numeroLot.trim { it <= ' ' }
-                            phPreparationLigneCourant.serieNumero = numero_Serie.trim { it <= ' ' }
                             phPreparationLigneCourant.peremptionDate = datePeremption.trim { it <= ' ' }
                             phPreparationLigneCourant.qte_preparer = quantite
 

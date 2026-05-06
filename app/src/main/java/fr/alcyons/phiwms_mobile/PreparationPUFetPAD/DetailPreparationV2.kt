@@ -1,5 +1,6 @@
 package fr.alcyons.phiwms_mobile.PreparationPUFetPAD;
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -10,31 +11,45 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
+import android.view.Window
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
+import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
-import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.android.volley.Response
+import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.google.android.gms.vision.L
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ImprimanteEtiquetteOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.StockUtilisesOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper
+import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur
+import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne
 import fr.alcyons.phiwms_mobile.Classes.Depot
+import fr.alcyons.phiwms_mobile.Classes.ImprimanteEtiquette
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne
 import fr.alcyons.phiwms_mobile.Classes.Produit
@@ -45,8 +60,10 @@ import fr.alcyons.phiwms_mobile.Fragment.ScannerFragment
 import fr.alcyons.phiwms_mobile.Fragment.ScannerInputFragment
 import fr.alcyons.phiwms_mobile.Interfaces.RechercheAdjustable
 import fr.alcyons.phiwms_mobile.Outils.Alerte
+import fr.alcyons.phiwms_mobile.Outils.Chronometer
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites
 import fr.alcyons.phiwms_mobile.Outils.GestionCodeScanne
+import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation
 import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.Adapter.DetailPreparationAdapter
 import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.Fragment.APreparerFragment
 import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.Fragment.DetailFragment
@@ -58,25 +75,16 @@ import fr.alcyons.phiwms_mobile.Services.ServicePreparationPufActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import java.lang.Double
+import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import kotlin.Boolean
-import kotlin.CharSequence
-import kotlin.Comparator
-import kotlin.Deprecated
-import kotlin.Int
-import kotlin.String
-import kotlin.Unit
-import kotlin.also
-import kotlin.apply
-import kotlin.compareTo
-import kotlin.let
-import kotlin.plus
-import kotlin.toString
+import java.util.Objects
+import java.util.Random
 
 class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     RechercheFragment.OnElementRechercheListener, APreparerFragment.OnElementSelectionneListener, PreparerFragment.OnElementSelectionneListener, RechercheAdjustable {
@@ -116,11 +124,19 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     private lateinit var depotOrigine : Depot
     private lateinit var phPreparationLignes : ArrayList<PH_Preparation_Ligne>
     var body = ""
+    lateinit var serialisation : Serialisation
+
+    var listeImprimanteEtiquette: MutableList<ImprimanteEtiquette>? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.detail_preparation_module)
         context = this
+
+        serialisation = Serialisation(this, db, utilisateurConnecte)
+        listeImprimanteEtiquette = ImprimanteEtiquetteOpenHelper.getAllImprimante(db)
+        Chronometer.LancementChrono()
 
         // Récupération des données de l'intent
         preparationCourante = PH_PreparationOpenHelper.getPH_PreparationByID(
@@ -327,7 +343,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         val nbLignePreparer = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparationNeg(db, preparationCourante).size
         findViewById<TextView>(R.id.nbReferenceAPreparer_TV).text = nbLigneTotal.toString()
         findViewById<TextView>(R.id.nbReferencePreparer_TV).text = nbLignePreparer.toString()
-        findViewById<ProgressBar>(R.id.progressBarPreparation_PB).max = nbLigneTotal
+        findViewById<ProgressBar>(R.id.progressBarPreparation_PB).max = listePHPreparationLigneBase.size
         findViewById<ProgressBar>(R.id.progressBarPreparation_PB).progress = nbLignePreparer
 
         if(nbLignePreparer > 0)
@@ -337,6 +353,229 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
 
         findViewById<CardView>(R.id.btnValiderPreparation_CV).setOnClickListener { v: View? ->
             demandeConfirmationValidation(layoutInflater) { resultat ->
+                if(resultat)
+                {
+                    //Création de l'action utilisateur
+                    val randomaction = Random()
+                    var actionId = randomaction.nextInt()
+                    if (actionId > 0) actionId = actionId * -1
+                    @SuppressLint("SimpleDateFormat") val parseFormat =
+                        SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                    val dateDestruction = Date()
+                    val date_string = parseFormat.format(dateDestruction)
+                    val new_action_utilisateur = ActionUtilisateur(
+                        actionId,
+                        utilisateurConnecte.id,
+                        date_string,
+                        serviceActuel.id,
+                        utilisateurConnecte.etablissementId,
+                        "En attente",
+                        preparationCourante.uid,
+                        "",
+                        "Preparation"
+                    )
+                    ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(
+                        db,
+                        new_action_utilisateur
+                    )
+                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
+                        db,
+                        ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR,
+                        new_action_utilisateur.phiMR4UUID,
+                        new_action_utilisateur.id,
+                        DBOpenHelper.ActionsEAS.AJOUT
+                    )
+
+
+                    //fin de la création de l'action utilisateur
+
+                    //on supprime les lignes de préparation de base
+                    val listeLigneBase =
+                        PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesBaseParPHPreparationAll(
+                            db,
+                            preparationCourante
+                        )
+                    for (ligneBase in listeLigneBase) {
+                        PH_Preparation_LigneOpenHelper.supprimerUnPhPreparationLigne(db, ligneBase)
+                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
+                            db,
+                            PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE,
+                            ligneBase.phiMR4UUID,
+                            ligneBase._UID,
+                            DBOpenHelper.ActionsEAS.SUPPR
+                        )
+                    }
+
+                    val listeLigne =
+                        PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(
+                            db,
+                            preparationCourante
+                        )
+                    for (lignecourante in listeLigne) {
+                        val produit_temp =
+                            ProduitOpenHelper.getProduitByID(db, lignecourante.produitID)
+                        val stocklotEmplacementLight =
+                            Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(
+                                db,
+                                produit_temp,
+                                depotOrigine,
+                                lignecourante.lotNumero,
+                                lignecourante.serieNumero
+                            )
+                        if (stocklotEmplacementLight != null) Stock_Lot_EmplacementLightOpenHelper.supprimerUnStockLotEmplacement(
+                            db,
+                            stocklotEmplacementLight
+                        )
+
+                        val randomactionligne = Random()
+                        var actionligneId = randomactionligne.nextInt()
+                        if (actionligneId > 0) actionligneId *= -1
+                        val actionUtilisateur_ligne = ActionUtilisateur_Ligne(
+                            actionligneId,
+                            new_action_utilisateur.id,
+                            "PH_Preparation_Ligne",
+                            lignecourante._UID,
+                            "",
+                            0,
+                            lignecourante.qte_preparer,
+                            lignecourante.produitDesignation
+                        )
+                        ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(
+                            db,
+                            actionUtilisateur_ligne
+                        )
+                    }
+
+                    val list_serialisation =
+                        PH_SerialisationOpenHelper.getAllPH_SerialisationByMvtId(
+                            db,
+                            preparationCourante.uid.toString()
+                        )
+                    if (!list_serialisation.isEmpty()) {
+                        for (serialisation in list_serialisation) {
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
+                                db,
+                                PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION,
+                                serialisation.phiMR4UUID,
+                                serialisation.get_UID(),
+                                DBOpenHelper.ActionsEAS.AJOUT
+                            )
+                            val randomAUSeri = Random()
+                            var actionSerId = randomAUSeri.nextInt()
+                            if (actionSerId > 0) actionSerId *= -1
+                            val new_action_utilisateur_serialisation = ActionUtilisateur(
+                                actionSerId,
+                                utilisateurConnecte.id,
+                                date_string,
+                                serviceActuel.id,
+                                utilisateurConnecte.etablissementId,
+                                "En attente",
+                                serialisation.get_UID(),
+                                "",
+                                "Serialisation"
+                            )
+                            ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(
+                                db,
+                                new_action_utilisateur_serialisation
+                            )
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
+                                db,
+                                ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR,
+                                new_action_utilisateur_serialisation.phiMR4UUID,
+                                new_action_utilisateur_serialisation.id,
+                                DBOpenHelper.ActionsEAS.AJOUT
+                            )
+                        }
+                    }
+
+                    val dateJour = Date()
+                    @SuppressLint("SimpleDateFormat") val format: DateFormat =
+                        SimpleDateFormat("dd-MM-yyyy")
+
+                    //différence
+                    Chronometer.FinChrono()
+                    Chronometer.getChrono()
+                    val TempsPreparation =
+                        Chronometer.heure + ":" + Chronometer.minute + ":" + Chronometer.seconde
+
+                    preparationCourante.tempsPreparation = TempsPreparation
+                    preparationCourante.preparationDate = format.format(dateJour)
+                    preparationCourante.statut = getString(R.string.PreparationEffectuee)
+
+                    val rowID = PH_PreparationOpenHelper.mettreAJourUnPHPreparation(
+                        db,
+                        preparationCourante
+                    )
+                    if (rowID != -1L) ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
+                        db,
+                        PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION,
+                        preparationCourante.phiMR4UUID,
+                        preparationCourante.uid,
+                        DBOpenHelper.ActionsEAS.MAJ
+                    )
+
+                    //véfication de la totalité de la préparation
+                    val listePhPreparationRALListe: MutableList<PH_Preparation_Ligne?>?
+                    listePhPreparationRALListe =
+                        PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesRAL(
+                            db,
+                            preparationCourante
+                        )
+                    if (!listePhPreparationRALListe.isEmpty()) {
+                        Toast.makeText(
+                            this@DetailPreparationV2,
+                            "Préparation effectuée en partie",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            this@DetailPreparationV2,
+                            "Préparation effectuée",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+
+                    // Si possible, on essaie de mettre à jour les éléments
+                    ElementASynchroniserOpenHelper.toutSynchroniser(
+                        this@DetailPreparationV2,
+                        db,
+                        utilisateurConnecte,
+                        true
+                    )
+
+                    //NewDetailPreparationActivity.this.setResult(CodesEchangesActivites.RETOUR_LISTE_LOTS);
+                    var retourListeIntent = Intent(
+                        this@DetailPreparationV2,
+                        ServicePreparationPufActivity::class.java
+                    )
+                    if (preparationCourante.getDepotDestinataireReference()
+                            .contains("-PAD-")
+                    ) retourListeIntent = Intent(
+                        this@DetailPreparationV2,
+                        ServicePreparationPadActivity::class.java
+                    )
+
+                    if (utilisateurConnecte.getEtablissement().uppercase(Locale.getDefault())
+                            .contentEquals("ADH") && listeImprimanteEtiquette?.size!! > 0
+                    ) {
+                        if (listeImprimanteEtiquette?.size == 1) envoyerImpressionZebra(
+                            preparationCourante,
+                            listeImprimanteEtiquette!!.get(0).getNom()
+                        )
+                        else afficherAlerteChoixImprimante(
+                            this@DetailPreparationV2,
+                            this@DetailPreparationV2.getLayoutInflater()
+                        )
+                    } else {
+                        val extras = Bundle()
+                        extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId())
+                        extras.putInt("serviceSelectionneID", serviceActuel.getId())
+                        retourListeIntent.putExtras(extras)
+                        this@DetailPreparationV2.startActivity(retourListeIntent)
+                        this@DetailPreparationV2.finish()
+                    }
+                }
             }
         }
 
@@ -399,7 +638,8 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     private fun choisirFragmentScanner(): Fragment {
         // Vérifie si c'est un Zebra ou Honeywell
         if (estScannerProfessionnel()) {
-            return ScannerInputFragment()
+            //return ScannerInputFragment()
+            return ScannerFragment()
         }
 
         // Vérifie si l'appareil a une caméra
@@ -440,7 +680,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
 
         scannerVisible = false
     }
-
+    
     /**
      * RECHERCHE
      */
@@ -759,22 +999,26 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
                 val numeroSerieIdentification = resultDecoupage["serie"]
                 val tabDateSQL = peremptionIdentification?.split("/")
                 var datePeremptionSQL = ""
-                if (tabDateSQL?.size == 3)
+                var datePeremptionSerialisation = ""
+                if (tabDateSQL?.size == 3) {
                     datePeremptionSQL =
-                        tabDateSQL?.get(tabDateSQL.size - 1) + "-" + tabDateSQL?.get(1) + "-" + tabDateSQL?.get(
-                            0
-                        )
+                        tabDateSQL[tabDateSQL.size - 1] + "-" + tabDateSQL[1] + "-" + tabDateSQL[0]
+
+                    datePeremptionSerialisation =
+                        tabDateSQL[tabDateSQL.size - 1].takeLast(2) + tabDateSQL[1] + tabDateSQL[0]
+                }
+
                 val produitIdentifier: List<Produit> =
                     ProduitOpenHelper.getProduitsByIdentification(db, codeIdentification)
 
                 if (!produitIdentifier.isEmpty() && produitIdentifier.size == 1) {
                     val produit = produitIdentifier[0]
 
-                    /*var reliquatcourant = PH_ReliquatOpenHelper.getPH_ReliquatByUnIdProduitetNumeroLotSerie(db, produit.iD_produit, receptionCourant.numero, numeroLotIdentification, numeroSerieIdentification)
+                    var preparationLigneCourant = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByProduitLotSerieNegPreparation(db, produit.iD_produit, preparationCourante.uid, numeroLotIdentification, numeroSerieIdentification)
 
-                    if(reliquatcourant != null)
+                    if(preparationLigneCourant != null)
                     {
-                        if(produit.isSuivi_Serialisation && produit.isSerialiser_Reception_Delivrance && numeroSerieIdentification != "")
+                        if(produit.isSuivi_Serialisation && !produit.isSerialiser_Reception_Delivrance && numeroSerieIdentification != "")
                         {
                             withContext(Dispatchers.Main) {
                                 alerteVisible = true // ← on lève le flag avant d'afficher
@@ -789,32 +1033,38 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
                         }
                         else
                         {
-                            ouvrirDetailFragment(reliquatcourant)
+                            ouvrirDetailFragment(preparationLigneCourant)
                         }
                     }
                     else
                     {
-                        reliquatcourant = PH_ReliquatOpenHelper.getPH_ReliquatBaseByUnIdProduitetNumero(db, produit.iD_produit, receptionCourant.numero)
+                        preparationLigneCourant = PH_Preparation_LigneOpenHelper.getUnPHPreparationLignesBaseParPHPreparationetProduit(db, preparationCourante,produit.iD_produit)
 
-                        if(reliquatcourant != null)
+                        if(preparationLigneCourant != null)
                         {
                             val randomreliquat = Random()
-                            var reliquatId = randomreliquat.nextInt()
-                            if (reliquatId > 0) reliquatId = reliquatId * -1
+                            var preparationLigneId = randomreliquat.nextInt()
+                            if (preparationLigneId > 0) preparationLigneId = preparationLigneId * -1
 
-                            reliquatcourant.setReliquat_UID(reliquatId)
-                            reliquatcourant.lot = numeroLotIdentification
-                            reliquatcourant.serie = numeroSerieIdentification
-                            reliquatcourant.peremptionDate = datePeremptionSQL
-                            reliquatcourant.scanValue = ""
-                            reliquatcourant.bL_Numero = ""
+                            preparationLigneCourant._UID = preparationLigneId
+                            preparationLigneCourant.lotNumero = numeroLotIdentification
+                            preparationLigneCourant.serieNumero = numeroSerieIdentification
+                            preparationLigneCourant.peremptionDate = datePeremptionSQL
+
+                            val stockCourant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByLotPeremptionEtDepot(db, numeroLotIdentification, datePeremptionSQL, depotOrigine)
+                            if(stockCourant != null)
+                                preparationLigneCourant.emplacementParDefaut = stockCourant.emplacement
+                            else
+                            {
+                                preparationLigneCourant.emplacementParDefaut = produit.emplacement_PUI_Defaut
+                            }
 
                             //ajout de la serialisation si suivi par série
-                            if(produit.isSuivi_Serialisation && produit.isSerialiser_Reception_Delivrance && numeroSerieIdentification != "")
-                                Serialisation.Serialisation_Creer(utilisateurConnecte.id, "G110", codeIdentification, "GTIN", numeroLotIdentification, peremptionIdentification, numeroSerieIdentification, "CDE", receptionCourant.numero).toInt()
+                            if(produit.isSuivi_Serialisation && !produit.isSerialiser_Reception_Delivrance && numeroSerieIdentification != "")
+                                Serialisation.Serialisation_Creer(utilisateurConnecte.id, "G110", codeIdentification, "GTIN", numeroLotIdentification, datePeremptionSerialisation, numeroSerieIdentification, "DELIVRANCE", preparationCourante.uid.toString()).toInt()
 
 
-                            ouvrirDetailFragment(reliquatcourant)
+                            ouvrirDetailFragment(preparationLigneCourant)
                         }
                         else
                         {
@@ -822,14 +1072,14 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
                                 alerteVisible = true // ← on lève le flag avant d'afficher
                                 afficherAlerteAvecCallback(
                                     "Erreur",
-                                    "Référence non présente dans la réception"
+                                    "Référence non présente dans la préparation"
                                 ) {
                                     alerteVisible = false // ← on baisse le flag à la fermeture
                                     ouvrirScanner()
                                 }
                             }
                         }
-                    }*/
+                    }
                 } else {
                     withContext(Dispatchers.Main) {
                         alerteVisible = true // ← on lève le flag avant d'afficher
@@ -854,6 +1104,9 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         findViewById<TextView>(R.id.nbReferenceAPreparer_TV).text = nbLigneTotal.toString()
         findViewById<TextView>(R.id.nbReferencePreparer_TV).text = nbLignePreparer.toString()
         findViewById<ProgressBar>(R.id.progressBarPreparation_PB).max = nbLigneTotal
+        if(nbLigneTotal == 0)
+            findViewById<ProgressBar>(R.id.progressBarPreparation_PB).max = nbLignePreparer
+
         findViewById<ProgressBar>(R.id.progressBarPreparation_PB).progress = nbLignePreparer
 
         if(nbLignePreparer > 0)
@@ -1025,4 +1278,226 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     fun masquerBoutonValider() {
         btnValiderPreparation_CV.visibility = View.GONE
     }
+
+    private fun afficherAlerteChoixImprimante(context: Context?, inflater: LayoutInflater) {
+        val builder = android.app.AlertDialog.Builder(context)
+        val layout = inflater.inflate(R.layout.alerte_selection_imprimante, null)
+
+        val zoneok = layout.findViewById<View?>(R.id.buttonOk) as LinearLayout
+        val buttonAnnuler =
+            layout.findViewById<View?>(R.id.fermer_alerte_imprimante_zebra) as LinearLayout
+        val spinnerImprimante = layout.findViewById<View?>(R.id.spinnerImprimante) as Spinner
+
+        val ListNomImprimante: MutableList<String?> = java.util.ArrayList<String?>()
+        for (imprimante in listeImprimanteEtiquette!!) {
+            ListNomImprimante.add(imprimante.getNom())
+        }
+        val adapterImprimante = ArrayAdapter<String?>(
+            this,
+            R.layout.inscription_spinner_item, ListNomImprimante
+        )
+        spinnerImprimante.setAdapter(adapterImprimante)
+
+
+        builder.setView(layout)
+        val alertDialogListeImprimante = builder.create()
+        Objects.requireNonNull<Window?>(alertDialogListeImprimante.getWindow())
+            .setGravity(Gravity.CENTER)
+        alertDialogListeImprimante.show()
+
+        zoneok.setOnClickListener(View.OnClickListener { v: View? ->
+            val nomImprimante = spinnerImprimante.getSelectedItem().toString()
+            try {
+                envoyerImpressionZebra(preparationCourante, nomImprimante)
+            } catch (e: JSONException) {
+                throw RuntimeException(e)
+            }
+        })
+
+        buttonAnnuler.setOnClickListener(View.OnClickListener { v: View? -> alertDialogListeImprimante.dismiss() })
+    }
+
+    @Throws(JSONException::class)
+    private fun envoyerImpressionZebra(ph_preparation: PH_Preparation, nomImprimante: String?) {
+        val cal = Calendar.getInstance()
+        val sdf = SimpleDateFormat("dd/MM/yyyy")
+        val strDate = sdf.format(cal.getTime())
+
+        val Etiquette_TO = JSONArray()
+
+        val DepotOrigineNom_VT = depotOrigine.getNom()
+
+        val depotDestinataire =
+            DepotOpenHelper.getDepotParID(db, ph_preparation.getDepotDestinataireID())
+        val CPDestinataire_VT = depotDestinataire.getCP()
+        val VilleDestinataire_VT = depotDestinataire.getVille()
+        val nomDestinataire_VT = depotDestinataire.getNom()
+
+        var preparerPar_VT: String? = ""
+        var validerPar_VT = ""
+        if (!ph_preparation.getPreparateur().isEmpty()) {
+            val tabPreparateur: Array<String?> =
+                ph_preparation.getPreparateur().split("\\(".toRegex())
+                    .dropLastWhile { it.isEmpty() }.toTypedArray()
+            if (tabPreparateur.size > 1) {
+                preparerPar_VT = tabPreparateur[0]
+                validerPar_VT = tabPreparateur[1]!!.substring(0, tabPreparateur[1]!!.length - 1)
+            } else {
+                preparerPar_VT = ph_preparation.getPreparateur()
+            }
+        }
+
+        val codeBarre_JO = JSONObject()
+        codeBarre_JO.put("type", "Datamatrix")
+        codeBarre_JO.put("phitag", "DDS:" + ph_preparation.getPHIE_Tag())
+
+        val etiquette_v1_JO = JSONObject()
+        etiquette_v1_JO.put("codeBarre", codeBarre_JO)
+        etiquette_v1_JO.put("phiTag", ph_preparation.getUID().toString())
+        etiquette_v1_JO.put("titre", ph_preparation.getListe())
+        etiquette_v1_JO.put("CPDestinataire", CPDestinataire_VT)
+        etiquette_v1_JO.put("villeDestinataire", VilleDestinataire_VT)
+        etiquette_v1_JO.put("destinataire", nomDestinataire_VT)
+        etiquette_v1_JO.put("nbCartons", ph_preparation.getColisNB().toString())
+        etiquette_v1_JO.put("nbPalette", ph_preparation.getPaletteNB().toString())
+        etiquette_v1_JO.put("nbConteneur", ph_preparation.getConteneur_NB().toString())
+        etiquette_v1_JO.put("poids", ph_preparation.getPoids().toString())
+        etiquette_v1_JO.put("date", strDate)
+        etiquette_v1_JO.put("etablissement", DepotOrigineNom_VT)
+        etiquette_v1_JO.put("preparationvaliderpar", validerPar_VT)
+        etiquette_v1_JO.put("preparationpreparerpar", preparerPar_VT)
+        etiquette_v1_JO.put("numContenant", 1)
+        etiquette_v1_JO.put("nbContenant", 1)
+
+        val listeph_preparation_ligne =
+            PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(
+                db,
+                ph_preparation
+            )
+        var compteur = 1
+        var tempAmbiante_VS = "false"
+        val fragile_VS = "false"
+        var abriLumiere_VS = "false"
+        var medicamentARisque = "false"
+        val numeroScelle = ""
+        var tempMax_VN = 0
+        var tempMin_VN = 0
+
+        for (ligne_courante in listeph_preparation_ligne) {
+            val produitcourant = ProduitOpenHelper.getProduitByID(db, ligne_courante.getProduitID())
+
+            if (produitcourant.isTemperature_Ambiante()) tempAmbiante_VS = "true"
+
+            if (produitcourant.isConservation_abri()) abriLumiere_VS = "true"
+
+            if (tempMax_VN < produitcourant.getConservation_temperature_Max()) tempMax_VN =
+                produitcourant.getConservation_temperature_Max().toInt()
+
+            if (tempMin_VN > produitcourant.getConservation_temperature_min()) tempMin_VN =
+                produitcourant.getConservation_temperature_min().toInt()
+
+            if (produitcourant.isMedicament_Risque()) medicamentARisque = "MEDICAMENT À RISQUE"
+
+            compteur++
+        }
+
+        val refrigere_JO = JSONObject()
+        refrigere_JO.put("tempMin", tempMin_VN.toString())
+        refrigere_JO.put("tempMax", tempMax_VN.toString())
+
+        val symbole_JO = JSONObject()
+        symbole_JO.put("scelle", numeroScelle)
+        symbole_JO.put("ambiante", tempAmbiante_VS)
+        symbole_JO.put("fragile", fragile_VS)
+        symbole_JO.put("abrilumiere", abriLumiere_VS)
+        symbole_JO.put("refrigere", refrigere_JO)
+        etiquette_v1_JO.put("symboles", symbole_JO)
+
+        etiquette_v1_JO.put("medicamentrisque", medicamentARisque)
+
+        Etiquette_TO.put(etiquette_v1_JO)
+
+        val imprimante_VT = nomImprimante
+        val aImprimer = "true"
+        val format = "Préparation"
+
+        val body = JSONObject()
+        try {
+            body.put("Imprimante", imprimante_VT)
+            body.put("aImprimer", aImprimer)
+            body.put("format", format)
+            body.put("etiquettes", Etiquette_TO)
+        } catch (e: JSONException) {
+            Log.e(L.TAG, "JSONException :", e)
+        }
+        val urlRequete =
+            ParametresServeurOpenHelper.getUrlsWeb(db) + DBOpenHelper.Urls.uriZebraImprimer
+        val obreq: JsonObjectRequest = object : JsonObjectRequest(
+            Method.POST, urlRequete, body, Response.Listener { response: JSONObject? ->
+                Toast.makeText(
+                    this@DetailPreparationV2,
+                    "Etiquette envoyée",
+                    Toast.LENGTH_SHORT
+                ).show()
+                var retourListeIntent = Intent(
+                    this@DetailPreparationV2,
+                    ServicePreparationPufActivity::class.java
+                )
+                if (preparationCourante.getDepotDestinataireReference()
+                        .contains("-PAD-")
+                ) retourListeIntent = Intent(
+                    this@DetailPreparationV2,
+                    ServicePreparationPadActivity::class.java
+                )
+                val extras = Bundle()
+                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId())
+                extras.putInt("serviceSelectionneID", serviceActuel.getId())
+                retourListeIntent.putExtras(extras)
+                this@DetailPreparationV2.startActivity(retourListeIntent)
+                this@DetailPreparationV2.finish()
+            },
+            Response.ErrorListener { error: VolleyError? ->
+                Log.e("Etiquette Volley", error.toString())
+                if (!error.toString().contains("\"isOk\":true")) {
+                    Alerte.afficherAlerte(
+                        this@DetailPreparationV2,
+                        "Erreur HTTP",
+                        "Erreur lors de l\'impression de l\'étiquette : " + error.toString(),
+                        "alerte"
+                    )
+                } else {
+                    Toast.makeText(
+                        this@DetailPreparationV2,
+                        "Etiquette envoyée",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                var retourListeIntent = Intent(
+                    this@DetailPreparationV2,
+                    ServicePreparationPufActivity::class.java
+                )
+                if (preparationCourante.getDepotDestinataireReference()
+                        .contains("-PAD-")
+                ) retourListeIntent = Intent(
+                    this@DetailPreparationV2,
+                    ServicePreparationPadActivity::class.java
+                )
+                val extras = Bundle()
+                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId())
+                extras.putInt("serviceSelectionneID", serviceActuel.getId())
+                retourListeIntent.putExtras(extras)
+                this@DetailPreparationV2.startActivity(retourListeIntent)
+                this@DetailPreparationV2.finish()
+            }
+        ) {
+            override fun getHeaders(): MutableMap<String?, String?> {
+                val params: MutableMap<String?, String?> = java.util.HashMap<String?, String?>()
+                params.put("Content-Type", "application/json;charset=utf-8")
+                return params
+            }
+        }
+        val requestQueueUtilisateur = Volley.newRequestQueue(this)
+        requestQueueUtilisateur.add<JSONObject?>(obreq)
+    }
+
 }

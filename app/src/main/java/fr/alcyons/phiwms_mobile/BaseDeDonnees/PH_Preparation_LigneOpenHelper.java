@@ -214,6 +214,21 @@ public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
         return phPreparationLigne;
     }
 
+    public static PH_Preparation_Ligne getPH_Preparation_LigneByProduitLotSerieNegPreparation(SQLiteDatabase db, int produitid, int prepartionid, String lotnumero, String serie) {
+        PH_Preparation_Ligne phPreparationLigne = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION_LIGNE + " WHERE " + Constantes.CLE_COL_PRODUITID_PH_PREPARATION_LIGNE + "=? AND "+Constantes.CLE_COL_PREPARATIONID_PH_PREPARATION_LIGNE+"=? AND "+Constantes.CLE_COL_LOTNUMERO_PH_PREPARATION_LIGNE+"=? AND "+Constantes.CLE_COL_SERIE_NUMERO+"= ? AND "+Constantes.CLE_COL__UID_PH_PREPARATION_LIGNE+" < 0", new String[]{String.valueOf(produitid), String.valueOf(prepartionid), String.valueOf(lotnumero), serie});
+
+        if (cursor.getCount() >= 1) {
+            cursor.moveToFirst();
+            phPreparationLigne = new PH_Preparation_Ligne(cursor);
+        }
+
+        cursor.close();
+        cursor = null;
+        return phPreparationLigne;
+    }
+
     public static PH_Preparation_Ligne getPH_Preparation_LigneByProduitLotPreparationSerieEmplacement(SQLiteDatabase db, int produitid, int prepartionid, String lotnumero, String serie, String emplacement) {
         PH_Preparation_Ligne phPreparationLigne = null;
 
@@ -262,6 +277,20 @@ public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
         List<PH_Preparation_Ligne> phPreparationLigneList = new ArrayList<>();
 
         Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION_LIGNE + " WHERE " + Constantes.CLE_COL_PREPARATIONID_PH_PREPARATION_LIGNE + "=? AND "+Constantes.CLE_COL__UID_PH_PREPARATION_LIGNE+" > 0 AND "+Constantes.CLE_COL_QTE_APREPARER_PH_PREPARATION_LIGNE+" > 0 ORDER BY "+Constantes.CLE_COL_PRODUITCATEGORIE_PH_PREPARATION_LIGNE+","+Constantes.CLE_COL_PRODUITDESIGNATION_PH_PREPARATION_LIGNE, new String[]{String.valueOf(phPreparation.getUID())});
+
+        while (cursor.moveToNext()) {
+            phPreparationLigneList.add(new PH_Preparation_Ligne(cursor));
+        }
+
+        cursor.close();
+        cursor = null;
+        return phPreparationLigneList;
+    }
+
+    public static List<PH_Preparation_Ligne> getAllPHPreparationLignesBaseParPHPreparationAll(SQLiteDatabase db, PH_Preparation phPreparation) {
+        List<PH_Preparation_Ligne> phPreparationLigneList = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION_LIGNE + " WHERE " + Constantes.CLE_COL_PREPARATIONID_PH_PREPARATION_LIGNE + "=? AND "+Constantes.CLE_COL__UID_PH_PREPARATION_LIGNE+" > 0 ORDER BY "+Constantes.CLE_COL_PRODUITCATEGORIE_PH_PREPARATION_LIGNE+","+Constantes.CLE_COL_PRODUITDESIGNATION_PH_PREPARATION_LIGNE, new String[]{String.valueOf(phPreparation.getUID())});
 
         while (cursor.moveToNext()) {
             phPreparationLigneList.add(new PH_Preparation_Ligne(cursor));
@@ -416,15 +445,11 @@ public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
 
     public static List<PH_Preparation_Ligne> getAllPHPreparationLignesRAL(SQLiteDatabase db, PH_Preparation phPreparation) {
         List<PH_Preparation_Ligne> phPreparationLigneList = new ArrayList<>();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION_LIGNE + " WHERE " + Constantes.CLE_COL_PREPARATIONID_PH_PREPARATION_LIGNE + "=?", new String[]{String.valueOf(phPreparation.getUID())});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION_LIGNE + " WHERE " + Constantes.CLE_COL_PREPARATIONID_PH_PREPARATION_LIGNE + "=? AND "+Constantes.CLE_COL__UID_PH_PREPARATION_LIGNE+" > 0", new String[]{String.valueOf(phPreparation.getUID())});
 
         while (cursor.moveToNext()) {
             PH_Preparation_Ligne phPreparationLigneCourant = new PH_Preparation_Ligne(cursor);
-            /*if(phPreparationLigneCourant.getQte_preparer() == 0 && phPreparationLigneCourant.getQte_RAL() != 0)
-            {
-                phPreparationLigneList.add(phPreparationLigneCourant);
-            }*/
-            if(phPreparationLigneCourant.getQte_RAL() != 0)
+            if(phPreparationLigneCourant.getQte_APreparer() != 0)
             {
                 phPreparationLigneList.add(phPreparationLigneCourant);
             }
