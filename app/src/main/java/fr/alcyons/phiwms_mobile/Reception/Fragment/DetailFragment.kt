@@ -109,6 +109,7 @@ class DetailFragment : Fragment() {
 
         view.findViewById<TextView>(R.id.designationReference_TV).text = reliquatBase.designationCourte
         var reliquatBaseReception = reliquatBase
+        var maxAReceptionner = reliquatBaseReception.qteReliquat_X
         if(reliquatBase.reliquat_UID < 0)
         {
             //on remet en place la quantité qui sera modifié après coup
@@ -119,6 +120,19 @@ class DetailFragment : Fragment() {
 
             view.findViewById<EditText>(R.id.numeroLot_ET).setText(reliquatBase.lot.toString())
             quantiteCompteeET.setText(reliquatBase.qteLivraison.toString())
+
+            if(reliquatBase.serie != "")
+            {
+                maxAReceptionner = produit.cond_achat
+                view.findViewById<EditText>(R.id.numeroLot_ET).apply {
+                    isFocusable = false
+                    isFocusableInTouchMode = false
+                    isClickable = false
+                    spinnerMoisDatePeremptionSP.isEnabled = false
+                    spinnerAnneeDatePeremptionSP.isEnabled = false
+                    view.findViewById<TextView>(R.id.emplacementLot_TV).text = produit.emplacement_PUI_Defaut
+                }
+            }
         }
         else
         {
@@ -135,8 +149,8 @@ class DetailFragment : Fragment() {
 
             qteActuelle += conditionnement
 
-            if(qteActuelle > reliquatBaseReception.qteReliquat_X)
-                qteActuelle = reliquatBaseReception.qteReliquat_X
+            if(qteActuelle > maxAReceptionner)
+                qteActuelle = maxAReceptionner
             quantiteCompteeET.setText(qteActuelle.toString())
         }
         layoutMoinsLL.setOnClickListener { _: View? ->
@@ -273,8 +287,6 @@ class DetailFragment : Fragment() {
                         if (!produit.isPeremption)
                             datePeremption = "0000-00-00"
 
-                        val serie = ""
-
                         val reliquatliste =
                             PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumeroAndProduit(
                                 db,
@@ -286,10 +298,10 @@ class DetailFragment : Fragment() {
                         var existe = false
 
                         for (reliquatcourant in reliquatliste) {
-                            if (reliquatcourant.getLot().trim { it <= ' ' }.contentEquals(
+                            if (reliquatcourant.lot.trim { it <= ' ' }.contentEquals(
                                     lot
-                                        .trim { it <= ' ' }) && reliquatcourant.getPeremptionDate()
-                                    .trim { it <= ' ' }.contentEquals(datePeremption)
+                                        .trim { it <= ' ' }) && reliquatcourant.peremptionDate
+                                    .trim { it <= ' ' }.contentEquals(datePeremption) && reliquatcourant.serie == ""
                             ) {
                                 phReliquatCourant = reliquatcourant
                                 existe = true
@@ -305,20 +317,21 @@ class DetailFragment : Fragment() {
                         } else {
                             val randomreliquat = Random()
                             var reliquatId = randomreliquat.nextInt()
-                            if (reliquatId > 0) reliquatId = reliquatId * -1
+                            if (reliquatId > 0) reliquatId *= -1
 
-                            phReliquatCourant.setReliquat_UID(reliquatId)
+                            phReliquatCourant.reliquat_UID = reliquatId
                             val numeroLot = lot
-                            val zoneName = reliquatBase.zone
-                            val emplacementName = reliquatBase.emplacement
-                            val numero_Serie = serie
+                            var emplacementName = reliquatBase.emplacement
+
+                            if(emplacementName == "")
+                                emplacementName = produit.emplacement_PUI_Defaut
 
                             phReliquatCourant.lot = numeroLot.trim { it <= ' ' }
-                            phReliquatCourant.serie = numero_Serie.trim { it <= ' ' }
                             phReliquatCourant.peremptionDate = datePeremption.trim { it <= ' ' }
                             phReliquatCourant.qteLivraison = quantite
                             phReliquatCourant.scanValue = ""
                             phReliquatCourant.bL_Numero = ""
+                            phReliquatCourant.emplacement = emplacementName
 
                             onValider?.invoke(phReliquatCourant, true)
                         }

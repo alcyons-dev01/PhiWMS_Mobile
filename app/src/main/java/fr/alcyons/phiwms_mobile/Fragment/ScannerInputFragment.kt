@@ -133,7 +133,7 @@ class ScannerInputFragment : Fragment(), ScanDebounce
                 layoutFondValidation.visibility = View.GONE
             }
 
-            delay(500)
+            delay(100)
             withContext(Dispatchers.Main) {
                 descriptionCode_TV.text = ""
                 fireCode(code)

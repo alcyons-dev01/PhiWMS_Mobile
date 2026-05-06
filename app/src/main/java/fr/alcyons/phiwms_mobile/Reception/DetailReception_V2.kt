@@ -108,11 +108,14 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     var bonLivraisonPhotoName = ""
     var subject = ""
     var bonLivraisonBitmap = null
+    lateinit var serialisation : Serialisation
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.detail_reception_module)
         context = this
+        serialisation = Serialisation(this, db, utilisateurConnecte)
 
         // Récupération des données de l'intent
         receptionCourant = CommandeOpenHelper.getCommandeByID(
@@ -655,11 +658,14 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                 val numeroSerieIdentification = resultDecoupage["serie"]
                 val tabDateSQL = peremptionIdentification?.split("/")
                 var datePeremptionSQL = ""
-                if (tabDateSQL?.size == 3)
+                var datePeremptionSerialisation = ""
+                if (tabDateSQL?.size == 3) {
                     datePeremptionSQL =
-                        tabDateSQL?.get(tabDateSQL.size - 1) + "-" + tabDateSQL?.get(1) + "-" + tabDateSQL?.get(
-                            0
-                        )
+                        tabDateSQL[tabDateSQL.size - 1] + "-" + tabDateSQL[1] + "-" + tabDateSQL[0]
+
+                    datePeremptionSerialisation =
+                        tabDateSQL[tabDateSQL.size - 1].takeLast(2) + tabDateSQL[1] + tabDateSQL[0]
+                }
                 val produitIdentifier: List<Produit> =
                     ProduitOpenHelper.getProduitsByIdentification(db, codeIdentification)
 
@@ -707,7 +713,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
 
                             //ajout de la serialisation si suivi par série
                             if(produit.isSuivi_Serialisation && produit.isSerialiser_Reception_Delivrance && numeroSerieIdentification != "")
-                                Serialisation.Serialisation_Creer(utilisateurConnecte.id, "G110", codeIdentification, "GTIN", numeroLotIdentification, peremptionIdentification, numeroSerieIdentification, "CDE", receptionCourant.numero).toInt()
+                                Serialisation.Serialisation_Creer(utilisateurConnecte.id, "G110", codeIdentification, "GTIN", numeroLotIdentification, datePeremptionSerialisation, numeroSerieIdentification, "CDE", receptionCourant.numero).toInt()
 
 
                             ouvrirDetailFragment(reliquatcourant)

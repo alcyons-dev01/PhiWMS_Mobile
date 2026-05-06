@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-04-24T12:35:52.306214Z">
+        <DropdownSelection timestamp="2026-05-06T14:06:06.768422Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=25046X0170" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/devops2.phiwms/.android/avd/Zebra_MC33.avd" />
             </handle>
           </Target>
         </DropdownSelection>
