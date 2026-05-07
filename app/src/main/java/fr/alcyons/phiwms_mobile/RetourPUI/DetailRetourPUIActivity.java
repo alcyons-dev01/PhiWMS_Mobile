@@ -102,6 +102,7 @@ public class DetailRetourPUIActivity extends ServiceActivity implements ARetourn
         });
 
         setupEventListeners();
+        this.lancerScan.performClick();
     }
 
     private void setupEventListeners() {
