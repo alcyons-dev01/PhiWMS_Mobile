@@ -76,7 +76,7 @@ class ScannerInputFragment : Fragment(), ScanDebounce
         scannerInput_ET.setOnKeyListener { _, keyCode, event ->
             if (event.action == KeyEvent.ACTION_DOWN &&
                 (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_TAB)) {
-                val texte = scannerInput_ET.text.toString().trim()
+                val texte = scannerInput_ET.text.toString()
                 if (texte.isNotEmpty()) {
                     traiterCode(texte)
                     scannerInput_ET.setText("")
@@ -243,7 +243,7 @@ class ScannerInputFragment : Fragment(), ScanDebounce
     private fun normalize(raw: String): String = raw
         .replace("]C1", "").replace("]e0", "").replace("]d2", "")
         .replace("]Q3", "").replace("}C1", "").replace("}d2010", "")
-        .replace("]d2010", "").replace("\u001D", "").trim()
+        .replace("]d2010", "")
 
     private fun handleSplitScan(raw: String): String? {
         val now = System.currentTimeMillis()
