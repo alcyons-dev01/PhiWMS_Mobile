@@ -109,13 +109,14 @@ class DetailFragment : Fragment() {
 
         view.findViewById<TextView>(R.id.designationReference_TV).text = reliquatBase.designationCourte
         var reliquatBaseReception = reliquatBase
-        var maxAReceptionner = reliquatBaseReception.qteReliquat_X
+        var maxAReceptionner = reliquatBase.qteReliquat_X
         if(reliquatBase.reliquat_UID < 0)
         {
             //on remet en place la quantité qui sera modifié après coup
             reliquatBaseReception = PH_ReliquatOpenHelper.getPH_ReliquatBaseByUnIdProduitetNumero(db, reliquatBase.produitID, reliquatBase.commandeNumero)
 
             reliquatBaseReception.qteReliquat_X += reliquatBase.qteLivraison
+            maxAReceptionner = reliquatBaseReception.qteReliquat_X
             PH_ReliquatOpenHelper.mettreAJourUnPHReliquat(db, reliquatBaseReception)
 
             view.findViewById<EditText>(R.id.numeroLot_ET).setText(reliquatBase.lot.toString())
@@ -136,9 +137,11 @@ class DetailFragment : Fragment() {
         }
         else
         {
+            maxAReceptionner = reliquatBaseReception.qteReliquat_X
             view.findViewById<EditText>(R.id.numeroLot_ET).setText("")
             quantiteCompteeET.setText("0")
         }
+
 
         //gestion du conditionnment
         layoutCarton_CV.visibility = View.GONE
@@ -159,6 +162,10 @@ class DetailFragment : Fragment() {
             if (qteActuelle < 0) qteActuelle = 0
             quantiteCompteeET.setText(qteActuelle.toString())
         }
+
+        //gestion bandeau restant à réceptionner
+        view.findViewById<LinearLayout>(R.id.bandeauQteRestante_LL).visibility = View.VISIBLE
+        view.findViewById<TextView>(R.id.restantAReceptionner_TV).text = maxAReceptionner.toString()
 
         //gestion de la date de péremption
         adapterMoisPeremption.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
