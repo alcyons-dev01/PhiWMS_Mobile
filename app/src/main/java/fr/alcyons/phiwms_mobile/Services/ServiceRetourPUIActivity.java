@@ -14,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -71,6 +73,10 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity
     private PackageManager packageManager = null;
     private boolean connexionDirecte = false;
     private ActivityResultLauncher<Intent> scanDocumentLauncher = null;
+    private List<String> listeDepotLivraison = null;
+    private ArrayAdapter<String> autoCompleteAdapter = null;
+    private AutoCompleteTextView autoComplete = null;
+    private List<Retour> retoursBase = null;
 
     @SuppressLint("SetTextI18n")
     @Override protected void onCreate(final Bundle savedInstanceState)
@@ -118,6 +124,9 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity
     private void refreshRetours()
     {
         this.retours = new ArrayList<>();
+        this.retoursBase = new ArrayList<>();
+        this.listeDepotLivraison = new ArrayList<>();
+        this.listeDepotLivraison.add("Tous");
 
         if (this.shouldLoadFromServer())
         {
@@ -145,12 +154,85 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity
     private void loadRetoursFromLocalDatabase()
     {
         this.retours = RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(this.db, this.getString(R.string.statutEncours), this.getString(R.string.RetourPUIDemande));
+        this.retoursBase = new ArrayList<>(this.retours);
+        this.populateDepotList(this.retoursBase);
 
         if (this.retours.isEmpty()) { this.handleNoLocalRetours(); }
-        else { this.handleAvailableLocalRetours(); }
+        else
+        {
+            this.handleAvailableLocalRetours();
+            this.initializeAutoComplete();
+        }
 
         this.invalidateOptionsMenu();
         new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500L);
+    }
+
+    private void populateDepotList(final List<Retour> retoursSource)
+    {
+        for (final Retour retour : retoursSource)
+        {
+            final String depotOrigine = this.getDepotLivraison(retour);
+            if (!this.listeDepotLivraison.contains(depotOrigine)) { this.listeDepotLivraison.add(depotOrigine); }
+        }
+    }
+
+    private void initializeAutoComplete()
+    {
+        this.autoComplete = this.findViewById(R.id.listeFiltre);
+        if (null == this.autoComplete) { return; }
+
+        this.listeDepotLivraison.sort((a, b) -> {
+            if (a.equals("Tous")) return -1;
+            if (b.equals("Tous")) return 1;
+            return a.compareTo(b);
+        });
+
+        this.autoCompleteAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_depot, this.listeDepotLivraison);
+        this.autoComplete.setAdapter(this.autoCompleteAdapter);
+        this.autoComplete.setThreshold(100);
+
+        if (!this.listeDepotLivraison.isEmpty()) { this.autoComplete.setText(this.listeDepotLivraison.get(0), false); }
+
+        final int hauteurEcran = this.getResources().getDisplayMetrics().heightPixels;
+        this.autoComplete.setDropDownHeight(hauteurEcran / 3);
+        this.autoComplete.setDropDownBackgroundResource(android.R.color.white);
+
+        this.autoComplete.post(() -> {
+            final int dpToPx = (int) (12.0F * this.getResources().getDisplayMetrics().density);
+            this.autoComplete.setDropDownWidth(this.findViewById(R.id.listeFiltre_LL).getWidth() - dpToPx);
+        });
+
+        this.autoComplete.setOnClickListener(v -> this.autoComplete.showDropDown());
+        this.findViewById(R.id.chevronFiltre).setOnClickListener(v -> this.autoComplete.showDropDown());
+        this.autoComplete.setOnItemClickListener((parent, view, position, id) -> this.filterRetoursByDepot(position));
+    }
+
+    private void filterRetoursByDepot(final int position)
+    {
+        final String depotNom = this.listeDepotLivraison.get(position);
+        this.autoComplete.setText(depotNom, false);
+        this.autoComplete.dismissDropDown();
+
+        this.retours = new ArrayList<>();
+
+        if (depotNom.contentEquals("Tous")) { this.retours.addAll(this.retoursBase); }
+        else
+        {
+            for (final Retour retourCourant : this.retoursBase)
+            {
+                if (this.getDepotLivraison(retourCourant).contentEquals(depotNom)) { this.retours.add(retourCourant); }
+            }
+        }
+
+        this.configureAdapter();
+    }
+
+    private String getDepotLivraison(final Retour retour)
+    {
+        String depotOrigine = retour.getRef_Depot_Dest();
+        if (retour.getRef_Depot_Origine().contains("-PAD-") && this.utilisateurConnecte.getIdentifiant().toLowerCase().contains("alcyons")) { depotOrigine = "XXX-PAD-XXX"; }
+        return depotOrigine;
     }
 
     private void handleNoLocalRetours()
@@ -209,6 +291,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity
                     this.clearConcernedTables();
                     this.hydrateRetoursFromResponse(response.getJSONArray("PH_Retours"));
                     this.displayRetoursOrClose();
+                    this.initializeAutoComplete();
                     this.passageParOnCreate = false;
 
                     new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500L);
@@ -316,8 +399,12 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity
             if (!this.isRetourPUIInProgress(retour)) { continue; }
 
             this.retours.add(retour);
+            this.retoursBase.add(retour);
             final long rowId = RetourOpenHelper.insererUnRetourEnBDD(this.db, retour);
             if (-1L == rowId) { continue; }
+
+            final String depotOrigine = this.getDepotLivraison(retour);
+            if (!this.listeDepotLivraison.contains(depotOrigine)) { this.listeDepotLivraison.add(depotOrigine); }
 
             final JSONArray retourLigneJSONArray = retourJSONObject.getJSONArray("ph_retour_ligne");
             for (int indexLigne = 0; indexLigne < retourLigneJSONArray.length(); indexLigne++)
