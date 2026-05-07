@@ -78,7 +78,6 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
     PackageManager pm;
     ActivityResultLauncher<Intent> resultScanDocument;
     boolean connexionDirecte;
-
     ArrayAdapter<String> autoCompleteAdapter;
     AutoCompleteTextView autoComplete;
     List<String> listeFournisseurReception;

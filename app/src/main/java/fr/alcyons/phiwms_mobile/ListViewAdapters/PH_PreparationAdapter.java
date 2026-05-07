@@ -77,7 +77,7 @@ public class PH_PreparationAdapter extends ArrayAdapter implements Filterable {
                 String[] tab_liste = phPreparation.getListe().split(" ");
                 String numeroCommande = tab_liste[tab_liste.length-1];
                 viewHolder.numeroCommande.setText("#"+numeroCommande);
-                viewHolder.fournisseurVerrou.setText("...");
+                viewHolder.fournisseurVerrou.setText("");
             }
 
             viewHolder.numCommande.setText(String.valueOf(phPreparation.getUID()));
@@ -102,7 +102,7 @@ public class PH_PreparationAdapter extends ArrayAdapter implements Filterable {
                 int delaiExpire = 0;
                 int delaiDemain = -1;
                 int delaiApresDemain = -2;
-                String libelle = "J-";
+                String libelle = "J";
                 if (delaiLivraison >= delaiExpire) {
                     viewHolder.delai.setTextColor(context.getResources().getColor(R.color.grey_color_fonce, null));
                     viewHolder.dateLiv.setBackgroundColor(context.getResources().getColor(R.color.grey_color_fonce, null));

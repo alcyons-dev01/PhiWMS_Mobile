@@ -1,106 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/background_plein_bleu_fonce_radius"
-    android:padding="2dp">
-
-    <TextView
-        android:id="@+id/titre"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Confirmation"
-        android:textSize="20sp"
-        android:gravity="center"
-        android:textColor="@android:color/white"
-        android:textStyle="bold"
-        android:layout_marginTop="10dp"/>
-
-    <TextView
-        android:id="@+id/messageFin"
-        android:layout_marginTop="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Voulez-vous recevoir une copie du mail ?"
-        android:layout_gravity="center"
-        android:layout_below="@+id/titre"
-        android:gravity="center"
-        android:background="@color/blanc"
-        android:paddingVertical="20dp"
-        android:textColor="@android:color/black"/>
-
-    <ImageView
-        android:id="@+id/separateur"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/bleu_fonce_alcyons"
-        android:layout_below="@id/messageFin"/>
+    android:layout_marginHorizontal="16dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="#F0F4FF">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@+id/separateur"
-        android:background="@drawable/background_empty_radius_bottom"
-        android:padding="1dp"
-        android:weightSum="2">
+        android:orientation="vertical">
 
+        <!-- Header : Titre -->
         <LinearLayout
-            android:id="@+id/buttonAnnuler"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_weight="1">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_clear"
-                android:backgroundTint="@color/rouge"
-                android:layout_gravity="center"
-                android:layout_centerHorizontal="true" />
+            android:background="@color/bleu_fonce_alcyons"
+            android:padding="16dp"
+            android:gravity="center">
 
             <TextView
-                android:id="@+id/TitreAnnulation"
+                android:id="@+id/titre"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Annuler"
-                android:layout_gravity="center"
+                android:text="Confirmation"
+                android:textSize="20sp"
                 android:gravity="center"
-                android:textColor="@color/noir"/>
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"/>
 
         </LinearLayout>
 
-        <ImageView
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="@color/bleu_fonce_alcyons"/>
-
-        <LinearLayout
-            android:id="@+id/buttonOk"
-            android:layout_width="0dp"
+        <!-- Message -->
+        <TextView
+            android:id="@+id/messageFin"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_weight="1">
+            android:text="Voulez-vous recevoir une copie du mail ?"
+            android:gravity="center"
+            android:background="#F0F4FF"
+            android:paddingVertical="24dp"
+            android:paddingHorizontal="16dp"
+            android:textColor="@color/bleu_fonce_alcyons"
+            android:textSize="15sp"/>
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/bleu_clair_alcyons"
-                android:layout_gravity="center"
-                android:layout_centerHorizontal="true" />
+        <!-- Séparateur -->
+        <View
+            android:id="@+id/separateur"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bleu_clair_alcyons_transparent"/>
 
-            <TextView
-                android:id="@+id/TitreConfirmation"
-                android:layout_width="match_parent"
+        <!-- Boutons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/bleu_fonce_alcyons"
+            android:weightSum="2">
+
+            <!-- Annuler -->
+            <LinearLayout
+                android:id="@+id/buttonAnnuler"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Confirmer"
-                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:orientation="vertical"
                 android:gravity="center"
-                android:textColor="@color/noir"/>
+                android:padding="14dp">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_clear"
+                    app:tint="@color/rouge"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/TitreAnnulation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Annuler"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"/>
+
+            </LinearLayout>
+
+            <!-- Séparateur vertical -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#33FFFFFF"/>
+
+            <!-- Confirmer -->
+            <LinearLayout
+                android:id="@+id/buttonOk"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="14dp">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_check_circle"
+                    app:tint="@color/bleu_clair_alcyons"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/TitreConfirmation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Confirmer"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
     </LinearLayout>
-</RelativeLayout>
+
+</androidx.cardview.widget.CardView>

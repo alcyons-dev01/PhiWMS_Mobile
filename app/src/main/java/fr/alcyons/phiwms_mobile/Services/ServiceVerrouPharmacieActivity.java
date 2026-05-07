@@ -18,6 +18,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -53,6 +55,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.Commande;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
@@ -73,15 +76,16 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
     Context context;
 
     List<PH_Preparation> phPreparationList;
+    List<PH_Preparation> phPreparationListBase;
+    List<String> listeNomDepot;
     ListView phPreparationListView;
     PH_PreparationAdapter phPreparationAdapter;
     PackageManager pm;
     JSONArray phPreparationJSONArray;
-
     long rowID = 0;
-
     boolean connexionDirect;
-
+    ArrayAdapter<String> autoCompleteAdapter;
+    AutoCompleteTextView autoComplete;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,6 +131,9 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
     public void onResume() {
         super.onResume();
         phPreparationList = new ArrayList<>();
+        phPreparationListBase = new ArrayList<>();
+        listeNomDepot = new ArrayList<>();
+        listeNomDepot.add("Tous les dépôts");
 
         /* Code nécessaire afin de réaliser une requête à l' API */
         if (statutConnexion && passageParOnCreate && !connexionDirect) {
@@ -143,6 +150,8 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
             requestQueueVerrouPharmacieUtilisateur.add(obreq);
         } else {
             phPreparationList = PH_PreparationOpenHelper.getAllPHPreparationVerrouPharmacie(db);
+            phPreparationListBase = PH_PreparationOpenHelper.getAllPHPreparationVerrouPharmacie(db);
+
             if (phPreparationList.isEmpty()) {
                 if(connexionDirect)
                 {
@@ -163,19 +172,14 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
             }
             else
             {
-                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(phPreparationList.size()));
-                phPreparationList.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
-
-                phPreparationAdapter = new PH_PreparationAdapter(ServiceVerrouPharmacieActivity.this, db, phPreparationList, utilisateurConnecte);
-                phPreparationListView.setDivider(footer);
-                phPreparationListView.setAdapter(phPreparationAdapter);
-
                 if (phPreparationList.isEmpty()) {
                     vide = true;
                     nomServiceVide = "Verrou Pharmacie";
                     ServiceVerrouPharmacieActivity.this.finish();
                 }
 
+                initialiserAutoComplete();
+                gestionAdapter();
                 passageParOnCreate = false;
                 if(connexionDirect)
                 {
@@ -234,6 +238,11 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
                                             rowID = PH_PreparationOpenHelper.insererUnPH_PreparationEnBDD(db, phPreparation);
                                             if (rowID != -1) {
                                                 phPreparationList.add(phPreparation);
+                                                phPreparationListBase.add(phPreparation);
+
+                                                if(!listeNomDepot.contains(depot.getNom()))
+                                                    listeNomDepot.add(depot.getNom());
+
                                                 remplirTablesPHPreparationLigneEtStockLotEmplacement(phPreparationJSONObject);
                                             }
                                         }
@@ -243,6 +252,9 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
                                                 rowID = PH_PreparationOpenHelper.insererUnPH_PreparationEnBDD(db, phPreparation);
                                                 if (rowID != -1) {
                                                     phPreparationList.add(phPreparation);
+                                                    phPreparationListBase.add(phPreparation);
+                                                    if(!listeNomDepot.contains(depot.getNom()))
+                                                        listeNomDepot.add(depot.getNom());
                                                     remplirTablesPHPreparationLigneEtStockLotEmplacement(phPreparationJSONObject);
                                                 }
                                             }
@@ -266,10 +278,8 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
                                 if(passageParOnCreate)
                                 {
                                     phPreparationList.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
-
-                                    phPreparationAdapter = new PH_PreparationAdapter(ServiceVerrouPharmacieActivity.this, db, phPreparationList, utilisateurConnecte);
-                                    phPreparationListView.setDivider(footer);
-                                    phPreparationListView.setAdapter(phPreparationAdapter);
+                                    initialiserAutoComplete();
+                                    gestionAdapter();
 
                                     if (phPreparationList.isEmpty()) {
                                         vide = true;
@@ -439,9 +449,7 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
                                 }
                             });
 
-                            phPreparationAdapter = new PH_PreparationAdapter(ServiceVerrouPharmacieActivity.this, db, phPreparationList, utilisateurConnecte);
-                            phPreparationListView.setDivider(footer);
-                            phPreparationListView.setAdapter(phPreparationAdapter);
+                            gestionAdapter();
 
                             if (phPreparationList.size() == 0) {
                                 vide = true;
@@ -477,9 +485,7 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
                             }
                         });
 
-                        phPreparationAdapter = new PH_PreparationAdapter(ServiceVerrouPharmacieActivity.this, db, phPreparationList, utilisateurConnecte);
-                        phPreparationListView.setDivider(footer);
-                        phPreparationListView.setAdapter(phPreparationAdapter);
+                        gestionAdapter();
 
                         if (phPreparationList.size() == 0) {
                             vide = true;
@@ -501,9 +507,7 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
                         }
                     });
 
-                    phPreparationAdapter = new PH_PreparationAdapter(ServiceVerrouPharmacieActivity.this, db, phPreparationList, utilisateurConnecte);
-                    phPreparationListView.setDivider(footer);
-                    phPreparationListView.setAdapter(phPreparationAdapter);
+                    gestionAdapter();
 
                     if (phPreparationList.size() == 0) {
                         vide = true;
@@ -526,5 +530,65 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
         TextView textView = (TextView) layout.findViewById(com.google.android.material.R.id.snackbar_text);
         textView.setTextSize(TypedValue.TYPE_STRING, 8);
         snackbar.show();
+    }
+
+    private void gestionAdapter()
+    {
+        phPreparationList.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
+        phPreparationAdapter = new PH_PreparationAdapter(ServiceVerrouPharmacieActivity.this, db, phPreparationList, utilisateurConnecte);
+        phPreparationListView.setAdapter(phPreparationAdapter);
+    }
+
+    private void initialiserAutoComplete() {
+        autoComplete = findViewById(R.id.listeFiltre);
+
+        // Trie en gardant "Tous les fournisseurs" en tête
+        String premierElement = listeNomDepot.get(0);
+        List<String> sansPremiereEntree = listeNomDepot.subList(1, listeNomDepot.size());
+        Collections.sort(sansPremiereEntree);
+        listeNomDepot = new ArrayList<>();
+        listeNomDepot.add(premierElement);
+        listeNomDepot.addAll(sansPremiereEntree);
+
+        autoCompleteAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_depot, listeNomDepot);
+        autoComplete.setAdapter(autoCompleteAdapter);
+        autoComplete.setThreshold(100);
+
+        if (!listeNomDepot.isEmpty()) {
+            autoComplete.setText(listeNomDepot.get(0), false);
+        }
+
+        int hauteurEcran = getResources().getDisplayMetrics().heightPixels;
+        autoComplete.setDropDownHeight(hauteurEcran / 3);
+        autoComplete.setDropDownBackgroundResource(android.R.color.white);
+
+        autoComplete.post(() -> {
+            int dpToPx = (int) (12 * getResources().getDisplayMetrics().density);
+            autoComplete.setDropDownWidth(findViewById(R.id.listeFiltre_LL).getWidth() - dpToPx);
+        });
+
+        autoComplete.setOnClickListener(v -> autoComplete.showDropDown());
+        findViewById(R.id.chevronFiltre).setOnClickListener(v -> autoComplete.showDropDown());
+
+        autoComplete.setOnItemClickListener((parent, view, position, id) -> {
+            String depot = listeNomDepot.get(position);
+            autoComplete.setText(depot, false);
+            autoComplete.dismissDropDown();
+
+            phPreparationList = new ArrayList<>();
+
+            if (depot.contentEquals("Tous les dépôts")) {
+                phPreparationList.addAll(phPreparationListBase);
+            } else {
+                for (PH_Preparation preparation_courante : phPreparationListBase) {
+                    Depot depotTemp = DepotOpenHelper.getDepotParID(db, preparation_courante.getDepotDestinataireID());
+                    if (depotTemp.getNom().contentEquals(depot)) {
+                        phPreparationList.add(preparation_courante);
+                    }
+                }
+            }
+
+            gestionAdapter();
+        });
     }
 }

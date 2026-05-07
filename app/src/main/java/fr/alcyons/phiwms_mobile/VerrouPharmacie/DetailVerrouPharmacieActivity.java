@@ -36,6 +36,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
@@ -166,7 +167,6 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
 
         // Gestion de la listView
         phPreparationLigneListView = (ListView) findViewById(R.id.listeView);
-        phPreparationLigneListView.setDivider(footer);
         phPreparationLigneListView.setItemsCanFocus(true);
 
         // Génération de la liste de PH_Preparation_Ligne_VerrouPharmacieAdapter
@@ -808,7 +808,9 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
         builder.setView(layout);
 
         final AlertDialog alertDialog = builder.create();
-        alertDialog.getWindow().setGravity(Gravity.CENTER);
+        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        alertDialog.show();
         alertDialog.show();
 
         zoneok.setOnClickListener(new View.OnClickListener() {
