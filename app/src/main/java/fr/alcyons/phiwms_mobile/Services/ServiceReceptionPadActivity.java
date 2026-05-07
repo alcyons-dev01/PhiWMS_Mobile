@@ -321,7 +321,6 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
         commandeList.sort(Comparator.comparing(Commande::getNumero));
 
         commandeReceptionPADAdapter = new ReceptionAdapter(ServiceReceptionPadActivity.this, db, commandeList);
-        commandeListView.setDivider(footer);
         commandeListView.setAdapter(commandeReceptionPADAdapter);
 
         if (commandeList.isEmpty()) {

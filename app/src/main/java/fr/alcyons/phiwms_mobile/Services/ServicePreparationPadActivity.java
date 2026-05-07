@@ -63,6 +63,7 @@ import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparationActivity;
+import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.DetailPreparationV2;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
@@ -91,7 +92,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
         ph_preparation_ListView.setOnItemClickListener((parent, view, position, id) -> {
             PH_Preparation ph_preparation_Selectionne = (PH_Preparation) ph_preparation_preparationAdapter.getItem(position);
 
-            Intent servicePreparationPad_Intent = new Intent(ServicePreparationPadActivity.this, DetailPreparationActivity.class);
+            Intent servicePreparationPad_Intent = new Intent(ServicePreparationPadActivity.this, DetailPreparationV2.class);
             Bundle servicePreparationPad_Bundle = ServicePreparationPadActivity.super.getBundle();
             assert ph_preparation_Selectionne != null;
             servicePreparationPad_Bundle.putInt("ph_preparationUID_Selectionne", ph_preparation_Selectionne.getUID());
@@ -396,7 +397,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
 
     @NonNull
     private Intent getIntent(PH_Preparation ph_preparation_Selectionne) {
-        Intent servicePreparationPad_Intent = new Intent(ServicePreparationPadActivity.this, DetailPreparationActivity.class);
+        Intent servicePreparationPad_Intent = new Intent(ServicePreparationPadActivity.this, DetailPreparationV2.class);
         Bundle servicePreparationPad_Bundle = ServicePreparationPadActivity.super.getBundle();
         servicePreparationPad_Bundle.putInt("ph_preparationUID_Selectionne", ph_preparation_Selectionne.getUID());
         servicePreparationPad_Bundle.putString("genre", "PAD");

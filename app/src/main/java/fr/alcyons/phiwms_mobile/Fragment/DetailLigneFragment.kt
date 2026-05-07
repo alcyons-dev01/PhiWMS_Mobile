@@ -177,7 +177,7 @@ class DetailLigneFragment : Fragment() {
         spinnerAnneeDatePeremptionSP.adapter = adapterAnneePeremption
         spinnerAnneeDatePeremptionSP.setSelection(3)
 
-        if (!ligne.peremptionDate.isNullOrEmpty() && ligne.peremptionDate != "0000-00-00" && !nouvelleCreation) {
+        if (!ligne.peremptionDate.isNullOrEmpty() && ligne.peremptionDate != "0000-00-00") {
             val parts = ligne.peremptionDate.split("-")
             val annee = parts[0] // "2026"
             val mois = parts[1].toInt() - 1 // "04" → index 3 (0-based)

@@ -121,7 +121,7 @@ public class ReceptionAdapter extends ArrayAdapter implements Filterable {
 
         //affichage du nombre de colis et du poids
         viewHolder.nbColisTotal.setText(String.valueOf(commandeCourant.getNbColisTotal_CE()));
-        viewHolder.poidsTotal.setText(String.valueOf(commandeCourant.getPoidsTotal_CE()));
+        viewHolder.poidsTotal.setText(String.valueOf(commandeCourant.getPoidsTotal_CE())+" kg");
 
         // Gestion des dates
         Date dateLiv = null;
