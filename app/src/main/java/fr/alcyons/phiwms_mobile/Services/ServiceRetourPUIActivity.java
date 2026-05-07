@@ -38,6 +38,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -52,6 +53,8 @@ import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourPUIAdapter;
+import fr.alcyons.phiwms_mobile.MainActivity;
+import fr.alcyons.phiwms_mobile.MenuActivity;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
@@ -59,148 +62,157 @@ import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.RetourPUI.DetailRetourPUIActivity;
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 
-public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
-    List<Retour> retourList;
-    ListView retourListView;
-    RetourPUIAdapter adapter;
-    PackageManager pm;
-    JSONArray retourJSONArray;
-    NavigationActivity navigationActivity;
-    Context context;
-    boolean connexionDirecte;
-    ActivityResultLauncher<Intent> resultScanDocument;
+public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity
+{
+    private List<Retour> retourList = null;
+    private ListView retourListView = null ;
+    private RetourPUIAdapter adapter = null ;
+    private PackageManager pm = null ;
+    private JSONArray retourJSONArray = null ;
+    private NavigationActivity navigationActivity = null ;
+    private Context context = null ;
+    private boolean connexionDirecte = false ;
+    private ActivityResultLauncher<Intent> resultScanDocument = null ;
 
     @SuppressLint("SetTextI18n")
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    @Override protected void onCreate(final Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_liste_refresh);
+        this.setContentView(R.layout.activity_liste_refresh);
 
         // Modification du titre
-        pm = ServiceRetourPUIActivity.this.getPackageManager();
+        this.pm = ServiceRetourPUIActivity.this.getPackageManager();
         // Gestion de la listView
-        retourListView = (ListView) findViewById(R.id.listeView);
-        retourListView.setOnItemClickListener((parent, view, position, id) -> {
-            Retour retourSelectionne = (Retour) adapter.getItem(position);
+        this.retourListView = (ListView) findViewById(R.id.listeView);
+        this.retourListView.setOnItemClickListener((parent, view, position, id) -> {
+            final Retour retourSelectionne = (Retour) this.adapter.getItem(position);
 
-            Intent serviceRetourPuiIntent = new Intent(ServiceRetourPUIActivity.this, DetailRetourPUIActivity.class);
-            Bundle serviceRetourPuiBundle = ServiceRetourPUIActivity.super.getBundle();
-            assert retourSelectionne != null;
+            final Intent serviceRetourPuiIntent = new Intent(ServiceRetourPUIActivity.this, DetailRetourPUIActivity.class);
+            final Bundle serviceRetourPuiBundle = ServiceRetourPUIActivity.super.getBundle();
+            assert null != retourSelectionne;
             serviceRetourPuiBundle.putInt("retourSelectionneID", retourSelectionne.get_UID());
 
             serviceRetourPuiIntent.putExtras(serviceRetourPuiBundle);
             ServiceRetourPUIActivity.this.startActivity(serviceRetourPuiIntent);
             ServiceRetourPUIActivity.this.finish();
         });
-        navigationActivity = new NavigationActivity();
-        context = navigationActivity;
 
-        connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(db);
+        this.navigationActivity = new NavigationActivity();
+        this.context = this.navigationActivity;
 
-        resultScanDocument = registerForActivityResult(
+        this.connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(this.db).booleanValue();
+
+        this.resultScanDocument = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    Intent data = result.getData();
-                    if (result.getResultCode() == CodesEchangesActivites.RESULT_OK) {
-                        if (data != null) {
-                            String code = Objects.requireNonNull(data.getExtras()).getString("code");
-                            if (code != null) {
-                                Retour retourSelectionne = RetourOpenHelper.getRetourByNumero(db, code);
-                                if (retourSelectionne == null) {
-                                    if (!code.contentEquals("")) {
-                                        afficherSnackBarRetourPUI();
-                                    }
+                    final Intent data = result.getData();
+                    if (CodesEchangesActivites.RESULT_OK == result.getResultCode())
+                    {
+                        if (null != data)
+                        {
+                            final String code = Objects.requireNonNull(data.getExtras()).getString("code");
+                            if (null != code) {
+                                final Retour retourSelectionne = RetourOpenHelper.getRetourByNumero(this.db, code);
+                                if (null == retourSelectionne)
+                                {
+                                    if (!code.contentEquals("")) {this.afficherSnackBarRetourPUI();}
                                     /* Code nécessaire à l'affichage de la liste */
-                                    adapter = new RetourPUIAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
-                                    retourListView.setAdapter(adapter);
+                                    this.adapter = new RetourPUIAdapter(ServiceRetourPUIActivity.this, this.db, this.retourList, this.utilisateurConnecte);
+                                    this.retourListView.setAdapter(this.adapter);
 
-                                    if (retourList.isEmpty()) {
-                                        vide = true;
-                                        nomServiceVide = "Retour PUI";
+                                    if (this.retourList.isEmpty())
+                                    {
+                                        MenuActivity.vide = Boolean.TRUE;
+                                        MenuActivity.nomServiceVide = "Retour PUI";
                                         ServiceRetourPUIActivity.this.finish();
                                     }
 
-                                    invalidateOptionsMenu();
-                                } else {
-                                    Intent serviceRetourPuiIntent = new Intent(ServiceRetourPUIActivity.this, DetailRetourPUIActivity.class);
-                                    Bundle serviceRetourPuiBundle = ServiceRetourPUIActivity.super.getBundle();
+                                    this.invalidateOptionsMenu();
+                                }
+                                else
+                                {
+                                    final Intent serviceRetourPuiIntent = new Intent(ServiceRetourPUIActivity.this, DetailRetourPUIActivity.class);
+                                    final Bundle serviceRetourPuiBundle = ServiceRetourPUIActivity.super.getBundle();
                                     serviceRetourPuiBundle.putInt("retourSelectionneID", retourSelectionne.get_UID());
 
                                     serviceRetourPuiIntent.putExtras(serviceRetourPuiBundle);
                                     ServiceRetourPUIActivity.this.startActivity(serviceRetourPuiIntent);
                                     ServiceRetourPUIActivity.this.finish();
                                 }
-                            } else {
-                                adapter = new RetourPUIAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
-                                retourListView.setAdapter(adapter);
+                            }
+                            else
+                            {
+                                this.adapter = new RetourPUIAdapter(ServiceRetourPUIActivity.this, this.db, this.retourList, this.utilisateurConnecte);
+                                this.retourListView.setAdapter(this.adapter);
 
-                                if (retourList.isEmpty()) {
+                                if (this.retourList.isEmpty()) {
 
-                                    vide = true;
-                                    nomServiceVide = "Retour PUI";
+                                    MenuActivity.vide = Boolean.TRUE;
+                                    MenuActivity.nomServiceVide = "Retour PUI";
                                     ServiceRetourPUIActivity.this.finish();
                                 }
 
-                                invalidateOptionsMenu();
+                                this.invalidateOptionsMenu();
                             }
-                        } else {
+                        }
+                        else
+                        {
                             /* Code nécessaire à l'affichage de la liste */
-                            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                            adapter = new RetourPUIAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
-                            retourListView.setAdapter(adapter);
+                            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(this.retourList.size()));
+                            this.adapter = new RetourPUIAdapter(ServiceRetourPUIActivity.this, this.db, this.retourList, this.utilisateurConnecte);
+                            this.retourListView.setAdapter(this.adapter);
 
-                            if (retourList.isEmpty()) {
-
-                                vide = true;
-                                nomServiceVide = "Retour PUI";
+                            if (this.retourList.isEmpty())
+                            {
+                                MenuActivity.vide = Boolean.TRUE;
+                                MenuActivity.nomServiceVide = "Retour PUI";
                                 ServiceRetourPUIActivity.this.finish();
                             }
 
-                            invalidateOptionsMenu();
+                            this.invalidateOptionsMenu();
                         }
                     }
                 });
 
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                Intent intent = new Intent(ServiceRetourPUIActivity.this, NavigationActivity.class);
-                Bundle extras = new Bundle();
-                extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-                intent.putExtras(extras);
-                ServiceRetourPUIActivity.this.startActivity(intent);
+        this.getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override public void handleOnBackPressed()
+            {
+                final Intent onBackIntent = new Intent(ServiceRetourPUIActivity.this, NavigationActivity.class);
+                final Bundle extras = new Bundle();
+                extras.putInt("utilisateurConnecteID", ServiceRetourPUIActivity.this.utilisateurConnecte.getId());
+                onBackIntent.putExtras(extras);
+                ServiceRetourPUIActivity.this.startActivity(onBackIntent);
                 ServiceRetourPUIActivity.this.finish();
             }
         });
     }
 
     @SuppressLint("SetTextI18n")
-    @Override
-    public void onResume() {
+    @Override public void onResume()
+    {
         super.onResume();
-        retourList = new ArrayList<>();
+        this.retourList = new ArrayList<>();
 
-        if (statutConnexion && passageParOnCreate && !connexionDirecte) {
+        if (MainActivity.statutConnexion && this.passageParOnCreate && !this.connexionDirecte) {
 
-            if (!swipeRefreshLayout.isRefreshing()) {
-                afficherSpinner(ServiceRetourPUIActivity.this, LayoutInflater.from(ServiceRetourPUIActivity.this));
-            }
+            if (!this.swipeRefreshLayout.isRefreshing()) { this.afficherSpinner(ServiceRetourPUIActivity.this, LayoutInflater.from(ServiceRetourPUIActivity.this)); }
 
-            RequestQueue requestQueueRetourPUI = Volley.newRequestQueue(ServiceRetourPUIActivity.this);
-            String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteRetourPUI;
+            final RequestQueue requestQueueRetourPUI = Volley.newRequestQueue(ServiceRetourPUIActivity.this);
+            final String urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(this.db) + DBOpenHelper.Urls.uriRequeteRetourPUI;
 
-            JsonObjectRequest obreq = getJsonObjectRequest(urlRequete);
+            final JsonObjectRequest obreq = this.getJsonObjectRequest(urlRequete);
             requestQueueRetourPUI.add(obreq);
         }
         else
         {
-            retourList = RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(db, getString(R.string.statutEncours), getString(R.string.RetourPUIDemande));
-            if (retourList.isEmpty()) {
-                if(connexionDirecte)
+            this.retourList = RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(this.db, getString(R.string.statutEncours), getString(R.string.RetourPUIDemande));
+            if (this.retourList.isEmpty())
+            {
+                if(this.connexionDirecte)
                 {
-                    Intent retourVersServiceConnexionDirectIntent = new Intent(ServiceRetourPUIActivity.this, ServiceConnexionDirecteActivity.class);
-                    Bundle retourVersServiceConnexionDirectBundle = new Bundle();
-                    retourVersServiceConnexionDirectBundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+                    final Intent retourVersServiceConnexionDirectIntent = new Intent(ServiceRetourPUIActivity.this, ServiceConnexionDirecteActivity.class);
+                    final Bundle retourVersServiceConnexionDirectBundle = new Bundle();
+                    retourVersServiceConnexionDirectBundle.putInt("utilisateurConnecteID", this.utilisateurConnecte.getId());
                     retourVersServiceConnexionDirectBundle.putBoolean("snackBar", true);
                     retourVersServiceConnexionDirectBundle.putString("nomService", "Retour PUI");
 
@@ -210,157 +222,134 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
                 }
                 else
                 {
-                    connexionNecessaire();
+                    this.connexionNecessaire();
                     return;
                 }
             }
             else
             {
-                passageParOnCreate = false;
-                if(connexionDirecte)
+                this.passageParOnCreate = false;
+                if(this.connexionDirecte)
                 {
                     /* Code nécessaire à l'affichage de la liste */
-                    adapter = new RetourPUIAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
-                    retourListView.setAdapter(adapter);
+                    this.adapter = new RetourPUIAdapter(ServiceRetourPUIActivity.this, this.db, this.retourList, this.utilisateurConnecte);
+                    this.retourListView.setAdapter(this.adapter);
 
-                    if (retourList.isEmpty()) {
-                        new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
-                        vide = true;
-                        nomServiceVide = "Retour PUI";
+                    if (this.retourList.isEmpty()) {
+                        new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500L);
+                        MenuActivity.vide = Boolean.TRUE;
+                        MenuActivity.nomServiceVide = "Retour PUI";
                         ServiceRetourPUIActivity.this.finish();
                     }
 
-                    invalidateOptionsMenu();
-                    connexionDirecte = !connexionDirecte;
+                    this.invalidateOptionsMenu();
+                    this.connexionDirecte = !this.connexionDirecte;
                 }
             }
 
-            invalidateOptionsMenu();
-            new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
+            this.invalidateOptionsMenu();
+            new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500L);
         }
     }
 
-    @NonNull
-    private JsonObjectRequest getJsonObjectRequest(String urlRequete) {
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,null,
-                response -> {
-                    try {
-                        int resultCount = response.getInt("resultCount");
-                        if (resultCount == 0) {
-                            String erreur = response.getString("erreur");
-                            if (erreur.equals(getString(R.string.tokenInvalide))) {
-                                Alerte.afficherAlerteInformation(ServiceRetourPUIActivity.this, getLayoutInflater(), "Alerte", "Votre session a expirée, veuillez vous reconnecter.", false, true);
-                            } else if (erreur.equals(getString(R.string.tokenExpire))) {
-                                Alerte.afficherAlerteInformation(ServiceRetourPUIActivity.this, getLayoutInflater(), "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter", false, true);
-                            } else if (!erreur.equals(getString(R.string.aucunRetour))) {
-                                Alerte.afficherAlerteInformation(ServiceRetourPUIActivity.this, getLayoutInflater(), "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete service retour pui", false, true);
-                            } else {
-                                arreterSpinner();
-                                Alerte.afficherAlerteInformation(ServiceRetourPUIActivity.this, getLayoutInflater(), "Alerte", "Aucun Retour PUI à traiter", false, true);
-                            }
-                        } else {
-                            viderTablesConcernees();
+    @NonNull private JsonObjectRequest getJsonObjectRequest(final String urlRequete)
+    {
+        final JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, urlRequete,null, response -> {
+            try
+            {
+                final int resultCount = response.getInt("resultCount");
+                if (0 == resultCount)
+                {
+                    final String erreur = response.getString("erreur");
+                    if (erreur.equals(getString(R.string.tokenInvalide))) { Alerte.afficherAlerteInformation(ServiceRetourPUIActivity.this, getLayoutInflater(), "Alerte", "Votre session a expirée, veuillez vous reconnecter.", false, true); }
+                    else if (erreur.equals(getString(R.string.tokenExpire))) { Alerte.afficherAlerteInformation(ServiceRetourPUIActivity.this, getLayoutInflater(), "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter", false, true); }
+                    else if (!erreur.equals(getString(R.string.aucunRetour))) { Alerte.afficherAlerteInformation(ServiceRetourPUIActivity.this, getLayoutInflater(), "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete service retour pui", false, true); }
+                    else
+                    {
+                        this.arreterSpinner();
+                        Alerte.afficherAlerteInformation(ServiceRetourPUIActivity.this, getLayoutInflater(), "Alerte", "Aucun Retour PUI à traiter", false, true);
+                    }
+                }
+                else
+                {
+                    this.viderTablesConcernees();
 
-                            retourJSONArray = response.getJSONArray("PH_Retours");
+                    this.retourJSONArray = response.getJSONArray("PH_Retours");
 
-                            for (int i = 0; i < retourJSONArray.length(); i++) {
-                                JSONObject retourJSONObject = retourJSONArray.getJSONObject(i);
-                                Retour retour = new Retour(retourJSONObject);
+                    for (int i = 0; i < this.retourJSONArray.length(); i++)
+                    {
+                        final JSONObject retourJSONObject = this.retourJSONArray.getJSONObject(i);
+                        final Retour retour = new Retour(retourJSONObject);
 
-                                if (retour.getEn_Attente_de().equals(getString(R.string.RetourPUIDemande)) && retour.getStatut().equals(getString(R.string.statutEncours))) {
-                                    retourList.add(retour);
-                                    long rowID = RetourOpenHelper.insererUnRetourEnBDD(db, retour);
-                                    if (rowID != -1) {
-                                        JSONArray retourLigneJSONArray = retourJSONObject.getJSONArray("ph_retour_ligne");
-                                        for (int k = 0; k < retourLigneJSONArray.length(); k++) {
-                                            JSONObject retourLigneJSONObject = retourLigneJSONArray.getJSONObject(k);
-                                            Retour_Ligne retourLigne = new Retour_Ligne(retourLigneJSONObject);
-                                            Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(db, retourLigne);
-                                        }
-                                    }
+                        if (retour.getEn_Attente_de().equals(getString(R.string.RetourPUIDemande)) && retour.getStatut().equals(getString(R.string.statutEncours)))
+                        {
+                            this.retourList.add(retour);
+                            final long rowID = RetourOpenHelper.insererUnRetourEnBDD(this.db, retour);
+                            if (rowID != -1L)
+                            {
+                                final JSONArray retourLigneJSONArray = retourJSONObject.getJSONArray("ph_retour_ligne");
+                                for (int k = 0; k < retourLigneJSONArray.length(); k++)
+                                {
+                                    final JSONObject retourLigneJSONObject = retourLigneJSONArray.getJSONObject(k);
+                                    final Retour_Ligne retourLigne = new Retour_Ligne(retourLigneJSONObject);
+                                    Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(this.db, retourLigne);
                                 }
                             }
-
-                            if (retourList.isEmpty()) {
-                                new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
-                                vide = true;
-                                nomServiceVide = "Retour PUI";
-                                ServiceRetourPUIActivity.this.finish();
-                            }
-                            else
-                            {
-                                adapter = new RetourPUIAdapter(ServiceRetourPUIActivity.this, db, retourList, utilisateurConnecte);
-                                retourListView.setAdapter(adapter);
-                                new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
-                                passageParOnCreate = false;
-                            }
-
-                            invalidateOptionsMenu();
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
                     }
-                },
-                error -> {
-                    Log.e("Volley", "Error");
-                    Alerte.afficherAlerteInformation(ServiceRetourPUIActivity.this, getLayoutInflater(), "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP service retour pui", false, true);
+
+                    if (this.retourList.isEmpty())
+                    {
+                        new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500L);
+                        MenuActivity.vide = true;
+                        MenuActivity.nomServiceVide = "Retour PUI";
+                        ServiceRetourPUIActivity.this.finish();
+                    }
+                    else
+                    {
+                        this.adapter = new RetourPUIAdapter(ServiceRetourPUIActivity.this, this.db, this.retourList, this.utilisateurConnecte);
+                        this.retourListView.setAdapter(this.adapter);
+                        new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500L);
+                        this.passageParOnCreate = false;
+                    }
+
+                    this.invalidateOptionsMenu();
                 }
-        ) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", utilisateurConnecte.getToken());
+            } catch (final JSONException e) { e.printStackTrace(); }
+        },
+        error -> {
+            Log.e("Volley", "Error");
+            Alerte.afficherAlerteInformation(ServiceRetourPUIActivity.this, getLayoutInflater(), "Erreur HTTP", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : HTTP service retour pui", false, true);
+        })
+        {
+            @Override public Map<String, String> getHeaders() throws AuthFailureError
+            {
+                final Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", ServiceRetourPUIActivity.this.utilisateurConnecte.getToken());
                 return headers;
             }
         };
-        obreq.setRetryPolicy(retryPolicy);
+
+        obreq.setRetryPolicy(this.retryPolicy);
         return obreq;
     }
 
     public void viderTablesConcernees() {
-        for (Retour retour : RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(db, getString(R.string.statutEncours), getString(R.string.RetourPUIDemande))
-                ) {
-            List<Retour_Ligne> retourLigneList = Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(db, retour);
-            for (Retour_Ligne retourLigne : retourLigneList
-                    ) {
-                Retour_LigneOpenHelper.supprimerUnRetourLigne(db, retourLigne);
-            }
-            RetourOpenHelper.supprimerUnRetour(db, retour);
+        for (final Retour retour : RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(this.db, getString(R.string.statutEncours), getString(R.string.RetourPUIDemande)))
+        {
+            final List<Retour_Ligne> retourLigneList = Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(this.db, retour);
+            for (final Retour_Ligne retourLigne : retourLigneList) { Retour_LigneOpenHelper.supprimerUnRetourLigne(this.db, retourLigne); }
+            RetourOpenHelper.supprimerUnRetour(this.db, retour);
         }
-    }
-
-    // Nécessaire afin d'avoir l'item Search
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.prepareOptionsMenu(menu, adapter, null, "Produit, Intitulé, N°...");
-        MenuItem item = menu.findItem(R.id.menuDatamatrix);
-        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-
-            @Override
-            public boolean onMenuItemClick(@NonNull MenuItem item) {
-                return true;
-            }
-        });
-        return true;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        //Récupération du menu
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_action, menu);
-        menu.findItem(R.id.menuDatamatrix).setVisible(false);
-        return true;
     }
 
     public void lancerScan()
     {
-        Bundle scanDocumentBundle = ServiceRetourPUIActivity.super.getBundle();
+        final Bundle scanDocumentBundle = ServiceRetourPUIActivity.super.getBundle();
         scanDocumentBundle.putString("contexte", String.valueOf(R.string.scannerContexteDocument));
         scanDocumentBundle.putBoolean("isBoutonSuppressionExistant", true);
         Intent scanDocumentIntent = null;
-        if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell") || Build.MANUFACTURER.toLowerCase().contains("google"))
+        if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase(Locale.ROOT).contains("honeywell") || Build.MANUFACTURER.toLowerCase().contains("google"))
         {
             scanDocumentIntent = new Intent(ServiceRetourPUIActivity.this, ScannerDocumentActivity.class);
             scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteDocument);
@@ -368,7 +357,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
         }
         else
         {
-            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
+            if(this.pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
             {
                 scanDocumentIntent = new Intent(ServiceRetourPUIActivity.this, BarcodeCaptureActivity.class);
                 scanDocumentBundle.putBoolean("modeRafale", false);
@@ -382,17 +371,18 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity {
         }
 
         scanDocumentIntent.putExtras(scanDocumentBundle);
-        resultScanDocument.launch(scanDocumentIntent);
+        this.resultScanDocument.launch(scanDocumentIntent);
     }
 
-    public void afficherSnackBarRetourPUI() {
+    private void afficherSnackBarRetourPUI()
+    {
         Snackbar snackbar = null;
         snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Document scanné inconnu</b>", 0), Snackbar.LENGTH_LONG);
 
         @SuppressLint("RestrictedApi") Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
         layout.setBackgroundColor(getResources().getColor(R.color.rouge2, null));
-        TextView textView = (TextView) layout.findViewById(com.google.android.material.R.id.snackbar_text);
-        textView.setTextSize(TypedValue.TYPE_STRING, 8);
+        final TextView textView = (TextView) layout.findViewById(com.google.android.material.R.id.snackbar_text);
+        textView.setTextSize(TypedValue.TYPE_STRING, 8.0F);
         snackbar.show();
     }
 }
