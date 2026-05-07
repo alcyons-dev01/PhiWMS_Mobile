@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/white">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@android:color/white">
+
+        <LinearLayout
+            android:id="@+id/barreDeTitre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/bleu_fonce_alcyons"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/intitule"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text=""
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="10dp"
+                android:weightSum="2">
+
+                <TextView
+                    android:id="@+id/motif"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:gravity="left"
+                    android:textColor="@android:color/white" />
+
+                <TextView
+                    android:id="@+id/numero"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:gravity="right"
+                    android:textColor="@android:color/white" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/temp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/barreDeTitre"
+            android:background="@color/bleu_fonce_alcyons"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:weightSum="2"/>
+
+        <RelativeLayout
+            android:id="@+id/zoneListView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/barreDeTitre"
+            android:orientation="vertical"
+            android:background="@drawable/background_empty_radius"
+            android:layout_marginTop="5dp"
+            android:padding="15dp">
+
+            <ListView
+                android:id="@+id/listeView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:descendantFocusability="afterDescendants"
+                android:dividerHeight="15dp"
+                android:divider="@android:color/transparent">
+            </ListView>
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
