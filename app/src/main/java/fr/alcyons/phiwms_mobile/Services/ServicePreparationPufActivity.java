@@ -299,12 +299,10 @@ public class ServicePreparationPufActivity extends ServiceAvecConnexionActivity 
 
     public void viderTablesConcernees() {
         for (PH_Preparation ph_preparation : PH_PreparationOpenHelper.getAllPHPreparationPreparationPUF(db)) {
-            if (!ph_preparation.getListe().contentEquals("ALCYONS_LISTE")) {
-                for (PH_Preparation_Ligne ph_preparation_ligne : PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesBaseParPHPreparation(db, ph_preparation)) {
-                    PH_Preparation_LigneOpenHelper.supprimerUnPhPreparationLigne(db, ph_preparation_ligne);
-                }
-                PH_PreparationOpenHelper.supprimerUnPhPreparation(db, ph_preparation);
+            for (PH_Preparation_Ligne ph_preparation_ligne : PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, ph_preparation)) {
+                PH_Preparation_LigneOpenHelper.supprimerUnPhPreparationLigne(db, ph_preparation_ligne);
             }
+            PH_PreparationOpenHelper.supprimerUnPhPreparation(db, ph_preparation);
         }
     }
 

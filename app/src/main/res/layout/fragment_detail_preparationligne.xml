@@ -28,7 +28,7 @@
 
     <!-- Bandeau nouvelle référence -->
     <LinearLayout
-        android:id="@+id/bandeauNouvelleReference_LL"
+        android:id="@+id/bandeauNouveauLot_LL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#C62828"
@@ -39,7 +39,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nouvelle référence inventoriée"
+            android:text="Nouveau lot"
             android:textColor="#FFFFFF"
             android:textSize="13sp"
             android:textStyle="bold"
@@ -127,22 +127,38 @@
                         android:textSize="10sp"
                         android:alpha="0.6"/>
 
-                    <EditText
-                        android:id="@+id/numeroLot_ET"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:inputType="text"
-                        android:textColor="@color/bleu_fonce_alcyons"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:background="@android:color/transparent"
-                        android:padding="0dp"
-                        android:gravity="center_vertical"/>
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <EditText
+                            android:id="@+id/numeroLot_ET"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:inputType="text"
+                            android:textColor="@color/bleu_fonce_alcyons"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:background="@android:color/transparent"
+                            android:padding="0dp"
+                            android:gravity="center_vertical"/>
+
+                        <ImageView
+                            android:id="@+id/effacerLot_IV"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_clear"
+                            app:tint="@color/bleu_fonce_alcyons"
+                            android:alpha="0.6"/>
+
+                    </LinearLayout>
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-
             <!-- Péremption -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/layoutDatePeremption_CV"
@@ -186,7 +202,8 @@
             android:layout_height="80dp"
             android:orientation="horizontal"
             android:baselineAligned="false"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="10dp"
+            android:visibility="visible">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardViewListLot"
@@ -306,6 +323,39 @@
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bandeauQteRestante_LL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#C62828"
+        android:padding="6dp"
+        android:visibility="visible">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Restant à préparer"
+            android:gravity="left"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"/>
+
+        <TextView
+            android:id="@+id/restantAPreparer_TV"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text=""
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"/>
 
     </LinearLayout>
 

@@ -1,150 +1,182 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white">
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="#F0F4FF">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="5dp"
-        android:background="@drawable/background_element_liste">
+        android:orientation="vertical">
 
+        <!-- Header : Fournisseur + Numéro commande -->
         <LinearLayout
             android:id="@+id/layoutCommande"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="2"
-            android:padding="5dp"
-            android:background="@drawable/background_liste_verrou">
+            android:background="@color/bleu_fonce_alcyons"
+            android:padding="14dp">
 
             <TextView
                 android:id="@+id/fournisseurVerrou"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@android:color/white"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
                 android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:text=""/>
 
             <TextView
                 android:id="@+id/numeroCommande"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="right"
-                android:textColor="@android:color/white"
+                android:gravity="end"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:text=""/>
 
         </LinearLayout>
 
+        <!-- Corps -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_below="@+id/layoutCommande"
-            android:padding="5dp"
-            android:weightSum="5">
+            android:background="#F0F4FF"
+            android:padding="12dp">
 
+            <!-- Zone gauche : Dépôt + Numéro -->
             <LinearLayout
                 android:id="@+id/zoneGauche"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
                 android:layout_weight="3"
                 android:orientation="vertical">
-
-
 
                 <LinearLayout
                     android:id="@+id/zoneDepot"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
 
                     <TextView
                         android:id="@+id/depotNom"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
                         android:layout_weight="2"
-                        android:text="" />
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:text=""/>
 
                 </LinearLayout>
+
+                <!-- Séparateur -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/bleu_clair_alcyons_transparent"
+                    android:layout_marginBottom="8dp"/>
 
                 <LinearLayout
                     android:id="@+id/zoneCommandeLivraison"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginRight="5dp"
-                        android:layout_marginEnd="5dp"
-                        android:text="@string/numero" />
+                        android:layout_height="wrap_content"
+                        android:text="@string/numero"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="14sp"
+                        android:alpha="0.6"
+                        android:layout_marginEnd="5dp"/>
 
                     <TextView
                         android:id="@+id/numCommande"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:text=""
-                        android:textColor="@android:color/black"
-                        android:textStyle="bold" />
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:text=""/>
 
                 </LinearLayout>
 
             </LinearLayout>
 
-            <ImageView
-                android:layout_width="2dp"
+            <!-- Séparateur vertical -->
+            <View
+                android:layout_width="1dp"
                 android:layout_height="match_parent"
-                android:contentDescription="@string/separateur"
-                android:background="@color/bleu_clair_alcyons" />
+                android:background="@color/bleu_clair_alcyons_transparent"
+                android:layout_marginHorizontal="10dp"/>
 
-            <LinearLayout
+            <!-- Zone droite : Date + Délai -->
+            <androidx.cardview.widget.CardView
                 android:id="@+id/zoneDroite"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
+                android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:layout_gravity="center_vertical"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/bleu_fonce_alcyons">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:background="@color/bleu_clair_alcyons"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="8dp">
 
                     <TextView
                         android:id="@+id/livraisonPrevueDate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text=""
-                        android:textColor="@android:color/white" />
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:text=""/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#33FFFFFF"
+                        android:layout_marginVertical="6dp"/>
+
+                    <TextView
+                        android:id="@+id/delaiLivraison"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textColor="#AAAAFF"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:text=""/>
 
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/delaiLivraison"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text=""
-                    android:textStyle="bold" />
-
-            </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
         </LinearLayout>
 
-    </RelativeLayout>
+    </LinearLayout>
 
-</RelativeLayout>
+</androidx.cardview.widget.CardView>

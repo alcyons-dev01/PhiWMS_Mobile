@@ -1,58 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@android:color/white">
 
     <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:background="@android:color/white">
 
+        <!-- Barre de titre -->
         <LinearLayout
             android:id="@+id/barreDeTitre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
             android:background="@color/bleu_fonce_alcyons"
             android:orientation="vertical"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp">
+            android:padding="12dp">
 
+            <!-- Fournisseur + Numéro commande -->
             <LinearLayout
                 android:id="@+id/informationCommande"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="2">
+                android:weightSum="2"
+                android:layout_marginBottom="6dp">
 
                 <TextView
                     android:id="@+id/fournisseurCommande"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginEnd="5dp"
                     android:layout_weight="1"
                     android:text=""
                     android:textColor="#FFFFFF"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
 
                 <TextView
                     android:id="@+id/commandeNumero"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_gravity="end"
+                    android:gravity="end"
                     android:text=""
-                    android:textAlignment="textEnd"
                     android:textColor="@color/bleu_clair_alcyons"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
 
             </LinearLayout>
 
+            <!-- Séparateur -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#33FFFFFF"
+                android:layout_marginBottom="6dp"/>
+
+            <!-- Dépôt + Numéro préparation -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -63,132 +72,168 @@
                     android:id="@+id/depotNom"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginEnd="5dp"
                     android:layout_weight="2"
                     android:text=""
                     android:textColor="#FFFFFF"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
 
                 <TextView
                     android:id="@+id/preparationNumero"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_gravity="end"
+                    android:gravity="end"
                     android:text=""
-                    android:textAlignment="textEnd"
                     android:textColor="@color/bleu_clair_alcyons"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <LinearLayout
+        <!-- Zone infos colis -->
+        <androidx.cardview.widget.CardView
             android:id="@+id/zoneInfos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/barreDeTitre"
-            android:orientation="horizontal"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp">
+            android:layout_below="@+id/barreDeTitre"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#F0F4FF">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:orientation="horizontal"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:weightSum="2">
+                android:padding="12dp">
 
+                <!-- Colis à réceptionner -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_weight="1">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:contentDescription="@string/colis"
-                        android:background="@drawable/ic_colis"
-                        android:layout_marginRight="5dp"/>
-
-                    <TextView
-                        android:id="@+id/nbColisTotal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:gravity="center"
-                        android:textColor="@color/rouge2"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:layout_marginRight="5dp"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:layout_weight="1"
-                    android:gravity="right">
-
-                    <TextView
-                        android:id="@+id/nbColisTotalReceptionner"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:gravity="center"
-                        android:textColor="@color/vert"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:layout_marginRight="5dp"/>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
                     <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/ic_colis"
+                        android:layout_marginEnd="8dp"/>
+
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:contentDescription="@string/colis"
-                        android:background="@drawable/ic_colis"
-                        android:backgroundTint="@color/vert"
-                        android:layout_marginRight="5dp"/>
+                        android:orientation="vertical">
 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="À déverrouiller"
+                            android:textColor="@color/bleu_fonce_alcyons"
+                            android:textSize="10sp"
+                            android:alpha="0.6"/>
 
+                        <TextView
+                            android:id="@+id/nbColisTotal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/rouge"
+                            android:textSize="20sp"
+                            android:textStyle="bold"/>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
+                <!-- Séparateur vertical -->
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/bleu_clair_alcyons_transparent"
+                    android:layout_marginHorizontal="8dp"/>
 
+                <!-- Colis réceptionnés -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical|end">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="end"
+                        android:layout_marginEnd="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Déverrouiller"
+                            android:textColor="@color/bleu_fonce_alcyons"
+                            android:textSize="10sp"
+                            android:alpha="0.6"/>
+
+                        <TextView
+                            android:id="@+id/nbColisTotalReceptionner"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/vert"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:gravity="end"/>
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/ic_colis"
+                        android:backgroundTint="@color/vert"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 
-        </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-        <ImageView
+        <!-- Séparateur -->
+        <View
             android:id="@+id/separateur"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_above="@+id/zoneListView"
-            android:layout_marginTop="10dp"
-            android:contentDescription="@string/separateur"
-            android:background="@android:color/darker_gray" />
+            android:layout_below="@+id/zoneInfos"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginBottom="4dp"
+            android:background="@color/bleu_clair_alcyons_transparent"/>
 
+        <!-- Liste -->
         <RelativeLayout
             android:id="@+id/zoneListView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/zoneInfos"
-            android:orientation="vertical"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp">
+            android:layout_below="@+id/separateur"
+            android:paddingHorizontal="8dp">
 
-            <include layout="@layout/liste_view" />
+            <ListView
+                android:id="@+id/listeView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:descendantFocusability="afterDescendants"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="12dp"/>
+
 
         </RelativeLayout>
 

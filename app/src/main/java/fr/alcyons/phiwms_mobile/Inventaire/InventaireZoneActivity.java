@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -37,6 +38,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -69,6 +71,7 @@ public class InventaireZoneActivity extends ServiceAvecConnexionActivity {
     Context context;
     PackageManager pm;
     List<JSONObject> listeZoneInventaire;
+    List<JSONObject> listeZoneInventaireBase;
     ListView inventaireListView;
     InventaireZoneAdapter inventaireZoneAdapter;
     boolean connexionDirecte;
@@ -76,6 +79,11 @@ public class InventaireZoneActivity extends ServiceAvecConnexionActivity {
     List<Inventaire_Ligne_Temp> inventaireLigneTempListBase;
     Inventaire inventaireCourant;
     Depot depotSelectionne;
+
+    ArrayAdapter<String> autoCompleteAdapter;
+    AutoCompleteTextView autoComplete;
+    ArrayList<String> listeZoneNom;
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +128,9 @@ public class InventaireZoneActivity extends ServiceAvecConnexionActivity {
     public void onResume() {
         super.onResume();
         listeZoneInventaire = new ArrayList<>();
+        listeZoneInventaireBase = new ArrayList<>();
+        listeZoneNom = new ArrayList<>();
+        listeZoneNom.add("Toutes les zones");
         /* Code nécessaire afin de réaliser une requête à l' API */
         if (statutConnexion && passageParOnCreate && !connexionDirecte) {
             if (!swipeRefreshLayout.isRefreshing()) {
@@ -192,11 +203,15 @@ public class InventaireZoneActivity extends ServiceAvecConnexionActivity {
 
                             JSONArray arrayZone = response.getJSONArray("Zone");
                             for(int i = 0; i < arrayZone.length(); i++) {
-                                listeZoneInventaire.add(arrayZone.getJSONObject(i));
+                                JSONObject zoneJsonObject = arrayZone.getJSONObject(i);
+                                listeZoneInventaire.add(zoneJsonObject);
+                                listeZoneInventaireBase.add(zoneJsonObject);
+                                if(!zoneJsonObject.optString("zone").isEmpty())
+                                    listeZoneNom.add(zoneJsonObject.optString("zone"));
                             }
 
-                            inventaireZoneAdapter = new InventaireZoneAdapter(InventaireZoneActivity.this, db, listeZoneInventaire, utilisateurConnecte, new ArrayList(), inventaireCourant, depotSelectionne);
-                            inventaireListView.setAdapter(inventaireZoneAdapter);
+                            initialiserAutoComplete();
+                            gestionAdapter();
 
                             if (passageParOnCreate) {
                                 invalidateOptionsMenu();
@@ -267,5 +282,68 @@ public class InventaireZoneActivity extends ServiceAvecConnexionActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void gestionAdapter()
+    {
+        inventaireZoneAdapter = new InventaireZoneAdapter(InventaireZoneActivity.this, db, listeZoneInventaire, utilisateurConnecte, new ArrayList(), inventaireCourant, depotSelectionne);
+        inventaireListView.setAdapter(inventaireZoneAdapter);
+    }
+
+    private void initialiserAutoComplete() {
+        autoComplete = findViewById(R.id.listeFiltre);
+        String premierElement = listeZoneNom.get(0);
+
+        // Trie la liste sans le premier élément
+        List<String> sansPremiereEntree = listeZoneNom.subList(1, listeZoneNom.size());
+        Collections.sort(sansPremiereEntree);
+
+        // Reconstruit la liste avec le premier élément en tête
+        listeZoneNom = new ArrayList<>();
+        listeZoneNom.add(premierElement);
+        listeZoneNom.addAll(sansPremiereEntree);
+
+        autoCompleteAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_depot, listeZoneNom);
+        autoComplete.setAdapter(autoCompleteAdapter);
+        autoComplete.setThreshold(100); // Empêche le filtrage automatique
+
+        // Affiche le premier élément par défaut
+        if (!listeZoneNom.isEmpty()) {
+            autoComplete.setText(listeZoneNom.get(0), false);
+        }
+
+        // Hauteur = 1/3 de l'écran
+        int hauteurEcran = getResources().getDisplayMetrics().heightPixels;
+        autoComplete.setDropDownHeight(hauteurEcran / 3);
+        int dpToPx = (int) (12 * getResources().getDisplayMetrics().density);
+        autoComplete.post(() -> autoComplete.setDropDownWidth(findViewById(R.id.listeFiltre_LL).getWidth() - dpToPx));
+        autoComplete.setDropDownBackgroundResource(android.R.color.white);
+
+        // Ouvre la liste au clic
+        autoComplete.setOnClickListener(v -> autoComplete.showDropDown());
+
+        // Chevron ouvre aussi la liste
+        findViewById(R.id.chevronFiltre).setOnClickListener(v -> autoComplete.showDropDown());
+
+        // Gère la sélection
+        autoComplete.setOnItemClickListener((parent, view, position, id) -> {
+            String zone = listeZoneNom.get(position);
+            autoComplete.setText(zone, false);
+            autoComplete.dismissDropDown();
+
+            listeZoneInventaire = new ArrayList<>();
+
+            if (zone.contentEquals("Tous les dépôts")) {
+                listeZoneInventaire.addAll(listeZoneInventaireBase);
+            } else {
+                for (JSONObject objetCourant : listeZoneInventaireBase) {
+                    if (objetCourant.optString("zone").contentEquals(zone)) {
+                        listeZoneInventaire.add(objetCourant);
+                    }
+                }
+            }
+
+            gestionAdapter();
+        });
     }
 }

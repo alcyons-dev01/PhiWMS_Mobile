@@ -1,5 +1,6 @@
 package fr.alcyons.phiwms_mobile.Fragment
 
+import android.content.Context
 import android.graphics.Color
 import android.media.AudioManager
 import android.media.ToneGenerator
@@ -12,6 +13,7 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
@@ -71,12 +73,20 @@ class ScannerInputFragment : Fragment(), ScanDebounce
 
         // Focus automatique pour recevoir les scans dès l'ouverture
         scannerInput_ET.requestFocus()
+        // Empêche le clavier de s'afficher
+        scannerInput_ET.showSoftInputOnFocus = false
+
+        // Cache le clavier s'il est déjà visible
+        scannerInput_ET.post {
+            val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.hideSoftInputFromWindow(scannerInput_ET.windowToken, 0)
+        }
 
         // Détection fin de scan : ENTER (Honeywell) ou TAB (Zebra)
         scannerInput_ET.setOnKeyListener { _, keyCode, event ->
             if (event.action == KeyEvent.ACTION_DOWN &&
                 (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_TAB)) {
-                val texte = scannerInput_ET.text.toString().trim()
+                val texte = scannerInput_ET.text.toString()
                 if (texte.isNotEmpty()) {
                     traiterCode(texte)
                     scannerInput_ET.setText("")
@@ -106,14 +116,6 @@ class ScannerInputFragment : Fragment(), ScanDebounce
 
     private fun traiterCode(texte: String)
     {
-        if (shouldDebounceScan())
-        {
-            Log.d("ScannerInputFragment", "Scan ignored because debounced")
-            return
-        }
-
-        android.util.Log.d("CODE_BRUT", "Code reçu : '$texte'")
-
         val code = if (texte.uppercase().startsWith("PHITAG"))
             normalize(texte)
         else
@@ -133,7 +135,7 @@ class ScannerInputFragment : Fragment(), ScanDebounce
                 layoutFondValidation.visibility = View.GONE
             }
 
-            delay(500)
+            delay(100)
             withContext(Dispatchers.Main) {
                 descriptionCode_TV.text = ""
                 fireCode(code)
@@ -243,7 +245,7 @@ class ScannerInputFragment : Fragment(), ScanDebounce
     private fun normalize(raw: String): String = raw
         .replace("]C1", "").replace("]e0", "").replace("]d2", "")
         .replace("]Q3", "").replace("}C1", "").replace("}d2010", "")
-        .replace("]d2010", "").replace("\u001D", "").trim()
+        .replace("]d2010", "")
 
     private fun handleSplitScan(raw: String): String? {
         val now = System.currentTimeMillis()
@@ -289,5 +291,14 @@ class ScannerInputFragment : Fragment(), ScanDebounce
     override fun onDestroy() {
         super.onDestroy()
         toneGenerator.release()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        scannerInput_ET.showSoftInputOnFocus = false
+        scannerInput_ET.post {
+            val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.hideSoftInputFromWindow(scannerInput_ET.windowToken, 0)
+        }
     }
 }

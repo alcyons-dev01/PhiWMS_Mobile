@@ -26,6 +26,7 @@ class DetailPreparationAdapter (
         val refProduit         = view.findViewById<TextView>(R.id.refProduit)
         val fournisseurProduit = view.findViewById<TextView>(R.id.fournisseurProduit)
         val lotProduit         = view.findViewById<TextView>(R.id.lotProduit)
+        val serieProduit         = view.findViewById<TextView>(R.id.serieProduit)
         val peremptionProduit  = view.findViewById<TextView>(R.id.peremptionProduit)
         val quantitePreparer = view.findViewById<TextView>(R.id.quantitePreparer)
         val quantiteAPreparer = view.findViewById<TextView>(R.id.quantiteAPreparer)
@@ -38,6 +39,7 @@ class DetailPreparationAdapter (
         fournisseurProduit.text = ""
         lotProduit.text         = item.lotNumero
         peremptionProduit.text  = item.peremptionDate
+        serieProduit.text = item.serieNumero
 
         if(item.lotNumero.uppercase().contentEquals("LOT NON TRACE") || item.lotNumero.uppercase().startsWith("PHI"))
         {

@@ -1,270 +1,272 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="#F0F4FF">
 
     <LinearLayout
-        android:id="@+id/layoutPrincipal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:padding="5dp"
-        android:background="@drawable/background_element_list_droit"
         android:orientation="vertical">
 
-            <LinearLayout
+        <!-- Header : Désignation + Référence -->
+        <LinearLayout
+            android:id="@+id/zoneDesignation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/bleu_fonce_alcyons"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/designationProduit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:weightSum="4"
-                android:orientation="horizontal">
+                android:text="Designation"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:id="@+id/referenceProduit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Reference"
+                android:textColor="#AAAAFF"
+                android:textSize="13sp"/>
+
+        </LinearLayout>
+
+        <!-- Corps -->
+        <LinearLayout
+            android:id="@+id/LinearInfoVerrou"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#F0F4FF"
+            android:padding="10dp">
+
+            <!-- Colis -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="8dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/bleu_fonce_alcyons">
 
                 <LinearLayout
-                    android:id="@+id/zoneDesignation"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2.5"
-                    android:orientation="vertical">
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_colis"
+                        android:backgroundTint="#FFFFFF"
+                        android:layout_marginBottom="4dp"/>
 
                     <TextView
-                        android:id="@+id/designationProduit"
-                        android:layout_width="match_parent"
+                        android:id="@+id/colis"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:text="Designation"
-                        android:textColor="@android:color/black"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/referenceProduit"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Reference"
-                        android:textColor="@android:color/black" />
+                        android:gravity="center"
+                        android:textColor="@color/rouge"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:text="100"/>
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.5"
-                    android:layout_gravity="center">
+            </androidx.cardview.widget.CardView>
 
-                    <ImageView
-                        android:id="@+id/boutonRechercheDataMatrix"
-                        android:layout_width="0px"
-                        android:layout_height="32dp"
-                        android:layout_marginLeft="20dp"
-                        android:layout_gravity="center"
+            <!-- Séparateur vertical -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/bleu_clair_alcyons_transparent"
+                android:layout_marginEnd="8dp"/>
+
+            <!-- Lot + Exp + Série -->
+            <LinearLayout
+                android:id="@+id/zoneInfoLot"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <!-- Lot -->
+                <LinearLayout
+                    android:id="@+id/layoutNumLot"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="6dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lot"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="12sp"
+                        android:alpha="0.6"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginEnd="8dp"/>
+
+                    <EditText
+                        android:id="@+id/numLot"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:contentDescription="@string/datamatrix"
-                        android:src="@drawable/ic_datamatrix"
-                        app:tint="@color/bleu_clair_alcyons" />
+                        android:inputType="text"
+                        android:text="XXXX"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:background="@android:color/transparent"
+                        android:padding="0dp"/>
+
+                </LinearLayout>
+
+                <!-- Séparateur -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/bleu_clair_alcyons_transparent"
+                    android:layout_marginBottom="6dp"/>
+
+                <!-- Exp -->
+                <LinearLayout
+                    android:id="@+id/layoutDateExp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="6dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Exp"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="12sp"
+                        android:alpha="0.6"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginEnd="8dp"/>
+
+                    <TextView
+                        android:id="@+id/datePeremption"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text=""
+                        android:textColor="@color/rouge"
+                        android:textSize="14sp"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+                <!-- Séparateur -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/bleu_clair_alcyons_transparent"
+                    android:layout_marginBottom="6dp"/>
+
+                <!-- Série -->
+                <LinearLayout
+                    android:id="@+id/layoutNumSerie"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textviewSerie"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Série"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="12sp"
+                        android:alpha="0.6"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginEnd="8dp"/>
+
+                    <EditText
+                        android:id="@+id/numeroSerie"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:inputType="text"
+                        android:text="XXXX"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:background="@android:color/transparent"
+                        android:padding="0dp"/>
 
                 </LinearLayout>
 
             </LinearLayout>
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/bleu_clair_alcyons"
-                android:layout_marginTop="2dp"/>
+            <!-- Séparateur vertical -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/bleu_clair_alcyons_transparent"
+                android:layout_marginHorizontal="8dp"/>
 
-            <LinearLayout
-                android:id="@+id/LinearInfoVerrou"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_gravity="center_vertical"
-                android:weightSum="4">
+            <!-- Quantité + Statut -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/layoutQuantite"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/rouge">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_gravity="center_vertical"
-                    android:gravity="center_vertical"
-                    android:layout_marginRight="10dp"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/colis"
-                        android:background="@drawable/ic_colis" />
-
-                    <TextView
-                        android:id="@+id/colis"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:textColor="@color/rouge2"
-                        android:textSize="14sp"
-                        android:text="100" />
-
-                </LinearLayout>
-
-                <ImageView
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:background="@color/bleu_clair_alcyons"/>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2.5"
-                    android:layout_marginLeft="10dp"
-                    android:layout_gravity="center_vertical"
-                    android:orientation="vertical">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_below="@+id/zoneDesignation"
-                        android:orientation="horizontal"
-                        android:weightSum="3">
-
-                        <LinearLayout
-                            android:id="@+id/zoneInfoLot"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:orientation="vertical">
-
-                            <LinearLayout
-                                android:id="@+id/layoutNumLot"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:weightSum="3">
-
-                                <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:text="Lot"
-                                    android:layout_gravity="center_vertical"/>
-
-                                <EditText
-                                    android:id="@+id/numLot"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1.5"
-                                    android:gravity="center_vertical"
-                                    android:inputType="text"
-                                    android:text="XXXX"
-                                    android:textColor="@color/bleu_clair_alcyons"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold"
-                                    android:background="@drawable/background_element_trait_bottom"/>
-
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:id="@+id/layoutDateExp"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:weightSum="3">
-
-                                <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:text="Exp"
-                                    android:layout_gravity="center_vertical"/>
-
-                                <TextView
-                                    android:id="@+id/datePeremption"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="2"
-                                    android:text=""
-                                    android:layout_gravity="center_vertical"
-                                    android:textColor="@color/rouge2"
-                                    android:textStyle="bold"/>
-
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:id="@+id/layoutNumSerie"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:weightSum="3">
-
-                                <TextView
-                                    android:id="@+id/textviewSerie"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:text="Série"
-                                    android:layout_gravity="center_vertical"/>
-
-                                <EditText
-                                    android:id="@+id/numeroSerie"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1.5"
-                                    android:gravity="center_vertical"
-                                    android:inputType="text"
-                                    android:text="XXXX"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold"
-                                    android:background="@drawable/background_element_trait_bottom"/>
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <ImageView
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:background="@color/bleu_clair_alcyons"/>
-
-                <LinearLayout
-                    android:id="@+id/layoutQuantite"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1.5"
                     android:orientation="vertical"
-                    android:layout_gravity="center_vertical|center_horizontal"
-                    android:background="@color/rouge2">
+                    android:gravity="center"
+                    android:padding="10dp">
 
                     <TextView
                         android:id="@+id/qte_par_lot"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
                         android:gravity="center"
                         android:text="5"
-                        android:textSize="20dp"
-                        android:padding="5dp"
-                        android:textColor="@color/noir"
-                        android:textStyle="bold" />
+                        android:textSize="22sp"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp"/>
 
                     <TextView
                         android:id="@+id/statutLigne"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:textColor="@color/noir"
-                        android:text="@string/verrouPharmaciePreparee" />
+                        android:gravity="center"
+                        android:textColor="#FFCCCC"
+                        android:textSize="10sp"
+                        android:text="@string/verrouPharmaciePreparee"/>
 
                 </LinearLayout>
 
-            </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
         </LinearLayout>
 
-</RelativeLayout>
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

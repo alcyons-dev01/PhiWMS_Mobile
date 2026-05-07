@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -36,6 +37,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +52,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.InventaireOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Inventaire_Ligne_TempOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.Commande;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Inventaire;
 import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp;
@@ -72,7 +75,12 @@ public class ServiceInventaireGeneralActivity extends ServiceAvecConnexionActivi
     ListView depotListView;
     DepotAdapter depotAdapter;
     boolean connexionDirecte;
+    ArrayAdapter<String> autoCompleteAdapter;
+    AutoCompleteTextView autoComplete;
     ArrayList<Depot> arrayDepot;
+    ArrayList<Depot> arrayDepotBase;
+    ArrayList<String> nomDepot;
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +106,9 @@ public class ServiceInventaireGeneralActivity extends ServiceAvecConnexionActivi
         });
 
         arrayDepot = new ArrayList<>();
+        arrayDepotBase = new ArrayList<>();
+        nomDepot = new ArrayList<>();
+        nomDepot.add("Tous les dépôts");
         connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(db);
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -170,10 +181,14 @@ public class ServiceInventaireGeneralActivity extends ServiceAvecConnexionActivi
                                 if(depot != null)
                                 {
                                     arrayDepot.add(depot);
+                                    arrayDepotBase.add(depot);
+                                    nomDepot.add(depot.getNom());
                                 }
                             }
 
                             arrayDepot.sort(Comparator.comparing(Depot::getNom));
+                            arrayDepotBase.sort(Comparator.comparing(Depot::getNom));
+                            initialiserAutoComplete();
                             gestionAdapter();
                             passageParOnCreate = false;
                             arreterSpinner();
@@ -223,10 +238,65 @@ public class ServiceInventaireGeneralActivity extends ServiceAvecConnexionActivi
 
     private void gestionAdapter()
     {
-        if(depotAdapter == null) {
-            depotAdapter = new DepotAdapter(ServiceInventaireGeneralActivity.this, arrayDepot, utilisateurConnecte);
-        }
+        depotAdapter = new DepotAdapter(ServiceInventaireGeneralActivity.this, arrayDepot, utilisateurConnecte);
 
         depotListView.setAdapter(depotAdapter);
+    }
+
+    private void initialiserAutoComplete() {
+        autoComplete = findViewById(R.id.listeFiltre);
+        String premierElement = nomDepot.get(0);
+
+        // Trie la liste sans le premier élément
+        List<String> sansPremiereEntree = nomDepot.subList(1, nomDepot.size());
+        Collections.sort(sansPremiereEntree);
+
+        // Reconstruit la liste avec le premier élément en tête
+        nomDepot = new ArrayList<>();
+        nomDepot.add(premierElement);
+        nomDepot.addAll(sansPremiereEntree);
+
+        autoCompleteAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_depot, nomDepot);
+        autoComplete.setAdapter(autoCompleteAdapter);
+        autoComplete.setThreshold(100); // Empêche le filtrage automatique
+
+        // Affiche le premier élément par défaut
+        if (!nomDepot.isEmpty()) {
+            autoComplete.setText(nomDepot.get(0), false);
+        }
+
+        // Hauteur = 1/3 de l'écran
+        int hauteurEcran = getResources().getDisplayMetrics().heightPixels;
+        autoComplete.setDropDownHeight(hauteurEcran / 3);
+        int dpToPx = (int) (12 * getResources().getDisplayMetrics().density);
+        autoComplete.post(() -> autoComplete.setDropDownWidth(findViewById(R.id.listeFiltre_LL).getWidth() - dpToPx));
+        autoComplete.setDropDownBackgroundResource(android.R.color.white);
+
+        // Ouvre la liste au clic
+        autoComplete.setOnClickListener(v -> autoComplete.showDropDown());
+
+        // Chevron ouvre aussi la liste
+        findViewById(R.id.chevronFiltre).setOnClickListener(v -> autoComplete.showDropDown());
+
+        // Gère la sélection
+        autoComplete.setOnItemClickListener((parent, view, position, id) -> {
+            String depot = nomDepot.get(position);
+            autoComplete.setText(depot, false);
+            autoComplete.dismissDropDown();
+
+            arrayDepot = new ArrayList<>();
+
+            if (depot.contentEquals("Tous les dépôts")) {
+                arrayDepot.addAll(arrayDepotBase);
+            } else {
+                for (Depot depotCourant : arrayDepotBase) {
+                    if (depotCourant.getNom().contentEquals(depot)) {
+                        arrayDepot.add(depotCourant);
+                    }
+                }
+            }
+
+            gestionAdapter();
+        });
     }
 }

@@ -91,7 +91,7 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="2"
                     android:orientation="vertical">
 
                     <TextView
@@ -108,7 +108,32 @@
                         android:layout_height="wrap_content"
                         android:text="LOT-2024-001"
                         android:textColor="@color/bleu_fonce_alcyons"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Série"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="10sp"
+                        android:alpha="0.6"/>
+
+                    <TextView
+                        android:id="@+id/serieProduit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SERIE-2024-001"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="12sp"
                         android:textStyle="bold"/>
 
                 </LinearLayout>
@@ -134,7 +159,7 @@
                         android:layout_height="wrap_content"
                         android:text="12/2026"
                         android:textColor="@color/bleu_fonce_alcyons"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
                         android:textStyle="bold"/>
 
                 </LinearLayout>

@@ -117,14 +117,14 @@ public class Stock_Lot_EmplacementLightOpenHelper extends DBOpenHelper {
         return stockLotEmplacementLightList;
     }
 
-    public static List<String> getAllStockLotEmplacementByProduitEtDepotString(SQLiteDatabase db, Produit produit, Depot depot) {
-        List<String> stockLotEmplacementLightListString = new ArrayList<>();
+    public static List<Stock_Lot_Emplacement_Light> getAllStockLotEmplacementByProduitEtDepotString(SQLiteDatabase db, Produit produit, Depot depot) {
+        List<Stock_Lot_Emplacement_Light> stockLotEmplacementLightListString = new ArrayList<>();
 
         Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_STOCK_LOT_EMPLACEMENT + " WHERE " + Constantes.CLE_COL_DEPOT_REFERENCE_STOCK_LOT_EMPLACEMENT + "=? and " + Constantes.CLE_COL_PRODUIT_CODE_STOCK_LOT_EMPLACEMENT + "=?", new String[]{depot.getDepot_Reference(), String.valueOf(produit.getID_produit())});
 
         while (cursor.moveToNext()) {
             Stock_Lot_Emplacement_Light stockLotEmplacementLight = new Stock_Lot_Emplacement_Light(cursor);
-            stockLotEmplacementLightListString.add(stockLotEmplacementLight.getLot());
+            stockLotEmplacementLightListString.add(stockLotEmplacementLight);
         }
         cursor.close();
         cursor = null;

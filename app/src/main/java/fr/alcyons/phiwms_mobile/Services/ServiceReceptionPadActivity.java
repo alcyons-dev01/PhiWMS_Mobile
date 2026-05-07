@@ -78,7 +78,6 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
     PackageManager pm;
     ActivityResultLauncher<Intent> resultScanDocument;
     boolean connexionDirecte;
-
     ArrayAdapter<String> autoCompleteAdapter;
     AutoCompleteTextView autoComplete;
     List<String> listeFournisseurReception;
@@ -321,7 +320,6 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
         commandeList.sort(Comparator.comparing(Commande::getNumero));
 
         commandeReceptionPADAdapter = new ReceptionAdapter(ServiceReceptionPadActivity.this, db, commandeList);
-        commandeListView.setDivider(footer);
         commandeListView.setAdapter(commandeReceptionPADAdapter);
 
         if (commandeList.isEmpty()) {

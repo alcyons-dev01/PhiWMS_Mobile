@@ -133,7 +133,7 @@
     <string name="verrouPharmacieInterneTitre">Délivrances</string>
     <string name="verrouPharmacieNombreTotalDeColis">Nombre total de colis :</string>
     <string name="verrouPharmacieDemandee">Demandée</string>
-    <string name="verrouPharmaciePreparee">Vérouillée</string>
+    <string name="verrouPharmaciePreparee">Verrouillé</string>
 
     <!-- Quarantaine -->
     <string name="quarantaineTitire">Mises en quarantaine à contrôler</string>
