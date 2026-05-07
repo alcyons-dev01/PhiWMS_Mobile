@@ -70,6 +70,20 @@ public class EmplacementOpenHelper extends DBOpenHelper {
         return depotEmplacementList;
     }
 
+    public static List<String> getNomEmplacementsParZone(SQLiteDatabase db, Depot_Zone depotZone) {
+        List<String> depotEmplacementList = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_DEPOT_EMPLACEMENT + " WHERE " + Constantes.CLE_COL_ZONE_ID_DEPOT_EMPLACEMENT + "=?", new String[]{String.valueOf(depotZone.getZoneID())});
+
+        while (cursor.moveToNext()) {
+            Depot_Emplacement emplacement = new Depot_Emplacement(cursor);
+            depotEmplacementList.add(emplacement.getAdressage());
+        }
+        cursor.close();
+        cursor = null;
+        return depotEmplacementList;
+    }
+
     public static long supprimerDonneesTest(SQLiteDatabase db)
     {
         db.delete(Constantes.TABLE_DEPOT_EMPLACEMENT, Constantes.CLE_COL_ADRESSAGE_DEPOT_EMPLACEMENT + "=?", new String[]{"EMPLACEMENT_UF_ALCYONS_ESSAI"});

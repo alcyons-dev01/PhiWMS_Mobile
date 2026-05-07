@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -21,7 +22,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper
 import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp
 import fr.alcyons.phiwms_mobile.Inventaire.DetailInventaire_V3
 import fr.alcyons.phiwms_mobile.Outils.Alerte
@@ -98,6 +102,41 @@ class DetailLigneFragment : Fragment() {
             getListeAnneeDatePicker()
         )
         val quantiteCompteeET = view.findViewById<EditText>(R.id.quantiteComptee_ET)
+        var emplacementCourant = ligne.emplacement
+        val emplacementAutoComplete = view.findViewById<AutoCompleteTextView>(R.id.emplacementLot_TV)
+        val chevronEmplacement = view.findViewById<ImageView>(R.id.chevronEmplacement)
+
+        val depotCourant = DepotOpenHelper.getDepotParReference(db, ligne.depotReference)
+        val zoneCourante = ZoneOpenHelper.getZoneByDepotEtNom(db, depotCourant, ligne.zone)
+        val listeEmplacements = EmplacementOpenHelper.getNomEmplacementsParZone(db, zoneCourante)
+
+        val adapter = ArrayAdapter(requireContext(), R.layout.spinner_item_depot, listeEmplacements)
+        emplacementAutoComplete.setAdapter(adapter)
+        emplacementAutoComplete.setThreshold(100)
+
+        // Ouvre au clic
+        emplacementAutoComplete.setOnClickListener { emplacementAutoComplete.showDropDown() }
+        chevronEmplacement.setOnClickListener { emplacementAutoComplete.showDropDown() }
+
+        // Hauteur dropdown
+        val hauteurEcran = resources.displayMetrics.heightPixels
+        emplacementAutoComplete.setDropDownHeight(hauteurEcran / 3)
+        emplacementAutoComplete.setDropDownBackgroundResource(android.R.color.white)
+
+        emplacementAutoComplete.post {
+            val dpToPx = (12 * resources.displayMetrics.density).toInt()
+            emplacementAutoComplete.setDropDownWidth(
+                view.findViewById<View>(R.id.emplacementLot_TV).width - dpToPx
+            )
+        }
+        emplacementAutoComplete.setText(emplacementCourant, false)
+
+        emplacementAutoComplete.setOnItemClickListener { _, _, position, _ ->
+            val emplacementSelectionne = listeEmplacements[position]
+            emplacementAutoComplete.setText(emplacementSelectionne, false)
+            emplacementAutoComplete.dismissDropDown()
+            emplacementCourant = emplacementSelectionne
+        }
 
         //gestion du conditionnment
         textCartonFermerTV.text =
@@ -197,7 +236,6 @@ class DetailLigneFragment : Fragment() {
         }
 
         //gestion des données
-        view.findViewById<TextView>(R.id.emplacementLot_TV).text = ligne.emplacement
         view.findViewById<TextView>(R.id.designationReference_TV).text = ligne.designation
         view.findViewById<EditText>(R.id.numeroLot_ET).setText(ligne.lot.toString())
         lotPrecedent = ligne.lot
@@ -259,6 +297,7 @@ class DetailLigneFragment : Fragment() {
             }*/
 
             ligne.stockPhysique = qte.toDouble()
+            ligne.emplacement = emplacementCourant
 
             var ajout : Boolean = false
 
