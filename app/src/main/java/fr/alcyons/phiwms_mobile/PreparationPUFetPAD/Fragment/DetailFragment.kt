@@ -361,6 +361,8 @@ class DetailFragment : Fragment() {
             quantiteCompteeET.setText("0")
         }
 
+        //affichage du restant à préparer
+        view.findViewById<TextView>(R.id.restantAPreparer_TV).setText(preparationLigneBasePreparation.qte_APreparer.toString())
 
         //gestion de la date de péremption
         adapterMoisPeremption.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)

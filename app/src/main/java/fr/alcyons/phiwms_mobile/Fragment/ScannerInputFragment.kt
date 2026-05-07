@@ -78,8 +78,8 @@ class ScannerInputFragment : Fragment(), ScanDebounce
 
         // Cache le clavier s'il est déjà visible
         scannerInput_ET.post {
-            val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(scannerInput_ET.windowToken, 0)
+            val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.hideSoftInputFromWindow(scannerInput_ET.windowToken, 0)
         }
 
         // Détection fin de scan : ENTER (Honeywell) ou TAB (Zebra)
@@ -297,8 +297,8 @@ class ScannerInputFragment : Fragment(), ScanDebounce
         super.onResume()
         scannerInput_ET.showSoftInputOnFocus = false
         scannerInput_ET.post {
-            val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(scannerInput_ET.windowToken, 0)
+            val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.hideSoftInputFromWindow(scannerInput_ET.windowToken, 0)
         }
     }
 }
