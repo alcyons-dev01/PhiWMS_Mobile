@@ -101,6 +101,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
         this.initializeData()
         this.initializeUI()
         this.setupEventListeners()
+        this.lancerScan?.performClick()
         this.setupOnBackPressedCallback()
     }
     

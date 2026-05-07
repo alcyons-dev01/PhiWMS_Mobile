@@ -1,15 +1,12 @@
 package fr.alcyons.phiwms_mobile.IdentificationParScan;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -35,7 +32,6 @@ import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.GS1Parser;
 import fr.alcyons.phiwms_mobile.R;
-import fr.alcyons.phiwms_mobile.RetourPUI.DetailRetourPUIActivity;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 import fr.alcyons.phiwms_mobile.Services.ServiceIdentificationParScanActivity;
 

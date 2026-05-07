@@ -1,21 +1,13 @@
 package fr.alcyons.phiwms_mobile.RetourPUI;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ListView;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,19 +37,40 @@ import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 import fr.alcyons.phiwms_mobile.Services.ServiceRetourPUIActivity;
+import fr.alcyons.phiwms_mobile.Fragment.RechercheFragment;
+import fr.alcyons.phiwms_mobile.Fragment.ScannerFragment;
+import fr.alcyons.phiwms_mobile.Fragment.ScannerInputFragment;
+import fr.alcyons.phiwms_mobile.Interfaces.RechercheAdjustable;
+import fr.alcyons.phiwms_mobile.Interfaces.ScanDebounce;
+import fr.alcyons.phiwms_mobile.Outils.GestionCodeScanne;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import fr.alcyons.phiwms_mobile.RetourPUI.Fragment.ARetournerPUIFragment;
 
-public class  DetailRetourPUIActivity extends ServiceActivity {
+public class DetailRetourPUIActivity extends ServiceActivity implements ARetournerPUIFragment.OnElementSelectionneListener, RechercheFragment.OnElementRechercheListener, RechercheAdjustable {
     Retour retourSelectionne;
     List<Retour_Ligne> retourLigneList;
-    ListView retourLigneListView;
-    Retour_Ligne_RetourPUIAdapter adapter;
     Retour_Ligne_RetourPUIAdapter.Retour_LigneViewHolder viewHolderAModifier;
     ActivityResultLauncher<Intent> resultListeEmplacement;
     String commentaire;
+    ARetournerPUIFragment aRetournerPUIFragment;
+    boolean isACompterOpen = false;
+
+    // UI elements
+    View lancerScan;
+    View lancerRecherche;
+    View boutonAction;
+
+    // Fragments
+    androidx.fragment.app.Fragment scannerFragment;
+    RechercheFragment rechercheFragment;
+
+    // State
+    boolean isScannerOpen = false;
+    boolean isSearchOpen = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,28 +80,8 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
         retourSelectionne = RetourOpenHelper.getRetourByID(db, Objects.requireNonNull(intent.getExtras()).getInt("retourSelectionneID"));
 
         // Affichage des informations de base
-        ((TextView) findViewById(R.id.intitule)).setText(retourSelectionne.getIntitule());
-        ((TextView) findViewById(R.id.numero)).setText(retourSelectionne.getNumero());
+        ((TextView) findViewById(R.id.numero)).setText("Numéro de retour : " + retourSelectionne.getNumero());
 
-        // Gestion de la listView
-        retourLigneListView = findViewById(R.id.listeView);
-        retourLigneListView.setItemsCanFocus(true);
-        retourLigneListView.setOnItemClickListener((parent, view, position, id) -> {
-            Retour_Ligne retourLigne = adapter.retourLigne.get(position);
-
-            viewHolderAModifier = adapter.viewHolderList.get(position);
-            viewHolderAModifier.progressBar.setVisibility(View.VISIBLE);
-            viewHolderAModifier.layoutPrincipal.setBackgroundColor(getResources().getColor(R.color.noirtransparent, null));
-
-            Intent detailRetourPUIIntent = new Intent(DetailRetourPUIActivity.this, ListeEmplacementRetourPUIActivity.class);
-            Bundle detailRetourPUIBundle = DetailRetourPUIActivity.super.getBundle();
-            detailRetourPUIBundle.putInt("produitID", retourLigne.getCode_produit());
-            detailRetourPUIBundle.putSerializable("retourLigne", retourLigne);
-            detailRetourPUIBundle.putInt("depotID", DepotOpenHelper.getDepotParReference(db, retourSelectionne.getRef_Depot_Dest()).getDepot_UID());
-            detailRetourPUIIntent.putExtras(detailRetourPUIBundle);
-
-            resultListeEmplacement.launch(detailRetourPUIIntent);
-        });
 
         retourLigneList = new ArrayList<>();
 
@@ -107,13 +100,65 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
                 Alerte.afficherAlerteConfirmation(DetailRetourPUIActivity.this, getLayoutInflater(), getBundle(), "Voulez-vous quitter le détail du retour PUI ?", true, false, DetailRetourPUIActivity.this);
             }
         });
+
+        setupEventListeners();
+        this.lancerScan.performClick();
+    }
+
+    private void setupEventListeners() {
+        // Scanner button listener
+        lancerScan = findViewById(R.id.lancerScan);
+        if (lancerScan != null) {
+            lancerScan.setOnClickListener(v -> {
+                if (isScannerOpen) {
+                    closeScanner();
+                } else {
+                    closeOpenedFragments();
+                    openScanner();
+                }
+            });
+        }
+
+        // Search button listener
+        lancerRecherche = findViewById(R.id.lancerRecherhe);
+        if (lancerRecherche != null) {
+            lancerRecherche.setOnClickListener(v -> {
+                if (isSearchOpen) {
+                    closeSearch();
+                } else {
+                    closeOpenedFragments();
+                    showSearchInput();
+                }
+            });
+        }
+
+        // Action button listener
+        boutonAction = findViewById(R.id.boutonAction);
+        if (boutonAction != null) {
+            boutonAction.setOnClickListener(v -> {
+                Alerte.afficherAlerteSaisieText(DetailRetourPUIActivity.this, getLayoutInflater(), "Validation retour PUI", "Souhaitez-vous valider le retour PUI ?", "Ajouter un commentaire...");
+            });
+        }
+
+        // "À Retourner" list button listener
+        View aRetournerPUI_LL = findViewById(R.id.aRetournerPUI_LL);
+        if (aRetournerPUI_LL != null) {
+            aRetournerPUI_LL.setOnClickListener(v -> {
+                if (isACompterOpen) {
+                    closeACompter();
+                } else {
+                    closeOpenedFragments();
+                    openACompter();
+                }
+            });
+        }
     }
     @Override
     public void onResume() {
         super.onResume();
         invalidateOptionsMenu();
 
-        // Récupération des retour_lige si nécessaire
+        // Récupération des retour_ligne si nécessaire
         retourLigneList = Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(db, retourSelectionne);
 
         //gestion des retours lignes
@@ -131,9 +176,16 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
             }
         }
 
-        // Initialisation de l'adapter puis transfere de l'adapter à la listeView pour l'affichage
-        adapter = new Retour_Ligne_RetourPUIAdapter(DetailRetourPUIActivity.this, db, retourLigneList, retourSelectionne);
-        retourLigneListView.setAdapter(adapter);
+        // Mise à jour de la liste dans le fragment si elle est ouverte
+        if (aRetournerPUIFragment != null) {
+            aRetournerPUIFragment.updateList((ArrayList<Retour_Ligne>) retourLigneList, retourSelectionne);
+        }
+
+        // Mise à jour du compteur
+        TextView nbRefTV = findViewById(R.id.nbReferenceARetournerPUI_TV);
+        if (nbRefTV != null) {
+            nbRefTV.setText(String.valueOf(retourLigneList.size()));
+        }
     }
 
     @Override
@@ -270,5 +322,302 @@ public class  DetailRetourPUIActivity extends ServiceActivity {
         retourLigneCourant.setQte_Retourner(retourLigneBase.getQte_Retourner());
 
         long rowID = Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(db, retourLigneCourant);
+    }
+
+    @Override
+    public void onElementSelectionne(Retour_Ligne retourLigne)
+    {
+        Intent detailRetourPUIIntent = new Intent(DetailRetourPUIActivity.this, ListeEmplacementRetourPUIActivity.class);
+        Bundle detailRetourPUIBundle = DetailRetourPUIActivity.super.getBundle();
+        detailRetourPUIBundle.putInt("produitID", retourLigne.getCode_produit());
+        detailRetourPUIBundle.putSerializable("retourLigne", retourLigne);
+        detailRetourPUIBundle.putInt("depotID", DepotOpenHelper.getDepotParReference(db, retourSelectionne.getRef_Depot_Dest()).getDepot_UID());
+        detailRetourPUIIntent.putExtras(detailRetourPUIBundle);
+
+        resultListeEmplacement.launch(detailRetourPUIIntent);
+    }
+
+    private void openACompter()
+    {
+        View container = findViewById(R.id.referenceARetournerPUIContainer);
+        android.widget.LinearLayout.LayoutParams params = (android.widget.LinearLayout.LayoutParams) container.getLayoutParams();
+        params.height = android.widget.LinearLayout.LayoutParams.WRAP_CONTENT;
+        params.weight = 0f;
+        container.setLayoutParams(params);
+        container.setVisibility(View.VISIBLE);
+
+        aRetournerPUIFragment = ARetournerPUIFragment.newInstance((ArrayList<Retour_Ligne>) retourLigneList, retourSelectionne);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.referenceARetournerPUIContainer, aRetournerPUIFragment)
+                .commit();
+
+        isACompterOpen = true;
+
+        // Scroll to the container
+        androidx.core.widget.NestedScrollView scrollView = findViewById(R.id.scrollView);
+        scrollView.post(() -> {
+            scrollView.smoothScrollTo(0, container.getTop());
+        });
+    }
+
+    private void closeACompter()
+    {
+        View container = findViewById(R.id.referenceARetournerPUIContainer);
+        container.setVisibility(View.GONE);
+        android.widget.LinearLayout.LayoutParams params = (android.widget.LinearLayout.LayoutParams) container.getLayoutParams();
+        params.height = 0;
+        params.weight = 0f;
+        container.setLayoutParams(params);
+        if (aRetournerPUIFragment != null) {
+            getSupportFragmentManager().beginTransaction()
+                    .remove(aRetournerPUIFragment)
+                    .commit();
+            aRetournerPUIFragment = null;
+        }
+        isACompterOpen = false;
+    }
+
+    @Override
+    public void onElementRechercher(int element) {
+        scrollToItemOrDisplayAlert(element);
+    }
+
+    @Override
+    public void ajusterHauteurRecherche(int hauteur) {
+        View rechercheContainer = findViewById(R.id.rechercheContainer);
+        if (rechercheContainer != null) {
+            rechercheContainer.getLayoutParams().height = hauteur == 0 ? 0 : ViewGroup.LayoutParams.WRAP_CONTENT;
+            rechercheContainer.requestLayout();
+        }
+    }
+
+    private void scrollToItemOrDisplayAlert(int idProduit) {
+        int position = -1;
+        for (int i = 0; i < retourLigneList.size(); i++) {
+            if (retourLigneList.get(i).getCode_produit() == idProduit) {
+                position = i;
+                break;
+            }
+        }
+
+        if (position >= 0) {
+            if (!isACompterOpen) {
+                closeOpenedFragments();
+                openACompter();
+            }
+            if (aRetournerPUIFragment != null) {
+                aRetournerPUIFragment.scrollToPosition(position);
+            }
+        } else {
+            Alerte.afficherAlerteInformation(this, getLayoutInflater(), "Produit non trouvé", "Ce produit n'est pas dans la liste de retour PUI", false, false);
+        }
+    }
+
+    private void closeOpenedFragments() {
+        if (isScannerOpen) closeScanner();
+        if (isSearchOpen) closeSearch();
+        if (isACompterOpen) closeACompter();
+    }
+
+    private void openScanner() {
+        View scannerContainer = findViewById(R.id.scannerContainer);
+        if (scannerContainer != null) {
+            // Set height to 300dp
+            android.widget.LinearLayout.LayoutParams params = (android.widget.LinearLayout.LayoutParams) scannerContainer.getLayoutParams();
+            params.height = (int) (300 * getResources().getDisplayMetrics().density);
+            params.weight = 0f;
+            scannerContainer.setLayoutParams(params);
+            scannerContainer.setVisibility(View.VISIBLE);
+            // Animate translationY
+            scannerContainer.setTranslationY(-getResources().getDisplayMetrics().heightPixels);
+            scannerContainer.animate().translationY(0f).setDuration(300).start();
+
+            scannerFragment = createScannerFragment();
+            setupScannerFragmentCallbacks(scannerFragment);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.scannerContainer, scannerFragment)
+                    .commit();
+        }
+        isScannerOpen = true;
+    }
+
+    private void closeScanner() {
+        View scannerContainer = findViewById(R.id.scannerContainer);
+        if (scannerContainer != null) {
+            scannerContainer.animate().translationY(-scannerContainer.getHeight()).setDuration(300).withEndAction(() -> {
+                scannerContainer.setVisibility(View.GONE);
+                android.widget.LinearLayout.LayoutParams params = (android.widget.LinearLayout.LayoutParams) scannerContainer.getLayoutParams();
+                params.height = 0;
+                params.weight = 0f;
+                scannerContainer.setLayoutParams(params);
+                if (scannerFragment != null) {
+                    getSupportFragmentManager().beginTransaction()
+                            .remove(scannerFragment)
+                            .commit();
+                    scannerFragment = null;
+                }
+            }).start();
+        }
+        isScannerOpen = false;
+    }
+
+    private androidx.fragment.app.Fragment createScannerFragment() {
+        if (hasCamera()) {
+            return new ScannerFragment();
+        } else {
+            return new ScannerInputFragment();
+        }
+    }
+
+    private boolean hasCamera() {
+        return getPackageManager().hasSystemFeature(android.content.pm.PackageManager.FEATURE_CAMERA_ANY);
+    }
+
+    private void setupScannerFragmentCallbacks(androidx.fragment.app.Fragment fragment) {
+        try {
+            if (fragment instanceof ScannerInputFragment) {
+                java.lang.reflect.Field onCodeScannedField = fragment.getClass().getDeclaredField("onCodeScanned");
+                onCodeScannedField.setAccessible(true);
+                onCodeScannedField.set(fragment, (kotlin.jvm.functions.Function1<String, kotlin.Unit>) code -> {
+                    handleScannedCode(code);
+                    return kotlin.Unit.INSTANCE;
+                });
+
+                java.lang.reflect.Field onCloseRequestedField = fragment.getClass().getDeclaredField("onCloseRequested");
+                onCloseRequestedField.setAccessible(true);
+                onCloseRequestedField.set(fragment, (kotlin.jvm.functions.Function0<kotlin.Unit>) () -> {
+                    closeScanner();
+                    return kotlin.Unit.INSTANCE;
+                });
+            } else if (fragment instanceof ScannerFragment) {
+                java.lang.reflect.Field onCodeScannedField = fragment.getClass().getDeclaredField("onCodeScanned");
+                onCodeScannedField.setAccessible(true);
+                onCodeScannedField.set(fragment, (kotlin.jvm.functions.Function1<String, kotlin.Unit>) code -> {
+                    handleScannedCode(code);
+                    return kotlin.Unit.INSTANCE;
+                });
+
+                java.lang.reflect.Field onCloseRequestedField = fragment.getClass().getDeclaredField("onCloseRequested");
+                onCloseRequestedField.setAccessible(true);
+                onCloseRequestedField.set(fragment, (kotlin.jvm.functions.Function0<kotlin.Unit>) () -> {
+                    closeScanner();
+                    return kotlin.Unit.INSTANCE;
+                });
+            }
+            if (fragment instanceof ScanDebounce) {
+                ((ScanDebounce) fragment).setScanDebounce(750L);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handleScannedCode(String scannedCode) {
+        java.util.HashMap<String, String> resultDecoupage = GestionCodeScanne.decoupageCode(scannedCode);
+        String codeIdentification = resultDecoupage.get("code");
+        if (codeIdentification != null && !codeIdentification.isEmpty()) {
+            List<Produit> produits = ProduitOpenHelper.getProduitsByIdentification(db, codeIdentification);
+            if (!produits.isEmpty()) {
+                int produitId = produits.get(0).getID_produit();
+                scrollToItemOrDisplayAlert(produitId);
+            } else {
+                Alerte.afficherAlerteInformation(this, getLayoutInflater(), "Produit non trouvé", "Aucun produit trouvé pour le code scanné: " + codeIdentification, false, false);
+            }
+        } else {
+            Alerte.afficherAlerteInformation(this, getLayoutInflater(), "Code non reconnu", "Le code scanné n'a pas pu être analysé: " + scannedCode, false, false);
+        }
+    }
+
+    private void showSearchInput() {
+        isSearchOpen = true;
+        View textChercherTV = findViewById(R.id.textChercher_TV);
+        View searchInputET = findViewById(R.id.searchInput_ET);
+        View effacerRechercheIV = findViewById(R.id.effacerRecherche_IV);
+        View chevronRecherche = findViewById(R.id.chevronRecherche);
+
+        if (textChercherTV != null) textChercherTV.setVisibility(View.GONE);
+        if (searchInputET != null) {
+            searchInputET.setVisibility(View.VISIBLE);
+            ((android.widget.EditText) searchInputET).requestFocus();
+            ((android.widget.EditText) searchInputET).addTextChangedListener(new android.text.TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                @Override
+                public void afterTextChanged(android.text.Editable s) {
+                    String query = s.toString().trim();
+                    if (!query.isEmpty()) {
+                        openSearch();
+                        if (rechercheFragment != null) {
+                            rechercheFragment.lancerRecherche(query, "retourPUI", String.valueOf(retourSelectionne.get_UID()));
+                        }
+                    } else {
+                        if (rechercheFragment != null) {
+                            rechercheFragment.viderListe();
+                        }
+                    }
+                }
+            });
+        }
+        if (effacerRechercheIV != null) {
+            effacerRechercheIV.setVisibility(View.VISIBLE);
+            effacerRechercheIV.setOnClickListener(v -> closeSearch());
+        }
+        if (chevronRecherche != null) chevronRecherche.setVisibility(View.GONE);
+
+        // Show keyboard
+        android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+        if (imm != null && searchInputET != null) {
+            imm.showSoftInput(searchInputET, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
+        }
+    }
+
+    private void openSearch() {
+        View rechercheContainer = findViewById(R.id.rechercheContainer);
+        if (rechercheContainer != null) {
+            rechercheContainer.setVisibility(View.VISIBLE);
+            rechercheFragment = new RechercheFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.rechercheContainer, rechercheFragment)
+                    .commitNow();
+        }
+        isSearchOpen = true;
+    }
+
+    private void closeSearch() {
+        hideSearchInput();
+        View rechercheContainer = findViewById(R.id.rechercheContainer);
+        if (rechercheContainer != null) {
+            rechercheContainer.setVisibility(View.GONE);
+            if (rechercheFragment != null) {
+                getSupportFragmentManager().beginTransaction()
+                        .remove(rechercheFragment)
+                        .commit();
+                rechercheFragment = null;
+            }
+        }
+        isSearchOpen = false;
+    }
+
+    private void hideSearchInput() {
+        View textChercherTV = findViewById(R.id.textChercher_TV);
+        View searchInputET = findViewById(R.id.searchInput_ET);
+        View effacerRechercheIV = findViewById(R.id.effacerRecherche_IV);
+        View chevronRecherche = findViewById(R.id.chevronRecherche);
+
+        if (textChercherTV != null) textChercherTV.setVisibility(View.VISIBLE);
+        if (searchInputET != null) {
+            searchInputET.setVisibility(View.GONE);
+            ((android.widget.EditText) searchInputET).setText("");
+        }
+        if (effacerRechercheIV != null) effacerRechercheIV.setVisibility(View.GONE);
+        if (chevronRecherche != null) chevronRecherche.setVisibility(View.VISIBLE);
+
+        // Hide keyboard
+        android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+        if (imm != null && searchInputET != null) {
+            imm.hideSoftInputFromWindow(searchInputET.getWindowToken(), 0);
+        }
     }
 }

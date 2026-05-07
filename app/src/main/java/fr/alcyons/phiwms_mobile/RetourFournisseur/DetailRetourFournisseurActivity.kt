@@ -100,6 +100,7 @@ class DetailRetourFournisseurActivity : ServiceActivity(), RechercheFragment.OnE
         this.initializeData()
         this.initializeUI()
         this.setupEventListeners()
+        this.lancerScan?.performClick()
         this.setupOnBackPressedCallback()
     }
 

@@ -82,8 +82,9 @@ class RechercheFragment : Fragment() {
         {
             "reception"->  resultats = PH_ReliquatOpenHelper.getDesignationReliquatByNumero(db, query, numDoc)
             "preparation"-> resultats = ProduitOpenHelper.getProduitByDesignation(db, query)
-            "retourFournisseur" -> resultats = Retour_LigneOpenHelper.getSimilarDesignationsProduitsWithRetourUid(db, query, numDoc)
-            "destruction" -> resultats = Retour_LigneOpenHelper.getSimilarDesignationsProduitsWithRetourUid(db, query, numDoc)
+            "retourFournisseur" -> resultats = ProduitOpenHelper.getProduitByDesignation(db, query)
+            "destruction" -> resultats = ProduitOpenHelper.getProduitByDesignation(db, query)
+            "retourPUI" -> resultats = ProduitOpenHelper.getProduitByDesignation(db, query)
             else -> resultats = ProduitOpenHelper.getProduitByDesignation(db, query)
         }
 
