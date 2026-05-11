@@ -65,6 +65,7 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
         viewHolder.numSerieProduit = (TextView) convertView.findViewById(R.id.numSerie);
         viewHolder.labelSerie = (TextView) convertView.findViewById(R.id.labelSerie);
         viewHolder.textEmplacement = (TextView) convertView.findViewById(R.id.textEmplacement);
+        viewHolder.textZone = (TextView) convertView.findViewById(R.id.textZone);
         viewHolder.layoutSerie = (LinearLayout) convertView.findViewById(R.id.layoutSerie);
         viewHolder.layoutQteARetourner = (LinearLayout) convertView.findViewById(R.id.layoutQteARetourner);
         viewHolder.layoutPrincipal = (RelativeLayout) convertView.findViewById(R.id.layoutPrincipal);
@@ -123,6 +124,7 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
             String nb_emplacement = listEmplacement.size()+" Emp.";
             viewHolder.textEmplacement.setText(nb_emplacement);
         }
+        viewHolder.textZone.setText(retourLigne.getRetourPUI_Zone());
 
         viewHolder.qteRetourner.setText(String.valueOf(quantiteRetourner));
         viewHolder.QteARetourner.setText(String.valueOf((int)retourLigne.getQte_avant_retour()));
@@ -144,6 +146,7 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
         public TextView numSerieProduit;
         public TextView labelSerie;
         public TextView textEmplacement;
+        public TextView textZone;
         public RelativeLayout layoutPrincipal;
         public ProgressBar progressBar;
         public LinearLayout layoutSerie;
