@@ -11,6 +11,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
@@ -113,6 +115,28 @@ class DetailLigneFragment : Fragment() {
         val adapter = ArrayAdapter(requireContext(), R.layout.spinner_item_depot, listeEmplacements)
         emplacementAutoComplete.setAdapter(adapter)
         emplacementAutoComplete.setThreshold(100)
+
+        //gestion information au clic sur la quantité
+        quantiteCompteeET.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                view.findViewById<CardView>(R.id.emplacementCardView).visibility = View.GONE
+                view.findViewById<CardView>(R.id.layoutCarton_CV).visibility = View.GONE
+            }
+        }
+
+        quantiteCompteeET.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                // Ton code ici
+                view.findViewById<CardView>(R.id.emplacementCardView).visibility = View.VISIBLE
+                view.findViewById<CardView>(R.id.layoutCarton_CV).visibility = View.VISIBLE
+                val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(quantiteCompteeET.windowToken, 0)
+                true
+            } else {
+                false
+            }
+        }
+
 
         // Ouvre au clic
         emplacementAutoComplete.setOnClickListener { emplacementAutoComplete.showDropDown() }
