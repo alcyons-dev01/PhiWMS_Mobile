@@ -72,7 +72,7 @@ class DetailFragment : Fragment()
         val spinnerMois = view.findViewById<Spinner>(R.id.selecteurDateMois_SP)
         val spinnerAnnee = view.findViewById<Spinner>(R.id.selecteurDateAnnee_SP)
         val layoutDatePeremption = view.findViewById<CardView>(R.id.layoutDatePeremption_CV)
-        val restantTV = view.findViewById<TextView>(R.id.restantAReceptionner_TV)
+        val restantTV = view.findViewById<TextView>(R.id.restantARetourner_TV)
 
         view.findViewById<TextView>(R.id.designationReference_TV).text = retourLigne.produit_Designation
         view.findViewById<CardView>(R.id.layoutCarton_CV).visibility = View.GONE
