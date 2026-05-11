@@ -520,12 +520,16 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
             // Affiche le container
             referenceReceptionnerContainer.apply {
                 layoutParams = (layoutParams as LinearLayout.LayoutParams).also {
-                    it.height = (400 * resources.displayMetrics.density).toInt()
+                    it.height = LinearLayout.LayoutParams.WRAP_CONTENT
                     it.weight = 0f
                 }
                 visibility = View.VISIBLE
-                translationY = -resources.displayMetrics.heightPixels.toFloat()
-                animate().translationY(0f).setDuration(300).start()
+                translationY = 0f // Plus d'animation de translation
+                alpha = 0f        // Animation en fondu à la place
+                animate()
+                    .alpha(1f)
+                    .setDuration(300)
+                    .start()
             }
 
             // Crée le fragment avec la liste

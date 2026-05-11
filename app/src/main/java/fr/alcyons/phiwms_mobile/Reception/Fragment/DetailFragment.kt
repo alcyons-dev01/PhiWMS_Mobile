@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -19,9 +20,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper
 import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat
 import fr.alcyons.phiwms_mobile.Classes.Produit
 import fr.alcyons.phiwms_mobile.Outils.Alerte
@@ -59,7 +63,7 @@ class DetailFragment : Fragment() {
 
     fun mettreAJourLigne(ligne: PH_Reliquat) {
         val view = view ?: return
-        view.findViewById<TextView>(R.id.emplacementLot_TV).text = ligne.emplacement
+        view.findViewById<AutoCompleteTextView>(R.id.emplacementLot_TV).setText(ligne.emplacement)
         view.findViewById<TextView>(R.id.designationReference_TV).text = ligne.designationCourte
         view.findViewById<EditText>(R.id.quantiteComptee_ET)
             .setText(ligne.qteLivraison.toInt().toString())
@@ -79,6 +83,7 @@ class DetailFragment : Fragment() {
             arguments?.getSerializable(ARG_LIGNE) as? PH_Reliquat
         } ?: return
 
+        val produit = ProduitOpenHelper.getProduitByID(db, reliquatBase.produitID)
         var conditionnement: Int = reliquatBase.conditionnementAchat
         val layoutCarton_CV = view.findViewById<CardView>(R.id.layoutCarton_CV)
         val layoutMoinsLL = view.findViewById<ImageView>(R.id.layoutMoins_LL)
@@ -97,14 +102,62 @@ class DetailFragment : Fragment() {
         )
         val quantiteCompteeET = view.findViewById<EditText>(R.id.quantiteComptee_ET)
 
+        var emplacementCourant = reliquatBase.emplacement
+        val emplacementAutoComplete = view.findViewById<AutoCompleteTextView>(R.id.emplacementLot_TV)
+        val chevronEmplacement = view.findViewById<ImageView>(R.id.chevronEmplacement)
+
+        val depotCourant = DepotOpenHelper.getDepotParReference(db, reliquatBase.depotReference)
+        var listeEmplacements : MutableList<String> = mutableListOf()
+        val zoneCourante = ZoneOpenHelper.getZoneByDepotEtNom(db, depotCourant, produit.zone_PUI_Defaut)
+        if(zoneCourante != null)
+             listeEmplacements = EmplacementOpenHelper.getNomEmplacementsParZone(db, zoneCourante)
+            if(listeEmplacements.isEmpty())
+                listeEmplacements.add("")
+        else
+            listeEmplacements.add("")
+
+        val adapter = ArrayAdapter(requireContext(), R.layout.spinner_item_depot, listeEmplacements)
+        emplacementAutoComplete.setAdapter(adapter)
+        emplacementAutoComplete.setThreshold(100)
+
+        // Ouvre au clic
+        emplacementAutoComplete.setOnClickListener { emplacementAutoComplete.showDropDown() }
+        chevronEmplacement.setOnClickListener { emplacementAutoComplete.showDropDown() }
+
+        // Hauteur dropdown
+        val hauteurEcran = resources.displayMetrics.heightPixels
+        emplacementAutoComplete.setDropDownHeight(hauteurEcran / 3)
+        emplacementAutoComplete.setDropDownBackgroundResource(android.R.color.white)
+
+        emplacementAutoComplete.post {
+            val dpToPx = (12 * resources.displayMetrics.density).toInt()
+            emplacementAutoComplete.setDropDownWidth(
+                view.findViewById<View>(R.id.emplacementLot_TV).width - dpToPx
+            )
+        }
+        emplacementAutoComplete.setText(emplacementCourant, false)
+
+        emplacementAutoComplete.setOnItemClickListener { _, _, position, _ ->
+            val emplacementSelectionne = listeEmplacements[position]
+            emplacementAutoComplete.setText(emplacementSelectionne, false)
+            emplacementAutoComplete.dismissDropDown()
+            emplacementCourant = emplacementSelectionne
+        }
+        
         //gestion des données
-        if(reliquatBase.emplacement == "")
+        if(emplacementCourant != "")
         {
-            view.findViewById<TextView>(R.id.emplacementLot_TV).text = reliquatBase.emplacement
+            view.findViewById<AutoCompleteTextView>(R.id.emplacementLot_TV).setText(reliquatBase.emplacement)
+        }
+        else if(produit.emplacement_PUI_Defaut != "")
+        {
+            emplacementCourant = produit.emplacement_PUI_Defaut
+            view.findViewById<AutoCompleteTextView>(R.id.emplacementLot_TV).setText(produit.emplacement_PUI_Defaut)
         }
         else
         {
-            view.findViewById<TextView>(R.id.emplacementLot_TV).text = produit.emplacement_PUI_Defaut
+            emplacementCourant = listeEmplacements[0]
+            view.findViewById<AutoCompleteTextView>(R.id.emplacementLot_TV).setText(listeEmplacements[0])
         }
 
         view.findViewById<TextView>(R.id.designationReference_TV).text = reliquatBase.designationCourte
@@ -131,7 +184,7 @@ class DetailFragment : Fragment() {
                     isClickable = false
                     spinnerMoisDatePeremptionSP.isEnabled = false
                     spinnerAnneeDatePeremptionSP.isEnabled = false
-                    view.findViewById<TextView>(R.id.emplacementLot_TV).text = produit.emplacement_PUI_Defaut
+                    view.findViewById<AutoCompleteTextView>(R.id.emplacementLot_TV).setText(produit.emplacement_PUI_Defaut)
                 }
             }
         }
@@ -141,7 +194,6 @@ class DetailFragment : Fragment() {
             view.findViewById<EditText>(R.id.numeroLot_ET).setText("")
             quantiteCompteeET.setText("0")
         }
-
 
         //gestion du conditionnment
         layoutCarton_CV.visibility = View.GONE
@@ -195,7 +247,6 @@ class DetailFragment : Fragment() {
 
 
         //gestion du suivi de lot et de péremption
-        val produit = ProduitOpenHelper.getProduitByID(db, reliquatBase.produitID)
         if (!produit.isSuivi_Lot && !produit.isPeremption) {
             view.findViewById<LinearLayout>(R.id.layoutLotPeremption_LL).visibility = View.GONE
         } else {
@@ -328,17 +379,13 @@ class DetailFragment : Fragment() {
 
                             phReliquatCourant.reliquat_UID = reliquatId
                             val numeroLot = lot
-                            var emplacementName = reliquatBase.emplacement
-
-                            if(emplacementName == "")
-                                emplacementName = produit.emplacement_PUI_Defaut
 
                             phReliquatCourant.lot = numeroLot.trim { it <= ' ' }
                             phReliquatCourant.peremptionDate = datePeremption.trim { it <= ' ' }
                             phReliquatCourant.qteLivraison = quantite
                             phReliquatCourant.scanValue = ""
                             phReliquatCourant.bL_Numero = ""
-                            phReliquatCourant.emplacement = emplacementName
+                            phReliquatCourant.emplacement = emplacementCourant
 
                             onValider?.invoke(phReliquatCourant, true)
                         }
