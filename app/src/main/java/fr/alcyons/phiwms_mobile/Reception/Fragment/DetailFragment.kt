@@ -143,7 +143,7 @@ class DetailFragment : Fragment() {
             emplacementAutoComplete.dismissDropDown()
             emplacementCourant = emplacementSelectionne
         }
-        
+
         //gestion des données
         if(emplacementCourant != "")
         {

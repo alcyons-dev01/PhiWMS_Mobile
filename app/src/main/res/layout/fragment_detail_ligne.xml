@@ -303,6 +303,7 @@
                         android:textSize="24sp"
                         android:textStyle="bold"
                         android:selectAllOnFocus="true"
+                        android:imeOptions="actionDone"
                         android:background="@android:color/transparent"/>
 
                     <ImageView
