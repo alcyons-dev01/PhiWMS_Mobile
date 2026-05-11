@@ -54,7 +54,7 @@ class DetailFragment : Fragment()
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = inflater.inflate(R.layout.fragment_detail_ligne, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = inflater.inflate(R.layout.fragment_detail_ligne_retour_pui, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
@@ -140,7 +140,7 @@ class DetailFragment : Fragment()
         val emplacementCourant = this.retourLigne.retourPUI_Emplacement?.trim().orEmpty()
         if (emplacementCourant.isNotEmpty() && emplacementCourant !in valeurs) { valeurs.add(0, emplacementCourant) }
 
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, valeurs)
+        val adapter = ArrayAdapter(requireContext(), R.layout.spinner_item_depot, valeurs)
         emplacementView.setAdapter(adapter)
         emplacementView.setText(emplacementCourant.ifEmpty { this.produit.emplacement_PUI_Defaut }, false)
         emplacementView.isFocusable = false

@@ -42,6 +42,7 @@ import fr.alcyons.phiwms_mobile.Outils.GestionCodeScanne
 import fr.alcyons.phiwms_mobile.R
 import fr.alcyons.phiwms_mobile.RetourPUI.Fragment.ARetournerPUIFragment
 import fr.alcyons.phiwms_mobile.RetourPUI.Fragment.DetailFragment
+import fr.alcyons.phiwms_mobile.RetourPUI.Fragment.RetournerPUIFragment
 import fr.alcyons.phiwms_mobile.ServiceActivity
 import fr.alcyons.phiwms_mobile.Services.ServiceRetourPUIActivity
 import java.text.SimpleDateFormat
@@ -49,7 +50,7 @@ import java.util.Date
 import java.util.Objects
 import java.util.Random
 
-class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnElementSelectionneListener, OnElementRechercheListener, RechercheAdjustable
+class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnElementSelectionneListener, RetournerPUIFragment.OnElementSelectionneListener, OnElementRechercheListener, RechercheAdjustable
 {
     companion object
     {
@@ -66,10 +67,12 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     private var scannerContainer: FragmentContainerView? = null
     private var rechercheContainer: FragmentContainerView? = null
     private var referenceARetournerPUIContainer: FragmentContainerView? = null
+    private var referenceRetournerPUIContainer: FragmentContainerView? = null
     private var detailContainer: FragmentContainerView? = null
     private var lancerScan: LinearLayout? = null
     private var lancerRecherche: LinearLayout? = null
     private var aRetournerPUI_LL: LinearLayout? = null
+    private var retournerPUI_LL: LinearLayout? = null
     private var actionButton: AppCompatButton? = null
     private var textChercher_TV: TextView? = null
     private var searchInput_ET: EditText? = null
@@ -79,12 +82,14 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     private var scannerFragment: Fragment? = null
     private var rechercheFragment: RechercheFragment? = null
     private var aRetournerPUIFragment: ARetournerPUIFragment? = null
+    private var retournerPUIFragment: RetournerPUIFragment? = null
     private var detailFragment: DetailFragment? = null
 
     // State
     private var isScannerOpen: Boolean = false
     private var isSearchOpen: Boolean = false
     private var isACompterOpen: Boolean = false
+    private var isRetournerOpen: Boolean = false
     private var isDetailOpen: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -118,11 +123,13 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         this.scannerContainer = this.findViewById<FragmentContainerView?>(R.id.scannerContainer)
         this.rechercheContainer = this.findViewById<FragmentContainerView?>(R.id.rechercheContainer)
         this.referenceARetournerPUIContainer = this.findViewById<FragmentContainerView?>(R.id.referenceARetournerPUIContainer)
+        this.referenceRetournerPUIContainer = this.findViewById<FragmentContainerView?>(R.id.referenceRetournerPUIContainer)
         this.detailContainer = this.findViewById<FragmentContainerView?>(R.id.detailContainer)
 
         this.lancerScan = this.findViewById<LinearLayout?>(R.id.lancerScan)
         this.lancerRecherche = this.findViewById<LinearLayout?>(R.id.lancerRecherhe)
         this.aRetournerPUI_LL = this.findViewById<LinearLayout?>(R.id.aRetournerPUI_LL)
+        this.retournerPUI_LL = this.findViewById<LinearLayout?>(R.id.retournerPUI_LL)
 
         this.textChercher_TV = this.findViewById<TextView?>(R.id.textChercher_TV)
         this.searchInput_ET = this.findViewById<EditText?>(R.id.searchInput_ET)
@@ -137,6 +144,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         this.setupSearchClickListener()
         this.setupClearSearchClickListener()
         this.setupARetournerPUIClickListener()
+        this.setupRetournerPUIClickListener()
         this.setupActionButtonClickListener()
     }
 
@@ -184,6 +192,18 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         }
     }
 
+    private fun setupRetournerPUIClickListener()
+    {
+        this.retournerPUI_LL?.setOnClickListener {
+            if (this.isRetournerOpen) this.closeRetourner()
+            else
+            {
+                this.closeOpenedFragments()
+                this.openRetourner()
+            }
+        }
+    }
+
     private fun setupActionButtonClickListener() { this.actionButton?.setOnClickListener { Alerte.afficherAlerteSaisieText(this, this.layoutInflater, "Validation retour PUI", "Souhaitez-vous valider le retour PUI ?", "Ajouter un commentaire...") } }
 
     public override fun onResume()
@@ -215,9 +235,13 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     private fun updateListView()
     {
         if (this.aRetournerPUIFragment != null) { (this.aRetournerPUIFragment ?: return).updateList(this.retourLigneList as ArrayList<Retour_Ligne?>? as ArrayList<Retour_Ligne>, this.retourSelectionne ?: return) }
+        val lignesRetournees = this.getRetourLignesRetournees()
+        if (this.retournerPUIFragment != null) { (this.retournerPUIFragment ?: return).updateList(ArrayList(lignesRetournees), this.retourSelectionne ?: return) }
 
         val nbRefTV = this.findViewById<TextView?>(R.id.nbReferenceARetournerPUI_TV)
         if (nbRefTV != null) { nbRefTV.text = (this.retourLigneList ?: return).size.toString() }
+        val nbRetourneTV = this.findViewById<TextView?>(R.id.nbReferenceRetournerPUI_TV)
+        if (nbRetourneTV != null) { nbRetourneTV.text = lignesRetournees.size.toString() }
     }
 
     override fun retourSaisieText(text: String?)
@@ -391,6 +415,45 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         this.isACompterOpen = false
     }
 
+    private fun openRetourner()
+    {
+        val lignesRetournees = ArrayList(this.getRetourLignesRetournees())
+        if (lignesRetournees.isEmpty()) { return }
+
+        this.referenceRetournerPUIContainer?.let { container ->
+            container.apply {
+                this.layoutParams = (this.layoutParams as LinearLayout.LayoutParams).also {
+                    it.height = LinearLayout.LayoutParams.WRAP_CONTENT
+                    it.weight = 0f
+                }
+                this.visibility = View.VISIBLE
+                this.translationY = -resources.displayMetrics.heightPixels.toFloat()
+                this.animate().translationY(0f).setDuration(ANIMATION_DURATION_MS.toLong()).start()
+            }
+
+            val frag = RetournerPUIFragment.newInstance(lignesRetournees, this.retourSelectionne ?: return).also { this.retournerPUIFragment = it }
+            this.supportFragmentManager.beginTransaction().replace(R.id.referenceRetournerPUIContainer, frag).commitNow()
+
+            val scrollView = findViewById<NestedScrollView>(R.id.scrollView)
+            scrollView.post { scrollView.smoothScrollTo(0, container.top) }
+        }
+
+        this.isRetournerOpen = true
+    }
+
+    private fun closeRetourner()
+    {
+        (this.referenceRetournerPUIContainer ?: return).animate().translationY(-(this.referenceRetournerPUIContainer ?: return).height.toFloat()).setDuration(ANIMATION_DURATION_MS.toLong()).withEndAction {
+                (this.referenceRetournerPUIContainer ?: return@withEndAction).visibility = View.GONE
+                (this.referenceRetournerPUIContainer ?: return@withEndAction).layoutParams = ((this.referenceRetournerPUIContainer ?: return@withEndAction).layoutParams as LinearLayout.LayoutParams).also { it.height = 0 }
+                this.retournerPUIFragment?.let { frag -> supportFragmentManager.beginTransaction().remove(frag).commit() }
+                this.retournerPUIFragment = null
+            }
+            .start()
+
+        this.isRetournerOpen = false
+    }
+
     override fun onElementRechercher(element: Int) { this.scrollToItemOrDisplayAlert(element) }
 
     override fun ajusterHauteurRecherche(hauteur: Int)
@@ -420,11 +483,14 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         if (this.isScannerOpen) this.closeScanner()
         if (this.isSearchOpen) this.closeSearch()
         if (this.isACompterOpen) this.closeACompter()
+        if (this.isRetournerOpen) this.closeRetourner()
         if (this.isDetailOpen) this.closeDetailFragment()
     }
 
     private fun openDetailFragment(retourLigneBase: Retour_Ligne)
     {
+        this.closeOpenedFragments()
+
         val produit = ProduitOpenHelper.getProduitByID(this.db, retourLigneBase.code_produit)
         val retourLigneEdition = this.getOrCreateEditableRetourLigne(retourLigneBase, produit)
         val maxQuantite = this.getQuantiteMaxEditable(retourLigneBase, retourLigneEdition)
@@ -438,6 +504,8 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
                 this.loadData()
                 this.updateListView()
                 this.closeDetailFragment()
+                if (ligne.qte_Retourner > 0) { if (!this.isRetournerOpen) { this.openRetourner() } }
+                else if (this.isRetournerOpen && this.getRetourLignesRetournees().isEmpty()) { this.closeRetourner() }
                 if (!this.isACompterOpen) { this.openACompter() }
                 this.aRetournerPUIFragment?.scrollToPosition((this.retourLigneList ?: emptyList()).indexOfFirst { it.code_produit == retourLigneBase.code_produit })
             }
@@ -487,6 +555,8 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
 
         return (retourLigneBase.qte_avant_retour.toInt() - quantiteAutresLignes).coerceAtLeast(0)
     }
+
+    private fun getRetourLignesRetournees(): List<Retour_Ligne> { return Retour_LigneOpenHelper.getAllRetourLignesNegByRetour(this.db, this.retourSelectionne ?: return emptyList()).filter { it.qte_Retourner > 0 } }
 
     private fun openScanner()
     {
