@@ -124,11 +124,18 @@ class DetailLigneFragment : Fragment() {
             }
         }
 
+        quantiteCompteeET.setOnClickListener {
+            quantiteCompteeET.selectAll()
+            view.findViewById<CardView>(R.id.emplacementCardView).visibility = View.GONE
+            view.findViewById<CardView>(R.id.layoutCarton_CV).visibility = View.GONE
+        }
+
         quantiteCompteeET.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 // Ton code ici
                 view.findViewById<CardView>(R.id.emplacementCardView).visibility = View.VISIBLE
-                view.findViewById<CardView>(R.id.layoutCarton_CV).visibility = View.VISIBLE
+                if(conditionnement != 1)
+                    view.findViewById<CardView>(R.id.layoutCarton_CV).visibility = View.VISIBLE
                 val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(quantiteCompteeET.windowToken, 0)
                 true
