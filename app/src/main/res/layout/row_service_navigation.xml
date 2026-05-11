@@ -1,41 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:backgroundTint="@android:color/white"
-    android:orientation="vertical">
-
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#F0F4FF">
 
     <LinearLayout
         android:id="@+id/principal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:orientation="horizontal"
-        android:layout_marginRight="5dp"
-        android:weightSum="5">
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp">
 
+        <!-- Barre indicateur gauche -->
+        <View
+            android:id="@+id/barreIndicateur"
+            android:layout_width="3dp"
+            android:layout_height="32dp"
+            android:background="@color/bleu_clair_alcyons"
+            android:layout_marginEnd="14dp"/>
+
+        <!-- Bouton info -->
         <ImageView
             android:id="@+id/boutonInformation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/ic_info"
-            android:layout_gravity="center_horizontal|center_vertical"
-            android:backgroundTint="@color/bleu_clair_alcyons"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:visibility="gone"/>
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_info"
+            app:tint="@color/bleu_clair_alcyons"
+            android:layout_marginEnd="10dp"
+            android:visibility="gone"
+            xmlns:app="http://schemas.android.com/apk/res-auto"/>
 
-
-        <ImageView
-            android:id="@+id/barreIndicateur"
-            android:layout_width="5dp"
-            android:layout_height="match_parent"
-            android:background="@color/bleu_clair_alcyons"/>
-
+        <!-- Nom + Description -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="4"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
@@ -43,40 +44,44 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:layout_marginLeft="5dp"
-                android:layout_gravity="center"
-                style="@style/sectiongras_style"/>
+                android:textColor="@color/bleu_fonce_alcyons"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end"/>
 
             <TextView
                 android:id="@+id/descriptionService"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:layout_marginLeft="5dp"
-                android:layout_gravity="center"
-                style="@style/text1ligne_style"/>
-
+                android:textColor="@color/bleu_fonce_alcyons"
+                android:textSize="12sp"
+                android:alpha="0.6"
+                android:maxLines="1"
+                android:ellipsize="end"/>
 
         </LinearLayout>
 
+        <!-- Indicateur droit -->
         <TextView
             android:id="@+id/indicateurService"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="right|center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text=""
             android:textColor="@color/bleu_clair_alcyons"
-            style="@style/titre_style"/>
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginStart="8dp"/>
 
     </LinearLayout>
 
-
-
-    <ImageView
+    <!-- Séparateur -->
+    <View
         android:id="@+id/listViewSeparation"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/gris_clair"/>
+        android:background="@color/bleu_clair_alcyons_transparent"
+        android:layout_marginHorizontal="16dp"/>
 
 </LinearLayout>
