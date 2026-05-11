@@ -68,6 +68,8 @@
             android:layout_alignParentBottom="true"
             android:visibility="gone"
             android:elevation="8dp"
+            android:clickable="true"
+            android:focusable="true"
             android:background="@android:color/transparent"/>
 
         <!-- Contenu scrollable -->

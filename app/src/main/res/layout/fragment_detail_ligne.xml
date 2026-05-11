@@ -57,6 +57,7 @@
 
         <!-- Emplacement -->
         <androidx.cardview.widget.CardView
+            android:id="@+id/emplacementCardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
@@ -302,6 +303,8 @@
                         android:textColor="@color/bleu_fonce_alcyons"
                         android:textSize="24sp"
                         android:textStyle="bold"
+                        android:selectAllOnFocus="true"
+                        android:imeOptions="actionDone"
                         android:background="@android:color/transparent"/>
 
                     <ImageView

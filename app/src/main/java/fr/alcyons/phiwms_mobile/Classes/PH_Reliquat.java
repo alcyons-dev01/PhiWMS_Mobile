@@ -114,6 +114,7 @@ public class PH_Reliquat implements Serializable, Comparable {
         this.lot = jsonObject.optString("lot");
         this.Zone = jsonObject.optString("Zone");
         this.Emplacement = jsonObject.optString("Emplacement");
+        this.DepotReference = jsonObject.optString("DepotReference");
     }
 
     public PH_Reliquat(Cursor cursor) {
@@ -137,6 +138,7 @@ public class PH_Reliquat implements Serializable, Comparable {
         this.Emplacement = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_EMPLACEMENT_PH_RELIQUAT);
         this.BL_Numero = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_BL_Numero);
         this.ScanValue = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_SCANVALUE_PH_RELIQUAT);
+        this.DepotReference = cursor.getString(PH_ReliquatOpenHelper.Constantes.NUM_COL_DEPOTREFERENCE_PH_RELIQUAT);
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
 
     }

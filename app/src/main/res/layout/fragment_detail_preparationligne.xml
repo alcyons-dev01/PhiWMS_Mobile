@@ -312,6 +312,7 @@
                         android:textColor="@color/bleu_fonce_alcyons"
                         android:textSize="24sp"
                         android:textStyle="bold"
+                        android:imeOptions="actionDone"
                         android:background="@android:color/transparent"/>
 
                     <ImageView
