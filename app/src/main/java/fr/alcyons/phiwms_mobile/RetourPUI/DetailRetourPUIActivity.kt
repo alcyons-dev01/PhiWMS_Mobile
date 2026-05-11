@@ -15,10 +15,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
@@ -26,7 +22,6 @@ import androidx.fragment.app.FragmentContainerView
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper
@@ -43,10 +38,10 @@ import fr.alcyons.phiwms_mobile.Fragment.ScannerInputFragment
 import fr.alcyons.phiwms_mobile.Interfaces.RechercheAdjustable
 import fr.alcyons.phiwms_mobile.Interfaces.ScanDebounce
 import fr.alcyons.phiwms_mobile.Outils.Alerte
-import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites
 import fr.alcyons.phiwms_mobile.Outils.GestionCodeScanne
 import fr.alcyons.phiwms_mobile.R
 import fr.alcyons.phiwms_mobile.RetourPUI.Fragment.ARetournerPUIFragment
+import fr.alcyons.phiwms_mobile.RetourPUI.Fragment.DetailFragment
 import fr.alcyons.phiwms_mobile.ServiceActivity
 import fr.alcyons.phiwms_mobile.Services.ServiceRetourPUIActivity
 import java.text.SimpleDateFormat
@@ -71,6 +66,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     private var scannerContainer: FragmentContainerView? = null
     private var rechercheContainer: FragmentContainerView? = null
     private var referenceARetournerPUIContainer: FragmentContainerView? = null
+    private var detailContainer: FragmentContainerView? = null
     private var lancerScan: LinearLayout? = null
     private var lancerRecherche: LinearLayout? = null
     private var aRetournerPUI_LL: LinearLayout? = null
@@ -83,14 +79,13 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     private var scannerFragment: Fragment? = null
     private var rechercheFragment: RechercheFragment? = null
     private var aRetournerPUIFragment: ARetournerPUIFragment? = null
+    private var detailFragment: DetailFragment? = null
 
     // State
     private var isScannerOpen: Boolean = false
     private var isSearchOpen: Boolean = false
     private var isACompterOpen: Boolean = false
-
-    // Activity Result
-    private var resultListeEmplacement: ActivityResultLauncher<Intent?>? = null
+    private var isDetailOpen: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -108,8 +103,6 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     {
         this.retourSelectionne = RetourOpenHelper.getRetourByID(this.db, Objects.requireNonNull<Bundle?>(this.intent.extras).getInt("retourSelectionneID"))
         this.retourLigneList = ArrayList<Retour_Ligne>()
-
-        this.resultListeEmplacement = registerForActivityResult<Intent?, ActivityResult?>(StartActivityForResult(), ActivityResultCallback { result: ActivityResult? -> if ((result ?: return@ActivityResultCallback).resultCode == CodesEchangesActivites.RETOUR_LISTE_EMPLACEMENTS) { this.onResume() } })
     }
 
     private fun initializeUI()
@@ -125,6 +118,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         this.scannerContainer = this.findViewById<FragmentContainerView?>(R.id.scannerContainer)
         this.rechercheContainer = this.findViewById<FragmentContainerView?>(R.id.rechercheContainer)
         this.referenceARetournerPUIContainer = this.findViewById<FragmentContainerView?>(R.id.referenceARetournerPUIContainer)
+        this.detailContainer = this.findViewById<FragmentContainerView?>(R.id.detailContainer)
 
         this.lancerScan = this.findViewById<LinearLayout?>(R.id.lancerScan)
         this.lancerRecherche = this.findViewById<LinearLayout?>(R.id.lancerRecherhe)
@@ -356,14 +350,9 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
 
     override fun onElementSelectionne(retourLigne: Retour_Ligne)
     {
-        val detailRetourPUIIntent = Intent(this, ListeEmplacementRetourPUIActivity::class.java)
-        val detailRetourPUIBundle = super.getBundle()
-        detailRetourPUIBundle.putInt("produitID", retourLigne.code_produit)
-        detailRetourPUIBundle.putSerializable("retourLigne", retourLigne)
-        detailRetourPUIBundle.putInt("depotID", DepotOpenHelper.getDepotParReference(this.db, (this.retourSelectionne ?: return).ref_Depot_Dest).depot_UID)
-        detailRetourPUIIntent.putExtras(detailRetourPUIBundle)
-
-        (this.resultListeEmplacement ?: return).launch(detailRetourPUIIntent)
+        if (this.isScannerOpen) { this.closeScanner() }
+        if (this.isSearchOpen) { this.closeSearch() }
+        this.openDetailFragment(retourLigne)
     }
 
     private fun openACompter()
@@ -431,6 +420,72 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         if (this.isScannerOpen) this.closeScanner()
         if (this.isSearchOpen) this.closeSearch()
         if (this.isACompterOpen) this.closeACompter()
+        if (this.isDetailOpen) this.closeDetailFragment()
+    }
+
+    private fun openDetailFragment(retourLigneBase: Retour_Ligne)
+    {
+        val produit = ProduitOpenHelper.getProduitByID(this.db, retourLigneBase.code_produit)
+        val retourLigneEdition = this.getOrCreateEditableRetourLigne(retourLigneBase, produit)
+        val maxQuantite = this.getQuantiteMaxEditable(retourLigneBase, retourLigneEdition)
+
+        this.detailContainer?.let { container ->
+            val fragment = DetailFragment.newInstance(retourLigneEdition, maxQuantite).also { this.detailFragment = it }
+
+            fragment.onFermer = { this.closeDetailFragment() }
+            fragment.onValider = { ligne ->
+                Retour_LigneOpenHelper.mettreAJourUnRetourLigne(this.db, ligne)
+                this.loadData()
+                this.updateListView()
+                this.closeDetailFragment()
+                if (!this.isACompterOpen) { this.openACompter() }
+                this.aRetournerPUIFragment?.scrollToPosition((this.retourLigneList ?: emptyList()).indexOfFirst { it.code_produit == retourLigneBase.code_produit })
+            }
+
+            this.supportFragmentManager.beginTransaction().replace(R.id.detailContainer, fragment).commitNow()
+
+            container.visibility = View.VISIBLE
+            container.translationY = container.height.toFloat().takeIf { it > 0f } ?: 600f
+            container.animate().translationY(0f).setDuration(ANIMATION_DURATION_MS.toLong()).start()
+        }
+
+        this.isDetailOpen = true
+    }
+
+    private fun closeDetailFragment()
+    {
+        val container = this.detailContainer ?: return
+        container.animate().translationY(container.height.toFloat().takeIf { it > 0f } ?: 600f).setDuration(ANIMATION_DURATION_MS.toLong()).withEndAction {
+                container.visibility = View.GONE
+                this.detailFragment?.let { frag -> this.supportFragmentManager.beginTransaction().remove(frag).commit() }
+                this.detailFragment = null
+            }
+            .start()
+
+        this.isDetailOpen = false
+    }
+
+    private fun getOrCreateEditableRetourLigne(retourLigneBase: Retour_Ligne, produit: Produit): Retour_Ligne
+    {
+        val retourLignesNegatives = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(this.db, this.retourSelectionne ?: return retourLigneBase, retourLigneBase.code_produit)
+
+        if (retourLignesNegatives.isNotEmpty())
+        {
+            val emplacementCourant = retourLigneBase.retourPUI_Emplacement
+            return retourLignesNegatives.firstOrNull { !emplacementCourant.isNullOrEmpty() && it.retourPUI_Emplacement == emplacementCourant } ?: retourLignesNegatives.first()
+        }
+
+        this.creationRetourLigne(retourLigneBase, produit)
+        return Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(this.db, this.retourSelectionne ?: return retourLigneBase, retourLigneBase.code_produit).first()
+    }
+
+    private fun getQuantiteMaxEditable(retourLigneBase: Retour_Ligne, retourLigneEdition: Retour_Ligne): Int
+    {
+        val retourLignesNegatives = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(this.db, this.retourSelectionne ?: return retourLigneBase.qte_avant_retour.toInt(), retourLigneBase.code_produit)
+
+        val quantiteAutresLignes = retourLignesNegatives.filter { it._UID != retourLigneEdition._UID }.sumOf { it.qte_Retourner.toInt() }
+
+        return (retourLigneBase.qte_avant_retour.toInt() - quantiteAutresLignes).coerceAtLeast(0)
     }
 
     private fun openScanner()
@@ -626,7 +681,15 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
 
     private fun setupOnBackPressedCallback()
     {
-        val callback = object : OnBackPressedCallback(true) { override fun handleOnBackPressed() { Alerte.afficherAlerteConfirmation(this@DetailRetourPUIActivity, this@DetailRetourPUIActivity.layoutInflater, getBundle(), "Voulez-vous quitter le détail du retour PUI ?", true, false, this@DetailRetourPUIActivity) } }
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (this@DetailRetourPUIActivity.isDetailOpen) {
+                    this@DetailRetourPUIActivity.closeDetailFragment()
+                } else {
+                    Alerte.afficherAlerteConfirmation(this@DetailRetourPUIActivity, this@DetailRetourPUIActivity.layoutInflater, getBundle(), "Voulez-vous quitter le détail du retour PUI ?", true, false, this@DetailRetourPUIActivity)
+                }
+            }
+        }
         this.onBackPressedDispatcher.addCallback(this, callback)
     }
 }
