@@ -230,7 +230,8 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity
 
     private String getDepotLivraison(final Retour retour)
     {
-        String depotOrigine = retour.getRef_Depot_Dest();
+        String[] intitule_tab = retour.getIntitule().split(":");
+        String depotOrigine = intitule_tab[0];
         if (retour.getRef_Depot_Origine().contains("-PAD-") && this.utilisateurConnecte.getIdentifiant().toLowerCase().contains("alcyons")) { depotOrigine = "XXX-PAD-XXX"; }
         return depotOrigine;
     }
