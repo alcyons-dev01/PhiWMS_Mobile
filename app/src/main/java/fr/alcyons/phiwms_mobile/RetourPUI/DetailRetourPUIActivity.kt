@@ -377,14 +377,11 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     {
         if (this.isScannerOpen) { this.closeScanner() }
         if (this.isSearchOpen) { this.closeSearch() }
-        this.openDetailFragment(this.resolveBaseRetourLigne(retourLigne))
+        this.openDetailFragment(this.resolveBaseRetourLigne(retourLigne), retourLigne.takeIf { it._UID < 0 })
     }
 
     private fun openARetourner()
     {
-        Log.d("DetailRetourPUIActivity", "openARetourner() - lignesRetournees.size = ${this.retourLigneList?.size}")
-        for (retourLigne in this.retourLigneList ?: return) { Log.d("DetailRetourPUIActivity", "retour uid : ${retourLigne.retour_UID}, uid : ${retourLigne._UID}, lot retourner : ${retourLigne.lot_Retourner}, qte retourner : ${retourLigne.qte_Retourner}, qte avant retour : ${retourLigne.qte_avant_retour}") }
-
         this.referenceARetournerPUIContainer?.let { container ->
             container.apply {
                 this.layoutParams = (this.layoutParams as LinearLayout.LayoutParams).also {
@@ -423,9 +420,6 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     {
         val lignesRetournees = ArrayList(this.getRetourLignesRetournees())
         if (lignesRetournees.isEmpty()) { return }
-
-        Log.d("DetailRetourPUIActivity", "openRetourner() - lignesRetournees.size = ${lignesRetournees.size}")
-        for (retourLigne in lignesRetournees) { Log.d("DetailRetourPUIActivity", "retour uid : ${retourLigne.retour_UID}, uid : ${retourLigne._UID}, lot retourner : ${retourLigne.lot_Retourner}, qte retourner : ${retourLigne.qte_Retourner}, qte avant retour : ${retourLigne.qte_avant_retour}") }
 
         this.referenceRetournerPUIContainer?.let { container ->
             container.apply {
@@ -494,12 +488,12 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         if (this.isDetailOpen) this.closeDetailFragment()
     }
 
-    private fun openDetailFragment(retourLigneBase: Retour_Ligne)
+    private fun openDetailFragment(retourLigneBase: Retour_Ligne, retourLigneSelectionnee: Retour_Ligne? = null)
     {
         this.closeOpenedFragments()
 
         this.detailContainer?.let { container ->
-            val fragment = DetailFragment.newInstance(retourLigneBase).also { this.detailFragment = it }
+            val fragment = DetailFragment.newInstance(retourLigneBase, retourLigneSelectionnee?._UID).also { this.detailFragment = it }
 
             fragment.onFermer = { this.closeDetailFragment() }
             fragment.onValider = {
@@ -508,8 +502,6 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
                 this.closeDetailFragment()
                 if (this.getRetourLignesRetournees().isNotEmpty()) { if (!this.isRetournerOpen) { this.openRetourner() } }
                 else if (this.isRetournerOpen) { this.closeRetourner() }
-                if (!this.isARetournerOpen) { this.openARetourner() }
-                this.aRetournerPUIFragment?.scrollToPosition((this.retourLigneList ?: emptyList()).indexOfFirst { it._UID == retourLigneBase._UID })
             }
 
             this.supportFragmentManager.beginTransaction().replace(R.id.detailContainer, fragment).commitNow()
@@ -535,7 +527,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         this.isDetailOpen = false
     }
 
-    private fun getRetourLignesRetournees(): List<Retour_Ligne> { return Retour_LigneOpenHelper.getAllRetourLignesNegByRetour(this.db, this.retourSelectionne ?: return emptyList()).filter { it.qte_Retourner > 0 && RetourPUIQuantiteHelper.parseBaseUid(it) != null } }
+    private fun getRetourLignesRetournees(): List<Retour_Ligne> { return Retour_LigneOpenHelper.getAllRetourLignesNegByRetour(this.db, this.retourSelectionne ?: return emptyList()).filter { it.qte_Retourner > 0 && RetourPUIQuantiteHelper.parseBaseUid(it) != null }.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.produit_Designation ?: "" }) }
 
     private fun getRetourLignesARetourner(): List<Retour_Ligne>
     {

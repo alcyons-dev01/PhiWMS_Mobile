@@ -3,6 +3,9 @@ package fr.alcyons.phiwms_mobile.RetourPUI.Fragment
 import android.database.sqlite.SQLiteDatabase
 import android.os.Build
 import android.os.Bundle
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,6 +33,7 @@ import fr.alcyons.phiwms_mobile.R
 import fr.alcyons.phiwms_mobile.RetourPUI.DetailRetourPUIActivity
 import fr.alcyons.phiwms_mobile.RetourPUI.RetourPUIQuantiteHelper
 import java.util.Calendar
+import java.util.Objects
 import kotlin.math.max
 
 class DetailFragment : Fragment()
@@ -45,6 +49,7 @@ class DetailFragment : Fragment()
     private lateinit var quantiteCompteeET: EditText
     private lateinit var restantTV: TextView
     private lateinit var emplacementView: AutoCompleteTextView
+    private lateinit var chevronEmplacement: ImageView
 
     private var maxQuantite = 0
     private var ligneCouranteExisteEnBDD = true
@@ -53,8 +58,14 @@ class DetailFragment : Fragment()
     companion object
     {
         private const val ARG_LIGNE = "ligne"
+        private const val ARG_RETOUR_LIGNE_SELECTIONNEE_UID = "retour_ligne_selectionnee_uid"
 
-        fun newInstance(ligne: Retour_Ligne): DetailFragment = DetailFragment().apply { arguments = Bundle().apply { putSerializable(ARG_LIGNE, ligne) } }
+        fun newInstance(ligne: Retour_Ligne, retourLigneSelectionneeUid: Int? = null): DetailFragment = DetailFragment().apply {
+            arguments = Bundle().apply {
+                putSerializable(ARG_LIGNE, ligne)
+                if (retourLigneSelectionneeUid != null) { putInt(ARG_RETOUR_LIGNE_SELECTIONNEE_UID, retourLigneSelectionneeUid) }
+            }
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View { return inflater.inflate(R.layout.fragment_detail_ligne_retour_pui, container, false) }
@@ -70,8 +81,10 @@ class DetailFragment : Fragment()
         retourCourant = RetourOpenHelper.getRetourByID(db, retourLigneInitiale.retour_UID)
         produit = ProduitOpenHelper.getProduitByID(db, retourLigneInitiale.code_produit)
         retourLigneCourante = Retour_Ligne(retourLigneInitiale)
+        val retourLigneSelectionneeUid = arguments?.getInt(ARG_RETOUR_LIGNE_SELECTIONNEE_UID)
 
         emplacementView = view.findViewById(R.id.emplacementLot_TV)
+        chevronEmplacement = view.findViewById(R.id.chevronEmplacement)
         quantiteCompteeET = view.findViewById(R.id.quantiteComptee_ET)
         restantTV = view.findViewById(R.id.restantARetourner_TV)
         val numeroLotET = view.findViewById<EditText>(R.id.numeroLot_ET)
@@ -91,7 +104,7 @@ class DetailFragment : Fragment()
         numeroLotET.isClickable = false
 
         configureDatePeremption(spinnerMois, spinnerAnnee, layoutDatePeremption)
-        applySelection(this.retourLigneInitiale.retourPUI_Emplacement?.trim().orEmpty(), true)
+        initializeSelection(retourLigneSelectionneeUid)
 
         view.findViewById<ImageView>(R.id.layoutPlus_LL).setOnClickListener {
             val quantite = (this.quantiteCompteeET.text.toString().toIntOrNull() ?: 0) + getPasQuantite()
@@ -104,7 +117,22 @@ class DetailFragment : Fragment()
 
         view.findViewById<LinearLayout>(R.id.layoutFermer_LL).setOnClickListener { this.onFermer?.invoke() }
 
-        view.findViewById<LinearLayout>(R.id.layoutValider_LL).setOnClickListener { this.enregistrerLigne() }
+        view.findViewById<LinearLayout>(R.id.layoutValider_LL).setOnClickListener { this.demanderConfirmationSiSuppressionNecessaire() }
+    }
+
+    private fun initializeSelection(retourLigneSelectionneeUid: Int?)
+    {
+        val retourLigneSelectionnee = retourLigneSelectionneeUid?.takeIf { it < 0 }?.let { Retour_LigneOpenHelper.getRetourLigneByID(this.db, it) }
+
+        if (retourLigneSelectionnee != null)
+        {
+            this.retourLigneCourante = retourLigneSelectionnee
+            this.ligneCouranteExisteEnBDD = true
+            applySelection(retourLigneSelectionnee.retourPUI_Emplacement?.trim().orEmpty(), true)
+            return
+        }
+
+        applySelection(this.retourLigneInitiale.retourPUI_Emplacement?.trim().orEmpty(), true)
     }
 
     private fun configureEmplacements()
@@ -117,6 +145,7 @@ class DetailFragment : Fragment()
 
         val adapter = ArrayAdapter(requireContext(), R.layout.spinner_item_depot, valeurs)
         this.emplacementView.setAdapter(adapter)
+        this.chevronEmplacement.setOnClickListener { this.emplacementView.showDropDown() }
         this.emplacementView.setOnClickListener { this.emplacementView.showDropDown() }
         this.emplacementView.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) { this.emplacementView.showDropDown() } }
         this.emplacementView.setOnItemClickListener { _, _, position, _ ->
@@ -203,14 +232,60 @@ class DetailFragment : Fragment()
             return
         }
 
-        this.retourLigneCourante.retourPUI_Zone = getZoneNameForEmplacement(emplacementSelectionne)
-        this.retourLigneCourante.retourPUI_Emplacement = emplacementSelectionne
         this.retourLigneCourante.qte_Retourner = quantite.toDouble()
+        if (quantite == 0)
+        {
+            this.retourLigneCourante.retourPUI_Zone = ""
+            this.retourLigneCourante.retourPUI_Emplacement = ""
+        }
+        else
+        {
+            this.retourLigneCourante.retourPUI_Zone = getZoneNameForEmplacement(emplacementSelectionne)
+            this.retourLigneCourante.retourPUI_Emplacement = emplacementSelectionne
+        }
 
         if (this.ligneCouranteExisteEnBDD) { Retour_LigneOpenHelper.mettreAJourUnRetourLigne(this.db, this.retourLigneCourante) }
         else if (quantite > 0) { Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(this.db, this.retourLigneCourante) }
 
         this.onValider?.invoke()
+    }
+
+    private fun demanderConfirmationSiSuppressionNecessaire()
+    {
+        val quantite = this.quantiteCompteeET.text.toString().toIntOrNull() ?: 0
+        val estSuppressionLigneRetournee = this.ligneCouranteExisteEnBDD && this.retourLigneCourante._UID < 0 && this.retourLigneCourante.qte_Retourner > 0 && quantite == 0
+
+        if (!estSuppressionLigneRetournee)
+        {
+            this.enregistrerLigne()
+            return
+        }
+
+        afficherConfirmationRemiseAZero()
+    }
+
+    private fun afficherConfirmationRemiseAZero()
+    {
+        val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        val layout = layoutInflater.inflate(R.layout.alerte_confirmation, null)
+        val buttonOk = layout.findViewById<LinearLayout>(R.id.buttonOk)
+        val buttonAnnuler = layout.findViewById<LinearLayout>(R.id.buttonAnnuler)
+        val messageTextView = layout.findViewById<TextView>(R.id.messageFin)
+
+        messageTextView.text = "La quantité retournée va être remise à 0. Voulez-vous continuer ?"
+        builder.setView(layout)
+
+        val alertDialog = builder.create()
+        Objects.requireNonNull(alertDialog.window)?.setGravity(Gravity.CENTER)
+        alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        alertDialog.show()
+
+        buttonOk.setOnClickListener {
+            alertDialog.dismiss()
+            this.enregistrerLigne()
+        }
+
+        buttonAnnuler.setOnClickListener { alertDialog.dismiss() }
     }
 
     private fun getRetourLigneByEmplacement(emplacement: String): Retour_Ligne? { return RetourPUIQuantiteHelper.getNegativeLinesForBase(this.db, this.retourCourant, this.retourLigneInitiale).firstOrNull { it.retourPUI_Emplacement == emplacement } }

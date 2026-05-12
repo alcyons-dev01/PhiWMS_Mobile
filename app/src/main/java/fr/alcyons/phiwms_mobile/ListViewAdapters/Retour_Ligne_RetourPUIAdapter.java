@@ -66,6 +66,7 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
         viewHolder.nomFournisseur = (TextView) convertView.findViewById(R.id.nomFournisseur);
         viewHolder.qteRetourner = (TextView) convertView.findViewById(R.id.QteRetourner);
         viewHolder.QteARetourner = (TextView) convertView.findViewById(R.id.QteARetourner);
+        viewHolder.labelQteBandeau = (TextView) convertView.findViewById(R.id.labelQteBandeau);
         viewHolder.lotRetourne = (TextView) convertView.findViewById(R.id.lotRetourne);
         viewHolder.datePeremption = (TextView) convertView.findViewById(R.id.datePeremption);
         viewHolder.numSerieProduit = (TextView) convertView.findViewById(R.id.numSerie);
@@ -73,9 +74,11 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
         viewHolder.textEmplacement = (TextView) convertView.findViewById(R.id.textEmplacement);
         viewHolder.textZone = (TextView) convertView.findViewById(R.id.textZone);
         viewHolder.layoutSerie = (LinearLayout) convertView.findViewById(R.id.layoutSerie);
-        viewHolder.layoutQteARetourner = (LinearLayout) convertView.findViewById(R.id.layoutQteARetourner);
+        viewHolder.layoutZoneEmplacement = (LinearLayout) convertView.findViewById(R.id.layoutZoneEmplacement);
+        viewHolder.layoutQteRetour = (LinearLayout) convertView.findViewById(R.id.layoutQteRetour);
         viewHolder.layoutPrincipal = (RelativeLayout) convertView.findViewById(R.id.layoutPrincipal);
         viewHolder.progressBar = (ProgressBar) convertView.findViewById(R.id.progressBar);
+        viewHolder.bottomDivider = (View) convertView.findViewById(R.id.bottomDivider);
 
         Retour_Ligne retourLigne = (Retour_Ligne) getItem(position);
 
@@ -97,7 +100,7 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
             if (retourLigne.getPeremptionDate().length() >= 10)
             {
                 date = dateDecodeur.parse(retourLigne.getPeremptionDate().substring(0, 10));
-                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                DateFormat dateFormat = new SimpleDateFormat("MM/yy");
                 dateAAfficher = dateFormat.format(date);
             }
         }
@@ -137,11 +140,28 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
             viewHolder.textZone.setText(retourLigne.getRetourPUI_Zone());
         }
 
-        viewHolder.qteRetourner.setText(String.valueOf(quantiteRetourner));
-        viewHolder.QteARetourner.setText(String.valueOf((int)retourLigne.getQte_avant_retour()));
-
-        if(this.shouldShowQteARetourner) { viewHolder.layoutQteARetourner.setVisibility(VISIBLE); }
-        else { viewHolder.layoutQteARetourner.setVisibility(GONE); }
+        if(this.shouldShowQteARetourner)
+        {
+            viewHolder.layoutZoneEmplacement.setVisibility(VISIBLE);
+            viewHolder.layoutQteRetour.setVisibility(VISIBLE);
+            viewHolder.layoutQteRetour.setBackgroundColor(context.getResources().getColor(R.color.vert, null));
+            viewHolder.labelQteBandeau.setText("Quantité retournée");
+            viewHolder.qteRetourner.setVisibility(VISIBLE);
+            viewHolder.qteRetourner.setText(String.valueOf(quantiteRetourner));
+            viewHolder.QteARetourner.setVisibility(GONE);
+            viewHolder.bottomDivider.setVisibility(VISIBLE);
+        }
+        else
+        {
+            viewHolder.layoutZoneEmplacement.setVisibility(GONE);
+            viewHolder.layoutQteRetour.setVisibility(VISIBLE);
+            viewHolder.layoutQteRetour.setBackgroundColor(context.getResources().getColor(R.color.rouge2, null));
+            viewHolder.labelQteBandeau.setText("Quantité à retourner");
+            viewHolder.qteRetourner.setVisibility(GONE);
+            viewHolder.QteARetourner.setVisibility(VISIBLE);
+            viewHolder.QteARetourner.setText(String.valueOf((int)retourLigne.getQte_avant_retour()));
+            viewHolder.bottomDivider.setVisibility(GONE);
+        }
 
         return convertView;
     }
@@ -151,6 +171,7 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
         public TextView designationProduit;
         public TextView referenceProduit;
         public TextView nomFournisseur;
+        public TextView labelQteBandeau;
         public TextView qteRetourner;
         public TextView QteARetourner;
         public TextView lotRetourne;
@@ -162,13 +183,15 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
         public RelativeLayout layoutPrincipal;
         public ProgressBar progressBar;
         public LinearLayout layoutSerie;
-        public LinearLayout layoutQteARetourner;
+        public LinearLayout layoutZoneEmplacement;
+        public LinearLayout layoutQteRetour;
+        public View bottomDivider;
 
         public void setDatePeremptionColor(Date date)
         {
 
-            if (date != null) {
-
+            if (date != null)
+            {
                 Date dateDuJour = new Date();
                 long diff = dateDuJour.getTime() - date.getTime();
                 int delai = (int) (diff / (1000 * 60 * 60 * 24));
@@ -176,17 +199,11 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
                 int delai30jours = -30;
                 int delai60jours = -60;
 
-                if (delai >= delai30jours) {
-                    datePeremption.setTextColor(context.getResources().getColor(R.color.rouge2, null));
-                } else if (delai >= delai60jours) {
-                    datePeremption.setTextColor(context.getResources().getColor(R.color.orange2, null));
-                } else {
-                    datePeremption.setTextColor(context.getResources().getColor(R.color.vert, null));
-                }
-            } else {
-                datePeremption.setTextColor(Color.BLACK);
+                if (delai >= delai30jours) { datePeremption.setTextColor(context.getResources().getColor(R.color.rouge2, null)); }
+                else if (delai >= delai60jours) { datePeremption.setTextColor(context.getResources().getColor(R.color.orange2, null));}
+                else { datePeremption.setTextColor(context.getResources().getColor(R.color.noir, null));}
             }
-
+            else { datePeremption.setTextColor(Color.BLACK); }
         }
     }
 }
