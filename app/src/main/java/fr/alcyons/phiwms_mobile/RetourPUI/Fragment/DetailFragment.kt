@@ -5,10 +5,12 @@ import android.os.Build
 import android.os.Bundle
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.view.KeyEvent
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
@@ -106,6 +108,7 @@ class DetailFragment : Fragment()
 
         configureDatePeremption(spinnerMois, spinnerAnnee, layoutDatePeremption)
         initializeSelection(retourLigneSelectionneeUid)
+        configureQuantiteField()
 
         view.findViewById<ImageView>(R.id.layoutPlus_LL).setOnClickListener {
             val quantite = (this.quantiteCompteeET.text.toString().toIntOrNull() ?: 0) + getPasQuantite()
@@ -119,6 +122,22 @@ class DetailFragment : Fragment()
         view.findViewById<LinearLayout>(R.id.layoutFermer_LL).setOnClickListener { this.onFermer?.invoke() }
 
         view.findViewById<LinearLayout>(R.id.layoutValider_LL).setOnClickListener { this.demanderConfirmationSiSuppressionNecessaire() }
+    }
+
+    private fun configureQuantiteField()
+    {
+        this.quantiteCompteeET.setSelectAllOnFocus(true)
+        this.quantiteCompteeET.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) { this.quantiteCompteeET.post { this.quantiteCompteeET.selectAll() } } }
+        this.quantiteCompteeET.setOnClickListener { this.quantiteCompteeET.post { this.quantiteCompteeET.selectAll() } }
+        this.quantiteCompteeET.setOnEditorActionListener { _, actionId, event ->
+            val isValidationAction = actionId == EditorInfo.IME_ACTION_DONE ||
+                actionId == EditorInfo.IME_ACTION_NEXT ||
+                (event?.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN)
+
+            if (!isValidationAction) { return@setOnEditorActionListener false }
+
+            verifierQuantiteSaisie() != null
+        }
     }
 
     private fun initializeSelection(retourLigneSelectionneeUid: Int?)
@@ -217,18 +236,7 @@ class DetailFragment : Fragment()
 
     private fun enregistrerLigne()
     {
-        val quantite = this.quantiteCompteeET.text.toString().toIntOrNull()
-        if (quantite == null)
-        {
-            Alerte.afficherAlerteInformation(requireContext(), LayoutInflater.from(requireContext()), "Erreur", "Veuillez saisir une quantité valide", false, false)
-            return
-        }
-
-        if (quantite > this.maxQuantite)
-        {
-            Alerte.afficherAlerteInformation(requireContext(), LayoutInflater.from(requireContext()), "Erreur", "La quantité ne peut pas dépasser $maxQuantite", false, false)
-            return
-        }
+        val quantite = verifierQuantiteSaisie() ?: return
 
         val emplacementSelectionne = this.emplacementView.text.toString().trim()
         if (emplacementSelectionne.isEmpty())
@@ -259,6 +267,24 @@ class DetailFragment : Fragment()
         else if (quantite > 0) { Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(this.db, this.retourLigneCourante) }
 
         this.onValider?.invoke()
+    }
+
+    private fun verifierQuantiteSaisie(): Int?
+    {
+        val quantite = this.quantiteCompteeET.text.toString().toIntOrNull()
+        if (quantite == null)
+        {
+            Alerte.afficherAlerteInformation(requireContext(), LayoutInflater.from(requireContext()), "Erreur", "Veuillez saisir une quantité valide", false, false)
+            return null
+        }
+
+        if (quantite > this.maxQuantite)
+        {
+            Alerte.afficherAlerteInformation(requireContext(), LayoutInflater.from(requireContext()), "Erreur", "La quantité ne peut pas dépasser $maxQuantite", false, false)
+            return null
+        }
+
+        return quantite
     }
 
     private fun enregistrerLigneDepuisRetourner(quantite: Int, emplacementSelectionne: String)

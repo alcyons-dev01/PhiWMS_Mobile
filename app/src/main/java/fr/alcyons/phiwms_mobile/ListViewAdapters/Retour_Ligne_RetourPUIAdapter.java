@@ -159,7 +159,8 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
             viewHolder.labelQteBandeau.setText("Quantité à retourner");
             viewHolder.qteRetourner.setVisibility(GONE);
             viewHolder.QteARetourner.setVisibility(VISIBLE);
-            viewHolder.QteARetourner.setText(String.valueOf((int)retourLigne.getQte_avant_retour()));
+            int quantiteRestante = (int) retourLigne.getQte_avant_retour() - quantiteRetourner;
+            viewHolder.QteARetourner.setText(String.valueOf(Math.max(0, quantiteRestante)));
             viewHolder.bottomDivider.setVisibility(GONE);
         }
 
