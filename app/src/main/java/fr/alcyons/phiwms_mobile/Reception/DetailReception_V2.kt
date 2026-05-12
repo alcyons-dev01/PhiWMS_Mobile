@@ -444,7 +444,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
             receptionCourant.numero
             )
 
-            if(reliquatcourant != null)
+            if(reliquatcourant != null && reliquatcourant.qteReliquat_X > 0)
                 liste.add(reliquatcourant)
         }
 
