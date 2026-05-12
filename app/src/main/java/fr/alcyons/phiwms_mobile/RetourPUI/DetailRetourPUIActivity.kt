@@ -384,7 +384,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     private fun openARetourner()
     {
         Log.d("DetailRetourPUIActivity", "openARetourner() - lignesRetournees.size = ${this.retourLigneList?.size}")
-        for (retourLigne in this.retourLigneList ?: return) { Log.d("DetailRetourPUIActivity", "retour uid : ${retourLigne.retour_UID}, uid : ${retourLigne._UID}, lot : ${retourLigne.lot}, lot retourner : ${retourLigne.lot_Retourner}") }
+        for (retourLigne in this.retourLigneList ?: return) { Log.d("DetailRetourPUIActivity", "retour uid : ${retourLigne.retour_UID}, uid : ${retourLigne._UID}, lot retourner : ${retourLigne.lot_Retourner}, qte retourner : ${retourLigne.qte_Retourner}, qte demander : ${retourLigne.qte_Demander}") }
 
         this.referenceARetournerPUIContainer?.let { container ->
             container.apply {
@@ -426,7 +426,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         if (lignesRetournees.isEmpty()) { return }
 
         Log.d("DetailRetourPUIActivity", "openRetourner() - lignesRetournees.size = ${lignesRetournees.size}")
-        for (retourLigne in lignesRetournees) { Log.d("DetailRetourPUIActivity", "retour uid : ${retourLigne.retour_UID}, uid : ${retourLigne._UID}, lot : ${retourLigne.lot}, lot retourner : ${retourLigne.lot_Retourner}, qte retourner : ${retourLigne.qte_Retourner}") }
+        for (retourLigne in lignesRetournees) { Log.d("DetailRetourPUIActivity", "retour uid : ${retourLigne.retour_UID}, uid : ${retourLigne._UID}, lot retourner : ${retourLigne.lot_Retourner}, qte retourner : ${retourLigne.qte_Retourner}, qte demander : ${retourLigne.qte_Demander}") }
 
         this.referenceRetournerPUIContainer?.let { container ->
             container.apply {
