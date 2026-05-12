@@ -386,7 +386,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         this.openDetailFragment(this.resolveBaseRetourLigne(retourLigne), retourLigne.takeIf { it._UID < 0 })
     }
 
-    private fun openARetourner()
+    private fun openARetourner(lignes: List<Retour_Ligne> = this.getRetourLignesARetourner())
     {
         this.referenceARetournerPUIContainer?.let { container ->
             container.apply {
@@ -399,7 +399,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
                 this.animate().translationY(0f).setDuration(ANIMATION_DURATION_MS.toLong()).start()
             }
 
-            val frag = ARetournerPUIFragment.newInstance(ArrayList(this.getRetourLignesARetourner()), this.retourSelectionne ?: return).also { aRetournerPUIFragment = it }
+            val frag = ARetournerPUIFragment.newInstance(ArrayList(lignes), this.retourSelectionne ?: return).also { aRetournerPUIFragment = it }
             this.supportFragmentManager.beginTransaction().replace(R.id.referenceARetournerPUIContainer, frag).commitNow()
 
             // Scroll to the container
@@ -422,10 +422,9 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         this.isARetournerOpen = false
     }
 
-    private fun openRetourner()
+    private fun openRetourner(lignes: List<Retour_Ligne> = this.getRetourLignesRetournees())
     {
-        val lignesRetournees = ArrayList(this.getRetourLignesRetournees())
-        if (lignesRetournees.isEmpty()) { return }
+        if (lignes.isEmpty()) { return }
 
         this.referenceRetournerPUIContainer?.let { container ->
             container.apply {
@@ -438,7 +437,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
                 this.animate().translationY(0f).setDuration(ANIMATION_DURATION_MS.toLong()).start()
             }
 
-            val frag = RetournerPUIFragment.newInstance(lignesRetournees, this.retourSelectionne ?: return).also { this.retournerPUIFragment = it }
+            val frag = RetournerPUIFragment.newInstance(ArrayList(lignes), this.retourSelectionne ?: return).also { this.retournerPUIFragment = it }
             this.supportFragmentManager.beginTransaction().replace(R.id.referenceRetournerPUIContainer, frag).commitNow()
 
             val scrollView = findViewById<NestedScrollView>(R.id.scrollView)
@@ -471,41 +470,19 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
 
     private fun scrollToItemOrDisplayAlert(idProduit: Int)
     {
-        val positionARetourner = getRetourLignesARetourner().indexOfFirst { retourLigne -> retourLigne.code_produit == idProduit }
-        if (positionARetourner >= 0)
+        val lignesARetourner = getRetourLignesARetourner().filter { retourLigne -> retourLigne.code_produit == idProduit }
+        val lignesRetournees = getRetourLignesRetournees().filter { retourLigne -> retourLigne.code_produit == idProduit }
+
+        if (lignesARetourner.isEmpty() && lignesRetournees.isEmpty())
         {
-            openARetournerAndScroll(positionARetourner)
+            Alerte.afficherAlerteInformation(this, this.layoutInflater, "Produit non trouvé", "Ce produit n'est pas dans la liste de retour PUI", false, false)
             return
         }
 
-        val positionRetourner = getRetourLignesRetournees().indexOfFirst { retourLigne -> retourLigne.code_produit == idProduit }
-        if (positionRetourner >= 0)
-        {
-            openRetournerAndScroll(positionRetourner)
-            return
-        }
-
-        Alerte.afficherAlerteInformation(this, this.layoutInflater, "Produit non trouvé", "Ce produit n'est pas dans la liste de retour PUI", false, false)
-    }
-
-    private fun openARetournerAndScroll(position: Int)
-    {
-        if (!this.isARetournerOpen)
-        {
-            this.closeOpenedFragments()
-            this.openARetourner()
-        }
-        this.aRetournerPUIFragment?.scrollToPosition(position)
-    }
-
-    private fun openRetournerAndScroll(position: Int)
-    {
-        if (!this.isRetournerOpen)
-        {
-            this.closeOpenedFragments()
-            this.openRetourner()
-        }
-        this.retournerPUIFragment?.scrollToPosition(position)
+        closeOpenedFragments()
+        if (lignesARetourner.isNotEmpty()) { openARetourner(lignesARetourner) }
+        if (lignesRetournees.isNotEmpty()) { openRetourner(lignesRetournees) }
+        if (isSearchOpen) { closeSearch() }
     }
 
     private fun closeOpenedFragments()
@@ -569,7 +546,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         return lignesBase.filter { ligneBase ->
             val quantiteRetournee = RetourPUIQuantiteHelper.getAllocatedQuantityForBase(lignesNegatives, ligneBase)
             quantiteRetournee < ligneBase.qte_avant_retour.toInt()
-        }
+        }.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.produit_Designation ?: "" })
     }
 
     private fun resolveBaseRetourLigne(retourLigne: Retour_Ligne): Retour_Ligne
