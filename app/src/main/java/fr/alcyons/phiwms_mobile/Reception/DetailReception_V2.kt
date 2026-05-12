@@ -438,13 +438,14 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                 )
             )
         } else {
-            liste.add(
-                PH_ReliquatOpenHelper.getPH_ReliquatBaseByUnIdProduitetNumero(
+            val reliquatcourant = PH_ReliquatOpenHelper.getPH_ReliquatBaseByUnIdProduitetNumero(
                     db,
-                    idProduit,
-                    receptionCourant.numero
-                )
+            idProduit,
+            receptionCourant.numero
             )
+
+            if(reliquatcourant != null)
+                liste.add(reliquatcourant)
         }
 
         if (liste.isNotEmpty()) {
