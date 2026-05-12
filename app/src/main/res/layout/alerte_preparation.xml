@@ -1,87 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/background_plein_bleu_fonce_radius"
-    android:padding="2dp">
-
-    <TextView
-        android:id="@+id/titre"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="COMPOSITION"
-        android:gravity="center"
-        android:textSize="18sp"
-        android:textColor="@color/blanc"
-        android:background="@drawable/background_empty_radius_top"
-        android:backgroundTint="@color/bleu_fonce_alcyons"
-        android:textStyle="bold"
-        android:padding="10dp"/>
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="@android:color/white">
 
     <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:background="@drawable/background_empty_radius_bottom"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
+        <!-- ═══════════════════════════════════════════
+             EN-TÊTE
+        ════════════════════════════════════════════ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/bleu_fonce_alcyons"
+            android:padding="14dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/titre"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="COMPOSITION"
+                android:textSize="16sp"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:letterSpacing="0.12" />
+
+        </LinearLayout>
+
+        <!-- Séparateur accent -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@color/bleu_clair_alcyons" />
+
+        <!-- ═══════════════════════════════════════════
+             LIGNE 1 : PALETTE + COLIS
+        ════════════════════════════════════════════ -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="2">
+            android:weightSum="2"
+            android:paddingTop="20dp"
+            android:paddingHorizontal="8dp">
 
+            <!-- PALETTE -->
             <LinearLayout
                 android:id="@+id/LinearPalette"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:gravity="center">
 
-                <ImageView
-                    android:id="@+id/iconPalette"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:background="@drawable/palette_preparation"
-                    android:layout_gravity="center"/>
+                <androidx.cardview.widget.CardView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_gravity="center"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#F0F4FF">
+
+                    <ImageView
+                        android:id="@+id/iconPalette"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/palette_preparation" />
+
+                </androidx.cardview.widget.CardView>
 
                 <TextView
                     android:id="@+id/nbPaletteSelectionne"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text=""
+                    android:text="0"
                     android:gravity="center"
-                    android:textSize="30dp"
-                    android:textColor="@color/noir"
+                    android:textSize="26sp"
+                    android:textColor="@color/bleu_fonce_alcyons"
                     android:textStyle="bold"
-                    android:visibility="gone"/>
+                    android:layout_marginTop="8dp"
+                    android:visibility="visible" />
 
-                <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="1dp"
-                    android:background="@color/noir"
+                <View
+                    android:layout_width="32dp"
+                    android:layout_height="2dp"
                     android:layout_gravity="center"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"/>
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="6dp"
+                    android:background="@color/bleu_clair_alcyons" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="PALETTE"
                     android:gravity="center"
-                    android:textSize="16dp"
-                    android:textColor="@color/noir"
-                    android:textStyle="bold"/>
-
+                    android:textSize="10sp"
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1"
+                    android:alpha="0.6" />
 
             </LinearLayout>
 
+            <!-- Séparateur vertical -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/bleu_clair_alcyons_transparent"
+                android:layout_marginVertical="8dp" />
+
+            <!-- COLIS -->
             <LinearLayout
                 android:id="@+id/LinearColis"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_gravity="center"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#F0F4FF">
+
+                    <ImageView
+                        android:id="@+id/iconColis"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/ic_colis"
+                        android:backgroundTint="@color/vert" />
+
+                </androidx.cardview.widget.CardView>
 
                 <TextView
                     android:id="@+id/nbColisSelectionne"
@@ -89,96 +152,145 @@
                     android:layout_height="wrap_content"
                     android:text="0"
                     android:gravity="center"
-                    android:textSize="30dp"
-                    android:textColor="@color/noir"
-                    android:textStyle="bold"/>
+                    android:textSize="26sp"
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textStyle="bold"
+                    android:layout_marginTop="8dp" />
 
-                <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="1dp"
-                    android:background="@color/noir"
+                <View
+                    android:layout_width="32dp"
+                    android:layout_height="2dp"
                     android:layout_gravity="center"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"/>
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="6dp"
+                    android:background="@color/bleu_clair_alcyons" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="COLIS"
                     android:gravity="center"
-                    android:textSize="16dp"
-                    android:textColor="@color/noir"
-                    android:textStyle="bold"/>
+                    android:textSize="10sp"
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1"
+                    android:alpha="0.6" />
 
             </LinearLayout>
 
-
         </LinearLayout>
 
+        <!-- Séparateur horizontal entre les deux lignes -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@color/bleu_clair_alcyons_transparent" />
+
+        <!-- ═══════════════════════════════════════════
+             LIGNE 2 : CONTAINER + SCELLÉ
+        ════════════════════════════════════════════ -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="2"
-            android:layout_marginTop="20dp">
+            android:paddingTop="16dp"
+            android:paddingBottom="20dp"
+            android:paddingHorizontal="8dp">
 
+            <!-- CONTAINER -->
             <LinearLayout
                 android:id="@+id/LinearContainer"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:gravity="center">
 
-                <ImageView
-                    android:id="@+id/iconContainer"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                <androidx.cardview.widget.CardView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
                     android:layout_gravity="center"
-                    android:background="@drawable/conteneur" />
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#F0F4FF">
+
+                    <ImageView
+                        android:id="@+id/iconContainer"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/conteneur" />
+
+                </androidx.cardview.widget.CardView>
 
                 <TextView
                     android:id="@+id/nbContainerSelectionne"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text=""
+                    android:text="0"
                     android:gravity="center"
-                    android:textSize="30dp"
-                    android:textColor="@color/noir"
+                    android:textSize="26sp"
+                    android:textColor="@color/bleu_fonce_alcyons"
                     android:textStyle="bold"
-                    android:visibility="gone"/>
+                    android:layout_marginTop="8dp"
+                    android:visibility="visible" />
 
-                <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="1dp"
-                    android:background="@color/noir"
+                <View
+                    android:layout_width="32dp"
+                    android:layout_height="2dp"
                     android:layout_gravity="center"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"/>
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="6dp"
+                    android:background="@color/bleu_clair_alcyons" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="CONTENER"
+                    android:text="CONTAINER"
                     android:gravity="center"
-                    android:textSize="16dp"
-                    android:textColor="@color/noir"
-                    android:textStyle="bold"/>
+                    android:textSize="10sp"
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1"
+                    android:alpha="0.6" />
 
             </LinearLayout>
 
+            <!-- Séparateur vertical -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/bleu_clair_alcyons_transparent"
+                android:layout_marginVertical="8dp" />
+
+            <!-- SCELLÉ -->
             <LinearLayout
                 android:id="@+id/LinearScelle"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:gravity="center">
 
-                <ImageView
-                    android:id="@+id/iconScelle"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:background="@drawable/scelle"
-                    android:layout_gravity="center"/>
+                <androidx.cardview.widget.CardView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_gravity="center"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#F0F4FF">
+
+                    <ImageView
+                        android:id="@+id/iconScelle"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/scelle" />
+
+                </androidx.cardview.widget.CardView>
 
                 <TextView
                     android:id="@+id/nbScelleSelectionne"
@@ -186,83 +298,90 @@
                     android:layout_height="wrap_content"
                     android:text=""
                     android:gravity="center"
-                    android:textSize="25dp"
-                    android:textColor="@color/noir"
-                    android:visibility="gone"/>
+                    android:textSize="22sp"
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:layout_marginTop="8dp"
+                    android:visibility="visible" />
 
-                <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="1dp"
-                    android:background="@color/noir"
+                <View
+                    android:layout_width="32dp"
+                    android:layout_height="2dp"
                     android:layout_gravity="center"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"/>
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="6dp"
+                    android:background="@color/bleu_clair_alcyons" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="SCELLE"
+                    android:text="SCELLÉ"
                     android:gravity="center"
-                    android:textSize="16dp"
-                    android:textColor="@color/noir"
-                    android:textStyle="bold"/>
+                    android:textSize="10sp"
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1"
+                    android:alpha="0.6" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <ImageView
+        <!-- ═══════════════════════════════════════════
+             PIED — ANNULER / VALIDER
+        ════════════════════════════════════════════ -->
+        <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/gris_clair"
-            android:layout_marginTop="10dp"/>
+            android:background="@color/bleu_clair_alcyons_transparent" />
 
         <LinearLayout
             android:id="@+id/fermerAlerteLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:orientation="horizontal"
-            android:gravity="center"
             android:weightSum="2">
 
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:paddingVertical="5dp"
-                android:gravity="center">
-
-                <ImageView
-                    android:id="@+id/annuler"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center_horizontal"
-                    android:background="@drawable/ic_clear"
-                    android:backgroundTint="@color/rouge"/>
-
-            </LinearLayout>
-
-            <ImageView
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="@color/gris_clair"/>
-
+            <!-- ANNULER -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:paddingVertical="5dp">
+                android:paddingVertical="16dp"
+                android:paddingHorizontal="12dp"
+                android:background="@color/bleu_fonce_alcyons">
+
+                <ImageView
+                    android:id="@+id/annuler"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/ic_clear"
+                    android:backgroundTint="@color/rouge" />
+
+            </LinearLayout>
+
+            <!-- Séparateur vertical -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/bleu_clair_alcyons_transparent" />
+
+            <!-- VALIDER -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingVertical="16dp"
+                android:paddingHorizontal="12dp"
+                android:background="@color/bleu_fonce_alcyons">
 
                 <ImageView
                     android:id="@+id/ok"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center_horizontal"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:background="@drawable/ic_check_circle"
-                    android:backgroundTint="@color/bleu_clair_alcyons"/>
+                    android:backgroundTint="#FFFFFF" />
 
             </LinearLayout>
 
@@ -270,4 +389,4 @@
 
     </LinearLayout>
 
-</LinearLayout>
+</androidx.cardview.widget.CardView>

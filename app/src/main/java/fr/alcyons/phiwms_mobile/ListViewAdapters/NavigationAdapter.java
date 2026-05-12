@@ -63,14 +63,13 @@ public class NavigationAdapter extends ArrayAdapter<Service> implements Filterab
         viewHolder.descriptionService = (TextView) convertView.findViewById(R.id.descriptionService);
         viewHolder.indicateurService = (TextView) convertView.findViewById(R.id.indicateurService);
         viewHolder.principal = (LinearLayout) convertView.findViewById(R.id.principal);
-        viewHolder.listViewSeparation = (ImageView) convertView.findViewById(R.id.listViewSeparation);
-        viewHolder.barreIndicateur = (ImageView) convertView.findViewById(R.id.barreIndicateur);
+        viewHolder.barreIndicateur = (View) convertView.findViewById(R.id.barreIndicateur);
         viewHolder.boutonInformation = (ImageView) convertView.findViewById(R.id.boutonInformation);
 
-        if(position == navigationViewHolderList.size())
+        /*if(position == navigationViewHolderList.size())
         {
             viewHolder.listViewSeparation.setVisibility(View.GONE);
-        }
+        }*/
 
         final Service serviceCourant = getItem(position);
 
@@ -167,7 +166,7 @@ public class NavigationAdapter extends ArrayAdapter<Service> implements Filterab
         public ImageView listViewSeparation;
         public ImageView boutonInformation;
         public LinearLayout principal;
-        public ImageView barreIndicateur;
+        public View barreIndicateur;
     }
 
 }

@@ -1,598 +1,673 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
+        <!-- Header -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/bleu_fonce_alcyons"
-            android:gravity="center"
-            android:padding="10dp"
-            android:text="Connexion en cours..."
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@color/noirtransparent"
-            android:orientation="horizontal"
-            android:weightSum="6">
-
-            <SeekBar
-                android:id="@+id/barDeProgression"
-                android:layout_width="0dp"
-                android:layout_height="30dp"
-                android:layout_weight="4.5"
-                android:layout_gravity="center|left"
-                android:max="13"
-                android:progress="0"
-                android:progressTint="@color/bleu_clair_alcyons"
-                android:thumbTint="@color/bleu_clair_alcyons" />
-
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1.5"
-                android:layout_marginRight="10dp"
-                android:layout_gravity="right"
-                android:adjustViewBounds="true"
-                android:baselineAligned="true"
-                android:scaleType="centerCrop"
-                android:src="@mipmap/ic_logo_phiwms" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="5dp">
-
-            <ImageView
-                android:id="@+id/checkService"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/grey_color_fonce" />
+            android:orientation="vertical"
+            android:padding="14dp">
 
             <TextView
-                android:id="@+id/Service"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:text="Service"
-                android:textSize="18sp"
-                android:layout_margin="5px" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="5dp">
-
-            <ImageView
-                android:id="@+id/checkDepot"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/grey_color_fonce" />
-
-            <TextView
-                android:id="@+id/depot"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:text="Dépôt"
-                android:textSize="18sp"
-                android:layout_margin="5px"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="5dp">
-
-            <ImageView
-                android:id="@+id/checkZone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/grey_color_fonce" />
-
-            <TextView
-                android:id="@+id/Zone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:text="Zones"
-                android:textSize="18sp"
-                android:layout_margin="5px" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="5dp">
-
-            <ImageView
-                android:id="@+id/checkEmplacement"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/grey_color_fonce" />
-
-            <TextView
-                android:id="@+id/Emplacement"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:text="Emplacements"
-                android:textSize="18sp"
-                android:layout_margin="5px" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="5dp">
-
-            <ImageView
-                android:id="@+id/checkProduit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/grey_color_fonce" />
-
-            <TextView
-                android:id="@+id/Produit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:text="Produit"
-                android:textSize="18sp"
-                android:layout_margin="5px" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="5dp">
-
-            <ImageView
-                android:id="@+id/checkMotif"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/grey_color_fonce" />
-
-            <TextView
-                android:id="@+id/Motif"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:text="Motifs de retour"
-                android:textSize="18sp"
-                android:layout_margin="5px" />
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="5dp">
-
-            <ImageView
-                android:id="@+id/checkDotation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/grey_color_fonce" />
-
-            <TextView
-                android:id="@+id/Dotation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:text="Dotations"
-                android:textSize="18sp"
-                android:layout_margin="5px" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="5dp"
-            android:visibility="gone">
-
-            <ImageView
-                android:id="@+id/checkFrequence"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/grey_color_fonce" />
-
-            <TextView
-                android:id="@+id/Frequence"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:text="Frequences"
-                android:textSize="18sp"
-                android:layout_margin="5px" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="5dp"
-            android:visibility="gone">
-
-            <ImageView
-                android:id="@+id/checkSerialisation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/grey_color_fonce" />
-
-            <TextView
-                android:id="@+id/Serialisation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:text="Sérialisation"
-                android:textSize="18sp"
-                android:layout_margin="5px"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="5dp">
-
-            <ImageView
-                android:id="@+id/checkAction"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/grey_color_fonce" />
-
-            <TextView
-                android:id="@+id/Action"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:text="ActionUtilisateur"
-                android:textSize="18sp"
-                android:layout_margin="5px"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="5dp">
-
-            <ImageView
-                android:id="@+id/checkReassort"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/grey_color_fonce" />
-
-            <TextView
-                android:id="@+id/Reassort"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:text="Réassort"
-                android:textSize="18sp"
-                android:layout_margin="5px"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="5dp">
-
-            <ImageView
-                android:id="@+id/checkMotifDemande"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/grey_color_fonce" />
-
-            <TextView
-                android:id="@+id/MotifDemande"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:text="Motif Demande"
-                android:textSize="18sp"
-                android:layout_margin="5px"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="5dp">
-
-            <ImageView
-                android:id="@+id/checkEvent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/grey_color_fonce" />
-
-            <TextView
-                android:id="@+id/Event"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:text="Events"
-                android:textSize="18sp"
-                android:layout_margin="5px"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="5dp">
-
-            <ImageView
-                android:id="@+id/checkParametreSerialisation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/grey_color_fonce" />
-
-            <TextView
-                android:id="@+id/ParametreSerialisation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:text="Paramètres Sérialisation"
-                android:textSize="18sp"
-                android:layout_margin="5px"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="5dp">
-
-            <ImageView
-                android:id="@+id/checkImprimanteEtiquette"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/grey_color_fonce" />
-
-            <TextView
-                android:id="@+id/ImprimanteEtiquette"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:text="Imprimante Etiquette"
-                android:textSize="18sp"
-                android:layout_margin="5px"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="5dp"
-            android:visibility="gone">
-
-            <ImageView
-                android:id="@+id/checkActionLigne"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/grey_color_fonce" />
-
-            <TextView
-                android:id="@+id/ActionLigne"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:text="Action Utilisateur Détail"
-                android:textSize="18sp"
-                android:layout_margin="5px"/>
-
-        </LinearLayout>
-
-<!--        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="5dp">
-
-            <ImageView
-                android:id="@+id/checkCommande"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/grey_color_fonce" />
-
-            <TextView
-                android:id="@+id/Commande"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Commande"
-                android:textSize="18sp" />
+                android:text="Connexion en cours..."
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="10dp"/>
 
-        </LinearLayout>-->
+            <!-- Barre de progression -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:weightSum="6">
 
+                <SeekBar
+                    android:id="@+id/barDeProgression"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_weight="4.5"
+                    android:layout_gravity="center_vertical"
+                    android:max="13"
+                    android:progress="0"
+                    android:progressTint="@color/bleu_clair_alcyons"
+                    android:thumbTint="@color/bleu_clair_alcyons"/>
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1.5"
+                    android:layout_marginStart="8dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerInside"
+                    android:src="@mipmap/ic_logo_phiwms"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Liste des étapes -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#F0F4FF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <!-- Service -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:id="@+id/checkService"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_check_circle"
+                        android:backgroundTint="@color/grey_color_fonce"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/Service"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Service"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/bleu_clair_alcyons_transparent"/>
+
+                <!-- Dépôt -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:id="@+id/checkDepot"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_check_circle"
+                        android:backgroundTint="@color/grey_color_fonce"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/depot"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Dépôt"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/bleu_clair_alcyons_transparent"/>
+
+                <!-- Zones -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:id="@+id/checkZone"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_check_circle"
+                        android:backgroundTint="@color/grey_color_fonce"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/Zone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Zones"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/bleu_clair_alcyons_transparent"/>
+
+                <!-- Emplacements -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:id="@+id/checkEmplacement"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_check_circle"
+                        android:backgroundTint="@color/grey_color_fonce"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/Emplacement"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Emplacements"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/bleu_clair_alcyons_transparent"/>
+
+                <!-- Produit -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:id="@+id/checkProduit"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_check_circle"
+                        android:backgroundTint="@color/grey_color_fonce"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/Produit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Produit"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/bleu_clair_alcyons_transparent"/>
+
+                <!-- Motifs -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:id="@+id/checkMotif"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_check_circle"
+                        android:backgroundTint="@color/grey_color_fonce"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/Motif"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Motifs de retour"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/bleu_clair_alcyons_transparent"/>
+
+                <!-- Dotations -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:id="@+id/checkDotation"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_check_circle"
+                        android:backgroundTint="@color/grey_color_fonce"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/Dotation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Dotations"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/bleu_clair_alcyons_transparent"/>
+
+                <!-- Fréquences (gone) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/checkFrequence"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_check_circle"
+                        android:backgroundTint="@color/grey_color_fonce"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/Frequence"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Fréquences"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <!-- Sérialisation (gone) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/checkSerialisation"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_check_circle"
+                        android:backgroundTint="@color/grey_color_fonce"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/Serialisation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Sérialisation"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/bleu_clair_alcyons_transparent"/>
+
+                <!-- ActionUtilisateur -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:id="@+id/checkAction"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_check_circle"
+                        android:backgroundTint="@color/grey_color_fonce"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/Action"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="ActionUtilisateur"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/bleu_clair_alcyons_transparent"/>
+
+                <!-- Réassort -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:id="@+id/checkReassort"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_check_circle"
+                        android:backgroundTint="@color/grey_color_fonce"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/Reassort"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Réassort"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/bleu_clair_alcyons_transparent"/>
+
+                <!-- Motif Demande -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:id="@+id/checkMotifDemande"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_check_circle"
+                        android:backgroundTint="@color/grey_color_fonce"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/MotifDemande"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Motif Demande"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/bleu_clair_alcyons_transparent"/>
+
+                <!-- Events -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:id="@+id/checkEvent"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_check_circle"
+                        android:backgroundTint="@color/grey_color_fonce"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/Event"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Events"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/bleu_clair_alcyons_transparent"/>
+
+                <!-- Paramètres Sérialisation -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:id="@+id/checkParametreSerialisation"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_check_circle"
+                        android:backgroundTint="@color/grey_color_fonce"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/ParametreSerialisation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Paramètres Sérialisation"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/bleu_clair_alcyons_transparent"/>
+
+                <!-- Imprimante Etiquette -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:id="@+id/checkImprimanteEtiquette"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_check_circle"
+                        android:backgroundTint="@color/grey_color_fonce"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/ImprimanteEtiquette"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Imprimante Etiquette"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <!-- Action Utilisateur Détail (gone) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/checkActionLigne"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_check_circle"
+                        android:backgroundTint="@color/grey_color_fonce"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/ActionLigne"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Action Utilisateur Détail"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Message synchronisation -->
         <TextView
             android:id="@+id/TextSynchronisation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
             android:gravity="center"
             android:text=""
-            android:textColor="@android:color/black"
+            android:textColor="@color/bleu_fonce_alcyons"
             android:textSize="15sp"
             android:visibility="gone"/>
 
-
-        <LinearLayout
+        <!-- Rapport d'erreurs -->
+        <androidx.cardview.widget.CardView
             android:id="@+id/gestionExpandable"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="20dp"
-            android:gravity="center"
-            android:orientation="horizontal"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#FFF8E1"
             android:visibility="gone">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_error" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" Rapport d'erreurs"
-                android:textColor="@android:color/black" />
-        </LinearLayout>
-
-        <com.skydoves.expandablelayout.ExpandableLayout
-            android:id="@+id/expandableLayout1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/gestionExpandable"
-            android:gravity="center"
-            app:expandable_duration="200"
-            app:expandable_isExpanded="false">
-
             <LinearLayout
-                android:id="@+id/zoneMessageErreur"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:weightSum="1">
-
-                <ImageView
-                    android:id="@+id/precedent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:background="@drawable/ic_navigate_before" />
-
-                <TextView
-                    android:id="@+id/messageErreur"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="Message d'erreur "
-                    android:textSize="15sp" />
-
-                <ImageView
-                    android:id="@+id/suivant"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    android:background="@drawable/ic_navigate_next" />
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/nombreMessageErreur"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/zoneMessageErreur"
-                android:gravity="center"
-                android:text="nombreErreur"
-                android:textSize="11sp" />
-
-            <ImageView
-                android:id="@+id/separateur"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_below="@+id/nombreMessageErreur"
-                android:layout_marginTop="5dp"
-                android:background="@color/grey_color_fonce" />
-
-            <LinearLayout
-                android:id="@+id/boutonOk"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_below="@+id/separateur"
-                android:layout_marginTop="5dp"
-                android:gravity="center"
                 android:orientation="vertical">
 
-                <ImageView
-                    android:layout_width="wrap_content"
+                <!-- Header rapport d'erreurs -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:background="@drawable/ic_check_circle"
-                    android:backgroundTint="@color/bleu_clair_alcyons" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="12dp">
 
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_error"
+                        android:layout_marginEnd="8dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Rapport d'erreurs"
+                        android:textColor="#F57F17"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+                <!-- Expandable -->
+                <com.skydoves.expandablelayout.ExpandableLayout
+                    android:id="@+id/expandableLayout1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:expandable_duration="200"
+                    app:expandable_isExpanded="false">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#33000000"/>
+
+                    <!-- Navigation message erreur -->
+                    <LinearLayout
+                        android:id="@+id/zoneMessageErreur"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="8dp">
+
+                        <ImageView
+                            android:id="@+id/precedent"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/ic_navigate_before"
+                            android:layout_marginStart="8dp"/>
+
+                        <TextView
+                            android:id="@+id/messageErreur"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="Message d'erreur"
+                            android:textColor="@color/bleu_fonce_alcyons"
+                            android:textSize="14sp"/>
+
+                        <ImageView
+                            android:id="@+id/suivant"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/ic_navigate_next"
+                            android:layout_marginEnd="8dp"/>
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/nombreMessageErreur"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text=""
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="11sp"
+                        android:alpha="0.6"
+                        android:layout_marginBottom="8dp"/>
+
+                    <View
+                        android:id="@+id/separateur"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/bleu_clair_alcyons_transparent"/>
+
+                    <!-- Bouton OK -->
+                    <LinearLayout
+                        android:id="@+id/boutonOk"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="12dp">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/ic_check_circle"
+                            android:backgroundTint="@color/bleu_clair_alcyons"/>
+
+                    </LinearLayout>
+
+                </com.skydoves.expandablelayout.ExpandableLayout>
 
             </LinearLayout>
 
-        </com.skydoves.expandablelayout.ExpandableLayout>
-
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
-</ScrollView>
+
+</androidx.core.widget.NestedScrollView>

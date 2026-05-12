@@ -1,242 +1,267 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    android:orientation="vertical">
 
-    <RelativeLayout
+    <!-- ═══════════════════════════════════════════
+         BARRE DE TITRE
+    ════════════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/barreDeTitre"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/white">
+        android:layout_height="wrap_content"
+        android:background="@color/bleu_fonce_alcyons"
+        android:orientation="vertical"
+        android:padding="12dp">
 
-        <!-- Barre de titre -->
+        <!-- Fournisseur + Numéro commande -->
         <LinearLayout
-            android:id="@+id/barreDeTitre"
+            android:id="@+id/informationCommande"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:background="@color/bleu_fonce_alcyons"
-            android:orientation="vertical"
+            android:layout_marginBottom="6dp"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/fournisseurCommande"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text=""
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/commandeNumero"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text=""
+                android:textColor="@color/bleu_clair_alcyons"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Séparateur -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="6dp"
+            android:background="#33FFFFFF" />
+
+        <!-- Dépôt + Numéro préparation -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <TextView
+                android:id="@+id/depotNom"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text=""
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/preparationNumero"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text=""
+                android:textColor="@color/bleu_clair_alcyons"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- ═══════════════════════════════════════════
+         ZONE INFOS COLIS
+    ════════════════════════════════════════════ -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/zoneInfos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        app:cardBackgroundColor="#F0F4FF"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:padding="12dp">
 
-            <!-- Fournisseur + Numéro commande -->
+            <!-- Colis à déverrouiller -->
             <LinearLayout
-                android:id="@+id/informationCommande"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="2"
-                android:layout_marginBottom="6dp">
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/fournisseurCommande"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:maxLines="1"
-                    android:ellipsize="end"/>
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/ic_colis" />
 
-                <TextView
-                    android:id="@+id/commandeNumero"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:text=""
-                    android:textColor="@color/bleu_clair_alcyons"
-                    android:textSize="18sp"
-                    android:textStyle="bold"/>
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.6"
+                        android:text="À déverrouiller"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="10sp" />
+
+                    <TextView
+                        android:id="@+id/nbColisTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/rouge"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <!-- Séparateur -->
+            <!-- Séparateur vertical -->
             <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#33FFFFFF"
-                android:layout_marginBottom="6dp"/>
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="8dp"
+                android:background="@color/bleu_clair_alcyons_transparent" />
 
-            <!-- Dépôt + Numéro préparation -->
+            <!-- Colis déverrouillés -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="3">
+                android:layout_weight="1"
+                android:gravity="center_vertical|end"
+                android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/depotNom"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:maxLines="1"
-                    android:ellipsize="end"/>
-
-                <TextView
-                    android:id="@+id/preparationNumero"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
                     android:gravity="end"
-                    android:text=""
-                    android:textColor="@color/bleu_clair_alcyons"
-                    android:textSize="16sp"
-                    android:textStyle="bold"/>
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.6"
+                        android:text="Déverrouillés"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="10sp" />
+
+                    <TextView
+                        android:id="@+id/nbColisTotalReceptionner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:text="0"
+                        android:textColor="@color/vert"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/ic_colis"
+                    android:backgroundTint="@color/vert" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <!-- Zone infos colis -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/zoneInfos"
+    </androidx.cardview.widget.CardView>
+
+    <!-- Séparateur -->
+    <View
+        android:id="@+id/separateur"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginBottom="4dp"
+        android:background="@color/bleu_clair_alcyons_transparent" />
+
+    <!-- ═══════════════════════════════════════════
+         LISTE — prend tout l'espace disponible
+    ════════════════════════════════════════════ -->
+    <ListView
+        android:id="@+id/listeView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:descendantFocusability="afterDescendants"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="12dp"
+        android:paddingHorizontal="8dp" />
+
+    <!-- ═══════════════════════════════════════════
+         BOUTON VALIDER — collé sous la liste
+    ════════════════════════════════════════════ -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/btnValiderVerrou_CV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
+        app:cardBackgroundColor="#2E7D32"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="6dp">
+
+        <LinearLayout
+            android:id="@+id/btnValiderVerrou_LL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/barreDeTitre"
-            android:layout_marginHorizontal="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="4dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
-            app:cardBackgroundColor="#F0F4FF">
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="18dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="12dp">
+                android:letterSpacing="0.1"
+                android:text="Valider le verrou"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
-                <!-- Colis à réceptionner -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+        </LinearLayout>
 
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:layout_gravity="center_vertical"
-                        android:background="@drawable/ic_colis"
-                        android:layout_marginEnd="8dp"/>
+    </androidx.cardview.widget.CardView>
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="À déverrouiller"
-                            android:textColor="@color/bleu_fonce_alcyons"
-                            android:textSize="10sp"
-                            android:alpha="0.6"/>
-
-                        <TextView
-                            android:id="@+id/nbColisTotal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/rouge"
-                            android:textSize="20sp"
-                            android:textStyle="bold"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <!-- Séparateur vertical -->
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:background="@color/bleu_clair_alcyons_transparent"
-                    android:layout_marginHorizontal="8dp"/>
-
-                <!-- Colis réceptionnés -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical|end">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="end"
-                        android:layout_marginEnd="8dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Déverrouiller"
-                            android:textColor="@color/bleu_fonce_alcyons"
-                            android:textSize="10sp"
-                            android:alpha="0.6"/>
-
-                        <TextView
-                            android:id="@+id/nbColisTotalReceptionner"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/vert"
-                            android:textSize="20sp"
-                            android:textStyle="bold"
-                            android:gravity="end"/>
-
-                    </LinearLayout>
-
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:layout_gravity="center_vertical"
-                        android:background="@drawable/ic_colis"
-                        android:backgroundTint="@color/vert"/>
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <!-- Séparateur -->
-        <View
-            android:id="@+id/separateur"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@+id/zoneInfos"
-            android:layout_marginHorizontal="8dp"
-            android:layout_marginBottom="4dp"
-            android:background="@color/bleu_clair_alcyons_transparent"/>
-
-        <!-- Liste -->
-        <RelativeLayout
-            android:id="@+id/zoneListView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/separateur"
-            android:paddingHorizontal="8dp">
-
-            <ListView
-                android:id="@+id/listeView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:descendantFocusability="afterDescendants"
-                android:divider="@android:color/transparent"
-                android:dividerHeight="12dp"/>
-
-
-        </RelativeLayout>
-
-    </RelativeLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

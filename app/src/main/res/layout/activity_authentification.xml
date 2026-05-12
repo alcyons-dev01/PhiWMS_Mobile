@@ -1,95 +1,167 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@color/bleu_fonce_alcyons"
-    android:theme="@style/AppTheme"
     tools:context="fr.alcyons.phiwms_mobile.AuthentificationActivity">
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        tools:ignore="UselessParent">
+    <!-- Logo centré en haut -->
+    <ImageView
+        android:id="@+id/imageLogo"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/logophiwms"
+        android:src="@drawable/phiwms_icon_100x100"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/formulaireConnexion"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.5"/>
+
+    <!-- Formulaire de connexion -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/formulaireConnexion"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="#F0F4FF"
+        app:layout_constraintTop_toBottomOf="@+id/imageLogo"
+        app:layout_constraintBottom_toTopOf="@+id/versionCode"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.4">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/formulaireConnexion"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:weightSum="3">
-
-            <ImageView
-                android:id="@+id/imageLogo"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/logophiwms"
-                android:src="@drawable/phiwms_icon_100x100" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/formulaireConnexion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerInParent="true"
-            android:layout_centerVertical="true"
             android:orientation="vertical"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
+            android:padding="20dp">
 
-            <EditText
-                android:id="@+id/identifiant"
+            <!-- Identifiant -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="48sp"
-                android:backgroundTint="@android:color/white"
-                android:fontFamily="sans-serif"
-                android:hint="@string/identifiant"
-                android:text=""
-                android:inputType="text"
-                android:imeOptions="actionNext"
-                android:textColor="@android:color/white"
-                android:textColorHint="@android:color/white"
-                android:textCursorDrawable="@null"
-                android:autofillHints="" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#E8EAF6">
 
-            <EditText
-                android:id="@+id/motDePasse"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="12dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="4dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/identifiant"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="11sp"
+                        android:alpha="0.6"/>
+
+                    <EditText
+                        android:id="@+id/identifiant"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        android:fontFamily="sans-serif"
+                        android:hint="@string/identifiant"
+                        android:inputType="text"
+                        android:imeOptions="actionNext"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textColorHint="#99000000"
+                        android:textCursorDrawable="@null"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:paddingVertical="6dp"
+                        android:text="alcyons"
+                        android:autofillHints=""/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Mot de passe -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="48sp"
-                android:autofillHints=""
-                android:backgroundTint="@android:color/white"
-                android:fontFamily="sans-serif"
-                android:hint="@string/mot_de_passe"
-                android:imeOptions="actionDone"
-                android:inputType="textPassword"
-                android:text=""
-                android:textColor="@android:color/white"
-                android:textColorHint="@android:color/white"
-                android:textCursorDrawable="@null" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#E8EAF6">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="12dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="4dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/mot_de_passe"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="11sp"
+                        android:alpha="0.6"/>
+
+                    <EditText
+                        android:id="@+id/motDePasse"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        android:fontFamily="sans-serif"
+                        android:hint="@string/mot_de_passe"
+                        android:imeOptions="actionDone"
+                        android:inputType="textPassword"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textColorHint="#99000000"
+                        android:textCursorDrawable="@null"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:paddingVertical="6dp"
+                        android:autofillHints=""
+                        android:text="helpdesk"/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Bouton connexion + ProgressBar -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:orientation="horizontal"
                 android:gravity="center"
-                android:weightSum="10">
+                android:layout_marginBottom="12dp">
 
-                <Button
-                    android:id="@+id/boutonConnexion"
+                <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
-                    android:layout_height="48sp"
-                    android:layout_gravity="center"
-                    android:layout_margin="20dp"
-                    android:layout_weight="5"
-                    android:background="@color/bleu_clair_alcyons"
-                    android:text="@string/se_connecter"
-                    android:textColor="@android:color/white" />
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="12dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@color/bleu_fonce_alcyons">
+
+                    <Button
+                        android:id="@+id/boutonConnexion"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@android:color/transparent"
+                        android:text="@string/se_connecter"
+                        android:textColor="#FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                </androidx.cardview.widget.CardView>
 
                 <ProgressBar
                     android:id="@+id/progressBar"
@@ -97,15 +169,17 @@
                     android:layout_height="wrap_content"
                     android:indeterminate="true"
                     android:visibility="gone"
-                    android:indeterminateTint="@color/bleu_clair_alcyons"/>
+                    android:indeterminateTint="@color/bleu_fonce_alcyons"/>
 
             </LinearLayout>
 
+            <!-- Nb éléments à synchroniser -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
 
                 <TextView
                     android:id="@+id/nbElements"
@@ -113,67 +187,48 @@
                     android:layout_height="wrap_content"
                     android:paddingEnd="5dp"
                     android:text="@string/nbele"
-                    android:textColor="@android:color/white"
-                    android:textSize="17sp"
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textSize="15sp"
                     android:textStyle="bold"
-                    android:visibility="invisible"
-                    tools:ignore="RtlSymmetry" />
+                    android:visibility="invisible"/>
 
                 <TextView
                     android:id="@+id/textElement"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/l_ments_synchroniser"
-                    android:textColor="@android:color/white"
-                    android:textSize="17sp"
-                    android:visibility="invisible" />
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textSize="15sp"
+                    android:visibility="invisible"/>
+
             </LinearLayout>
 
+            <!-- Bouton scan datamatrix -->
             <ImageView
                 android:id="@+id/vers_identification_scan"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:adjustViewBounds="true"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_datamatrix"
-                android:contentDescription="@string/bouton_scan" />
+                app:tint="@color/bleu_fonce_alcyons"
+                android:contentDescription="@string/bouton_scan"/>
 
         </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="bottom"
-            android:orientation="vertical"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:weightSum="2"
-            android:id="@+id/linearLayout2">
+    <!-- Version en bas -->
+    <TextView
+        android:id="@+id/versionCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:gravity="center"
+        android:textSize="@dimen/text_lg"
+        android:textColor="@color/blanc"
+        android:alpha="0.7"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-            <!-- <TextView
-                android:id="@+id/versCGU"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/cgu"
-                android:gravity="center"
-                android:textSize="14sp"
-                android:textStyle="normal"
-                android:textColor="@color/bleu_clair_alcyons"
-                android:layout_marginBottom="20dp"/>-->
-
-            <TextView
-                android:id="@+id/versionCode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textSize="@dimen/text_lg"
-                android:textStyle="normal"
-                android:textColor="@color/blanc"
-                android:layout_marginBottom="50dp"/>
-
-        </LinearLayout>
-
-    </RelativeLayout>
-
-
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

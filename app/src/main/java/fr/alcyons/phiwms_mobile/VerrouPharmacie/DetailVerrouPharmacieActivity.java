@@ -241,10 +241,25 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
 
         // Permet de mettre à jour les données se trouvant pas dans l'adapter mais dépend de lui
         phPreparationLigneVerrouPharmacieAdapter.setOnDataChangeListener(new PH_Preparation_Ligne_VerrouPharmacieAdapter.OnDataChangeListener() {
-            public void onDataChanged(int quantitéAvant, int quantitéAprès) {
-                Integer nbColisTotal = Integer.parseInt(((TextView) findViewById(R.id.nbColisTotal)).getText().toString());
-                Integer somme = nbColisTotal - quantitéAvant + quantitéAprès;
-                ((TextView) findViewById(R.id.nbColisTotal)).setText(String.valueOf(somme));
+            public void onDataChanged(int quantitéAvant, int quantitéAprès, boolean deverrouillee) {
+
+                Integer nbColisTotalVerrouille = Integer.parseInt(((TextView) findViewById(R.id.nbColisTotal)).getText().toString());
+                Integer nbColisTotalDeverrouille = Integer.parseInt(((TextView) findViewById(R.id.nbColisTotalReceptionner)).getText().toString());
+
+                if(deverrouillee)
+                {
+                    nbColisTotalVerrouille = nbColisTotalVerrouille - quantitéAprès;
+                    nbColisTotalDeverrouille = nbColisTotalDeverrouille + quantitéAprès;
+                }
+                else
+                {
+                    nbColisTotalVerrouille = nbColisTotalVerrouille + quantitéAvant;
+                    nbColisTotalDeverrouille = nbColisTotalDeverrouille - quantitéAvant;
+                }
+
+                ((TextView) findViewById(R.id.nbColisTotal)).setText(String.valueOf(nbColisTotalVerrouille));
+                ((TextView) findViewById(R.id.nbColisTotalReceptionner)).setText(String.valueOf(nbColisTotalDeverrouille));
+
             }
         });
 
@@ -277,6 +292,13 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
         {
             //Alerte.afficherAlerte(DetailVerrouPharmacieActivity.this, "Erreur", "Un produit de la liste est périmé", "alerte");
         }
+
+        ((LinearLayout) findViewById(R.id.btnValiderVerrou_LL)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClick_ActionContenant();
+            }
+        });
 
         invalidateOptionsMenu();
     }
@@ -417,30 +439,267 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
         PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, phPreparationLigne);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        //Récupération du menu
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_preparation_detail, menu);
-        return true;
+
+    public void onClick_ActionContenant() {
+
+        boolean deverouiller = true;
+
+        for(int i = 0; i < phPreparationLigneVerrouPharmacieAdapter.viewHolderList.size(); i++)
+        {
+            PH_Preparation_Ligne_VerrouPharmacieAdapter.PH_Preparation_Ligne_AdapteViewHolder viewHolder = phPreparationLigneVerrouPharmacieAdapter.viewHolderList.get(i);
+
+            String statut = viewHolder.valeurStatut;
+
+            if(statut.contentEquals("Verrouillé"))
+            {
+                deverouiller = false;
+                break;
+            }
+        }
+
+        if(deverouiller)
+        {
+            final HashMap<Integer, Integer> resultat = new HashMap<>();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            View view = this.getLayoutInflater().inflate(R.layout.alerte_preparation, null);
+
+            LinearLayout LinearPalette = (LinearLayout) view.findViewById(R.id.LinearPalette);
+            LinearLayout LinearColis = (LinearLayout) view.findViewById(R.id.LinearColis);
+            LinearLayout LinearContainer = (LinearLayout) view.findViewById(R.id.LinearContainer);
+            LinearLayout LinearScelle = (LinearLayout) view.findViewById(R.id.LinearScelle);
+            textViewNBPalette = (TextView) view.findViewById(R.id.nbPaletteSelectionne);
+            textViewNBCaisse = (TextView) view.findViewById(R.id.nbColisSelectionne);
+            textViewNBContainer = (TextView) view.findViewById(R.id.nbContainerSelectionne);
+            textViewNBScelle = (TextView) view.findViewById(R.id.nbScelleSelectionne);
+
+            //on calcule le nombre de colis
+            int nbColis = 0;
+            for(PH_Preparation_Ligne_VerrouPharmacie_Adapte courant : phPreparationLigneVerrouPharmacieAdaptes)
+            {
+                PH_Preparation_Ligne_VerrouPharmacieAdapter.PH_Preparation_Ligne_AdapteViewHolder viewHolder = phPreparationLigneVerrouPharmacieAdapter.viewHolderList.get(phPreparationLigneVerrouPharmacieAdapter.phPreparationLigneVerrouPharmacieAdapteList.indexOf(courant));
+                PH_Preparation_Ligne ph_preparation_ligne = courant.getPhPreparationLigne();
+                int quantitePreparer = (viewHolder.valeurQteParLot == -1 ? viewHolder.valeurQteDemander : viewHolder.valeurQteParLot);
+                if(quantitePreparer > 0)
+                {
+                    Produit produit = ProduitOpenHelper.getProduitByID(db, ph_preparation_ligne.getProduitID());
+                    int conditionnement = (int) produit.getCond_distrib();
+                    if(conditionnement == 0)
+                    {
+                        conditionnement = 1;
+                    }
+                    int nbColisProduit = (int) ((int) quantitePreparer / (int) conditionnement);
+
+                    if(nbColisProduit == 0)
+                    {
+                        nbColisProduit = 1;
+                    }
+                    nbColis = nbColis + nbColisProduit;
+                }
+            }
+
+            textViewNBCaisse.setText(String.valueOf(nbColis));
+
+            /* Gestion des numbers pickers */
+
+            //gestion des colis
+            textViewNBCaisse.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Ouvre une boite de dialogue avec un NumberPicker
+                    String title = "Saisir le nombre de colis";
+                    String message = "Nombre de colis : ";
+                    int maxValue = 20;
+                    int value = 0;
+
+                    DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                            int qteAprès = aNumberPicker.getValue();
+                            textViewNBCaisse.setText(String.valueOf(qteAprès));
+                            InputMethodManager imm = (InputMethodManager) DetailVerrouPharmacieActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                            dialog.dismiss();
+                        }
+                    };
+
+                    Alerte.afficherAlerteNumberPicker(DetailVerrouPharmacieActivity.this, title, message, value, maxValue, onClickListener);
+                }
+            });
+
+
+            //gestion des palettes
+            LinearPalette.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Ouvre une boite de dialogue avec un NumberPicker
+                    textViewNBPalette.performClick();
+                }
+            });
+
+            textViewNBPalette.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Ouvre une boite de dialogue avec un NumberPicker
+                    String title = "Saisir le nombre de palette";
+                    String message = "Nombre de palettes : ";
+                    int maxValue = 15;
+                    int value = 0;
+
+                    DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            int qteAprès = aNumberPicker.getValue();
+                            textViewNBPalette.setText(String.valueOf(qteAprès));
+
+                            dialog.dismiss();
+                        }
+                    };
+
+                    Alerte.afficherAlerteNumberPicker(DetailVerrouPharmacieActivity.this, title, message, value, maxValue, onClickListener);
+                }
+            });
+
+            //gestion des container
+            LinearContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Ouvre une boite de dialogue avec un NumberPicker
+                    textViewNBContainer.performClick();
+                }
+            });
+
+            textViewNBContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Ouvre une boite de dialogue avec un NumberPicker
+                    String title = "Saisir le nombre de container";
+                    String message = "Nombre de container : ";
+                    int maxValue = 15;
+                    int value = 0;
+
+                    DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            int qteAprès = aNumberPicker.getValue();
+                            textViewNBContainer.setText(String.valueOf(qteAprès));
+
+                            dialog.dismiss();
+                        }
+                    };
+
+                    Alerte.afficherAlerteNumberPicker(DetailVerrouPharmacieActivity.this, title, message, value, maxValue, onClickListener);
+                }
+            });
+
+            //gestion des scelles
+            LinearScelle.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Ouvre une boite de dialogue avec un NumberPicker
+                    textViewNBScelle.performClick();
+                }
+            });
+
+            textViewNBScelle.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Ouvre une boite de dialogue avec un edittext
+                    String textscelle = Alerte.afficherAlerteEditText(DetailVerrouPharmacieActivity.this, "Numéro de scellé", "Saisir un numéro de scellé");
+                    textViewNBScelle.setText(textscelle);
+                }
+            });
+
+            ImageView ok = (ImageView) view.findViewById(R.id.ok);
+            ImageView annuler = (ImageView) view.findViewById(R.id.annuler);
+            builder.setView(view);
+            final AlertDialog alertDialog = builder.create();
+            alertDialog.setCancelable(false);
+            alertDialog.getWindow().setGravity(Gravity.CENTER);
+            alertDialog.show();
+            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+            ok.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int nbPalette = 0;
+                    if(!textViewNBPalette.getText().toString().contentEquals(""))
+                        nbPalette = Integer.parseInt(textViewNBPalette.getText().toString());
+
+                    int nbCaisse = 0;
+                    if(!textViewNBCaisse.getText().toString().contentEquals(""))
+                        nbCaisse = Integer.parseInt(textViewNBCaisse.getText().toString());
+
+                    int Conteneur_NB = 0;
+                    if(!textViewNBContainer.getText().toString().contentEquals(""))
+                        Conteneur_NB = Integer.parseInt(textViewNBContainer.getText().toString());
+
+                    String numero_scelle = "";
+                    if(textViewNBScelle.getText().toString() != null)
+                        numero_scelle = textViewNBScelle.getText().toString();
+
+                    phPreparationSelectionne.setColisNB(nbCaisse);
+                    phPreparationSelectionne.setPaletteNB(nbPalette);
+                    phPreparationSelectionne.setConteneur_NB(Conteneur_NB);
+                    phPreparationSelectionne.setNumero_scelle(numero_scelle);
+                    PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, phPreparationSelectionne);
+                    alertDialog.dismiss();
+                    validerVerrou();
+                }
+            });
+
+            annuler.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    alertDialog.dismiss();
+                }
+            });
+        }
+        else
+        {
+            Alerte.afficherAlerte(DetailVerrouPharmacieActivity.this, "Alerte", "Veuillez déverrouiller toutes les lignes", "alerte");
+        }
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem valider = menu.findItem(R.id.boutonValider);
-        valider.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+    public void afficherAlerteConfirmationRetour(Context context, LayoutInflater inflater, final Bundle bundle) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View layout = inflater.inflate(R.layout.alerte_confirmation, null);
+
+        LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
+        LinearLayout buttonAnnuler = (LinearLayout) layout.findViewById(R.id.buttonAnnuler);
+        TextView messageTextView = (TextView) layout.findViewById(R.id.messageFin);
+        messageTextView.setText("Vous allez quitter le verrou, confirmez vous ?");
+        builder.setView(layout);
+
+        final AlertDialog alertDialog = builder.create();
+        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        alertDialog.show();
+        alertDialog.show();
+
+        zoneok.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                onClick_ActionContenant();
-                return true;
+            public void onClick(View v) {
+                alertDialog.dismiss();
+                retourService(bundle);
             }
         });
 
-        return true;
+        buttonAnnuler.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+    }
+    @Override
+    public void retourService(final Bundle bundle)
+    {
+        Intent detailVerrouIntent = new Intent(DetailVerrouPharmacieActivity.this, ServiceVerrouPharmacieActivity.class);
+        Bundle detailVerrouBundle = super.getBundle();
+        detailVerrouIntent.putExtras(detailVerrouBundle);
+        DetailVerrouPharmacieActivity.this.startActivity(detailVerrouIntent);
+        DetailVerrouPharmacieActivity.this.finish();
     }
 
-    public void onClick_ActionValider()
+    private void validerVerrou()
     {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         DateFormat dateDecodeur = new SimpleDateFormat("dd/MM/yyyy");
@@ -568,273 +827,5 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
             }
             onBackPressed();
         }
-    }
-
-    public void onClick_ActionContenant() {
-
-        boolean deverouiller = true;
-
-        for(int i = 0; i < phPreparationLigneVerrouPharmacieAdapter.viewHolderList.size(); i++)
-        {
-            PH_Preparation_Ligne_VerrouPharmacieAdapter.PH_Preparation_Ligne_AdapteViewHolder viewHolder = phPreparationLigneVerrouPharmacieAdapter.viewHolderList.get(i);
-
-            String statut = viewHolder.valeurStatut;
-
-            if(statut.contentEquals("Vérouillée"))
-            {
-                deverouiller = false;
-                break;
-            }
-        }
-
-        if(deverouiller)
-        {
-            final HashMap<Integer, Integer> resultat = new HashMap<>();
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            View view = this.getLayoutInflater().inflate(R.layout.alerte_preparation, null);
-
-            LinearLayout LinearPalette = (LinearLayout) view.findViewById(R.id.LinearPalette);
-            LinearLayout LinearColis = (LinearLayout) view.findViewById(R.id.LinearColis);
-            LinearLayout LinearContainer = (LinearLayout) view.findViewById(R.id.LinearContainer);
-            LinearLayout LinearScelle = (LinearLayout) view.findViewById(R.id.LinearScelle);
-            textViewNBPalette = (TextView) view.findViewById(R.id.nbPaletteSelectionne);
-            textViewNBCaisse = (TextView) view.findViewById(R.id.nbColisSelectionne);
-            textViewNBContainer = (TextView) view.findViewById(R.id.nbContainerSelectionne);
-            textViewNBScelle = (TextView) view.findViewById(R.id.nbScelleSelectionne);
-            final ImageView imagePalette = (ImageView) view.findViewById(R.id.iconPalette);
-            final ImageView imageContainer = (ImageView) view.findViewById(R.id.iconContainer);
-            final ImageView imageScelle = (ImageView) view.findViewById(R.id.iconScelle);
-
-            //on calcule le nombre de colis
-            int nbColis = 0;
-            for(PH_Preparation_Ligne_VerrouPharmacie_Adapte courant : phPreparationLigneVerrouPharmacieAdaptes)
-            {
-                PH_Preparation_Ligne_VerrouPharmacieAdapter.PH_Preparation_Ligne_AdapteViewHolder viewHolder = phPreparationLigneVerrouPharmacieAdapter.viewHolderList.get(phPreparationLigneVerrouPharmacieAdapter.phPreparationLigneVerrouPharmacieAdapteList.indexOf(courant));
-                PH_Preparation_Ligne ph_preparation_ligne = courant.getPhPreparationLigne();
-                int quantitePreparer = (viewHolder.valeurQteParLot == -1 ? viewHolder.valeurQteDemander : viewHolder.valeurQteParLot);
-                if(quantitePreparer > 0)
-                {
-                    Produit produit = ProduitOpenHelper.getProduitByID(db, ph_preparation_ligne.getProduitID());
-                    int conditionnement = (int) produit.getCond_distrib();
-                    if(conditionnement == 0)
-                    {
-                        conditionnement = 1;
-                    }
-                    int nbColisProduit = (int) ((int) quantitePreparer / (int) conditionnement);
-
-                    if(nbColisProduit == 0)
-                    {
-                        nbColisProduit = 1;
-                    }
-                    nbColis = nbColis + nbColisProduit;
-                }
-            }
-
-            textViewNBCaisse.setText(String.valueOf(nbColis));
-
-            /* Gestion des numbers pickers */
-
-            //gestion des colis
-            textViewNBCaisse.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Ouvre une boite de dialogue avec un NumberPicker
-                    String title = "Saisir le nombre de colis";
-                    String message = "Nombre de colis : ";
-                    int maxValue = 20;
-                    int value = 0;
-
-                    DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-
-                            int qteAprès = aNumberPicker.getValue();
-                            textViewNBCaisse.setText(String.valueOf(qteAprès));
-                            InputMethodManager imm = (InputMethodManager) DetailVerrouPharmacieActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-                            imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                            dialog.dismiss();
-                        }
-                    };
-
-                    Alerte.afficherAlerteNumberPicker(DetailVerrouPharmacieActivity.this, title, message, value, maxValue, onClickListener);
-                }
-            });
-
-
-            //gestion des palettes
-            LinearPalette.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Ouvre une boite de dialogue avec un NumberPicker
-                    textViewNBPalette.performClick();
-                }
-            });
-
-            textViewNBPalette.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Ouvre une boite de dialogue avec un NumberPicker
-                    String title = "Saisir le nombre de palette";
-                    String message = "Nombre de palettes : ";
-                    int maxValue = 15;
-                    int value = 0;
-
-                    DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            imagePalette.setVisibility(View.GONE);
-                            textViewNBPalette.setVisibility(View.VISIBLE);
-                            int qteAprès = aNumberPicker.getValue();
-                            textViewNBPalette.setText(String.valueOf(qteAprès));
-
-                            dialog.dismiss();
-                        }
-                    };
-
-                    Alerte.afficherAlerteNumberPicker(DetailVerrouPharmacieActivity.this, title, message, value, maxValue, onClickListener);
-                }
-            });
-
-            //gestion des container
-            LinearContainer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Ouvre une boite de dialogue avec un NumberPicker
-                    textViewNBContainer.performClick();
-                }
-            });
-
-            textViewNBContainer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Ouvre une boite de dialogue avec un NumberPicker
-                    String title = "Saisir le nombre de container";
-                    String message = "Nombre de container : ";
-                    int maxValue = 15;
-                    int value = 0;
-
-                    DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            imageContainer.setVisibility(View.GONE);
-                            textViewNBContainer.setVisibility(View.VISIBLE);
-                            int qteAprès = aNumberPicker.getValue();
-                            textViewNBContainer.setText(String.valueOf(qteAprès));
-
-                            dialog.dismiss();
-                        }
-                    };
-
-                    Alerte.afficherAlerteNumberPicker(DetailVerrouPharmacieActivity.this, title, message, value, maxValue, onClickListener);
-                }
-            });
-
-            //gestion des scelles
-            LinearScelle.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Ouvre une boite de dialogue avec un NumberPicker
-                    textViewNBScelle.performClick();
-                }
-            });
-
-            textViewNBScelle.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Ouvre une boite de dialogue avec un edittext
-                    String textscelle = Alerte.afficherAlerteEditText(DetailVerrouPharmacieActivity.this, "Numéro de scellé", "Saisir un numéro de scellé");
-                    imageScelle.setVisibility(View.GONE);
-                    textViewNBScelle.setVisibility(View.VISIBLE);
-                    textViewNBScelle.setText(textscelle);
-                }
-            });
-
-            ImageView ok = (ImageView) view.findViewById(R.id.ok);
-            ImageView annuler = (ImageView) view.findViewById(R.id.annuler);
-            builder.setView(view);
-            final AlertDialog alertDialog = builder.create();
-            alertDialog.setCancelable(false);
-            alertDialog.getWindow().setGravity(Gravity.CENTER);
-            alertDialog.show();
-            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-            ok.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int nbPalette = 0;
-                    if(!textViewNBPalette.getText().toString().contentEquals(""))
-                        nbPalette = Integer.parseInt(textViewNBPalette.getText().toString());
-
-                    int nbCaisse = 0;
-                    if(!textViewNBCaisse.getText().toString().contentEquals(""))
-                        nbCaisse = Integer.parseInt(textViewNBCaisse.getText().toString());
-
-                    int Conteneur_NB = 0;
-                    if(!textViewNBContainer.getText().toString().contentEquals(""))
-                        Conteneur_NB = Integer.parseInt(textViewNBContainer.getText().toString());
-
-                    String numero_scelle = "";
-                    if(textViewNBScelle.getText().toString() != null)
-                        numero_scelle = textViewNBScelle.getText().toString();
-
-                    phPreparationSelectionne.setColisNB(nbCaisse);
-                    phPreparationSelectionne.setPaletteNB(nbPalette);
-                    phPreparationSelectionne.setConteneur_NB(Conteneur_NB);
-                    phPreparationSelectionne.setNumero_scelle(numero_scelle);
-                    PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, phPreparationSelectionne);
-                    alertDialog.dismiss();
-                    onClick_ActionValider();
-                }
-            });
-
-            annuler.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    alertDialog.dismiss();
-                }
-            });
-        }
-        else
-        {
-            Alerte.afficherAlerte(DetailVerrouPharmacieActivity.this, "Alerte", "Veuillez dévérouiller toutes les lignes", "alerte");
-        }
-    }
-
-    public void afficherAlerteConfirmationRetour(Context context, LayoutInflater inflater, final Bundle bundle) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View layout = inflater.inflate(R.layout.alerte_confirmation, null);
-
-        LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
-        LinearLayout buttonAnnuler = (LinearLayout) layout.findViewById(R.id.buttonAnnuler);
-        TextView messageTextView = (TextView) layout.findViewById(R.id.messageFin);
-        messageTextView.setText("Vous allez quitter le verrou, confirmez vous ?");
-        builder.setView(layout);
-
-        final AlertDialog alertDialog = builder.create();
-        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        alertDialog.show();
-        alertDialog.show();
-
-        zoneok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-                retourService(bundle);
-            }
-        });
-
-        buttonAnnuler.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
-    }
-    @Override
-    public void retourService(final Bundle bundle)
-    {
-        Intent detailVerrouIntent = new Intent(DetailVerrouPharmacieActivity.this, ServiceVerrouPharmacieActivity.class);
-        Bundle detailVerrouBundle = super.getBundle();
-        detailVerrouIntent.putExtras(detailVerrouBundle);
-        DetailVerrouPharmacieActivity.this.startActivity(detailVerrouIntent);
-        DetailVerrouPharmacieActivity.this.finish();
     }
 }
