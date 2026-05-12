@@ -217,7 +217,7 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
     public static PH_Reliquat getPH_ReliquatBaseByUnIdProduitetNumero(SQLiteDatabase db, Integer id_produit, String NumeroCommande) {
         PH_Reliquat phReliquat = null;
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_RELIQUAT + " WHERE " + Constantes.CLE_COL_PRODUITID_PH_RELIQUAT + "=? AND "+Constantes.CLE_COL_COMMANDENUMERO_PH_RELIQUAT+"=? AND "+Constantes.CLE_COL_RELIQUAT_UID_PH_RELIQUAT+">0 AND "+Constantes.CLE_COL_QTERELIQUAT_X_PH_RELIQUAT+">0", new String[]{String.valueOf(id_produit), NumeroCommande});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_RELIQUAT + " WHERE " + Constantes.CLE_COL_PRODUITID_PH_RELIQUAT + "=? AND "+Constantes.CLE_COL_COMMANDENUMERO_PH_RELIQUAT+"=? AND "+Constantes.CLE_COL_RELIQUAT_UID_PH_RELIQUAT+">0", new String[]{String.valueOf(id_produit), NumeroCommande});
 
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
