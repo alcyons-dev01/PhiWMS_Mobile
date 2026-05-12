@@ -217,7 +217,7 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
     public static PH_Reliquat getPH_ReliquatBaseByUnIdProduitetNumero(SQLiteDatabase db, Integer id_produit, String NumeroCommande) {
         PH_Reliquat phReliquat = null;
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_RELIQUAT + " WHERE " + Constantes.CLE_COL_PRODUITID_PH_RELIQUAT + "=? AND "+Constantes.CLE_COL_COMMANDENUMERO_PH_RELIQUAT+"=? AND "+Constantes.CLE_COL_RELIQUAT_UID_PH_RELIQUAT+">0", new String[]{String.valueOf(id_produit), NumeroCommande});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_RELIQUAT + " WHERE " + Constantes.CLE_COL_PRODUITID_PH_RELIQUAT + "=? AND "+Constantes.CLE_COL_COMMANDENUMERO_PH_RELIQUAT+"=? AND "+Constantes.CLE_COL_RELIQUAT_UID_PH_RELIQUAT+">0 AND "+Constantes.CLE_COL_QTERELIQUAT_X_PH_RELIQUAT+">0", new String[]{String.valueOf(id_produit), NumeroCommande});
 
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
@@ -370,9 +370,10 @@ public class PH_ReliquatOpenHelper extends DBOpenHelper {
         Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_RELIQUAT + " WHERE " + Constantes.CLE_COL_COMMANDENUMERO_PH_RELIQUAT + " = '"+numreception+"' AND "+ Constantes.CLE_COL_DESIGNATIONCOURTE_PH_RELIQUAT +" LIKE '%"+designation+"%'", new String[]{});
 
         while (cursor.moveToNext()) {
-            PH_Reliquat produit = new PH_Reliquat(cursor);
-            if(!produitList.contains(produit.getDesignationCourte()))
-                produitList.add(produit.getDesignationCourte());
+            PH_Reliquat reliquat = new PH_Reliquat(cursor);
+            Produit produitCourant = ProduitOpenHelper.getProduitByID(db, reliquat.getProduitID());
+            if(!produitList.contains(produitCourant.getDesignation_interne()))
+                produitList.add(produitCourant.getDesignation_interne());
         }
         cursor.close();
         cursor = null;

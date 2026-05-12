@@ -246,7 +246,7 @@ public class ProduitOpenHelper extends DBOpenHelper {
     public static Produit getUnProduitByDesignation(SQLiteDatabase db, String designation)
     {
         Produit produit = null;
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT + " =? OR "+Constantes.CLE_COL_DESIGNATION_EXT_PRODUIT+ "=?" , new String[]{designation, designation});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT + " LIKE \""+designation+"\" OR "+Constantes.CLE_COL_DESIGNATION_EXT_PRODUIT+ " LIKE \""+designation+"\"" , new String[]{});
 
         if(cursor.getCount() > 0) {
             cursor.moveToFirst();
