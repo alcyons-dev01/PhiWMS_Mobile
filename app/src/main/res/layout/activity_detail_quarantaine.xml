@@ -124,7 +124,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:cardBackgroundColor="#2E7D32"
+            app:cardBackgroundColor="@color/vert"
             app:cardCornerRadius="16dp"
             app:cardElevation="6dp">
 

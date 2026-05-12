@@ -397,7 +397,7 @@
                     android:elevation="6dp"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="6dp"
-                    app:cardBackgroundColor="#2E7D32"
+                    app:cardBackgroundColor="@color/vert"
                     android:visibility="gone">
 
                     <LinearLayout

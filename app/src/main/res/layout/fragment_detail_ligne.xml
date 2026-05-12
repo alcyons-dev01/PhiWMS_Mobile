@@ -31,7 +31,7 @@
         android:id="@+id/bandeauNouvelleReference_LL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#C62828"
+        android:background="@color/rouge"
         android:padding="8dp"
         android:gravity="center"
         android:visibility="gone">
@@ -323,7 +323,7 @@
         android:id="@+id/bandeauQteRestante_LL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#C62828"
+        android:background="@color/rouge"
         android:padding="6dp"
         android:visibility="gone">
 
