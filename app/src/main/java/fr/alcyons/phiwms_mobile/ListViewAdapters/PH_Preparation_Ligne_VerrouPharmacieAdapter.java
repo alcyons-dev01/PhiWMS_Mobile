@@ -15,8 +15,6 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +32,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
@@ -51,343 +51,382 @@ import fr.alcyons.phiwms_mobile.R;
 
 import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 
-public class PH_Preparation_Ligne_VerrouPharmacieAdapter extends ArrayAdapter {
+public class PH_Preparation_Ligne_VerrouPharmacieAdapter extends ArrayAdapter<PH_Preparation_Ligne_VerrouPharmacie_Adapte> {
+
+    // ─── Données ────────────────────────────────────────────────────────────
 
     public List<PH_Preparation_Ligne_VerrouPharmacie_Adapte> phPreparationLigneVerrouPharmacieAdapteList;
     public List<PH_Preparation_Ligne_AdapteViewHolder> viewHolderList;
+
     Context context;
     SQLiteDatabase db;
     int nb_inactive;
     boolean first_passage;
     OnDataChangeListener mOnDataChangeListener;
 
-    private static final DateFormat DATE_FORMAT_SQL = new SimpleDateFormat("yyyy-MM-dd");
+    /**
+     * Cache des conditionnements par produitID — évite les requêtes BDD répétées
+     * dans recupererNbColis() à chaque scroll / frappe clavier.
+     */
+    private final Map<Integer, Integer> conditionnementCache = new HashMap<>();
+
+    /**
+     * Résultats de sérialisation pré-chargés à l'init — indexés par position.
+     * Valeur : résultat ("INACTIVE", "UNKNOWN", "") ou null si non applicable.
+     */
+    private final List<String> serialisationResultats = new ArrayList<>();
+
+    private static final DateFormat DATE_FORMAT_SQL     = new SimpleDateFormat("yyyy-MM-dd");
     private static final DateFormat DATE_FORMAT_DISPLAY = new SimpleDateFormat("dd/MM/yyyy");
+
+    // ─── Listener date ──────────────────────────────────────────────────────
 
     View.OnClickListener clicDate = v -> {
         DatePickerFragment newFragment = new DatePickerFragment();
         PH_Preparation_Ligne_AdapteViewHolder viewHolder = null;
-        for (PH_Preparation_Ligne_AdapteViewHolder viewHolderC : viewHolderList) {
-            if (viewHolderC.datePeremption == v.findViewById(R.id.datePeremption)) {
-                viewHolder = viewHolderC;
+        for (PH_Preparation_Ligne_AdapteViewHolder vh : viewHolderList) {
+            if (vh.datePeremption == v.findViewById(R.id.datePeremption)) {
+                viewHolder = vh;
                 break;
             }
         }
         if (viewHolder != null) {
             newFragment.setViewHolder(viewHolder, ((MenuActivity) context).db,
-                    phPreparationLigneVerrouPharmacieAdapteList.get(viewHolderList.indexOf(viewHolder)));
-            newFragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "datePicker");
+                    phPreparationLigneVerrouPharmacieAdapteList.get(
+                            viewHolderList.indexOf(viewHolder)));
+            newFragment.show(((AppCompatActivity) context)
+                    .getSupportFragmentManager(), "datePicker");
         }
     };
 
-    public PH_Preparation_Ligne_VerrouPharmacieAdapter(Context context, SQLiteDatabase database,
-                                                       List<PH_Preparation_Ligne_VerrouPharmacie_Adapte> phPreparationLigneVerrouPharmacieAdapteList) {
-        super(context, 0, phPreparationLigneVerrouPharmacieAdapteList);
+    // ─── Constructeur ───────────────────────────────────────────────────────
+
+    public PH_Preparation_Ligne_VerrouPharmacieAdapter(
+            Context context, SQLiteDatabase database,
+            List<PH_Preparation_Ligne_VerrouPharmacie_Adapte> list) {
+
+        super(context, 0, list);
         this.context = context;
-        this.db = database;
-        this.phPreparationLigneVerrouPharmacieAdapteList = phPreparationLigneVerrouPharmacieAdapteList;
+        this.db      = database;
+        this.phPreparationLigneVerrouPharmacieAdapteList = list;
         this.first_passage = false;
-        this.nb_inactive = 0;
+        this.nb_inactive   = 0;
 
         this.viewHolderList = new ArrayList<>();
-        for (PH_Preparation_Ligne_VerrouPharmacie_Adapte item : phPreparationLigneVerrouPharmacieAdapteList) {
-            this.viewHolderList.add(new PH_Preparation_Ligne_AdapteViewHolder(item));
+
+        for (PH_Preparation_Ligne_VerrouPharmacie_Adapte item : list) {
+            viewHolderList.add(new PH_Preparation_Ligne_AdapteViewHolder(item));
+
+            // Pré-charge le conditionnement du produit une seule fois
+            prechargerConditionnement(item);
+
+            // Pré-charge la sérialisation une seule fois
+            serialisationResultats.add(prechargerSerialisation(item));
         }
     }
 
+    // ─── Pré-chargements ────────────────────────────────────────────────────
+
+    private void prechargerConditionnement(PH_Preparation_Ligne_VerrouPharmacie_Adapte item) {
+        if (item.getProduitCorrespondant() == null) return;
+        int produitID = item.getProduitCorrespondant().getID_produit();
+        if (conditionnementCache.containsKey(produitID)) return;
+
+        Produit produit = ProduitOpenHelper.getProduitByID(db, produitID);
+        if (produit == null) {
+            conditionnementCache.put(produitID, 1);
+            return;
+        }
+        int cond = produit.getCond_achat();
+        if (cond == 0) cond = (int) produit.getCond_distrib();
+        conditionnementCache.put(produitID, cond);
+    }
+
+    private String prechargerSerialisation(PH_Preparation_Ligne_VerrouPharmacie_Adapte item) {
+        String serie = item.getSerieNumero();
+        if (serie == null || serie.isEmpty() || serie.equals("null")) return "";
+
+        if (item.getProduitCorrespondant() == null) return "";
+
+        String numeroCommande = item.getPhPreparation().getListe().trim();
+        String[] tabNumero    = numeroCommande.split(" ");
+        numeroCommande        = tabNumero[tabNumero.length - 1];
+
+        PH_Serialisation s = PH_SerialisationOpenHelper.getPH_SerialisationVerrou(
+                db, numeroCommande, item.getProduitCorrespondant().getID_produit());
+
+        return s != null ? s.getResultat() : "";
+    }
+
+    // ─── getView ────────────────────────────────────────────────────────────
+
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        // Ferme le clavier si ouvert
-        fermerClavier();
 
-        final PH_Preparation_Ligne_AdapteViewHolder viewHolder = viewHolderList.get(position);
+        final PH_Preparation_Ligne_AdapteViewHolder viewHolder =
+                viewHolderList.get(position);
         final PH_Preparation_Ligne_VerrouPharmacie_Adapte phPrepAdapte =
-                (PH_Preparation_Ligne_VerrouPharmacie_Adapte) getItem(position);
+                getItem(position);
 
-        convertView = LayoutInflater.from(getContext())
-                .inflate(R.layout.row_ph_preparation_ligne_verrou_pharmacie, parent, false);
+        // Réutilise le convertView existant — inflate uniquement si nécessaire
+        if (convertView == null) {
+            convertView = LayoutInflater.from(getContext()).inflate(
+                    R.layout.row_ph_preparation_ligne_verrou_pharmacie, parent, false);
+        }
 
         // Binding des vues
         bindVues(viewHolder, convertView);
 
         if (phPrepAdapte != null) {
-            // Affichage des données
             afficherDonnees(viewHolder, phPrepAdapte);
-
-            // Statut verrouillage
             appliquerStatutVerrouillage(viewHolder);
-
-            // Listeners
             configurerListeners(viewHolder, phPrepAdapte, position);
-
-            // Gestion de la sérialisation
-            gererSerialisation(viewHolder, phPrepAdapte, position);
+            appliquerSerialisation(viewHolder, phPrepAdapte, position);
         }
 
-        // Alerte produit inactif en fin de liste
+        // Alerte produit inactif — une seule fois, en fin de liste
         if (position + 1 == viewHolderList.size() && !first_passage && nb_inactive > 0) {
             first_passage = true;
             Alerte.afficherAlerte(context, "Erreur",
-                    "Produit inactif détecté, vérifiez vos surveillances références", "alerte");
+                    "Produit inactif détecté, vérifiez vos surveillances références",
+                    "alerte");
         }
 
         return convertView;
     }
 
-    // ─── Méthodes privées ───────────────────────────────────────────────────
+    // ─── Bind & affichage ───────────────────────────────────────────────────
 
-    private void fermerClavier() {
-        View currentFocus = ((Activity) context).getCurrentFocus();
-        if (currentFocus != null) {
-            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
-            currentFocus.clearFocus();
-        }
+    private void bindVues(PH_Preparation_Ligne_AdapteViewHolder vh, View v) {
+        vh.designation     = v.findViewById(R.id.designationProduit);
+        vh.produitRef      = v.findViewById(R.id.referenceProduit);
+        vh.nbColis         = v.findViewById(R.id.colis);
+        vh.qteParLot       = v.findViewById(R.id.qte_par_lot);
+        vh.numLot          = v.findViewById(R.id.numLot);
+        vh.datePeremption  = v.findViewById(R.id.datePeremption);
+        vh.textviewSerie   = v.findViewById(R.id.textviewSerie);
+        vh.layoutQuantite  = v.findViewById(R.id.layoutQuantite);
+        vh.numeroSerie     = v.findViewById(R.id.numeroSerie);
+        vh.layoutNumSerie  = v.findViewById(R.id.layoutNumSerie);
+        vh.layoutPrincipal = v.findViewById(R.id.layoutPrincipal);
+        vh.statutLigne     = v.findViewById(R.id.statutLigne);
     }
 
-    private void bindVues(PH_Preparation_Ligne_AdapteViewHolder viewHolder, View convertView) {
-        viewHolder.designation    = convertView.findViewById(R.id.designationProduit);
-        viewHolder.produitRef     = convertView.findViewById(R.id.referenceProduit);
-        viewHolder.nbColis        = convertView.findViewById(R.id.colis);
-        viewHolder.qteParLot      = convertView.findViewById(R.id.qte_par_lot);
-        viewHolder.numLot         = convertView.findViewById(R.id.numLot);
-        viewHolder.datePeremption = convertView.findViewById(R.id.datePeremption);
-        viewHolder.textviewSerie  = convertView.findViewById(R.id.textviewSerie);
-        viewHolder.layoutQuantite = convertView.findViewById(R.id.layoutQuantite);
-        viewHolder.numeroSerie    = convertView.findViewById(R.id.numeroSerie);
-        viewHolder.layoutNumSerie = convertView.findViewById(R.id.layoutNumSerie);
-        viewHolder.layoutPrincipal = convertView.findViewById(R.id.layoutPrincipal);
-        viewHolder.statutLigne    = convertView.findViewById(R.id.statutLigne);
-    }
-
-    private void afficherDonnees(PH_Preparation_Ligne_AdapteViewHolder viewHolder,
+    private void afficherDonnees(PH_Preparation_Ligne_AdapteViewHolder vh,
                                  PH_Preparation_Ligne_VerrouPharmacie_Adapte phPrepAdapte) {
 
-        viewHolder.designation.setText(phPrepAdapte.getDesignation());
-        viewHolder.produitRef.setText(phPrepAdapte.getProduitRef());
-        viewHolder.nbColis.setText(phPrepAdapte.getNbColis());
-        viewHolder.statutLigne.setText(viewHolder.valeurStatut);
+        vh.designation.setText(phPrepAdapte.getDesignation());
+        vh.produitRef.setText(phPrepAdapte.getProduitRef());
+        vh.nbColis.setText(phPrepAdapte.getNbColis());
+        vh.statutLigne.setText(vh.valeurStatut);
 
-        if (viewHolder.produit_inconnu) return;
+        if (vh.produit_inconnu) return;
 
         // Quantité
-        if (viewHolder.valeurQteParLot > -1) {
-            viewHolder.qteParLot.setText(String.valueOf(viewHolder.valeurQteParLot));
+        if (vh.valeurQteParLot > -1) {
+            vh.qteParLot.setText(String.valueOf(vh.valeurQteParLot));
         } else {
             String qte = phPrepAdapte.getQteParLot();
-            viewHolder.qteParLot.setText(qte.equals("0") ? "" : qte);
-            viewHolder.valeurQteParLot = Integer.parseInt(qte);
+            vh.qteParLot.setText(qte.equals("0") ? "" : qte);
+            vh.valeurQteParLot = Integer.parseInt(qte);
         }
 
-        // Lot
-        if (!viewHolder.valeurLot.isEmpty()) {
-            viewHolder.numLot.setText(viewHolder.valeurLot);
+        vh.enCoursDeChargement = true; // bloque tout setText parasite résiduel
+
+        if (!vh.valeurLot.isEmpty()) {
+            vh.numLot.setText(vh.valeurLot);
         } else {
-            viewHolder.numLot.setText(phPrepAdapte.getNumLot());
-            viewHolder.valeurLot = phPrepAdapte.getNumLot();
+            vh.numLot.setText(phPrepAdapte.getNumLot());
+            vh.valeurLot = phPrepAdapte.getNumLot();
         }
 
         // Série
         String serie = phPrepAdapte.getSerieNumero();
         if (serie == null || serie.isEmpty()) {
-            viewHolder.layoutNumSerie.setVisibility(View.GONE);
-            viewHolder.valeurSerie = "";
+            vh.layoutNumSerie.setVisibility(View.GONE);
+            vh.valeurSerie = "";
         } else {
-            viewHolder.numeroSerie.setText(serie);
-            viewHolder.valeurSerie = serie;
+            vh.numeroSerie.setText(serie);
+            vh.valeurSerie = serie;
         }
 
+        vh.enCoursDeChargement = false;
+
         // Date péremption
-        if (viewHolder.valeurDate.isEmpty()) {
+        if (vh.valeurDate.isEmpty()) {
             try {
                 String dateStr = phPrepAdapte.getPeremptionDate();
                 if (dateStr != null && dateStr.length() >= 10) {
                     Date date = DATE_FORMAT_SQL.parse(dateStr.substring(0, 10));
-                    viewHolder.valeurDate = DATE_FORMAT_DISPLAY.format(date);
-                    viewHolder.setDatePeremptionColor(date);
+                    vh.valeurDate = DATE_FORMAT_DISPLAY.format(date);
+                    vh.setDatePeremptionColor(date);
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
             }
         }
 
-        if (!viewHolder.valeurDate.isEmpty()) {
-            viewHolder.datePeremption.setText(viewHolder.valeurDate);
+        if (!vh.valeurDate.isEmpty()) {
+            vh.datePeremption.setText(vh.valeurDate);
             try {
-                Date date = DATE_FORMAT_DISPLAY.parse(viewHolder.valeurDate);
-                viewHolder.setDatePeremptionColor(date);
+                vh.setDatePeremptionColor(DATE_FORMAT_DISPLAY.parse(vh.valeurDate));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
         } else {
-            viewHolder.datePeremption.setText("");
-            viewHolder.setDatePeremptionColor(null);
+            vh.datePeremption.setText("");
+            vh.setDatePeremptionColor(null);
         }
     }
 
-    private void appliquerStatutVerrouillage(PH_Preparation_Ligne_AdapteViewHolder viewHolder) {
-        boolean deVerrouille = viewHolder.valeurStatut.equals("Déverrouillé");
-        viewHolder.layoutQuantite.setCardBackgroundColor(
+    private void appliquerStatutVerrouillage(PH_Preparation_Ligne_AdapteViewHolder vh) {
+        boolean deVerrouille = vh.valeurStatut.equals("Déverrouillé");
+        vh.layoutQuantite.setCardBackgroundColor(
                 context.getColor(deVerrouille ? R.color.vert : R.color.rouge2));
-        viewHolder.statutLigne.setText(deVerrouille ? "Déverrouillé" : "Verrouillé");
+        vh.statutLigne.setText(deVerrouille ? "Déverrouillé" : "Verrouillé");
     }
 
-    private void configurerListeners(PH_Preparation_Ligne_AdapteViewHolder viewHolder,
-                                     PH_Preparation_Ligne_VerrouPharmacie_Adapte phPrepAdapte, int position) {
+    // ─── Listeners ──────────────────────────────────────────────────────────
 
+    private void configurerListeners(PH_Preparation_Ligne_AdapteViewHolder vh,
+                                     PH_Preparation_Ligne_VerrouPharmacie_Adapte phPrepAdapte,
+                                     int position) {
         // Date
-        viewHolder.datePeremption.setOnClickListener(clicDate);
+        vh.datePeremption.setOnClickListener(clicDate);
 
         // Verrouillage / Déverrouillage
-        viewHolder.layoutQuantite.setOnClickListener(v -> {
+        vh.layoutQuantite.setOnClickListener(v -> {
             PH_Preparation_Ligne_AdapteViewHolder item = viewHolderList.get(position);
             boolean estVerrouille = item.valeurStatut.equals("Verrouillé");
             item.valeurStatut = estVerrouille ? "Déverrouillé" : "Verrouillé";
             appliquerStatutVerrouillage(item);
 
             if (mOnDataChangeListener != null) {
-                int nbColis = item.recupererNbColis(
+                int nbColis = recupererNbColisDepuisCache(
                         phPrepAdapte.getProduitCorrespondant().getID_produit(),
-                        item.valeurQteParLot
-                );
-                // Si on verrouille → on retire les colis, si on déverrouille → on les ajoute
-                int avant = estVerrouille ? 0 : nbColis;  // état AVANT le clic
-                int apres = estVerrouille ? nbColis : 0;  // état APRÈS le clic
+                        item.valeurQteParLot);
+                int avant = estVerrouille ? 0 : nbColis;
+                int apres = estVerrouille ? nbColis : 0;
                 mOnDataChangeListener.onDataChanged(avant, apres, estVerrouille);
             }
             notifyDataSetChanged();
         });
 
         // Long clic → NumberPicker
-        viewHolder.qteParLot.setOnLongClickListener(v -> {
-            String title = viewHolderList.get(position).designation.getText().toString();
-            String message = "Quantité déverrouillée : ";
-            int maxValue = viewHolder.valeurQteDemander;
-            int value = 0;
-
-            String qteText = viewHolderList.get(position).qteParLot.getText().toString();
-            if (!qteText.isEmpty()) {
-                value = Integer.parseInt(qteText);
-            }
+        vh.qteParLot.setOnLongClickListener(v -> {
+            String title    = viewHolderList.get(position).designation.getText().toString();
+            String message  = "Quantité déverrouillée : ";
+            int maxValue    = vh.valeurQteDemander;
+            String qteText  = vh.qteParLot.getText().toString();
+            int value       = qteText.isEmpty() ? 0 : Integer.parseInt(qteText);
 
             Alerte.afficherAlerteNumberPicker(context, title, message, value, maxValue,
                     (dialog, id) -> {
                         int qteApres = aNumberPicker.getValue();
-                        viewHolderList.get(position).qteParLot.setText(String.valueOf(qteApres));
+                        vh.qteParLot.setText(String.valueOf(qteApres));
                         phPrepAdapte.setQteParLot(String.valueOf(qteApres));
-                        viewHolder.valeurQteParLot = qteApres;
-                        viewHolderList.get(position).valeurStatut = "Déverrouillé";
+                        vh.valeurQteParLot = qteApres;
+                        vh.valeurStatut    = "Déverrouillé";
                         notifyDataSetChanged();
 
-                        InputMethodManager imm = (InputMethodManager)
-                                context.getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                        ((InputMethodManager) context.getSystemService(
+                                Context.INPUT_METHOD_SERVICE))
+                                .toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
                         dialog.dismiss();
                     });
             return true;
         });
 
-        // TextWatcher et KeyListener
-        new GestionnaireEditText(viewHolder, phPrepAdapte);
+        // Listeners — instanciés une seule fois par viewHolder
+        if (!vh.listenersInitialises) {
+            new GestionnaireEditText(vh, phPrepAdapte);
+            vh.listenersInitialises = true;
+        }
     }
 
-    private void gererSerialisation(PH_Preparation_Ligne_AdapteViewHolder viewHolder,
-                                    PH_Preparation_Ligne_VerrouPharmacie_Adapte phPrepAdapte, int position) {
+    // ─── Sérialisation (depuis cache, sans BDD) ──────────────────────────────
 
-        String serie = phPrepAdapte.getSerieNumero();
-        if (serie == null) {
-            phPrepAdapte.setSerieNumero("");
-            return;
-        }
+    private void appliquerSerialisation(PH_Preparation_Ligne_AdapteViewHolder vh,
+                                        PH_Preparation_Ligne_VerrouPharmacie_Adapte phPrepAdapte,
+                                        int position) {
 
-        if (serie.isEmpty() || serie.equals("null")) return;
-
-        String numeroCommande = phPrepAdapte.getPhPreparation().getListe().trim();
-        String[] tabNumero = numeroCommande.split(" ");
-        numeroCommande = tabNumero[tabNumero.length - 1];
-
-        PH_Serialisation serialisationCourant = null;
-        if (phPrepAdapte.getProduitCorrespondant() != null) {
-            serialisationCourant = PH_SerialisationOpenHelper.getPH_SerialisationVerrou(
-                    db, numeroCommande, phPrepAdapte.getProduitCorrespondant().getID_produit());
-        }
-
-        if (serialisationCourant == null) return;
-
-        String resultat = serialisationCourant.getResultat();
+        String resultat = serialisationResultats.get(position);
+        if (resultat == null || resultat.isEmpty()) return;
         if (!resultat.equals("INACTIVE") && !resultat.equals("UNKNOWN")) return;
 
         if (first_passage) {
-            // Restaure les valeurs sauvegardées
-            viewHolder.datePeremption.setText(viewHolder.valeurDate.isEmpty() ? "00/00/0000" : viewHolder.valeurDate);
-            viewHolder.qteParLot.setText(String.valueOf(viewHolder.valeurQteParLot));
-            viewHolder.numeroSerie.setText(viewHolder.valeurSerie);
-            viewHolder.numLot.setText(viewHolder.valeurLot);
+            vh.datePeremption.setText(vh.valeurDate.isEmpty() ? "00/00/0000" : vh.valeurDate);
+            vh.qteParLot.setText(String.valueOf(vh.valeurQteParLot));
+            vh.numeroSerie.setText(vh.valeurSerie);
+            vh.numLot.setText(vh.valeurLot);
         } else {
-            // Reset
-            viewHolder.numLot.setText("");
-            viewHolder.valeurLot = "";
-            viewHolder.numeroSerie.setText("");
-            viewHolder.valeurSerie = "";
-            viewHolder.valeurQteParLot = 0;
-            viewHolder.valeurDate = "00/00/0000";
-            viewHolder.datePeremption.setText("00/00/0000");
-            viewHolder.qteParLot.setText("0");
-            viewHolder.produit_inconnu = true;
+            vh.numLot.setText("");
+            vh.valeurLot       = "";
+            vh.numeroSerie.setText("");
+            vh.valeurSerie     = "";
+            vh.valeurQteParLot = 0;
+            vh.valeurDate      = "00/00/0000";
+            vh.datePeremption.setText("00/00/0000");
+            vh.qteParLot.setText("0");
+            vh.produit_inconnu = true;
             nb_inactive++;
         }
     }
 
+    // ─── Calcul nb colis depuis cache (0 BDD) ───────────────────────────────
+
+    private int recupererNbColisDepuisCache(int produitID, double qte) {
+        if (produitID == 0 || qte == 0) return 0;
+        Integer cond = conditionnementCache.get(produitID);
+        if (cond == null || cond == 0) return qte > 0 ? 1 : 0;
+        int nbColis = (int) Math.ceil(qte / cond);
+        return nbColis == 0 && qte > 0 ? 1 : nbColis;
+    }
+
     // ─── Mise à jour BDD ────────────────────────────────────────────────────
 
-    public void mettreAJourPHPrepLigne(PH_Preparation_Ligne_AdapteViewHolder viewHolder,
+    public void mettreAJourPHPrepLigne(PH_Preparation_Ligne_AdapteViewHolder vh,
                                        PH_Preparation_Ligne_VerrouPharmacie_Adapte phPrepLigneAdapte) {
 
-        PH_Preparation_Ligne phPrepLigne = phPrepLigneAdapte.getPhPreparationLigne();
-        Stock_Lot_Emplacement_Light stockLotEmplacement = phPrepLigneAdapte.getStockLotEmplacement();
+        PH_Preparation_Ligne phPrepLigne       = phPrepLigneAdapte.getPhPreparationLigne();
+        Stock_Lot_Emplacement_Light stockLot   = phPrepLigneAdapte.getStockLotEmplacement();
 
-        stockLotEmplacement.setLot(viewHolder.valeurLot);
-        stockLotEmplacement.setQte_Preparer(viewHolder.valeurQteParLot);
+        stockLot.setLot(vh.valeurLot);
+        stockLot.setQte_Preparer(vh.valeurQteParLot);
 
         try {
-            Date dateFournie = DATE_FORMAT_DISPLAY.parse(viewHolder.valeurDate);
-            String dateSQL = DATE_FORMAT_SQL.format(dateFournie);
-            stockLotEmplacement.setPeremptionDate(dateSQL);
+            Date dateFournie = DATE_FORMAT_DISPLAY.parse(vh.valeurDate);
+            String dateSQL   = DATE_FORMAT_SQL.format(dateFournie);
+            stockLot.setPeremptionDate(dateSQL);
             phPrepLigneAdapte.setPeremptionDate(dateSQL);
             phPrepLigne.setPeremptionDate(dateSQL);
-            viewHolder.setDatePeremptionColor(dateFournie);
+            vh.setDatePeremptionColor(dateFournie);
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
-        Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockLotEmplacement);
+        Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockLot);
 
         int qteAvant = 0;
         if (phPrepLigneAdapte.getNbColis() != null && !phPrepLigneAdapte.getNbColis().isEmpty()) {
             qteAvant = Integer.parseInt(phPrepLigneAdapte.getNbColis());
         }
 
-        int qteApres = viewHolder.recupererNbColis(
+        int qteApres = recupererNbColisDepuisCache(
                 phPrepLigneAdapte.getProduitCorrespondant().getID_produit(),
-                viewHolder.valeurQteParLot);
+                vh.valeurQteParLot);
 
         phPrepLigneAdapte.setNbColis(String.valueOf(qteApres));
-        phPrepLigneAdapte.setNumLot(viewHolder.valeurLot);
-        phPrepLigneAdapte.setQteParLot(String.valueOf(viewHolder.valeurQteParLot));
+        phPrepLigneAdapte.setNumLot(vh.valeurLot);
+        phPrepLigneAdapte.setQteParLot(String.valueOf(vh.valeurQteParLot));
 
-        phPrepLigne.setLotNumero(viewHolder.valeurLot);
-        phPrepLigne.setQte_RAL(viewHolder.valeurQteParLot);
-        phPrepLigne.setSerieNumero(viewHolder.valeurSerie);
+        phPrepLigne.setLotNumero(vh.valeurLot);
+        phPrepLigne.setQte_RAL(vh.valeurQteParLot);
+        phPrepLigne.setSerieNumero(vh.valeurSerie);
 
         PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, phPrepLigne);
-
-        boolean verrou = false;
-        if(phPrepLigne.isVerrouiller())
-            verrou = true;
-
-        if (mOnDataChangeListener != null) {
-            mOnDataChangeListener.onDataChanged(qteAvant, qteApres, verrou);
-        }
+        // Pas d appel a onDataChanged ici : les compteurs ne bougent
+        // qu au clic verrou/deverrou dans configurerListeners().
     }
 
     @Override
@@ -395,8 +434,8 @@ public class PH_Preparation_Ligne_VerrouPharmacieAdapter extends ArrayAdapter {
         phPreparationLigneVerrouPharmacieAdapteList.clear();
     }
 
-    public void setOnDataChangeListener(OnDataChangeListener onDataChangeListener) {
-        mOnDataChangeListener = onDataChangeListener;
+    public void setOnDataChangeListener(OnDataChangeListener l) {
+        mOnDataChangeListener = l;
     }
 
     public interface OnDataChangeListener {
@@ -417,36 +456,37 @@ public class PH_Preparation_Ligne_VerrouPharmacieAdapter extends ArrayAdapter {
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             Calendar c = Calendar.getInstance();
             return new DatePickerDialog(getActivity(), this,
-                    c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+                    c.get(Calendar.YEAR), c.get(Calendar.MONTH),
+                    c.get(Calendar.DAY_OF_MONTH));
         }
 
         @Override
         public void onDateSet(DatePicker view, int year, int month, int day) {
-            String monthStr = month < 9 ? "0" + (month + 1) : String.valueOf(month + 1);
-            String dayStr = day < 10 ? "0" + day : String.valueOf(day);
-            String date = dayStr + "/" + monthStr + "/" + year;
+            String monthStr = (month + 1) < 10 ? "0" + (month + 1) : String.valueOf(month + 1);
+            String dayStr   = day < 10 ? "0" + day : String.valueOf(day);
+            String date     = dayStr + "/" + monthStr + "/" + year;
 
             viewHolder.datePeremption.setText(date);
             viewHolder.valeurDate = date;
 
-            PH_Preparation_Ligne phPrepLigne = phPrepLigneAdapte.getPhPreparationLigne();
-            Stock_Lot_Emplacement_Light stockLotEmplacement = phPrepLigneAdapte.getStockLotEmplacement();
+            PH_Preparation_Ligne phPrepLigne     = phPrepLigneAdapte.getPhPreparationLigne();
+            Stock_Lot_Emplacement_Light stockLot = phPrepLigneAdapte.getStockLotEmplacement();
 
-            stockLotEmplacement.setLot(viewHolder.valeurLot);
-            stockLotEmplacement.setQte_Preparer(viewHolder.valeurQteParLot);
+            stockLot.setLot(viewHolder.valeurLot);
+            stockLot.setQte_Preparer(viewHolder.valeurQteParLot);
 
             try {
                 Date dateFournie = new SimpleDateFormat("dd/MM/yyyy").parse(date);
                 viewHolder.setDatePeremptionColor(dateFournie);
                 String dateSQL = new SimpleDateFormat("yyyy-MM-dd").format(dateFournie);
-                stockLotEmplacement.setPeremptionDate(dateSQL);
+                stockLot.setPeremptionDate(dateSQL);
                 phPrepLigneAdapte.setPeremptionDate(dateSQL);
                 phPrepLigne.setPeremptionDate(dateSQL);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
 
-            Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockLotEmplacement);
+            Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockLot);
             phPrepLigneAdapte.setNumLot(viewHolder.valeurLot);
             phPrepLigneAdapte.setQteParLot(String.valueOf(viewHolder.valeurQteParLot));
             phPrepLigne.setLotNumero(viewHolder.valeurLot);
@@ -454,55 +494,79 @@ public class PH_Preparation_Ligne_VerrouPharmacieAdapter extends ArrayAdapter {
             PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, phPrepLigne);
         }
 
-        public void setViewHolder(PH_Preparation_Ligne_AdapteViewHolder view,
-                                  SQLiteDatabase database, PH_Preparation_Ligne_VerrouPharmacie_Adapte adapte) {
-            viewHolder = view;
-            db = database;
+        public void setViewHolder(PH_Preparation_Ligne_AdapteViewHolder v,
+                                  SQLiteDatabase database,
+                                  PH_Preparation_Ligne_VerrouPharmacie_Adapte adapte) {
+            viewHolder       = v;
+            db               = database;
             phPrepLigneAdapte = adapte;
         }
     }
 
     // ─── GestionnaireEditText ───────────────────────────────────────────────
+    // Utilise onFocusChangeListener au lieu de TextWatcher pour éviter
+    // les déclenchements parasites lors des setText() internes au scroll.
 
     private class GestionnaireEditText {
 
-        public GestionnaireEditText(PH_Preparation_Ligne_AdapteViewHolder viewHolder,
-                                    PH_Preparation_Ligne_VerrouPharmacie_Adapte phPrepLigneAdapte) {
+        GestionnaireEditText(PH_Preparation_Ligne_AdapteViewHolder vh,
+                             PH_Preparation_Ligne_VerrouPharmacie_Adapte phPrepLigneAdapte) {
 
-            viewHolder.numLot.addTextChangedListener(new TextWatcher() {
-                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-                @Override
-                public void afterTextChanged(Editable s) {
-                    viewHolder.valeurLot = s.toString();
-                    mettreAJourPHPrepLigne(viewHolder,
-                            phPreparationLigneVerrouPharmacieAdapteList.get(viewHolderList.indexOf(viewHolder)));
+            // Sauvegarde du lot uniquement quand l utilisateur quitte le champ
+            vh.numLot.setOnFocusChangeListener((v, hasFocus) -> {
+                if (!hasFocus) {
+                    String nouvellValeur = vh.numLot.getText().toString();
+                    if (!nouvellValeur.equals(vh.valeurLot)) {
+                        vh.valeurLot = nouvellValeur;
+                        int idx = viewHolderList.indexOf(vh);
+                        if (idx >= 0) {
+                            mettreAJourPHPrepLigne(vh,
+                                    phPreparationLigneVerrouPharmacieAdapteList.get(idx));
+                        }
+                    }
                 }
             });
 
-            viewHolder.numeroSerie.addTextChangedListener(new TextWatcher() {
-                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-                @Override
-                public void afterTextChanged(Editable s) {
-                    viewHolder.valeurSerie = s.toString();
-                    mettreAJourPHPrepLigne(viewHolder,
-                            phPreparationLigneVerrouPharmacieAdapteList.get(viewHolderList.indexOf(viewHolder)));
+            // Sauvegarde de la série uniquement quand l utilisateur quitte le champ
+            vh.numeroSerie.setOnFocusChangeListener((v, hasFocus) -> {
+                if (!hasFocus) {
+                    String nouvellValeur = vh.numeroSerie.getText().toString();
+                    if (!nouvellValeur.equals(vh.valeurSerie)) {
+                        vh.valeurSerie = nouvellValeur;
+                        int idx = viewHolderList.indexOf(vh);
+                        if (idx >= 0) {
+                            mettreAJourPHPrepLigne(vh,
+                                    phPreparationLigneVerrouPharmacieAdapteList.get(idx));
+                        }
+                    }
                 }
             });
 
-            viewHolder.qteParLot.setOnKeyListener((v, keyCode, event) -> {
-                if (event.getAction() == KeyEvent.ACTION_UP) {
-                    String qteText = viewHolder.qteParLot.getText().toString();
-                    viewHolder.valeurQteParLot = qteText.isEmpty() ? 0 : Integer.parseInt(qteText);
+            // Quantité : sauvegarde à la perte de focus
+            vh.qteParLot.setOnFocusChangeListener((v, hasFocus) -> {
+                if (!hasFocus) {
+                    String qteText     = vh.qteParLot.getText().toString();
+                    int nouvelleQte    = qteText.isEmpty() ? 0 : Integer.parseInt(qteText);
+                    if (nouvelleQte != vh.valeurQteParLot) {
+                        vh.valeurQteParLot = nouvelleQte;
+                        int nbColis = recupererNbColisDepuisCache(
+                                phPrepLigneAdapte.getProduitCorrespondant().getID_produit(),
+                                vh.valeurQteParLot);
+                        vh.nbColis.setText(String.valueOf(nbColis));
+                        int idx = viewHolderList.indexOf(vh);
+                        if (idx >= 0) {
+                            mettreAJourPHPrepLigne(vh,
+                                    phPreparationLigneVerrouPharmacieAdapteList.get(idx));
+                        }
+                    }
+                }
+            });
 
-                    int nbColis = viewHolder.recupererNbColis(
-                            phPrepLigneAdapte.getProduitCorrespondant().getID_produit(),
-                            viewHolder.valeurQteParLot);
-                    viewHolder.nbColis.setText(String.valueOf(nbColis));
-
-                    mettreAJourPHPrepLigne(viewHolder,
-                            phPreparationLigneVerrouPharmacieAdapteList.get(viewHolderList.indexOf(viewHolder)));
+            // KeyListener conservé pour détecter la touche Entrée
+            vh.qteParLot.setOnKeyListener((v, keyCode, event) -> {
+                if (event.getAction() == KeyEvent.ACTION_UP
+                        && keyCode == KeyEvent.KEYCODE_ENTER) {
+                    v.clearFocus(); // déclenche onFocusChange → sauvegarde
                 }
                 return false;
             });
@@ -512,73 +576,71 @@ public class PH_Preparation_Ligne_VerrouPharmacieAdapter extends ArrayAdapter {
     // ─── ViewHolder ─────────────────────────────────────────────────────────
 
     public class PH_Preparation_Ligne_AdapteViewHolder {
-        public TextView designation;
-        public TextView produitRef;
-        public TextView qteParLot;
-        public TextView numLot;
-        public TextView nbColis;
-        public TextView datePeremption;
-        public TextView textviewSerie;
-        public TextView statutLigne;
-        public EditText numeroSerie;
+
+        public TextView     designation;
+        public TextView     produitRef;
+        public TextView     qteParLot;
+        public TextView     numLot;
+        public TextView     nbColis;
+        public TextView     datePeremption;
+        public TextView     textviewSerie;
+        public TextView     statutLigne;
+        public EditText     numeroSerie;
         public LinearLayout layoutNumSerie;
         public LinearLayout layoutPrincipal;
-        public CardView layoutQuantite;
-        public boolean produit_inconnu = false;
-        public int valeurQteParLot = -1;
-        public int valeurQteDemander;
-        public String valeurDate = "";
-        public String valeurLot = "";
-        public String valeurSerie = "";
-        public String valeurStatut = "Verrouillé";
+        public CardView     layoutQuantite;
 
-        public PH_Preparation_Ligne_AdapteViewHolder(PH_Preparation_Ligne_VerrouPharmacie_Adapte phPrepLigne) {
+        public boolean produit_inconnu      = false;
+        public boolean listenersInitialises = false;
+        public boolean enCoursDeChargement  = false; // bloque les TextWatchers pendant setText()
+
+        public int    valeurQteParLot  = -1;
+        public int    valeurQteDemander;
+        public String valeurDate       = "";
+        public String valeurLot        = "";
+        public String valeurSerie      = "";
+        public String valeurStatut     = "Verrouillé";
+
+        public PH_Preparation_Ligne_AdapteViewHolder(
+                PH_Preparation_Ligne_VerrouPharmacie_Adapte phPrepLigne) {
+
             String qte = phPrepLigne.getQteParLot();
             if (qte != null && !qte.isEmpty()) {
                 this.valeurQteDemander = Integer.parseInt(qte);
-                this.valeurQteParLot = Integer.parseInt(qte);
+                this.valeurQteParLot   = Integer.parseInt(qte);
             }
-            this.valeurLot = phPrepLigne.getNumLot();
+            this.valeurLot = phPrepLigne.getNumLot() != null ? phPrepLigne.getNumLot() : "";
 
             try {
-                Date date = DATE_FORMAT_SQL.parse(phPrepLigne.getPeremptionDate());
-                this.valeurDate = DATE_FORMAT_DISPLAY.format(date);
+                String dateStr = phPrepLigne.getPeremptionDate();
+                if (dateStr != null && !dateStr.isEmpty()) {
+                    Date date      = DATE_FORMAT_SQL.parse(dateStr);
+                    this.valeurDate = DATE_FORMAT_DISPLAY.format(date);
+                }
             } catch (ParseException e) {
                 e.printStackTrace();
             }
         }
 
         public void setDatePeremptionColor(Date date) {
+            if (datePeremption == null) return;
             if (date == null) {
                 datePeremption.setTextColor(Color.BLACK);
                 return;
             }
-
-            long diff = new Date().getTime() - date.getTime();
-            int delai = (int) (diff / (1000 * 60 * 60 * 24));
+            long diff  = new Date().getTime() - date.getTime();
+            int  delai = (int) (diff / (1000L * 60 * 60 * 24));
 
             if (delai >= -30) {
-                datePeremption.setTextColor(context.getResources().getColor(R.color.rouge2, null));
+                datePeremption.setTextColor(
+                        context.getResources().getColor(R.color.rouge2, null));
             } else if (delai >= -60) {
-                datePeremption.setTextColor(context.getResources().getColor(R.color.orange2, null));
+                datePeremption.setTextColor(
+                        context.getResources().getColor(R.color.orange2, null));
             } else {
-                datePeremption.setTextColor(context.getResources().getColor(R.color.vert, null));
+                datePeremption.setTextColor(
+                        context.getResources().getColor(R.color.vert, null));
             }
-        }
-
-        public int recupererNbColis(int produitID, double qte) {
-            if (produitID == 0 || qte == 0) return 0;
-
-            Produit produit = ProduitOpenHelper.getProduitByID(db, produitID);
-            int conditionnement = produit.getCond_achat();
-            if (conditionnement == 0) {
-                conditionnement = (int) produit.getCond_distrib();
-            }
-
-            if (conditionnement == 0) return qte > 0 ? 1 : 0;
-
-            int nbColis = (int) Math.ceil(qte / conditionnement);
-            return nbColis == 0 && qte > 0 ? 1 : nbColis;
         }
     }
 }

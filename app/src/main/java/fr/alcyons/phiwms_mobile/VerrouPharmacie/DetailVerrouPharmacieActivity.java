@@ -7,11 +7,9 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -24,14 +22,12 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -72,156 +68,129 @@ import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 
 public class DetailVerrouPharmacieActivity extends ServiceActivity {
 
-    public PH_Preparation phPreparationSelectionne;
+    // ─── Données ────────────────────────────────────────────────────────────
 
+    public PH_Preparation phPreparationSelectionne;
     public List<PH_Preparation_Ligne_VerrouPharmacie_Adapte> phPreparationLigneVerrouPharmacieAdaptes;
     public List<Stock_Lot_Emplacement_Light> stockLotEmplacementLightList;
-
     public PH_Preparation_Ligne_VerrouPharmacieAdapter phPreparationLigneVerrouPharmacieAdapter;
 
     public ListView phPreparationLigneListView;
     public PH_Preparation_Ligne_VerrouPharmacieAdapter.PH_Preparation_Ligne_AdapteViewHolder viewHolderAModifier;
     public TextView datePeremptionTextView;
     public EditText numeroLotEditText;
+
+    // Compteurs locaux — source de vérité, jamais recalculés depuis les listeners
+    private int nbColisVerrouille   = 0;
+    private int nbColisDeverrouille = 0;
+
+    // Vues compteurs
+    private TextView tvNbColisTotal;
+    private TextView tvNbColisDeverrouille;
+
+    // Alerte composition
     TextView textViewNBPalette;
     TextView textViewNBCaisse;
     TextView textViewNBContainer;
     TextView textViewNBScelle;
 
-    public Integer nbColisTotal = 0;
-
     PackageManager pm;
 
-    // Permet de lancer l'activity BarcodeCaptureActivity afin de lire un codebarre
-    public void decoderCodeBarre(EditText numLot, TextView date, PH_Preparation_Ligne_VerrouPharmacieAdapter.PH_Preparation_Ligne_AdapteViewHolder viewHolder) {
+    // ─── Scan code-barres ───────────────────────────────────────────────────
+
+    public void decoderCodeBarre(EditText numLot, TextView date,
+                                 PH_Preparation_Ligne_VerrouPharmacieAdapter.PH_Preparation_Ligne_AdapteViewHolder viewHolder) {
+
         datePeremptionTextView = date;
-        numeroLotEditText = numLot;
-        viewHolderAModifier = viewHolder;
+        numeroLotEditText      = numLot;
+        viewHolderAModifier    = viewHolder;
 
-        PH_Preparation_Ligne_VerrouPharmacie_Adapte phPreparationLigneVerrouPharmacieAdapte = phPreparationLigneVerrouPharmacieAdapter.phPreparationLigneVerrouPharmacieAdapteList.get(phPreparationLigneVerrouPharmacieAdapter.viewHolderList.indexOf(viewHolderAModifier));
-        String designation = phPreparationLigneVerrouPharmacieAdapte.getProduitCorrespondant().getDesignation_interne();
+        PH_Preparation_Ligne_VerrouPharmacie_Adapte adapte =
+                phPreparationLigneVerrouPharmacieAdapter.phPreparationLigneVerrouPharmacieAdapteList
+                        .get(phPreparationLigneVerrouPharmacieAdapter.viewHolderList
+                                .indexOf(viewHolderAModifier));
 
-        Bundle detailVerrouPharmacieBundle = super.getBundle();
-        detailVerrouPharmacieBundle.putBoolean("doitEtreIdentique", true);
-        detailVerrouPharmacieBundle.putString("Designation", designation);
-        detailVerrouPharmacieBundle.putBoolean("isBoutonSuppressionExistant", true);
-        Intent detailVerrouPharmacieIntent = null;
-        if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY) && !android.os.Build.MANUFACTURER.contains("Zebra Technologies") && !android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
-        {
+        String designation = adapte.getProduitCorrespondant().getDesignation_interne();
 
+        Bundle bundle = super.getBundle();
+        bundle.putBoolean("doitEtreIdentique", true);
+        bundle.putString("Designation", designation);
+        bundle.putBoolean("isBoutonSuppressionExistant", true);
+
+        Intent intent;
+        if (android.os.Build.MANUFACTURER.contains("Zebra Technologies")
+                || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell")) {
+            intent = new Intent(this, ScannerSearchOnlyActivity.class);
+        } else if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+            intent = new Intent(this, BarcodeCaptureActivity.class);
+        } else {
+            intent = new Intent(this, ScannerSearchOnlyActivity.class);
         }
 
-        if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell"))
-        {
-            detailVerrouPharmacieIntent = new Intent(DetailVerrouPharmacieActivity.this, ScannerSearchOnlyActivity.class);
-        }
-        else
-        {
-            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
-            {
-                detailVerrouPharmacieIntent = new Intent(DetailVerrouPharmacieActivity.this, BarcodeCaptureActivity.class);
-            }
-            else
-            {
-                detailVerrouPharmacieIntent = new Intent(DetailVerrouPharmacieActivity.this, ScannerSearchOnlyActivity.class);
-
-            }
-        }
-
-        detailVerrouPharmacieIntent.putExtras(detailVerrouPharmacieBundle);
-        DetailVerrouPharmacieActivity.this.startActivityForResult(detailVerrouPharmacieIntent, CodesEchangesActivites.RETOUR_CODE_GS1);
+        intent.putExtras(bundle);
+        startActivityForResult(intent, CodesEchangesActivites.RETOUR_CODE_GS1);
     }
+
+    // ─── Lifecycle ──────────────────────────────────────────────────────────
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_verrou_pharmacie);
 
-        //gestion du package manager
-        pm = DetailVerrouPharmacieActivity.this.getPackageManager();
+        pm = getPackageManager();
 
-        // Récupération da la préparation selectionné
-        phPreparationSelectionne = PH_PreparationOpenHelper.getPH_PreparationByID(db, intent.getExtras().getInt("phPreparationSelectionneID"));
+        // Vues compteurs — récupérées une seule fois
+        tvNbColisTotal       = findViewById(R.id.nbColisTotal);
+        tvNbColisDeverrouille = findViewById(R.id.nbColisTotalReceptionner);
 
-        // Entete
+        // Préparation sélectionnée
+        phPreparationSelectionne = PH_PreparationOpenHelper.getPH_PreparationByID(
+                db, intent.getExtras().getInt("phPreparationSelectionneID"));
+
+        // En-tête
         Depot depot = DepotOpenHelper.getDepotParID(db, phPreparationSelectionne.getDepotDestinataireID());
         ((TextView) findViewById(R.id.depotNom)).setText(depot.getNom());
-        String preparationNumero = "N° " + String.valueOf(phPreparationSelectionne.getUID());
-        ((TextView) findViewById(R.id.preparationNumero)).setText(preparationNumero);
+        ((TextView) findViewById(R.id.preparationNumero))
+                .setText("N° " + phPreparationSelectionne.getUID());
 
-        Commande commandeCourante = CommandeOpenHelper.getCommandeByID(db, phPreparationSelectionne.getCommande_ID());
-        String numeroCommande = "";
-        if(commandeCourante != null)
-        {
-            ((TextView) findViewById(R.id.commandeNumero)).setText("#"+commandeCourante.getNumero());
-            ((TextView) findViewById(R.id.fournisseurCommande)).setText(commandeCourante.getFournisseur());
+        Commande commandeCourante = CommandeOpenHelper.getCommandeByID(
+                db, phPreparationSelectionne.getCommande_ID());
+        String numeroCommande;
+        if (commandeCourante != null) {
+            ((TextView) findViewById(R.id.commandeNumero))
+                    .setText("#" + commandeCourante.getNumero());
+            ((TextView) findViewById(R.id.fournisseurCommande))
+                    .setText(commandeCourante.getFournisseur());
             numeroCommande = commandeCourante.getNumero();
-        }
-        else
-        {
-            String[] tab_liste = phPreparationSelectionne.getListe().split(" ");
-            numeroCommande = tab_liste[tab_liste.length-1];
-            ((TextView) findViewById(R.id.commandeNumero)).setText("#"+numeroCommande);
+        } else {
+            String[] tab = phPreparationSelectionne.getListe().split(" ");
+            numeroCommande = tab[tab.length - 1];
+            ((TextView) findViewById(R.id.commandeNumero)).setText("#" + numeroCommande);
             ((TextView) findViewById(R.id.fournisseurCommande)).setText("...");
         }
 
-        // Gestion de la listView
-        phPreparationLigneListView = (ListView) findViewById(R.id.listeView);
+        // ListView
+        phPreparationLigneListView = findViewById(R.id.listeView);
         phPreparationLigneListView.setItemsCanFocus(true);
 
-        // Génération de la liste de PH_Preparation_Ligne_VerrouPharmacieAdapter
+        // Construction de la liste d'items
         phPreparationLigneVerrouPharmacieAdaptes = new ArrayList<>();
+        construireLignes(numeroCommande);
 
-        List<PH_Preparation_Ligne> phPreparationLignes = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, phPreparationSelectionne);
-        for (PH_Preparation_Ligne phPreparationLigne : phPreparationLignes) {
-            Produit produit = ProduitOpenHelper.getProduitByID(db, phPreparationLigne.getProduitID());
-            stockLotEmplacementLightList = Stock_Lot_EmplacementLightOpenHelper.getAllStock_Lot_EmplacementsByProduitIDEtCommandeNumero(db, produit, numeroCommande);
-            if (stockLotEmplacementLightList.size() > 0) {
-                for (Stock_Lot_Emplacement_Light stockLotEmplacement : stockLotEmplacementLightList) {
+        // Compteur initial — toutes les lignes sont verrouillées au départ
+        nbColisVerrouille   = nbColisTotal();
+        nbColisDeverrouille = 0;
+        mettreAJourAffichageCompteurs();
 
-                    int qteRALLot = 0;
-                    if (phPreparationLigne.getSuivi_Par_Lot()) {
-                        qteRALLot = (int) stockLotEmplacement.getQte();
-                    }
-
-                    int qteParLot = (int) stockLotEmplacement.getQte();
-
-                    if (stockLotEmplacement.getQte_Preparer() != 0) {
-                        qteParLot = stockLotEmplacement.getQte_Preparer();
-                    }
-
-                    String numLot = stockLotEmplacement.getLot();
-                    String datePeremption = stockLotEmplacement.getPeremptionDate();
-                    String emplacementAdressage = stockLotEmplacement.getEmplacement();
-
-                    int nbColis = recupererNbColis(stockLotEmplacement.getProduit_Code(), qteRALLot);
-                    nbColisTotal = nbColisTotal + nbColis;
-
-                    phPreparationLigneVerrouPharmacieAdaptes.add(new PH_Preparation_Ligne_VerrouPharmacie_Adapte(phPreparationLigne.getProduitDesignation(), phPreparationLigne.getProduitReference(), String.valueOf(nbColis), String.valueOf(qteRALLot), String.valueOf(qteParLot), numLot, datePeremption, emplacementAdressage, stockLotEmplacement, phPreparationLigne, phPreparationSelectionne, phPreparationLigne.isSuivi_Par_Serie(), phPreparationLigne.isSerialiser_Reception(), phPreparationLigne.getSerieNumero(), db, false));
-                }
-            } else {
-                String numLot = "";
-                String datePeremption = "";
-                String emplacementAdressage = "";
-                Stock_Lot_Emplacement_Light stockLotEmplacementCourant = null;
-                if(phPreparationSelectionne.getListe().contentEquals("ALCYONS_VERROU"))
-                    stockLotEmplacementCourant = new Stock_Lot_Emplacement_Light(phPreparationLigne.getQte_preparer(), "", "", phPreparationLigne.getEmplacementParDefaut(), phPreparationSelectionne.getDepotDestinataireReference(), phPreparationLigne.getZoneDepot(), phPreparationLigne.getProduitID(), phPreparationLigne.getQte_preparer(), "");
-                else
-                    stockLotEmplacementCourant = new Stock_Lot_Emplacement_Light(0, "", "", "", "", "", 0, 0, "");
-
-                if(phPreparationSelectionne.getListe().contentEquals("ALCYONS_VERROU"))
-                    phPreparationLigneVerrouPharmacieAdaptes.add(new PH_Preparation_Ligne_VerrouPharmacie_Adapte(phPreparationLigne.getProduitDesignation(), phPreparationLigne.getProduitReference(), String.valueOf(0), String.valueOf(phPreparationLigne.getQte_preparer()), String.valueOf(phPreparationLigne.getQte_preparer()), numLot, datePeremption, emplacementAdressage, stockLotEmplacementCourant, phPreparationLigne, phPreparationSelectionne, phPreparationLigne.isSuivi_Par_Serie(), phPreparationLigne.isSerialiser_Reception(), phPreparationLigne.getSerieNumero(), db, false));
-                else
-                    phPreparationLigneVerrouPharmacieAdaptes.add(new PH_Preparation_Ligne_VerrouPharmacie_Adapte(phPreparationLigne.getProduitDesignation(), phPreparationLigne.getProduitReference(), "", "", "", numLot, datePeremption, emplacementAdressage, stockLotEmplacementCourant, phPreparationLigne, phPreparationSelectionne, phPreparationLigne.isSuivi_Par_Serie(), phPreparationLigne.isSerialiser_Reception(), phPreparationLigne.getSerieNumero(), db, false));
-            }
-        }
-
-        ((TextView) findViewById(R.id.nbColisTotal)).setText(String.valueOf(nbColisTotal));
-
+        // Retour arrière
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                afficherAlerteConfirmationRetour(DetailVerrouPharmacieActivity.this, LayoutInflater.from(DetailVerrouPharmacieActivity.this), DetailVerrouPharmacieActivity.super.getBundle());
+                afficherAlerteConfirmationRetour(
+                        DetailVerrouPharmacieActivity.this,
+                        LayoutInflater.from(DetailVerrouPharmacieActivity.this),
+                        DetailVerrouPharmacieActivity.super.getBundle());
             }
         });
     }
@@ -229,603 +198,555 @@ public class DetailVerrouPharmacieActivity extends ServiceActivity {
     @Override
     public void onResume() {
         super.onResume();
-        Collections.sort(phPreparationLigneVerrouPharmacieAdaptes, new Comparator<PH_Preparation_Ligne_VerrouPharmacie_Adapte>() {
-            @Override
-            public int compare(PH_Preparation_Ligne_VerrouPharmacie_Adapte o1, PH_Preparation_Ligne_VerrouPharmacie_Adapte o2) {
-                return o1.getDesignation().compareTo(o2.getDesignation());
-            }
-        });
 
-        // Initialisation de l'adapter puis transfere de l'adapter à la listeView pour l'affichage
-        phPreparationLigneVerrouPharmacieAdapter = new PH_Preparation_Ligne_VerrouPharmacieAdapter(DetailVerrouPharmacieActivity.this, db, phPreparationLigneVerrouPharmacieAdaptes);
+        // Tri alphabétique
+        Collections.sort(phPreparationLigneVerrouPharmacieAdaptes,
+                (o1, o2) -> o1.getDesignation().compareTo(o2.getDesignation()));
 
-        // Permet de mettre à jour les données se trouvant pas dans l'adapter mais dépend de lui
-        phPreparationLigneVerrouPharmacieAdapter.setOnDataChangeListener(new PH_Preparation_Ligne_VerrouPharmacieAdapter.OnDataChangeListener() {
-            public void onDataChanged(int quantitéAvant, int quantitéAprès, boolean deverrouillee) {
+        for (PH_Preparation_Ligne_VerrouPharmacie_Adapte item : phPreparationLigneVerrouPharmacieAdaptes)
+            Log.d("DEBUG_LOT", "Désignation: " + item.getDesignation() + " | Lot: " + item.getNumLot());
+        // Adapter
+        phPreparationLigneVerrouPharmacieAdapter =
+                new PH_Preparation_Ligne_VerrouPharmacieAdapter(
+                        this, db, phPreparationLigneVerrouPharmacieAdaptes);
 
-                Integer nbColisTotalVerrouille = Integer.parseInt(((TextView) findViewById(R.id.nbColisTotal)).getText().toString());
-                Integer nbColisTotalDeverrouille = Integer.parseInt(((TextView) findViewById(R.id.nbColisTotalReceptionner)).getText().toString());
-
-                if(deverrouillee)
-                {
-                    nbColisTotalVerrouille = nbColisTotalVerrouille - quantitéAprès;
-                    nbColisTotalDeverrouille = nbColisTotalDeverrouille + quantitéAprès;
-                }
-                else
-                {
-                    nbColisTotalVerrouille = nbColisTotalVerrouille + quantitéAvant;
-                    nbColisTotalDeverrouille = nbColisTotalDeverrouille - quantitéAvant;
-                }
-
-                ((TextView) findViewById(R.id.nbColisTotal)).setText(String.valueOf(nbColisTotalVerrouille));
-                ((TextView) findViewById(R.id.nbColisTotalReceptionner)).setText(String.valueOf(nbColisTotalDeverrouille));
-
-            }
-        });
+        // ─── Listener verrouillage ───────────────────────────────────────
+        // Appelé UNIQUEMENT depuis le clic sur layoutQuantite dans l'adapter.
+        // mettreAJourPHPrepLigne() NE DOIT PAS appeler onDataChanged.
+        phPreparationLigneVerrouPharmacieAdapter.setOnDataChangeListener(
+                (quantiteAvant, quantiteApres, estEnTrainDeDeverrouiller) -> {
+                    if (estEnTrainDeDeverrouiller) {
+                        // On vient de déverrouiller → retire du verrou, ajoute au déverrou
+                        nbColisVerrouille   -= quantiteApres;
+                        nbColisDeverrouille += quantiteApres;
+                    } else {
+                        // On vient de reverrouiller → retire du déverrou, remet dans verrou
+                        nbColisVerrouille   += quantiteAvant;
+                        nbColisDeverrouille -= quantiteAvant;
+                    }
+                    mettreAJourAffichageCompteurs();
+                });
 
         phPreparationLigneListView.setAdapter(phPreparationLigneVerrouPharmacieAdapter);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        DateFormat dateDecodeur = new SimpleDateFormat("dd/MM/yyyy");
-        Date dateDuJour = Calendar.getInstance().getTime();
-        boolean perime_present = false;
-        for (PH_Preparation_Ligne_VerrouPharmacie_Adapte phPreparationLigneVerrouPharmacieAdapte : phPreparationLigneVerrouPharmacieAdapter.phPreparationLigneVerrouPharmacieAdapteList) {
-            PH_Preparation_Ligne_VerrouPharmacieAdapter.PH_Preparation_Ligne_AdapteViewHolder viewHolder = phPreparationLigneVerrouPharmacieAdapter.viewHolderList.get(phPreparationLigneVerrouPharmacieAdapter.phPreparationLigneVerrouPharmacieAdapteList.indexOf(phPreparationLigneVerrouPharmacieAdapte));
-            Date date_peremption = null;
+        // Bouton valider
+        ((LinearLayout) findViewById(R.id.btnValiderVerrou_LL))
+                .setOnClickListener(v -> onClick_ActionContenant());
+    }
+
+    // ─── Construction des lignes ─────────────────────────────────────────────
+
+    private void construireLignes(String numeroCommande) {
+        List<PH_Preparation_Ligne> phPreparationLignes =
+                PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(
+                        db, phPreparationSelectionne);
+
+        for (PH_Preparation_Ligne ligne : phPreparationLignes) {
+            Produit produit = ProduitOpenHelper.getProduitByID(db, ligne.getProduitID());
+            stockLotEmplacementLightList =
+                    Stock_Lot_EmplacementLightOpenHelper
+                            .getAllStock_Lot_EmplacementsByProduitIDEtCommandeNumero(
+                                    db, produit, numeroCommande);
+
+            if (!stockLotEmplacementLightList.isEmpty()) {
+                for (Stock_Lot_Emplacement_Light stockLot : stockLotEmplacementLightList) {
+                    int qteRALLot = ligne.getSuivi_Par_Lot() ? (int) stockLot.getQte() : 0;
+                    int qteParLot = stockLot.getQte_Preparer() != 0
+                            ? stockLot.getQte_Preparer() : (int) stockLot.getQte();
+
+                    phPreparationLigneVerrouPharmacieAdaptes.add(
+                            new PH_Preparation_Ligne_VerrouPharmacie_Adapte(
+                                    ligne.getProduitDesignation(), ligne.getProduitReference(),
+                                    String.valueOf(recupererNbColis(stockLot.getProduit_Code(), qteRALLot)),
+                                    String.valueOf(qteRALLot), String.valueOf(qteParLot),
+                                    stockLot.getLot(), stockLot.getPeremptionDate(),
+                                    stockLot.getEmplacement(), stockLot, ligne,
+                                    phPreparationSelectionne,
+                                    ligne.isSuivi_Par_Serie(), ligne.isSerialiser_Reception(),
+                                    ligne.getSerieNumero(), db, false));
+                }
+            } else {
+                boolean estVerrou = phPreparationSelectionne.getListe()
+                        .contentEquals("ALCYONS_VERROU");
+
+                Stock_Lot_Emplacement_Light stockLotVide = estVerrou
+                        ? new Stock_Lot_Emplacement_Light(
+                        ligne.getQte_preparer(), "", "",
+                        ligne.getEmplacementParDefaut(),
+                        phPreparationSelectionne.getDepotDestinataireReference(),
+                        ligne.getZoneDepot(), ligne.getProduitID(),
+                        ligne.getQte_preparer(), "")
+                        : new Stock_Lot_Emplacement_Light(0, "", "", "", "", "", 0, 0, "");
+
+                phPreparationLigneVerrouPharmacieAdaptes.add(
+                        new PH_Preparation_Ligne_VerrouPharmacie_Adapte(
+                                ligne.getProduitDesignation(), ligne.getProduitReference(),
+                                estVerrou ? "0" : "",
+                                estVerrou ? String.valueOf(ligne.getQte_preparer()) : "",
+                                estVerrou ? String.valueOf(ligne.getQte_preparer()) : "",
+                                "", "", "",
+                                stockLotVide, ligne, phPreparationSelectionne,
+                                ligne.isSuivi_Par_Serie(), ligne.isSerialiser_Reception(),
+                                ligne.getSerieNumero(), db, false));
+            }
+        }
+    }
+
+    // ─── Compteurs ──────────────────────────────────────────────────────────
+
+    /** Calcule le total initial de colis (toutes lignes verrouillées). */
+    private int nbColisTotal() {
+        int total = 0;
+        for (PH_Preparation_Ligne_VerrouPharmacie_Adapte adapte
+                : phPreparationLigneVerrouPharmacieAdaptes) {
+            String nbColisStr = adapte.getNbColis();
+            if (nbColisStr != null && !nbColisStr.isEmpty()) {
+                try { total += Integer.parseInt(nbColisStr); }
+                catch (NumberFormatException ignored) {}
+            }
+        }
+        return total;
+    }
+
+    /** Met à jour les deux TextViews compteurs depuis les variables locales. */
+    private void mettreAJourAffichageCompteurs() {
+        tvNbColisTotal.setText(String.valueOf(Math.max(0, nbColisVerrouille)));
+        tvNbColisDeverrouille.setText(String.valueOf(Math.max(0, nbColisDeverrouille)));
+    }
+
+    // ─── Résultat scan GS1 ──────────────────────────────────────────────────
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data == null) return;
+
+        if (requestCode == CodesEchangesActivites.RETOUR_CODE_GS1) {
+            String codeComplet = data.getStringExtra("code");
+            if (codeComplet == null || codeComplet.isEmpty()) return;
+
+            Map<String, String> gs1 = OutilsDecodage.decouperGTIN(codeComplet);
+
+            if (gs1.size() == 1) {
+                afficherToast("Le code fourni n'est pas un code GS1, veuillez réessayer.");
+                return;
+            }
+
+            if (datePeremptionTextView == null || numeroLotEditText == null) {
+                afficherToast("Le produit scanné ne correspond pas au produit attendu");
+                return;
+            }
+
+            PH_Preparation_Ligne_VerrouPharmacie_Adapte adapte =
+                    phPreparationLigneVerrouPharmacieAdapter.phPreparationLigneVerrouPharmacieAdapteList
+                            .get(phPreparationLigneVerrouPharmacieAdapter.viewHolderList
+                                    .indexOf(viewHolderAModifier));
+
+            Produit produitScanner = ProduitOpenHelper.getUnProduitParGTIN(
+                    db, gs1.get(OutilsDecodage.codeGtin));
+
+            if (produitScanner == null) {
+                afficherToast("Le produit scanné inconnu");
+                return;
+            }
+
+            if (produitScanner.getID_produit()
+                    != adapte.getProduitCorrespondant().getID_produit()) {
+                afficherToast("Le produit scanné ne correspond pas au produit attendu");
+                return;
+            }
+
+            DateFormat fmt1 = new SimpleDateFormat("yy-MM-dd");
+            DateFormat fmt2 = new SimpleDateFormat("dd/MM/yyyy");
+            Date date = new Date();
             try {
-                date_peremption = dateDecodeur.parse(viewHolder.valeurDate);
+                date = fmt1.parse(gs1.get(OutilsDecodage.dateDePeremption));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
 
-            if(date_peremption != null)
-            {
-                if(dateDuJour.after(date_peremption))
-                {
-                    perime_present = true;
-                    break;
-                }
-            }
-        }
-
-        if(perime_present)
-        {
-            //Alerte.afficherAlerte(DetailVerrouPharmacieActivity.this, "Erreur", "Un produit de la liste est périmé", "alerte");
-        }
-
-        ((LinearLayout) findViewById(R.id.btnValiderVerrou_LL)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClick_ActionContenant();
-            }
-        });
-
-        invalidateOptionsMenu();
-    }
-
-    // Lorsqu'on lance une nouvelle activity avec " startActivityForResult ", action à réaliser à la fin de l'activity lancé suivant le " CodesEchangesActivites " passé
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (data != null) {
-            switch (requestCode) {
-                case CodesEchangesActivites.RETOUR_CODE_GS1:
-                    String codeComplet = data.getStringExtra("code");
-                    if(codeComplet != null && !codeComplet.contentEquals(""))
-                    {
-                        Map<String, String> gs1Decoupe = OutilsDecodage.decouperGTIN(codeComplet);
-                        if (gs1Decoupe.size() != 1) {
-                            if (datePeremptionTextView != null && numeroLotEditText != null)
-                            {
-                                PH_Preparation_Ligne_VerrouPharmacie_Adapte phPreparationLigneVerrouPharmacieAdapte = phPreparationLigneVerrouPharmacieAdapter.phPreparationLigneVerrouPharmacieAdapteList.get(phPreparationLigneVerrouPharmacieAdapter.viewHolderList.indexOf(viewHolderAModifier));
-
-                                Produit produitScanner = ProduitOpenHelper.getUnProduitParGTIN(db, gs1Decoupe.get(OutilsDecodage.codeGtin));
-                                if(produitScanner != null)
-                                {
-                                    if(produitScanner.getID_produit() == phPreparationLigneVerrouPharmacieAdapte.getProduitCorrespondant().getID_produit())
-                                    {
-                                        DateFormat dateFormat1 = new SimpleDateFormat("yy-MM-dd");
-                                        DateFormat dateFormat2 = new SimpleDateFormat("dd/MM/yyyy");
-
-                                        Date date = new Date();
-
-                                        try {
-                                            date = dateFormat1.parse(gs1Decoupe.get(OutilsDecodage.dateDePeremption));
-                                        } catch (ParseException e) {
-                                            e.printStackTrace();
-                                        }
-
-                                        String dateFinale = dateFormat2.format(date);
-
-                                        datePeremptionTextView.setText(dateFinale);
-                                        numeroLotEditText.setText(gs1Decoupe.get(OutilsDecodage.numeroLot));
-
-
-                                        viewHolderAModifier.valeurDate = dateFinale;
-                                        viewHolderAModifier.valeurLot = gs1Decoupe.get(OutilsDecodage.numeroLot);
-                                        mettreAJourPHPrepLigne(viewHolderAModifier, phPreparationLigneVerrouPharmacieAdapte);
-                                    }
-                                    else
-                                    {
-                                        Toast toast = Toast.makeText(DetailVerrouPharmacieActivity.this, "Le produit scanné ne correspond pas au produit attendu", Toast.LENGTH_SHORT);
-                                        toast.setGravity(Gravity.CENTER, 0, 0);
-                                        toast.show();
-                                    }
-                                }
-                                else
-                                {
-                                    Toast toast = Toast.makeText(DetailVerrouPharmacieActivity.this, "Le produit scanné inconnu", Toast.LENGTH_SHORT);
-                                    toast.setGravity(Gravity.CENTER, 0, 0);
-                                    toast.show();
-                                }
-                            }
-                            else
-                            {
-                                Toast toast = Toast.makeText(DetailVerrouPharmacieActivity.this, "Le produit scanné ne correspond pas au produit attendu", Toast.LENGTH_SHORT);
-                                toast.setGravity(Gravity.CENTER, 0, 0);
-                                toast.show();
-                            }
-                        }
-                        else
-                        {
-                            Toast toast = Toast.makeText(DetailVerrouPharmacieActivity.this, "Le code fourni n'est pas un code GS1, veuillez réessayer.", Toast.LENGTH_SHORT);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-                        }
-                    }
-                    else
-                    {
-
-                    }
-                    invalidateOptionsMenu();
-                    break;
-            }
+            String dateFinale = fmt2.format(date);
+            datePeremptionTextView.setText(dateFinale);
+            numeroLotEditText.setText(gs1.get(OutilsDecodage.numeroLot));
+            viewHolderAModifier.valeurDate = dateFinale;
+            viewHolderAModifier.valeurLot  = gs1.get(OutilsDecodage.numeroLot);
+            mettreAJourPHPrepLigne(viewHolderAModifier, adapte);
         }
     }
 
-    // Permet de calculer les nombre de colis en fonction du conditionnement du produit
+    // ─── Calcul nb colis ────────────────────────────────────────────────────
+
     public int recupererNbColis(int produitID, double qte) {
-        int nbColis = 0;
+        if (produitID == 0 || qte == 0) return 0;
+        Produit p = ProduitOpenHelper.getProduitByID(db, produitID);
+        if (p == null) return 0;
 
-        int conditionnementAchat = 0;
-        int quantite = (int) qte;
+        int cond = p.getCond_achat();
+        if (cond == 0) cond = (int) p.getCond_distrib();
+        if (cond == 0) return 1;
 
-        if (produitID != 0) {
-            Produit produitCorrespondant = ProduitOpenHelper.getProduitByID(db, produitID);
-            conditionnementAchat = produitCorrespondant.getCond_achat();
-            if (conditionnementAchat == 0) {
-                conditionnementAchat = (int) produitCorrespondant.getCond_distrib();
-            }
-        }
-        if (quantite != 0 && conditionnementAchat != 0) {
-            nbColis = quantite / conditionnementAchat;
-            nbColis = (int) Math.ceil(nbColis);
-        }
-        if (quantite != 0) {
-            if (nbColis == 0) {
-                nbColis = 1;
-            }
-        }
-
-        return nbColis;
+        int nb = (int) Math.ceil(qte / cond);
+        return nb == 0 ? 1 : nb;
     }
 
-    // Permet de mettre à jour un PH_Preparation_Ligne
-    public void mettreAJourPHPrepLigne(PH_Preparation_Ligne_VerrouPharmacieAdapter.PH_Preparation_Ligne_AdapteViewHolder viewHolder, PH_Preparation_Ligne_VerrouPharmacie_Adapte phPreparationLigneVerrouPharmacieAdapte) {
-        PH_Preparation_Ligne phPreparationLigne = phPreparationLigneVerrouPharmacieAdapte.getPhPreparationLigne();
-        Stock_Lot_Emplacement_Light stockLotEmplacementLight = phPreparationLigneVerrouPharmacieAdapte.getStockLotEmplacement();
+    // ─── Mise à jour BDD (sans toucher aux compteurs) ───────────────────────
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        DateFormat dateDecodeur = new SimpleDateFormat("dd/MM/yyyy");
+    public void mettreAJourPHPrepLigne(
+            PH_Preparation_Ligne_VerrouPharmacieAdapter.PH_Preparation_Ligne_AdapteViewHolder viewHolder,
+            PH_Preparation_Ligne_VerrouPharmacie_Adapte adapte) {
 
-        stockLotEmplacementLight.setLot(viewHolder.valeurLot);
-        stockLotEmplacementLight.setQte_Preparer(viewHolder.valeurQteParLot);
+        PH_Preparation_Ligne ligne       = adapte.getPhPreparationLigne();
+        Stock_Lot_Emplacement_Light stockLot = adapte.getStockLotEmplacement();
+
+        DateFormat fmtSQL     = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat fmtDisplay = new SimpleDateFormat("dd/MM/yyyy");
+
+        stockLot.setLot(viewHolder.valeurLot);
+        stockLot.setQte_Preparer(viewHolder.valeurQteParLot);
+
         try {
-            Date dateFournie = dateDecodeur.parse(viewHolder.valeurDate);
-            stockLotEmplacementLight.setPeremptionDate(dateFormat.format(dateFournie));
-            phPreparationLigneVerrouPharmacieAdapte.setPeremptionDate(dateFormat.format(dateFournie));
-            phPreparationLigne.setPeremptionDate(dateFormat.format(dateFournie));
+            Date d = fmtDisplay.parse(viewHolder.valeurDate);
+            String dateSQL = fmtSQL.format(d);
+            stockLot.setPeremptionDate(dateSQL);
+            adapte.setPeremptionDate(dateSQL);
+            ligne.setPeremptionDate(dateSQL);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockLotEmplacementLight);
 
-        phPreparationLigneVerrouPharmacieAdapte.setNumLot(viewHolder.valeurLot);
-        phPreparationLigneVerrouPharmacieAdapte.setQteParLot(String.valueOf(viewHolder.valeurQteParLot));
+        Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockLot);
 
-        phPreparationLigne.setLotNumero(viewHolder.valeurLot);
-        phPreparationLigne.setQte_RAL(viewHolder.valeurQteParLot);
+        adapte.setNumLot(viewHolder.valeurLot);
+        adapte.setQteParLot(String.valueOf(viewHolder.valeurQteParLot));
+        ligne.setLotNumero(viewHolder.valeurLot);
+        ligne.setQte_RAL(viewHolder.valeurQteParLot);
 
-        PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, phPreparationLigne);
+        PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ligne);
     }
 
+    // ─── Validation ─────────────────────────────────────────────────────────
 
     public void onClick_ActionContenant() {
-
-        boolean deverouiller = true;
-
-        for(int i = 0; i < phPreparationLigneVerrouPharmacieAdapter.viewHolderList.size(); i++)
-        {
-            PH_Preparation_Ligne_VerrouPharmacieAdapter.PH_Preparation_Ligne_AdapteViewHolder viewHolder = phPreparationLigneVerrouPharmacieAdapter.viewHolderList.get(i);
-
-            String statut = viewHolder.valeurStatut;
-
-            if(statut.contentEquals("Verrouillé"))
-            {
-                deverouiller = false;
+        boolean toutDeverrouille = true;
+        for (PH_Preparation_Ligne_VerrouPharmacieAdapter.PH_Preparation_Ligne_AdapteViewHolder vh
+                : phPreparationLigneVerrouPharmacieAdapter.viewHolderList) {
+            if (vh.valeurStatut.contentEquals("Verrouillé")) {
+                toutDeverrouille = false;
                 break;
             }
         }
 
-        if(deverouiller)
-        {
-            final HashMap<Integer, Integer> resultat = new HashMap<>();
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            View view = this.getLayoutInflater().inflate(R.layout.alerte_preparation, null);
+        if (!toutDeverrouille) {
+            Alerte.afficherAlerte(this, "Alerte",
+                    "Veuillez déverrouiller toutes les lignes", "alerte");
+            return;
+        }
 
-            LinearLayout LinearPalette = (LinearLayout) view.findViewById(R.id.LinearPalette);
-            LinearLayout LinearColis = (LinearLayout) view.findViewById(R.id.LinearColis);
-            LinearLayout LinearContainer = (LinearLayout) view.findViewById(R.id.LinearContainer);
-            LinearLayout LinearScelle = (LinearLayout) view.findViewById(R.id.LinearScelle);
-            textViewNBPalette = (TextView) view.findViewById(R.id.nbPaletteSelectionne);
-            textViewNBCaisse = (TextView) view.findViewById(R.id.nbColisSelectionne);
-            textViewNBContainer = (TextView) view.findViewById(R.id.nbContainerSelectionne);
-            textViewNBScelle = (TextView) view.findViewById(R.id.nbScelleSelectionne);
+        // Affichage de l'alerte composition
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.alerte_preparation, null);
 
-            //on calcule le nombre de colis
-            int nbColis = 0;
-            for(PH_Preparation_Ligne_VerrouPharmacie_Adapte courant : phPreparationLigneVerrouPharmacieAdaptes)
-            {
-                PH_Preparation_Ligne_VerrouPharmacieAdapter.PH_Preparation_Ligne_AdapteViewHolder viewHolder = phPreparationLigneVerrouPharmacieAdapter.viewHolderList.get(phPreparationLigneVerrouPharmacieAdapter.phPreparationLigneVerrouPharmacieAdapteList.indexOf(courant));
-                PH_Preparation_Ligne ph_preparation_ligne = courant.getPhPreparationLigne();
-                int quantitePreparer = (viewHolder.valeurQteParLot == -1 ? viewHolder.valeurQteDemander : viewHolder.valeurQteParLot);
-                if(quantitePreparer > 0)
-                {
-                    Produit produit = ProduitOpenHelper.getProduitByID(db, ph_preparation_ligne.getProduitID());
-                    int conditionnement = (int) produit.getCond_distrib();
-                    if(conditionnement == 0)
-                    {
-                        conditionnement = 1;
-                    }
-                    int nbColisProduit = (int) ((int) quantitePreparer / (int) conditionnement);
+        LinearLayout LinearPalette   = view.findViewById(R.id.LinearPalette);
+        LinearLayout LinearColis     = view.findViewById(R.id.LinearColis);
+        LinearLayout LinearContainer = view.findViewById(R.id.LinearContainer);
+        LinearLayout LinearScelle    = view.findViewById(R.id.LinearScelle);
+        textViewNBPalette   = view.findViewById(R.id.nbPaletteSelectionne);
+        textViewNBCaisse    = view.findViewById(R.id.nbColisSelectionne);
+        textViewNBContainer = view.findViewById(R.id.nbContainerSelectionne);
+        textViewNBScelle    = view.findViewById(R.id.nbScelleSelectionne);
 
-                    if(nbColisProduit == 0)
-                    {
-                        nbColisProduit = 1;
-                    }
-                    nbColis = nbColis + nbColisProduit;
-                }
+        // Calcul nb colis pour pré-remplissage
+        int nbColis = 0;
+        for (PH_Preparation_Ligne_VerrouPharmacie_Adapte courant
+                : phPreparationLigneVerrouPharmacieAdaptes) {
+            PH_Preparation_Ligne_VerrouPharmacieAdapter.PH_Preparation_Ligne_AdapteViewHolder vh =
+                    phPreparationLigneVerrouPharmacieAdapter.viewHolderList.get(
+                            phPreparationLigneVerrouPharmacieAdapter
+                                    .phPreparationLigneVerrouPharmacieAdapteList.indexOf(courant));
+            int qte = vh.valeurQteParLot == -1 ? vh.valeurQteDemander : vh.valeurQteParLot;
+            if (qte > 0) {
+                Produit p = ProduitOpenHelper.getProduitByID(
+                        db, courant.getPhPreparationLigne().getProduitID());
+                int cond = (int) p.getCond_distrib();
+                if (cond == 0) cond = 1;
+                int nb = qte / cond;
+                nbColis += nb == 0 ? 1 : nb;
             }
-
-            textViewNBCaisse.setText(String.valueOf(nbColis));
-
-            /* Gestion des numbers pickers */
-
-            //gestion des colis
-            textViewNBCaisse.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Ouvre une boite de dialogue avec un NumberPicker
-                    String title = "Saisir le nombre de colis";
-                    String message = "Nombre de colis : ";
-                    int maxValue = 20;
-                    int value = 0;
-
-                    DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-
-                            int qteAprès = aNumberPicker.getValue();
-                            textViewNBCaisse.setText(String.valueOf(qteAprès));
-                            InputMethodManager imm = (InputMethodManager) DetailVerrouPharmacieActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-                            imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                            dialog.dismiss();
-                        }
-                    };
-
-                    Alerte.afficherAlerteNumberPicker(DetailVerrouPharmacieActivity.this, title, message, value, maxValue, onClickListener);
-                }
-            });
-
-
-            //gestion des palettes
-            LinearPalette.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Ouvre une boite de dialogue avec un NumberPicker
-                    textViewNBPalette.performClick();
-                }
-            });
-
-            textViewNBPalette.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Ouvre une boite de dialogue avec un NumberPicker
-                    String title = "Saisir le nombre de palette";
-                    String message = "Nombre de palettes : ";
-                    int maxValue = 15;
-                    int value = 0;
-
-                    DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            int qteAprès = aNumberPicker.getValue();
-                            textViewNBPalette.setText(String.valueOf(qteAprès));
-
-                            dialog.dismiss();
-                        }
-                    };
-
-                    Alerte.afficherAlerteNumberPicker(DetailVerrouPharmacieActivity.this, title, message, value, maxValue, onClickListener);
-                }
-            });
-
-            //gestion des container
-            LinearContainer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Ouvre une boite de dialogue avec un NumberPicker
-                    textViewNBContainer.performClick();
-                }
-            });
-
-            textViewNBContainer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Ouvre une boite de dialogue avec un NumberPicker
-                    String title = "Saisir le nombre de container";
-                    String message = "Nombre de container : ";
-                    int maxValue = 15;
-                    int value = 0;
-
-                    DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            int qteAprès = aNumberPicker.getValue();
-                            textViewNBContainer.setText(String.valueOf(qteAprès));
-
-                            dialog.dismiss();
-                        }
-                    };
-
-                    Alerte.afficherAlerteNumberPicker(DetailVerrouPharmacieActivity.this, title, message, value, maxValue, onClickListener);
-                }
-            });
-
-            //gestion des scelles
-            LinearScelle.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Ouvre une boite de dialogue avec un NumberPicker
-                    textViewNBScelle.performClick();
-                }
-            });
-
-            textViewNBScelle.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Ouvre une boite de dialogue avec un edittext
-                    String textscelle = Alerte.afficherAlerteEditText(DetailVerrouPharmacieActivity.this, "Numéro de scellé", "Saisir un numéro de scellé");
-                    textViewNBScelle.setText(textscelle);
-                }
-            });
-
-            ImageView ok = (ImageView) view.findViewById(R.id.ok);
-            ImageView annuler = (ImageView) view.findViewById(R.id.annuler);
-            builder.setView(view);
-            final AlertDialog alertDialog = builder.create();
-            alertDialog.setCancelable(false);
-            alertDialog.getWindow().setGravity(Gravity.CENTER);
-            alertDialog.show();
-            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-            ok.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int nbPalette = 0;
-                    if(!textViewNBPalette.getText().toString().contentEquals(""))
-                        nbPalette = Integer.parseInt(textViewNBPalette.getText().toString());
-
-                    int nbCaisse = 0;
-                    if(!textViewNBCaisse.getText().toString().contentEquals(""))
-                        nbCaisse = Integer.parseInt(textViewNBCaisse.getText().toString());
-
-                    int Conteneur_NB = 0;
-                    if(!textViewNBContainer.getText().toString().contentEquals(""))
-                        Conteneur_NB = Integer.parseInt(textViewNBContainer.getText().toString());
-
-                    String numero_scelle = "";
-                    if(textViewNBScelle.getText().toString() != null)
-                        numero_scelle = textViewNBScelle.getText().toString();
-
-                    phPreparationSelectionne.setColisNB(nbCaisse);
-                    phPreparationSelectionne.setPaletteNB(nbPalette);
-                    phPreparationSelectionne.setConteneur_NB(Conteneur_NB);
-                    phPreparationSelectionne.setNumero_scelle(numero_scelle);
-                    PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, phPreparationSelectionne);
-                    alertDialog.dismiss();
-                    validerVerrou();
-                }
-            });
-
-            annuler.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    alertDialog.dismiss();
-                }
-            });
         }
-        else
-        {
-            Alerte.afficherAlerte(DetailVerrouPharmacieActivity.this, "Alerte", "Veuillez déverrouiller toutes les lignes", "alerte");
-        }
-    }
+        textViewNBCaisse.setText(String.valueOf(nbColis));
 
-    public void afficherAlerteConfirmationRetour(Context context, LayoutInflater inflater, final Bundle bundle) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View layout = inflater.inflate(R.layout.alerte_confirmation, null);
+        configurerNumberPickerColis();
+        configurerNumberPickerPalette(LinearPalette);
+        configurerNumberPickerContainer(LinearContainer);
+        configurerSaisieScelle(LinearScelle);
 
-        LinearLayout zoneok = (LinearLayout) layout.findViewById(R.id.buttonOk);
-        LinearLayout buttonAnnuler = (LinearLayout) layout.findViewById(R.id.buttonAnnuler);
-        TextView messageTextView = (TextView) layout.findViewById(R.id.messageFin);
-        messageTextView.setText("Vous allez quitter le verrou, confirmez vous ?");
-        builder.setView(layout);
+        ImageView ok      = view.findViewById(R.id.ok);
+        ImageView annuler = view.findViewById(R.id.annuler);
+        builder.setView(view);
 
         final AlertDialog alertDialog = builder.create();
-        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
+        alertDialog.setCancelable(false);
+        alertDialog.getWindow().setGravity(Gravity.CENTER);
+        alertDialog.show();
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        alertDialog.show();
-        alertDialog.show();
 
-        zoneok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-                retourService(bundle);
-            }
+        ok.setOnClickListener(v -> {
+            int nbPalette  = parseOuZero(textViewNBPalette);
+            int nbCaisse   = parseOuZero(textViewNBCaisse);
+            int nbContainer = parseOuZero(textViewNBContainer);
+            String scelle  = textViewNBScelle.getText().toString();
+
+            phPreparationSelectionne.setColisNB(nbCaisse);
+            phPreparationSelectionne.setPaletteNB(nbPalette);
+            phPreparationSelectionne.setConteneur_NB(nbContainer);
+            phPreparationSelectionne.setNumero_scelle(scelle);
+            PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, phPreparationSelectionne);
+            alertDialog.dismiss();
+            validerVerrou();
         });
 
-        buttonAnnuler.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
-    }
-    @Override
-    public void retourService(final Bundle bundle)
-    {
-        Intent detailVerrouIntent = new Intent(DetailVerrouPharmacieActivity.this, ServiceVerrouPharmacieActivity.class);
-        Bundle detailVerrouBundle = super.getBundle();
-        detailVerrouIntent.putExtras(detailVerrouBundle);
-        DetailVerrouPharmacieActivity.this.startActivity(detailVerrouIntent);
-        DetailVerrouPharmacieActivity.this.finish();
+        annuler.setOnClickListener(v -> alertDialog.dismiss());
     }
 
-    private void validerVerrou()
-    {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        DateFormat dateDecodeur = new SimpleDateFormat("dd/MM/yyyy");
+    // ─── NumberPickers composition ───────────────────────────────────────────
+
+    private void configurerNumberPickerColis() {
+        textViewNBCaisse.setOnClickListener(v ->
+                Alerte.afficherAlerteNumberPicker(this,
+                        "Saisir le nombre de colis", "Nombre de colis : ", 0, 20,
+                        (dialog, id) -> {
+                            textViewNBCaisse.setText(String.valueOf(aNumberPicker.getValue()));
+                            ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE))
+                                    .toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                            dialog.dismiss();
+                        }));
+    }
+
+    private void configurerNumberPickerPalette(LinearLayout zone) {
+        View.OnClickListener listener = v ->
+                Alerte.afficherAlerteNumberPicker(this,
+                        "Saisir le nombre de palette", "Nombre de palettes : ", 0, 15,
+                        (dialog, id) -> {
+                            textViewNBPalette.setText(String.valueOf(aNumberPicker.getValue()));
+                            dialog.dismiss();
+                        });
+        zone.setOnClickListener(listener);
+        textViewNBPalette.setOnClickListener(listener);
+    }
+
+    private void configurerNumberPickerContainer(LinearLayout zone) {
+        View.OnClickListener listener = v ->
+                Alerte.afficherAlerteNumberPicker(this,
+                        "Saisir le nombre de container", "Nombre de container : ", 0, 15,
+                        (dialog, id) -> {
+                            textViewNBContainer.setText(String.valueOf(aNumberPicker.getValue()));
+                            dialog.dismiss();
+                        });
+        zone.setOnClickListener(listener);
+        textViewNBContainer.setOnClickListener(listener);
+    }
+
+    private void configurerSaisieScelle(LinearLayout zone) {
+        View.OnClickListener listener = v -> {
+            String texte = Alerte.afficherAlerteEditText(this,
+                    "Numéro de scellé", "Saisir un numéro de scellé");
+            textViewNBScelle.setText(texte);
+        };
+        zone.setOnClickListener(listener);
+        textViewNBScelle.setOnClickListener(listener);
+    }
+
+    // ─── Validation finale ───────────────────────────────────────────────────
+
+    private void validerVerrou() {
+        DateFormat fmtSQL     = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat fmtDisplay = new SimpleDateFormat("dd/MM/yyyy");
         Date dateDuJour = Calendar.getInstance().getTime();
 
-        boolean confirmation;
-        confirmation = Alerte.afficherAlerte(DetailVerrouPharmacieActivity.this, "Validation", "Êtes-vous sur de vouloir valider ?", "OuiNon");
+        boolean confirmation = Alerte.afficherAlerte(this,
+                "Validation", "Êtes-vous sûr de vouloir valider ?", "OuiNon");
+        if (!confirmation) return;
 
-        if (confirmation) {
+        // Création action utilisateur
+        int actionId = genererIdNegatif();
+        SimpleDateFormat parseFmt  = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat dateFmt   = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat heureFmt  = new SimpleDateFormat("HH:mm:ss");
+        Date now         = new Date();
+        String only_date = dateFmt.format(now);
+        String only_heure = heureFmt.format(now);
 
-            //création de l'action
-            Random random = new Random();
-            int actionId = random.nextInt();
-            if(actionId > 0)
-                actionId= actionId*-1;
-            SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            SimpleDateFormat parseDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            SimpleDateFormat parseHeureFormat = new SimpleDateFormat("HH:mm:ss");
-            Date date =new Date();
-            String date_string = parseFormat.format(date);
-            String only_date = parseDateFormat.format(date);
-            String only_heure = parseHeureFormat.format(date);
-            ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", phPreparationSelectionne.getUID(), "", "Verrou Pharmacie");
-            ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
-            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
-            //fin de la création de l'action utilisateur
+        ActionUtilisateur action = new ActionUtilisateur(
+                actionId, utilisateurConnecte.getId(), parseFmt.format(now),
+                serviceActuel.getId(), utilisateurConnecte.getEtablissementId(),
+                "En attente", phPreparationSelectionne.getUID(), "", "Verrou Pharmacie");
+        ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, action);
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db,
+                ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR,
+                action.getPhiMR4UUID(), action.getId(), DBOpenHelper.ActionsEAS.AJOUT);
 
-            int compteurReussite = 0;
+        int compteurReussite = 0;
 
-            for (PH_Preparation_Ligne_VerrouPharmacie_Adapte phPreparationLigneVerrouPharmacieAdapte : phPreparationLigneVerrouPharmacieAdapter.phPreparationLigneVerrouPharmacieAdapteList) {
-                PH_Preparation_Ligne_VerrouPharmacieAdapter.PH_Preparation_Ligne_AdapteViewHolder viewHolder = phPreparationLigneVerrouPharmacieAdapter.viewHolderList.get(phPreparationLigneVerrouPharmacieAdapter.phPreparationLigneVerrouPharmacieAdapteList.indexOf(phPreparationLigneVerrouPharmacieAdapte));
-                PH_Preparation_Ligne phPreparationLigne = phPreparationLigneVerrouPharmacieAdapte.getPhPreparationLigne();
-                Stock_Lot_Emplacement_Light stockLotEmplacementLight = phPreparationLigneVerrouPharmacieAdapte.getStockLotEmplacement();
+        for (PH_Preparation_Ligne_VerrouPharmacie_Adapte adapte
+                : phPreparationLigneVerrouPharmacieAdapter.phPreparationLigneVerrouPharmacieAdapteList) {
 
-                if(phPreparationLigneVerrouPharmacieAdapte.getProduitCorrespondant().getID_produit() == phPreparationLigne.getProduitID() && !phPreparationLigneVerrouPharmacieAdapte.getNumLot().contentEquals(phPreparationLigne.getLotNumero()) && !phPreparationLigne.getLotNumero().contentEquals(""))
-                {
-                    //duplication ph_preparation_ligne
-                    PH_Preparation_Ligne phpreparationligneold = new PH_Preparation_Ligne(phPreparationLigne);
-                    phPreparationLigne = new PH_Preparation_Ligne(phpreparationligneold);
-                    Random randomactionPhpreparationLigne = new Random();
-                    int phPreparationLigneUID = randomactionPhpreparationLigne.nextInt();
-                    if(phPreparationLigneUID > 0)
-                        phPreparationLigneUID= phPreparationLigneUID*-1;
+            PH_Preparation_Ligne_VerrouPharmacieAdapter.PH_Preparation_Ligne_AdapteViewHolder vh =
+                    phPreparationLigneVerrouPharmacieAdapter.viewHolderList.get(
+                            phPreparationLigneVerrouPharmacieAdapter
+                                    .phPreparationLigneVerrouPharmacieAdapteList.indexOf(adapte));
 
-                    phPreparationLigne.set_UID(phPreparationLigneUID);
-                    phPreparationLigne.setPhiMR4UUID(phPreparationLigneUID);
-                    PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, phPreparationLigne);
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, phPreparationLigne.getPhiMR4UUID(), phPreparationLigne.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
-                }
+            PH_Preparation_Ligne ligne       = adapte.getPhPreparationLigne();
+            Stock_Lot_Emplacement_Light stock = adapte.getStockLotEmplacement();
 
-                stockLotEmplacementLight.setLot(viewHolder.valeurLot);
-                stockLotEmplacementLight.setQte_Preparer(viewHolder.valeurQteParLot == -1 ? viewHolder.valeurQteDemander : viewHolder.valeurQteParLot);
-                Date date_peremption = null;
-                try {
-                    date_peremption = dateDecodeur.parse(viewHolder.valeurDate);
-                    stockLotEmplacementLight.setPeremptionDate(dateFormat.format(date_peremption));
-                    phPreparationLigneVerrouPharmacieAdapte.setPeremptionDate(dateFormat.format(date_peremption));
-                    phPreparationLigne.setPeremptionDate(dateFormat.format(date_peremption));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+            // Duplication si lot différent
+            if (adapte.getProduitCorrespondant().getID_produit() == ligne.getProduitID()
+                    && !adapte.getNumLot().contentEquals(ligne.getLotNumero())
+                    && !ligne.getLotNumero().contentEquals("")) {
 
-                if(date_peremption != null)
-                {
-                    if(dateDuJour.after(date_peremption))
-                    {
-                        Alerte.afficherAlerte(DetailVerrouPharmacieActivity.this, "Erreur", "Un produit de la liste est périmé", "alerte");
-                        return;
-                    }
-                }
-
-                Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockLotEmplacementLight);
-
-                phPreparationLigneVerrouPharmacieAdapte.setNumLot(viewHolder.valeurLot);
-
-                phPreparationLigne.setLotNumero(viewHolder.valeurLot);
-                phPreparationLigne.setQte_preparer(stockLotEmplacementLight.getQte_Preparer());
-                phPreparationLigne.setQte_APreparer(stockLotEmplacementLight.getQte_Preparer());
-                phPreparationLigne.setQte_RAL(stockLotEmplacementLight.getQte_Preparer());
-                phPreparationLigne.setEmplacementParDefaut(stockLotEmplacementLight.getEmplacement());
-                long rowID = PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, phPreparationLigne);
-                if (rowID != -1) {
-                    compteurReussite++;
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, phPreparationLigne.getPhiMR4UUID(), phPreparationLigne.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
-                } else {
-                    compteurReussite = 0;
-                }
-
-                //gestiond des action utilisateur ligne pour le verrou pharmacie
-                Random randomactionligne = new Random();
-                int actionligneId = randomactionligne.nextInt();
-                if(actionligneId > 0)
-                    actionligneId= actionligneId*-1;
-
-                ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.getId(), "PH_Preparation_Ligne", phPreparationLigne.get_UID(), "", 0, phPreparationLigne.getQte_RAL(), phPreparationLigne.getProduitDesignation());
-                ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne);
+                PH_Preparation_Ligne copie = new PH_Preparation_Ligne(ligne);
+                int uid = genererIdNegatif();
+                copie.set_UID(uid);
+                copie.setPhiMR4UUID(uid);
+                PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, copie);
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db,
+                        PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE,
+                        copie.getPhiMR4UUID(), copie.get_UID(), DBOpenHelper.ActionsEAS.AJOUT);
             }
 
-            if (compteurReussite == phPreparationLigneVerrouPharmacieAdapter.phPreparationLigneVerrouPharmacieAdapteList.size()) {
-                phPreparationSelectionne.setStatut(getString(R.string.statutDéverrouillée));
-                phPreparationSelectionne.setPharmacien_userID(utilisateurConnecte.getId());
-                phPreparationSelectionne.setDelivranceValider_Par(utilisateurConnecte.getId());
-                phPreparationSelectionne.setDelivranceValider_Le(only_date);
-                phPreparationSelectionne.setDelivranceValider_A(only_heure);
+            stock.setLot(vh.valeurLot);
+            int qtePrepared = vh.valeurQteParLot == -1 ? vh.valeurQteDemander : vh.valeurQteParLot;
+            stock.setQte_Preparer(qtePrepared);
 
-                long rowID = PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, phPreparationSelectionne);
-                if (rowID != -1) {
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, phPreparationSelectionne.getPhiMR4UUID(), phPreparationSelectionne.getUID(), DBOpenHelper.ActionsEAS.MAJ);
-                } else {
-                    compteurReussite = 0;
-                }
+            Date datePeremption = null;
+            try {
+                datePeremption = fmtDisplay.parse(vh.valeurDate);
+                String dateSQL = fmtSQL.format(datePeremption);
+                stock.setPeremptionDate(dateSQL);
+                adapte.setPeremptionDate(dateSQL);
+                ligne.setPeremptionDate(dateSQL);
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
 
-            if (compteurReussite != phPreparationLigneVerrouPharmacieAdapter.phPreparationLigneVerrouPharmacieAdapteList.size()) {
-                Alerte.afficherAlerte(DetailVerrouPharmacieActivity.this, "Alerte", "Une erreur est survenue, aucun traitement ne sera effectué.", "alerte");
-                ElementASynchroniserOpenHelper.viderTableElementASynchroniser(db);
-                DetailVerrouPharmacieActivity.this.finish();
+            if (datePeremption != null && dateDuJour.after(datePeremption)) {
+                Alerte.afficherAlerte(this, "Erreur",
+                        "Un produit de la liste est périmé", "alerte");
                 return;
             }
 
-            Toast.makeText(DetailVerrouPharmacieActivity.this, "Préparation déverrouillée", Toast.LENGTH_SHORT).show();
+            Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock);
+            adapte.setNumLot(vh.valeurLot);
+            ligne.setLotNumero(vh.valeurLot);
+            ligne.setQte_preparer(stock.getQte_Preparer());
+            ligne.setQte_APreparer(stock.getQte_Preparer());
+            ligne.setQte_RAL(stock.getQte_Preparer());
+            ligne.setEmplacementParDefaut(stock.getEmplacement());
 
-            if (statutConnexion) {
-                ElementASynchroniserOpenHelper.toutSynchroniser(DetailVerrouPharmacieActivity.this, db, utilisateurConnecte, true);
+            long rowID = PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ligne);
+            if (rowID != -1) {
+                compteurReussite++;
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db,
+                        PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE,
+                        ligne.getPhiMR4UUID(), ligne.get_UID(), DBOpenHelper.ActionsEAS.MAJ);
+            } else {
+                compteurReussite = 0;
             }
-            onBackPressed();
+
+            // Action ligne
+            int ligneId = genererIdNegatif();
+            ActionUtilisateur_Ligne actionLigne = new ActionUtilisateur_Ligne(
+                    ligneId, action.getId(), "PH_Preparation_Ligne",
+                    ligne.get_UID(), "", 0, ligne.getQte_RAL(),
+                    ligne.getProduitDesignation());
+            ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionLigne);
         }
+
+        int total = phPreparationLigneVerrouPharmacieAdapter
+                .phPreparationLigneVerrouPharmacieAdapteList.size();
+
+        if (compteurReussite == total) {
+            phPreparationSelectionne.setStatut(getString(R.string.statutDéverrouillée));
+            phPreparationSelectionne.setPharmacien_userID(utilisateurConnecte.getId());
+            phPreparationSelectionne.setDelivranceValider_Par(utilisateurConnecte.getId());
+            phPreparationSelectionne.setDelivranceValider_Le(only_date);
+            phPreparationSelectionne.setDelivranceValider_A(only_heure);
+
+            long rowID = PH_PreparationOpenHelper.mettreAJourUnPHPreparation(
+                    db, phPreparationSelectionne);
+            if (rowID != -1) {
+                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db,
+                        PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION,
+                        phPreparationSelectionne.getPhiMR4UUID(),
+                        phPreparationSelectionne.getUID(), DBOpenHelper.ActionsEAS.MAJ);
+            } else {
+                compteurReussite = 0;
+            }
+        }
+
+        if (compteurReussite != total) {
+            Alerte.afficherAlerte(this, "Alerte",
+                    "Une erreur est survenue, aucun traitement ne sera effectué.", "alerte");
+            ElementASynchroniserOpenHelper.viderTableElementASynchroniser(db);
+            finish();
+            return;
+        }
+
+        Toast.makeText(this, "Préparation déverrouillée", Toast.LENGTH_SHORT).show();
+        if (statutConnexion) {
+            ElementASynchroniserOpenHelper.toutSynchroniser(
+                    this, db, utilisateurConnecte, true);
+        }
+        onBackPressed();
+    }
+
+    // ─── Alerte confirmation retour ──────────────────────────────────────────
+
+    public void afficherAlerteConfirmationRetour(Context context, LayoutInflater inflater,
+                                                 Bundle bundle) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View layout = inflater.inflate(R.layout.alerte_confirmation, null);
+
+        LinearLayout zoneOk      = layout.findViewById(R.id.buttonOk);
+        LinearLayout zoneAnnuler = layout.findViewById(R.id.buttonAnnuler);
+        ((TextView) layout.findViewById(R.id.messageFin))
+                .setText("Vous allez quitter le verrou, confirmez vous ?");
+        builder.setView(layout);
+
+        AlertDialog alertDialog = builder.create();
+        Objects.requireNonNull(alertDialog.getWindow()).setGravity(Gravity.CENTER);
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        alertDialog.show();
+
+        zoneOk.setOnClickListener(v -> {
+            alertDialog.dismiss();
+            retourService(bundle);
+        });
+        zoneAnnuler.setOnClickListener(v -> alertDialog.dismiss());
+    }
+
+    @Override
+    public void retourService(Bundle bundle) {
+        Intent intent = new Intent(this, ServiceVerrouPharmacieActivity.class);
+        intent.putExtras(super.getBundle());
+        startActivity(intent);
+        finish();
+    }
+
+    // ─── Utilitaires ────────────────────────────────────────────────────────
+
+    private void afficherToast(String message) {
+        Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
+
+    private int parseOuZero(TextView tv) {
+        String s = tv.getText().toString();
+        return s.isEmpty() ? 0 : Integer.parseInt(s);
+    }
+
+    private int genererIdNegatif() {
+        int id = new Random().nextInt();
+        return id > 0 ? -id : id;
     }
 }
