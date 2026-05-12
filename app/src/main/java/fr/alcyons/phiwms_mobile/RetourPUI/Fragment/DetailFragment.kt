@@ -54,6 +54,7 @@ class DetailFragment : Fragment()
     private var maxQuantite = 0
     private var ligneCouranteExisteEnBDD = true
     private var emplacementsDisponibles: List<Depot_Emplacement> = emptyList()
+    private var retourLigneSelectionneeUid: Int? = null
 
     companion object
     {
@@ -81,7 +82,7 @@ class DetailFragment : Fragment()
         retourCourant = RetourOpenHelper.getRetourByID(db, retourLigneInitiale.retour_UID)
         produit = ProduitOpenHelper.getProduitByID(db, retourLigneInitiale.code_produit)
         retourLigneCourante = Retour_Ligne(retourLigneInitiale)
-        val retourLigneSelectionneeUid = arguments?.getInt(ARG_RETOUR_LIGNE_SELECTIONNEE_UID)
+        retourLigneSelectionneeUid = arguments?.getInt(ARG_RETOUR_LIGNE_SELECTIONNEE_UID)
 
         emplacementView = view.findViewById(R.id.emplacementLot_TV)
         chevronEmplacement = view.findViewById(R.id.chevronEmplacement)
@@ -187,16 +188,20 @@ class DetailFragment : Fragment()
         val quantiteSaisieAvantChangement = this.quantiteCompteeET.text.toString().toIntOrNull() ?: 0
         val emplacementSelectionne = emplacement.ifEmpty { this.retourLigneInitiale.retourPUI_Emplacement?.trim().orEmpty().ifEmpty { produit.emplacement_PUI_Defaut } }
 
-        val ligneExistante = getRetourLigneByEmplacement(emplacementSelectionne)
-        if (ligneExistante != null)
-        {
-            this.retourLigneCourante = ligneExistante
-            this.ligneCouranteExisteEnBDD = true
-        }
+        if (isEditingReturnedLine()) { this.ligneCouranteExisteEnBDD = true }
         else
         {
-            this.retourLigneCourante = createTemporaryRetourLigne(emplacementSelectionne)
-            this.ligneCouranteExisteEnBDD = false
+            val ligneExistante = getRetourLigneByEmplacement(emplacementSelectionne)
+            if (ligneExistante != null)
+            {
+                this.retourLigneCourante = ligneExistante
+                this.ligneCouranteExisteEnBDD = true
+            }
+            else
+            {
+                this.retourLigneCourante = createTemporaryRetourLigne(emplacementSelectionne)
+                this.ligneCouranteExisteEnBDD = false
+            }
         }
 
         this.maxQuantite = getQuantiteRestantePourLigne(retourLigneCourante)
@@ -232,6 +237,12 @@ class DetailFragment : Fragment()
             return
         }
 
+        if (isEditingReturnedLine())
+        {
+            enregistrerLigneDepuisRetourner(quantite, emplacementSelectionne)
+            return
+        }
+
         this.retourLigneCourante.qte_Retourner = quantite.toDouble()
         if (quantite == 0)
         {
@@ -246,6 +257,37 @@ class DetailFragment : Fragment()
 
         if (this.ligneCouranteExisteEnBDD) { Retour_LigneOpenHelper.mettreAJourUnRetourLigne(this.db, this.retourLigneCourante) }
         else if (quantite > 0) { Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(this.db, this.retourLigneCourante) }
+
+        this.onValider?.invoke()
+    }
+
+    private fun enregistrerLigneDepuisRetourner(quantite: Int, emplacementSelectionne: String)
+    {
+        val ligneSelectionnee = Retour_LigneOpenHelper.getRetourLigneByID(this.db, this.retourLigneCourante._UID) ?: this.retourLigneCourante
+        val ligneDestinationExistante = getRetourLigneByEmplacement(emplacementSelectionne, ligneSelectionnee._UID)
+
+        if (quantite == 0)
+        {
+            Retour_LigneOpenHelper.supprimerUnRetourLigne(this.db, ligneSelectionnee)
+            this.onValider?.invoke()
+            return
+        }
+
+        if (ligneDestinationExistante != null)
+        {
+            ligneDestinationExistante.qte_Retourner += quantite.toDouble()
+            ligneDestinationExistante.retourPUI_Zone = getZoneNameForEmplacement(emplacementSelectionne)
+            ligneDestinationExistante.retourPUI_Emplacement = emplacementSelectionne
+            Retour_LigneOpenHelper.mettreAJourUnRetourLigne(this.db, ligneDestinationExistante)
+            Retour_LigneOpenHelper.supprimerUnRetourLigne(this.db, ligneSelectionnee)
+        }
+        else
+        {
+            ligneSelectionnee.qte_Retourner = quantite.toDouble()
+            ligneSelectionnee.retourPUI_Zone = getZoneNameForEmplacement(emplacementSelectionne)
+            ligneSelectionnee.retourPUI_Emplacement = emplacementSelectionne
+            Retour_LigneOpenHelper.mettreAJourUnRetourLigne(this.db, ligneSelectionnee)
+        }
 
         this.onValider?.invoke()
     }
@@ -288,7 +330,7 @@ class DetailFragment : Fragment()
         buttonAnnuler.setOnClickListener { alertDialog.dismiss() }
     }
 
-    private fun getRetourLigneByEmplacement(emplacement: String): Retour_Ligne? { return RetourPUIQuantiteHelper.getNegativeLinesForBase(this.db, this.retourCourant, this.retourLigneInitiale).firstOrNull { it.retourPUI_Emplacement == emplacement } }
+    private fun getRetourLigneByEmplacement(emplacement: String, excludedUid: Int? = null): Retour_Ligne? { return RetourPUIQuantiteHelper.getNegativeLinesForBase(this.db, this.retourCourant, this.retourLigneInitiale).firstOrNull { it.retourPUI_Emplacement == emplacement && (excludedUid == null || it._UID != excludedUid) } }
 
     private fun getQuantiteRestantePourLigne(retourLigne: Retour_Ligne): Int
     {
@@ -334,6 +376,12 @@ class DetailFragment : Fragment()
         var pasNumberPicker = this.produit.cond_distrib.toInt()
         if (pasNumberPicker == 0 || pasNumberPicker >= this.maxQuantite) { pasNumberPicker = 1 }
         return max(1, pasNumberPicker)
+    }
+
+    private fun isEditingReturnedLine(): Boolean
+    {
+        val selectedUid = this.retourLigneSelectionneeUid ?: return false
+        return selectedUid < 0 && this.retourLigneCourante._UID == selectedUid
     }
 
     private fun getListeMoisDatePicker(): Array<String> { return Array(12) { index -> String.format("%02d", index + 1) } }
