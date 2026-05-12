@@ -244,6 +244,17 @@ public class PH_Preparation_Ligne_VerrouPharmacieAdapter extends ArrayAdapter {
             boolean estVerrouille = item.valeurStatut.equals("Verrouillé");
             item.valeurStatut = estVerrouille ? "Déverrouillé" : "Verrouillé";
             appliquerStatutVerrouillage(item);
+
+            if (mOnDataChangeListener != null) {
+                int nbColis = item.recupererNbColis(
+                        phPrepAdapte.getProduitCorrespondant().getID_produit(),
+                        item.valeurQteParLot
+                );
+                // Si on verrouille → on retire les colis, si on déverrouille → on les ajoute
+                int avant = estVerrouille ? 0 : nbColis;  // état AVANT le clic
+                int apres = estVerrouille ? nbColis : 0;  // état APRÈS le clic
+                mOnDataChangeListener.onDataChanged(avant, apres, estVerrouille);
+            }
             notifyDataSetChanged();
         });
 
@@ -370,8 +381,12 @@ public class PH_Preparation_Ligne_VerrouPharmacieAdapter extends ArrayAdapter {
 
         PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, phPrepLigne);
 
+        boolean verrou = false;
+        if(phPrepLigne.isVerrouiller())
+            verrou = true;
+
         if (mOnDataChangeListener != null) {
-            mOnDataChangeListener.onDataChanged(qteAvant, qteApres);
+            mOnDataChangeListener.onDataChanged(qteAvant, qteApres, verrou);
         }
     }
 
@@ -385,7 +400,7 @@ public class PH_Preparation_Ligne_VerrouPharmacieAdapter extends ArrayAdapter {
     }
 
     public interface OnDataChangeListener {
-        void onDataChanged(int quantitéAvant, int quantitéAprès);
+        void onDataChanged(int quantitéAvant, int quantitéAprès, boolean verrou);
     }
 
     // ─── DatePickerFragment ─────────────────────────────────────────────────
