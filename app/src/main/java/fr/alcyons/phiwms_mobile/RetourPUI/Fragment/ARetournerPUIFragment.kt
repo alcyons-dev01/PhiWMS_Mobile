@@ -20,7 +20,7 @@ class ARetournerPUIFragment : Fragment()
         private const val ARG_LISTE = "liste"
         private const val ARG_RETOUR = "retour"
         private const val SHOULD_SHOW_QTE_ARETOURNER = false
-        private const val SHOULD_AGGREGATE_BY_PRODUIT = true
+        private const val SHOULD_AGGREGATE_BY_PRODUIT = false
 
         @JvmStatic
         fun newInstance(

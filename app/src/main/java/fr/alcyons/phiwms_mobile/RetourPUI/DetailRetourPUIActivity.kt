@@ -221,10 +221,11 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     private fun loadData()
     {
         this.retourLigneList = Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(this.db, this.retourSelectionne)
+        RetourPUIQuantiteHelper.normalizeNegativeLineOrigins(this.db, this.retourSelectionne, this.retourLigneList ?: emptyList())
 
         for (retourLigneTemp in this.retourLigneList ?: return)
         {
-            val retourLigneRetournee = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(this.db, this.retourSelectionne, retourLigneTemp.code_produit)
+            val retourLigneRetournee = RetourPUIQuantiteHelper.getNegativeLinesForBase(this.db, this.retourSelectionne ?: return, retourLigneTemp)
 
             if (retourLigneRetournee.isEmpty())
             {
@@ -362,15 +363,12 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
 
     private fun creationRetourLigne(retourLigneBase: Retour_Ligne, produit: Produit)
     {
-        val random = Random()
-        var retourLigneId = random.nextInt()
-        if (retourLigneId > 0) retourLigneId *= -1
-
         val retourLigneCourant = Retour_Ligne(retourLigneBase)
-        retourLigneCourant._UID = retourLigneId
+        retourLigneCourant._UID = RetourPUIQuantiteHelper.generateNegativeUid()
         retourLigneCourant.retourPUI_Zone = produit.zone_PUI_Defaut
         retourLigneCourant.retourPUI_Emplacement = produit.emplacement_PUI_Defaut
-        retourLigneCourant.qte_Retourner = retourLigneBase.qte_Retourner
+        retourLigneCourant.emplacementOrigine = RetourPUIQuantiteHelper.buildBaseOrigin(retourLigneBase._UID)
+        retourLigneCourant.qte_Retourner = 0.0
 
         Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(this.db, retourLigneCourant)
     }
@@ -379,7 +377,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     {
         if (this.isScannerOpen) { this.closeScanner() }
         if (this.isSearchOpen) { this.closeSearch() }
-        this.openDetailFragment(retourLigne)
+        this.openDetailFragment(this.resolveBaseRetourLigne(retourLigne))
     }
 
     private fun openARetourner()
@@ -511,7 +509,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
                 if (this.getRetourLignesRetournees().isNotEmpty()) { if (!this.isRetournerOpen) { this.openRetourner() } }
                 else if (this.isRetournerOpen) { this.closeRetourner() }
                 if (!this.isARetournerOpen) { this.openARetourner() }
-                this.aRetournerPUIFragment?.scrollToPosition((this.retourLigneList ?: emptyList()).indexOfFirst { it.code_produit == retourLigneBase.code_produit })
+                this.aRetournerPUIFragment?.scrollToPosition((this.retourLigneList ?: emptyList()).indexOfFirst { it._UID == retourLigneBase._UID })
             }
 
             this.supportFragmentManager.beginTransaction().replace(R.id.detailContainer, fragment).commitNow()
@@ -537,15 +535,24 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         this.isDetailOpen = false
     }
 
-    private fun getRetourLignesRetournees(): List<Retour_Ligne> { return Retour_LigneOpenHelper.getAllRetourLignesNegByRetour(this.db, this.retourSelectionne ?: return emptyList()).filter { it.qte_Retourner > 0 } }
+    private fun getRetourLignesRetournees(): List<Retour_Ligne> { return Retour_LigneOpenHelper.getAllRetourLignesNegByRetour(this.db, this.retourSelectionne ?: return emptyList()).filter { it.qte_Retourner > 0 && RetourPUIQuantiteHelper.parseBaseUid(it) != null } }
 
     private fun getRetourLignesARetourner(): List<Retour_Ligne>
     {
         val lignesBase = this.retourLigneList ?: return emptyList()
+        val lignesNegatives = Retour_LigneOpenHelper.getAllRetourLignesNegByRetour(this.db, this.retourSelectionne ?: return emptyList())
         return lignesBase.filter { ligneBase ->
-            val quantiteRetournee = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(this.db, this.retourSelectionne ?: return@filter false, ligneBase.code_produit).sumOf { it.qte_Retourner.toInt() }
+            val quantiteRetournee = RetourPUIQuantiteHelper.getAllocatedQuantityForBase(lignesNegatives, ligneBase)
             quantiteRetournee < ligneBase.qte_avant_retour.toInt()
         }
+    }
+
+    private fun resolveBaseRetourLigne(retourLigne: Retour_Ligne): Retour_Ligne
+    {
+        if (retourLigne._UID > 0) { return retourLigne }
+
+        val baseUid = RetourPUIQuantiteHelper.parseBaseUid(retourLigne) ?: return retourLigne
+        return (this.retourLigneList ?: emptyList()).firstOrNull { it._UID == baseUid } ?: Retour_LigneOpenHelper.getRetourLigneByID(this.db, baseUid) ?: retourLigne
     }
 
     private fun openScanner()

@@ -28,8 +28,8 @@ import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne
 import fr.alcyons.phiwms_mobile.Outils.Alerte
 import fr.alcyons.phiwms_mobile.R
 import fr.alcyons.phiwms_mobile.RetourPUI.DetailRetourPUIActivity
+import fr.alcyons.phiwms_mobile.RetourPUI.RetourPUIQuantiteHelper
 import java.util.Calendar
-import java.util.Random
 import kotlin.math.max
 
 class DetailFragment : Fragment()
@@ -213,12 +213,12 @@ class DetailFragment : Fragment()
         this.onValider?.invoke()
     }
 
-    private fun getRetourLigneByEmplacement(emplacement: String): Retour_Ligne? { return Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(this.db, this.retourCourant, this.retourLigneInitiale.code_produit).firstOrNull { it.retourPUI_Emplacement == emplacement } }
+    private fun getRetourLigneByEmplacement(emplacement: String): Retour_Ligne? { return RetourPUIQuantiteHelper.getNegativeLinesForBase(this.db, this.retourCourant, this.retourLigneInitiale).firstOrNull { it.retourPUI_Emplacement == emplacement } }
 
     private fun getQuantiteRestantePourLigne(retourLigne: Retour_Ligne): Int
     {
         var quantiteRestante = this.retourLigneInitiale.qte_avant_retour.toInt()
-        val retourLignesNegatives = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(this.db, this.retourCourant, this.retourLigneInitiale.code_produit)
+        val retourLignesNegatives = RetourPUIQuantiteHelper.getNegativeLinesForBase(this.db, this.retourCourant, this.retourLigneInitiale)
 
         for (ligne in retourLignesNegatives) { if (ligne._UID != retourLigne._UID) { quantiteRestante -= ligne.qte_Retourner.toInt() } }
 
@@ -228,11 +228,10 @@ class DetailFragment : Fragment()
     private fun createTemporaryRetourLigne(emplacement: String): Retour_Ligne
     {
         val ligne = Retour_Ligne(this.retourLigneInitiale)
-        var retourLigneId = Random().nextInt()
-        if (retourLigneId > 0) { retourLigneId *= -1 }
-        ligne._UID = retourLigneId
+        ligne._UID = RetourPUIQuantiteHelper.generateNegativeUid()
         ligne.retourPUI_Zone = getZoneNameForEmplacement(emplacement)
         ligne.retourPUI_Emplacement = emplacement
+        ligne.emplacementOrigine = RetourPUIQuantiteHelper.buildBaseOrigin(this.retourLigneInitiale._UID)
         ligne.qte_Retourner = 0.0
         return ligne
     }
@@ -253,12 +252,7 @@ class DetailFragment : Fragment()
         return EmplacementOpenHelper.getEmplacementsParZoneID(this.db, zone.zoneID)
     }
 
-    private fun getDisplayedLot(): String
-    {
-        val lotRetourne = this.retourLigneInitiale.lot_Retourner?.trim().orEmpty()
-        if (lotRetourne.isNotEmpty()) { return lotRetourne }
-        return this.retourLigneInitiale.lot?.trim().orEmpty()
-    }
+    private fun getDisplayedLot(): String { return RetourPUIQuantiteHelper.getDisplayedLot(this.retourLigneInitiale) }
 
     private fun getPasQuantite(): Int
     {

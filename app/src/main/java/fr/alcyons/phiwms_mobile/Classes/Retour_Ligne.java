@@ -205,6 +205,7 @@ public class Retour_Ligne implements Serializable, Comparable {
         this.Quarantaine_Qte_Demander = cursor.getInt(Retour_LigneOpenHelper.Constantes.NUM_COL_QUARANTAINE_QTE_DEMANDER_RETOUR_LIGNE);
         this.Serie_Retourner = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_SERIE_RETOURNER);
         this.RetourPUI_Emplacement = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_RETOURPUI_EMPLACEMENT_RETOUR_LIGNE);
+        this.emplacementOrigine = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_EMPLACEMENTORIGINE_RETOUR_LIGNE);
         this.RetourPUI_Zone = cursor.getString(Retour_LigneOpenHelper.Constantes.NUM_COL_RETOURPUI_ZONE_RETOUR_LIGNE);
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
