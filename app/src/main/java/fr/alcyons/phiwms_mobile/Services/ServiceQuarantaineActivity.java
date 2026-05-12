@@ -19,6 +19,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -46,12 +48,15 @@ import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerDocumentActivity;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.SYS_User_RulesOpenHelper;
+import fr.alcyons.phiwms_mobile.Classes.Depot;
+import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
@@ -59,6 +64,7 @@ import fr.alcyons.phiwms_mobile.Classes.SYS_User_Rules;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourDestructionAdapter;
 
+import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourQuarantaineAdapter;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
@@ -69,12 +75,17 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
     Retour retourSelectionne;
     PackageManager pm;
     List<Retour> retourList;
+    List<Retour> retourListBase;
     ListView retourListView;
-    RetourDestructionAdapter retourDestructionAdapter;
+    RetourQuarantaineAdapter retourQuarantaineAdapter;
     JSONArray retourJSONArray;
     Context context;
     boolean connexionDirecte;
     ActivityResultLauncher<Intent> resultScanDocument;
+
+    List<String> listeDepotQuarantaine;
+    ArrayAdapter<String> autoCompleteAdapter;
+    AutoCompleteTextView autoComplete;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -95,7 +106,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
         // Gestion de la listView
         retourListView = findViewById(R.id.listeView);
         retourListView.setOnItemClickListener((parent, view, position, id) -> {
-            retourSelectionne = (Retour) retourDestructionAdapter.getItem(position);
+            retourSelectionne = (Retour) retourQuarantaineAdapter.getItem(position);
 
             Intent serviceQuarantaineIntent = new Intent(ServiceQuarantaineActivity.this, DetailQuarantaineActivity.class);
             Bundle serviceQuarantaineBundle = ServiceQuarantaineActivity.super.getBundle();
@@ -127,12 +138,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                                     if (retour_alcyons != null)
                                         retourList.add(retour_alcyons);
 
-                                    ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                                    retourList.sort(Comparator.comparing(Retour::getDate_retour));
-                                    retourDestructionAdapter = new RetourDestructionAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
-                                    //retourListView.setDivider(footer);
-
-                                    retourListView.setAdapter(retourDestructionAdapter);
+                                    gestionAdapter();
                                     if (retourList.isEmpty()) {
                                         vide = true;
                                         nomServiceVide = "Quarantaine";
@@ -153,12 +159,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                                 if (retour_alcyons != null)
                                     retourList.add(retour_alcyons);
 
-                                ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                                retourList.sort(Comparator.comparing(Retour::getDate_retour));
-                                retourDestructionAdapter = new RetourDestructionAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
-                                //retourListView.setDivider(footer);
-
-                                retourListView.setAdapter(retourDestructionAdapter);
+                                gestionAdapter();
                                 if (retourList.isEmpty()) {
                                     vide = true;
                                     nomServiceVide = "Quarantaine";
@@ -166,12 +167,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                                 }
                             }
                         } else {
-                            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(retourList.size()));
-                            retourList.sort(Comparator.comparing(Retour::getDate_retour));
-                            retourDestructionAdapter = new RetourDestructionAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
-                            //retourListView.setDivider(footer);
-
-                            retourListView.setAdapter(retourDestructionAdapter);
+                           gestionAdapter();
                             if (retourList.isEmpty()) {
                                 vide = true;
                                 nomServiceVide = "Quarantaine";
@@ -198,6 +194,9 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
     public void onResume() {
         super.onResume();
         retourList = new ArrayList<>();
+        retourListBase = new ArrayList<>();
+        listeDepotQuarantaine = new ArrayList<>();
+        listeDepotQuarantaine.add("Tous les dépôts");
 
         if (statutConnexion && passageParOnCreate && !connexionDirecte) {
 
@@ -214,6 +213,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
         else
         {
             retourList = RetourOpenHelper.getAllRetoursByStatutEtEnAttenteDe(db, getString(R.string.statutEncours), getString(R.string.MiseEnQuarantaine));
+            retourListBase.addAll(retourList);
 
             if (retourList.isEmpty()) {
                 if(connexionDirecte)
@@ -231,6 +231,7 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
             else if (retourSelectionne != null) {
                 if (retourSelectionne.getStatut().equals(getString(R.string.statutValide)) && retourSelectionne.getEn_Attente_de().equals(getString(R.string.Quarantaine))) {
                     retourList.remove(retourSelectionne);
+                    retourListBase.remove(retourSelectionne);
                 }
             }
             else
@@ -238,7 +239,6 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                 passageParOnCreate = false;
                 if(connexionDirecte)
                 {
-                    lancerScan();
                     connexionDirecte = !connexionDirecte;
                 }
             }
@@ -297,6 +297,14 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                                     }
 
                                     retourList.add(retour);
+                                    retourListBase.add(retour);
+
+                                    String[] intitule_tab = retour.getIntitule().split(":");
+                                    String depot_origine = intitule_tab[0];
+
+                                    if(!listeDepotQuarantaine.contains(depot_origine))
+                                        listeDepotQuarantaine.add(depot_origine);
+
                                     RetourOpenHelper.insererUnRetourEnBDD(db, retour);
                                     JSONArray retourLigneJSONArray = retourJSONObject.getJSONArray("ph_retour_ligne");
 
@@ -319,11 +327,8 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
                                 ServiceQuarantaineActivity.this.finish();
                             } else {
                                 if (passageParOnCreate) {
-                                    retourList.sort(Comparator.comparing(Retour::getDate_retour));
-                                    retourDestructionAdapter = new RetourDestructionAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
-                                    //retourListView.setDivider(footer);
-
-                                    retourListView.setAdapter(retourDestructionAdapter);
+                                    initialiserAutoComplete();
+                                    gestionAdapter();
                                     new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
                                 }
                                 passageParOnCreate = false;
@@ -365,60 +370,6 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
             }
         }
     }
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.prepareOptionsMenu(menu, retourDestructionAdapter, null, "Produit, Intitulé, N°...");
-        MenuItem item = menu.findItem(R.id.menuDatamatrix);
-        item.setOnMenuItemClickListener(item1 -> {
-            lancerScan();
-            return true;
-        });
-        return true;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        //Récupération du menu
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_action, menu);
-        menu.findItem(R.id.menuDatamatrix).setVisible(true);
-        return true;
-    }
-
-
-    public void lancerScan()
-    {
-        Bundle scanDocumentBundle = ServiceQuarantaineActivity.super.getBundle();
-        scanDocumentBundle.putString("contexte", String.valueOf(R.string.scannerContexteDocument));
-        scanDocumentBundle.putBoolean("isBoutonSuppressionExistant", true);
-
-
-        Intent scanDocumentIntent;
-        if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell") || Build.MANUFACTURER.toLowerCase().contains("google"))
-        {
-            scanDocumentIntent = new Intent(ServiceQuarantaineActivity.this, ScannerDocumentActivity.class);
-            scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteDocument);
-            scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'un document");
-        }
-        else
-        {
-            if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
-            {
-                scanDocumentIntent = new Intent(ServiceQuarantaineActivity.this, BarcodeCaptureActivity.class);
-                scanDocumentBundle.putBoolean("modeRafale", false);
-            }
-            else
-            {
-                scanDocumentIntent = new Intent(ServiceQuarantaineActivity.this, ScannerDocumentActivity.class);
-                scanDocumentBundle.putInt("scannerContexteInt", R.string.scannerContexteDocument);
-                scanDocumentBundle.putString("TextBannerManuel", "Scannez le datamatrix d'un document");
-            }
-        }
-
-        scanDocumentIntent.putExtras(scanDocumentBundle);
-        resultScanDocument.launch(scanDocumentIntent);
-    }
 
     public void afficherSnackBarPreparationQuarantaine() {
         Snackbar snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Document scanné inconnu</b>", 0), Snackbar.LENGTH_LONG);
@@ -428,6 +379,63 @@ public class ServiceQuarantaineActivity extends ServiceAvecConnexionActivity {
         TextView textView = layout.findViewById(com.google.android.material.R.id.snackbar_text);
         textView.setTextSize(TypedValue.TYPE_STRING, 8);
         snackbar.show();
+    }
+
+    private void gestionAdapter()
+    {
+        retourList.sort(Comparator.comparing(Retour::getDate_retour));
+        retourQuarantaineAdapter = new RetourQuarantaineAdapter(ServiceQuarantaineActivity.this, db, retourList, utilisateurConnecte);
+        retourListView.setAdapter(retourQuarantaineAdapter);
+    }
+
+    private void initialiserAutoComplete() {
+        autoComplete = findViewById(R.id.listeFiltre);
+
+        autoCompleteAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_depot, listeDepotQuarantaine);
+        autoComplete.setAdapter(autoCompleteAdapter);
+        autoComplete.setThreshold(100); // Empêche le filtrage automatique
+
+        // Affiche le premier élément par défaut
+        if (!listeDepotQuarantaine.isEmpty()) {
+            autoComplete.setText(listeDepotQuarantaine.get(0), false);
+        }
+
+        // Hauteur = 1/3 de l'écran
+        int hauteurEcran = getResources().getDisplayMetrics().heightPixels;
+        autoComplete.setDropDownHeight(hauteurEcran / 3);
+        int dpToPx = (int) (12 * getResources().getDisplayMetrics().density);
+        autoComplete.post(() -> autoComplete.setDropDownWidth(findViewById(R.id.listeFiltre_LL).getWidth() - dpToPx));
+        autoComplete.setDropDownBackgroundResource(android.R.color.white);
+
+        // Ouvre la liste au clic
+        autoComplete.setOnClickListener(v -> autoComplete.showDropDown());
+
+        // Chevron ouvre aussi la liste
+        findViewById(R.id.chevronFiltre).setOnClickListener(v -> autoComplete.showDropDown());
+
+        // Gère la sélection
+        autoComplete.setOnItemClickListener((parent, view, position, id) -> {
+            String depot = listeDepotQuarantaine.get(position);
+            autoComplete.setText(depot, false);
+            autoComplete.dismissDropDown();
+
+            retourList = new ArrayList<>();
+
+            if (depot.contentEquals("Tous les dépôts")) {
+                retourList.addAll(retourListBase);
+            } else {
+                for (Retour retourCourant : retourListBase) {
+                    String[] intitule_tab = retourCourant.getIntitule().split(":");
+                    String depot_origine = intitule_tab[0];
+
+                    if (depot_origine.contentEquals(depot)) {
+                        retourList.add(retourCourant);
+                    }
+                }
+            }
+
+            gestionAdapter();
+        });
     }
 }
 
