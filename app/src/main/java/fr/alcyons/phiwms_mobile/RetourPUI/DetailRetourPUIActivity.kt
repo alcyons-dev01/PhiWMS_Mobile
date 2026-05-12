@@ -471,18 +471,41 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
 
     private fun scrollToItemOrDisplayAlert(idProduit: Int)
     {
-        val position = (this.retourLigneList ?: emptyList()).indexOfFirst { retourLigne -> retourLigne.code_produit == idProduit }
-
-        if (position >= 0)
+        val positionARetourner = getRetourLignesARetourner().indexOfFirst { retourLigne -> retourLigne.code_produit == idProduit }
+        if (positionARetourner >= 0)
         {
-            if (!this.isARetournerOpen)
-            {
-                this.closeOpenedFragments()
-                this.openARetourner()
-            }
-            this.aRetournerPUIFragment?.scrollToPosition(position)
+            openARetournerAndScroll(positionARetourner)
+            return
         }
-        else { Alerte.afficherAlerteInformation(this, this.layoutInflater, "Produit non trouvé", "Ce produit n'est pas dans la liste de retour PUI", false, false) }
+
+        val positionRetourner = getRetourLignesRetournees().indexOfFirst { retourLigne -> retourLigne.code_produit == idProduit }
+        if (positionRetourner >= 0)
+        {
+            openRetournerAndScroll(positionRetourner)
+            return
+        }
+
+        Alerte.afficherAlerteInformation(this, this.layoutInflater, "Produit non trouvé", "Ce produit n'est pas dans la liste de retour PUI", false, false)
+    }
+
+    private fun openARetournerAndScroll(position: Int)
+    {
+        if (!this.isARetournerOpen)
+        {
+            this.closeOpenedFragments()
+            this.openARetourner()
+        }
+        this.aRetournerPUIFragment?.scrollToPosition(position)
+    }
+
+    private fun openRetournerAndScroll(position: Int)
+    {
+        if (!this.isRetournerOpen)
+        {
+            this.closeOpenedFragments()
+            this.openRetourner()
+        }
+        this.retournerPUIFragment?.scrollToPosition(position)
     }
 
     private fun closeOpenedFragments()
@@ -505,7 +528,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
             fragment.onValider = {
                 refreshRetourData()
                 closeDetailFragment()
-                syncRetournerSectionAfterDetailSave()
+                openARetournerAfterDetailSave()
             }
 
             this.supportFragmentManager.beginTransaction().replace(R.id.detailContainer, fragment).commitNow()
@@ -531,16 +554,10 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         this.isDetailOpen = false
     }
 
-    private fun syncRetournerSectionAfterDetailSave()
+    private fun openARetournerAfterDetailSave()
     {
-        val lignesRetournees = getRetourLignesRetournees()
-        if (lignesRetournees.isNotEmpty())
-        {
-            if (!isRetournerOpen) { openRetourner() }
-            return
-        }
-
         if (isRetournerOpen) { closeRetourner() }
+        if (!isARetournerOpen) { openARetourner() }
     }
 
     private fun getRetourLignesRetournees(): List<Retour_Ligne> { return Retour_LigneOpenHelper.getAllRetourLignesNegByRetour(this.db, this.retourSelectionne ?: return emptyList()).filter { it.qte_Retourner > 0 && RetourPUIQuantiteHelper.parseBaseUid(it) != null }.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.produit_Designation ?: "" }) }
@@ -764,11 +781,8 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     {
         val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (this@DetailRetourPUIActivity.isDetailOpen) {
-                    this@DetailRetourPUIActivity.closeDetailFragment()
-                } else {
-                    Alerte.afficherAlerteConfirmation(this@DetailRetourPUIActivity, this@DetailRetourPUIActivity.layoutInflater, getBundle(), "Voulez-vous quitter le détail du retour PUI ?", true, false, this@DetailRetourPUIActivity)
-                }
+                if (this@DetailRetourPUIActivity.isDetailOpen) { this@DetailRetourPUIActivity.closeDetailFragment() }
+                else { Alerte.afficherAlerteConfirmation(this@DetailRetourPUIActivity, this@DetailRetourPUIActivity.layoutInflater, getBundle(), "Voulez-vous quitter le détail du retour PUI ?", true, false, this@DetailRetourPUIActivity) }
             }
         }
         this.onBackPressedDispatcher.addCallback(this, callback)

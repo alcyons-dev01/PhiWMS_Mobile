@@ -83,6 +83,12 @@ class RetournerPUIFragment : Fragment() {
         bindAdapter(newListe, retour, db)
     }
 
+    fun scrollToPosition(position: Int)
+    {
+        if (!this::adapter.isInitialized || position < 0 || position >= adapter.count) return
+        listeRetourLigneLV.smoothScrollToPosition(position)
+    }
+
     private fun readArguments(): Pair<ArrayList<Retour_Ligne>, Retour?>
     {
         @Suppress("UNCHECKED_CAST")
