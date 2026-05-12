@@ -236,12 +236,13 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
 
     private fun updateListView()
     {
-        if (this.aRetournerPUIFragment != null) { (this.aRetournerPUIFragment ?: return).updateList(this.retourLigneList as ArrayList<Retour_Ligne?>? as ArrayList<Retour_Ligne>, this.retourSelectionne ?: return) }
+        val lignesARetourner = this.getRetourLignesARetourner()
+        if (this.aRetournerPUIFragment != null) { (this.aRetournerPUIFragment ?: return).updateList(ArrayList(lignesARetourner), this.retourSelectionne ?: return) }
         val lignesRetournees = this.getRetourLignesRetournees()
         if (this.retournerPUIFragment != null) { (this.retournerPUIFragment ?: return).updateList(ArrayList(lignesRetournees), this.retourSelectionne ?: return) }
 
         val nbRefTV = this.findViewById<TextView?>(R.id.nbReferenceARetournerPUI_TV)
-        if (nbRefTV != null) { nbRefTV.text = (this.retourLigneList ?: return).size.toString() }
+        if (nbRefTV != null) { nbRefTV.text = lignesARetourner.size.toString() }
         val nbRetourneTV = this.findViewById<TextView?>(R.id.nbReferenceRetournerPUI_TV)
         if (nbRetourneTV != null) { nbRetourneTV.text = lignesRetournees.size.toString() }
     }
@@ -384,7 +385,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     private fun openARetourner()
     {
         Log.d("DetailRetourPUIActivity", "openARetourner() - lignesRetournees.size = ${this.retourLigneList?.size}")
-        for (retourLigne in this.retourLigneList ?: return) { Log.d("DetailRetourPUIActivity", "retour uid : ${retourLigne.retour_UID}, uid : ${retourLigne._UID}, lot retourner : ${retourLigne.lot_Retourner}, qte retourner : ${retourLigne.qte_Retourner}, qte demander : ${retourLigne.qte_Demander}") }
+        for (retourLigne in this.retourLigneList ?: return) { Log.d("DetailRetourPUIActivity", "retour uid : ${retourLigne.retour_UID}, uid : ${retourLigne._UID}, lot retourner : ${retourLigne.lot_Retourner}, qte retourner : ${retourLigne.qte_Retourner}, qte avant retour : ${retourLigne.qte_avant_retour}") }
 
         this.referenceARetournerPUIContainer?.let { container ->
             container.apply {
@@ -397,7 +398,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
                 this.animate().translationY(0f).setDuration(ANIMATION_DURATION_MS.toLong()).start()
             }
 
-            val frag = ARetournerPUIFragment.newInstance(this.retourLigneList as ArrayList<Retour_Ligne?>? as ArrayList<Retour_Ligne>, this.retourSelectionne ?: return).also { aRetournerPUIFragment = it }
+            val frag = ARetournerPUIFragment.newInstance(ArrayList(this.getRetourLignesARetourner()), this.retourSelectionne ?: return).also { aRetournerPUIFragment = it }
             this.supportFragmentManager.beginTransaction().replace(R.id.referenceARetournerPUIContainer, frag).commitNow()
 
             // Scroll to the container
@@ -426,7 +427,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         if (lignesRetournees.isEmpty()) { return }
 
         Log.d("DetailRetourPUIActivity", "openRetourner() - lignesRetournees.size = ${lignesRetournees.size}")
-        for (retourLigne in lignesRetournees) { Log.d("DetailRetourPUIActivity", "retour uid : ${retourLigne.retour_UID}, uid : ${retourLigne._UID}, lot retourner : ${retourLigne.lot_Retourner}, qte retourner : ${retourLigne.qte_Retourner}, qte demander : ${retourLigne.qte_Demander}") }
+        for (retourLigne in lignesRetournees) { Log.d("DetailRetourPUIActivity", "retour uid : ${retourLigne.retour_UID}, uid : ${retourLigne._UID}, lot retourner : ${retourLigne.lot_Retourner}, qte retourner : ${retourLigne.qte_Retourner}, qte avant retour : ${retourLigne.qte_avant_retour}") }
 
         this.referenceRetournerPUIContainer?.let { container ->
             container.apply {
@@ -499,21 +500,16 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     {
         this.closeOpenedFragments()
 
-        val produit = ProduitOpenHelper.getProduitByID(this.db, retourLigneBase.code_produit)
-        val retourLigneEdition = this.getOrCreateEditableRetourLigne(retourLigneBase, produit)
-        val maxQuantite = this.getQuantiteMaxEditable(retourLigneBase, retourLigneEdition)
-
         this.detailContainer?.let { container ->
-            val fragment = DetailFragment.newInstance(retourLigneEdition, maxQuantite).also { this.detailFragment = it }
+            val fragment = DetailFragment.newInstance(retourLigneBase).also { this.detailFragment = it }
 
             fragment.onFermer = { this.closeDetailFragment() }
-            fragment.onValider = { ligne ->
-                Retour_LigneOpenHelper.mettreAJourUnRetourLigne(this.db, ligne)
+            fragment.onValider = {
                 this.loadData()
                 this.updateListView()
                 this.closeDetailFragment()
-                if (ligne.qte_Retourner > 0) { if (!this.isRetournerOpen) { this.openRetourner() } }
-                else if (this.isRetournerOpen && this.getRetourLignesRetournees().isEmpty()) { this.closeRetourner() }
+                if (this.getRetourLignesRetournees().isNotEmpty()) { if (!this.isRetournerOpen) { this.openRetourner() } }
+                else if (this.isRetournerOpen) { this.closeRetourner() }
                 if (!this.isARetournerOpen) { this.openARetourner() }
                 this.aRetournerPUIFragment?.scrollToPosition((this.retourLigneList ?: emptyList()).indexOfFirst { it.code_produit == retourLigneBase.code_produit })
             }
@@ -541,30 +537,16 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         this.isDetailOpen = false
     }
 
-    private fun getOrCreateEditableRetourLigne(retourLigneBase: Retour_Ligne, produit: Produit): Retour_Ligne
-    {
-        val retourLignesNegatives = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(this.db, this.retourSelectionne ?: return retourLigneBase, retourLigneBase.code_produit)
-
-        if (retourLignesNegatives.isNotEmpty())
-        {
-            val emplacementCourant = retourLigneBase.retourPUI_Emplacement
-            return retourLignesNegatives.firstOrNull { !emplacementCourant.isNullOrEmpty() && it.retourPUI_Emplacement == emplacementCourant } ?: retourLignesNegatives.first()
-        }
-
-        this.creationRetourLigne(retourLigneBase, produit)
-        return Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(this.db, this.retourSelectionne ?: return retourLigneBase, retourLigneBase.code_produit).first()
-    }
-
-    private fun getQuantiteMaxEditable(retourLigneBase: Retour_Ligne, retourLigneEdition: Retour_Ligne): Int
-    {
-        val retourLignesNegatives = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(this.db, this.retourSelectionne ?: return retourLigneBase.qte_avant_retour.toInt(), retourLigneBase.code_produit)
-
-        val quantiteAutresLignes = retourLignesNegatives.filter { it._UID != retourLigneEdition._UID }.sumOf { it.qte_Retourner.toInt() }
-
-        return (retourLigneBase.qte_avant_retour.toInt() - quantiteAutresLignes).coerceAtLeast(0)
-    }
-
     private fun getRetourLignesRetournees(): List<Retour_Ligne> { return Retour_LigneOpenHelper.getAllRetourLignesNegByRetour(this.db, this.retourSelectionne ?: return emptyList()).filter { it.qte_Retourner > 0 } }
+
+    private fun getRetourLignesARetourner(): List<Retour_Ligne>
+    {
+        val lignesBase = this.retourLigneList ?: return emptyList()
+        return lignesBase.filter { ligneBase ->
+            val quantiteRetournee = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(this.db, this.retourSelectionne ?: return@filter false, ligneBase.code_produit).sumOf { it.qte_Retourner.toInt() }
+            quantiteRetournee < ligneBase.qte_avant_retour.toInt()
+        }
+    }
 
     private fun openScanner()
     {

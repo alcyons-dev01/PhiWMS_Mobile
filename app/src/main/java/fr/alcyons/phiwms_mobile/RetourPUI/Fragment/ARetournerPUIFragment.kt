@@ -20,6 +20,7 @@ class ARetournerPUIFragment : Fragment()
         private const val ARG_LISTE = "liste"
         private const val ARG_RETOUR = "retour"
         private const val SHOULD_SHOW_QTE_ARETOURNER = false
+        private const val SHOULD_AGGREGATE_BY_PRODUIT = true
 
         @JvmStatic
         fun newInstance(
@@ -73,7 +74,7 @@ class ARetournerPUIFragment : Fragment()
         val db = activity?.db
 
         if (db != null && retour != null) {
-            this.adapter = Retour_Ligne_RetourPUIAdapter(requireContext(), db, liste, retour, ARetournerPUIFragment.SHOULD_SHOW_QTE_ARETOURNER)
+            this.adapter = Retour_Ligne_RetourPUIAdapter(requireContext(), db, liste, retour, ARetournerPUIFragment.SHOULD_SHOW_QTE_ARETOURNER, ARetournerPUIFragment.SHOULD_AGGREGATE_BY_PRODUIT)
             this.liste_RetourLigne_LV.adapter = this.adapter
 
             // Calcul de la hauteur réelle de la ListView
@@ -120,7 +121,7 @@ class ARetournerPUIFragment : Fragment()
             val activity = requireActivity() as? ServiceActivity
             val db = activity?.db
             if (db != null) {
-                this.adapter = Retour_Ligne_RetourPUIAdapter(requireContext(), db, newListe, retour, ARetournerPUIFragment.SHOULD_SHOW_QTE_ARETOURNER)
+                this.adapter = Retour_Ligne_RetourPUIAdapter(requireContext(), db, newListe, retour, ARetournerPUIFragment.SHOULD_SHOW_QTE_ARETOURNER, ARetournerPUIFragment.SHOULD_AGGREGATE_BY_PRODUIT)
                 this.liste_RetourLigne_LV.adapter = this.adapter
             }
         }

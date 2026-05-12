@@ -18,6 +18,7 @@ class RetournerPUIFragment : Fragment() {
         private const val ARG_LISTE = "liste"
         private const val ARG_RETOUR = "retour"
         private const val SHOULD_SHOW_QTE_ARETOURNER = true
+        private const val SHOULD_AGGREGATE_BY_PRODUIT = false
 
         fun newInstance(
             liste: ArrayList<Retour_Ligne>,
@@ -68,7 +69,7 @@ class RetournerPUIFragment : Fragment() {
         val db = (requireActivity() as? ServiceActivity)?.db
 
         if (db != null && retour != null) {
-            adapter = Retour_Ligne_RetourPUIAdapter(requireContext(), db, liste, retour, RetournerPUIFragment.SHOULD_SHOW_QTE_ARETOURNER)
+            adapter = Retour_Ligne_RetourPUIAdapter(requireContext(), db, liste, retour, RetournerPUIFragment.SHOULD_SHOW_QTE_ARETOURNER, RetournerPUIFragment.SHOULD_AGGREGATE_BY_PRODUIT)
             listeRetourLigneLV.adapter = adapter
 
             listeRetourLigneLV.post {
@@ -101,7 +102,7 @@ class RetournerPUIFragment : Fragment() {
         if (this::adapter.isInitialized) {
             val db = (requireActivity() as? ServiceActivity)?.db
             if (db != null) {
-                adapter = Retour_Ligne_RetourPUIAdapter(requireContext(), db, newListe, retour, RetournerPUIFragment.SHOULD_SHOW_QTE_ARETOURNER)
+                adapter = Retour_Ligne_RetourPUIAdapter(requireContext(), db, newListe, retour, RetournerPUIFragment.SHOULD_SHOW_QTE_ARETOURNER, RetournerPUIFragment.SHOULD_AGGREGATE_BY_PRODUIT)
                 listeRetourLigneLV.adapter = adapter
             }
         }

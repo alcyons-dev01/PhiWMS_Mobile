@@ -35,8 +35,9 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
     Context context;
     SQLiteDatabase db;
     public boolean shouldShowQteARetourner = false;
+    public boolean shouldAggregateByProduit = true;
 
-    public Retour_Ligne_RetourPUIAdapter(Context context, SQLiteDatabase db, List<Retour_Ligne> retourLigne, Retour retourCourant, final boolean shouldShowQteARetourner) {
+    public Retour_Ligne_RetourPUIAdapter(Context context, SQLiteDatabase db, List<Retour_Ligne> retourLigne, Retour retourCourant, final boolean shouldShowQteARetourner, final boolean shouldAggregateByProduit) {
         super(context, 0, retourLigne);
         this.context = context;
         this.db = db;
@@ -48,6 +49,7 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
             viewHolderList.add(viewHolder);
         }
         this.shouldShowQteARetourner = shouldShowQteARetourner;
+        this.shouldAggregateByProduit = shouldAggregateByProduit;
     }
 
     @Override
@@ -101,31 +103,36 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
 
         viewHolder.datePeremption.setText(dateAAfficher);
         viewHolder.setDatePeremptionColor(date);
+        int quantiteRetourner;
 
+        if(this.shouldAggregateByProduit) {
+            quantiteRetourner = 0;
+            List<Retour_Ligne> retourLigneProduitCourant = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(db, retourCourant, retourLigne.getCode_produit());
+            List<String> listEmplacement = new ArrayList<>();
 
-        int quantiteRetourner = 0;
-
-        List<Retour_Ligne> retourLigneProduitCourant = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(db, retourCourant, retourLigne.getCode_produit());
-        List<String> listEmplacement = new ArrayList<>();
-
-        for(Retour_Ligne retour_ligne_temp : retourLigneProduitCourant)
-        {
-            if(!listEmplacement.contains(retour_ligne_temp.getRetourPUI_Emplacement()) && retour_ligne_temp.getQte_Retourner() > 0)
+            for(Retour_Ligne retour_ligne_temp : retourLigneProduitCourant)
             {
-                listEmplacement.add(retour_ligne_temp.getRetourPUI_Emplacement());
+                if(!listEmplacement.contains(retour_ligne_temp.getRetourPUI_Emplacement()) && retour_ligne_temp.getQte_Retourner() > 0)
+                {
+                    listEmplacement.add(retour_ligne_temp.getRetourPUI_Emplacement());
+                }
+
+                quantiteRetourner = (int) (quantiteRetourner + retour_ligne_temp.getQte_Retourner());
             }
 
-            quantiteRetourner = (int) (quantiteRetourner + retour_ligne_temp.getQte_Retourner());
+            if(listEmplacement.size() == 1)
+            {
+                viewHolder.textEmplacement.setText(listEmplacement.get(0));
+            }
+            else
+            {
+                String nb_emplacement = listEmplacement.size()+" Emp.";
+                viewHolder.textEmplacement.setText(nb_emplacement);
+            }
         }
-
-        if(listEmplacement.size() == 1)
-        {
-            viewHolder.textEmplacement.setText(listEmplacement.get(0));
-        }
-        else
-        {
-            String nb_emplacement = listEmplacement.size()+" Emp.";
-            viewHolder.textEmplacement.setText(nb_emplacement);
+        else {
+            quantiteRetourner = (int) retourLigne.getQte_Retourner();
+            viewHolder.textEmplacement.setText(retourLigne.getRetourPUI_Emplacement());
         }
         viewHolder.textZone.setText(retourLigne.getRetourPUI_Zone());
 
@@ -134,9 +141,6 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
 
         if(this.shouldShowQteARetourner) { viewHolder.layoutQteARetourner.setVisibility(VISIBLE); }
         else { viewHolder.layoutQteARetourner.setVisibility(GONE); }
-
-        if(quantiteRetourner == retourLigne.getQte_avant_retour())
-            viewHolder.layoutQteARetourner.setVisibility(GONE);
 
         return convertView;
     }
