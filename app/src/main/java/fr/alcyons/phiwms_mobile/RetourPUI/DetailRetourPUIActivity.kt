@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -19,6 +20,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
+import com.google.android.datatransport.runtime.firebase.transport.LogSourceMetrics
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper
@@ -88,7 +90,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     // State
     private var isScannerOpen: Boolean = false
     private var isSearchOpen: Boolean = false
-    private var isACompterOpen: Boolean = false
+    private var isARetournerOpen: Boolean = false
     private var isRetournerOpen: Boolean = false
     private var isDetailOpen: Boolean = false
 
@@ -183,11 +185,11 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     private fun setupARetournerPUIClickListener()
     {
         this.aRetournerPUI_LL?.setOnClickListener {
-            if (this.isACompterOpen) this.closeACompter()
+            if (this.isARetournerOpen) this.closeARetourner()
             else
             {
                 this.closeOpenedFragments()
-                this.openACompter()
+                this.openARetourner()
             }
         }
     }
@@ -379,8 +381,11 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         this.openDetailFragment(retourLigne)
     }
 
-    private fun openACompter()
+    private fun openARetourner()
     {
+        Log.d("DetailRetourPUIActivity", "openARetourner() - lignesRetournees.size = ${this.retourLigneList?.size}")
+        for (retourLigne in this.retourLigneList ?: return) { Log.d("DetailRetourPUIActivity", "retour uid : ${retourLigne.retour_UID}, uid : ${retourLigne._UID}, lot : ${retourLigne.lot}, lot retourner : ${retourLigne.lot_Retourner}") }
+
         this.referenceARetournerPUIContainer?.let { container ->
             container.apply {
                 this.layoutParams = (this.layoutParams as LinearLayout.LayoutParams).also {
@@ -400,10 +405,10 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
             scrollView.post { scrollView.smoothScrollTo(0, container.top) }
         }
 
-        this.isACompterOpen = true
+        this.isARetournerOpen = true
     }
 
-    private fun closeACompter()
+    private fun closeARetourner()
     {
         (this.referenceARetournerPUIContainer ?: return).animate().translationY(-(this.referenceARetournerPUIContainer ?: return).height.toFloat()).setDuration(ANIMATION_DURATION_MS.toLong()).withEndAction {
             (this.referenceARetournerPUIContainer ?: return@withEndAction).visibility = View.GONE
@@ -412,13 +417,16 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
             this.aRetournerPUIFragment = null
         }.start()
 
-        this.isACompterOpen = false
+        this.isARetournerOpen = false
     }
 
     private fun openRetourner()
     {
         val lignesRetournees = ArrayList(this.getRetourLignesRetournees())
         if (lignesRetournees.isEmpty()) { return }
+
+        Log.d("DetailRetourPUIActivity", "openRetourner() - lignesRetournees.size = ${lignesRetournees.size}")
+        for (retourLigne in lignesRetournees) { Log.d("DetailRetourPUIActivity", "retour uid : ${retourLigne.retour_UID}, uid : ${retourLigne._UID}, lot : ${retourLigne.lot}, lot retourner : ${retourLigne.lot_Retourner}, qte retourner : ${retourLigne.qte_Retourner}") }
 
         this.referenceRetournerPUIContainer?.let { container ->
             container.apply {
@@ -468,10 +476,10 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
 
         if (position >= 0)
         {
-            if (!this.isACompterOpen)
+            if (!this.isARetournerOpen)
             {
                 this.closeOpenedFragments()
-                this.openACompter()
+                this.openARetourner()
             }
             this.aRetournerPUIFragment?.scrollToPosition(position)
         }
@@ -482,7 +490,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     {
         if (this.isScannerOpen) this.closeScanner()
         if (this.isSearchOpen) this.closeSearch()
-        if (this.isACompterOpen) this.closeACompter()
+        if (this.isARetournerOpen) this.closeARetourner()
         if (this.isRetournerOpen) this.closeRetourner()
         if (this.isDetailOpen) this.closeDetailFragment()
     }
@@ -506,7 +514,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
                 this.closeDetailFragment()
                 if (ligne.qte_Retourner > 0) { if (!this.isRetournerOpen) { this.openRetourner() } }
                 else if (this.isRetournerOpen && this.getRetourLignesRetournees().isEmpty()) { this.closeRetourner() }
-                if (!this.isACompterOpen) { this.openACompter() }
+                if (!this.isARetournerOpen) { this.openARetourner() }
                 this.aRetournerPUIFragment?.scrollToPosition((this.retourLigneList ?: emptyList()).indexOfFirst { it.code_produit == retourLigneBase.code_produit })
             }
 

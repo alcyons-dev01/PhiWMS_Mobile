@@ -25,6 +25,7 @@ import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.R;
 
 import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
 
@@ -33,8 +34,9 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
     Retour retourCourant;
     Context context;
     SQLiteDatabase db;
+    public boolean shouldShowQteARetourner = false;
 
-    public Retour_Ligne_RetourPUIAdapter(Context context, SQLiteDatabase db, List<Retour_Ligne> retourLigne, Retour retourCourant) {
+    public Retour_Ligne_RetourPUIAdapter(Context context, SQLiteDatabase db, List<Retour_Ligne> retourLigne, Retour retourCourant, final boolean shouldShowQteARetourner) {
         super(context, 0, retourLigne);
         this.context = context;
         this.db = db;
@@ -45,6 +47,7 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
             Retour_LigneViewHolder viewHolder = new Retour_LigneViewHolder();
             viewHolderList.add(viewHolder);
         }
+        this.shouldShowQteARetourner = shouldShowQteARetourner;
     }
 
     @Override
@@ -128,6 +131,9 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
 
         viewHolder.qteRetourner.setText(String.valueOf(quantiteRetourner));
         viewHolder.QteARetourner.setText(String.valueOf((int)retourLigne.getQte_avant_retour()));
+
+        if(this.shouldShowQteARetourner) { viewHolder.layoutQteARetourner.setVisibility(VISIBLE); }
+        else { viewHolder.layoutQteARetourner.setVisibility(GONE); }
 
         if(quantiteRetourner == retourLigne.getQte_avant_retour())
             viewHolder.layoutQteARetourner.setVisibility(GONE);
