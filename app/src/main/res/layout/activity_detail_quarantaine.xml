@@ -1,108 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@android:color/white">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
 
+    <!-- ═══════════════════════════════════════════
+         BARRE DE TITRE
+    ════════════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/barreDeTitre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bleu_fonce_alcyons"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/intitule"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Intitule"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- Trait accent -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/bleu_clair_alcyons" />
+
+    <!-- ═══════════════════════════════════════════
+         SOUS-TITRE : MOTIF + NUMÉRO
+    ════════════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/sousTitre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bleu_fonce_alcyons"
+        android:orientation="horizontal"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="8dp"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/motif"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="motif"
+            android:textColor="@color/bleu_clair_alcyons"
+            android:textSize="13sp"
+            android:alpha="0.85" />
+
+        <TextView
+            android:id="@+id/numero"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="numéro"
+            android:textColor="@color/bleu_clair_alcyons"
+            android:textSize="13sp"
+            android:alpha="0.85" />
+
+    </LinearLayout>
+
+    <!-- ═══════════════════════════════════════════
+         LISTE — prend tout l'espace disponible
+    ════════════════════════════════════════════ -->
     <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="@android:color/white">
+        android:id="@+id/zoneListView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="4dp"
+        android:paddingTop="8dp">
 
-        <LinearLayout
-            android:id="@+id/barreDeTitre"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:background="@color/bleu_fonce_alcyons"
-            android:orientation="vertical">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/intitule"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:text="Intitule"
-                    android:textColor="#FFFFFF"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
-            </RelativeLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/sousTitre"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/barreDeTitre"
-            android:background="@color/bleu_fonce_alcyons"
-            android:orientation="horizontal"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:weightSum="2">
-
-            <TextView
-                android:id="@+id/motif"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="motif"
-                android:textColor="#FFFFFF" />
-
-            <TextView
-                android:id="@+id/numero"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="numéro"
-                android:textColor="#FFFFFF" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/temp"
+        <ListView
+            android:id="@+id/listeView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/sousTitre"
-            android:background="@color/bleu_fonce_alcyons"
-            android:orientation="horizontal"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:weightSum="2">
-
-        </LinearLayout>
-
-        <RelativeLayout
-            android:id="@+id/zoneListView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/sousTitre"
-            android:orientation="vertical"
-            android:background="@drawable/background_empty_radius"
-            android:layout_marginTop="5dp"
-            android:padding="15dp">
-
-            <ListView
-                android:id="@+id/listeView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:descendantFocusability="afterDescendants"
-                android:divider="@android:color/transparent"
-                android:dividerHeight="10sp">
-
-            </ListView>
-
-        </RelativeLayout>
+            android:descendantFocusability="afterDescendants"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="12dp" />
 
     </RelativeLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- ═══════════════════════════════════════════
+         ZONE BASSE : FAB + BOUTON VALIDER
+    ════════════════════════════════════════════ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp"
+        android:gravity="center_vertical">
+
+        <!-- FAB aide à la saisie -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAideSaisie"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:contentDescription="Aide à la saisie"
+            app:srcCompat="@drawable/ic_setting"
+            app:backgroundTint="@color/bleu_clair_alcyons"
+            app:tint="#FFFFFF"
+            app:elevation="6dp"
+            app:fabSize="normal" />
+
+        <!-- Bouton valider -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btnValiderQuarantaine_CV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:cardBackgroundColor="#2E7D32"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="6dp">
+
+            <LinearLayout
+                android:id="@+id/btnValiderQuarantaine_LL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.1"
+                    android:text="Valider"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+</LinearLayout>

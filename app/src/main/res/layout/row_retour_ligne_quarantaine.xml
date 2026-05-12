@@ -1,120 +1,176 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/background_element_liste_radius"
-    android:layout_margin="5dp">
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="5dp"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#FFFFFF">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        android:padding="5dp">
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/designationProduit"
+        <!-- ═══════════════════════════════════════════
+             BANDE COULEUR HAUTE + DÉSIGNATION
+        ════════════════════════════════════════════ -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="@android:color/black"
-            android:textStyle="bold" />
+            android:background="@color/bleu_fonce_alcyons"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="10dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
+            <TextView
+                android:id="@+id/designationProduit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text=""
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:ellipsize="end"
+                android:maxLines="1" />
+
+        </LinearLayout>
+
+        <!-- Trait accent -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/bleu_clair_alcyons" />
+
+        <!-- ═══════════════════════════════════════════
+             RÉFÉRENCE + FOURNISSEUR
+        ════════════════════════════════════════════ -->
         <LinearLayout
             android:id="@+id/zoneReferences"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/designationProduit"
             android:orientation="horizontal"
-            android:weightSum="10">
+            android:weightSum="10"
+            android:paddingHorizontal="14dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="4dp">
 
             <TextView
                 android:id="@+id/referenceProduit"
-                android:layout_width="0px"
-                android:layout_height="wrap_content"
-                android:layout_weight="5"
-                android:text="" />
-
-            <TextView
-                android:id="@+id/nomFournisseur"
-                android:layout_width="0px"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="5"
                 android:text=""
-                android:textColor="@android:color/black" />
+                android:textSize="12sp"
+                android:textColor="@color/bleu_fonce_alcyons"
+                android:alpha="0.7" />
+
+            <TextView
+                android:id="@+id/nomFournisseur"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:text=""
+                android:textSize="12sp"
+                android:textColor="@color/bleu_fonce_alcyons"
+                android:gravity="end"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
+        <!-- ═══════════════════════════════════════════
+             LOT + DATE PÉREMPTION
+        ════════════════════════════════════════════ -->
         <LinearLayout
             android:id="@+id/zoneQuarantaine"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:baselineAligned="false"
-            android:layout_below="@id/zoneReferences"
             android:orientation="horizontal"
-            android:weightSum="10">
+            android:weightSum="10"
+            android:paddingHorizontal="14dp"
+            android:paddingBottom="10dp">
 
             <LinearLayout
-                android:layout_width="0px"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="5">
+                android:layout_weight="5"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:text="@string/lot" />
+                    android:text="@string/lot"
+                    android:textSize="11sp"
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:alpha="0.5"
+                    android:layout_marginEnd="4dp" />
 
                 <TextView
                     android:id="@+id/lotRetourne"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textColor="@android:color/black"
+                    android:textSize="12sp"
+                    android:textColor="@color/bleu_fonce_alcyons"
                     android:textStyle="bold" />
-
 
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="0px"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="5">
+                android:layout_weight="5"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:text="@string/datePeremption" />
+                    android:text="@string/datePeremption"
+                    android:textSize="11sp"
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:alpha="0.5"
+                    android:layout_marginEnd="4dp" />
 
                 <TextView
                     android:id="@+id/datePeremption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
+                    android:textSize="12sp"
                     android:textColor="@android:color/holo_red_light"
                     android:textStyle="bold" />
 
             </LinearLayout>
+
         </LinearLayout>
 
-
+        <!-- ═══════════════════════════════════════════
+             NUMÉRO DE SÉRIE
+        ════════════════════════════════════════════ -->
         <LinearLayout
             android:id="@+id/zoneNumSerie"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/zoneQuarantaine"
             android:orientation="horizontal"
-            android:weightSum="6">
+            android:weightSum="6"
+            android:paddingHorizontal="14dp"
+            android:paddingBottom="10dp">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.6"
-                android:text="Série "/>
+                android:text="Série "
+                android:textSize="11sp"
+                android:textColor="@color/bleu_fonce_alcyons"
+                android:alpha="0.5" />
 
             <TextView
                 android:id="@+id/numeroSerieModifiable"
@@ -122,7 +178,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="3.8"
                 android:text=""
-                android:textSize="15dp"/>
+                android:textSize="12sp"
+                android:textColor="@color/bleu_fonce_alcyons"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/resultatSerialisation"
@@ -130,35 +188,55 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1.6"
                 android:gravity="center"
-                android:text=""/>
+                android:text=""
+                android:textSize="11sp" />
 
         </LinearLayout>
 
+        <!-- Séparateur -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="14dp"
+            android:layout_marginEnd="14dp"
+            android:background="@color/bleu_clair_alcyons_transparent" />
+
+        <!-- ═══════════════════════════════════════════
+             ZONE QUANTITÉS : 4 COLONNES
+        ════════════════════════════════════════════ -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:baselineAligned="false"
-            android:layout_below="@id/zoneNumSerie"
             android:orientation="horizontal"
             android:weightSum="4">
 
+            <!-- QUARANTAINE -->
             <LinearLayout
-                android:layout_width="0px"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:padding="2dp">
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="#FFF7F0">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@string/Quarantaine" />
+                    android:text="@string/Quarantaine"
+                    android:textSize="9sp"
+                    android:textColor="#C4622D"
+                    android:alpha="0.8"
+                    android:letterSpacing="0.05" />
 
-                <ImageView
-                    android:layout_width="match_parent"
+                <View
+                    android:layout_width="24dp"
                     android:layout_height="2dp"
-                    android:contentDescription="@string/separateur"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
                     android:background="@color/orange2" />
 
                 <TextView
@@ -168,28 +246,37 @@
                     android:gravity="center"
                     android:text=""
                     android:textColor="@color/orange2"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
             </LinearLayout>
 
+            <!-- DESTRUCTION -->
             <LinearLayout
-                android:layout_width="0px"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:clickable="true"
                 android:orientation="vertical"
-                android:padding="2dp">
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="#FFF4F4">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@string/Destruction" />
+                    android:text="@string/Destruction"
+                    android:textSize="9sp"
+                    android:textColor="@color/rouge2"
+                    android:alpha="0.8"
+                    android:letterSpacing="0.05" />
 
-                <ImageView
-                    android:layout_width="match_parent"
+                <View
+                    android:layout_width="24dp"
                     android:layout_height="2dp"
-                    android:contentDescription="@string/separateur"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
                     android:background="@color/rouge2" />
 
                 <TextView
@@ -199,29 +286,37 @@
                     android:gravity="center"
                     android:text=""
                     android:textColor="@color/rouge2"
-                    android:textSize="17sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
             </LinearLayout>
 
+            <!-- RETOUR PUI -->
             <LinearLayout
-                android:layout_width="0px"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:clickable="true"
                 android:orientation="vertical"
-                android:padding="2dp">
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="#F4FFF6">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@string/RetourPUI" />
+                    android:text="@string/RetourPUI"
+                    android:textSize="9sp"
+                    android:textColor="@color/vert2"
+                    android:alpha="0.8"
+                    android:letterSpacing="0.05" />
 
-                <ImageView
-                    android:layout_width="match_parent"
+                <View
+                    android:layout_width="24dp"
                     android:layout_height="2dp"
-                    android:contentDescription="@string/separateur"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
                     android:background="@color/vert2" />
 
                 <TextView
@@ -231,29 +326,37 @@
                     android:gravity="center"
                     android:text=""
                     android:textColor="@color/vert2"
-                    android:textSize="17sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
             </LinearLayout>
 
+            <!-- RETOUR FOURNISSEUR -->
             <LinearLayout
-                android:layout_width="0px"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:clickable="true"
                 android:orientation="vertical"
-                android:padding="2dp">
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="#F4F7FF">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@string/RetourFrs" />
+                    android:text="@string/RetourFrs"
+                    android:textSize="9sp"
+                    android:textColor="@color/bleu2"
+                    android:alpha="0.8"
+                    android:letterSpacing="0.05" />
 
-                <ImageView
-                    android:layout_width="match_parent"
+                <View
+                    android:layout_width="24dp"
                     android:layout_height="2dp"
-                    android:contentDescription="@string/separateur"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
                     android:background="@color/bleu2" />
 
                 <TextView
@@ -263,14 +366,13 @@
                     android:gravity="center"
                     android:text=""
                     android:textColor="@color/bleu2"
-                    android:textSize="17sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
             </LinearLayout>
 
         </LinearLayout>
 
+    </LinearLayout>
 
-    </RelativeLayout>
-
-</RelativeLayout>
+</androidx.cardview.widget.CardView>

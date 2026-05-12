@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -14,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -22,6 +24,8 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -67,38 +71,6 @@ public class DetailQuarantaineActivity extends ServiceActivity {
     PackageManager pm;
     String commentaire;
     ActivityResultLauncher<Intent> resultScanCodeGs1;
-    private void clicToutRetournerPUI()
-    {
-        for (int i = 0; i < retourLigneQuarantaineAdapter.viewHolderList.size(); i++) {
-            Retour_Ligne_QuarantaineAdapter.Retour_LigneViewHolder viewHolder = retourLigneQuarantaineAdapter.viewHolderList.get(i);
-            viewHolder.toutRetournerPUI();
-        }
-    }
-
-    private void clicToutRetournerFournisseur()
-    {
-        for (int i = 0; i < retourLigneQuarantaineAdapter.viewHolderList.size(); i++) {
-            Retour_Ligne_QuarantaineAdapter.Retour_LigneViewHolder viewHolder = retourLigneQuarantaineAdapter.viewHolderList.get(i);
-            viewHolder.toutRetournerFrs();
-        }
-    }
-
-    private void clicToutDetruire()
-    {
-        for (int i = 0; i < retourLigneQuarantaineAdapter.viewHolderList.size(); i++)
-        {
-            Retour_Ligne_QuarantaineAdapter.Retour_LigneViewHolder viewHolder = retourLigneQuarantaineAdapter.viewHolderList.get(i);
-            viewHolder.toutDetruire();
-        }
-    }
-
-    private void clicToutRemettreAZero()
-    {
-        for (int i = 0; i < retourLigneQuarantaineAdapter.viewHolderList.size(); i++) {
-            Retour_Ligne_QuarantaineAdapter.Retour_LigneViewHolder viewHolder = retourLigneQuarantaineAdapter.viewHolderList.get(i);
-            viewHolder.toutRemettreAZero();
-        }
-    }
 
     public void decoderCodeBarre(TextView dateAModifier, TextView numLotAModifier, Retour_Ligne_QuarantaineAdapter.Retour_LigneViewHolder viewHolder, String designation) {
         datePeremtionTextView = dateAModifier;
@@ -230,6 +202,67 @@ public class DetailQuarantaineActivity extends ServiceActivity {
         // Initialisation de l'adapter puis transfere de l'adapter à la listeView pour l'affichage
         retourLigneQuarantaineAdapter = new Retour_Ligne_QuarantaineAdapter(DetailQuarantaineActivity.this, db, retourLigneList);
         retourLigneListView.setAdapter(retourLigneQuarantaineAdapter);
+
+        findViewById(R.id.btnValiderQuarantaine_CV).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Alerte.afficherAlerteConfirmation(DetailQuarantaineActivity.this, getLayoutInflater(), getBundle(), "Confirmez-vous la validation de cette quarantaine ?", false, true, DetailQuarantaineActivity.this);
+            }
+        });
+
+        // Dans votre Activity
+        findViewById(R.id.fabAideSaisie).setOnClickListener(v -> {
+            BottomSheetDialog dialog = new BottomSheetDialog(this);
+            View sheetView = getLayoutInflater().inflate(R.layout.aide_saisie_quarantaine, null);
+            dialog.setContentView(sheetView);
+
+            dialog.setCanceledOnTouchOutside(false); // empêche la fermeture ET bloque les clics derrière
+            dialog.setCancelable(false);             // empêche aussi la fermeture avec le bouton retour
+
+            // Fond transparent
+            FrameLayout bottomSheet = dialog.findViewById(
+                    com.google.android.material.R.id.design_bottom_sheet);
+            if (bottomSheet != null) {
+                bottomSheet.setBackgroundColor(Color.TRANSPARENT);
+            }
+
+            sheetView.findViewById(R.id.btnToutDetruire).setOnClickListener(v2 -> {
+                // logique tout détruire
+                for (int i = 0; i < retourLigneQuarantaineAdapter.viewHolderList.size(); i++)
+                {
+                    Retour_Ligne_QuarantaineAdapter.Retour_LigneViewHolder viewHolder = retourLigneQuarantaineAdapter.viewHolderList.get(i);
+                    viewHolder.toutDetruire();
+                }
+                dialog.dismiss();
+            });
+            sheetView.findViewById(R.id.btnToutRetournerPUI).setOnClickListener(v2 -> {
+                // logique retour PUI
+                for (int i = 0; i < retourLigneQuarantaineAdapter.viewHolderList.size(); i++) {
+                    Retour_Ligne_QuarantaineAdapter.Retour_LigneViewHolder viewHolder = retourLigneQuarantaineAdapter.viewHolderList.get(i);
+                    viewHolder.toutRetournerPUI();
+                }
+                dialog.dismiss();
+            });
+            sheetView.findViewById(R.id.btnToutRetournerFournisseur).setOnClickListener(v2 -> {
+                // logique retour fournisseur
+                for (int i = 0; i < retourLigneQuarantaineAdapter.viewHolderList.size(); i++) {
+                    Retour_Ligne_QuarantaineAdapter.Retour_LigneViewHolder viewHolder = retourLigneQuarantaineAdapter.viewHolderList.get(i);
+                    viewHolder.toutRetournerFrs();
+                }
+                dialog.dismiss();
+            });
+            sheetView.findViewById(R.id.btnReinitialiser).setOnClickListener(v2 -> {
+                // logique réinitialiser
+                for (int i = 0; i < retourLigneQuarantaineAdapter.viewHolderList.size(); i++) {
+                    Retour_Ligne_QuarantaineAdapter.Retour_LigneViewHolder viewHolder = retourLigneQuarantaineAdapter.viewHolderList.get(i);
+                    viewHolder.toutRemettreAZero();
+                }
+                dialog.dismiss();
+            });
+            sheetView.findViewById(R.id.btnFermerBottomSheet).setOnClickListener(v2 -> dialog.dismiss());
+
+            dialog.show();
+        });
     }
 
     public void mettreAJourUnRetourLigne(Retour_Ligne retourLigne, Retour_Ligne_QuarantaineAdapter.Retour_LigneViewHolder viewHolder) {
@@ -251,67 +284,6 @@ public class DetailQuarantaineActivity extends ServiceActivity {
         retourLigne.setRetourFrs_Qte(viewHolder.valeurFrs);
 
         Retour_LigneOpenHelper.mettreAJourUnRetourLigne(db, retourLigne);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_quarantaine, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        // Récupération de l'item ADD et affectation de l'action à réaliser lors d'un clic
-        MenuItem item_tout_detruire = menu.findItem(R.id.tout_detruire);
-        item_tout_detruire.setOnMenuItemClickListener(item -> {
-            clicToutDetruire();
-            return true;
-        });
-
-        MenuItem item_tout_pui = menu.findItem(R.id.tout_retourner_pui);
-        item_tout_pui.setOnMenuItemClickListener(item -> {
-            clicToutRetournerPUI();
-            return true;
-        });
-
-        MenuItem item_tout_fournisseur = menu.findItem(R.id.tout_retourner_fournisseur);
-        item_tout_fournisseur.setOnMenuItemClickListener(item -> {
-            clicToutRetournerFournisseur();
-            return true;
-        });
-
-        MenuItem item_tout_zero = menu.findItem(R.id.tout_remettre_zero);
-        item_tout_zero.setOnMenuItemClickListener(item -> {
-            clicToutRemettreAZero();
-            return true;
-        });
-
-        MenuItem item_valider = menu.findItem(R.id.menuSaveCircle);
-        item_valider.setOnMenuItemClickListener(item-> {
-            Alerte.afficherAlerteConfirmation(DetailQuarantaineActivity.this, getLayoutInflater(), getBundle(), "Confirmez-vous la validation de cette quarantaine ?", false, true, DetailQuarantaineActivity.this);
-            return true;
-        });
-
-        MenuItem item_commentaire = menu.findItem(R.id.menuCommentaire);
-
-        if(retourSelectionne.getCommentaire().contentEquals(""))
-        {
-            item_commentaire.getIcon().mutate().setAlpha(50);
-            item_commentaire.setOnMenuItemClickListener(null);
-        }
-        else
-        {
-            item_commentaire.getIcon().mutate().setAlpha(255);
-            item_commentaire.setOnMenuItemClickListener(item-> {
-                Alerte.afficherAlerteInformation(DetailQuarantaineActivity.this, getLayoutInflater(), "Commentaire", retourSelectionne.getCommentaire(), false, false);
-                return true;
-            });
-        }
-
-
-        return true;
     }
 
     @Override
