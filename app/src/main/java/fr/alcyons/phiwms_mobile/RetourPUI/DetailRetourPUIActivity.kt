@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -20,7 +19,6 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
-import com.google.android.datatransport.runtime.firebase.transport.LogSourceMetrics
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper
@@ -49,7 +47,6 @@ import fr.alcyons.phiwms_mobile.ServiceActivity
 import fr.alcyons.phiwms_mobile.Services.ServiceRetourPUIActivity
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Objects
 import java.util.Random
 
 class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnElementSelectionneListener, RetournerPUIFragment.OnElementSelectionneListener, OnElementRechercheListener, RechercheAdjustable
@@ -58,6 +55,10 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     {
         private const val ANIMATION_DURATION_MS = 300
         private const val SCANNER_HEIGHT_DP = 300
+        private const val DETAIL_FALLBACK_TRANSLATION_Y = 600f
+        private const val RETOUR_SELECTIONNE_ID_ARG = "retourSelectionneID"
+        private const val SEARCH_DOMAIN_RETOUR_PUI = "retourPUI"
+        private const val SCAN_DEBOUNCE_MS = 750L
     }
 
     // Data
@@ -79,6 +80,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     private var textChercher_TV: TextView? = null
     private var searchInput_ET: EditText? = null
     private var effacerRecherche_IV: ImageView? = null
+    private var searchTextWatcher: TextWatcher? = null
 
     // Fragments
     private var scannerFragment: Fragment? = null
@@ -108,8 +110,9 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
 
     private fun initializeData()
     {
-        this.retourSelectionne = RetourOpenHelper.getRetourByID(this.db, Objects.requireNonNull<Bundle?>(this.intent.extras).getInt("retourSelectionneID"))
-        this.retourLigneList = ArrayList<Retour_Ligne>()
+        val retourSelectionneId = requireNotNull(intent.extras).getInt(RETOUR_SELECTIONNE_ID_ARG)
+        retourSelectionne = RetourOpenHelper.getRetourByID(db, retourSelectionneId)
+        retourLigneList = ArrayList()
     }
 
     private fun initializeUI()
@@ -211,27 +214,30 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     public override fun onResume()
     {
         super.onResume()
-        this.invalidateOptionsMenu()
-
-        this.loadData()
-        this.updateUI()
-        this.updateListView()
+        invalidateOptionsMenu()
+        refreshRetourData()
     }
 
-    private fun loadData()
+    private fun refreshRetourData()
     {
-        this.retourLigneList = Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(this.db, this.retourSelectionne)
-        RetourPUIQuantiteHelper.normalizeNegativeLineOrigins(this.db, this.retourSelectionne, this.retourLigneList ?: emptyList())
+        val retour = retourSelectionne ?: return
+        retourLigneList = Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(db, retour)
+        RetourPUIQuantiteHelper.normalizeNegativeLineOrigins(db, retour, retourLigneList ?: emptyList())
+        ensureDefaultReturnedLines(retour)
+        updateUI()
+        updateListView()
+    }
 
-        for (retourLigneTemp in this.retourLigneList ?: return)
+    private fun ensureDefaultReturnedLines(retour: Retour)
+    {
+        for (retourLigneTemp in retourLigneList ?: return)
         {
-            val retourLigneRetournee = RetourPUIQuantiteHelper.getNegativeLinesForBase(this.db, this.retourSelectionne ?: return, retourLigneTemp)
+            val retourLigneRetournee = RetourPUIQuantiteHelper.getNegativeLinesForBase(db, retour, retourLigneTemp)
+            if (retourLigneRetournee.isNotEmpty()) { continue }
 
-            if (retourLigneRetournee.isEmpty())
-            {
-                val produitCourant = ProduitOpenHelper.getProduitByID(this.db, retourLigneTemp.code_produit)
-                if (!produitCourant.emplacement_PUI_Defaut.contentEquals("") && produitCourant.emplacement_PUI_Defaut != null) { this.creationRetourLigne(retourLigneTemp, produitCourant) }
-            }
+            val produitCourant = ProduitOpenHelper.getProduitByID(db, retourLigneTemp.code_produit)
+            val emplacementDefaut = produitCourant.emplacement_PUI_Defaut
+            if (!emplacementDefaut.isNullOrEmpty()) { creationRetourLigne(retourLigneTemp, produitCourant) }
         }
     }
 
@@ -497,17 +503,15 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
 
             fragment.onFermer = { this.closeDetailFragment() }
             fragment.onValider = {
-                this.loadData()
-                this.updateListView()
-                this.closeDetailFragment()
-                if (this.getRetourLignesRetournees().isNotEmpty()) { if (!this.isRetournerOpen) { this.openRetourner() } }
-                else if (this.isRetournerOpen) { this.closeRetourner() }
+                refreshRetourData()
+                closeDetailFragment()
+                syncRetournerSectionAfterDetailSave()
             }
 
             this.supportFragmentManager.beginTransaction().replace(R.id.detailContainer, fragment).commitNow()
 
             container.visibility = View.VISIBLE
-            container.translationY = container.height.toFloat().takeIf { it > 0f } ?: 600f
+            container.translationY = container.height.toFloat().takeIf { it > 0f } ?: DETAIL_FALLBACK_TRANSLATION_Y
             container.animate().translationY(0f).setDuration(ANIMATION_DURATION_MS.toLong()).start()
         }
 
@@ -517,7 +521,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     private fun closeDetailFragment()
     {
         val container = this.detailContainer ?: return
-        container.animate().translationY(container.height.toFloat().takeIf { it > 0f } ?: 600f).setDuration(ANIMATION_DURATION_MS.toLong()).withEndAction {
+        container.animate().translationY(container.height.toFloat().takeIf { it > 0f } ?: DETAIL_FALLBACK_TRANSLATION_Y).setDuration(ANIMATION_DURATION_MS.toLong()).withEndAction {
                 container.visibility = View.GONE
                 this.detailFragment?.let { frag -> this.supportFragmentManager.beginTransaction().remove(frag).commit() }
                 this.detailFragment = null
@@ -525,6 +529,18 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
             .start()
 
         this.isDetailOpen = false
+    }
+
+    private fun syncRetournerSectionAfterDetailSave()
+    {
+        val lignesRetournees = getRetourLignesRetournees()
+        if (lignesRetournees.isNotEmpty())
+        {
+            if (!isRetournerOpen) { openRetourner() }
+            return
+        }
+
+        if (isRetournerOpen) { closeRetourner() }
     }
 
     private fun getRetourLignesRetournees(): List<Retour_Ligne> { return Retour_LigneOpenHelper.getAllRetourLignesNegByRetour(this.db, this.retourSelectionne ?: return emptyList()).filter { it.qte_Retourner > 0 && RetourPUIQuantiteHelper.parseBaseUid(it) != null }.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.produit_Designation ?: "" }) }
@@ -637,7 +653,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
             }
         }
 
-        (fragment as ScanDebounce).setScanDebounce(750L)
+        (fragment as ScanDebounce).setScanDebounce(SCAN_DEBOUNCE_MS)
     }
 
     private fun handleScannedCode(scannedCode: String)
@@ -661,34 +677,41 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
 
     private fun showSearchInput()
     {
-        this.isSearchOpen = true
+        isSearchOpen = true
 
-        // Bascule TextView → EditText dans le header
-        this.findViewById<ImageView>(R.id.chevronRecherche).visibility = View.GONE
+        val searchInput = searchInput_ET ?: return
+        findViewById<ImageView>(R.id.chevronRecherche).visibility = View.GONE
         (textChercher_TV ?: return).visibility = View.GONE
-        (searchInput_ET ?: return).visibility = View.VISIBLE
+        searchInput.visibility = View.VISIBLE
         (effacerRecherche_IV ?: return).visibility = View.VISIBLE
-        (searchInput_ET ?: return).requestFocus()
+        searchInput.requestFocus()
 
-        // Ouvre le clavier
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(searchInput_ET, InputMethodManager.SHOW_IMPLICIT)
+        attachSearchWatcher(searchInput)
+    }
 
-        // Écoute la saisie et lance la recherche dans le fragment
-        (searchInput_ET ?: return).addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+    private fun attachSearchWatcher(searchInput: EditText)
+    {
+        searchTextWatcher?.let(searchInput::removeTextChangedListener)
+        searchTextWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+
             override fun afterTextChanged(s: Editable?)
             {
                 val query = s.toString().trim()
-                if (query.isNotEmpty())
+                if (query.isEmpty())
                 {
-                    this@DetailRetourPUIActivity.openSearch()
-                    this@DetailRetourPUIActivity.rechercheFragment?.lancerRecherche(query, "retourPUI", (this@DetailRetourPUIActivity.retourSelectionne ?: return)._UID.toString())
+                    rechercheFragment?.viderListe()
+                    return
                 }
-                else { this@DetailRetourPUIActivity.rechercheFragment?.viderListe() }
+
+                openSearch()
+                rechercheFragment?.lancerRecherche(query, SEARCH_DOMAIN_RETOUR_PUI, (retourSelectionne ?: return)._UID.toString())
             }
-        })
+        }
+        searchInput.addTextChangedListener(searchTextWatcher)
     }
 
     internal fun openSearch()
@@ -733,7 +756,6 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         (effacerRecherche_IV ?: return).visibility = View.GONE
         (searchInput_ET ?: return).text.clear()
 
-        // Ferme le clavier
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow((this.searchInput_ET ?: return).windowToken, 0)
     }

@@ -17,6 +17,7 @@ class RetournerPUIFragment : Fragment() {
     companion object {
         private const val ARG_LISTE = "liste"
         private const val ARG_RETOUR = "retour"
+        private const val MAX_LIST_HEIGHT_DP = 400
         private const val SHOULD_SHOW_QTE_ARETOURNER = true
         private const val SHOULD_AGGREGATE_BY_PRODUIT = false
 
@@ -63,35 +64,12 @@ class RetournerPUIFragment : Fragment() {
         listeRetourLigneLV = view.findViewById(R.id.liste_RetourLigne_LV)
         listeRetourLigneLV.isNestedScrollingEnabled = true
 
-        @Suppress("UNCHECKED_CAST")
-        val liste = arguments?.getSerializable(ARG_LISTE) as? ArrayList<Retour_Ligne> ?: arrayListOf()
-        val retour = arguments?.getSerializable(ARG_RETOUR) as? Retour
-        val db = (requireActivity() as? ServiceActivity)?.db
+        val (liste, retour) = readArguments()
+        val db = (requireActivity() as? ServiceActivity)?.db ?: return
+        val retourCourant = retour ?: return
 
-        if (db != null && retour != null) {
-            adapter = Retour_Ligne_RetourPUIAdapter(requireContext(), db, liste, retour, RetournerPUIFragment.SHOULD_SHOW_QTE_ARETOURNER, RetournerPUIFragment.SHOULD_AGGREGATE_BY_PRODUIT)
-            listeRetourLigneLV.adapter = adapter
-
-            listeRetourLigneLV.post {
-                if (adapter.count == 0) return@post
-
-                val maxHauteur = (400 * resources.displayMetrics.density).toInt()
-                val premierItem = adapter.getView(0, null, listeRetourLigneLV)
-                premierItem.measure(
-                    View.MeasureSpec.makeMeasureSpec(listeRetourLigneLV.width, View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-                )
-                var hauteurTotale = premierItem.measuredHeight * adapter.count
-                hauteurTotale += listeRetourLigneLV.dividerHeight * (adapter.count - 1)
-                hauteurTotale += listeRetourLigneLV.paddingTop + listeRetourLigneLV.paddingBottom
-                listeRetourLigneLV.layoutParams.height = hauteurTotale.coerceAtMost(maxHauteur)
-                listeRetourLigneLV.requestLayout()
-            }
-
-            listeRetourLigneLV.setOnItemClickListener { _, _, position, _ ->
-                listener?.onElementSelectionne(liste[position])
-            }
-        }
+        bindAdapter(liste, retourCourant, db)
+        listeRetourLigneLV.setOnItemClickListener { _, _, position, _ -> listener?.onElementSelectionne(liste[position]) }
     }
 
     fun updateList(newListe: ArrayList<Retour_Ligne>, retour: Retour) {
@@ -99,12 +77,44 @@ class RetournerPUIFragment : Fragment() {
             putSerializable(ARG_LISTE, newListe)
             putSerializable(ARG_RETOUR, retour)
         }
-        if (this::adapter.isInitialized) {
-            val db = (requireActivity() as? ServiceActivity)?.db
-            if (db != null) {
-                adapter = Retour_Ligne_RetourPUIAdapter(requireContext(), db, newListe, retour, RetournerPUIFragment.SHOULD_SHOW_QTE_ARETOURNER, RetournerPUIFragment.SHOULD_AGGREGATE_BY_PRODUIT)
-                listeRetourLigneLV.adapter = adapter
-            }
+        if (!this::adapter.isInitialized) return
+
+        val db = (requireActivity() as? ServiceActivity)?.db ?: return
+        bindAdapter(newListe, retour, db)
+    }
+
+    private fun readArguments(): Pair<ArrayList<Retour_Ligne>, Retour?>
+    {
+        @Suppress("UNCHECKED_CAST")
+        val liste = arguments?.getSerializable(ARG_LISTE) as? ArrayList<Retour_Ligne> ?: arrayListOf()
+        val retour = arguments?.getSerializable(ARG_RETOUR) as? Retour
+        return liste to retour
+    }
+
+    private fun bindAdapter(liste: ArrayList<Retour_Ligne>, retour: Retour, db: android.database.sqlite.SQLiteDatabase)
+    {
+        adapter = Retour_Ligne_RetourPUIAdapter(requireContext(), db, liste, retour, SHOULD_SHOW_QTE_ARETOURNER, SHOULD_AGGREGATE_BY_PRODUIT)
+        listeRetourLigneLV.adapter = adapter
+        updateListHeight()
+    }
+
+    private fun updateListHeight()
+    {
+        listeRetourLigneLV.post {
+            if (!this::adapter.isInitialized || adapter.count == 0) return@post
+
+            val maxHeightPx = (MAX_LIST_HEIGHT_DP * resources.displayMetrics.density).toInt()
+            val firstItem = adapter.getView(0, null, listeRetourLigneLV)
+            firstItem.measure(
+                View.MeasureSpec.makeMeasureSpec(listeRetourLigneLV.width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            )
+
+            var totalHeight = firstItem.measuredHeight * adapter.count
+            totalHeight += listeRetourLigneLV.dividerHeight * (adapter.count - 1)
+            totalHeight += listeRetourLigneLV.paddingTop + listeRetourLigneLV.paddingBottom
+            listeRetourLigneLV.layoutParams.height = totalHeight.coerceAtMost(maxHeightPx)
+            listeRetourLigneLV.requestLayout()
         }
     }
 }

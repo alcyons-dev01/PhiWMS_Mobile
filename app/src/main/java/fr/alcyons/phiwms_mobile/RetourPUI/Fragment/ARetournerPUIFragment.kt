@@ -19,6 +19,7 @@ class ARetournerPUIFragment : Fragment()
     {
         private const val ARG_LISTE = "liste"
         private const val ARG_RETOUR = "retour"
+        private const val MAX_LIST_HEIGHT_DP = 400
         private const val SHOULD_SHOW_QTE_ARETOURNER = false
         private const val SHOULD_AGGREGATE_BY_PRODUIT = false
 
@@ -60,70 +61,67 @@ class ARetournerPUIFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        this.liste_RetourLigne_LV = view.findViewById(R.id.liste_RetourLigne_LV)
-        this.liste_RetourLigne_LV.isNestedScrollingEnabled = true
+        liste_RetourLigne_LV = view.findViewById(R.id.liste_RetourLigne_LV)
+        liste_RetourLigne_LV.isNestedScrollingEnabled = true
 
-        // Récupère la liste passée en argument
-        @Suppress("UNCHECKED_CAST")
-        val liste = arguments?.getSerializable(ARG_LISTE) as? ArrayList<Retour_Ligne> ?: arrayListOf()
-        @Suppress("UNCHECKED_CAST")
-        val retour = arguments?.getSerializable(ARG_RETOUR) as? Retour
+        val (liste, retour) = readArguments()
+        val db = (requireActivity() as? ServiceActivity)?.db ?: return
+        val retourCourant = retour ?: return
 
-        // Get the db from the parent activity
-        val activity = requireActivity() as? ServiceActivity
-        val db = activity?.db
-
-        if (db != null && retour != null) {
-            this.adapter = Retour_Ligne_RetourPUIAdapter(requireContext(), db, liste, retour, ARetournerPUIFragment.SHOULD_SHOW_QTE_ARETOURNER, ARetournerPUIFragment.SHOULD_AGGREGATE_BY_PRODUIT)
-            this.liste_RetourLigne_LV.adapter = this.adapter
-
-            // Calcul de la hauteur réelle de la ListView
-            this.liste_RetourLigne_LV.post {
-                if (this.adapter.count == 0) return@post
-
-                val maxHauteur = (400 * resources.displayMetrics.density).toInt()
-                // On mesure uniquement le premier item pour estimer la hauteur de tous
-                val premierItem = this.adapter.getView(0, null, this.liste_RetourLigne_LV)
-                premierItem.measure(
-                    View.MeasureSpec.makeMeasureSpec(this.liste_RetourLigne_LV.width, View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
-                val hauteurItem = premierItem.measuredHeight
-                // Multiplie par le nombre d'items
-                var hauteurTotale = hauteurItem * this.adapter.count
-                // Ajoute la hauteur des dividers
-                hauteurTotale += this.liste_RetourLigne_LV.dividerHeight * (adapter.count - 1)
-                // Ajoute le padding (top + bottom)
-                hauteurTotale += (this.liste_RetourLigne_LV.paddingTop + this.liste_RetourLigne_LV.paddingBottom)
-                this.liste_RetourLigne_LV.layoutParams.height = hauteurTotale.coerceAtMost(maxHauteur)
-                this.liste_RetourLigne_LV.requestLayout()
-            }
-
-            this.liste_RetourLigne_LV.setOnItemClickListener { _, _, position, _ ->
-                val elementSelectionne = liste[position]
-                this.listener?.onElementSelectionne(elementSelectionne)
-            }
-        }
+        bindAdapter(liste, retourCourant, db)
+        liste_RetourLigne_LV.setOnItemClickListener { _, _, position, _ -> listener?.onElementSelectionne(liste[position]) }
     }
 
     fun scrollToPosition(position: Int)
     {
-        if (!this::adapter.isInitialized || position < 0 || position >= this.adapter.count) return
-        this.liste_RetourLigne_LV.smoothScrollToPosition(position)
+        if (!this::adapter.isInitialized || position < 0 || position >= adapter.count) return
+        liste_RetourLigne_LV.smoothScrollToPosition(position)
     }
 
     fun updateList(newListe: ArrayList<Retour_Ligne>, retour: Retour)
     {
-        this.arguments = Bundle().apply {
+        arguments = Bundle().apply {
             putSerializable(ARG_LISTE, newListe)
             putSerializable(ARG_RETOUR, retour)
         }
-        if (this::adapter.isInitialized) {
-            val activity = requireActivity() as? ServiceActivity
-            val db = activity?.db
-            if (db != null) {
-                this.adapter = Retour_Ligne_RetourPUIAdapter(requireContext(), db, newListe, retour, ARetournerPUIFragment.SHOULD_SHOW_QTE_ARETOURNER, ARetournerPUIFragment.SHOULD_AGGREGATE_BY_PRODUIT)
-                this.liste_RetourLigne_LV.adapter = this.adapter
-            }
+        if (!this::adapter.isInitialized) return
+
+        val db = (requireActivity() as? ServiceActivity)?.db ?: return
+        bindAdapter(newListe, retour, db)
+    }
+
+    private fun readArguments(): Pair<ArrayList<Retour_Ligne>, Retour?>
+    {
+        @Suppress("UNCHECKED_CAST")
+        val liste = arguments?.getSerializable(ARG_LISTE) as? ArrayList<Retour_Ligne> ?: arrayListOf()
+        val retour = arguments?.getSerializable(ARG_RETOUR) as? Retour
+        return liste to retour
+    }
+
+    private fun bindAdapter(liste: ArrayList<Retour_Ligne>, retour: Retour, db: android.database.sqlite.SQLiteDatabase)
+    {
+        adapter = Retour_Ligne_RetourPUIAdapter(requireContext(), db, liste, retour, SHOULD_SHOW_QTE_ARETOURNER, SHOULD_AGGREGATE_BY_PRODUIT)
+        liste_RetourLigne_LV.adapter = adapter
+        updateListHeight()
+    }
+
+    private fun updateListHeight()
+    {
+        liste_RetourLigne_LV.post {
+            if (!this::adapter.isInitialized || adapter.count == 0) return@post
+
+            val maxHeightPx = (MAX_LIST_HEIGHT_DP * resources.displayMetrics.density).toInt()
+            val firstItem = adapter.getView(0, null, liste_RetourLigne_LV)
+            firstItem.measure(
+                View.MeasureSpec.makeMeasureSpec(liste_RetourLigne_LV.width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            )
+
+            var totalHeight = firstItem.measuredHeight * adapter.count
+            totalHeight += liste_RetourLigne_LV.dividerHeight * (adapter.count - 1)
+            totalHeight += liste_RetourLigne_LV.paddingTop + liste_RetourLigne_LV.paddingBottom
+            liste_RetourLigne_LV.layoutParams.height = totalHeight.coerceAtMost(maxHeightPx)
+            liste_RetourLigne_LV.requestLayout()
         }
     }
 }
