@@ -1,74 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/background_plein_bleu_fonce_radius"
-    android:padding="2dp">
-
-    <TextView
-        android:id="@+id/titre"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Confirmation"
-        android:textSize="20sp"
-        android:gravity="center"
-        android:textColor="@android:color/white"
-        android:textStyle="bold"
-        android:layout_marginTop="10dp"/>
-
-    <TextView
-        android:id="@+id/messageFin"
-        android:layout_marginTop="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Voulez-vous recevoir une copie du mail ?"
-        android:layout_gravity="center"
-        android:layout_below="@+id/titre"
-        android:gravity="center"
-        android:background="@color/blanc"
-        android:paddingVertical="20dp"
-        android:textColor="@android:color/black"/>
-
-    <ImageView
-        android:id="@+id/separateur"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/bleu_fonce_alcyons"
-        android:layout_below="@id/messageFin"/>
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@+id/separateur"
-        android:background="@drawable/background_empty_radius_bottom"
-        android:padding="1dp">
+        android:orientation="vertical">
 
+        <!-- ═══════════════════════════════════════════
+             EN-TÊTE
+        ════════════════════════════════════════════ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/bleu_fonce_alcyons"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="14dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/titre"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Confirmation"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05" />
+
+        </LinearLayout>
+
+        <!-- Trait accent -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@color/bleu_clair_alcyons" />
+
+        <!-- ═══════════════════════════════════════════
+             MESSAGE
+        ════════════════════════════════════════════ -->
+        <TextView
+            android:id="@+id/messageFin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Voulez-vous recevoir une copie du mail ?"
+            android:gravity="center"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="28dp"
+            android:textColor="@color/bleu_fonce_alcyons"
+            android:textSize="15sp"
+            android:lineSpacingMultiplier="1.3" />
+
+        <!-- Séparateur -->
+        <View
+            android:id="@+id/separateur"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@color/bleu_clair_alcyons_transparent" />
+
+        <!-- ═══════════════════════════════════════════
+             BOUTON FERMER
+        ════════════════════════════════════════════ -->
         <LinearLayout
             android:id="@+id/buttonOk"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_weight="1">
+            android:gravity="center"
+            android:paddingVertical="16dp"
+            android:background="@color/bleu_fonce_alcyons">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/bleu_clair_alcyons"
-                android:layout_gravity="center"
-                android:layout_centerHorizontal="true" />
+                android:backgroundTint="#FFFFFF"
+                android:layout_gravity="center" />
 
             <TextView
                 android:id="@+id/TitreConfirmation"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Fermer"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:textColor="@color/noir"/>
+                android:layout_marginTop="4dp"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05" />
 
         </LinearLayout>
 
     </LinearLayout>
-</RelativeLayout>
+
+</androidx.cardview.widget.CardView>

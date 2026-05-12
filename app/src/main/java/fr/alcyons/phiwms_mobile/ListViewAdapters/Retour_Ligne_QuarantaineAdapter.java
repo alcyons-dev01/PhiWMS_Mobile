@@ -14,6 +14,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -24,7 +25,6 @@ import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.DateFormat;
@@ -48,261 +48,271 @@ import fr.alcyons.phiwms_mobile.R;
 
 import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
 
-public class Retour_Ligne_QuarantaineAdapter extends ArrayAdapter {
+public class Retour_Ligne_QuarantaineAdapter extends ArrayAdapter<Retour_Ligne> {
+
+    // ─── Données ────────────────────────────────────────────────────────────
 
     public List<Retour_Ligne> retourLigneList;
     public List<Retour_LigneViewHolder> viewHolderList;
 
+    /** Résultats de sérialisation pré-calculés, indexés par position */
+    private final List<String> serialisationResultats;
+
     SQLiteDatabase db;
     Context context;
-    View.OnClickListener clicDate = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            DatePickerFragment newFragment = new DatePickerFragment();
-            Retour_LigneViewHolder viewHolder = null;
-            for (Retour_LigneViewHolder viewHolderC : viewHolderList) {
-                if (viewHolderC.datePeremption == v.findViewById(R.id.datePeremption)) {
-                    viewHolder = viewHolderC;
-                    break;
-                }
-            }
-            newFragment.setViewHolder(viewHolder, retourLigneList.get(viewHolderList.indexOf(viewHolder)), ((MenuActivity) context).db);
-            newFragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "timePicker");
-        }
-    };
 
-    View.OnClickListener clicDataMatrix = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            RelativeLayout parent = (RelativeLayout) v.getParent().getParent();
-            LinearLayout zoneRef = (LinearLayout) parent.findViewById(R.id.zoneQuarantaine);
-            FrameLayout zoneLot = (FrameLayout) zoneRef.findViewById(R.id.zoneLot);
-            FrameLayout zoneDate = (FrameLayout) zoneRef.findViewById(R.id.zoneDate);
-            TextView date = (TextView) zoneDate.findViewById(R.id.datePeremption);
-            TextView numLot = (TextView) zoneLot.findViewById(R.id.lotRetourne);
-            Retour_LigneViewHolder viewHolderSelectionne = null;
-            for (Retour_LigneViewHolder viewHolder : viewHolderList) {
-                if (viewHolder.datePeremption == date && viewHolder.lotRetourne == numLot) {
-                    viewHolderSelectionne = viewHolder;
-                }
-            }
-            ((DetailQuarantaineActivity) context).decoderCodeBarre(date, numLot, viewHolderSelectionne, String.valueOf(viewHolderSelectionne.designation.getText()));
-        }
-    };
+    private static final DateFormat DATE_FORMAT_SQL     = new SimpleDateFormat("yyyy-MM-dd");
+    private static final DateFormat DATE_FORMAT_DISPLAY = new SimpleDateFormat("dd/MM/yyyy");
 
-    public Retour_Ligne_QuarantaineAdapter(Context context, SQLiteDatabase db, List<Retour_Ligne> retourLigneList) {
+    // ─── Constructeur ───────────────────────────────────────────────────────
+
+    public Retour_Ligne_QuarantaineAdapter(Context context, SQLiteDatabase db,
+                                           List<Retour_Ligne> retourLigneList) {
         super(context, 0, retourLigneList);
-        this.context = context;
+        this.context        = context;
         this.retourLigneList = retourLigneList;
-        this.db = db;
+        this.db             = db;
 
-        this.viewHolderList = new ArrayList<>();
+        this.viewHolderList       = new ArrayList<>();
+        this.serialisationResultats = new ArrayList<>();
+
+        // Pré-charge toutes les données lourdes UNE SEULE FOIS
         for (Retour_Ligne retourLigne : retourLigneList) {
+            // ViewHolder initialisé avec les valeurs de départ
             Retour_LigneViewHolder viewHolder = new Retour_LigneViewHolder();
-            viewHolder.layoutRef = R.layout.row_retour_ligne_quarantaine;
+            viewHolder.layoutRef        = R.layout.row_retour_ligne_quarantaine;
             viewHolder.valeurQteRetourner = (int) retourLigne.getQte_Retourner();
-            this.viewHolderList.add(viewHolder);
-        }
-    }
+            viewHolder.valeurLot        = retourLigne.getLot_Retourner() != null
+                    ? retourLigne.getLot_Retourner() : "";
+            viewHolder.valeurSerie      = retourLigne.getSerie_Retourner() != null
+                    ? retourLigne.getSerie_Retourner() : "";
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-
-        View currentFocus = ((Activity) context).getCurrentFocus();
-        if (currentFocus != null) {
-
-        }
-
-        final Retour_LigneViewHolder viewHolder = viewHolderList.get(position);
-
-
-        convertView = LayoutInflater.from(getContext()).inflate(viewHolder.layoutRef, parent, false);
-
-
-        // Récupération des objets graphiques
-        viewHolder.designation = (TextView) convertView.findViewById(R.id.designationProduit);
-        viewHolder.referenceProduit = (TextView) convertView.findViewById(R.id.referenceProduit);
-        viewHolder.fournisseur = (TextView) convertView.findViewById(R.id.nomFournisseur);
-        viewHolder.lotRetourne = (TextView) convertView.findViewById(R.id.lotRetourne);
-        viewHolder.numeroSerieModifiable = (TextView) convertView.findViewById(R.id.numeroSerieModifiable);
-        viewHolder.datePeremption = (TextView) convertView.findViewById(R.id.datePeremption);
-        viewHolder.qteRetourner = (TextView) convertView.findViewById(R.id.QteRetourner);
-        viewHolder.qteDestruction = (TextView) convertView.findViewById(R.id.QteDestruction);
-        viewHolder.qteRetourPUI = (TextView) convertView.findViewById(R.id.QteRetourPUI);
-        viewHolder.qteRetourFournisseur = (TextView) convertView.findViewById(R.id.QteRetourFournisseur);
-        viewHolder.resultatSerialisation = (TextView) convertView.findViewById(R.id.resultatSerialisation);
-        viewHolder.zoneNumSerie = (LinearLayout) convertView.findViewById(R.id.zoneNumSerie);
-
-        final Retour_Ligne retourLigne = (Retour_Ligne) getItem(position);
-
-        if (retourLigne != null) {
-            // Affichage des valeurs
-            viewHolder.designation.setText(retourLigne.getProduit_Designation());
-            viewHolder.referenceProduit.setText(retourLigne.getProduit_Reference());
-
-            String[] tab_four = retourLigne.getProduit_Fournisseur().split(" ");
-            String fournisseur_nom = tab_four[0];
-            viewHolder.fournisseur.setText(fournisseur_nom);
-
-            viewHolder.qteRetourner.setText(String.valueOf((int) retourLigne.getQte_Retourner()));
-            viewHolder.valeurQteRetourner = (int) retourLigne.getQte_Retourner();
-
-            // Affichage des valeurs saisissables
-            if (viewHolder.valeurDestruction > -1) {
-                viewHolder.qteDestruction.setText(String.valueOf(viewHolder.valeurDestruction));
-            } else {
-                viewHolder.qteDestruction.setText(retourLigne.getDestruction_Qte() <= 0 ? "" : String.valueOf(retourLigne.getDestruction_Qte()));
-            }
-            if (viewHolder.valeurFrs > -1) {
-                viewHolder.qteRetourFournisseur.setText(String.valueOf(viewHolder.valeurFrs));
-            } else {
-                viewHolder.qteRetourFournisseur.setText(retourLigne.getRetourFrs_Qte() <= 0 ? "" : String.valueOf(retourLigne.getRetourFrs_Qte()));
-            }
-            if (viewHolder.valeurPUI > -1) {
-                viewHolder.qteRetourPUI.setText(String.valueOf(viewHolder.valeurPUI));
-            } else {
-                viewHolder.qteRetourPUI.setText(retourLigne.getRetourPui_Qte() <= 0 ? "" : String.valueOf(retourLigne.getRetourPui_Qte()));
-            }
-            if (!viewHolder.valeurLot.equals("")) {
-                viewHolder.lotRetourne.setText(viewHolder.valeurLot);
-            } else {
-                viewHolder.lotRetourne.setText(retourLigne.getLot_Retourner());
-                viewHolder.valeurLot = retourLigne.getLot_Retourner();
-            }
-
-            if (!viewHolder.valeurSerie.equals("")) {
-                viewHolder.numeroSerieModifiable.setText(viewHolder.valeurSerie);
-                viewHolder.zoneNumSerie.setVisibility(View.VISIBLE);
-            } else {
-
-                viewHolder.zoneNumSerie.setVisibility(View.GONE);
-            }
-
-            // Date de péremption
-            Date date = null;
-            DateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
-            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
+            // Date initiale
             try {
-                if (retourLigne.getPeremptionDate().length() >= 10) {
-                    date = dateDecodeur.parse(retourLigne.getPeremptionDate().substring(0, 10));
+                if (retourLigne.getPeremptionDate() != null
+                        && retourLigne.getPeremptionDate().length() >= 10) {
+                    Date date = DATE_FORMAT_SQL.parse(
+                            retourLigne.getPeremptionDate().substring(0, 10));
+                    viewHolder.valeurDate = DATE_FORMAT_DISPLAY.format(date);
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            if (viewHolder.valeurDate.equals("") && date != null) {
-                viewHolder.valeurDate = dateFormat.format(date);
-            }
 
-            if (!viewHolder.valeurDate.equals("")) {
-                viewHolder.datePeremption.setText(viewHolder.valeurDate);
-            } else {
-                viewHolder.datePeremption.setText("");
-            }
-            viewHolder.setDatePeremptionColor(date);
+            this.viewHolderList.add(viewHolder);
 
-            // Gestion des actions et saisies utilisateur
-            if (viewHolder.layoutRef == R.layout.row_retour_ligne_quarantaine_modifiable) {
-                viewHolder.zoneDate = (FrameLayout) convertView.findViewById(R.id.zoneDate);
-                viewHolder.zoneDate.setOnClickListener(clicDate);
-                viewHolder.dataMatrix = (LinearLayout) convertView.findViewById(R.id.zoneDataMatrix);
-                viewHolder.dataMatrix.setOnClickListener(clicDataMatrix);
-                viewHolder.datePeremption.setPaintFlags(viewHolder.datePeremption.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+            // Sérialisation pré-chargée
+            String resultat = prechargerSerialisation(retourLigne);
+            serialisationResultats.add(resultat);
 
-            } else {
-                GestionnaireTextView gestionnaireTextView = new GestionnaireTextView(viewHolder, retourLigneList.get(viewHolderList.indexOf(viewHolder)));
-            }
-
-            if(retourLigne.getSerie_Retourner()!= null)
-            {
-                viewHolder.numeroSerieModifiable.setText(retourLigne.getSerie_Retourner());
-            }
-            else
-            {
-                viewHolder.numeroSerieModifiable.setText("");
+            // Si UNKNOWN → destruction auto
+            if ("UNKNOWN".equals(resultat)) {
+                viewHolder.valeurDestruction = viewHolder.valeurQteRetourner;
             }
         }
+    }
 
+    /** Requête BDD faite UNE FOIS à l'init, jamais dans getView */
+    private String prechargerSerialisation(Retour_Ligne retourLigne) {
+        String serie = retourLigne.getSerie_Retourner();
+        if (serie == null || serie.isEmpty()) return "";
 
         Produit produit = ProduitOpenHelper.getProduitByID(db, retourLigne.getCode_produit());
+        if (produit == null) return "";
+
         String gtin = produit.getGTIN();
-        if(gtin.length() > 14)
-        {
-            gtin = gtin.substring(2);
+        if (gtin == null) return "";
+        if (gtin.length() > 14) gtin = gtin.substring(2);
+
+        PH_Serialisation s = PH_SerialisationOpenHelper
+                .getPH_SerialisationQuarantaine(db, gtin, serie);
+        return s != null ? s.getResultat() : "";
+    }
+
+    // ─── getView ────────────────────────────────────────────────────────────
+
+    @Override
+    public View getView(final int position, View convertView, ViewGroup parent) {
+
+        final Retour_LigneViewHolder viewHolder = viewHolderList.get(position);
+        final Retour_Ligne retourLigne          = getItem(position);
+
+        // Réutilisation du convertView — inflate uniquement si nécessaire
+        if (convertView == null
+                || getViewTypeForHolder(convertView) != viewHolder.layoutRef) {
+            convertView = LayoutInflater.from(getContext())
+                    .inflate(viewHolder.layoutRef, parent, false);
         }
 
-        String serie = retourLigne.getSerie_Retourner();
+        if (retourLigne == null) return convertView;
 
-        if(serie != null && gtin != null)
-        {
-            PH_Serialisation serialisation_courant = PH_SerialisationOpenHelper.getPH_SerialisationQuarantaine(db, gtin, serie);
-            if(serialisation_courant != null)
-            {
-                if(serialisation_courant.getResultat().contentEquals("UNKNOWN")) {
-                    viewHolder.valeurDestruction = viewHolder.valeurQteRetourner;
-                    viewHolder.qteDestruction.setText(String.valueOf(viewHolder.valeurDestruction));
-                    retourLigne.setQte_Retourner(viewHolder.valeurQteRetourner);
-                }
-                viewHolder.resultatSerialisation.setText(serialisation_courant.getResultat());
-                viewHolder.valeurSerialisation = serialisation_courant.getResultat();
-            }
-        }
+        // Binding des vues
+        bindVues(viewHolder, convertView);
 
-        if (!viewHolder.valeurSerialisation.equals("")) {
-            viewHolder.resultatSerialisation.setText(viewHolder.valeurSerialisation);
-        } else {
-            viewHolder.resultatSerialisation.setText("");
-            viewHolder.valeurSerialisation = "";
-        }
+        // Affichage des données (jamais de BDD ici)
+        afficherDonnees(viewHolder, retourLigne, position);
 
-        if(viewHolder.modification)
-        {
-            if(!viewHolder.resultatSerialisation.getText().toString().contentEquals("UNKNOWN"))
-            {
-                viewHolder.qteRetourFournisseur.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        afficherNumberPicker(viewHolder, "Fournisseur", retourLigne);
-                    }
-                });
-
-                viewHolder.qteRetourPUI.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        afficherNumberPicker(viewHolder, "PUI", retourLigne);
-                    }
-                });
-            }
-
-            viewHolder.qteDestruction.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    afficherNumberPicker(viewHolder, "Destruction", retourLigne);
-                }
-            });
-        }
+        // Listeners
+        configurerListeners(viewHolder, retourLigne, position);
 
         return convertView;
     }
 
-    public void setModeModif(boolean modeModif, Retour_LigneViewHolder viewHolder) {
-        if (modeModif) {
-            viewHolder.layoutRef = R.layout.row_retour_ligne_quarantaine_modifiable;
-            viewHolder.modification = true;
+    @Override
+    public int getViewTypeCount() { return 2; }
+
+    @Override
+    public int getItemViewType(int position) {
+        return viewHolderList.get(position).layoutRef
+                == R.layout.row_retour_ligne_quarantaine ? 0 : 1;
+    }
+
+    private int getViewTypeForHolder(View view) {
+        // Tag posé à l'inflate pour savoir quel layout est actuellement dans la vue
+        Object tag = view.getTag(R.id.tag_layout_ref);
+        return tag != null ? (int) tag : -1;
+    }
+
+    // ─── Méthodes privées ───────────────────────────────────────────────────
+
+    private void bindVues(Retour_LigneViewHolder vh, View v) {
+        vh.designation          = v.findViewById(R.id.designationProduit);
+        vh.referenceProduit     = v.findViewById(R.id.referenceProduit);
+        vh.fournisseur          = v.findViewById(R.id.nomFournisseur);
+        vh.lotRetourne          = v.findViewById(R.id.lotRetourne);
+        vh.numeroSerieModifiable= v.findViewById(R.id.numeroSerieModifiable);
+        vh.datePeremption       = v.findViewById(R.id.datePeremption);
+        vh.qteRetourner         = v.findViewById(R.id.QteRetourner);
+        vh.qteDestruction       = v.findViewById(R.id.QteDestruction);
+        vh.qteRetourPUI         = v.findViewById(R.id.QteRetourPUI);
+        vh.qteRetourFournisseur = v.findViewById(R.id.QteRetourFournisseur);
+        vh.resultatSerialisation= v.findViewById(R.id.resultatSerialisation);
+        vh.zoneNumSerie         = v.findViewById(R.id.zoneNumSerie);
+
+        v.setTag(R.id.tag_layout_ref, vh.layoutRef);
+    }
+
+    private void afficherDonnees(Retour_LigneViewHolder vh, Retour_Ligne rl, int position) {
+        // Textes statiques
+        vh.designation.setText(rl.getProduit_Designation());
+        vh.referenceProduit.setText(rl.getProduit_Reference());
+
+        String fournisseur = rl.getProduit_Fournisseur();
+        vh.fournisseur.setText(fournisseur != null && !fournisseur.isEmpty()
+                ? fournisseur.split(" ")[0] : "");
+
+        vh.qteRetourner.setText(String.valueOf((int) rl.getQte_Retourner()));
+
+        // Quantités saisies
+        vh.qteDestruction.setText(vh.valeurDestruction > -1
+                ? String.valueOf(vh.valeurDestruction)
+                : (rl.getDestruction_Qte() <= 0 ? "" : String.valueOf((int) rl.getDestruction_Qte())));
+
+        vh.qteRetourFournisseur.setText(vh.valeurFrs > -1
+                ? String.valueOf(vh.valeurFrs)
+                : (rl.getRetourFrs_Qte() <= 0 ? "" : String.valueOf((int) rl.getRetourFrs_Qte())));
+
+        vh.qteRetourPUI.setText(vh.valeurPUI > -1
+                ? String.valueOf(vh.valeurPUI)
+                : (rl.getRetourPui_Qte() <= 0 ? "" : String.valueOf((int) rl.getRetourPui_Qte())));
+
+        // Lot
+        vh.lotRetourne.setText(vh.valeurLot);
+
+        // Série
+        String serie = rl.getSerie_Retourner();
+        if (serie != null && !serie.isEmpty()) {
+            vh.numeroSerieModifiable.setText(serie);
+            vh.zoneNumSerie.setVisibility(View.VISIBLE);
         } else {
-            viewHolder.layoutRef = R.layout.row_retour_ligne_quarantaine;
-            viewHolder.firstModifPassage = true;
+            vh.zoneNumSerie.setVisibility(View.GONE);
+        }
+
+        // Date péremption
+        if (!vh.valeurDate.isEmpty()) {
+            vh.datePeremption.setText(vh.valeurDate);
+            try {
+                vh.setDatePeremptionColor(DATE_FORMAT_DISPLAY.parse(vh.valeurDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        } else {
+            vh.datePeremption.setText("");
+            vh.setDatePeremptionColor(null);
+        }
+
+        // Sérialisation — déjà pré-chargée, pas de BDD
+        String resultat = serialisationResultats.get(position);
+        vh.valeurSerialisation = resultat;
+        vh.resultatSerialisation.setText(resultat);
+    }
+
+    private void configurerListeners(final Retour_LigneViewHolder vh,
+                                     final Retour_Ligne rl, final int position) {
+
+        boolean estModifiable = vh.layoutRef == R.layout.row_retour_ligne_quarantaine_modifiable;
+
+        if (estModifiable) {
+            // Mode modifiable : date picker + datamatrix
+            FrameLayout zoneDate = vh.zoneDate;
+            if (zoneDate == null) return;
+
+            zoneDate.setOnClickListener(v -> {
+                DatePickerFragment f = new DatePickerFragment();
+                f.setViewHolder(vh, rl, db);
+                f.show(((AppCompatActivity) context).getSupportFragmentManager(), "datePicker");
+            });
+
+            LinearLayout zoneDataMatrix = vh.dataMatrix;
+            if (zoneDataMatrix != null) {
+                zoneDataMatrix.setOnClickListener(v ->
+                        ((DetailQuarantaineActivity) context).decoderCodeBarre(
+                                vh.datePeremption, vh.lotRetourne, vh,
+                                vh.designation.getText().toString()));
+            }
+
+            vh.datePeremption.setPaintFlags(
+                    vh.datePeremption.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+
+            // NumberPickers si mode modification
+            if (vh.modification) {
+                String resultat = serialisationResultats.get(position);
+                if (!"UNKNOWN".equals(resultat)) {
+                    vh.qteRetourFournisseur.setOnClickListener(
+                            v -> afficherNumberPicker(vh, "Fournisseur", rl));
+                    vh.qteRetourPUI.setOnClickListener(
+                            v -> afficherNumberPicker(vh, "PUI", rl));
+                }
+                vh.qteDestruction.setOnClickListener(
+                        v -> afficherNumberPicker(vh, "Destruction", rl));
+            }
+
+        } else {
+            // Mode lecture : clics simples sur les zones quantité
+            new GestionnaireTextView(vh, rl);
         }
     }
 
-    public long mettreAJourUnRetourLigne(Retour_Ligne retourLigne, Retour_LigneViewHolder viewHolder) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        DateFormat dateDecodeur = new SimpleDateFormat("dd/MM/yyyy");
+    // ─── Mode modif ─────────────────────────────────────────────────────────
 
+    public void setModeModif(boolean modeModif, Retour_LigneViewHolder viewHolder) {
+        viewHolder.layoutRef    = modeModif
+                ? R.layout.row_retour_ligne_quarantaine_modifiable
+                : R.layout.row_retour_ligne_quarantaine;
+        viewHolder.modification = modeModif;
+        if (!modeModif) viewHolder.firstModifPassage = true;
+    }
+
+    // ─── Mise à jour BDD ────────────────────────────────────────────────────
+
+    public long mettreAJourUnRetourLigne(Retour_Ligne retourLigne,
+                                         Retour_LigneViewHolder viewHolder) {
         try {
-            Date dateFournie = dateDecodeur.parse(viewHolder.valeurDate);
-            retourLigne.setPeremptionDate(dateFormat.format(dateFournie));
-            viewHolder.setDatePeremptionColor(dateFournie);
+            if (!viewHolder.valeurDate.isEmpty()) {
+                Date dateFournie = DATE_FORMAT_DISPLAY.parse(viewHolder.valeurDate);
+                retourLigne.setPeremptionDate(DATE_FORMAT_SQL.format(dateFournie));
+                viewHolder.setDatePeremptionColor(dateFournie);
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -312,11 +322,15 @@ public class Retour_Ligne_QuarantaineAdapter extends ArrayAdapter {
         retourLigne.setDestruction_Qte(viewHolder.valeurDestruction);
         retourLigne.setRetourPui_Qte(viewHolder.valeurPUI);
         retourLigne.setRetourFrs_Qte(viewHolder.valeurFrs);
-        return Retour_LigneOpenHelper.mettreAJourUnRetourLigne(((MenuActivity) context).db, retourLigne);
+        return Retour_LigneOpenHelper.mettreAJourUnRetourLigne(
+                ((MenuActivity) context).db, retourLigne);
     }
+
+    // ─── DatePickerFragment ─────────────────────────────────────────────────
 
     public static class DatePickerFragment extends DialogFragment
             implements DatePickerDialog.OnDateSetListener {
+
         Retour_LigneViewHolder viewHolder;
         Retour_Ligne retourLigne;
         SQLiteDatabase db;
@@ -324,37 +338,25 @@ public class Retour_Ligne_QuarantaineAdapter extends ArrayAdapter {
         @TargetApi(Build.VERSION_CODES.N)
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current date as the default date in the picker
-            final Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
-            int day = c.get(Calendar.DAY_OF_MONTH);
-
-            // Create a new instance of DatePickerDialog and return it
-            return new DatePickerDialog(getActivity(), this, year, month, day);
+            Calendar c = Calendar.getInstance();
+            return new DatePickerDialog(getActivity(), this,
+                    c.get(Calendar.YEAR), c.get(Calendar.MONTH),
+                    c.get(Calendar.DAY_OF_MONTH));
         }
 
+        @Override
         public void onDateSet(DatePicker view, int year, int month, int day) {
-            if (month < 10) {
-                month++;
-            }
-            String mois = "";
-            if (month < 10) {
-                mois += "0";
-            }
-
-            mois += String.valueOf(month);
-
-            String date = String.valueOf(day) + "/" + mois + "/" + String.valueOf(year);
+            String mois = (month + 1) < 10 ? "0" + (month + 1) : String.valueOf(month + 1);
+            String jour = day < 10 ? "0" + day : String.valueOf(day);
+            String date = jour + "/" + mois + "/" + year;
 
             viewHolder.datePeremption.setText(date);
             viewHolder.valeurDate = date;
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            DateFormat dateDecodeur = new SimpleDateFormat("dd/MM/yyyy");
 
             try {
-                Date dateFournie = dateDecodeur.parse(viewHolder.valeurDate);
-                retourLigne.setPeremptionDate(dateFormat.format(dateFournie));
+                Date dateFournie = new SimpleDateFormat("dd/MM/yyyy").parse(date);
+                retourLigne.setPeremptionDate(
+                        new SimpleDateFormat("yyyy-MM-dd").format(dateFournie));
                 viewHolder.setDatePeremptionColor(dateFournie);
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -365,377 +367,256 @@ public class Retour_Ligne_QuarantaineAdapter extends ArrayAdapter {
             retourLigne.setDestruction_Qte(viewHolder.valeurDestruction);
             retourLigne.setRetourPui_Qte(viewHolder.valeurPUI);
             retourLigne.setRetourFrs_Qte(viewHolder.valeurFrs);
-
             Retour_LigneOpenHelper.mettreAJourUnRetourLigne(db, retourLigne);
         }
 
-        public void setViewHolder(Retour_LigneViewHolder view, Retour_Ligne retourL, SQLiteDatabase database) {
-            this.viewHolder = view;
-            this.db = database;
-            this.retourLigne = retourL;
+        public void setViewHolder(Retour_LigneViewHolder v, Retour_Ligne rl,
+                                  SQLiteDatabase database) {
+            viewHolder  = v;
+            retourLigne = rl;
+            db          = database;
         }
     }
+
+    // ─── GestionnaireTextView (mode lecture) ────────────────────────────────
 
     private class GestionnaireTextView {
-        public Retour_LigneViewHolder viewHolder;
 
-        public Retour_Ligne retourLigne;
+        final Retour_LigneViewHolder viewHolder;
+        final Retour_Ligne retourLigne;
 
-        View.OnClickListener clicPUIListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!viewHolder.resultatSerialisation.getText().toString().contentEquals("UNKNOWN"))
-                {
-                    if (!viewHolder.qteRetourPUI.getText().toString().equals(String.valueOf(viewHolder.valeurQteRetourner))) {
-                        viewHolder.qteRetourPUI.setText(viewHolder.qteRetourner.getText().toString());
-                        viewHolder.valeurPUI = viewHolder.valeurQteRetourner;
+        GestionnaireTextView(Retour_LigneViewHolder vh, Retour_Ligne rl) {
+            this.viewHolder  = vh;
+            this.retourLigne = rl;
 
-                        viewHolder.qteRetourFournisseur.setText(String.valueOf(0));
-                        viewHolder.valeurFrs = 0;
-                        viewHolder.qteDestruction.setText(String.valueOf(0));
-                        viewHolder.valeurDestruction = 0;
-                    } else {
-                        viewHolder.valeurPUI = viewHolder.valeurQteRetourner;
-                        viewHolder.valeurFrs = 0;
-                        viewHolder.valeurDestruction = 0;
-                        setModeModif(true, viewHolder);
-                        notifyDataSetChanged();
-                    }
-                    mettreAJourUnRetourLigne(retourLigne, viewHolder);
-                }
+            ((View) vh.qteRetourPUI.getParent()).setOnClickListener(v -> clicPUI());
+            ((View) vh.qteDestruction.getParent()).setOnClickListener(v -> clicDestruction());
+            ((View) vh.qteRetourFournisseur.getParent()).setOnClickListener(v -> clicFournisseur());
+        }
+
+        private void clicPUI() {
+            if ("UNKNOWN".equals(viewHolder.valeurSerialisation)) return;
+            boolean dejaPlein = viewHolder.qteRetourPUI.getText()
+                    .toString().equals(String.valueOf(viewHolder.valeurQteRetourner));
+            viewHolder.valeurPUI         = viewHolder.valeurQteRetourner;
+            viewHolder.valeurFrs         = 0;
+            viewHolder.valeurDestruction = 0;
+            if (dejaPlein) {
+                setModeModif(true, viewHolder);
+                notifyDataSetChanged();
+            } else {
+                viewHolder.qteRetourPUI.setText(viewHolder.qteRetourner.getText());
+                viewHolder.qteRetourFournisseur.setText("0");
+                viewHolder.qteDestruction.setText("0");
             }
-        };
+            mettreAJourUnRetourLigne(retourLigne, viewHolder);
+        }
 
-        View.OnClickListener clicDestructionListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!viewHolder.qteDestruction.getText().toString().equals(String.valueOf(viewHolder.valeurQteRetourner))) {
-                    viewHolder.qteDestruction.setText(viewHolder.qteRetourner.getText().toString());
-                    viewHolder.valeurDestruction = viewHolder.valeurQteRetourner;
-
-                    viewHolder.qteRetourFournisseur.setText(String.valueOf(0));
-                    viewHolder.valeurFrs = 0;
-                    viewHolder.qteRetourPUI.setText(String.valueOf(0));
-                    viewHolder.valeurPUI = 0;
-                } else {
-                    viewHolder.valeurDestruction = viewHolder.valeurQteRetourner;
-                    viewHolder.valeurFrs = 0;
-                    viewHolder.valeurPUI = 0;
-                    setModeModif(true, viewHolder);
-                    notifyDataSetChanged();
-                }
-                mettreAJourUnRetourLigne(retourLigne, viewHolder);
+        private void clicDestruction() {
+            boolean dejaPlein = viewHolder.qteDestruction.getText()
+                    .toString().equals(String.valueOf(viewHolder.valeurQteRetourner));
+            viewHolder.valeurDestruction = viewHolder.valeurQteRetourner;
+            viewHolder.valeurFrs         = 0;
+            viewHolder.valeurPUI         = 0;
+            if (dejaPlein) {
+                setModeModif(true, viewHolder);
+                notifyDataSetChanged();
+            } else {
+                viewHolder.qteDestruction.setText(viewHolder.qteRetourner.getText());
+                viewHolder.qteRetourFournisseur.setText("0");
+                viewHolder.qteRetourPUI.setText("0");
             }
-        };
+            mettreAJourUnRetourLigne(retourLigne, viewHolder);
+        }
 
-        View.OnClickListener clicFournisseurListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!viewHolder.resultatSerialisation.getText().toString().contentEquals("UNKNOWN"))
-                {
-                    if (!viewHolder.qteRetourFournisseur.getText().toString().equals(String.valueOf(viewHolder.valeurQteRetourner))) {
-                        viewHolder.qteRetourFournisseur.setText(viewHolder.qteRetourner.getText().toString());
-                        viewHolder.valeurFrs = viewHolder.valeurQteRetourner;
-
-                        viewHolder.qteRetourPUI.setText(String.valueOf(0));
-                        viewHolder.valeurPUI = 0;
-                        viewHolder.qteDestruction.setText(String.valueOf(0));
-                        viewHolder.valeurDestruction = 0;
-                    } else {
-                        viewHolder.valeurFrs = viewHolder.valeurQteRetourner;
-                        viewHolder.valeurPUI = 0;
-                        viewHolder.valeurDestruction = 0;
-                        setModeModif(true, viewHolder);
-                        notifyDataSetChanged();
-                    }
-                    mettreAJourUnRetourLigne(retourLigne, viewHolder);
-                }
+        private void clicFournisseur() {
+            if ("UNKNOWN".equals(viewHolder.valeurSerialisation)) return;
+            boolean dejaPlein = viewHolder.qteRetourFournisseur.getText()
+                    .toString().equals(String.valueOf(viewHolder.valeurQteRetourner));
+            viewHolder.valeurFrs         = viewHolder.valeurQteRetourner;
+            viewHolder.valeurPUI         = 0;
+            viewHolder.valeurDestruction = 0;
+            if (dejaPlein) {
+                setModeModif(true, viewHolder);
+                notifyDataSetChanged();
+            } else {
+                viewHolder.qteRetourFournisseur.setText(viewHolder.qteRetourner.getText());
+                viewHolder.qteRetourPUI.setText("0");
+                viewHolder.qteDestruction.setText("0");
             }
-        };
-
-        public GestionnaireTextView(Retour_LigneViewHolder vH, Retour_Ligne retourL) {
-            this.viewHolder = vH;
-            this.retourLigne = retourL;
-            ((View) viewHolder.qteRetourPUI.getParent()).setOnClickListener(clicPUIListener);
-            ((View) viewHolder.qteDestruction.getParent()).setOnClickListener(clicDestructionListener);
-            ((View) viewHolder.qteRetourFournisseur.getParent()).setOnClickListener(clicFournisseurListener);
+            mettreAJourUnRetourLigne(retourLigne, viewHolder);
         }
     }
 
-    private class GestionnaireEditText {
+    // ─── NumberPicker ───────────────────────────────────────────────────────
 
-        public Retour_LigneViewHolder viewHolder;
-        Retour_Ligne retourLigne;
-
-
-        public GestionnaireEditText(Retour_LigneViewHolder view, final Retour_Ligne retour_ligne) {
-            viewHolder = view;
-            retourLigne = retour_ligne;
-
-
-            viewHolder.lotRetourne.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    viewHolder.valeurLot = viewHolder.lotRetourne.getText().toString();
-                    mettreAJourUnRetourLigne(retourLigneList.get(viewHolderList.indexOf(viewHolder)), viewHolder);
-                }
-            });
-
-            viewHolder.firstModifPassage = false;
-        }
-    }
-
-    public void afficherNumberPicker(final Retour_LigneViewHolder viewHolder, final String denomination, final Retour_Ligne courant)
-    {
-        // Ouvre une boite de dialogue avec un NumberPicker
-        String title = denomination;
-        String message = "Quantité placée : ";
-        final int maxValue = viewHolder.valeurQteRetourner;
+    public void afficherNumberPicker(final Retour_LigneViewHolder vh,
+                                     final String denomination,
+                                     final Retour_Ligne courant) {
+        final int maxValue = vh.valeurQteRetourner;
         int value = 0;
-        switch (denomination)
-        {
+        switch (denomination) {
             case "PUI":
-                if(!viewHolder.qteRetourPUI.getText().toString().contentEquals(""))
-                    value = Integer.parseInt(viewHolder.qteRetourPUI.getText().toString());
+                if (!vh.qteRetourPUI.getText().toString().isEmpty())
+                    value = Integer.parseInt(vh.qteRetourPUI.getText().toString());
                 break;
             case "Destruction":
-                if(!viewHolder.qteDestruction.getText().toString().contentEquals(""))
-                    value = Integer.parseInt(viewHolder.qteDestruction.getText().toString());
+                if (!vh.qteDestruction.getText().toString().isEmpty())
+                    value = Integer.parseInt(vh.qteDestruction.getText().toString());
                 break;
             default:
-                if(!viewHolder.qteRetourFournisseur.getText().toString().contentEquals(""))
-                    value = Integer.parseInt(viewHolder.qteRetourFournisseur.getText().toString());
+                if (!vh.qteRetourFournisseur.getText().toString().isEmpty())
+                    value = Integer.parseInt(vh.qteRetourFournisseur.getText().toString());
                 break;
         }
 
-        DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
+        Alerte.afficherAlerteNumberPicker(context, denomination, "Quantité placée : ",
+                value, maxValue, (dialog, id) -> {
+                    int qteApres = aNumberPicker.getValue();
+                    appliquerQuantite(vh, denomination, qteApres, maxValue, courant);
+                    notifyDataSetChanged();
+                    ((InputMethodManager) context.getSystemService(
+                            Context.INPUT_METHOD_SERVICE))
+                            .toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                    dialog.dismiss();
+                });
 
-                int qteAprès = aNumberPicker.getValue();
-
-                if(maxValue == qteAprès)
-                {
-                    viewHolder.valeurPUI = 0;
-                    viewHolder.valeurDestruction = 0;
-                    viewHolder.valeurFrs = 0;
-                }
-                int total_place = 0;
-                int difference = 0;
-                int fournisseur = viewHolder.valeurFrs;
-                int destruction = viewHolder.valeurDestruction;
-                int pui = viewHolder.valeurPUI;
-                switch (denomination)
-                {
-                    case "PUI":
-                        viewHolder.valeurPUI = qteAprès;
-
-
-                        if(destruction == -1)
-                            destruction = 0;
-
-
-                        if(fournisseur == -1)
-                            fournisseur = 0;
-
-                        total_place = destruction+fournisseur+viewHolder.valeurPUI;
-                        difference = maxValue - total_place;
-                        while(difference < 0)
-                        {
-                            if(viewHolder.valeurFrs > 0)
-                            {
-                                viewHolder.valeurFrs--;
-                                total_place = viewHolder.valeurDestruction+viewHolder.valeurFrs+viewHolder.valeurPUI;
-                                difference = maxValue - total_place;
-                            }
-                            else
-                            {
-                                viewHolder.valeurDestruction--;
-                                total_place = viewHolder.valeurDestruction+viewHolder.valeurFrs+viewHolder.valeurPUI;
-                                difference = maxValue - total_place;
-                            }
-                        }
-
-                        viewHolder.qteRetourPUI.setText(String.valueOf(qteAprès));
-                        viewHolder.qteRetourFournisseur.setText(String.valueOf(difference));
-                        viewHolder.valeurFrs = difference;
-                        viewHolder.valeurPUI = qteAprès;
-                        courant.setRetourPui_Qte(qteAprès);
-                        courant.setRetourFrs_Qte(difference);
-                        break;
-                    case "Destruction":
-                        viewHolder.valeurDestruction = qteAprès;
-
-                        if(fournisseur == -1)
-                            fournisseur = 0;
-
-                        if(pui == -1)
-                            pui = 0;
-
-                        total_place = viewHolder.valeurDestruction+fournisseur+pui;
-                        difference = maxValue - total_place;
-                        while(difference < 0)
-                        {
-                            if(viewHolder.valeurFrs > 0)
-                            {
-                                viewHolder.valeurFrs--;
-                                total_place = viewHolder.valeurDestruction+viewHolder.valeurFrs+viewHolder.valeurPUI;
-                                difference = maxValue - total_place;
-                            }
-                            else
-                            {
-                                viewHolder.valeurPUI--;
-                                total_place = viewHolder.valeurDestruction+viewHolder.valeurFrs+viewHolder.valeurPUI;
-                                difference = maxValue - total_place;
-                            }
-                        }
-                        viewHolder.qteDestruction.setText(String.valueOf(qteAprès));
-                        viewHolder.qteRetourPUI.setText(String.valueOf(difference));
-                        viewHolder.valeurDestruction = qteAprès;
-                        viewHolder.valeurPUI = difference;
-                        courant.setDestruction_Qte(qteAprès);
-                        courant.setRetourPui_Qte(difference);
-                        break;
-                    default:
-                        viewHolder.valeurFrs = qteAprès;
-
-                        if(destruction == -1)
-                            destruction = 0;
-
-                        if(pui == -1)
-                            pui = 0;
-
-                        total_place = destruction+viewHolder.valeurFrs+pui;
-                        difference = maxValue - total_place;
-                        while(difference < 0)
-                        {
-                            if(viewHolder.valeurDestruction > 0)
-                            {
-                                viewHolder.valeurDestruction--;
-                                total_place = viewHolder.valeurDestruction+viewHolder.valeurFrs+viewHolder.valeurPUI;
-                                difference = maxValue - total_place;
-                            }
-                            else
-                            {
-                                viewHolder.valeurPUI--;
-                                total_place = viewHolder.valeurDestruction+viewHolder.valeurFrs+viewHolder.valeurPUI;
-                                difference = maxValue - total_place;
-                            }
-                        }
-                        viewHolder.qteRetourFournisseur.setText(String.valueOf(qteAprès));
-                        viewHolder.qteDestruction.setText(String.valueOf(difference));
-                        viewHolder.valeurFrs = qteAprès;
-                        viewHolder.valeurDestruction = difference;
-                        courant.setRetourFrs_Qte(qteAprès);
-                        courant.setDestruction_Qte(difference);
-                        break;
-                }
-
-
-                notifyDataSetChanged();
-                InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                dialog.dismiss();
-            }
-        };
-
-        Alerte.afficherAlerteNumberPicker(context, title, message, 0, maxValue, onClickListener);
-        setModeModif(false, viewHolder);
-        viewHolder.modification = false;
+        setModeModif(false, vh);
+        vh.modification = false;
     }
 
+    private void appliquerQuantite(Retour_LigneViewHolder vh, String denomination,
+                                   int qteApres, int max, Retour_Ligne courant) {
+        int frs         = Math.max(vh.valeurFrs, 0);
+        int destruction = Math.max(vh.valeurDestruction, 0);
+        int pui         = Math.max(vh.valeurPUI, 0);
+
+        switch (denomination) {
+            case "PUI":
+                pui = qteApres;
+                int diffPUI = max - (destruction + frs + pui);
+                while (diffPUI < 0) {
+                    if (frs > 0) frs--; else destruction--;
+                    diffPUI = max - (destruction + frs + pui);
+                }
+                vh.valeurPUI = pui; vh.valeurFrs = frs; vh.valeurDestruction = destruction;
+                vh.qteRetourPUI.setText(String.valueOf(pui));
+                vh.qteRetourFournisseur.setText(String.valueOf(frs));
+                vh.qteDestruction.setText(String.valueOf(destruction));
+                courant.setRetourPui_Qte(pui); courant.setRetourFrs_Qte(frs);
+                break;
+
+            case "Destruction":
+                destruction = qteApres;
+                int diffDest = max - (destruction + frs + pui);
+                while (diffDest < 0) {
+                    if (frs > 0) frs--; else pui--;
+                    diffDest = max - (destruction + frs + pui);
+                }
+                vh.valeurDestruction = destruction; vh.valeurFrs = frs; vh.valeurPUI = pui;
+                vh.qteDestruction.setText(String.valueOf(destruction));
+                vh.qteRetourFournisseur.setText(String.valueOf(frs));
+                vh.qteRetourPUI.setText(String.valueOf(pui));
+                courant.setDestruction_Qte(destruction); courant.setRetourPui_Qte(pui);
+                break;
+
+            default: // Fournisseur
+                frs = qteApres;
+                int diffFrs = max - (destruction + frs + pui);
+                while (diffFrs < 0) {
+                    if (destruction > 0) destruction--; else pui--;
+                    diffFrs = max - (destruction + frs + pui);
+                }
+                vh.valeurFrs = frs; vh.valeurDestruction = destruction; vh.valeurPUI = pui;
+                vh.qteRetourFournisseur.setText(String.valueOf(frs));
+                vh.qteDestruction.setText(String.valueOf(destruction));
+                vh.qteRetourPUI.setText(String.valueOf(pui));
+                courant.setRetourFrs_Qte(frs); courant.setDestruction_Qte(destruction);
+                break;
+        }
+
+        mettreAJourUnRetourLigne(courant, vh);
+    }
+
+    // ─── ViewHolder ─────────────────────────────────────────────────────────
+
     public class Retour_LigneViewHolder {
-        public int layoutRef;
-        public int valeurPUI = -1;
-        public int valeurFrs = -1;
-        public int valeurDestruction = -1;
-        public int valeurQteRetourner;
-        public String valeurLot = "";
-        public String valeurDate = "";
-        public String valeurSerie ="";
+        public int    layoutRef;
+        public int    valeurPUI           = -1;
+        public int    valeurFrs           = -1;
+        public int    valeurDestruction   = -1;
+        public int    valeurQteRetourner;
+        public String valeurLot           = "";
+        public String valeurDate          = "";
+        public String valeurSerie         = "";
         public String valeurSerialisation = "";
+        public boolean firstModifPassage  = true;
+        public boolean modification       = false;
 
-        public boolean firstModifPassage = true;
-
-        public TextView designation;
-        public TextView referenceProduit;
-        public TextView fournisseur;
-        public TextView lotRetourne;
-        public TextView datePeremption;
-        public TextView qteRetourner;
-        public TextView qteDestruction;
-        public TextView qteRetourPUI;
-        public TextView qteRetourFournisseur;
-        public TextView numeroSerieModifiable;
-        public TextView resultatSerialisation;
+        public TextView   designation;
+        public TextView   referenceProduit;
+        public TextView   fournisseur;
+        public TextView   lotRetourne;
+        public TextView   datePeremption;
+        public TextView   qteRetourner;
+        public TextView   qteDestruction;
+        public TextView   qteRetourPUI;
+        public TextView   qteRetourFournisseur;
+        public TextView   numeroSerieModifiable;
+        public TextView   resultatSerialisation;
         public LinearLayout dataMatrix;
         public LinearLayout zoneNumSerie;
-        public FrameLayout zoneDate;
-        boolean modification = false;
+        public FrameLayout  zoneDate;
+
+        // ─── Actions globales (appelées depuis le BottomSheet) ───────────
 
         public void toutRetournerPUI() {
-            valeurPUI = valeurQteRetourner;
-            valeurFrs = 0;
-            valeurDestruction = 0;
-            mettreAJourUnRetourLigne(retourLigneList.get(viewHolderList.indexOf(this)), this);
+            valeurPUI = valeurQteRetourner; valeurFrs = 0; valeurDestruction = 0;
+            mettreAJourUnRetourLigne(
+                    retourLigneList.get(viewHolderList.indexOf(this)), this);
             notifyDataSetChanged();
         }
 
         public void toutRetournerFrs() {
-            valeurPUI = 0;
-            valeurFrs = valeurQteRetourner;
-            valeurDestruction = 0;
-            mettreAJourUnRetourLigne(retourLigneList.get(viewHolderList.indexOf(this)), this);
+            valeurPUI = 0; valeurFrs = valeurQteRetourner; valeurDestruction = 0;
+            mettreAJourUnRetourLigne(
+                    retourLigneList.get(viewHolderList.indexOf(this)), this);
             notifyDataSetChanged();
         }
 
         public void toutDetruire() {
-            valeurPUI = 0;
-            valeurFrs = 0;
-            valeurDestruction = valeurQteRetourner;
-            mettreAJourUnRetourLigne(retourLigneList.get(viewHolderList.indexOf(this)), this);
+            valeurPUI = 0; valeurFrs = 0; valeurDestruction = valeurQteRetourner;
+            mettreAJourUnRetourLigne(
+                    retourLigneList.get(viewHolderList.indexOf(this)), this);
             notifyDataSetChanged();
         }
 
         public void toutRemettreAZero() {
-            valeurPUI = 0;
-            valeurFrs = 0;
-            valeurDestruction = 0;
-            mettreAJourUnRetourLigne(retourLigneList.get(viewHolderList.indexOf(this)), this);
+            valeurPUI = 0; valeurFrs = 0; valeurDestruction = 0;
+            mettreAJourUnRetourLigne(
+                    retourLigneList.get(viewHolderList.indexOf(this)), this);
             notifyDataSetChanged();
         }
 
         public void setDatePeremptionColor(Date date) {
-
-            if (date != null) {
-
-                Date dateDuJour = new Date();
-                long diff = dateDuJour.getTime() - date.getTime();
-                int delai = (int) (diff / (1000 * 60 * 60 * 24));
-
-                int delai30jours = -30;
-                int delai60jours = -60;
-
-                if (delai >= delai30jours) {
-                    datePeremption.setTextColor(context.getResources().getColor(R.color.rouge2, null));
-                } else if (delai >= delai60jours) {
-                    datePeremption.setTextColor(context.getResources().getColor(R.color.orange2, null));
-                } else {
-                    datePeremption.setTextColor(context.getResources().getColor(R.color.vert, null));
-                }
-            } else {
+            if (datePeremption == null) return;
+            if (date == null) {
                 datePeremption.setTextColor(Color.BLACK);
+                return;
             }
+            long diff  = new Date().getTime() - date.getTime();
+            int  delai = (int) (diff / (1000L * 60 * 60 * 24));
 
+            if (delai >= -30) {
+                datePeremption.setTextColor(
+                        context.getResources().getColor(R.color.rouge2, null));
+            } else if (delai >= -60) {
+                datePeremption.setTextColor(
+                        context.getResources().getColor(R.color.orange2, null));
+            } else {
+                datePeremption.setTextColor(
+                        context.getResources().getColor(R.color.vert, null));
+            }
         }
     }
 }

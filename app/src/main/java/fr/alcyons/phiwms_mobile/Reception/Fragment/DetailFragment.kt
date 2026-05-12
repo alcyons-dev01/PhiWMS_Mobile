@@ -110,9 +110,11 @@ class DetailFragment : Fragment() {
         var listeEmplacements : MutableList<String> = mutableListOf()
         val zoneCourante = ZoneOpenHelper.getZoneByDepotEtNom(db, depotCourant, produit.zone_PUI_Defaut)
         if(zoneCourante != null)
-             listeEmplacements = EmplacementOpenHelper.getNomEmplacementsParZone(db, zoneCourante)
+        {
+            listeEmplacements = EmplacementOpenHelper.getNomEmplacementsParZone(db, zoneCourante)
             if(listeEmplacements.isEmpty())
                 listeEmplacements.add("")
+        }
         else
             listeEmplacements.add("")
 
