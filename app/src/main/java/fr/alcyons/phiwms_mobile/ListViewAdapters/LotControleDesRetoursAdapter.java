@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
-import fr.alcyons.phiwms_mobile.ControleDesRetours.ListeLotsControleDesRetoursActivity;
+import fr.alcyons.phiwms_mobile.ControleDesRetours.LotControleDesRetoursActions;
 import fr.alcyons.phiwms_mobile.R;
 
 public class LotControleDesRetoursAdapter extends RecyclerView.Adapter<LotControleDesRetoursAdapter.LotViewHolder> {
@@ -30,6 +30,7 @@ public class LotControleDesRetoursAdapter extends RecyclerView.Adapter<LotContro
     public Context context;
     private List<Stock_Lot_Emplacement_Light> lots;
     private LotControleDesRetoursAdapter.OnDeleteClickListener deleteClickListener;
+    private LotControleDesRetoursActions actions;
 
     public interface OnDeleteClickListener {
         void onDeleteClick(int position);
@@ -40,6 +41,16 @@ public class LotControleDesRetoursAdapter extends RecyclerView.Adapter<LotContro
         this.lots = lots;
         this.deleteClickListener = listener;
         this.context = context;
+        if (context instanceof LotControleDesRetoursActions) {
+            this.actions = (LotControleDesRetoursActions) context;
+        }
+    }
+
+    public LotControleDesRetoursAdapter(List<Stock_Lot_Emplacement_Light> lots, LotControleDesRetoursAdapter.OnDeleteClickListener listener, Context context, LotControleDesRetoursActions actions) {
+        this.lots = lots;
+        this.deleteClickListener = listener;
+        this.context = context;
+        this.actions = actions;
     }
 
     @NonNull
@@ -90,7 +101,7 @@ public class LotControleDesRetoursAdapter extends RecyclerView.Adapter<LotContro
             holder.qteSaisie.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((ListeLotsControleDesRetoursActivity) context).ClickNumberPicker(position);
+                    if (actions != null) { actions.ClickNumberPicker(position); }
                 }
             });
 
@@ -146,7 +157,7 @@ public class LotControleDesRetoursAdapter extends RecyclerView.Adapter<LotContro
                 holder.layoutPrincipal.setClickable(true);
                 holder.layoutPrincipal.setOnClickListener(v -> {
                     v.setEnabled(false); // désactive pour éviter un second clic
-                    ((ListeLotsControleDesRetoursActivity) context).ClickLigneLot(position);
+                    if (actions != null) { actions.ClickLigneLot(position); }
 
                     // optionnel : réactiver après un délai
                     v.postDelayed(() -> v.setEnabled(true), 500);
@@ -312,4 +323,3 @@ public class LotControleDesRetoursAdapter extends RecyclerView.Adapter<LotContro
         return lots.get(position);
     }
 }
-

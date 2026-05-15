@@ -245,12 +245,6 @@
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
 
-    <activity
-        android:name="fr.alcyons.phiwms_mobile.RetourPUI.ListeEmplacementRetourPUIActivity"
-        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:configChanges="orientation|screenSize"/>
-
     <!-- Retour Fournisseur -->
     <activity
         android:name="fr.alcyons.phiwms_mobile.Services.ServiceRetourFournisseurActivity"

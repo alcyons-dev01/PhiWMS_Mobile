@@ -12,11 +12,13 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.LinearLayout
-import android.widget.ListView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.widget.AppCompatButton
+import androidx.core.widget.NestedScrollView
+import androidx.fragment.app.FragmentContainerView
 import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
@@ -39,12 +41,11 @@ import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne
 import fr.alcyons.phiwms_mobile.Classes.Depot
 import fr.alcyons.phiwms_mobile.Classes.Retour
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne
-import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne_ControleRetour_Adapte
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light
-import fr.alcyons.phiwms_mobile.ListViewAdapters.Retour_Ligne_ControleRetoursAdapter_2025
+import fr.alcyons.phiwms_mobile.ControleDesRetours.Fragment.ControleRetourLignesFragment
+import fr.alcyons.phiwms_mobile.ControleDesRetours.Fragment.ListeLotsControleDesRetoursFragment
 import fr.alcyons.phiwms_mobile.Outils.Alerte
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites
-import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation
 import fr.alcyons.phiwms_mobile.R
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity
 import fr.alcyons.phiwms_mobile.Services.ServiceControleRetoursActivity
@@ -56,497 +57,488 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.Random
-import java.util.function.Function
 
-class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity()
+class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
+    ControleRetourLignesFragment.OnElementSelectionneListener,
+    ListeLotsControleDesRetoursFragment.OnLotsControleValidesListener
 {
-    private var retourSelectionne: Retour? = null
+    companion object
+    {
+        private const val ANIMATION_DURATION_MS = 300L
+        private const val DETAIL_FALLBACK_TRANSLATION_Y = 600f
+        private const val RETOUR_SELECTIONNE_ID_ARG = "retourSelectionneID"
+    }
 
-    private var retourLigneControleRetourAdapteListView: ListView? = null
-    private var retourLigneControleRetoursAdapter: Retour_Ligne_ControleRetoursAdapter_2025? = null
-    private var viewHolderAModifier: Retour_Ligne_ControleRetoursAdapter_2025.Retour_LigneViewHolder? = null
-    private var pm: PackageManager? = null
-    private var serialisation: Serialisation? = null
-    private var liste_id_retour_ligne: MutableList<Int?>? = null
-    private var premierPassage = false
-    private var liste_retour_ligne: MutableList<Retour_Ligne>? = null
-    private var context: Context? = null
-    private var tri_choisi: String? = null
-    private var lancerScan: LinearLayout? = null
+    private var retourSelectionne: Retour? = null
     private var depot: Depot? = null
-    private var listelot: MutableList<String?>? = null
+    private var listeRetourLigne: MutableList<Retour_Ligne> = ArrayList()
+    private var listelot: MutableList<String?> = ArrayList()
+    private var context: Context? = null
+    private var pm: PackageManager? = null
+    private var triChoisi: String? = null
+    private var premierPassage = false
 
     private var optionTri: Spinner? = null
+    private var lancerScan: LinearLayout? = null
+    private var aControlerLL: LinearLayout? = null
+    private var controleLL: LinearLayout? = null
+    private var actionButton: AppCompatButton? = null
+    private var aControlerContainer: FragmentContainerView? = null
+    private var controleContainer: FragmentContainerView? = null
+    private var detailContainer: FragmentContainerView? = null
+
+    private var aControlerFragment: ControleRetourLignesFragment? = null
+    private var controleFragment: ControleRetourLignesFragment? = null
+    private var detailFragment: ListeLotsControleDesRetoursFragment? = null
+
+    private var isAControlerOpen = false
+    private var isControleOpen = false
+    private var isDetailOpen = false
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        this.setContentView(R.layout.activity_detail_controle_retours)
+        setContentView(R.layout.activity_detail_controle_retours)
+        context = this
+        pm = packageManager
+        premierPassage = true
 
-        this.context = this@DetailControleDesRetoursActivity
+        initializeData()
+        bindViews()
+        setupUi()
+        setupListeners()
+        setupOnBackPressedCallback()
+    }
 
-        // Récupération des variables globales
-        this.retourSelectionne = RetourOpenHelper.getRetourByID(this.db, (this.intent.extras ?: return).getInt("retourSelectionneID"))
-        this.depot = DepotOpenHelper.getDepotParReference(this.db, (this.retourSelectionne ?: return).ref_Depot_Origine)
+    private fun initializeData()
+    {
+        val retourId = requireNotNull(intent.extras).getInt(RETOUR_SELECTIONNE_ID_ARG)
+        retourSelectionne = RetourOpenHelper.getRetourByID(db, retourId)
+        depot = DepotOpenHelper.getDepotParReference(db, retourSelectionne?.ref_Depot_Origine)
+        listeRetourLigne = Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(db, retourSelectionne).toMutableList()
+    }
 
-        this.listelot = ArrayList<String?>()
-        this.serialisation = Serialisation(this@DetailControleDesRetoursActivity, this.db, this.utilisateurConnecte)
+    private fun bindViews()
+    {
+        optionTri = findViewById(R.id.optionTri)
+        lancerScan = findViewById(R.id.lancerScan)
+        aControlerLL = findViewById(R.id.aControler_LL)
+        controleLL = findViewById(R.id.controle_LL)
+        actionButton = findViewById(R.id.boutonAction)
+        aControlerContainer = findViewById(R.id.referenceAControlerContainer)
+        controleContainer = findViewById(R.id.referenceControleContainer)
+        detailContainer = findViewById(R.id.detailContainer)
+    }
 
-        // Affichage des informations de base
-        (this.findViewById<View?>(R.id.intitule) as TextView).text = (this.retourSelectionne ?: return).intitule
-        (this.findViewById<View?>(R.id.numero) as TextView).text = (this.retourSelectionne ?: return).numero
+    private fun setupUi()
+    {
+        findViewById<TextView>(R.id.intitule).text = retourSelectionne?.intitule.orEmpty()
+        findViewById<TextView>(R.id.numero).text = retourSelectionne?.numero.orEmpty()
 
-        // Récupération et initialisation de la listView
-        this.retourLigneControleRetourAdapteListView = this.findViewById<ListView?>(R.id.listeView)
-
-        (this.retourLigneControleRetourAdapteListView ?: return).itemsCanFocus = true
-        (this.retourLigneControleRetourAdapteListView ?: return).setOnItemClickListener { parent: AdapterView<*>?, view: View?, position: Int, id: Long ->
-            val retourLigne = (this.retourLigneControleRetoursAdapter ?: return@setOnItemClickListener).retour_Lignes[position]
-            this.viewHolderAModifier = (this.retourLigneControleRetoursAdapter ?: return@setOnItemClickListener).retourLigneViewHolderList[position]
-
-            val DetailControleRetours_Bundle = super@DetailControleDesRetoursActivity.getBundle()
-            DetailControleRetours_Bundle.putInt("produitID", retourLigne.code_produit)
-            DetailControleRetours_Bundle.putInt("retourLigneId", retourLigne._UID)
-            val DetailControleRetours_Intent = Intent(this@DetailControleDesRetoursActivity, ListeLotsControleDesRetoursActivity::class.java)
-            DetailControleRetours_Intent.putExtras(DetailControleRetours_Bundle)
-            this@DetailControleDesRetoursActivity.startActivityForResult(DetailControleRetours_Intent, CodesEchangesActivites.RETOUR_LISTE_LOTS)
-        }
-
-        //Initialisation des variables
-        this.premierPassage = true
-        this.liste_id_retour_ligne = ArrayList<Int?>()
-        //liste_resultat_scan = new ArrayList<>();
-        this.liste_retour_ligne = ArrayList<Retour_Ligne>()
-        this.pm = this@DetailControleDesRetoursActivity.packageManager
-        this.liste_retour_ligne = Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(this.db, this.retourSelectionne)
-
-        this.optionTri = this.findViewById<Spinner?>(R.id.optionTri)
-        this.tri_choisi = ParametreUtilisateurOpenHelper.getChoixTriRetourLigne(this.db)
-        if (null == this.tri_choisi)
+        triChoisi = ParametreUtilisateurOpenHelper.getChoixTriRetourLigne(db)
+        if (triChoisi == null)
         {
-            ParametreUtilisateurOpenHelper.mettreAJourTriRetourLigne(this.db, 0, "Designation")
-            this.tri_choisi = ParametreUtilisateurOpenHelper.getChoixTriRetourLigne(this.db)
+            ParametreUtilisateurOpenHelper.mettreAJourTriRetourLigne(db, 0, "Designation")
+            triChoisi = ParametreUtilisateurOpenHelper.getChoixTriRetourLigne(db)
         }
+    }
 
-        (this.optionTri ?: return).onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            var isFirstSelection: Boolean = true // drapeau pour ignorer le premier appel
+    private fun setupListeners()
+    {
+        optionTri?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            private var isFirstSelection = true
 
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
             {
-                if (this.isFirstSelection)
+                if (isFirstSelection)
                 {
-                    this.isFirstSelection = false // on consomme le premier appel
-                    return  // ne rien faire au lancement
+                    isFirstSelection = false
+                    return
                 }
 
-                if (null != parent.getChildAt(0)) { parent.getChildAt(0).visibility = View.INVISIBLE }
-                this@DetailControleDesRetoursActivity.tri_choisi = (this@DetailControleDesRetoursActivity.optionTri ?: return).getItemAtPosition(position).toString()
-                ParametreUtilisateurOpenHelper.mettreAJourTriPreparation(this@DetailControleDesRetoursActivity.db, 0, this@DetailControleDesRetoursActivity.tri_choisi)
-
-                when (this@DetailControleDesRetoursActivity.tri_choisi)
-                {
-                    "Designation" -> this@DetailControleDesRetoursActivity.onClickTriDesignation()
-                    "Place" -> this@DetailControleDesRetoursActivity.onClickTriParPlace()
-                    "Catégorie" -> this@DetailControleDesRetoursActivity.onClickTriCategorie()
-                    "Poids" -> this@DetailControleDesRetoursActivity.onClickTriParPoids()
-                }
+                if (parent.getChildAt(0) != null) { parent.getChildAt(0).visibility = View.INVISIBLE }
+                triChoisi = optionTri?.getItemAtPosition(position).toString()
+                ParametreUtilisateurOpenHelper.mettreAJourTriPreparation(db, 0, triChoisi)
+                applySortAndRefresh()
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
+            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
         }
 
-        //gestion du bouton de scan
-        this.lancerScan = this.findViewById<LinearLayout?>(R.id.lancerScan)
-        (this.lancerScan ?: return).setOnClickListener { v: View? -> this.lancerScanner() }
-
-        this.setupOnBackPressedCallback()
+        lancerScan?.setOnClickListener { lancerScanner() }
+        aControlerLL?.setOnClickListener {
+            if (isAControlerOpen) closeAControler()
+            else
+            {
+                closeOpenedFragments()
+                openAControler()
+            }
+        }
+        controleLL?.setOnClickListener {
+            if (isControleOpen) closeControle()
+            else
+            {
+                closeOpenedFragments()
+                openControle()
+            }
+        }
+        actionButton?.setOnClickListener { demanderValidationControle() }
     }
 
     public override fun onResume()
     {
         super.onResume()
-        if (statutConnexion && this.passageParOnCreate)
-        {
-            if (!this.swipeRefreshLayout.isRefreshing) { this.afficherSpinner(this@DetailControleDesRetoursActivity, LayoutInflater.from(this@DetailControleDesRetoursActivity)) }
-
-            val requestQueue = Volley.newRequestQueue(this@DetailControleDesRetoursActivity)
-            val urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(this.db) + DBOpenHelper.Urls.uriRequeteControleRetours + "/" + (this.retourSelectionne ?: return)._UID
-
-            // Takes the response from the JSON request
-            val obreq: JsonObjectRequest = object : JsonObjectRequest(Method.GET, urlRequete, null, Response.Listener { response: JSONObject? ->
-                try
-                {
-                    val nbResultat = (response ?: return@Listener).getInt("resultCount")
-                    if (0 == nbResultat)
-                    {
-                        val erreur = response.getString("erreur")
-                        if (erreur == (this.context ?: return@Listener).getString(R.string.tokenInvalide)) { Alerte.afficherAlerteInformation(this@DetailControleDesRetoursActivity, this.layoutInflater, "Alerte", "Votre session est invalide, veuillez vous reconnecter.", true, false) }
-                        else if (erreur == (this.context ?: return@Listener).getString(R.string.tokenExpire)) { Alerte.afficherAlerteInformation(this@DetailControleDesRetoursActivity, this.layoutInflater, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", true, false) }
-                        else if (!erreur.contentEquals("Aucun PH_Retour trouvé")) { Alerte.afficherAlerteInformation(this@DetailControleDesRetoursActivity, this.layoutInflater, "Erreur", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Contrôle des retours", true, false) }
-                    }
-                    else
-                    {
-                        val retourLignesJSONArray = response.getJSONArray("PH_Retour_Lignes")
-                        for (k in 0..<retourLignesJSONArray.length())
-                        {
-                            val retourLigneJSONObject = retourLignesJSONArray.getJSONObject(k)
-                            val stockLotEmplacementsJSONArray = retourLigneJSONObject.getJSONArray("ph_stock_lot_emplacements")
-
-                            for (y in 0..<stockLotEmplacementsJSONArray.length())
-                            {
-                                val stock_lot_emplacement_light = Stock_Lot_Emplacement_Light(stockLotEmplacementsJSONArray.getJSONObject(y))
-                                val stock_lot_emplacement_bdd = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(this.db, stock_lot_emplacement_light._UID)
-
-                                if (null == stock_lot_emplacement_bdd) { if (0.0 <= stock_lot_emplacement_light.qte) { Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(this.db, stock_lot_emplacement_light) } }
-                                else { if (stock_lot_emplacement_bdd.qte != stock_lot_emplacement_light.qte) { Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(this.db, stock_lot_emplacement_light) } }
-
-                                (this.listelot ?: return@Listener).add(stock_lot_emplacement_light.lot)
-                            }
-                        }
-                        // Récupération des retours_lignes du Retour présélectionné
-                        for (retourLigne in this.liste_retour_ligne ?: return@Listener)
-                        {
-                            val retourLigneAdapte = Retour_Ligne_ControleRetour_Adapte(retourLigne._UID)
-                            val produit = ProduitOpenHelper.getProduitByID(this.db, retourLigne.code_produit)
-                            val depot = DepotOpenHelper.getDepotParReference(this.db, (this.retourSelectionne ?: return@Listener).ref_Depot_Origine)
-                            if (null != produit && null != depot)
-                            {
-                                for (stockLotEmplacement in Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(this.db, produit, depot))
-                                { retourLigneAdapte.lotAdaptes.add(retourLigneAdapte.LotAdapte(stockLotEmplacement)) }
-                            }
-
-                            (this.liste_id_retour_ligne ?: return@Listener).add(retourLigne._UID)
-                        }
-
-                        when (this.tri_choisi)
-                        {
-                            "Designation" -> this.onClickTriDesignation()
-                            "Place" -> this.onClickTriParPlace()
-                            "Catégorie" -> this.onClickTriCategorie()
-                            "Poids" -> this.onClickTriParPoids()
-                        }
-
-                        this.invalidateOptionsMenu()
-                    }
-
-                    this.passageParOnCreate = false
-
-                    this.arreterSpinner()
-                }
-                catch (e: JSONException) { e.printStackTrace() }
-                },
-                Response.ErrorListener { error: VolleyError? ->
-                    Log.e("Volley CdR", error.toString())
-                    Alerte.afficherAlerteInformation(this@DetailControleDesRetoursActivity, this.layoutInflater, "Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Contrôle des retours)", true, false)
-                })
-            {
-                /**
-                 * Passing some request headers
-                 */
-                override fun getHeaders(): MutableMap<String?, String?>
-                {
-                    val headers: MutableMap<String?, String?> = HashMap<String?, String?>()
-                    headers["Authorization"] = this@DetailControleDesRetoursActivity.utilisateurConnecte.token
-                    return headers
-                }
-            }
-
-            obreq.setRetryPolicy(this.retryPolicy)
-            requestQueue.add<JSONObject?>(obreq)
-        }
-        else
-        {
-            // Récupération des retours_lignes du Retour présélectionné
-            for (retourLigne in this.liste_retour_ligne ?: return)
-            {
-                val retourLigneAdapte = Retour_Ligne_ControleRetour_Adapte(retourLigne._UID)
-                val produit = ProduitOpenHelper.getProduitByID(this.db, retourLigne.code_produit)
-                val depot = DepotOpenHelper.getDepotParReference(this.db, (this.retourSelectionne ?: return).ref_Depot_Origine)
-                if (null != produit && null != depot)
-                {
-                    for (stockLotEmplacement in Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(this.db, produit, depot))
-                    { retourLigneAdapte.lotAdaptes.add(retourLigneAdapte.LotAdapte(stockLotEmplacement)) }
-                }
-                (this.liste_id_retour_ligne ?: return).add(retourLigne._UID)
-            }
-
-            when (this.tri_choisi)
-            {
-                "Designation" -> this.onClickTriDesignation()
-                "Place" -> this.onClickTriParPlace()
-                "Catégorie" -> this.onClickTriCategorie()
-                "Poids" -> this.onClickTriParPoids()
-            }
-
-            this.invalidateOptionsMenu()
-        }
+        if (statutConnexion && premierPassage) { chargerDetailRetourDepuisServeur() }
+        else { refreshRetourData() }
     }
 
-    // Lorsqu'on lance une nouvelle activity avec " startActivityForResult ", action à réaliser à la fin de l'activity lancé suivant le " CodesEchangesActivites " passé
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+    private fun chargerDetailRetourDepuisServeur()
+    {
+        if (swipeRefreshLayout == null || !swipeRefreshLayout.isRefreshing) { afficherSpinner(this, LayoutInflater.from(this)) }
+
+        val requestQueue = Volley.newRequestQueue(this)
+        val urlRequete = ParametresServeurOpenHelper.getPartieCommuneUrls(db) + DBOpenHelper.Urls.uriRequeteControleRetours + "/" + (retourSelectionne ?: return)._UID
+        val obreq: JsonObjectRequest = object : JsonObjectRequest(Method.GET, urlRequete, null, Response.Listener { response: JSONObject? ->
+            try
+            {
+                val nbResultat = response?.getInt("resultCount") ?: return@Listener
+                if (nbResultat == 0)
+                {
+                    val erreur = response.getString("erreur")
+                    if (erreur == getString(R.string.tokenInvalide)) { Alerte.afficherAlerteInformation(this, layoutInflater, "Alerte", "Votre session est invalide, veuillez vous reconnecter.", true, false) }
+                    else if (erreur == getString(R.string.tokenExpire)) { Alerte.afficherAlerteInformation(this, layoutInflater, "Alerte", "Votre session de connexion est expirée, veuillez vous reconnecter.", true, false) }
+                    else if (!erreur.contentEquals("Aucun PH_Retour trouvé")) { Alerte.afficherAlerteInformation(this, layoutInflater, "Erreur", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete Service Contrôle des retours", true, false) }
+                }
+                else
+                {
+                    val retourLignesJSONArray = response.getJSONArray("PH_Retour_Lignes")
+                    for (k in 0 until retourLignesJSONArray.length())
+                    {
+                        val retourLigneJSONObject = retourLignesJSONArray.getJSONObject(k)
+                        val stockLotEmplacementsJSONArray = retourLigneJSONObject.getJSONArray("ph_stock_lot_emplacements")
+                        for (y in 0 until stockLotEmplacementsJSONArray.length())
+                        {
+                            val stockLotEmplacementLight = Stock_Lot_Emplacement_Light(stockLotEmplacementsJSONArray.getJSONObject(y))
+                            val stockLotEmplacementBdd = Stock_Lot_EmplacementLightOpenHelper.getStock_Lot_EmplacementByID(db, stockLotEmplacementLight._UID)
+                            if (stockLotEmplacementBdd == null)
+                            { if (stockLotEmplacementLight.qte >= 0.0) { Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, stockLotEmplacementLight) } }
+                            else if (stockLotEmplacementBdd.qte != stockLotEmplacementLight.qte)
+                            { Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockLotEmplacementLight) }
+                            listelot.add(stockLotEmplacementLight.lot)
+                        }
+                    }
+                }
+
+                premierPassage = false
+                refreshRetourData()
+                arreterSpinner()
+            }
+            catch (e: JSONException) { e.printStackTrace() }
+        }, Response.ErrorListener { error: VolleyError? ->
+            Log.e("Volley CdR", error.toString())
+            Alerte.afficherAlerteInformation(this, layoutInflater, "Erreur", "Veuillez contacter la société Alcyons (erreur Volley : Contrôle des retours)", true, false)
+        })
+        {
+            override fun getHeaders(): MutableMap<String?, String?>
+            {
+                val headers: MutableMap<String?, String?> = HashMap()
+                headers["Authorization"] = utilisateurConnecte.token
+                return headers
+            }
+        }
+        obreq.retryPolicy = retryPolicy
+        requestQueue.add(obreq)
+    }
+
+    private fun refreshRetourData()
+    {
+        listeRetourLigne = Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(db, retourSelectionne).toMutableList()
+        applySortAndRefresh()
+    }
+
+    private fun applySortAndRefresh()
+    {
+        when (triChoisi)
+        {
+            "Designation" -> listeRetourLigne.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.produit_Designation ?: "" })
+            "Place" -> listeRetourLigne.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { getEmplacementTri(it) })
+            "Catégorie" -> listeRetourLigne.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { ProduitOpenHelper.getProduitByID(db, it.code_produit)?.categorie ?: "" })
+            "Poids" -> listeRetourLigne.sortBy { ProduitOpenHelper.getProduitByID(db, it.code_produit)?.poids ?: 0.0 }
+            else -> listeRetourLigne.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.produit_Designation ?: "" })
+        }
+        updateFragments()
+    }
+
+    private fun getEmplacementTri(retourLigne: Retour_Ligne): String
+    {
+        val emplacementOrigine = retourLigne.emplacementOrigine
+        if (!emplacementOrigine.isNullOrEmpty()) { return emplacementOrigine }
+        return ProduitOpenHelper.getProduitByID(db, retourLigne.code_produit)?.emplacement_PUI_Defaut ?: ""
+    }
+
+    private fun updateFragments()
+    {
+        val aControler = getRetourLignesAControler()
+        val controlees = getRetourLignesControlees()
+        findViewById<TextView>(R.id.nbReferenceAControler_TV).text = aControler.size.toString()
+        findViewById<TextView>(R.id.nbReferenceControle_TV).text = controlees.size.toString()
+
+        aControlerFragment?.updateList(ArrayList(aControler), retourSelectionne ?: return)
+        controleFragment?.updateList(ArrayList(controlees), retourSelectionne ?: return)
+        if (!isAControlerOpen && !isControleOpen && !isDetailOpen) { openAControler() }
+    }
+
+    private fun getRetourLignesAControler(): List<Retour_Ligne>
+    {
+        return listeRetourLigne.filter { ligne -> getQuantiteRetournee(ligne) < ligne.qte_Demander.toInt() }
+    }
+
+    private fun getRetourLignesControlees(): List<Retour_Ligne>
+    {
+        return listeRetourLigne.filter { ligne -> getQuantiteRetournee(ligne) >= ligne.qte_Demander.toInt() }
+    }
+
+    private fun getQuantiteRetournee(ligne: Retour_Ligne): Int
+    {
+        var qteRetourner = 0
+        val retourLigneNegList = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(db, retourSelectionne, ligne.code_produit)
+        for (negTemp in retourLigneNegList) { qteRetourner += negTemp.qte_Retourner.toInt() }
+        return qteRetourner
+    }
+
+    override fun onElementSelectionne(element: Retour_Ligne) { openDetailFragment(element) }
+
+    private fun openAControler(lignes: List<Retour_Ligne> = getRetourLignesAControler())
+    {
+        val retour = retourSelectionne ?: return
+        aControlerContainer?.let { container ->
+            openContainer(container)
+            val frag = ControleRetourLignesFragment.newInstance(ArrayList(lignes), retour).also { aControlerFragment = it }
+            supportFragmentManager.beginTransaction().replace(R.id.referenceAControlerContainer, frag).commitNow()
+            scrollTo(container)
+        }
+        isAControlerOpen = true
+    }
+
+    private fun closeAControler()
+    {
+        closeContainer(aControlerContainer) {
+            aControlerFragment?.let { supportFragmentManager.beginTransaction().remove(it).commit() }
+            aControlerFragment = null
+        }
+        isAControlerOpen = false
+    }
+
+    private fun openControle(lignes: List<Retour_Ligne> = getRetourLignesControlees())
+    {
+        if (lignes.isEmpty()) { return }
+        val retour = retourSelectionne ?: return
+        controleContainer?.let { container ->
+            openContainer(container)
+            val frag = ControleRetourLignesFragment.newInstance(ArrayList(lignes), retour).also { controleFragment = it }
+            supportFragmentManager.beginTransaction().replace(R.id.referenceControleContainer, frag).commitNow()
+            scrollTo(container)
+        }
+        isControleOpen = true
+    }
+
+    private fun closeControle()
+    {
+        closeContainer(controleContainer) {
+            controleFragment?.let { supportFragmentManager.beginTransaction().remove(it).commit() }
+            controleFragment = null
+        }
+        isControleOpen = false
+    }
+
+    private fun openDetailFragment(retourLigne: Retour_Ligne)
+    {
+        closeOpenedFragments()
+        detailContainer?.let { container ->
+            val fragment = ListeLotsControleDesRetoursFragment.newInstance(retourLigne._UID, retourLigne.code_produit).also { detailFragment = it }
+            supportFragmentManager.beginTransaction().replace(R.id.detailContainer, fragment).commitNow()
+            container.visibility = View.VISIBLE
+            container.translationY = container.height.toFloat().takeIf { it > 0f } ?: DETAIL_FALLBACK_TRANSLATION_Y
+            container.animate().translationY(0f).setDuration(ANIMATION_DURATION_MS).start()
+        }
+        isDetailOpen = true
+    }
+
+    private fun closeDetailFragment()
+    {
+        val container = detailContainer ?: return
+        container.animate().translationY(container.height.toFloat().takeIf { it > 0f } ?: DETAIL_FALLBACK_TRANSLATION_Y).setDuration(ANIMATION_DURATION_MS).withEndAction {
+            container.visibility = View.GONE
+            detailFragment?.let { supportFragmentManager.beginTransaction().remove(it).commit() }
+            detailFragment = null
+        }.start()
+        isDetailOpen = false
+    }
+
+    override fun onLotsControleValides()
+    {
+        closeDetailFragment()
+        refreshRetourData()
+        openAControler()
+    }
+
+    private fun openContainer(container: FragmentContainerView)
+    {
+        container.layoutParams = (container.layoutParams as LinearLayout.LayoutParams).also {
+            it.height = LinearLayout.LayoutParams.WRAP_CONTENT
+            it.weight = 0f
+        }
+        container.visibility = View.VISIBLE
+        container.translationY = -resources.displayMetrics.heightPixels.toFloat()
+        container.animate().translationY(0f).setDuration(ANIMATION_DURATION_MS).start()
+    }
+
+    private fun closeContainer(container: FragmentContainerView?, onComplete: () -> Unit)
+    {
+        (container ?: return).animate().translationY(-container.height.toFloat()).setDuration(ANIMATION_DURATION_MS).withEndAction {
+            container.visibility = View.GONE
+            container.layoutParams = (container.layoutParams as LinearLayout.LayoutParams).also { it.height = 0 }
+            onComplete()
+        }.start()
+    }
+
+    private fun scrollTo(container: View)
+    {
+        val scrollView = findViewById<NestedScrollView>(R.id.scrollView)
+        scrollView.post { scrollView.smoothScrollTo(0, container.top) }
+    }
+
+    private fun closeOpenedFragments()
+    {
+        if (isAControlerOpen) closeAControler()
+        if (isControleOpen) closeControle()
+        if (isDetailOpen) closeDetailFragment()
+    }
+
+    private fun lancerScanner()
+    {
+        val intent = Intent(this, ScannerRetourActivity::class.java)
+        val bundle = super.getBundle()
+        bundle.putString("contexte", R.string.scannerContextMultipleNewControleRetour.toString())
+        bundle.putBoolean("isBoutonSuppressionExistant", true)
+        bundle.putSerializable("RetourCourant", retourSelectionne)
+        bundle.putSerializable("DepotOrigine", depot)
+        bundle.putStringArrayList("liste_lot", listelot as ArrayList<String?>)
+        bundle.putSerializable("ListeRetourLigne", listeRetourLigne as Serializable)
+        bundle.putBoolean("EmplacementUF", true)
+        intent.putExtras(bundle)
+        startActivityForResult(intent, CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {
         super.onActivityResult(requestCode, resultCode, data)
-        if (null != data)
-        {
-            when (requestCode)
-            {
-                CodesEchangesActivites.RETOUR_LISTE_LOTS -> {}
-                CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH -> if (null != data)
-                {
-//                        int retourLigneId = data.getExtras().getInt("retourLigneId");
-//                        String numLot = data.getExtras().getString("numLot");
-//                        String numSerie = data.getExtras().getString("numSerie");
-//                        String datePeremption = data.getExtras().getString("datePeremption");
-//                        int qteActuelle = data.getExtras().getInt("qteActuelle");
-//
-//                        Retour_Ligne retour_ligne_courant = Retour_LigneOpenHelper.getRetourLigneByID(db, retourLigneId);
-//
-//                        if(retour_ligne_courant != null)
-//                        {
-//                            Produit produit_courant = ProduitOpenHelper.getProduitByID(db, retour_ligne_courant.getCode_produit());
-//
-//                            //MAJ du retour ligne
-//                            retour_ligne_courant.setQte_Retourner(retour_ligne_courant.getQte_Retourner()+qteActuelle);
-//                            Retour_LigneOpenHelper.mettreAJourUnRetourLigne(db, retour_ligne_courant);
-//
-//                            ObjetPreparationScannee objetPreparationScannee = new ObjetPreparationScannee(qteActuelle, numLot, datePeremption, "", "", "", produit_courant.getID_produit(), qteActuelle, numSerie);
-//                            Retour_Ligne_ControleRetour_Adapte retourLigneAdapteCourant = new Retour_Ligne_ControleRetour_Adapte(retourLigneId);
-//                            int index_a_supprimer = -1;
-//                            boolean aSupprimer = false;
-//                            for(Retour_Ligne_ControleRetour_Adapte retour_adapte_temp : retourLigneControleRetourAdapteList)
-//                            {
-//                                index_a_supprimer ++;
-//                                if(retour_adapte_temp.getRetourLigneID() == retourLigneAdapteCourant.getRetourLigneID())
-//                                {
-//                                    retourLigneAdapteCourant = retour_adapte_temp;
-//                                    aSupprimer = true;
-//                                    break;
-//                                }
-//                            }
-//
-//                            if(aSupprimer)
-//                            {
-//                                retourLigneControleRetourAdapteList.remove(index_a_supprimer);
-//                            }
-//
-//                            retourLigneAdapteCourant.getLotAdaptes().add(retourLigneAdapteCourant.new LotAdapte(objetPreparationScannee));
-//                            retourLigneControleRetourAdapteList.add(retourLigneAdapteCourant);
-//                        }
-                }
-            }
-
-            this.invalidateOptionsMenu()
-        }
+        if (requestCode == CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH) { refreshRetourData() }
     }
+
+    private fun demanderValidationControle()
+    {
+        val listeBaseTemp = Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(db, retourSelectionne)
+        var retourComplet = true
+        for (baseTemp in listeBaseTemp)
+        {
+            val qteARetourner = baseTemp.qte_Demander.toInt()
+            if (qteARetourner != getQuantiteRetournee(baseTemp))
+            {
+                retourComplet = false
+                break
+            }
+        }
+
+        if (retourComplet) onMenuSaveClick()
+        else Alerte.afficherAlerteConfirmation(this, layoutInflater, getBundle(), "Toutes les références n'ont pas été retournées, souhaitez vous continuer ?", false, true, this)
+    }
+
+    fun onMenuSaveClick()
+    {
+        val retourLigneBase = Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(db, retourSelectionne)
+        for (retourLigneTemp in retourLigneBase)
+        {
+            Retour_LigneOpenHelper.supprimerUnRetourLigne(db, retourLigneTemp)
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE, retourLigneTemp.phiMR4UUID, retourLigneTemp._UID, DBOpenHelper.ActionsEAS.SUPPR)
+        }
+
+        val actionId = generateNegativeRandomId()
+        val dateString = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+        val actionUtilisateur = ActionUtilisateur(actionId, utilisateurConnecte.id, dateString, serviceActuel.id, utilisateurConnecte.etablissementId, "En attente", (retourSelectionne ?: return)._UID, "", "Controle des retours")
+        ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, actionUtilisateur)
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, actionUtilisateur.phiMR4UUID, actionUtilisateur.id, DBOpenHelper.ActionsEAS.AJOUT)
+
+        val retourLignesListe = Retour_LigneOpenHelper.getAllRetourLignesByRetour(db, retourSelectionne)
+        for (retourLigne in retourLignesListe)
+        {
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE, retourLigne.phiMR4UUID, retourLigne._UID, DBOpenHelper.ActionsEAS.AJOUT)
+            val actionLigne = ActionUtilisateur_Ligne(generateNegativeRandomId(), actionUtilisateur.id, "Retour Ligne", retourLigne._UID, "", 0, retourLigne.qte_Retourner.toInt(), retourLigne.produit_Designation)
+            ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionLigne)
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, actionLigne.phiMR4UUID, actionLigne.id, DBOpenHelper.ActionsEAS.AJOUT)
+        }
+
+        val listSerialisation = PH_SerialisationOpenHelper.getAllPH_SerialisationByMvtId(db, (retourSelectionne ?: return)._UID.toString())
+        for (serialisationCourante in listSerialisation)
+        { ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisationCourante.phiMR4UUID, serialisationCourante.get_UID(), DBOpenHelper.ActionsEAS.AJOUT) }
+
+        val retour = retourSelectionne ?: return
+        retour.en_Attente_de = getString(R.string.RepriseEffectuee)
+        val dateFormat: DateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        retour.date_retour = dateFormat.format(Date())
+        retour.date_Validation = dateFormat.format(Date())
+
+        val rowID = RetourOpenHelper.mettreAJourRetour(db, retour)
+        if (rowID != -1L) { ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, RetourOpenHelper.Constantes.TABLE_RETOUR, retour.phiMR4UUID, retour._UID, DBOpenHelper.ActionsEAS.MAJ) }
+
+        Toast.makeText(this, "Retour contrôlé", Toast.LENGTH_SHORT).show()
+        ElementASynchroniserOpenHelper.toutSynchroniser(this, db, utilisateurConnecte, true)
+        val intent = Intent(this, ServiceControleRetoursActivity::class.java)
+        intent.putExtras(super.getBundle())
+        startActivity(intent)
+        finish()
+    }
+
+    private fun generateNegativeRandomId(): Int
+    {
+        var id = Random().nextInt()
+        if (id > 0) { id *= -1 }
+        if (id == 0) { id = -1 }
+        return id
+    }
+
+    override fun confirmationService() { onMenuSaveClick() }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean
     {
         super.onCreateOptionsMenu(menu)
-        //Récupération du menu
-        val inflater = this.menuInflater
-        inflater.inflate(R.menu.menu_action, menu)
-        menu.findItem(R.id.menuSaveCircle).isVisible = true
         return true
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean
     {
-        val item = menu.findItem(R.id.menuSaveCircle)
-        item.setOnMenuItemClickListener { item1: MenuItem? ->
-            val listeBaseTemp = Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(this.db, this.retourSelectionne)
-            var retourComplet = true
-            for (baseTemp in listeBaseTemp) {
-                val qteARetourner = baseTemp.qte_Demander.toInt()
-                var retourLigneComplet = true
-                val retourLigneNegList = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(this.db, this.retourSelectionne, baseTemp.code_produit)
-
-                var qteRetourner = 0
-                for (negTemp in retourLigneNegList) { qteRetourner = (qteRetourner.toDouble() + negTemp.qte_Retourner).toInt() }
-
-                if (qteARetourner != qteRetourner) { retourLigneComplet = false }
-
-                if (!retourLigneComplet)
-                {
-                    retourComplet = false
-                    break
-                }
-            }
-
-            if (retourComplet) this.onMenuSaveClick()
-            else Alerte.afficherAlerteConfirmation(this@DetailControleDesRetoursActivity, this.layoutInflater, this.getBundle(), "Toutes les références n'ont pas été retournées, souhaitez vous continuer ?", false, true, this@DetailControleDesRetoursActivity)
-            true
-        }
-
+        val item: MenuItem? = menu.findItem(R.id.menuSaveCircle)
+        item?.isVisible = false
         return true
     }
-
-    // Définition de l'action sur Click du bouton Save
-    fun onMenuSaveClick()
-    {
-        val retourLigneBase = Retour_LigneOpenHelper.getAllRetourLignesBaseByRetour(this.db, this.retourSelectionne)
-
-        for (retourLigneTemp in retourLigneBase)
-        {
-            Retour_LigneOpenHelper.supprimerUnRetourLigne(this.db, retourLigneTemp)
-            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(this.db, Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE, retourLigneTemp.phiMR4UUID, retourLigneTemp._UID, DBOpenHelper.ActionsEAS.SUPPR)
-        }
-
-        //Création de l'action utilisateur
-        val random = Random()
-        var actionId = random.nextInt()
-        if (0 < actionId) actionId *= -1
-        val parseFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-        val date = Date()
-        val date_string = parseFormat.format(date)
-        val new_action_utilisateur = ActionUtilisateur(actionId, this.utilisateurConnecte.id, date_string, this.serviceActuel.id, this.utilisateurConnecte.etablissementId, "En attente", (this.retourSelectionne ?: return)._UID, "", "Controle des retours")
-        ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(this.db, new_action_utilisateur)
-        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(this.db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.phiMR4UUID, new_action_utilisateur.id, DBOpenHelper.ActionsEAS.AJOUT)
-
-        val retourLignesListe = Retour_LigneOpenHelper.getAllRetourLignesByRetour(this.db, this.retourSelectionne)
-        for (retourLigne in retourLignesListe)
-        {
-            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(this.db, Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE, retourLigne.phiMR4UUID, retourLigne._UID, DBOpenHelper.ActionsEAS.AJOUT)
-
-            val randomactionligne = Random()
-            var actionligneId = randomactionligne.nextInt()
-            if (0 < actionligneId) actionligneId *= -1
-
-            val actionUtilisateur_ligne = ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.id, "Retour Ligne", retourLigne._UID, "", 0, retourLigne.qte_Retourner.toInt(), retourLigne.produit_Designation)
-            ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(this.db, actionUtilisateur_ligne)
-            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(this.db, ActionUtilisateur_LigneOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR_LIGNE, actionUtilisateur_ligne.phiMR4UUID, actionUtilisateur_ligne.id, DBOpenHelper.ActionsEAS.AJOUT)
-        }
-
-        val listSerialisation = PH_SerialisationOpenHelper.getAllPH_SerialisationByMvtId(this.db, (this.retourSelectionne ?: return)._UID.toString())
-        for (serialisationCourante in listSerialisation) { ElementASynchroniserOpenHelper.ajouterElementASynchroniser(this.db, PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION, serialisationCourante.phiMR4UUID, serialisationCourante.get_UID(), DBOpenHelper.ActionsEAS.AJOUT) }
-
-        (this.retourSelectionne ?: return).en_Attente_de = this.getString(R.string.RepriseEffectuee)
-
-        val dateJour = Date()
-        val format: DateFormat = SimpleDateFormat("dd-MM-yyyy")
-
-        (this.retourSelectionne ?: return).date_retour = format.format(dateJour)
-        (this.retourSelectionne ?: return).date_Validation = format.format(dateJour)
-
-        val rowID = RetourOpenHelper.mettreAJourRetour(this.db, this.retourSelectionne)
-        if (-1L != rowID) { ElementASynchroniserOpenHelper.ajouterElementASynchroniser(this.db, RetourOpenHelper.Constantes.TABLE_RETOUR, (this.retourSelectionne ?: return).phiMR4UUID, (this.retourSelectionne ?: return)._UID, DBOpenHelper.ActionsEAS.MAJ) }
-
-        Toast.makeText(this@DetailControleDesRetoursActivity, "Retour contrôlé", Toast.LENGTH_SHORT).show()
-
-        // Si possible, on essaie de mettre à jour les éléments
-        ElementASynchroniserOpenHelper.toutSynchroniser(this@DetailControleDesRetoursActivity, this.db, this.utilisateurConnecte, true)
-        val validationRetour_Intent = Intent(this@DetailControleDesRetoursActivity, ServiceControleRetoursActivity::class.java)
-        val validationRetours_Bundle = super@DetailControleDesRetoursActivity.getBundle()
-        validationRetour_Intent.putExtras(validationRetours_Bundle)
-        this@DetailControleDesRetoursActivity.startActivity(validationRetour_Intent)
-        this@DetailControleDesRetoursActivity.finish()
-        return
-    }
-
-    private fun lancerScanner()
-    {
-        this.premierPassage = false
-        var controleDesRetour_Intent: Intent? = null
-        val controleDesRetour_Bundle = super.getBundle()
-        controleDesRetour_Bundle.putString("contexte", R.string.scannerContextMultipleNewControleRetour.toString())
-
-        if (Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.lowercase(Locale.getDefault()).contains("honeywell")) { controleDesRetour_Intent = Intent(this@DetailControleDesRetoursActivity, ScannerRetourActivity::class.java) }
-        else
-        {
-            if ((this.pm ?: return).hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
-            {
-                //controleDesRetour_Intent = new Intent(DetailControleDesRetours2025Activity.this, BarcodePreparationActivity.class);
-            }
-            else { controleDesRetour_Intent = Intent(this@DetailControleDesRetoursActivity, ScannerRetourActivity::class.java) }
-        }
-
-        controleDesRetour_Bundle.putBoolean("isBoutonSuppressionExistant", true)
-        controleDesRetour_Bundle.putSerializable("RetourCourant", this.retourSelectionne)
-        controleDesRetour_Bundle.putSerializable("DepotOrigine", this.depot)
-        controleDesRetour_Bundle.putStringArrayList("liste_lot", this.listelot as ArrayList<String?>?)
-        controleDesRetour_Bundle.putSerializable("ListeRetourLigne", this.liste_retour_ligne as Serializable?)
-        controleDesRetour_Bundle.putBoolean("EmplacementUF", true)
-
-        (controleDesRetour_Intent ?: return).putExtras(controleDesRetour_Bundle)
-        this@DetailControleDesRetoursActivity.startActivityForResult(controleDesRetour_Intent, CodesEchangesActivites.RESULT_BOUTON_FERMETURE_BARCODE_SEARCH)
-    }
-
-    internal fun onClickTriDesignation()
-    {
-        this.tri_choisi = "Designation"
-        (liste_retour_ligne ?: return).sortWith(Comparator.comparing<Retour_Ligne?, String?>(Function { oo: Retour_Ligne? -> oo!!.produit_Designation.lowercase(Locale.getDefault()) }))
-        this.gestionAdapter()
-    }
-
-    internal fun onClickTriCategorie()
-    {
-        this.tri_choisi = "Catégorie"
-        (liste_retour_ligne ?: return).sortWith(Comparator { oo1: Retour_Ligne?, oo2: Retour_Ligne? ->
-            val produit1 = ProduitOpenHelper.getProduitByID(this.db, oo1!!.code_produit)
-            val produit2 = ProduitOpenHelper.getProduitByID(this.db, oo2!!.code_produit)
-            produit1.categorie.lowercase(Locale.getDefault()).compareTo(produit2.categorie.lowercase(Locale.getDefault()))
-        })
-
-        this.gestionAdapter()
-    }
-
-    internal fun onClickTriParPoids()
-    {
-        this.tri_choisi = "Poids"
-        (liste_retour_ligne ?: return).sortWith(Comparator { oo1: Retour_Ligne?, oo2: Retour_Ligne? ->
-            val produit1 = ProduitOpenHelper.getProduitByID(this.db, oo1!!.code_produit)
-            val produit2 = ProduitOpenHelper.getProduitByID(this.db, oo2!!.code_produit)
-            produit1.poids.compareTo(produit2.poids)
-        })
-
-        this.gestionAdapter()
-    }
-
-    internal fun onClickTriParPlace()
-    {
-        this.tri_choisi = "Place"
-        (liste_retour_ligne ?: return).sortWith(Comparator { oo1: Retour_Ligne?, oo2: Retour_Ligne? ->
-            var oo1EmplacementParDefaut = oo1!!.emplacementOrigine
-            var oo2EmplacementParDefaut = oo2!!.emplacementOrigine
-
-            if (null == oo1EmplacementParDefaut || oo1EmplacementParDefaut.contentEquals(""))
-            {
-                val produit = ProduitOpenHelper.getProduitByID(this.db, oo1.code_produit)
-                oo1EmplacementParDefaut = produit.emplacement_PUI_Defaut
-            }
-
-            if (null == oo2EmplacementParDefaut || oo2EmplacementParDefaut.contentEquals(""))
-            {
-                val produit = ProduitOpenHelper.getProduitByID(this.db, oo2.code_produit)
-                oo2EmplacementParDefaut = produit.emplacement_PUI_Defaut
-            }
-
-            oo1EmplacementParDefaut.compareTo(oo2EmplacementParDefaut)
-        })
-
-        this.gestionAdapter()
-    }
-
-    fun gestionAdapter()
-    {
-        this.retourLigneControleRetoursAdapter = Retour_Ligne_ControleRetoursAdapter_2025(this@DetailControleDesRetoursActivity, this.liste_retour_ligne, this.db, this.retourSelectionne)
-        (this.retourLigneControleRetourAdapteListView ?: return).adapter = this.retourLigneControleRetoursAdapter
-    }
-
-    override fun confirmationService() { this.onMenuSaveClick() }
 
     private fun setupOnBackPressedCallback()
     {
         val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed()
             {
-                val detailControleIntent = Intent(this@DetailControleDesRetoursActivity, ServiceControleRetoursActivity::class.java)
-                val detailControleBundle = super@DetailControleDesRetoursActivity.getBundle()
-                detailControleBundle.putString("Etat", "Retour")
-                detailControleIntent.putExtras(detailControleBundle)
-                this@DetailControleDesRetoursActivity.startActivity(detailControleIntent)
-                this@DetailControleDesRetoursActivity.finish()
+                if (isDetailOpen) closeDetailFragment()
+                else
+                {
+                    val intent = Intent(this@DetailControleDesRetoursActivity, ServiceControleRetoursActivity::class.java)
+                    val bundle = super@DetailControleDesRetoursActivity.getBundle()
+                    bundle.putString("Etat", "Retour")
+                    intent.putExtras(bundle)
+                    startActivity(intent)
+                    finish()
+                }
             }
         }
-        this.onBackPressedDispatcher.addCallback(this, callback)
+        onBackPressedDispatcher.addCallback(this, callback)
     }
 }
