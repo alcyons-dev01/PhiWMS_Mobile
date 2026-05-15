@@ -6,40 +6,39 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.ListView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper
 import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp
 import fr.alcyons.phiwms_mobile.Interfaces.DatabaseProvider
 import fr.alcyons.phiwms_mobile.Interfaces.RechercheAdjustable
 import fr.alcyons.phiwms_mobile.R
 
 class RechercheFragment : Fragment() {
+
     interface OnElementRechercheListener {
-        fun onElementRechercher(element: Int) // ou ton type d'objet
+        fun onElementRechercher(element: Int)
     }
 
-    private lateinit var resultatsLV: ListView
-    private lateinit var adapter: ArrayAdapter<String> // ou ton adapter custom
+    private lateinit var resultatsRV: RecyclerView
+    private lateinit var adapter: ResultatRechercheAdapter
     private var listener: OnElementRechercheListener? = null
-    private lateinit var db: SQLiteDatabase // ton type de BDD
+    private lateinit var db: SQLiteDatabase
 
     companion object {
         private const val ARG_LIGNE = "ligne"
 
         fun newInstance(ligne: Inventaire_Ligne_Temp?) = RechercheFragment().apply {
-            arguments = Bundle().apply {
-                putSerializable(ARG_LIGNE, ligne)
-            }
+            arguments = Bundle().apply { putSerializable(ARG_LIGNE, ligne) }
         }
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        listener = context as? RechercheFragment.OnElementRechercheListener
+        listener = context as? OnElementRechercheListener
     }
 
     override fun onDetach() {
@@ -47,79 +46,92 @@ class RechercheFragment : Fragment() {
         listener = null
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         return inflater.inflate(R.layout.fragment_recherche, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        resultatsLV = view.findViewById(R.id.liste_reference_LV)
-        resultatsLV.isNestedScrollingEnabled = true
-
-        adapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, mutableListOf())
-        resultatsLV.adapter = adapter
         db = (requireActivity() as DatabaseProvider).db
 
-        resultatsLV.setOnItemClickListener { _, _, position, _ ->
-            val elementSelectionne = adapter.getItem(position)
-            val produitIdentifier =
-                ProduitOpenHelper.getUnProduitByDesignation(db, elementSelectionne)
-            if (produitIdentifier != null)
-                elementSelectionne?.let { listener?.onElementRechercher(produitIdentifier.iD_produit) }
+        adapter = ResultatRechercheAdapter(mutableListOf()) { designation ->
+            val produit = ProduitOpenHelper.getUnProduitByDesignation(db, designation)
+            if (produit != null) listener?.onElementRechercher(produit.iD_produit)
+        }
+
+        resultatsRV = view.findViewById(R.id.liste_reference_RV)
+        resultatsRV.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            isNestedScrollingEnabled = true
+            adapter = this@RechercheFragment.adapter
         }
     }
 
-    fun lancerRecherche(query: String, typeDoc : String = "",numDoc : String = "") {
-        var resultats = listOf<String>()
-        when(typeDoc)
-        {
-            "reception"->  resultats = PH_ReliquatOpenHelper.getDesignationReliquatByNumero(db, query, numDoc)
-            "preparation"-> resultats = ProduitOpenHelper.getProduitByDesignation(db, query)
-            "retourFournisseur" -> resultats = ProduitOpenHelper.getProduitByDesignation(db, query)
-            "destruction" -> resultats = ProduitOpenHelper.getProduitByDesignation(db, query)
-            "retourPUI" -> resultats = ProduitOpenHelper.getProduitByDesignation(db, query)
-            else -> resultats = ProduitOpenHelper.getProduitByDesignation(db, query)
+    fun lancerRecherche(query: String, typeDoc: String = "", numDoc: String = "") {
+        val resultats = when (typeDoc) {
+            "reception"        -> PH_ReliquatOpenHelper.getDesignationReliquatByNumero(db, query, numDoc)
+            "preparation",
+            "retourFournisseur",
+            "destruction",
+            "retourPUI"        -> ProduitOpenHelper.getProduitByDesignation(db, query)
+            else               -> ProduitOpenHelper.getProduitByDesignation(db, query)
         }
 
-        adapter.clear()
-        adapter.addAll(resultats)
-        adapter.notifyDataSetChanged()
+        adapter.mettreAJourListe(resultats)
 
-        resultatsLV.post {
-            // Vérifie que le fragment est bien attaché avant de continuer
+        // Calcul hauteur : hauteur d'un item × nb résultats, plafonnée à 300dp
+        resultatsRV.post {
             if (!isAdded || context == null) return@post
 
-            val maxHauteur = (300 * resources.displayMetrics.density).toInt()
+            val maxHauteur = (resources.displayMetrics.heightPixels * 0.25).toInt()
+            val itemHauteur = (48 * resources.displayMetrics.density).toInt() // hauteur standard item texte
+            val hauteurTotale = (itemHauteur * adapter.itemCount).coerceAtMost(maxHauteur)
 
-            if (adapter.count == 0) return@post
+            resultatsRV.layoutParams.height = hauteurTotale
+            resultatsRV.requestLayout()
 
-            val premierItem = adapter.getView(0, null, resultatsLV)
-            premierItem.measure(
-                View.MeasureSpec.makeMeasureSpec(resultatsLV.width, View.MeasureSpec.EXACTLY),
-                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-            )
-            val hauteurItem = premierItem.measuredHeight
-            var hauteurTotale = hauteurItem * adapter.count
-            hauteurTotale += resultatsLV.dividerHeight * (adapter.count - 1)
-
-            resultatsLV.layoutParams.height = hauteurTotale.coerceAtMost(maxHauteur)
-            resultatsLV.requestLayout()
-
-            (activity as? RechercheAdjustable)?.ajusterHauteurRecherche(hauteurTotale.coerceAtMost(maxHauteur))
+            (activity as? RechercheAdjustable)?.ajusterHauteurRecherche(hauteurTotale)
         }
     }
 
     fun viderListe() {
-        adapter.clear()
-        resultatsLV.layoutParams.height = 0
-        resultatsLV.requestLayout()
+        adapter.mettreAJourListe(emptyList())
+        resultatsRV.layoutParams.height = 0
+        resultatsRV.requestLayout()
         (activity as? RechercheAdjustable)?.ajusterHauteurRecherche(0)
+    }
+}
+
+class ResultatRechercheAdapter(
+    private val liste: MutableList<String>,
+    private val onItemClick: (String) -> Unit
+) : RecyclerView.Adapter<ResultatRechercheAdapter.ViewHolder>() {
+
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val texte: TextView = itemView.findViewById(android.R.id.text1)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(android.R.layout.simple_list_item_1, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.texte.text = liste[position]
+        holder.itemView.setOnClickListener { onItemClick(liste[position]) }
+    }
+
+    override fun getItemCount(): Int = liste.size
+
+    fun mettreAJourListe(nouvelleListe: List<String>) {
+        liste.clear()
+        liste.addAll(nouvelleListe)
+        notifyDataSetChanged()
     }
 }
