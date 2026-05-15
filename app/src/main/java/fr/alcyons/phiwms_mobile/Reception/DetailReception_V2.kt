@@ -49,7 +49,6 @@ import fr.alcyons.phiwms_mobile.Outils.Mail
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionPhotos
 import fr.alcyons.phiwms_mobile.OutilsSerialisation.Serialisation
 import fr.alcyons.phiwms_mobile.R
-import fr.alcyons.phiwms_mobile.Reception.Adapter.DetailReceptionAdapter
 import fr.alcyons.phiwms_mobile.Reception.Fragment.AReceptionnerFragment
 import fr.alcyons.phiwms_mobile.Reception.Fragment.DetailFragment
 import fr.alcyons.phiwms_mobile.Reception.Fragment.ReceptionnerFragment
@@ -66,6 +65,8 @@ import java.util.Locale
 import java.util.Objects
 import java.util.Random
 import fr.alcyons.phiwms_mobile.Interfaces.RechercheAdjustable
+import androidx.core.view.isVisible
+import androidx.core.graphics.drawable.toDrawable
 
 class DetailReception_V2 : ServiceAvecConnexionActivity(),
     RechercheFragment.OnElementRechercheListener,
@@ -85,7 +86,6 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     private lateinit var receptionner_LL: LinearLayout
     private lateinit var btnValiderReception_LL: LinearLayout
     private lateinit var btnValiderReception_CV: CardView
-    private var adapter: DetailReceptionAdapter? = null
     private var scannerFragment: Fragment? = null
     private var rechercheFragment: RechercheFragment? = null
     private var aReceptionnerFragment: AReceptionnerFragment? = null
@@ -100,7 +100,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     private var alerteVisible = false
     private var positionSelectionnee = -1
     private var hauteurDetailFragment = 0
-
+    private var hauteurListeFragment = 0
     private lateinit var textChercher_TV: TextView
     private lateinit var searchInput_ET: EditText
     private lateinit var effacerRecherche_IV: ImageView
@@ -109,8 +109,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     var subject = ""
     var bonLivraisonBitmap = null
     lateinit var serialisation : Serialisation
-
-
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.detail_reception_module)
@@ -145,6 +144,12 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         val frameContenu = findViewById<RelativeLayout>(R.id.frameLayout)
         frameContenu.post {
             hauteurDetailFragment = frameContenu.height / 2
+            val widthDp = resources.displayMetrics.run { widthPixels / density }
+            hauteurListeFragment = (frameContenu.height * when {
+                widthDp < 400  -> 0.35   // petit écran  (Zebra MC33, PDA industriels)
+                widthDp < 600  -> 0.65   // écran normal (smartphones classiques)
+                else           -> 0.75   // grand écran  (tablettes, grands smartphones)
+            }).toInt()
         }
 
         lancerScan.setOnClickListener {
@@ -219,7 +224,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         else
             findViewById<CardView>(R.id.btnValiderReception_CV).visibility = View.GONE
 
-        findViewById<CardView>(R.id.btnValiderReception_CV).setOnClickListener { v: View? ->
+        findViewById<CardView>(R.id.btnValiderReception_CV).setOnClickListener { _: View? ->
             demandeConfirmationValidation(layoutInflater) { resultat ->
                 if (resultat)
                     if(receptionner(receptionCourant))
@@ -339,8 +344,6 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
      * RECHERCHE
      */
     private fun ouvrirRecherche() {
-        findViewById<androidx.core.widget.NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled =
-            false
         rechercheContainer.apply {
             layoutParams = (layoutParams as LinearLayout.LayoutParams).also {
                 it.height = LinearLayout.LayoutParams.WRAP_CONTENT
@@ -361,8 +364,6 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
 
     private fun fermerRecherche() {
         cacherSearchInput()
-        findViewById<androidx.core.widget.NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled =
-            true
         rechercheContainer.animate()
             .translationY(-rechercheContainer.height.toFloat())
             .setDuration(300)
@@ -384,7 +385,6 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     private fun afficherSearchInput() {
         rechercheVisible = true
         // Bascule TextView → EditText dans le header
-        findViewById<ImageView>(R.id.chevronRecherche).visibility = View.GONE
         textChercher_TV.visibility = View.GONE
         searchInput_ET.visibility = View.VISIBLE
         effacerRecherche_IV.visibility = View.VISIBLE
@@ -412,7 +412,6 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     }
 
     private fun cacherSearchInput() {
-        findViewById<ImageView>(R.id.chevronRecherche).visibility = View.VISIBLE
         textChercher_TV.visibility = View.VISIBLE
         searchInput_ET.visibility = View.GONE
         effacerRecherche_IV.visibility = View.GONE
@@ -425,7 +424,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     }
 
     /**
-     * A COMPTER
+     * A RÉCEPTIONNER
      */
     private fun ouvrirAReceptionner(idProduit: Int = 0) {
         var liste: ArrayList<PH_Reliquat> = arrayListOf()
@@ -456,28 +455,27 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
 
             referenceAReceptionnerContainer.apply {
                 layoutParams = (layoutParams as LinearLayout.LayoutParams).also {
-                    it.height = LinearLayout.LayoutParams.WRAP_CONTENT
+                    it.height = hauteurListeFragment
                     it.weight = 0f
                 }
+
                 visibility = View.VISIBLE
                 translationY = 0f // Plus d'animation de translation
                 alpha = 0f        // Animation en fondu à la place
                 animate()
                     .alpha(1f)
-                    .setDuration(300)
+                    .setDuration(200)
                     .start()
             }
-
+            
             aCompterVisible = true
         }
     }
 
     private fun fermerAReceptionner() {
-        findViewById<androidx.core.widget.NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled =
-            true
         referenceAReceptionnerContainer.animate()
             .translationY(-referenceAReceptionnerContainer.height.toFloat())
-            .setDuration(300)
+            .setDuration(200)
             .withEndAction {
                 referenceAReceptionnerContainer.visibility = View.GONE
                 referenceAReceptionnerContainer.layoutParams =
@@ -494,7 +492,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     }
 
     /**
-     * COMPTER
+     * RÉCEPTIONNER
      */
     private fun ouvrirReceptionner(idProduit: Int = 0) {
         var liste: ArrayList<PH_Reliquat>
@@ -521,7 +519,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
             // Affiche le container
             referenceReceptionnerContainer.apply {
                 layoutParams = (layoutParams as LinearLayout.LayoutParams).also {
-                    it.height = LinearLayout.LayoutParams.WRAP_CONTENT
+                    it.height = hauteurListeFragment
                     it.weight = 0f
                 }
                 visibility = View.VISIBLE
@@ -529,7 +527,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                 alpha = 0f        // Animation en fondu à la place
                 animate()
                     .alpha(1f)
-                    .setDuration(300)
+                    .setDuration(200)
                     .start()
             }
 
@@ -544,11 +542,9 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     }
 
     private fun fermerReceptionner() {
-        findViewById<androidx.core.widget.NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled =
-            true
         referenceReceptionnerContainer.animate()
             .translationY(-referenceReceptionnerContainer.height.toFloat())
-            .setDuration(300)
+            .setDuration(200)
             .withEndAction {
                 referenceReceptionnerContainer.visibility = View.GONE
                 referenceReceptionnerContainer.layoutParams =
@@ -569,7 +565,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     ) {
         lifecycleScope.launch(Dispatchers.Main) {
             val fragmentDejaOuvert =
-                detailFragment != null && detailContainer.visibility == View.VISIBLE
+                detailFragment != null && detailContainer.isVisible
 
             if (fragmentDejaOuvert) {
                 // ─── Fragment déjà visible : on met juste à jour les données ───
@@ -790,16 +786,16 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
             var date = dateFormat.format(dateDuJour)
             val depotdest =
                 DepotOpenHelper.getDepotParReference(db, receptionCourant.ref_Depot_Dest)
-            var depot_destinataire = ""
+            var depotDestinataire = ""
             if (depotdest != null) {
-                depot_destinataire = depotdest.getNom()
+                depotDestinataire = depotdest.nom
             }
 
              subject =
-                "PhiWMS Mobile - " + depot_destinataire + " - " + receptionCourant.fournisseur + " - Réception PUI N°" + receptionCourant.numero + " - " + date
+                "PhiWMS Mobile - " + depotDestinataire + " - " + receptionCourant.fournisseur + " - Réception PUI N°" + receptionCourant.numero + " - " + date
 
             if (receptionCourant.ref_Depot_Dest.contains("-PAD")) subject =
-                "PhiWMS Mobile - " + depot_destinataire + " - " + receptionCourant.fournisseur + " - Réception PAD N°" + receptionCourant.numero + " - " + date
+                "PhiWMS Mobile - " + depotDestinataire + " - " + receptionCourant.fournisseur + " - Réception PAD N°" + receptionCourant.numero + " - " + date
 
             if (bonLivraisonBitmap != null) {
                 body = "Madame, Monsieur, \n \n" +
@@ -856,36 +852,32 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
 
         val alertDialog = builder.create()
         Objects.requireNonNull<Window?>(alertDialog.getWindow()).setGravity(Gravity.CENTER)
-        alertDialog.getWindow()!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        alertDialog.window!!.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         alertDialog.show()
 
-        zoneok.setOnClickListener(View.OnClickListener { v: View? ->
+        zoneok.setOnClickListener { _: View? ->
             alertDialog.dismiss()
             try {
                 envoyerEmail(subject, body)
             } catch (e: JSONException) {
                 throw RuntimeException(e)
             }
-        })
+        }
 
-        buttonAnnuler.setOnClickListener(View.OnClickListener { v: View? ->
+        buttonAnnuler.setOnClickListener { _: View? ->
             alertDialog.dismiss()
             try {
                 envoyerEmail(subject, body)
             } catch (e: JSONException) {
                 throw RuntimeException(e)
             }
-        })
+        }
     }
 
-
-    private fun getDateDuJour(): String =
-        SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-
-    override fun onElementRechercher(idProduit: Int) {
+    override fun onElementRechercher(element: Int) {
         fermerRecherche()
-        ouvrirAReceptionner(idProduit)
-        ouvrirReceptionner(idProduit)
+        ouvrirAReceptionner(element)
+        ouvrirReceptionner(element)
     }
 
     private fun ajouterPHReliquat(
@@ -893,8 +885,8 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     ) {
         //on regarde si un reliquat existe déjà avec ces informations
         if (receptionCourant.ref_Depot_Dest.contains("-PAD")) {
-            nouveauReliquat.setZone("RECEPTION")
-            nouveauReliquat.setEmplacement("RECEPTION-" + receptionCourant.numero + "-" + receptionCourant.patient_identite)
+            nouveauReliquat.zone = "RECEPTION"
+            nouveauReliquat.emplacement = "RECEPTION-" + receptionCourant.numero + "-" + receptionCourant.patient_identite
         }
 
         val rowID = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, nouveauReliquat)
@@ -941,7 +933,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     }
 
     private fun afficherAlerteAvecCallback(titre: String, message: String, onDismiss: () -> Unit) {
-        val builder = androidx.appcompat.app.AlertDialog.Builder(this)
+        val builder = AlertDialog.Builder(this)
         val layout = layoutInflater.inflate(R.layout.alerte_information, null)
 
         layout.findViewById<TextView>(R.id.titre).text = titre
@@ -949,9 +941,9 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         builder.setView(layout)
 
         val alertDialog = builder.create()
-        alertDialog.window?.setGravity(android.view.Gravity.CENTER)
+        alertDialog.window?.setGravity(Gravity.CENTER)
         alertDialog.window?.setBackgroundDrawable(
-            android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT)
+            Color.TRANSPARENT.toDrawable()
         )
         alertDialog.show()
 
@@ -962,7 +954,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     }
 
     fun demandeConfirmationValidation(inflater: LayoutInflater, onResultat: (Boolean) -> Unit) {
-        val builder = context?.let { AlertDialog.Builder(it) }
+        val builder = context.let { AlertDialog.Builder(it) }
         val layout = inflater.inflate(R.layout.alerte_confirmation, null)
 
         val zoneok = layout.findViewById<LinearLayout>(R.id.buttonOk)
@@ -973,20 +965,20 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         layout.findViewById<TextView>(R.id.TitreAnnulation).text = "Non"
         layout.findViewById<TextView>(R.id.TitreConfirmation).text = "Oui"
 
-        builder?.setView(layout)
+        builder.setView(layout)
 
-        val alertDialog = builder?.create()
-        alertDialog?.window?.setGravity(Gravity.CENTER)
-        alertDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        alertDialog?.show()
+        val alertDialog = builder.create()
+        alertDialog.window?.setGravity(Gravity.CENTER)
+        alertDialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+        alertDialog.show()
 
         zoneok.setOnClickListener {
-            alertDialog?.dismiss()
+            alertDialog.dismiss()
             onResultat(true)
         }
 
         buttonAnnuler.setOnClickListener {
-            alertDialog?.dismiss()
+            alertDialog.dismiss()
             onResultat(false)
         }
     }
@@ -1009,98 +1001,98 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     private fun receptionner(commande: Commande): Boolean {
         val random = Random()
         var actionId = random.nextInt()
-        if (actionId > 0) actionId = actionId * -1
+        if (actionId > 0) actionId *= -1
         @SuppressLint("SimpleDateFormat") val parseFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         val date = Date()
-        val date_string = parseFormat.format(date)
-        var new_action_utilisateur = ActionUtilisateur(
+        val dateString = parseFormat.format(date)
+        var newActionUtilisateur = ActionUtilisateur(
             actionId,
-            utilisateurConnecte.getId(),
-            date_string,
-            serviceActuel.getId(),
-            utilisateurConnecte.getEtablissementId(),
+            utilisateurConnecte.id,
+            dateString,
+            serviceActuel.id,
+            utilisateurConnecte.etablissementId,
             "En attente",
-            commande.getID_commande(),
+            commande.iD_commande,
             "",
             "Réception PUI"
         )
-        if (receptionCourant.getRef_Depot_Dest().contains("-PAD")) new_action_utilisateur =
+        if (receptionCourant.ref_Depot_Dest.contains("-PAD")) newActionUtilisateur =
             ActionUtilisateur(
                 actionId,
-                utilisateurConnecte.getId(),
-                date_string,
-                serviceActuel.getId(),
-                utilisateurConnecte.getEtablissementId(),
+                utilisateurConnecte.id,
+                dateString,
+                serviceActuel.id,
+                utilisateurConnecte.etablissementId,
                 "En attente",
-                commande.getID_commande(),
+                commande.iD_commande,
                 "",
                 "Réception PAD"
             )
-        ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur)
+        ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, newActionUtilisateur)
 
         val listeReliquatBase = PH_ReliquatOpenHelper.getPH_ReliquatBaseByCommandeNumero(
             db,
-            receptionCourant.getNumero()
+            receptionCourant.numero
         )
         for (reliquat in listeReliquatBase) {
             PH_ReliquatOpenHelper.supprimerUnPHReliquat(db, reliquat)
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
                 db,
                 PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT,
-                reliquat!!.getPhiMR4UUID(),
-                reliquat.getReliquat_UID(),
+                reliquat!!.phiMR4UUID,
+                reliquat.reliquat_UID,
                 DBOpenHelper.ActionsEAS.SUPPR
             )
         }
 
         val listeReliquat = PH_ReliquatOpenHelper.getPH_ReliquatNegByCommandeNumero(
             db,
-            receptionCourant.getNumero()
+            receptionCourant.numero
         )
         for (reliquatcourant in listeReliquat) {
             val randomactionligne = Random()
             var actionligneId = randomactionligne.nextInt()
-            if (actionligneId > 0) actionligneId = actionligneId * -1
-            val actionUtilisateur_ligne = ActionUtilisateur_Ligne(
+            if (actionligneId > 0) actionligneId *= -1
+            val actionUtilisateurLigne = ActionUtilisateur_Ligne(
                 actionligneId,
-                new_action_utilisateur.getId(),
+                newActionUtilisateur.id,
                 "PH_Reliquat",
-                reliquatcourant.getReliquat_UID(),
+                reliquatcourant.reliquat_UID,
                 "",
                 0,
-                reliquatcourant.getQteLivraison(),
-                reliquatcourant.getDesignationCourte()
+                reliquatcourant.qteLivraison,
+                reliquatcourant.designationCourte
             )
             ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(
                 db,
-                actionUtilisateur_ligne
+                actionUtilisateurLigne
             )
 
             PH_ReliquatOpenHelper.supprimerUnPHReliquat(db, reliquatcourant)
         }
 
-        val list_serialisation = PH_SerialisationOpenHelper.getAllPH_SerialisationByMvtId(
+        val listeSerialisation = PH_SerialisationOpenHelper.getAllPH_SerialisationByMvtId(
             db,
-            receptionCourant.getNumero().toString()
+            receptionCourant.numero.toString()
         )
-        if (!list_serialisation.isEmpty()) {
-            for (serialisation in list_serialisation) {
+        if (!listeSerialisation.isEmpty()) {
+            for (serialisation in listeSerialisation) {
                 ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
                     db,
                     PH_SerialisationOpenHelper.Constantes.TABLE_PH_SERIALISATION,
-                    serialisation.getPhiMR4UUID(),
+                    serialisation.phiMR4UUID,
                     serialisation.get_UID(),
                     DBOpenHelper.ActionsEAS.AJOUT
                 )
                 val randomAUSeri = Random()
                 var actionSerId = randomAUSeri.nextInt()
-                if (actionSerId > 0) actionSerId = actionSerId * -1
-                val new_action_utilisateur_serialisation = ActionUtilisateur(
+                if (actionSerId > 0) actionSerId *= -1
+                val newActionUtilisateurSerialisation = ActionUtilisateur(
                     actionSerId,
-                    utilisateurConnecte.getId(),
-                    date_string,
-                    serviceActuel.getId(),
-                    utilisateurConnecte.getEtablissementId(),
+                    utilisateurConnecte.id,
+                    dateString,
+                    serviceActuel.id,
+                    utilisateurConnecte.etablissementId,
                     "En attente",
                     serialisation.get_UID(),
                     "",
@@ -1108,34 +1100,34 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                 )
                 ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(
                     db,
-                    new_action_utilisateur_serialisation
+                    newActionUtilisateurSerialisation
                 )
                 ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
                     db,
                     ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR,
-                    new_action_utilisateur_serialisation.getPhiMR4UUID(),
-                    new_action_utilisateur_serialisation.getId(),
+                    newActionUtilisateurSerialisation.phiMR4UUID,
+                    newActionUtilisateurSerialisation.id,
                     DBOpenHelper.ActionsEAS.AJOUT
                 )
             }
         }
 
-        commande.setSituation("RM") //R = Réception, M = Mobile
+        commande.situation = "RM" //R = Réception, M = Mobile
         val rowID = CommandeOpenHelper.mettreAJourUneCommande(db, commande)
         if (rowID != -1L) {
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
                 db,
                 CommandeOpenHelper.Constantes.TABLE_COMMANDE,
-                commande.getPhiMR4UUID(),
-                commande.getID_commande(),
+                commande.phiMR4UUID,
+                commande.iD_commande,
                 DBOpenHelper.ActionsEAS.MAJ
             )
             //on ajoute l'action utilisateur à synchroniser à la fin
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
                 db,
                 ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR,
-                new_action_utilisateur.getPhiMR4UUID(),
-                new_action_utilisateur.getId(),
+                newActionUtilisateur.phiMR4UUID,
+                newActionUtilisateur.id,
                 DBOpenHelper.ActionsEAS.AJOUT
             )
 

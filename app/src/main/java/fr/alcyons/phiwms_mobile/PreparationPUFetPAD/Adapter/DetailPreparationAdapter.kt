@@ -4,72 +4,82 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne
 import fr.alcyons.phiwms_mobile.R
 
-class DetailPreparationAdapter (
-    context: Context,
-    private var liste: MutableList<PH_Preparation_Ligne>
+class DetailPreparationAdapter(
+    private val context: Context,
+    private val liste: MutableList<PH_Preparation_Ligne>,
+    private val onItemClick: (PH_Preparation_Ligne) -> Unit
+) : RecyclerView.Adapter<DetailPreparationAdapter.ViewHolder>() {
 
-) : ArrayAdapter<PH_Preparation_Ligne>(context, 0, liste) {
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val nomProduit: TextView              = itemView.findViewById(R.id.nomProduit)
+        val refProduit: TextView              = itemView.findViewById(R.id.refProduit)
+        val fournisseurProduit: TextView      = itemView.findViewById(R.id.fournisseurProduit)
+        val lotProduit: TextView              = itemView.findViewById(R.id.lotProduit)
+        val serieProduit: TextView            = itemView.findViewById(R.id.serieProduit)
+        val peremptionProduit: TextView       = itemView.findViewById(R.id.peremptionProduit)
+        val quantitePreparer: TextView        = itemView.findViewById(R.id.quantitePreparer)
+        val quantiteAPreparer: TextView       = itemView.findViewById(R.id.quantiteAPreparer)
+        val informationLot_LL: LinearLayout   = itemView.findViewById(R.id.InformationLot_LL)
+        val bandeauQteAPreparer: LinearLayout = itemView.findViewById(R.id.bandeauQteAPreparer)
+        val bandeauQtePreparer: LinearLayout  = itemView.findViewById(R.id.bandeauQtePreparer)
+        val layoutSerieNumero: LinearLayout   = itemView.findViewById(R.id.layoutSerieNumero)
+    }
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view = convertView ?: LayoutInflater.from(context)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(context)
             .inflate(R.layout.row_preparation, parent, false)
+        return ViewHolder(view)
+    }
 
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = liste[position]
 
-        val nomProduit         = view.findViewById<TextView>(R.id.nomProduit)
-        val refProduit         = view.findViewById<TextView>(R.id.refProduit)
-        val fournisseurProduit = view.findViewById<TextView>(R.id.fournisseurProduit)
-        val lotProduit         = view.findViewById<TextView>(R.id.lotProduit)
-        val serieProduit         = view.findViewById<TextView>(R.id.serieProduit)
-        val peremptionProduit  = view.findViewById<TextView>(R.id.peremptionProduit)
-        val quantitePreparer = view.findViewById<TextView>(R.id.quantitePreparer)
-        val quantiteAPreparer = view.findViewById<TextView>(R.id.quantiteAPreparer)
-        val informationLot_LL = view.findViewById<LinearLayout>(R.id.InformationLot_LL)
-        val bandeauQteAPreparer = view.findViewById<LinearLayout>(R.id.bandeauQteAPreparer)
-        val bandeauQtePreparer = view.findViewById<LinearLayout>(R.id.bandeauQtePreparer)
+        holder.nomProduit.text         = item.produitDesignation
+        holder.refProduit.text         = item.produitReference
+        holder.fournisseurProduit.text = ""
+        holder.lotProduit.text         = item.lotNumero
+        holder.serieProduit.text       = item.serieNumero
 
-        nomProduit.text         = item.produitDesignation
-        refProduit.text         = item.produitReference
-        fournisseurProduit.text = ""
-        lotProduit.text         = item.lotNumero
-        peremptionProduit.text  = item.peremptionDate
-        serieProduit.text = item.serieNumero
-
-        if(item.lotNumero.uppercase().contentEquals("LOT NON TRACE") || item.lotNumero.uppercase().startsWith("PHI"))
-        {
-            peremptionProduit.visibility = View.GONE
-        }
-
+        // Gestion de la date de péremption
         val dateString = item.peremptionDate
+        val lotUpper = item.lotNumero.uppercase()
 
-        if (dateString.isNullOrEmpty() || dateString == "0000-00-00") {
-            peremptionProduit.visibility = View.GONE
+        if (dateString.isNullOrEmpty() || dateString == "0000-00-00"
+            || lotUpper.contentEquals("LOT NON TRACE")
+            || lotUpper.startsWith("PHI")
+        ) {
+            holder.peremptionProduit.visibility = View.GONE
         } else {
-            peremptionProduit.visibility = View.VISIBLE
+            holder.peremptionProduit.visibility = View.VISIBLE
             val parts = dateString.split("-")
-            peremptionProduit.text = "${parts[1]}/${parts[0].substring(2)}"
+            holder.peremptionProduit.text = "${parts[1]}/${parts[0].substring(2)}"
         }
 
-        if(item._UID < 0)
-        {
-            bandeauQtePreparer.visibility = View.VISIBLE
-            informationLot_LL.visibility = View.VISIBLE
-            bandeauQteAPreparer.visibility = View.GONE
-            quantitePreparer.text = item.qte_preparer.toString()
-        }
-        else{
-            bandeauQtePreparer.visibility = View.GONE
-            informationLot_LL.visibility = View.GONE
-            bandeauQteAPreparer.visibility = View.VISIBLE
-            quantiteAPreparer.text = item.qte_APreparer.toString()
+        // Gestion des bandeaux selon le type de ligne
+        if (item._UID < 0) {
+            holder.bandeauQtePreparer.visibility  = View.VISIBLE
+            holder.informationLot_LL.visibility   = View.VISIBLE
+            holder.bandeauQteAPreparer.visibility = View.GONE
+            holder.quantitePreparer.text          = item.qte_preparer.toString()
+        } else {
+            holder.bandeauQtePreparer.visibility  = View.GONE
+            holder.informationLot_LL.visibility   = View.GONE
+            holder.bandeauQteAPreparer.visibility = View.VISIBLE
+            holder.quantiteAPreparer.text         = item.qte_APreparer.toString()
         }
 
-        return view
+        // Gestion de l'affichage du numéro de série
+        holder.layoutSerieNumero.visibility =
+            if (item.serieNumero.isEmpty()) View.GONE else View.VISIBLE
+
+        holder.itemView.setOnClickListener { onItemClick(item) }
     }
+
+    override fun getItemCount(): Int = liste.size
 }

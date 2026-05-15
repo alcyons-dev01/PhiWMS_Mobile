@@ -117,6 +117,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     private var alerteVisible = false
     private var positionSelectionnee = -1
     private var hauteurDetailFragment = 0
+    private var hauteurListeFragment = 0
 
     private lateinit var textChercher_TV: TextView
     private lateinit var searchInput_ET: EditText
@@ -177,6 +178,12 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         val frameContenu = findViewById<RelativeLayout>(R.id.frameLayout)
         frameContenu.post {
             hauteurDetailFragment = frameContenu.height / 2
+            val widthDp = resources.displayMetrics.run { widthPixels / density }
+            hauteurListeFragment = (frameContenu.height * when {
+                widthDp < 400  -> 0.35   // petit écran  (Zebra MC33, PDA industriels)
+                widthDp < 600  -> 0.65   // écran normal (smartphones classiques)
+                else           -> 0.75   // grand écran  (tablettes, grands smartphones)
+            }).toInt()
         }
 
         lancerScan.setOnClickListener {
@@ -232,6 +239,8 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
 
             val obreq: JsonObjectRequest = getJsonObjectRequest(urlRequete)
             requestQueue.add<JSONObject?>(obreq)
+            ouvrirScanner()
+
         } else {
           gestionVisuelle()
         }
@@ -578,8 +587,6 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
                 }
             }
         }
-
-        ouvrirScanner()
     }
 
     @Deprecated("Deprecated in Java")
@@ -685,8 +692,6 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
      * RECHERCHE
      */
     private fun ouvrirRecherche() {
-        findViewById<androidx.core.widget.NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled =
-            false
         rechercheContainer.apply {
             layoutParams = (layoutParams as LinearLayout.LayoutParams).also {
                 it.height = LinearLayout.LayoutParams.WRAP_CONTENT
@@ -707,8 +712,6 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
 
     private fun fermerRecherche() {
         cacherSearchInput()
-        findViewById<androidx.core.widget.NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled =
-            true
         rechercheContainer.animate()
             .translationY(-rechercheContainer.height.toFloat())
             .setDuration(300)
@@ -730,7 +733,6 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     private fun afficherSearchInput() {
         rechercheVisible = true
         // Bascule TextView → EditText dans le header
-        findViewById<ImageView>(R.id.chevronRecherche).visibility = View.GONE
         textChercher_TV.visibility = View.GONE
         searchInput_ET.visibility = View.VISIBLE
         effacerRecherche_IV.visibility = View.VISIBLE
@@ -758,7 +760,6 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     }
 
     private fun cacherSearchInput() {
-        findViewById<ImageView>(R.id.chevronRecherche).visibility = View.VISIBLE
         textChercher_TV.visibility = View.VISIBLE
         searchInput_ET.visibility = View.GONE
         effacerRecherche_IV.visibility = View.GONE
@@ -795,7 +796,10 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
                     preparationLigneBaseByProduit
                 )
             }
-
+            else
+            {
+                Alerte.afficherAlerteInformation(this@DetailPreparationV2, layoutInflater, "Erreur", "La référence ne fait pas partie de la préparation", false, false)
+            }
         }
 
         if (liste.isNotEmpty()) {
@@ -806,15 +810,16 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
 
             referenceAPreparerContainer.apply {
                 layoutParams = (layoutParams as LinearLayout.LayoutParams).also {
-                    it.height = LinearLayout.LayoutParams.WRAP_CONTENT
+                    it.height = hauteurListeFragment
                     it.weight = 0f
                 }
+
                 visibility = View.VISIBLE
                 translationY = 0f // Plus d'animation de translation
                 alpha = 0f        // Animation en fondu à la place
                 animate()
                     .alpha(1f)
-                    .setDuration(300)
+                    .setDuration(200)
                     .start()
             }
 
@@ -823,11 +828,9 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     }
 
     private fun fermerAPreparer() {
-        findViewById<androidx.core.widget.NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled =
-            true
         referenceAPreparerContainer.animate()
             .translationY(-referenceAPreparerContainer.height.toFloat())
-            .setDuration(300)
+            .setDuration(200)
             .withEndAction {
                 referenceAPreparerContainer.visibility = View.GONE
                 referenceAPreparerContainer.layoutParams =
@@ -859,12 +862,17 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
             // Affiche le container
             referencePreparerContainer.apply {
                 layoutParams = (layoutParams as LinearLayout.LayoutParams).also {
-                    it.height = (400 * resources.displayMetrics.density).toInt()
+                    it.height = hauteurListeFragment
                     it.weight = 0f
                 }
+
                 visibility = View.VISIBLE
-                translationY = -resources.displayMetrics.heightPixels.toFloat()
-                animate().translationY(0f).setDuration(300).start()
+                translationY = 0f // Plus d'animation de translation
+                alpha = 0f        // Animation en fondu à la place
+                animate()
+                    .alpha(1f)
+                    .setDuration(200)
+                    .start()
             }
 
             // Crée le fragment avec la liste
@@ -878,11 +886,9 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     }
 
     private fun fermerPreparer() {
-        findViewById<androidx.core.widget.NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled =
-            true
         referencePreparerContainer.animate()
             .translationY(-referencePreparerContainer.height.toFloat())
-            .setDuration(300)
+            .setDuration(200)
             .withEndAction {
                 referencePreparerContainer.visibility = View.GONE
                 referencePreparerContainer.layoutParams =
