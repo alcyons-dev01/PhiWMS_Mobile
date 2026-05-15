@@ -1,7 +1,5 @@
 package fr.alcyons.phiwms_mobile.ControleDesRetours;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -11,25 +9,23 @@ import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.DialogFragment;
-
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -47,21 +43,16 @@ import java.util.TimeZone;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerEmplacementActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerProduitActivity;
-import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.EmplacementOpenHelper;
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_ReliquatOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ZoneOpenHelper;
-import fr.alcyons.phiwms_mobile.Classes.Commande;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
-import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
@@ -72,233 +63,229 @@ import fr.alcyons.phiwms_mobile.Outils.OutilsDecodage;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ServiceActivity;
 
-import static fr.alcyons.phiwms_mobile.Outils.Alerte.aNumberPicker;
-import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RESULT_ZONE;
-import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT;
-import static fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites.RETOUR_LOT;
+public class CreationLotControleDesRetoursActivity extends ServiceActivity
+{
+    private Produit produitSelectionne = null;
+    private Depot depotSelectionne = null;
+    private Depot depotPUI = null;
 
-import com.google.android.material.snackbar.Snackbar;
+    private Depot_Zone zoneSelectionner = null;
+    private Depot_Emplacement emplacementSelectionner = null;
+    private List<Depot_Emplacement> emplacementList = null;
+    private List<Depot_Zone> depotZoneList = null;
 
-public class CreationLotControleDesRetoursActivity extends ServiceActivity {
-    Produit produitSelectionne;
-    Depot depotSelectionne;
-    Depot depotPUI;
+    private TextView zoneTextView = null;
+    private TextView emplacementTextView = null;
+    private TextView numSerieEditText = null;
+    private TextView lotEditText = null;
+    private TextView datePeremptionTextView = null;
+    private TextView fournisseurTextView = null;
+    private TextView qteActuelleEditText = null;
+    private ImageView datamatrix1ImageView = null;
+    private ImageView datamatrix2ImageView = null;
+    private TextView labelSerie = null;
+    private TextView numPreparation = null;
+    private TextView referenceProduit = null;
+    private LinearLayout validationScan = null;
+    private ImageView imageValidation = null;
+    private RelativeLayout relativeQte = null;
 
-    Depot_Zone zoneSelectionner;
-    Depot_Emplacement emplacementSelectionner;
-    List<Depot_Emplacement> emplacementList;
-    List<Depot_Zone> depotZoneList;
+    private int qte_a_retourner = 0;
+    private int qte_retourner = 0;
+    private int qte_restante = 0;
+    private PackageManager pm = null;
 
-    TextView zoneTextView;
-    TextView emplacementTextView;
-    TextView numSerieEditText;
-    TextView lotEditText;
-    TextView datePeremptionTextView;
-    TextView fournisseurTextView;
-    TextView qteActuelleEditText;
-    ImageView datamatrix1ImageView;
-    ImageView datamatrix2ImageView;
-    TextView labelSerie;
-    TextView numPreparation;
-    TextView referenceProduit;
-    LinearLayout validationScan;
-    ImageView imageValidation;
-    RelativeLayout relativeQte;
+    private Retour retourSelectionne = null;
+    private Retour_Ligne retourLigneCourant = null;
 
-    int qte_a_retourner;
-    int qte_retourner;
-    int qte_restante;
-    PackageManager pm;
-
-    Retour retourSelectionne;
-    Retour_Ligne retourLigneCourant;
-    @SuppressLint("SetTextI18n")
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    @Override protected void onCreate(final Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_creation_lot_preparation);
+        this.setContentView(R.layout.activity_creation_lot_preparation);
 
         //gestion du package manager
-        pm = CreationLotControleDesRetoursActivity.this.getPackageManager();
+        this.pm = CreationLotControleDesRetoursActivity.this.getPackageManager();
 
         // Récupération des variables globales
-        produitSelectionne = ProduitOpenHelper.getProduitByID(db, Objects.requireNonNull(intent.getExtras()).getInt("produitID"));
-        depotSelectionne = DepotOpenHelper.getDepotParID(db, intent.getExtras().getInt("depotID"));
-        retourLigneCourant = Retour_LigneOpenHelper.getRetourLigneByID(db, intent.getExtras().getInt("retourLigneID"));
-        retourSelectionne = RetourOpenHelper.getRetourByID(db, intent.getExtras().getInt("retourUID"));
-        depotPUI = DepotOpenHelper.getDepotPUI(db);
+        this.produitSelectionne = ProduitOpenHelper.getProduitByID(this.db, Objects.requireNonNull(this.intent.getExtras()).getInt("produitID"));
+        this.depotSelectionne = DepotOpenHelper.getDepotParID(this.db, this.intent.getExtras().getInt("depotID"));
+        this.retourLigneCourant = Retour_LigneOpenHelper.getRetourLigneByID(this.db, this.intent.getExtras().getInt("retourLigneID"));
+        this.retourSelectionne = RetourOpenHelper.getRetourByID(this.db, this.intent.getExtras().getInt("retourUID"));
+        this.depotPUI = DepotOpenHelper.getDepotPUI(this.db);
 
         /**
          * Gestion quantité restant à retourner
          */
-        qte_a_retourner = (int) retourLigneCourant.getQte_Demander();
-        qte_retourner = 0;
-        List<Retour_Ligne> listeRetourLigneRetourner = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(db, retourSelectionne, retourLigneCourant.getCode_produit());
-        for(Retour_Ligne retourLigne : listeRetourLigneRetourner)
-        {
-            qte_retourner = (int) (qte_retourner + retourLigne.getQte_Retourner());
-        }
-        qte_restante = qte_a_retourner - qte_retourner;
+        this.qte_a_retourner = (int) this.retourLigneCourant.getQte_Demander();
+        this.qte_retourner = 0;
+        final List<Retour_Ligne> listeRetourLigneRetourner = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(this.db, this.retourSelectionne, this.retourLigneCourant.getCode_produit());
+        for(final Retour_Ligne retourLigne : listeRetourLigneRetourner) { this.qte_retourner = (int) ((double) this.qte_retourner + retourLigne.getQte_Retourner()); }
+        this.qte_restante = this.qte_a_retourner - this.qte_retourner;
 
         // Récupération des objets graphiques
-        zoneTextView = (TextView) findViewById(R.id.zoneName);
-        emplacementTextView = (TextView) findViewById(R.id.nomEmplacement);
-        labelSerie = (TextView) findViewById(R.id.labelSerie);
-        numPreparation = (TextView) findViewById(R.id.numPreparation);
-        referenceProduit = (TextView) findViewById(R.id.referenceProduit);
-        fournisseurTextView = (TextView) findViewById(R.id.depotPreparation);
-        lotEditText = (TextView) findViewById(R.id.numLot);
-        numSerieEditText = (TextView) findViewById(R.id.numSerie);
-        datePeremptionTextView = (TextView) findViewById(R.id.datePeremption);
-        qteActuelleEditText = (TextView) findViewById(R.id.qteActuelle);
-        datamatrix1ImageView = (ImageView) findViewById(R.id.datamatrix1);
-        datamatrix2ImageView = (ImageView) findViewById(R.id.datamatrix2);
-        imageValidation = (ImageView) findViewById(R.id.imageValidation);
-        validationScan = (LinearLayout) findViewById(R.id.validationScan);
-        relativeQte = (RelativeLayout) findViewById(R.id.relativeQte);
+        this.zoneTextView = this.findViewById(R.id.zoneName);
+        this.emplacementTextView = this.findViewById(R.id.nomEmplacement);
+        this.labelSerie = this.findViewById(R.id.labelSerie);
+        this.numPreparation = this.findViewById(R.id.numPreparation);
+        this.referenceProduit = this.findViewById(R.id.referenceProduit);
+        this.fournisseurTextView = this.findViewById(R.id.depotPreparation);
+        this.lotEditText = this.findViewById(R.id.numLot);
+        this.numSerieEditText = this.findViewById(R.id.numSerie);
+        this.datePeremptionTextView = this.findViewById(R.id.datePeremption);
+        this.qteActuelleEditText = this.findViewById(R.id.qteActuelle);
+        this.datamatrix1ImageView = this.findViewById(R.id.datamatrix1);
+        this.datamatrix2ImageView = this.findViewById(R.id.datamatrix2);
+        this.imageValidation = this.findViewById(R.id.imageValidation);
+        this.validationScan = this.findViewById(R.id.validationScan);
+        this.relativeQte = this.findViewById(R.id.relativeQte);
 
         //gestion du produit non tracé
-        if(!produitSelectionne.isSuivi_Lot())
+        if(!this.produitSelectionne.isSuivi_Lot())
         {
             //gestion de la date
-            String currentDate = new SimpleDateFormat("yyMMdd", Locale.getDefault()).format(new Date());
+            final String currentDate = new SimpleDateFormat("yyMMdd", Locale.getDefault()).format(new Date());
 
-            lotEditText.setText("Phi"+currentDate);
-            Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+            this.lotEditText.setText("Phi"+currentDate);
+            final Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
 
-            int currentYear = calendar.get(Calendar.YEAR)+1;
-            int currentMonth = calendar.get(Calendar.MONTH)+1;
-            int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
+            final int currentYear = calendar.get(Calendar.YEAR)+1;
+            final int currentMonth = calendar.get(Calendar.MONTH)+1;
+            final int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
 
-            String dateNextYear = currentDay+"/"+currentMonth+"/"+currentYear;
+            final String dateNextYear = currentDay+"/"+currentMonth+"/"+currentYear;
 
-            datePeremptionTextView.setText(dateNextYear);
+            this.datePeremptionTextView.setText(dateNextYear);
         }
 
         //affichage des informations en barre de titre
-        numPreparation.setText("#"+retourSelectionne.getNumero());
-        fournisseurTextView.setText(retourSelectionne.getRef_Depot_Origine());
+        this.numPreparation.setText("#"+ this.retourSelectionne.getNumero());
+        this.fournisseurTextView.setText(this.retourSelectionne.getRef_Depot_Origine());
 
         // Définition des actions sur Click
-        datePeremptionTextView.setOnClickListener(v -> {
-            CreationLotControleDesRetoursActivity.DatePickerFragmentReception newFragment = new CreationLotControleDesRetoursActivity.DatePickerFragmentReception();
-            newFragment.setTextView(datePeremptionTextView);
+        this.datePeremptionTextView.setOnClickListener(v -> {
+            final CreationLotControleDesRetoursActivity.DatePickerFragmentReception newFragment = new CreationLotControleDesRetoursActivity.DatePickerFragmentReception();
+            newFragment.setTextView(this.datePeremptionTextView);
             newFragment.show((CreationLotControleDesRetoursActivity.this).getSupportFragmentManager(), "timePicker");
         });
 
         //affichage de la liste des zones
-        zoneTextView.setOnClickListener(view -> {
-            depotZoneList = new ArrayList<>();
-            depotZoneList = ZoneOpenHelper.getZonesEtEmplacementsParDepot(db, depotSelectionne);
+        this.zoneTextView.setOnClickListener(view -> {
+            this.depotZoneList = new ArrayList<>();
+            this.depotZoneList = ZoneOpenHelper.getZonesEtEmplacementsParDepot(this.db, this.depotSelectionne);
 
-            if (!depotZoneList.isEmpty()) {
-                Intent newIntent = new Intent(CreationLotControleDesRetoursActivity.this, ListeZoneCreationActivity.class);
-                Bundle extras = CreationLotControleDesRetoursActivity.super.getBundle();
-                extras.putInt("depotID", depotSelectionne.getDepot_UID());
+            if (!this.depotZoneList.isEmpty())
+            {
+                final Intent newIntent = new Intent(CreationLotControleDesRetoursActivity.this, ListeZoneCreationActivity.class);
+                final Bundle extras = CreationLotControleDesRetoursActivity.super.getBundle();
+                extras.putInt("depotID", this.depotSelectionne.getDepot_UID());
                 newIntent.putExtras(extras);
-                CreationLotControleDesRetoursActivity.this.startActivityForResult(newIntent, RESULT_ZONE);
+                CreationLotControleDesRetoursActivity.this.startActivityForResult(newIntent, CodesEchangesActivites.RESULT_ZONE);
             }
 
         });
 
         //affichage des emplacements
-        emplacementTextView.setOnClickListener(view -> {
-            emplacementList = new ArrayList<>();
-            if (zoneSelectionner != null) {
-                emplacementList = EmplacementOpenHelper.getEmplacementsParZone(db, zoneSelectionner);
-            }
-            if (!emplacementList.isEmpty()) {
-                Intent newIntent = new Intent(CreationLotControleDesRetoursActivity.this, ListeEmplacementCreationActivity.class);
-                Bundle extras = CreationLotControleDesRetoursActivity.super.getBundle();
-                extras.putInt("zoneid", zoneSelectionner.getZoneID());
+        this.emplacementTextView.setOnClickListener(view -> {
+            this.emplacementList = new ArrayList<>();
+            if (null != this.zoneSelectionner) { this.emplacementList = EmplacementOpenHelper.getEmplacementsParZone(this.db, this.zoneSelectionner); }
+            if (!this.emplacementList.isEmpty())
+            {
+                final Intent newIntent = new Intent(CreationLotControleDesRetoursActivity.this, ListeEmplacementCreationActivity.class);
+                final Bundle extras = CreationLotControleDesRetoursActivity.super.getBundle();
+                extras.putInt("zoneid", this.zoneSelectionner.getZoneID());
                 newIntent.putExtras(extras);
-                CreationLotControleDesRetoursActivity.this.startActivityForResult(newIntent, RETOUR_CODE_EMPLACEMENT);
+                CreationLotControleDesRetoursActivity.this.startActivityForResult(newIntent, CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT);
             }
 
         });
 
         //clic sur le datamatrix de la zone et de l'emplacement
-        datamatrix1ImageView.setOnClickListener(view -> {
+        this.datamatrix1ImageView.setOnClickListener(view -> {
             if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell"))
             {
-                Intent detailProduitPlanDePlacementIntent = getDetailProduitPlanDePlacementIntent();
+                final Intent detailProduitPlanDePlacementIntent = this.getDetailProduitPlanDePlacementIntent();
                 CreationLotControleDesRetoursActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT);
             }
             else
             {
-                if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
+                if(this.pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
                 {
-                    Bundle detailProduitPlanDePlacementBundle = CreationLotControleDesRetoursActivity.super.getBundle();
+                    final Bundle detailProduitPlanDePlacementBundle = CreationLotControleDesRetoursActivity.super.getBundle();
                     detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un emplacement");
                     detailProduitPlanDePlacementBundle.putString("contexte", String.valueOf(R.string.scannerContexteEmplacement));
                     detailProduitPlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
-                    Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotControleDesRetoursActivity.this, BarcodeCaptureActivity.class);
+                    final Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotControleDesRetoursActivity.this, BarcodeCaptureActivity.class);
                     detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
                     CreationLotControleDesRetoursActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT);
                 }
                 else
                 {
-                    Intent detailProduitPlanDePlacementIntent = getProduitPlanDePlacementIntent();
+                    final Intent detailProduitPlanDePlacementIntent = this.getProduitPlanDePlacementIntent();
                     CreationLotControleDesRetoursActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT);
                 }
             }
         });
 
-        if (depotSelectionne.getStructure().contains("PAD")) {
-            zoneTextView.setText(produitSelectionne.getZone_PAD_Defaut());
-            emplacementTextView.setText(produitSelectionne.getEmplacement_PAD_Defaut());
-            zoneSelectionner = ZoneOpenHelper.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_PAD_Defaut());
-        } else if (depotSelectionne.getStructure().contains("PUF")) {
-            zoneTextView.setText(produitSelectionne.getZone_UF_Defaut());
-            emplacementTextView.setText(produitSelectionne.getEmplacement_UF_Defaut());
-            zoneSelectionner = ZoneOpenHelper.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_UF_Defaut());
-        } else {
-            zoneTextView.setText(produitSelectionne.getZone_PUI_Defaut());
-            emplacementTextView.setText(produitSelectionne.getEmplacement_PUI_Defaut());
-            zoneSelectionner = ZoneOpenHelper.getZoneByDepotEtNom(db, depotSelectionne, produitSelectionne.getZone_PUI_Defaut());
+        if (this.depotSelectionne.getStructure().contains("PAD"))
+        {
+            this.zoneTextView.setText(this.produitSelectionne.getZone_PAD_Defaut());
+            this.emplacementTextView.setText(this.produitSelectionne.getEmplacement_PAD_Defaut());
+            this.zoneSelectionner = ZoneOpenHelper.getZoneByDepotEtNom(this.db, this.depotSelectionne, this.produitSelectionne.getZone_PAD_Defaut());
+        }
+        else if (this.depotSelectionne.getStructure().contains("PUF"))
+        {
+            this.zoneTextView.setText(this.produitSelectionne.getZone_UF_Defaut());
+            this.emplacementTextView.setText(this.produitSelectionne.getEmplacement_UF_Defaut());
+            this.zoneSelectionner = ZoneOpenHelper.getZoneByDepotEtNom(this.db, this.depotSelectionne, this.produitSelectionne.getZone_UF_Defaut());
+        }
+        else
+        {
+            this.zoneTextView.setText(this.produitSelectionne.getZone_PUI_Defaut());
+            this.emplacementTextView.setText(this.produitSelectionne.getEmplacement_PUI_Defaut());
+            this.zoneSelectionner = ZoneOpenHelper.getZoneByDepotEtNom(this.db, this.depotSelectionne, this.produitSelectionne.getZone_PUI_Defaut());
         }
 
         //clic sur le datamtrix permettant de récupérer le numéro de lot et la date de péremption
-        datamatrix2ImageView.setOnClickListener(view -> {
+        this.datamatrix2ImageView.setOnClickListener(view -> {
 
             if(Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.toLowerCase().contains("honeywell") || Build.MANUFACTURER.toLowerCase().contains("google"))
             {
-                Bundle detailProduitPlanDePlacementBundle = CreationLotControleDesRetoursActivity.super.getBundle();
+                final Bundle detailProduitPlanDePlacementBundle = CreationLotControleDesRetoursActivity.super.getBundle();
                 detailProduitPlanDePlacementBundle.putBoolean("doitEtreIdentique", false);
-                detailProduitPlanDePlacementBundle.putString("Designation", produitSelectionne.getDesignation_interne());
+                detailProduitPlanDePlacementBundle.putString("Designation", this.produitSelectionne.getDesignation_interne());
                 detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un numéro de lot");
                 detailProduitPlanDePlacementBundle.putString("contexte", String.valueOf(R.string.scannerContexteProduit));
                 detailProduitPlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
-                detailProduitPlanDePlacementBundle.putString("numerodocument", retourSelectionne.getNumero());
-                detailProduitPlanDePlacementBundle.putInt("depotdestinataireid", depotPUI.getDepot_UID());
-                detailProduitPlanDePlacementBundle.putString("depotRef", retourSelectionne.getRef_Depot_Origine());
-                Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotControleDesRetoursActivity.this, ScannerProduitActivity.class);
+                detailProduitPlanDePlacementBundle.putString("numerodocument", this.retourSelectionne.getNumero());
+                detailProduitPlanDePlacementBundle.putInt("depotdestinataireid", this.depotPUI.getDepot_UID());
+                detailProduitPlanDePlacementBundle.putString("depotRef", this.retourSelectionne.getRef_Depot_Origine());
+                final Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotControleDesRetoursActivity.this, ScannerProduitActivity.class);
                 detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
                 CreationLotControleDesRetoursActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_LOT);
             }
             else
             {
-                if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
+                if(this.pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
                 {
-                    Bundle detailProduitPlanDePlacementBundle = CreationLotControleDesRetoursActivity.super.getBundle();
+                    final Bundle detailProduitPlanDePlacementBundle = CreationLotControleDesRetoursActivity.super.getBundle();
                     detailProduitPlanDePlacementBundle.putBoolean("doitEtreIdentique", true);
-                    detailProduitPlanDePlacementBundle.putString("Designation", produitSelectionne.getDesignation_interne());
+                    detailProduitPlanDePlacementBundle.putString("Designation", this.produitSelectionne.getDesignation_interne());
                     detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un numéro de lot");
                     detailProduitPlanDePlacementBundle.putString("contexte", String.valueOf(R.string.scannerContexteProduit));
                     detailProduitPlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
-                    Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotControleDesRetoursActivity.this, BarcodeCaptureActivity.class);
+                    final Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotControleDesRetoursActivity.this, BarcodeCaptureActivity.class);
                     detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
                     CreationLotControleDesRetoursActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_LOT);
                 }
                 else
                 {
-                    Bundle detailProduitPlanDePlacementBundle = CreationLotControleDesRetoursActivity.super.getBundle();
+                    final Bundle detailProduitPlanDePlacementBundle = CreationLotControleDesRetoursActivity.super.getBundle();
                     detailProduitPlanDePlacementBundle.putBoolean("doitEtreIdentique", true);
-                    detailProduitPlanDePlacementBundle.putString("Designation", produitSelectionne.getDesignation_interne());
+                    detailProduitPlanDePlacementBundle.putString("Designation", this.produitSelectionne.getDesignation_interne());
                     detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un numéro de lot");
                     detailProduitPlanDePlacementBundle.putString("contexte", String.valueOf(R.string.scannerContexteProduit));
                     detailProduitPlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
-                    Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotControleDesRetoursActivity.this, ScannerProduitActivity.class);
+                    final Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotControleDesRetoursActivity.this, ScannerProduitActivity.class);
                     detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
                     CreationLotControleDesRetoursActivity.this.startActivityForResult(detailProduitPlanDePlacementIntent, CodesEchangesActivites.RETOUR_LOT);
                 }
@@ -306,402 +293,368 @@ public class CreationLotControleDesRetoursActivity extends ServiceActivity {
 
         });
 
-        if(!pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
-        {
-            datamatrix2ImageView.setVisibility(View.GONE);
-        }
+        if(!this.pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) { this.datamatrix2ImageView.setVisibility(View.GONE); }
 
         // Hydratation des objets graphiques
-        ((TextView) findViewById(R.id.nomProduit)).setText(produitSelectionne.getDesignation_interne());
-        referenceProduit.setText(produitSelectionne.getRef_fourni());
-        String numLot = intent.getExtras().getString("numLot");
-        if (numLot != null) {
-            lotEditText.setText(numLot);
-        }
+        ((TextView) this.findViewById(R.id.nomProduit)).setText(this.produitSelectionne.getDesignation_interne());
+        this.referenceProduit.setText(this.produitSelectionne.getRef_fourni());
+        final String numLot = this.intent.getExtras().getString("numLot");
+        if (null != numLot) { this.lotEditText.setText(numLot); }
 
-        String numSerie = intent.getExtras().getString("numSerie");
-        if(numSerie != null)
+        String numSerie = this.intent.getExtras().getString("numSerie");
+        if(null != numSerie)
         {
-            String last_char = numSerie.substring(numSerie.length()-1);
-            if(last_char.contentEquals("@"))
-                numSerie = numSerie.substring(0, numSerie.length()-1);
-            numSerieEditText.setText(numSerie);
+            final String last_char = numSerie.substring(numSerie.length()-1);
+            if(last_char.contentEquals("@")) numSerie = numSerie.substring(0, numSerie.length()-1);
+            this.numSerieEditText.setText(numSerie);
         }
 
         // Transformation d'une date au format yyyy-MM-dd à dd/MM/yyyyy
-        String dateDePeremption = intent.getExtras().getString("datePeremption");
-        if (dateDePeremption != null) {
-            @SuppressLint("SimpleDateFormat") DateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
-            @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        final String dateDePeremption = this.intent.getExtras().getString("datePeremption");
+        if (null != dateDePeremption)
+        {
+            final DateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
+            final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
             String dateAAfficher = "";
-            Date date;
+            final Date date;
 
-            try {
+            try
+            {
                 date = dateDecodeur.parse(dateDePeremption);
-                assert date != null;
+                assert null != date;
                 dateAAfficher = dateFormat.format(date);
-            } catch (ParseException e) {
-                Log.e("Parse Exception", Objects.requireNonNull(e.getMessage()));
             }
-            datePeremptionTextView.setText(dateAAfficher);
+            catch (final ParseException e) { Log.e("Parse Exception", Objects.requireNonNull(e.getMessage())); }
+            this.datePeremptionTextView.setText(dateAAfficher);
         }
 
-        if(!produitSelectionne.isSuivi_Serialisation() || !produitSelectionne.isSerialiser_Reception_Delivrance())
+        if(!this.produitSelectionne.isSuivi_Serialisation() || !this.produitSelectionne.isSerialiser_Reception_Delivrance())
         {
-            numSerieEditText.setVisibility(View.GONE);
-            labelSerie.setVisibility(View.GONE);
+            this.numSerieEditText.setVisibility(View.GONE);
+            this.labelSerie.setVisibility(View.GONE);
         }
 
-        lotEditText.setOnClickListener(view -> {
-            String lotnumero = Alerte.afficherAlerteEditText(CreationLotControleDesRetoursActivity.this, "Numéro de lot", "Saisir le numéro de lot");
-            lotEditText.setText(lotnumero);
-            apparitionValider();
+        this.lotEditText.setOnClickListener(view -> {
+            final String lotnumero = Alerte.afficherAlerteEditText(CreationLotControleDesRetoursActivity.this, "Numéro de lot", "Saisir le numéro de lot");
+            this.lotEditText.setText(lotnumero);
+            this.apparitionValider();
         });
 
         //affichage de la quantité de base
-        qteActuelleEditText.setText(String.valueOf(qte_restante));
+        this.qteActuelleEditText.setText(String.valueOf(this.qte_restante));
 
 
-        relativeQte.setOnClickListener(view -> {
-            String title = produitSelectionne.getDesignation_interne();
-            String message = "Choisir une quantité: ";
-            int maxValue = qte_restante;
-            int value = qte_restante;
-            int conditionnement = (int)produitSelectionne.getCond_Achat_Gros_volume();
+        this.relativeQte.setOnClickListener(view -> {
+            final String title = this.produitSelectionne.getDesignation_interne();
+            final String message = "Choisir une quantité: ";
+            final int maxValue = this.qte_restante;
+            final int value = this.qte_restante;
+            int conditionnement = (int) this.produitSelectionne.getCond_Achat_Gros_volume();
 
-            if(conditionnement == 0 || conditionnement > qte_restante)
-                conditionnement = (int)produitSelectionne.getCond_achat();
+            if(0 == conditionnement || conditionnement > this.qte_restante) conditionnement = this.produitSelectionne.getCond_achat();
 
-            if(conditionnement == 0 || conditionnement > qte_restante)
-                conditionnement = 1;
+            if(0 == conditionnement || conditionnement > this.qte_restante) conditionnement = 1;
 
-            int finalConditionnement = conditionnement;
-            DialogInterface.OnClickListener onClickListener = (dialog, id) -> {
+            final int finalConditionnement = conditionnement;
 
-                int qteApres = aNumberPicker.getValue()* finalConditionnement;
-                qteActuelleEditText.setText(String.valueOf(qteApres).trim());
+            final DialogInterface.OnClickListener onClickListener = (dialog, id) -> {
+                final int qteApres = Alerte.aNumberPicker.getValue()* finalConditionnement;
+                this.qteActuelleEditText.setText(String.valueOf(qteApres).trim());
                 dialog.dismiss();
-                apparitionValider();
+                this.apparitionValider();
             };
 
             Alerte.afficherAlerteNumberPickerAvecPas(CreationLotControleDesRetoursActivity.this, title, message, value, maxValue, onClickListener, conditionnement);
         });
 
         //on affiche des valeurs fictive si c'est alcyons qui est connecté
-        if(utilisateurConnecte.getIdentifiant().toLowerCase().contentEquals("alcyons"))
+        if(this.utilisateurConnecte.getIdentifiant().toLowerCase().contentEquals("alcyons"))
         {
-            lotEditText.setText("LotAclyons");
-            Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+            this.lotEditText.setText("LotAclyons");
+            final Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
 
-            int currentYear = calendar.get(Calendar.YEAR)+1;
-            int currentMonth = calendar.get(Calendar.MONTH)+1;
-            int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
+            final int currentYear = calendar.get(Calendar.YEAR)+1;
+            final int currentMonth = calendar.get(Calendar.MONTH)+1;
+            final int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
 
-            String dateNextYear = currentDay+"/"+currentMonth+"/"+currentYear;
+            final String dateNextYear = currentDay+"/"+currentMonth+"/"+currentYear;
 
-            datePeremptionTextView.setText(dateNextYear);
+            this.datePeremptionTextView.setText(dateNextYear);
         }
 
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                CreationLotControleDesRetoursActivity.this.finish();
-            }
+        this.getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override public void handleOnBackPressed() { CreationLotControleDesRetoursActivity.this.finish(); }
         });
 
-        apparitionValider();
-        imageValidation.setOnClickListener(view -> onMenuSaveClick());
+        this.apparitionValider();
+        this.imageValidation.setOnClickListener(view -> this.onMenuSaveClick());
     }
 
-    @NonNull
-    private Intent getProduitPlanDePlacementIntent() {
-        Bundle detailProduitPlanDePlacementBundle = CreationLotControleDesRetoursActivity.super.getBundle();
+    @NonNull private Intent getProduitPlanDePlacementIntent()
+    {
+        final Bundle detailProduitPlanDePlacementBundle = CreationLotControleDesRetoursActivity.super.getBundle();
         detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un emplacement");
         detailProduitPlanDePlacementBundle.putInt("scannerContexteInt", R.string.scannerContexteEmplacement);
         detailProduitPlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
-        Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotControleDesRetoursActivity.this, ScannerEmplacementActivity.class);
+        final Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotControleDesRetoursActivity.this, ScannerEmplacementActivity.class);
         detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
         return detailProduitPlanDePlacementIntent;
     }
 
-    @NonNull
-    private Intent getDetailProduitPlanDePlacementIntent() {
-        Bundle detailProduitPlanDePlacementBundle = CreationLotControleDesRetoursActivity.super.getBundle();
+    @NonNull private Intent getDetailProduitPlanDePlacementIntent()
+    {
+        final Bundle detailProduitPlanDePlacementBundle = CreationLotControleDesRetoursActivity.super.getBundle();
         detailProduitPlanDePlacementBundle.putString("bannerText", "Scanner un emplacement");
         detailProduitPlanDePlacementBundle.putInt("scannerContexteInt", R.string.scannerContexteEmplacement);
         detailProduitPlanDePlacementBundle.putBoolean("isBoutonSuppressionExistant", true);
-        Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotControleDesRetoursActivity.this, ScannerEmplacementActivity.class);
+        final Intent detailProduitPlanDePlacementIntent = new Intent(CreationLotControleDesRetoursActivity.this, ScannerEmplacementActivity.class);
         detailProduitPlanDePlacementIntent.putExtras(detailProduitPlanDePlacementBundle);
         return detailProduitPlanDePlacementIntent;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    @Override public boolean onCreateOptionsMenu(final Menu menu)
+    {
         super.onCreateOptionsMenu(menu);
-
         return true;
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    @Override public boolean onPrepareOptionsMenu(final Menu menu) { return true; }
 
-        return true;
-    }
+    private void onMenuSaveClick()
+    {
+        if (this.zoneTextView.getText().toString().trim().isEmpty() || this.emplacementTextView.getText().toString().trim().isEmpty() || this.lotEditText.getText().toString().trim().isEmpty() || this.datePeremptionTextView.getText().toString().trim().isEmpty())
+        { Toast.makeText(CreationLotControleDesRetoursActivity.this, "Tous les éléments n'ont pas été saisis.", Toast.LENGTH_SHORT).show(); }
+        else
+        {
+            final Bundle onMenuSaveClick_Bundle = CreationLotControleDesRetoursActivity.super.getBundle();
 
-    private void onMenuSaveClick() {
-        if (zoneTextView.getText().toString().trim().isEmpty() || emplacementTextView.getText().toString().trim().isEmpty() || lotEditText.getText().toString().trim().isEmpty() || datePeremptionTextView.getText().toString().trim().isEmpty()) {
-            Toast.makeText(CreationLotControleDesRetoursActivity.this, "Tous les éléments n'ont pas été saisis.", Toast.LENGTH_SHORT).show();
-        } else {
-            Bundle onMenuSaveClick_Bundle = CreationLotControleDesRetoursActivity.super.getBundle();
+            this.ajoutRetourLigneBDD();
 
-            ajoutRetourLigneBDD();
-
-            Intent onMenuSaveClick_Intent = new Intent();
+            final Intent onMenuSaveClick_Intent = new Intent();
             onMenuSaveClick_Intent.putExtras(onMenuSaveClick_Bundle);
 
-            CreationLotControleDesRetoursActivity.this.setResult(RETOUR_LOT, onMenuSaveClick_Intent);
+            CreationLotControleDesRetoursActivity.this.setResult(CodesEchangesActivites.RETOUR_LOT, onMenuSaveClick_Intent);
             CreationLotControleDesRetoursActivity.this.finish();
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    @Override public void onActivityResult(final int requestCode, final int resultCode, final Intent data)
+    {
         super.onActivityResult(requestCode, resultCode, data);
-        if (data != null) {
-            switch (requestCode) {
-                case RESULT_ZONE:
-                    int zoneid = Objects.requireNonNull(data.getExtras()).getInt("zoneid");
-                    if(zoneid != -1)
+        if (null != data)
+        {
+            switch (requestCode)
+            {
+                case CodesEchangesActivites.RESULT_ZONE:
+                    final int zoneid = Objects.requireNonNull(data.getExtras()).getInt("zoneid");
+                    if(-1 != zoneid)
                     {
-                        zoneSelectionner = ZoneOpenHelper.getUneZoneByID(db, zoneid);
-                        zoneTextView.setText(zoneSelectionner.getZoneName().trim());
-                        emplacementTextView.performClick();
+                        this.zoneSelectionner = ZoneOpenHelper.getUneZoneByID(this.db, zoneid);
+                        this.zoneTextView.setText(this.zoneSelectionner.getZoneName().trim());
+                        this.emplacementTextView.performClick();
                     }
                     break;
-                case RETOUR_CODE_EMPLACEMENT:
-                    int emplacementid = Objects.requireNonNull(data.getExtras()).getInt("emplacementId");
-                    if(emplacementid != -1)
+                case CodesEchangesActivites.RETOUR_CODE_EMPLACEMENT:
+                    final int emplacementid = Objects.requireNonNull(data.getExtras()).getInt("emplacementId");
+                    if(-1 != emplacementid)
                     {
-                        emplacementSelectionner = EmplacementOpenHelper.getUnEmplacementByID(db, emplacementid);
-                        emplacementTextView.setText(emplacementSelectionner.getAdressage().trim());
+                        this.emplacementSelectionner = EmplacementOpenHelper.getUnEmplacementByID(this.db, emplacementid);
+                        this.emplacementTextView.setText(this.emplacementSelectionner.getAdressage().trim());
                     }
                     break;
 
                 case CodesEchangesActivites.RETOUR_ZONE_ET_EMPLACEMENT:
-                    Depot_Emplacement depotEmplacement = EmplacementOpenHelper.getUnEmplacementByID(db, Objects.requireNonNull(data.getExtras()).getInt("emplacementSelectionneID"));
+                    Depot_Emplacement depotEmplacement = EmplacementOpenHelper.getUnEmplacementByID(this.db, Objects.requireNonNull(data.getExtras()).getInt("emplacementSelectionneID"));
                     String code_emplacement = data.getStringExtra("code");
-                    if(code_emplacement != null && !code_emplacement.contentEquals(""))
+                    if(null != code_emplacement && !code_emplacement.contentEquals(""))
                     {
-                        if(depotEmplacement == null)
+                        if(null == depotEmplacement)
                         {
                             if (code_emplacement.startsWith("PHITAGPLACE")) {
-                                String[] tabchaine = code_emplacement.split(":");
+                                final String[] tabchaine = code_emplacement.split(":");
                                 code_emplacement = tabchaine[1];
-                                depotEmplacement = EmplacementOpenHelper.getUnEmplacementByID(db, Integer.parseInt(code_emplacement));
+                                depotEmplacement = EmplacementOpenHelper.getUnEmplacementByID(this.db, Integer.parseInt(code_emplacement));
                             }
                         }
-                        if(depotEmplacement != null)
+                        if(null != depotEmplacement)
                         {
-                            Depot_Zone depotZone = ZoneOpenHelper.getUneZoneByID(db, depotEmplacement.getZoneID());
-                            if(depotZone != null){
-                                zoneTextView.setText(depotZone.getZoneName().trim());
-                                emplacementTextView.setText(depotEmplacement.getAdressage().trim());
+                            final Depot_Zone depotZone = ZoneOpenHelper.getUneZoneByID(this.db, depotEmplacement.getZoneID());
+                            if(null != depotZone)
+                            {
+                                this.zoneTextView.setText(depotZone.getZoneName().trim());
+                                this.emplacementTextView.setText(depotEmplacement.getAdressage().trim());
                             }
                         }
-                        else
-                        {
-                            zoneTextView.performClick();
-                        }
+                        else { this.zoneTextView.performClick(); }
                     }
-                    else
-                    {
-                        zoneTextView.performClick();
-                    }
+                    else { this.zoneTextView.performClick(); }
                     break;
 
-                case RETOUR_LOT:
-                    String code = Objects.requireNonNull(data.getExtras()).getString("code");
+                case CodesEchangesActivites.RETOUR_LOT:
+                    final String code = Objects.requireNonNull(data.getExtras()).getString("code");
                     String numLot = data.getExtras().getString("numLot");
                     String datePeremptionScanner = data.getExtras().getString("datePeremption");
-                    if(code != null)
+                    if(null != code)
                     {
-                        if(numLot == null || numLot.contentEquals(""))
+                        if(null == numLot || numLot.contentEquals(""))
                         {
-                            Map<String, String> DecoupeMap = OutilsDecodage.decouperGTIN(code);
-                            if(DecoupeMap.size()>1)
+                            final Map<String, String> DecoupeMap = OutilsDecodage.decouperGTIN(code);
+                            if(1 < DecoupeMap.size())
                             {
                                 Produit produitScanne = null;
-                                List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(db, DecoupeMap.get(OutilsDecodage.codeGtin));
+                                List<Produit> produits = ProduitOpenHelper.getProduitsParGTIN(this.db, DecoupeMap.get(OutilsDecodage.codeGtin));
 
-                                if(produits.size() == 0)
-                                    produits = ProduitOpenHelper.getProduitsParGTIN(db, DecoupeMap.get(OutilsDecodage.codeGtinSansAi));
+                                if(produits.isEmpty()) produits = ProduitOpenHelper.getProduitsParGTIN(this.db, DecoupeMap.get(OutilsDecodage.codeGtinSansAi));
 
-                                if (produits.size() == 1) {
-                                    produitScanne = produits.get(0);
-                                }
+                                if (1 == produits.size()) { produitScanne = produits.get(0); }
 
-                                if(produitScanne == null || produitScanne.getID_produit() != produitSelectionne.getID_produit())
+                                if(null == produitScanne || produitScanne.getID_produit() != this.produitSelectionne.getID_produit())
                                 {
                                     numLot = null;
                                     datePeremptionScanner = null;
-                                    lotEditText.setText("");
-                                    datePeremptionTextView.setText("");
-                                    afficherSnackBar();
+                                    this.lotEditText.setText("");
+                                    this.datePeremptionTextView.setText("");
+                                    this.afficherSnackBar();
                                 }
                                 else
                                 {
                                     numLot = DecoupeMap.get(OutilsDecodage.numeroLot);
                                     datePeremptionScanner = DecoupeMap.get(OutilsDecodage.dateDePeremption);
-                                    if(datePeremptionScanner != null)
+                                    if(null != datePeremptionScanner)
                                     {
-                                        String[] tab_date = datePeremptionScanner.split("-");
-                                        if(tab_date.length == 3)
-                                        {
-                                            datePeremptionScanner = tab_date[2]+"/"+tab_date[1]+"/"+tab_date[0];
-                                        }
+                                        final String[] tab_date = datePeremptionScanner.split("-");
+                                        if(3 == tab_date.length) { datePeremptionScanner = tab_date[2]+"/"+tab_date[1]+"/"+tab_date[0]; }
                                     }
                                 }
                             }
                         }
-                        if(numLot != null)
-                        {
-                            lotEditText.setText(numLot);
-                        }
 
-                        if(datePeremptionScanner != null)
-                        {
-                            datePeremptionTextView.setText(datePeremptionScanner);
-                        }
+                        if(null != numLot) { this.lotEditText.setText(numLot); }
+
+                        if(null != datePeremptionScanner) { this.datePeremptionTextView.setText(datePeremptionScanner); }
                     }
                     break;
             }
-            invalidateOptionsMenu();
+
+            this.invalidateOptionsMenu();
         }
     }
 
-    public void apparitionValider()
+    void apparitionValider()
     {
-        if(!lotEditText.getText().toString().contentEquals("") && !datePeremptionTextView.getText().toString().contentEquals("") && !qteActuelleEditText.getText().toString().contentEquals("0"))
+        if(!this.lotEditText.getText().toString().contentEquals("") && !this.datePeremptionTextView.getText().toString().contentEquals("") && !this.qteActuelleEditText.getText().toString().contentEquals("0"))
         {
-            validationScan.setVisibility(View.VISIBLE);
-            blinkImage();
+            this.validationScan.setVisibility(View.VISIBLE);
+            this.blinkImage();
         }
     }
 
-    private void blinkImage() {
+    private void blinkImage()
+    {
         // set its background to our AnimationDrawable XML resource.
-        imageValidation.setBackgroundResource(R.drawable.animation_blinking);
+        this.imageValidation.setBackgroundResource(R.drawable.animation_blinking);
 
         /*
          * Get the background, which has been compiled to an AnimationDrawable
          * object.
          */
-        AnimationDrawable frameAnimation = (AnimationDrawable) imageValidation
-                .getBackground();
+        final AnimationDrawable frameAnimation = (AnimationDrawable) this.imageValidation.getBackground();
 
         // Start the animation (looped playback by default).
         frameAnimation.start();
     }
 
     // Class static permettant de faire apparaitre le DatePicker du téléphone
-    public static class DatePickerFragmentReception extends DialogFragment
-            implements DatePickerDialog.OnDateSetListener {
+    public static class DatePickerFragmentReception extends DialogFragment implements DatePickerDialog.OnDateSetListener
+    {
+        TextView datePeremption = null;
 
-        TextView datePeremption;
-
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
+        @Override @NonNull public Dialog onCreateDialog(final Bundle savedInstanceState)
+        {
             // Use the current date as the default date in the picker
-
             final Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR)+1;
+            final int year = c.get(Calendar.YEAR)+1;
             c.add(Calendar.MONTH, -1);
             c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
-            int month = c.get(Calendar.MONTH);
-            int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
+            final int month = c.get(Calendar.MONTH);
+            final int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
 
             // Create a new instance of DatePickerDialog and return it
-            return new DatePickerDialog(requireActivity(), this, year, month, day);
+            return new DatePickerDialog(this.requireActivity(), this, year, month, day);
         }
 
-        public void onDateSet(DatePicker view, int year, int month, int day) {
+        public void onDateSet(final DatePicker view, final int year, int month, final int day)
+        {
             month++;
             String mois = "";
-            if (month < 10) {
-                mois += "0";
-            }
+            if (10 > month) { mois += "0"; }
             mois += String.valueOf(month);
-            String date = day + "/" + mois + "/" + year;
+            final String date = day + "/" + mois + "/" + year;
             Date datedate = null;
-            try {
-                @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            try
+            {
+                final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 datedate = dateFormat.parse(date);
 
-            } catch (ParseException e) {
-                Log.e("Parse Exception", Objects.requireNonNull(e.getMessage()));
             }
-            datePeremption.setText(date);
-            setDatePeremptionColor(datedate);
-            ((CreationLotControleDesRetoursActivity) requireActivity()).apparitionValider();
+            catch (final ParseException e) { Log.e("Parse Exception", Objects.requireNonNull(e.getMessage())); }
+            this.datePeremption.setText(date);
+            this.setDatePeremptionColor(datedate);
+            ((CreationLotControleDesRetoursActivity) this.requireActivity()).apparitionValider();
 
         }
 
-        private void setDatePeremptionColor(Date date) {
+        private void setDatePeremptionColor(final Date date)
+        {
+            if (null != date)
+            {
+                final Date dateDuJour = new Date();
+                final long diff = dateDuJour.getTime() - date.getTime();
+                final int delai = (int) (diff / (long) (1000 * 60 * 60 * 24));
 
-            if (date != null) {
+                final int delai30jours = -30;
+                final int delai60jours = -60;
 
-                Date dateDuJour = new Date();
-                long diff = dateDuJour.getTime() - date.getTime();
-                int delai = (int) (diff / (1000 * 60 * 60 * 24));
-
-                int delai30jours = -30;
-                int delai60jours = -60;
-
-                if (delai >= delai30jours) {
-                    datePeremption.setTextColor(requireContext().getResources().getColor(R.color.rouge2, null));
-                } else if (delai >= delai60jours) {
-                    datePeremption.setTextColor(requireContext().getResources().getColor(R.color.orange2, null));
-                } else {
-                    datePeremption.setTextColor(requireContext().getResources().getColor(R.color.vert, null));
-                }
-            } else {
-                datePeremption.setTextColor(Color.BLACK);
+                if (delai >= delai30jours) { this.datePeremption.setTextColor(this.requireContext().getResources().getColor(R.color.rouge2, null)); }
+                else if (delai >= delai60jours) { this.datePeremption.setTextColor(this.requireContext().getResources().getColor(R.color.orange2, null)); }
+                else { this.datePeremption.setTextColor(this.requireContext().getResources().getColor(R.color.vert, null)); }
             }
+            else { this.datePeremption.setTextColor(Color.BLACK); }
         }
 
-        public void setTextView(TextView editText) {
-            datePeremption = editText;
+        public void setTextView(final TextView editText) {
+            this.datePeremption = editText;
         }
     }
 
-    public void afficherSnackBar() {
-        Snackbar snackbar;
-        snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Mauvais produit scanné</b>", 0), Snackbar.LENGTH_LONG);
+    public void afficherSnackBar()
+    {
+        final Snackbar snackbar;
+        snackbar = Snackbar.make(this.getWindow().getDecorView().findViewById(android.R.id.content), Html.fromHtml("<b>Mauvais produit scanné</b>", 0), Snackbar.LENGTH_LONG);
 
-        @SuppressLint("RestrictedApi") Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
-        layout.setBackgroundColor(getResources().getColor(R.color.rouge2, null));
-        TextView textView = (TextView) layout.findViewById(com.google.android.material.R.id.snackbar_text);
-        textView.setTextSize(TypedValue.TYPE_STRING, 8);
+        final Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
+        layout.setBackgroundColor(this.getResources().getColor(R.color.rouge2, null));
+        final TextView textView = layout.findViewById(com.google.android.material.R.id.snackbar_text);
+        textView.setTextSize(TypedValue.TYPE_STRING, 8.0F);
         snackbar.show();
     }
 
-    private void ajoutRetourLigneBDD() {
-
+    private void ajoutRetourLigneBDD()
+    {
         //on regarde si un reliquat existe déjà avec ces informations
-        List<Retour_Ligne> retourLigneListe = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(db, retourSelectionne, produitSelectionne.getID_produit());
-        Retour_Ligne retourLigneTemp  = retourLigneCourant;
+        final List<Retour_Ligne> retourLigneListe = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(this.db, this.retourSelectionne, this.produitSelectionne.getID_produit());
+        Retour_Ligne retourLigneTemp  = this.retourLigneCourant;
 
         boolean existe = false;
-        for(Retour_Ligne retourligne : retourLigneListe)
+        for(final Retour_Ligne retourligne : retourLigneListe)
         {
-            String datePeremption = datePeremptionTextView.getText().toString();
-            String[] datePeremptionTab = datePeremption.split("/");
-            if (datePeremptionTab.length == 3)
+            String datePeremption = this.datePeremptionTextView.getText().toString();
+            final String[] datePeremptionTab = datePeremption.split("/");
+            if (3 == datePeremptionTab.length)
                 datePeremption = datePeremptionTab[2] + "-" + datePeremptionTab[1] + "-" + datePeremptionTab[0];
 
-            if(retourligne.getLot_Retourner().trim().contentEquals(lotEditText.getText().toString().trim()) && retourligne.getPeremptionDate().trim().contentEquals(datePeremption))
+            if(retourligne.getLot_Retourner().trim().contentEquals(this.lotEditText.getText().toString().trim()) && retourligne.getPeremptionDate().trim().contentEquals(datePeremption))
             {
                 retourLigneTemp = retourligne;
                 existe = true;
@@ -710,53 +663,51 @@ public class CreationLotControleDesRetoursActivity extends ServiceActivity {
 
         if(existe)
         {
-            int quantite = Integer.parseInt(qteActuelleEditText.getText().toString());
+            final int quantite = Integer.parseInt(this.qteActuelleEditText.getText().toString());
 
             /**
              * MAJ du stock lot emplacement
              */
-            Stock_Lot_Emplacement_Light stockLotEmplacementLight = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(db, produitSelectionne, depotSelectionne, retourLigneTemp.getLot(), retourLigneTemp.getSerie_Retourner());
-            stockLotEmplacementLight.setQte(stockLotEmplacementLight.getQte()+quantite);
+            final Stock_Lot_Emplacement_Light stockLotEmplacementLight = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(this.db, this.produitSelectionne, this.depotSelectionne, retourLigneTemp.getLot(), retourLigneTemp.getSerie_Retourner());
+            stockLotEmplacementLight.setQte(stockLotEmplacementLight.getQte()+ (double) quantite);
             stockLotEmplacementLight.setQte_Preparer(stockLotEmplacementLight.getQte_Preparer()+quantite);
-            Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockLotEmplacementLight);
+            Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(this.db, stockLotEmplacementLight);
 
             /**
              * MAJ retourLigne
              */
-            retourLigneTemp.setQte_Retourner(retourLigneTemp.getQte_Retourner()+quantite);
-            long rowID = Retour_LigneOpenHelper.mettreAJourUnRetourLigne(db, retourLigneTemp);
+            retourLigneTemp.setQte_Retourner(retourLigneTemp.getQte_Retourner()+ (double) quantite);
+            final long rowID = Retour_LigneOpenHelper.mettreAJourUnRetourLigne(this.db, retourLigneTemp);
         }
         else
         {
-            String numeroLot = lotEditText.getText().toString();
-            String datePeremption = datePeremptionTextView.getText().toString();
-            String[] datePeremptionTab = datePeremption.split("/");
-            if (datePeremptionTab.length == 3)
+            final String numeroLot = this.lotEditText.getText().toString();
+            String datePeremption = this.datePeremptionTextView.getText().toString();
+            final String[] datePeremptionTab = datePeremption.split("/");
+            if (3 == datePeremptionTab.length)
                 datePeremption = datePeremptionTab[2] + "-" + datePeremptionTab[1] + "-" + datePeremptionTab[0];
 
-            String zoneName = zoneTextView.getText().toString();
-            String emplacementName = emplacementTextView.getText().toString();
-            String numero_Serie = numSerieEditText.getText().toString();
-            int quantite = Integer.parseInt(qteActuelleEditText.getText().toString());
+            final String zoneName = this.zoneTextView.getText().toString();
+            final String emplacementName = this.emplacementTextView.getText().toString();
+            final String numero_Serie = this.numSerieEditText.getText().toString();
+            final int quantite = Integer.parseInt(this.qteActuelleEditText.getText().toString());
 
             /**
              * Création du stock correspondant
              */
-            Random randomStock = new Random();
+            final Random randomStock = new Random();
             int stockId = randomStock.nextInt();
-            if (stockId > 0)
-                stockId = stockId * -1;
-            Stock_Lot_Emplacement_Light newStockLot = new Stock_Lot_Emplacement_Light(quantite, numeroLot, datePeremption, emplacementName, depotSelectionne.getDepot_Reference(), zoneName, produitSelectionne.getID_produit(), quantite, numero_Serie);
+            if (0 < stockId) stockId = stockId * -1;
+            final Stock_Lot_Emplacement_Light newStockLot = new Stock_Lot_Emplacement_Light((double) quantite, numeroLot, datePeremption, emplacementName, this.depotSelectionne.getDepot_Reference(), zoneName, this.produitSelectionne.getID_produit(), quantite, numero_Serie);
             newStockLot.set_UID(stockId);
-            Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, newStockLot);
+            Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(this.db, newStockLot);
 
             /**
              * Création du retourLigne
              */
-            Random randomretourLigne = new Random();
+            final Random randomretourLigne = new Random();
             int retourLigneId = randomretourLigne.nextInt();
-            if (retourLigneId > 0)
-                retourLigneId = retourLigneId * -1;
+            if (0 < retourLigneId) retourLigneId = retourLigneId * -1;
 
             retourLigneTemp.set_UID(retourLigneId);
             retourLigneTemp.setLot_Retourner(numeroLot.trim());
@@ -765,12 +716,10 @@ public class CreationLotControleDesRetoursActivity extends ServiceActivity {
 
             retourLigneTemp.setRetourPUI_Zone(zoneName.trim());
             retourLigneTemp.setRetourPUI_Emplacement(emplacementName.trim());
-            retourLigneTemp.setQte_Retourner(quantite);
+            retourLigneTemp.setQte_Retourner((double) quantite);
 
-            long rowID = Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(db, retourLigneTemp);
-            if (rowID != -1) {
-
-            }
+            final long rowID = Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(this.db, retourLigneTemp);
+            if (-1L != rowID) {}
         }
     }
 }
