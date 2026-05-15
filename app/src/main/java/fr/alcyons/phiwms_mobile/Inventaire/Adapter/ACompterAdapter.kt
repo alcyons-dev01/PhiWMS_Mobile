@@ -4,61 +4,67 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import fr.alcyons.phiwms_mobile.Classes.Inventaire_Ligne_Temp
 import fr.alcyons.phiwms_mobile.R
-import okio.utf8Size
 
 class ACompterAdapter(
-    context: Context,
-    private var liste: MutableList<Inventaire_Ligne_Temp>
-) : ArrayAdapter<Inventaire_Ligne_Temp>(context, 0, liste) {
+    private val context: Context,
+    private val liste: MutableList<Inventaire_Ligne_Temp>,
+    private val onItemClick: (Inventaire_Ligne_Temp) -> Unit
+) : RecyclerView.Adapter<ACompterAdapter.ViewHolder>() {
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view = convertView ?: LayoutInflater.from(context)
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val nomProduit: TextView          = itemView.findViewById(R.id.nomProduit)
+        val refProduit: TextView          = itemView.findViewById(R.id.refProduit)
+        val fournisseurProduit: TextView  = itemView.findViewById(R.id.fournisseurProduit)
+        val lotProduit: TextView          = itemView.findViewById(R.id.lotProduit)
+        val peremptionProduit: TextView   = itemView.findViewById(R.id.peremptionProduit)
+        val quantiteProduit: TextView     = itemView.findViewById(R.id.quantiteProduit)
+        val bandeauStockSaisie_LL: LinearLayout = itemView.findViewById(R.id.bandeauStockSaisie_LL)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(context)
             .inflate(R.layout.row_detail_inventaire, parent, false)
+        return ViewHolder(view)
+    }
 
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = liste[position]
 
-        val nomProduit         = view.findViewById<TextView>(R.id.nomProduit)
-        val refProduit         = view.findViewById<TextView>(R.id.refProduit)
-        val fournisseurProduit = view.findViewById<TextView>(R.id.fournisseurProduit)
-        val lotProduit         = view.findViewById<TextView>(R.id.lotProduit)
-        val peremptionProduit  = view.findViewById<TextView>(R.id.peremptionProduit)
-        val quantiteProduit = view.findViewById<TextView>(R.id.quantiteProduit)
-        val bandeauStockSaisie_LL = view.findViewById<LinearLayout>(R.id.bandeauStockSaisie_LL)
+        holder.nomProduit.text         = item.designation
+        holder.refProduit.text         = item.produitReference
+        holder.fournisseurProduit.text = item.fournisseurNom
+        holder.lotProduit.text         = item.lot
 
-        nomProduit.text         = item.designation
-        refProduit.text         = item.produitReference
-        fournisseurProduit.text = item.fournisseurNom
-        lotProduit.text         = item.lot
-        peremptionProduit.text  = item.peremptionDate
-
-        if(item.lot.uppercase().contentEquals("LOT NON TRACE") || item.lot.uppercase().startsWith("PHI"))
-        {
-            peremptionProduit.visibility = View.GONE
-        }
-
+        // Gestion de la date de péremption
         val dateString = item.peremptionDate
+        val lotUpper = item.lot.uppercase()
 
-        if (dateString.isNullOrEmpty() || dateString == "0000-00-00") {
-            peremptionProduit.visibility = View.GONE
+        if (dateString.isNullOrEmpty() || dateString == "0000-00-00"
+            || lotUpper.contentEquals("LOT NON TRACE")
+            || lotUpper.startsWith("PHI")
+        ) {
+            holder.peremptionProduit.visibility = View.GONE
         } else {
-            peremptionProduit.visibility = View.VISIBLE
+            holder.peremptionProduit.visibility = View.VISIBLE
             val parts = dateString.split("-")
-            peremptionProduit.text = "${parts[1]}/${parts[0].substring(2)}"
+            holder.peremptionProduit.text = "${parts[1]}/${parts[0].substring(2)}"
         }
 
-        if(item.stockPhysique.toInt() > -1)
-        {
-            bandeauStockSaisie_LL.visibility = View.VISIBLE
-            quantiteProduit.text = item.stockPhysique.toInt().toString()
+        // Gestion du bandeau stock
+        if (item.stockPhysique.toInt() > -1) {
+            holder.bandeauStockSaisie_LL.visibility = View.VISIBLE
+            holder.quantiteProduit.text = item.stockPhysique.toInt().toString()
+        } else {
+            holder.bandeauStockSaisie_LL.visibility = View.GONE
         }
-        else
-            bandeauStockSaisie_LL.visibility = View.GONE
 
-        return view
+        holder.itemView.setOnClickListener { onItemClick(item) }
     }
+
+    override fun getItemCount(): Int = liste.size
 }
