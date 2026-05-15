@@ -12,6 +12,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -88,6 +89,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     private var aRetournerPUIFragment: ARetournerPUIFragment? = null
     private var retournerPUIFragment: RetournerPUIFragment? = null
     private var detailFragment: DetailFragment? = null
+    private var hauteurListeFragment = 0
 
     // State
     private var isScannerOpen: Boolean = false
@@ -214,6 +216,15 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
     public override fun onResume()
     {
         super.onResume()
+        val frameContenu = findViewById<RelativeLayout>(R.id.frameLayout)
+        frameContenu.post {
+            val widthDp = resources.displayMetrics.run { widthPixels / density }
+            hauteurListeFragment = (frameContenu.height * when {
+                widthDp < 400  -> 0.35   // petit écran  (Zebra MC33, PDA industriels)
+                widthDp < 600  -> 0.65   // écran normal (smartphones classiques)
+                else           -> 0.75   // grand écran  (tablettes, grands smartphones)
+            }).toInt()
+        }
         invalidateOptionsMenu()
         refreshRetourData()
     }
@@ -391,7 +402,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         this.referenceARetournerPUIContainer?.let { container ->
             container.apply {
                 this.layoutParams = (this.layoutParams as LinearLayout.LayoutParams).also {
-                    it.height = LinearLayout.LayoutParams.WRAP_CONTENT
+                    it.height = hauteurListeFragment
                     it.weight = 0f
                 }
                 this.visibility = View.VISIBLE
@@ -401,10 +412,6 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
 
             val frag = ARetournerPUIFragment.newInstance(ArrayList(lignes), this.retourSelectionne ?: return).also { aRetournerPUIFragment = it }
             this.supportFragmentManager.beginTransaction().replace(R.id.referenceARetournerPUIContainer, frag).commitNow()
-
-            // Scroll to the container
-            val scrollView = findViewById<NestedScrollView>(R.id.scrollView)
-            scrollView.post { scrollView.smoothScrollTo(0, container.top) }
         }
 
         this.isARetournerOpen = true
@@ -429,7 +436,7 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
         this.referenceRetournerPUIContainer?.let { container ->
             container.apply {
                 this.layoutParams = (this.layoutParams as LinearLayout.LayoutParams).also {
-                    it.height = LinearLayout.LayoutParams.WRAP_CONTENT
+                    it.height = hauteurListeFragment
                     it.weight = 0f
                 }
                 this.visibility = View.VISIBLE
@@ -439,9 +446,6 @@ class DetailRetourPUIActivity : ServiceActivity(), ARetournerPUIFragment.OnEleme
 
             val frag = RetournerPUIFragment.newInstance(ArrayList(lignes), this.retourSelectionne ?: return).also { this.retournerPUIFragment = it }
             this.supportFragmentManager.beginTransaction().replace(R.id.referenceRetournerPUIContainer, frag).commitNow()
-
-            val scrollView = findViewById<NestedScrollView>(R.id.scrollView)
-            scrollView.post { scrollView.smoothScrollTo(0, container.top) }
         }
 
         this.isRetournerOpen = true

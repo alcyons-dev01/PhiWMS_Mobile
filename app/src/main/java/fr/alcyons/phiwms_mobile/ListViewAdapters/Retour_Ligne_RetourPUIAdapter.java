@@ -6,13 +6,14 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.text.DateFormat;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,186 +26,184 @@ import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.RetourPUI.RetourPUIQuantiteHelper;
 
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
+public class Retour_Ligne_RetourPUIAdapter extends RecyclerView.Adapter<Retour_Ligne_RetourPUIAdapter.ViewHolder> {
 
-public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
+    public interface OnItemClickListener {
+        void onItemClick(Retour_Ligne item);
+    }
 
-    public List<Retour_Ligne> retourLigne;
-    public List<Retour_LigneViewHolder> viewHolderList;
-    Retour retourCourant;
-    Context context;
-    SQLiteDatabase db;
-    public boolean shouldShowQteARetourner = false;
-    public boolean shouldAggregateByProduit = true;
+    private final Context context;
+    private final SQLiteDatabase db;
+    private final List<Retour_Ligne> mRetour_Lignes;
+    private final Retour retourCourant;
+    private final OnItemClickListener onItemClickListener;
+    public boolean shouldShowQteARetourner;
+    public boolean shouldAggregateByProduit;
 
-    public Retour_Ligne_RetourPUIAdapter(Context context, SQLiteDatabase db, List<Retour_Ligne> retourLigne, Retour retourCourant, final boolean shouldShowQteARetourner, final boolean shouldAggregateByProduit) {
-        super(context, 0, retourLigne);
+    public Retour_Ligne_RetourPUIAdapter(Context context, SQLiteDatabase db, List<Retour_Ligne> liste, Retour retourCourant, boolean shouldShowQteARetourner, boolean shouldAggregateByProduit, OnItemClickListener onItemClickListener) {
         this.context = context;
         this.db = db;
-        this.retourLigne = retourLigne;
+        this.mRetour_Lignes = liste;
         this.retourCourant = retourCourant;
-        viewHolderList = new ArrayList<>();
-        for (int i = 0; i < retourLigne.size(); i++) {
-            Retour_LigneViewHolder viewHolder = new Retour_LigneViewHolder();
-            viewHolderList.add(viewHolder);
-        }
         this.shouldShowQteARetourner = shouldShowQteARetourner;
         this.shouldAggregateByProduit = shouldAggregateByProduit;
+        this.onItemClickListener = onItemClickListener;
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public final TextView designationProduit;
+        public final TextView referenceProduit;
+        public final TextView nomFournisseur;
+        public final TextView labelQteBandeau;
+        public final TextView qteRetourner;
+        public final TextView qteARetourner;
+        public final TextView lotRetourne;
+        public final TextView datePeremption;
+        public final TextView numSerieProduit;
+        public final TextView labelSerie;
+        public final TextView textEmplacement;
+        public final TextView textZone;
+        public final RelativeLayout layoutPrincipal;
+        public final ProgressBar progressBar;
+        public final LinearLayout layoutSerie;
+        public final LinearLayout layoutZoneEmplacement;
+        public final LinearLayout layoutQteRetour;
+        public final View bottomDivider;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            designationProduit   = itemView.findViewById(R.id.designationProduit);
+            referenceProduit     = itemView.findViewById(R.id.referenceProduit);
+            nomFournisseur       = itemView.findViewById(R.id.nomFournisseur);
+            labelQteBandeau      = itemView.findViewById(R.id.labelQteBandeau);
+            qteRetourner         = itemView.findViewById(R.id.QteRetourner);
+            qteARetourner        = itemView.findViewById(R.id.QteARetourner);
+            lotRetourne          = itemView.findViewById(R.id.lotRetourne);
+            datePeremption       = itemView.findViewById(R.id.datePeremption);
+            numSerieProduit      = itemView.findViewById(R.id.numSerie);
+            labelSerie           = itemView.findViewById(R.id.labelSerie);
+            textEmplacement      = itemView.findViewById(R.id.textEmplacement);
+            textZone             = itemView.findViewById(R.id.textZone);
+            layoutPrincipal      = itemView.findViewById(R.id.layoutPrincipal);
+            progressBar          = itemView.findViewById(R.id.progressBar);
+            layoutSerie          = itemView.findViewById(R.id.layoutSerie);
+            layoutZoneEmplacement = itemView.findViewById(R.id.layoutZoneEmplacement);
+            layoutQteRetour      = itemView.findViewById(R.id.layoutQteRetour);
+            bottomDivider        = itemView.findViewById(R.id.bottomDivider);
+        }
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context)
+                .inflate(R.layout.row_retour_ligne_retour_pui, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Retour_Ligne item = mRetour_Lignes.get(position);
 
-        final Retour_LigneViewHolder viewHolder = viewHolderList.get(position);
+        holder.designationProduit.setText(item.getProduit_Designation());
+        holder.referenceProduit.setText(item.getProduit_Reference());
+        holder.nomFournisseur.setText(item.getProduit_Fournisseur());
+        holder.lotRetourne.setText(RetourPUIQuantiteHelper.getDisplayedLot(item));
+        holder.numSerieProduit.setText(item.getSerie_Retourner());
 
-        convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_retour_ligne_retour_pui, parent, false);
-
-
-        viewHolder.designationProduit = (TextView) convertView.findViewById(R.id.designationProduit);
-        viewHolder.referenceProduit = (TextView) convertView.findViewById(R.id.referenceProduit);
-        viewHolder.nomFournisseur = (TextView) convertView.findViewById(R.id.nomFournisseur);
-        viewHolder.qteRetourner = (TextView) convertView.findViewById(R.id.QteRetourner);
-        viewHolder.QteARetourner = (TextView) convertView.findViewById(R.id.QteARetourner);
-        viewHolder.labelQteBandeau = (TextView) convertView.findViewById(R.id.labelQteBandeau);
-        viewHolder.lotRetourne = (TextView) convertView.findViewById(R.id.lotRetourne);
-        viewHolder.datePeremption = (TextView) convertView.findViewById(R.id.datePeremption);
-        viewHolder.numSerieProduit = (TextView) convertView.findViewById(R.id.numSerie);
-        viewHolder.labelSerie = (TextView) convertView.findViewById(R.id.labelSerie);
-        viewHolder.textEmplacement = (TextView) convertView.findViewById(R.id.textEmplacement);
-        viewHolder.textZone = (TextView) convertView.findViewById(R.id.textZone);
-        viewHolder.layoutSerie = (LinearLayout) convertView.findViewById(R.id.layoutSerie);
-        viewHolder.layoutZoneEmplacement = (LinearLayout) convertView.findViewById(R.id.layoutZoneEmplacement);
-        viewHolder.layoutQteRetour = (LinearLayout) convertView.findViewById(R.id.layoutQteRetour);
-        viewHolder.layoutPrincipal = (RelativeLayout) convertView.findViewById(R.id.layoutPrincipal);
-        viewHolder.progressBar = (ProgressBar) convertView.findViewById(R.id.progressBar);
-        viewHolder.bottomDivider = (View) convertView.findViewById(R.id.bottomDivider);
-
-        Retour_Ligne retourLigne = (Retour_Ligne) getItem(position);
-
-        viewHolder.designationProduit.setText(retourLigne.getProduit_Designation());
-        viewHolder.referenceProduit.setText(retourLigne.getProduit_Reference());
-        viewHolder.nomFournisseur.setText(retourLigne.getProduit_Fournisseur());
-        viewHolder.lotRetourne.setText(RetourPUIQuantiteHelper.getDisplayedLot(retourLigne));
-        viewHolder.numSerieProduit.setText(retourLigne.getSerie_Retourner());
-        if(retourLigne.getSerie_Retourner().contentEquals(""))
-        {
-            viewHolder.labelSerie.setVisibility(View.GONE);
-            viewHolder.numSerieProduit.setVisibility(View.GONE);
+        // Gestion numéro de série
+        if (item.getSerie_Retourner().contentEquals("")) {
+            holder.labelSerie.setVisibility(View.GONE);
+            holder.numSerieProduit.setVisibility(View.GONE);
         }
-        Date date = null;
+
+        // Gestion de la date de péremption
+        Date dateParsed = null;
         String dateAAfficher = "";
-        DateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
-        try
-        {
-            if (retourLigne.getPeremptionDate().length() >= 10)
-            {
-                date = dateDecodeur.parse(retourLigne.getPeremptionDate().substring(0, 10));
-                DateFormat dateFormat = new SimpleDateFormat("MM/yy");
-                dateAAfficher = dateFormat.format(date);
+        try {
+            String peremption = item.getPeremptionDate();
+            if (peremption != null && peremption.length() >= 10) {
+                SimpleDateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
+                dateParsed = dateDecodeur.parse(peremption.substring(0, 10));
+                if (dateParsed != null) {
+                    dateAAfficher = new SimpleDateFormat("MM/yy").format(dateParsed);
+                }
             }
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        catch (ParseException e) {e.printStackTrace();}
 
-        viewHolder.datePeremption.setText(dateAAfficher);
-        viewHolder.setDatePeremptionColor(date);
+        holder.datePeremption.setText(dateAAfficher);
+        holder.datePeremption.setTextColor(getCouleurPeremption(dateParsed));
+
+        // Gestion quantité et emplacement
         int quantiteRetourner;
-        if(retourLigne.get_UID() > 0)
-        {
+        if (item.get_UID() > 0) {
             List<Retour_Ligne> retourLignesNegatives = Retour_LigneOpenHelper.getAllRetourLignesNegByRetour(db, retourCourant);
-            List<Retour_Ligne> retourLignesBaseCourante = RetourPUIQuantiteHelper.getNegativeLinesForBase(retourLignesNegatives, retourLigne);
+            List<Retour_Ligne> retourLignesBaseCourante = RetourPUIQuantiteHelper.getNegativeLinesForBase(retourLignesNegatives, item);
             List<String> listEmplacement = new ArrayList<>();
             List<String> listZone = new ArrayList<>();
 
-            quantiteRetourner = RetourPUIQuantiteHelper.getAllocatedQuantityForBase(retourLignesNegatives, retourLigne);
+            quantiteRetourner = RetourPUIQuantiteHelper.getAllocatedQuantityForBase(retourLignesNegatives, item);
 
-            for(Retour_Ligne retourLigneTemp : retourLignesBaseCourante)
-            {
-                if(retourLigneTemp.getQte_Retourner() <= 0) {continue;}
-                if(!listEmplacement.contains(retourLigneTemp.getRetourPUI_Emplacement())) {listEmplacement.add(retourLigneTemp.getRetourPUI_Emplacement());}
-                if(!listZone.contains(retourLigneTemp.getRetourPUI_Zone())) {listZone.add(retourLigneTemp.getRetourPUI_Zone());}
+            for (Retour_Ligne retourLigneTemp : retourLignesBaseCourante) {
+                if (retourLigneTemp.getQte_Retourner() <= 0) continue;
+                if (!listEmplacement.contains(retourLigneTemp.getRetourPUI_Emplacement()))
+                    listEmplacement.add(retourLigneTemp.getRetourPUI_Emplacement());
+                if (!listZone.contains(retourLigneTemp.getRetourPUI_Zone()))
+                    listZone.add(retourLigneTemp.getRetourPUI_Zone());
             }
 
-            if(listEmplacement.size() == 1) {viewHolder.textEmplacement.setText(listEmplacement.get(0));}
-            else if(listEmplacement.size() > 1) {viewHolder.textEmplacement.setText(listEmplacement.size() + " Emp.");}
-            else {viewHolder.textEmplacement.setText(retourLigne.getRetourPUI_Emplacement());}
+            if (listEmplacement.size() == 1)       holder.textEmplacement.setText(listEmplacement.get(0));
+            else if (listEmplacement.size() > 1)   holder.textEmplacement.setText(listEmplacement.size() + " Emp.");
+            else                                   holder.textEmplacement.setText(item.getRetourPUI_Emplacement());
 
-            if(listZone.size() == 1) {viewHolder.textZone.setText(listZone.get(0));}
-            else if(listZone.size() > 1) {viewHolder.textZone.setText(listZone.size() + " Zones");}
-            else {viewHolder.textZone.setText(retourLigne.getRetourPUI_Zone());}
-        }
-        else
-        {
-            quantiteRetourner = (int) retourLigne.getQte_Retourner();
-            viewHolder.textEmplacement.setText(retourLigne.getRetourPUI_Emplacement());
-            viewHolder.textZone.setText(retourLigne.getRetourPUI_Zone());
+            if (listZone.size() == 1)              holder.textZone.setText(listZone.get(0));
+            else if (listZone.size() > 1)          holder.textZone.setText(listZone.size() + " Zones");
+            else                                   holder.textZone.setText(item.getRetourPUI_Zone());
+        } else {
+            quantiteRetourner = (int) item.getQte_Retourner();
+            holder.textEmplacement.setText(item.getRetourPUI_Emplacement());
+            holder.textZone.setText(item.getRetourPUI_Zone());
         }
 
-        if(this.shouldShowQteARetourner)
-        {
-            viewHolder.layoutZoneEmplacement.setVisibility(VISIBLE);
-            viewHolder.layoutQteRetour.setVisibility(VISIBLE);
-            viewHolder.layoutQteRetour.setBackgroundColor(context.getResources().getColor(R.color.vert, null));
-            viewHolder.labelQteBandeau.setText("Quantité retournée");
-            viewHolder.qteRetourner.setVisibility(VISIBLE);
-            viewHolder.qteRetourner.setText(String.valueOf(quantiteRetourner));
-            viewHolder.QteARetourner.setVisibility(GONE);
-            viewHolder.bottomDivider.setVisibility(VISIBLE);
-        }
-        else
-        {
-            viewHolder.layoutZoneEmplacement.setVisibility(GONE);
-            viewHolder.layoutQteRetour.setVisibility(VISIBLE);
-            viewHolder.layoutQteRetour.setBackgroundColor(context.getResources().getColor(R.color.rouge2, null));
-            viewHolder.labelQteBandeau.setText("Quantité à retourner");
-            viewHolder.qteRetourner.setVisibility(GONE);
-            viewHolder.QteARetourner.setVisibility(VISIBLE);
-            int quantiteRestante = (int) retourLigne.getQte_avant_retour() - quantiteRetourner;
-            viewHolder.QteARetourner.setText(String.valueOf(Math.max(0, quantiteRestante)));
-            viewHolder.bottomDivider.setVisibility(GONE);
+        // Gestion affichage selon shouldShowQteARetourner
+        if (!shouldShowQteARetourner) {
+            holder.layoutZoneEmplacement.setVisibility(View.VISIBLE);
+            holder.layoutQteRetour.setVisibility(View.VISIBLE);
+            holder.layoutQteRetour.setBackgroundColor(context.getResources().getColor(R.color.vert, null));
+            holder.labelQteBandeau.setText("Quantité retournée");
+            holder.qteRetourner.setVisibility(View.VISIBLE);
+            holder.qteRetourner.setText(String.valueOf(quantiteRetourner));
+            holder.qteARetourner.setVisibility(View.GONE);
+            holder.bottomDivider.setVisibility(View.VISIBLE);
+        } else {
+            holder.layoutZoneEmplacement.setVisibility(View.GONE);
+            holder.layoutQteRetour.setVisibility(View.VISIBLE);
+            holder.layoutQteRetour.setBackgroundColor(context.getResources().getColor(R.color.rouge2, null));
+            holder.labelQteBandeau.setText("Quantité à retourner");
+            holder.qteRetourner.setVisibility(View.GONE);
+            holder.qteARetourner.setVisibility(View.VISIBLE);
+            int quantiteRestante = (int) item.getQte_avant_retour() - quantiteRetourner;
+            holder.qteARetourner.setText(String.valueOf(Math.max(0, quantiteRestante)));
+            holder.bottomDivider.setVisibility(View.GONE);
         }
 
-        return convertView;
+        holder.itemView.setOnClickListener(v -> onItemClickListener.onItemClick(item));
     }
 
-    public class Retour_LigneViewHolder
-    {
-        public TextView designationProduit;
-        public TextView referenceProduit;
-        public TextView nomFournisseur;
-        public TextView labelQteBandeau;
-        public TextView qteRetourner;
-        public TextView QteARetourner;
-        public TextView lotRetourne;
-        public TextView datePeremption;
-        public TextView numSerieProduit;
-        public TextView labelSerie;
-        public TextView textEmplacement;
-        public TextView textZone;
-        public RelativeLayout layoutPrincipal;
-        public ProgressBar progressBar;
-        public LinearLayout layoutSerie;
-        public LinearLayout layoutZoneEmplacement;
-        public LinearLayout layoutQteRetour;
-        public View bottomDivider;
+    @Override
+    public int getItemCount() {
+        return mRetour_Lignes.size();
+    }
 
-        public void setDatePeremptionColor(Date date)
-        {
+    private int getCouleurPeremption(Date date) {
+        if (date == null) return Color.BLACK;
 
-            if (date != null)
-            {
-                Date dateDuJour = new Date();
-                long diff = dateDuJour.getTime() - date.getTime();
-                int delai = (int) (diff / (1000 * 60 * 60 * 24));
+        long diff = (new Date().getTime() - date.getTime()) / (1000 * 60 * 60 * 24);
 
-                int delai30jours = -30;
-                int delai60jours = -60;
-
-                if (delai >= delai30jours) { datePeremption.setTextColor(context.getResources().getColor(R.color.rouge2, null)); }
-                else if (delai >= delai60jours) { datePeremption.setTextColor(context.getResources().getColor(R.color.orange2, null));}
-                else { datePeremption.setTextColor(context.getResources().getColor(R.color.noir, null));}
-            }
-            else { datePeremption.setTextColor(Color.BLACK); }
-        }
+        if (diff >= -30) return context.getResources().getColor(R.color.rouge2, null);
+        if (diff >= -60) return context.getResources().getColor(R.color.orange2, null);
+        return context.getResources().getColor(R.color.noir, null);
     }
 }
