@@ -13,73 +13,66 @@ import fr.alcyons.phiwms_mobile.ListViewAdapters.Retour_Ligne_RetourPUIAdapter
 import fr.alcyons.phiwms_mobile.R
 import fr.alcyons.phiwms_mobile.ServiceActivity
 
-class ARetournerPUIFragment : Fragment()
-{
-    companion object
-    {
+class RetournerPUIFragment : Fragment() {
+    companion object {
         private const val ARG_LISTE = "liste"
         private const val ARG_RETOUR = "retour"
         private const val MAX_LIST_HEIGHT_DP = 400
-        private const val SHOULD_SHOW_QTE_ARETOURNER = false
+        private const val SHOULD_SHOW_QTE_ARETOURNER = true
         private const val SHOULD_AGGREGATE_BY_PRODUIT = false
 
-        @JvmStatic
         fun newInstance(
             liste: ArrayList<Retour_Ligne>,
             retour: Retour
-        ): ARetournerPUIFragment = ARetournerPUIFragment().apply {
-            this.arguments = Bundle().apply {
+        ): RetournerPUIFragment = RetournerPUIFragment().apply {
+            arguments = Bundle().apply {
                 putSerializable(ARG_LISTE, liste)
                 putSerializable(ARG_RETOUR, retour)
             }
         }
     }
 
-    private lateinit var liste_RetourLigne_LV: ListView
+    private lateinit var listeRetourLigneLV: ListView
     private var listener: OnElementSelectionneListener? = null
     private lateinit var adapter: Retour_Ligne_RetourPUIAdapter
 
-    interface OnElementSelectionneListener { fun onElementSelectionne(element: Retour_Ligne) }
+    interface OnElementSelectionneListener {
+        fun onElementSelectionne(element: Retour_Ligne)
+    }
 
-    override fun onAttach(context: Context)
-    {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
-        this.listener = context as? OnElementSelectionneListener
+        listener = context as? OnElementSelectionneListener
     }
 
-    override fun onDetach()
-    {
+    override fun onDetach() {
         super.onDetach()
-        this.listener = null
+        listener = null
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         return inflater.inflate(R.layout.fragment_aretourner, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
-    {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        liste_RetourLigne_LV = view.findViewById(R.id.liste_RetourLigne_LV)
-        liste_RetourLigne_LV.isNestedScrollingEnabled = true
+        listeRetourLigneLV = view.findViewById(R.id.liste_RetourLigne_LV)
+        listeRetourLigneLV.isNestedScrollingEnabled = true
 
         val (liste, retour) = readArguments()
         val db = (requireActivity() as? ServiceActivity)?.db ?: return
         val retourCourant = retour ?: return
 
         bindAdapter(liste, retourCourant, db)
-        liste_RetourLigne_LV.setOnItemClickListener { _, _, position, _ -> listener?.onElementSelectionne(liste[position]) }
+        listeRetourLigneLV.setOnItemClickListener { _, _, position, _ -> listener?.onElementSelectionne(liste[position]) }
     }
 
-    fun scrollToPosition(position: Int)
-    {
-        if (!this::adapter.isInitialized || position < 0 || position >= adapter.count) return
-        liste_RetourLigne_LV.smoothScrollToPosition(position)
-    }
-
-    fun updateList(newListe: ArrayList<Retour_Ligne>, retour: Retour)
-    {
+    fun updateList(newListe: ArrayList<Retour_Ligne>, retour: Retour) {
         arguments = Bundle().apply {
             putSerializable(ARG_LISTE, newListe)
             putSerializable(ARG_RETOUR, retour)
@@ -88,6 +81,12 @@ class ARetournerPUIFragment : Fragment()
 
         val db = (requireActivity() as? ServiceActivity)?.db ?: return
         bindAdapter(newListe, retour, db)
+    }
+
+    fun scrollToPosition(position: Int)
+    {
+        if (!this::adapter.isInitialized || position < 0 || position >= adapter.count) return
+        listeRetourLigneLV.smoothScrollToPosition(position)
     }
 
     private fun readArguments(): Pair<ArrayList<Retour_Ligne>, Retour?>
@@ -101,27 +100,27 @@ class ARetournerPUIFragment : Fragment()
     private fun bindAdapter(liste: ArrayList<Retour_Ligne>, retour: Retour, db: android.database.sqlite.SQLiteDatabase)
     {
         adapter = Retour_Ligne_RetourPUIAdapter(requireContext(), db, liste, retour, SHOULD_SHOW_QTE_ARETOURNER, SHOULD_AGGREGATE_BY_PRODUIT)
-        liste_RetourLigne_LV.adapter = adapter
+        listeRetourLigneLV.adapter = adapter
         updateListHeight()
     }
 
     private fun updateListHeight()
     {
-        liste_RetourLigne_LV.post {
+        listeRetourLigneLV.post {
             if (!this::adapter.isInitialized || adapter.count == 0) return@post
 
             val maxHeightPx = (MAX_LIST_HEIGHT_DP * resources.displayMetrics.density).toInt()
-            val firstItem = adapter.getView(0, null, liste_RetourLigne_LV)
+            val firstItem = adapter.getView(0, null, listeRetourLigneLV)
             firstItem.measure(
-                View.MeasureSpec.makeMeasureSpec(liste_RetourLigne_LV.width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(listeRetourLigneLV.width, View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
             )
 
             var totalHeight = firstItem.measuredHeight * adapter.count
-            totalHeight += liste_RetourLigne_LV.dividerHeight * (adapter.count - 1)
-            totalHeight += liste_RetourLigne_LV.paddingTop + liste_RetourLigne_LV.paddingBottom
-            liste_RetourLigne_LV.layoutParams.height = totalHeight.coerceAtMost(maxHeightPx)
-            liste_RetourLigne_LV.requestLayout()
+            totalHeight += listeRetourLigneLV.dividerHeight * (adapter.count - 1)
+            totalHeight += listeRetourLigneLV.paddingTop + listeRetourLigneLV.paddingBottom
+            listeRetourLigneLV.layoutParams.height = totalHeight.coerceAtMost(maxHeightPx)
+            listeRetourLigneLV.requestLayout()
         }
     }
 }

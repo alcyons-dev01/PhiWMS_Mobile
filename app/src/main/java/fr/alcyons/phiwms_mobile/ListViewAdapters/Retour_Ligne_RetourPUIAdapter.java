@@ -23,8 +23,10 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.R;
+import fr.alcyons.phiwms_mobile.RetourPUI.RetourPUIQuantiteHelper;
 
 import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
 
@@ -33,8 +35,10 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
     Retour retourCourant;
     Context context;
     SQLiteDatabase db;
+    public boolean shouldShowQteARetourner = false;
+    public boolean shouldAggregateByProduit = true;
 
-    public Retour_Ligne_RetourPUIAdapter(Context context, SQLiteDatabase db, List<Retour_Ligne> retourLigne, Retour retourCourant) {
+    public Retour_Ligne_RetourPUIAdapter(Context context, SQLiteDatabase db, List<Retour_Ligne> retourLigne, Retour retourCourant, final boolean shouldShowQteARetourner, final boolean shouldAggregateByProduit) {
         super(context, 0, retourLigne);
         this.context = context;
         this.db = db;
@@ -45,6 +49,8 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
             Retour_LigneViewHolder viewHolder = new Retour_LigneViewHolder();
             viewHolderList.add(viewHolder);
         }
+        this.shouldShowQteARetourner = shouldShowQteARetourner;
+        this.shouldAggregateByProduit = shouldAggregateByProduit;
     }
 
     @Override
@@ -60,22 +66,26 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
         viewHolder.nomFournisseur = (TextView) convertView.findViewById(R.id.nomFournisseur);
         viewHolder.qteRetourner = (TextView) convertView.findViewById(R.id.QteRetourner);
         viewHolder.QteARetourner = (TextView) convertView.findViewById(R.id.QteARetourner);
+        viewHolder.labelQteBandeau = (TextView) convertView.findViewById(R.id.labelQteBandeau);
         viewHolder.lotRetourne = (TextView) convertView.findViewById(R.id.lotRetourne);
         viewHolder.datePeremption = (TextView) convertView.findViewById(R.id.datePeremption);
         viewHolder.numSerieProduit = (TextView) convertView.findViewById(R.id.numSerie);
         viewHolder.labelSerie = (TextView) convertView.findViewById(R.id.labelSerie);
         viewHolder.textEmplacement = (TextView) convertView.findViewById(R.id.textEmplacement);
+        viewHolder.textZone = (TextView) convertView.findViewById(R.id.textZone);
         viewHolder.layoutSerie = (LinearLayout) convertView.findViewById(R.id.layoutSerie);
-        viewHolder.layoutQteARetourner = (LinearLayout) convertView.findViewById(R.id.layoutQteARetourner);
+        viewHolder.layoutZoneEmplacement = (LinearLayout) convertView.findViewById(R.id.layoutZoneEmplacement);
+        viewHolder.layoutQteRetour = (LinearLayout) convertView.findViewById(R.id.layoutQteRetour);
         viewHolder.layoutPrincipal = (RelativeLayout) convertView.findViewById(R.id.layoutPrincipal);
         viewHolder.progressBar = (ProgressBar) convertView.findViewById(R.id.progressBar);
+        viewHolder.bottomDivider = (View) convertView.findViewById(R.id.bottomDivider);
 
         Retour_Ligne retourLigne = (Retour_Ligne) getItem(position);
 
         viewHolder.designationProduit.setText(retourLigne.getProduit_Designation());
         viewHolder.referenceProduit.setText(retourLigne.getProduit_Reference());
         viewHolder.nomFournisseur.setText(retourLigne.getProduit_Fournisseur());
-        viewHolder.lotRetourne.setText(retourLigne.getLot_Retourner());
+        viewHolder.lotRetourne.setText(RetourPUIQuantiteHelper.getDisplayedLot(retourLigne));
         viewHolder.numSerieProduit.setText(retourLigne.getSerie_Retourner());
         if(retourLigne.getSerie_Retourner().contentEquals(""))
         {
@@ -85,58 +95,84 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
         Date date = null;
         String dateAAfficher = "";
         DateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            if (retourLigne.getPeremptionDate().length() >= 10) {
+        try
+        {
+            if (retourLigne.getPeremptionDate().length() >= 10)
+            {
                 date = dateDecodeur.parse(retourLigne.getPeremptionDate().substring(0, 10));
-                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                DateFormat dateFormat = new SimpleDateFormat("MM/yy");
                 dateAAfficher = dateFormat.format(date);
             }
-        } catch (ParseException e) {
-            e.printStackTrace();
         }
+        catch (ParseException e) {e.printStackTrace();}
 
         viewHolder.datePeremption.setText(dateAAfficher);
         viewHolder.setDatePeremptionColor(date);
-
-
-        int quantiteRetourner = 0;
-
-        List<Retour_Ligne> retourLigneProduitCourant = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(db, retourCourant, retourLigne.getCode_produit());
-        List<String> listEmplacement = new ArrayList<>();
-
-        for(Retour_Ligne retour_ligne_temp : retourLigneProduitCourant)
+        int quantiteRetourner;
+        if(retourLigne.get_UID() > 0)
         {
-            if(!listEmplacement.contains(retour_ligne_temp.getRetourPUI_Emplacement()) && retour_ligne_temp.getQte_Retourner() > 0)
+            List<Retour_Ligne> retourLignesNegatives = Retour_LigneOpenHelper.getAllRetourLignesNegByRetour(db, retourCourant);
+            List<Retour_Ligne> retourLignesBaseCourante = RetourPUIQuantiteHelper.getNegativeLinesForBase(retourLignesNegatives, retourLigne);
+            List<String> listEmplacement = new ArrayList<>();
+            List<String> listZone = new ArrayList<>();
+
+            quantiteRetourner = RetourPUIQuantiteHelper.getAllocatedQuantityForBase(retourLignesNegatives, retourLigne);
+
+            for(Retour_Ligne retourLigneTemp : retourLignesBaseCourante)
             {
-                listEmplacement.add(retour_ligne_temp.getRetourPUI_Emplacement());
+                if(retourLigneTemp.getQte_Retourner() <= 0) {continue;}
+                if(!listEmplacement.contains(retourLigneTemp.getRetourPUI_Emplacement())) {listEmplacement.add(retourLigneTemp.getRetourPUI_Emplacement());}
+                if(!listZone.contains(retourLigneTemp.getRetourPUI_Zone())) {listZone.add(retourLigneTemp.getRetourPUI_Zone());}
             }
 
-            quantiteRetourner = (int) (quantiteRetourner + retour_ligne_temp.getQte_Retourner());
-        }
+            if(listEmplacement.size() == 1) {viewHolder.textEmplacement.setText(listEmplacement.get(0));}
+            else if(listEmplacement.size() > 1) {viewHolder.textEmplacement.setText(listEmplacement.size() + " Emp.");}
+            else {viewHolder.textEmplacement.setText(retourLigne.getRetourPUI_Emplacement());}
 
-        if(listEmplacement.size() == 1)
-        {
-            viewHolder.textEmplacement.setText(listEmplacement.get(0));
+            if(listZone.size() == 1) {viewHolder.textZone.setText(listZone.get(0));}
+            else if(listZone.size() > 1) {viewHolder.textZone.setText(listZone.size() + " Zones");}
+            else {viewHolder.textZone.setText(retourLigne.getRetourPUI_Zone());}
         }
         else
         {
-            String nb_emplacement = listEmplacement.size()+" Emp.";
-            viewHolder.textEmplacement.setText(nb_emplacement);
+            quantiteRetourner = (int) retourLigne.getQte_Retourner();
+            viewHolder.textEmplacement.setText(retourLigne.getRetourPUI_Emplacement());
+            viewHolder.textZone.setText(retourLigne.getRetourPUI_Zone());
         }
 
-        viewHolder.qteRetourner.setText(String.valueOf(quantiteRetourner));
-        viewHolder.QteARetourner.setText(String.valueOf((int)retourLigne.getQte_avant_retour()));
-
-        if(quantiteRetourner == retourLigne.getQte_avant_retour())
-            viewHolder.layoutQteARetourner.setVisibility(GONE);
+        if(this.shouldShowQteARetourner)
+        {
+            viewHolder.layoutZoneEmplacement.setVisibility(VISIBLE);
+            viewHolder.layoutQteRetour.setVisibility(VISIBLE);
+            viewHolder.layoutQteRetour.setBackgroundColor(context.getResources().getColor(R.color.vert, null));
+            viewHolder.labelQteBandeau.setText("Quantité retournée");
+            viewHolder.qteRetourner.setVisibility(VISIBLE);
+            viewHolder.qteRetourner.setText(String.valueOf(quantiteRetourner));
+            viewHolder.QteARetourner.setVisibility(GONE);
+            viewHolder.bottomDivider.setVisibility(VISIBLE);
+        }
+        else
+        {
+            viewHolder.layoutZoneEmplacement.setVisibility(GONE);
+            viewHolder.layoutQteRetour.setVisibility(VISIBLE);
+            viewHolder.layoutQteRetour.setBackgroundColor(context.getResources().getColor(R.color.rouge2, null));
+            viewHolder.labelQteBandeau.setText("Quantité à retourner");
+            viewHolder.qteRetourner.setVisibility(GONE);
+            viewHolder.QteARetourner.setVisibility(VISIBLE);
+            int quantiteRestante = (int) retourLigne.getQte_avant_retour() - quantiteRetourner;
+            viewHolder.QteARetourner.setText(String.valueOf(Math.max(0, quantiteRestante)));
+            viewHolder.bottomDivider.setVisibility(GONE);
+        }
 
         return convertView;
     }
 
-    public class Retour_LigneViewHolder {
+    public class Retour_LigneViewHolder
+    {
         public TextView designationProduit;
         public TextView referenceProduit;
         public TextView nomFournisseur;
+        public TextView labelQteBandeau;
         public TextView qteRetourner;
         public TextView QteARetourner;
         public TextView lotRetourne;
@@ -144,15 +180,19 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
         public TextView numSerieProduit;
         public TextView labelSerie;
         public TextView textEmplacement;
+        public TextView textZone;
         public RelativeLayout layoutPrincipal;
         public ProgressBar progressBar;
         public LinearLayout layoutSerie;
-        public LinearLayout layoutQteARetourner;
+        public LinearLayout layoutZoneEmplacement;
+        public LinearLayout layoutQteRetour;
+        public View bottomDivider;
 
-        public void setDatePeremptionColor(Date date) {
+        public void setDatePeremptionColor(Date date)
+        {
 
-            if (date != null) {
-
+            if (date != null)
+            {
                 Date dateDuJour = new Date();
                 long diff = dateDuJour.getTime() - date.getTime();
                 int delai = (int) (diff / (1000 * 60 * 60 * 24));
@@ -160,17 +200,11 @@ public class Retour_Ligne_RetourPUIAdapter extends ArrayAdapter {
                 int delai30jours = -30;
                 int delai60jours = -60;
 
-                if (delai >= delai30jours) {
-                    datePeremption.setTextColor(context.getResources().getColor(R.color.rouge2, null));
-                } else if (delai >= delai60jours) {
-                    datePeremption.setTextColor(context.getResources().getColor(R.color.orange2, null));
-                } else {
-                    datePeremption.setTextColor(context.getResources().getColor(R.color.vert, null));
-                }
-            } else {
-                datePeremption.setTextColor(Color.BLACK);
+                if (delai >= delai30jours) { datePeremption.setTextColor(context.getResources().getColor(R.color.rouge2, null)); }
+                else if (delai >= delai60jours) { datePeremption.setTextColor(context.getResources().getColor(R.color.orange2, null));}
+                else { datePeremption.setTextColor(context.getResources().getColor(R.color.noir, null));}
             }
-
+            else { datePeremption.setTextColor(Color.BLACK); }
         }
     }
 }
