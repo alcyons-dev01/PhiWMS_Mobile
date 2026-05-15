@@ -452,7 +452,7 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity()
         if (Build.MANUFACTURER.contains("Zebra Technologies") || Build.MANUFACTURER.lowercase(Locale.getDefault()).contains("honeywell")) { controleDesRetour_Intent = Intent(this@DetailControleDesRetoursActivity, ScannerRetourActivity::class.java) }
         else
         {
-            if ((this.pm ?: return).hasSystemFeature(PackageManager.FEATURE_CAMERA))
+            if ((this.pm ?: return).hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
             {
                 //controleDesRetour_Intent = new Intent(DetailControleDesRetours2025Activity.this, BarcodePreparationActivity.class);
             }
