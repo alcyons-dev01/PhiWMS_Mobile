@@ -207,8 +207,7 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity()
                         {
                             val retourLigneAdapte = Retour_Ligne_ControleRetour_Adapte(retourLigne._UID)
                             val produit = ProduitOpenHelper.getProduitByID(this.db, retourLigne.code_produit)
-                            val depot = DepotOpenHelper.getDepotParReference(this.db, (this.retourSelectionne ?: return@Listener).ref_Depot_Origine
-                            )
+                            val depot = DepotOpenHelper.getDepotParReference(this.db, (this.retourSelectionne ?: return@Listener).ref_Depot_Origine)
                             if (null != produit && null != depot)
                             {
                                 for (stockLotEmplacement in Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(this.db, produit, depot))
@@ -261,8 +260,7 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity()
             {
                 val retourLigneAdapte = Retour_Ligne_ControleRetour_Adapte(retourLigne._UID)
                 val produit = ProduitOpenHelper.getProduitByID(this.db, retourLigne.code_produit)
-                val depot = DepotOpenHelper.getDepotParReference(this.db, (this.retourSelectionne ?: return).ref_Depot_Origine
-                )
+                val depot = DepotOpenHelper.getDepotParReference(this.db, (this.retourSelectionne ?: return).ref_Depot_Origine)
                 if (null != produit && null != depot)
                 {
                     for (stockLotEmplacement in Stock_Lot_EmplacementLightOpenHelper.getAllStockLotEmplacementByProduitEtDepot(this.db, produit, depot))
