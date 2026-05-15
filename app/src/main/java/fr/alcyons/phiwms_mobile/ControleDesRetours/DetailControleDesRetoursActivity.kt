@@ -87,8 +87,7 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity()
 
         // Récupération des variables globales
         this.retourSelectionne = RetourOpenHelper.getRetourByID(this.db, (this.intent.extras ?: return).getInt("retourSelectionneID"))
-        this.depot = DepotOpenHelper.getDepotParReference(this.db, (this.retourSelectionne ?: return).ref_Depot_Origine
-        )
+        this.depot = DepotOpenHelper.getDepotParReference(this.db, (this.retourSelectionne ?: return).ref_Depot_Origine)
 
         this.listelot = ArrayList<String?>()
         this.serialisation = Serialisation(this@DetailControleDesRetoursActivity, this.db, this.utilisateurConnecte)
@@ -132,19 +131,20 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity()
         (this.optionTri ?: return).onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             var isFirstSelection: Boolean = true // drapeau pour ignorer le premier appel
 
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                if (this.isFirstSelection) {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
+            {
+                if (this.isFirstSelection)
+                {
                     this.isFirstSelection = false // on consomme le premier appel
                     return  // ne rien faire au lancement
                 }
 
-                if (null != parent.getChildAt(0)) {
-                    parent.getChildAt(0).visibility = View.INVISIBLE
-                }
+                if (null != parent.getChildAt(0)) { parent.getChildAt(0).visibility = View.INVISIBLE }
                 this@DetailControleDesRetoursActivity.tri_choisi = (this@DetailControleDesRetoursActivity.optionTri ?: return).getItemAtPosition(position).toString()
                 ParametreUtilisateurOpenHelper.mettreAJourTriPreparation(this@DetailControleDesRetoursActivity.db, 0, this@DetailControleDesRetoursActivity.tri_choisi)
 
-                when (this@DetailControleDesRetoursActivity.tri_choisi) {
+                when (this@DetailControleDesRetoursActivity.tri_choisi)
+                {
                     "Designation" -> this@DetailControleDesRetoursActivity.onClickTriDesignation()
                     "Place" -> this@DetailControleDesRetoursActivity.onClickTriParPlace()
                     "Catégorie" -> this@DetailControleDesRetoursActivity.onClickTriCategorie()
