@@ -46,6 +46,7 @@ import java.util.Objects;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerDocumentActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoIdentificationDocument;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametreUtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper;
@@ -450,7 +451,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
 
         final MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_action, menu);
-        menu.findItem(R.id.menuDatamatrix).setVisible(true);
+        menu.findItem(R.id.menuDatamatrix).setVisible(false);
 
         return true;
     }
@@ -476,7 +477,7 @@ public class ServiceDestructionActivity extends ServiceAvecConnexionActivity
             return new Intent(ServiceDestructionActivity.this, ScannerDocumentActivity.class);
         }
 
-        return new Intent(ServiceDestructionActivity.this, BarcodeCaptureActivity.class);
+        return new Intent(ServiceDestructionActivity.this, ScannerPhotoIdentificationDocument.class);
     }
 
     private boolean shouldUseDedicatedDocumentScanner()

@@ -370,7 +370,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         //Récupération du menu
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_action, menu);
-        menu.findItem(R.id.menuDatamatrix).setVisible(true);
+        menu.findItem(R.id.menuDatamatrix).setVisible(false);
         return true;
     }
 
