@@ -45,6 +45,7 @@ import java.util.Map;
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerDocumentActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoIdentificationDocument;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
@@ -332,7 +333,7 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
         {
             if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
             {
-                scanDocumentIntent = new Intent(ServiceVerrouPharmacieActivity.this, BarcodeCaptureActivity.class);
+                scanDocumentIntent = new Intent(ServiceVerrouPharmacieActivity.this, ScannerPhotoIdentificationDocument.class);
             }
             else
             {
@@ -425,9 +426,9 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
         switch (requestCode) {
             case CodesEchangesActivites.RETOUR_DOCUMENT: {
                 if (data != null) {
-                    String code = data.getExtras().getString("code");
+                    String code = data.getStringExtra("numeroDocument");
                     if (code != null) {
-                        PH_Preparation phPreparationSelectionne = PH_PreparationOpenHelper.getPH_PreparationByNumeroCommande(db, code);
+                        PH_Preparation phPreparationSelectionne = PH_PreparationOpenHelper.getPH_PreparationByID(db, Integer.parseInt(code));
                         if(phPreparationSelectionne == null)
                         {
                             if(!code.contentEquals(""))
@@ -441,7 +442,6 @@ public class ServiceVerrouPharmacieActivity extends ServiceAvecConnexionActivity
                                 phPreparationList.add(verrou_alcyons);
                             }
                             /* Code nécessaire à l'affichage de la liste */
-                            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(phPreparationList.size()));
                             Collections.sort(phPreparationList, new Comparator<PH_Preparation>() {
                                 @Override
                                 public int compare(PH_Preparation o1, PH_Preparation o2) {
