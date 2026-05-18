@@ -41,6 +41,8 @@ import java.util.Map;
 import java.util.Objects;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.Scanner;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerIdentificationProduit;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerProduitActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
@@ -191,8 +193,7 @@ public class ListeReferenceActivity extends ServiceAvecConnexionActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CodesEchangesActivites.RETOUR_CODE_GS1) {
             String code = data.getStringExtra("code");
-            assert code != null;
-            if (!code.contentEquals("")) {
+            if (code != null && !code.contentEquals("")) {
                 if(code.toUpperCase().startsWith("PHITAGREF:"))
                 {
                     String[] codeDecoupe = code.split(":");
@@ -313,7 +314,7 @@ public class ListeReferenceActivity extends ServiceAvecConnexionActivity {
         {
             if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
             {
-                rechercheProduitIntent = new Intent(ListeReferenceActivity.this, BarcodeCaptureActivity.class);
+                rechercheProduitIntent = new Intent(ListeReferenceActivity.this, ScannerIdentificationProduit.class);
             }
             else
             {
