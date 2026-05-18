@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.text.Normalizer;
@@ -49,6 +50,7 @@ public class MedicamentAdapter extends ArrayAdapter implements Filterable {
             viewHolder = new MedicamentViewHolder();
             viewHolder.nom = (TextView) convertView.findViewById(R.id.nomMedicament);
             viewHolder.alerte = (TextView) convertView.findViewById(R.id.alerte);
+            viewHolder.alerte_LL = (LinearLayout) convertView.findViewById(R.id.alerte_LL);
             viewHolder.type = (TextView) convertView.findViewById(R.id.type);
             convertView.setTag(viewHolder);
         }
@@ -69,10 +71,10 @@ public class MedicamentAdapter extends ArrayAdapter implements Filterable {
                 alerte += "ARRET-DISTRIBUTION";
             }
             if (alerte.contentEquals("")) {
-                viewHolder.alerte.setVisibility(View.GONE);
+                viewHolder.alerte_LL.setVisibility(View.GONE);
             } else {
                 viewHolder.alerte.setText(alerte);
-                viewHolder.alerte.setVisibility(View.VISIBLE);
+                viewHolder.alerte_LL.setVisibility(View.VISIBLE);
             }
         }
 
@@ -92,6 +94,7 @@ public class MedicamentAdapter extends ArrayAdapter implements Filterable {
         public TextView nom;
         public TextView type;
         public TextView alerte;
+        public LinearLayout alerte_LL;
     }
 
     private class MedicamentFilter extends Filter {

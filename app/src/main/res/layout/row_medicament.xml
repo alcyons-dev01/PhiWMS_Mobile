@@ -1,56 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white"
-    android:orientation="vertical">
+    android:padding="6dp">
 
-    <RelativeLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="2dp"
-        android:background="@drawable/background_element_liste"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp">
+        app:cardCornerRadius="12dp"
+        app:cardElevation="3dp"
+        app:cardBackgroundColor="#F0F4FF">
 
-        <RelativeLayout
-            android:id="@+id/titreMedicament"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp">
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/nomMedicament"
-                android:layout_width="wrap_content"
+            <!-- Corps : nom + catégorie -->
+            <LinearLayout
+                android:id="@+id/titreMedicament"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="MedicamentName"
-                android:textColor="#000000"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="10dp">
 
-            <TextView
-                android:id="@+id/type"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/nomMedicament"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:layout_marginBottom="6dp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/bleu_clair_alcyons_transparent"
+                    android:layout_marginBottom="6dp"/>
+
+                <TextView
+                    android:id="@+id/type"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textSize="12sp"
+                    android:alpha="0.7"/>
+
+            </LinearLayout>
+
+            <!-- Bandeau alerte — collé en bas, visible ou gone -->
+            <LinearLayout
+                android:id="@+id/alerte_LL"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/nomMedicament"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentLeft="true"
-                android:text="Catégorie"
-                android:textColor="#000000" />
-        </RelativeLayout>
+                android:background="#C62828"
+                android:orientation="horizontal"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="8dp"
+                android:gravity="center_vertical"
+                android:visibility="gone">
 
-        <TextView
-            android:id="@+id/alerte"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/titreMedicament"
-            android:background="#F40101"
-            android:gravity="center_horizontal"
-            android:text="ALERTE"
-            android:textColor="#FAF6F6"
-            android:textSize="15sp"
-            android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/alerte"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="ALERTE"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:gravity="center" />
 
-    </RelativeLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
 </LinearLayout>
