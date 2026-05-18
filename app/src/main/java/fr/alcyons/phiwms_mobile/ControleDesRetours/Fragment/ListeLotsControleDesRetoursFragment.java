@@ -70,7 +70,8 @@ public class ListeLotsControleDesRetoursFragment extends Fragment implements Lot
     private List<String> listelot = new ArrayList<>();
     private SQLiteDatabase db;
 
-    public static ListeLotsControleDesRetoursFragment newInstance(int retourLigneId, int produitId) {
+    public static ListeLotsControleDesRetoursFragment newInstance(int retourLigneId, int produitId)
+    {
         ListeLotsControleDesRetoursFragment fragment = new ListeLotsControleDesRetoursFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_RETOUR_LIGNE_ID, retourLigneId);
@@ -79,21 +80,25 @@ public class ListeLotsControleDesRetoursFragment extends Fragment implements Lot
         return fragment;
     }
 
-    @Override public void onAttach(@NonNull Context context) {
+    @Override public void onAttach(@NonNull Context context)
+    {
         super.onAttach(context);
         listener = context instanceof OnLotsControleValidesListener ? (OnLotsControleValidesListener) context : null;
     }
 
-    @Override public void onDetach() {
+    @Override public void onDetach()
+    {
         super.onDetach();
         listener = null;
     }
 
-    @Nullable @Override public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    @Nullable @Override public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
+    {
         return inflater.inflate(R.layout.activity_liste_lots_controle_des_retours_2025, container, false);
     }
 
-    @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
+    {
         super.onViewCreated(view, savedInstanceState);
         db = ((ServiceActivity) requireActivity()).db;
         Bundle args = requireArguments();
@@ -108,12 +113,14 @@ public class ListeLotsControleDesRetoursFragment extends Fragment implements Lot
         bindLots();
     }
 
-    @Override public void onResume() {
+    @Override public void onResume()
+    {
         super.onResume();
         bindLots();
     }
 
-    private void bindLots() {
+    private void bindLots()
+    {
         View view = getView();
         if (view == null || produit == null || depot == null) { return; }
 
@@ -125,7 +132,8 @@ public class ListeLotsControleDesRetoursFragment extends Fragment implements Lot
         quantiteRestant = qteDeclaree;
         quantiteRetournee = 0;
         List<Retour_Ligne> retourLigneRetourner = Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(db, retourCourant, retourLigne.getCode_produit());
-        for (Retour_Ligne temp : retourLigneRetourner) {
+        for (Retour_Ligne temp : retourLigneRetourner)
+        {
             quantiteRetournee += (int) temp.getQte_Retourner();
             quantiteRestant -= (int) temp.getQte_Retourner();
         }
@@ -152,7 +160,8 @@ public class ListeLotsControleDesRetoursFragment extends Fragment implements Lot
         majVisuel();
     }
 
-    private void ouvrirCreationLotManuelle() {
+    private void ouvrirCreationLotManuelle()
+    {
         Bundle bundle = ((ServiceActivity) requireActivity()).getBundle();
         bundle.putInt("produitID", produit.getID_produit());
         bundle.putInt("depotID", depot.getDepot_UID());
@@ -163,7 +172,8 @@ public class ListeLotsControleDesRetoursFragment extends Fragment implements Lot
         startActivityForResult(intent, RETOUR_LOT);
     }
 
-    private void lancerScan() {
+    private void lancerScan()
+    {
         List<Retour_Ligne> listeScannerRetourLigne = new ArrayList<>();
         listeScannerRetourLigne.add(retourLigne);
         Bundle bundle = ((ServiceActivity) requireActivity()).getBundle();
@@ -179,14 +189,17 @@ public class ListeLotsControleDesRetoursFragment extends Fragment implements Lot
         startActivityForResult(intent, RETOUR_CODE_GS1);
     }
 
-    @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    @Override public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
         super.onActivityResult(requestCode, resultCode, data);
         if (data != null && (requestCode == RETOUR_CODE_GS1 || requestCode == RETOUR_LOT)) { bindLots(); }
     }
 
-    @Override public void ClickNumberPicker(final int position) {
+    @Override public void ClickNumberPicker(final int position)
+    {
         Stock_Lot_Emplacement_Light stockCourant = adapter.getLotAt(position);
-        if (stockCourant.getQte_Preparer() > 0) {
+        if (stockCourant.getQte_Preparer() > 0)
+        {
             int qteAvant = stockCourant.getQte_Preparer();
             stockCourant.setQte_Preparer(0);
             Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stockCourant);
@@ -216,9 +229,11 @@ public class ListeLotsControleDesRetoursFragment extends Fragment implements Lot
         Alerte.afficherAlerteNumberPicker(requireContext(), stockCourant.getLot(), "Quantité placée : ", value, maxValue, onClickListener);
     }
 
-    @Override public void ClickLigneLot(int position) {
+    @Override public void ClickLigneLot(int position)
+    {
         Stock_Lot_Emplacement_Light courant = listeStockLotEmplacement.get(position);
-        if (courant.getLot().contentEquals("")) {
+        if (courant.getLot().contentEquals(""))
+        {
             Alerte.afficherAlerteInformation(requireContext(), getLayoutInflater(), "Erreur", "Vous ne pouvez pas préparer un lot vide.", false, false);
             return;
         }
@@ -233,7 +248,8 @@ public class ListeLotsControleDesRetoursFragment extends Fragment implements Lot
         bindLots();
     }
 
-    private void supprimerLotPosition(int position) {
+    private void supprimerLotPosition(int position)
+    {
         RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
         if (!(viewHolder instanceof LotControleDesRetoursAdapter.LotViewHolder)) { return; }
         Stock_Lot_Emplacement_Light stockCourant = listeStockLotEmplacement.get(position);
@@ -247,7 +263,8 @@ public class ListeLotsControleDesRetoursFragment extends Fragment implements Lot
         bindLots();
     }
 
-    private void majVisuel() {
+    private void majVisuel()
+    {
         View view = getView();
         if (view == null) { return; }
         if (quantiteRestant == 0) {
@@ -257,7 +274,8 @@ public class ListeLotsControleDesRetoursFragment extends Fragment implements Lot
             view.findViewById(R.id.QteRetourner).setVisibility(View.INVISIBLE);
             view.findViewById(R.id.btnAjoutManuel).setVisibility(View.INVISIBLE);
         }
-        else {
+        else
+        {
             ((LinearLayout) view.findViewById(R.id.firstRow)).setBackground(requireContext().getResources().getDrawable(R.drawable.background_cadre_orange));
             view.findViewById(R.id.lancerScan).setVisibility(View.VISIBLE);
             view.findViewById(R.id.QteRetourner).setVisibility(View.VISIBLE);
@@ -266,7 +284,8 @@ public class ListeLotsControleDesRetoursFragment extends Fragment implements Lot
         }
     }
 
-    private void majValues(boolean ajout, int quantiteAModifier) {
+    private void majValues(boolean ajout, int quantiteAModifier)
+    {
         quantiteRetournee = ajout ? quantiteRetournee + quantiteAModifier : quantiteRetournee - quantiteAModifier;
         quantiteRestant = qteDeclaree - quantiteRetournee;
     }
@@ -275,7 +294,8 @@ public class ListeLotsControleDesRetoursFragment extends Fragment implements Lot
         if (listener != null) { listener.onLotsControleValides(); }
     }
 
-    private void enregistrementRetourLigne(Retour_Ligne retourLigneBase, Stock_Lot_Emplacement_Light stockCourant) {
+    private void enregistrementRetourLigne(Retour_Ligne retourLigneBase, Stock_Lot_Emplacement_Light stockCourant)
+    {
         Retour_Ligne retourLigneCourant = new Retour_Ligne(retourLigneBase);
         int retourLigneId = new Random().nextInt();
         if (retourLigneId > 0) { retourLigneId *= -1; }
@@ -287,7 +307,8 @@ public class ListeLotsControleDesRetoursFragment extends Fragment implements Lot
         Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(db, retourLigneCourant);
     }
 
-    private void supprimerUnRetourLigne(Retour_Ligne retourLigneBase, Stock_Lot_Emplacement_Light stockCourant) {
+    private void supprimerUnRetourLigne(Retour_Ligne retourLigneBase, Stock_Lot_Emplacement_Light stockCourant)
+    {
         Retour_Ligne retourLigneASupprimer = Retour_LigneOpenHelper.getRetourLigneNegByProduitLot(db, retourLigneBase.getRetour_UID(), retourLigneBase.getCode_produit(), stockCourant.getLot(), stockCourant.getSerie());
         if (retourLigneASupprimer != null) { Retour_LigneOpenHelper.supprimerUnRetourLigne(db, retourLigneASupprimer); }
     }
