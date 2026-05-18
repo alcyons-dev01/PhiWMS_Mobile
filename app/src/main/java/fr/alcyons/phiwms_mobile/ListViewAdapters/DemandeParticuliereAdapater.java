@@ -151,7 +151,7 @@ public class DemandeParticuliereAdapater extends RecyclerView.Adapter<DemandePar
         TextView reference;
         TextView qteConditionnement;
         public EditText qte_demander;
-        ImageView separateur;
+        View separateur;
         LinearLayout linearLigneProduit;
         TextView qte_a_preparer;
 
