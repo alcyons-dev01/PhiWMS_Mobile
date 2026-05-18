@@ -1,86 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:orientation="vertical"
+    android:background="#FFFFFF">
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:padding="10dp">
+    <!-- ═══════════════════════════════
+         CARTE EN-TÊTE PRODUIT
+    ═══════════════════════════════ -->
+    <androidx.cardview.widget.CardView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/barreDeTitreLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="#F0F4FF">
 
         <LinearLayout
-            android:id="@+id/barreDeTitreLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/background_cadre_bleu"
-            android:padding="3dp"
             android:orientation="vertical">
 
+            <!-- Header dépôt -->
             <LinearLayout
                 android:id="@+id/barreDeTitre"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/background_empty_radius_top"
-                android:backgroundTint="@color/bleu_fonce_alcyons"
-                android:gravity="center"
-                android:paddingTop="3dp"
-                android:paddingLeft="3dp"
-                android:paddingRight="3dp"
-                android:orientation="horizontal">
+                android:background="@color/bleu_fonce_alcyons"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="10dp">
 
-                <LinearLayout
+                <ImageView
+                    android:id="@+id/icone_geloc"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/ic_location_white"
+                    android:contentDescription="@string/geolocalisation" />
+
+                <TextView
+                    android:id="@+id/nomDepot"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="5dp">
-
-                    <ImageView
-                        android:id="@+id/icone_geloc"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginRight="5dp"
-                        android:background="@drawable/ic_location_white"
-                        android:contentDescription="@string/geolocalisation" />
-
-                    <TextView
-                        android:id="@+id/nomDepot"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
+            <!-- Séparateur accent -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/bleu_clair_alcyons" />
+
+            <!-- Corps : désignation + ref + fournisseur -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:orientation="vertical"
-                android:background="@drawable/background_empty_radius"
-                android:padding="10dp">
+                android:padding="12dp">
 
                 <TextView
                     android:id="@+id/nomProduit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Designation"
+                    android:text=""
                     android:textColor="@color/bleu_fonce_alcyons"
                     android:textSize="17sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:maxLines="3"
+                    android:ellipsize="end"
+                    android:layout_marginBottom="8dp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/bleu_clair_alcyons_transparent"
+                    android:layout_marginBottom="8dp"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="10dp"
                     android:weightSum="2">
 
                     <TextView
@@ -89,83 +98,93 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text=""
-                        android:textColor="@color/bleu_fonce_alcyons"/>
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="12sp"
+                        android:alpha="0.7"/>
 
                     <TextView
                         android:id="@+id/nomFournisseur"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:gravity="end"
                         android:maxLines="1"
                         android:ellipsize="end"
-                        android:gravity="right"
                         android:text=""
-                        android:textColor="@color/bleu_fonce_alcyons" />
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="12sp"
+                        android:alpha="0.7"/>
 
                 </LinearLayout>
 
             </LinearLayout>
 
+            <!-- Séparateur accent -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/bleu_clair_alcyons" />
+
+            <!-- Bandeau stock théorique — collé en bas de la carte -->
+            <LinearLayout
+                android:id="@+id/zoneInfos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="#F0F4FF"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp"
+                android:weightSum="2">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/stockTheorique"
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/qteActuelle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textStyle="bold"
+                    android:gravity="end"
+                    android:layout_gravity="center_vertical"
+                    android:textSize="20sp"/>
+
+            </LinearLayout>
+
         </LinearLayout>
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipeRefreshLayout"
+    </androidx.cardview.widget.CardView>
+
+    <!-- ═══════════════════════════════
+         LISTE
+    ═══════════════════════════════ -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="4dp">
+
+        <ListView
+            android:id="@+id/listeView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/barreDeTitreLayout"
-            android:layout_above="@+id/zoneInfos"
-            android:orientation="vertical"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/background_empty_radius_bottom">
+            android:descendantFocusability="afterDescendants"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:clipToPadding="false"/>
 
-            <ListView
-                android:id="@+id/listeView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:descendantFocusability="afterDescendants"
-                android:divider="@android:color/transparent"
-                android:dividerHeight="15dp">
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-            </ListView>
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-        <LinearLayout
-            android:id="@+id/zoneInfos"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:gravity="start"
-            android:orientation="horizontal"
-            android:background="@drawable/background_cadre_bleu"
-            android:padding="10dp"
-            android:weightSum="2">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:gravity="start"
-                android:textSize="20dp"
-                android:text="@string/stockTheorique"
-                android:textColor="@color/bleu_fonce_alcyons"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/qteActuelle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="200"
-                android:textColor="@color/bleu_fonce_alcyons"
-                android:textStyle="bold"
-                android:gravity="right"
-                android:layout_gravity="right|center_vertical"
-                android:textSize="20dp"/>
-        </LinearLayout>
-
-    </RelativeLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
-<!--         -->
+</LinearLayout>

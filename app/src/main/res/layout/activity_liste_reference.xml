@@ -1,81 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:orientation="vertical"
+    android:background="#FFFFFF">
 
+    <!-- ═══════════════════════════════
+         BARRE DE TITRE
+    ═══════════════════════════════ -->
     <LinearLayout
         android:id="@+id/barreDeTitre"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/bleu_fonce_alcyons"
         android:orientation="horizontal"
-        android:weightSum="1">
+        android:gravity="center_vertical">
 
-        <LinearLayout
-            android:id="@+id/triListe"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:background="@color/bleu_clair_alcyons">
-
-            <Spinner
-                android:id="@+id/optionTri"
-                android:background="@drawable/ic_sort_white"
-                android:entries="@array/option_tri_reference"
-                android:layout_height="30dp"
-                android:layout_width="30dp"
-                android:padding="10dp"/>
-
-        </LinearLayout>
-
+        <!-- Titre -->
         <TextView
-            android:id="@+id/titre"
+            android:id="@+id/nomDepot"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_margin="5dp"
+            android:layout_marginStart="12dp"
             android:text="Références"
-            android:layout_gravity="center_vertical"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/nbElementInAdapter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:layout_gravity="right|center_vertical"
-            android:gravity="right"
-            android:text=""
-            android:textColor="@color/bleu_clair_alcyons"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
     </LinearLayout>
 
+    <!-- Séparateur accent -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/bleu_clair_alcyons" />
+
+    <!-- ═══════════════════════════════
+         LISTE
+    ═══════════════════════════════ -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/barreDeTitre"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <ListView
             android:id="@+id/listeView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:descendantFocusability="afterDescendants"
-            android:dividerHeight="15dp"
-            android:divider="@android:color/transparent">
-
-        </ListView>
+            android:dividerHeight="12dp"
+            android:divider="@android:color/transparent"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:clipToPadding="false"/>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-</RelativeLayout>
-
+</LinearLayout>
