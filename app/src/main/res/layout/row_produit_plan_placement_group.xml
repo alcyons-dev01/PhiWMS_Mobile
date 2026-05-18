@@ -1,59 +1,103 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="6dp"
-    android:paddingBottom="6dp"
-    android:paddingStart="4dp"
-    android:paddingEnd="4dp">
+    android:padding="6dp">
 
-    <LinearLayout
-        android:id="@+id/linearPrincipal"
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/nomProduit"
-            style="@style/titre_style"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:padding="5dp"/>
-
-        <TextView
-            android:id="@+id/refProduit"
-            style="@style/section_style"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:padding="5dp"/>
+        app:cardCornerRadius="12dp"
+        app:cardElevation="3dp"
+        app:cardBackgroundColor="#F0F4FF">
 
         <LinearLayout
-            android:id="@+id/layoutIdEmplacement"
+            android:id="@+id/linearPrincipal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="5"
-            android:padding="5dp">
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/nbEmplacements_TV"
-                android:layout_width="0dp"
+            <!-- Header : nom produit -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="5"
-                style="@style/text1lignegras_style"
-                android:textColor="@color/bleu_clair_alcyons"
-                android:gravity="center_vertical"/>
+                android:background="@color/bleu_fonce_alcyons"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="10dp">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center"
-                android:background="@drawable/ic_expand_more"
-                android:backgroundTint="@color/bleu_clair_alcyons"/>
+                <TextView
+                    android:id="@+id/nomProduit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:maxLines="2"
+                    android:ellipsize="end" />
+
+            </LinearLayout>
+
+            <!-- Séparateur accent -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/bleu_clair_alcyons" />
+
+            <!-- Référence -->
+            <TextView
+                android:id="@+id/refProduit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/bleu_fonce_alcyons"
+                android:textSize="11sp"
+                android:alpha="0.7"
+                android:paddingHorizontal="12dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="6dp" />
+
+            <!-- Séparateur fin -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/bleu_clair_alcyons_transparent"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginBottom="4dp" />
+
+            <!-- Nb emplacements + chevron -->
+            <LinearLayout
+                android:id="@+id/layoutIdEmplacement"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="10dp">
+
+                <TextView
+                    android:id="@+id/nbEmplacements_TV"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:gravity="center_vertical" />
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/ic_expand_more"
+                    android:backgroundTint="@color/bleu_clair_alcyons"
+                    android:contentDescription="@null" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
-</FrameLayout>
+</LinearLayout>
