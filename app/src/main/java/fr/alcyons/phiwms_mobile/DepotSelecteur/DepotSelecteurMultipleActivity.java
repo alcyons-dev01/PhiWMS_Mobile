@@ -148,8 +148,8 @@ public class DepotSelecteurMultipleActivity extends ServiceActivity {
             return false;
         });
 
-        boutonGeolocalisation = findViewById(R.id.boutonGeolocalisation);
-        boutonGeolocalisation.setOnClickListener(view -> {
+        //boutonGeolocalisation = findViewById(R.id.boutonGeolocalisation);
+        /*boutonGeolocalisation.setOnClickListener(view -> {
 
             double latitude = 0;
             double longitude = 0;
@@ -226,7 +226,7 @@ public class DepotSelecteurMultipleActivity extends ServiceActivity {
                 depotExpandableListAdapter = new DepotExpandableListAdapter(DepotSelecteurMultipleActivity.this, depotParentList, depotParentListItems, utilisateurConnecte);
                 depotExpandablelistView.setAdapter(depotExpandableListAdapter);
             }
-        });
+        });*/
         invalidateOptionsMenu();
 
         if(nbDepotType == 1)
