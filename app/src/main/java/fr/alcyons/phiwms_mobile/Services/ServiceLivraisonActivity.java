@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -71,7 +72,8 @@ public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
     PackageManager pm;
     boolean connexionDirecte;
     List<String> listeDepotLivraison;
-    ArrayAdapter<String> spinnerArrayAdapter;
+    ArrayAdapter<String> autoCompleteAdapter;
+    AutoCompleteTextView autoComplete;
     Spinner spinner;
 
     @SuppressLint("SetTextI18n")
@@ -83,7 +85,7 @@ public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
 
         pm = ServiceLivraisonActivity.this.getPackageManager();
         listeDepotLivraison = new ArrayList<>();
-        listeDepotLivraison.add("Tous");
+        listeDepotLivraison.add("Tous les dépôts");
         //Gestion de la listView
         ph_preparation_ListView = findViewById(R.id.listeView);
         ph_preparation_ListView.setOnItemClickListener((parent, view, position, id) -> {
@@ -154,39 +156,10 @@ public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
             if(connexionDirecte)
                 connexionDirecte = false;
 
+            // Tri par Date : de la plus récente à la plus ancienne
+            initialiserAutoComplete();
+            gestionAdapter();
         }
-
-        // Tri par Date : de la plus récente à la plus ancienne
-        ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
-
-        listePointDeLivraisonAdapter = new ListePointDeLivraisonAdapter(ServiceLivraisonActivity.this, db, utilisateurConnecte);
-
-       for (PH_Preparation ph_courant : ph_preparation_List) {
-            if (!listeDate.contains(ph_courant.getLivraisonPrevueDate())) {
-                listeDate.add(ph_courant.getLivraisonPrevueDate());
-                listePointDeLivraisonAdapter.addSectionHeaderItem(ph_courant);
-                listePointLivraison.add(ph_courant.getDepotDestinataireReference());
-                listePointDeLivraisonAdapter.addItem(ph_courant);
-            }
-
-            if(!listePointLivraison.contains(ph_courant.getDepotDestinataireReference()))
-            {
-                listePointLivraison.add(ph_courant.getDepotDestinataireReference());
-                listePointDeLivraisonAdapter.addItem(ph_courant);
-            }
-        }
-
-
-        ph_preparation_ListView.setDivider(footer);
-        ph_preparation_ListView.setAdapter(listePointDeLivraisonAdapter);
-
-
-        int taille_liste = ph_preparation_List.size();
-        String titre = "Livraisons";
-        if(taille_liste < 2)
-            titre = "Livraison";
-
-        /* Code nécessaire à l'affichage de la liste */
 
         if (ph_preparation_List.isEmpty()) {
             vide = true;
@@ -195,78 +168,6 @@ public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
         }
         else
         {
-            //initi du tri
-            spinner = (Spinner) findViewById(R.id.optionTri);
-
-            spinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listeDepotLivraison);
-            spinner.setAdapter(spinnerArrayAdapter);
-
-            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if(parent.getChildAt(0) != null)
-                    {
-                        parent.getChildAt(0).setVisibility(View.INVISIBLE);
-                    }
-                    String depot = spinner.getItemAtPosition(position).toString();
-
-                    ph_preparation_List = new ArrayList<>();
-                    listeDate = new ArrayList<>();
-                    listePointLivraison = new ArrayList<>();
-
-                    if(depot.contentEquals("Tous"))
-                    {
-                        ph_preparation_List.addAll(ph_preparation_List_base);
-                    }
-                    else
-                    {
-                        for(PH_Preparation preparation_courant : ph_preparation_List_base)
-                        {
-                            Depot depotCourant = DepotOpenHelper.getDepotParReference(db, preparation_courant.getDepotDestinataireReference());
-                            if(depotCourant.getNom().contentEquals(depot))
-                            {
-                                ph_preparation_List.add(preparation_courant);
-                            }
-                        }
-                    }
-
-                    ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
-
-                    listePointDeLivraisonAdapter = new ListePointDeLivraisonAdapter(ServiceLivraisonActivity.this, db, utilisateurConnecte);
-
-                    for (PH_Preparation ph_courant : ph_preparation_List) {
-                        if (!listeDate.contains(ph_courant.getLivraisonPrevueDate())) {
-                            listeDate.add(ph_courant.getLivraisonPrevueDate());
-                            listePointDeLivraisonAdapter.addSectionHeaderItem(ph_courant);
-                            listePointLivraison.add(ph_courant.getDepotDestinataireReference());
-                            listePointDeLivraisonAdapter.addItem(ph_courant);
-                        }
-
-                        if(!listePointLivraison.contains(ph_courant.getDepotDestinataireReference()))
-                        {
-                            listePointLivraison.add(ph_courant.getDepotDestinataireReference());
-                            listePointDeLivraisonAdapter.addItem(ph_courant);
-                        }
-                    }
-
-                    ph_preparation_ListView.setDivider(footer);
-                    ph_preparation_ListView.setAdapter(listePointDeLivraisonAdapter);
-
-                    int taille_liste = ph_preparation_List.size();
-                    String titre = "Livraisons";
-                    if(taille_liste < 2)
-                        titre = "Livraison";
-
-                    /* Code nécessaire à l'affichage de la liste */
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> arg0) {
-                    // TODO Auto-generated method stub
-                }
-            });
-
-
             invalidateOptionsMenu();
         }
     }
@@ -334,7 +235,7 @@ public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
                             }
 
                             //récupération des PH_Lot_Ligne
-                            JSONArray ph_lot_ligneJSONArray = response.getJSONArray("PH_Lot_Ligne");
+                            /*JSONArray ph_lot_ligneJSONArray = response.getJSONArray("PH_Lot_Ligne");
                             for(int j = 0; j < ph_lot_ligneJSONArray.length(); j++)
                             {
                                 JSONArray lot_ligne_array = ph_lot_ligneJSONArray.getJSONArray(j);
@@ -349,7 +250,12 @@ public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
                                         PH_Lot_LigneOpenHelper.insererUnPH_Lot_LigneBDD(db, lot_ligne_courant);
                                     }
                                 }
-                            }
+                            }*/
+                            // Tri par Date : de la plus récente à la plus ancienne
+                            initialiserAutoComplete();
+                            gestionAdapter();
+
+                            arreterSpinner();
                         }
                     } catch (JSONException e) {
                         Log.e(TAG, "Error JSON :", e);
@@ -378,7 +284,7 @@ public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
             List<PH_Preparation_Ligne> ph_preparation_lignes = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, ph_preparation);
             for (PH_Preparation_Ligne ph_preparation_ligne : ph_preparation_lignes) {
                 //suppression des ph_lot_ligne en bdd
-                PH_Lot_LigneOpenHelper.supprimerPH_LotLigne(db, ph_preparation_ligne.get_UID());
+                //PH_Lot_LigneOpenHelper.supprimerPH_LotLigne(db, ph_preparation_ligne.get_UID());
                 PH_Preparation_LigneOpenHelper.supprimerUnPhPreparationLigne(db, ph_preparation_ligne);
             }
             PH_PreparationOpenHelper.supprimerUnPhPreparation(db, ph_preparation);
@@ -435,5 +341,79 @@ public class ServiceLivraisonActivity extends ServiceAvecConnexionActivity {
 
         scanDocumentIntent.putExtras(scanDocumentBundle);
         ServiceLivraisonActivity.this.startActivityForResult(scanDocumentIntent, CodesEchangesActivites.RETOUR_DOCUMENT);
+    }
+
+    private void initialiserAutoComplete() {
+        autoComplete = findViewById(R.id.listeFiltre);
+
+        autoCompleteAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_depot, listeDepotLivraison);
+        autoComplete.setAdapter(autoCompleteAdapter);
+        autoComplete.setThreshold(100); // Empêche le filtrage automatique
+
+        // Affiche le premier élément par défaut
+        if (!listeDepotLivraison.isEmpty()) {
+            autoComplete.setText(listeDepotLivraison.get(0), false);
+        }
+
+        // Hauteur = 1/3 de l'écran
+        int hauteurEcran = getResources().getDisplayMetrics().heightPixels;
+        autoComplete.setDropDownHeight(hauteurEcran / 3);
+        int dpToPx = (int) (12 * getResources().getDisplayMetrics().density);
+        autoComplete.post(() -> autoComplete.setDropDownWidth(findViewById(R.id.listeFiltre_LL).getWidth() - dpToPx));
+        autoComplete.setDropDownBackgroundResource(android.R.color.white);
+
+        // Ouvre la liste au clic
+        autoComplete.setOnClickListener(v -> autoComplete.showDropDown());
+
+        // Chevron ouvre aussi la liste
+        findViewById(R.id.chevronFiltre).setOnClickListener(v -> autoComplete.showDropDown());
+
+        // Gère la sélection
+        autoComplete.setOnItemClickListener((parent, view, position, id) -> {
+            String depot = listeDepotLivraison.get(position);
+            autoComplete.setText(depot, false);
+            autoComplete.dismissDropDown();
+
+            ph_preparation_List = new ArrayList<>();
+
+            if (depot.contentEquals("Tous les dépôts")) {
+                ph_preparation_List.addAll(ph_preparation_List_base);
+            } else {
+                for (PH_Preparation preparation_courant : ph_preparation_List_base) {
+                    Depot depotCourant = DepotOpenHelper.getDepotParReference(db, preparation_courant.getDepotDestinataireReference());
+                    if (depotCourant != null && depotCourant.getNom().contentEquals(depot)) {
+                        ph_preparation_List.add(preparation_courant);
+                    }
+                }
+            }
+
+            gestionAdapter();
+        });
+    }
+
+    private void gestionAdapter()
+    {
+        ph_preparation_List.sort(Comparator.comparing(PH_Preparation::getLivraisonPrevueDate));
+
+        listePointDeLivraisonAdapter = new ListePointDeLivraisonAdapter(ServiceLivraisonActivity.this, db, utilisateurConnecte);
+        listeDate = new ArrayList<>();
+        listePointLivraison = new ArrayList<>();
+        for (PH_Preparation ph_courant : ph_preparation_List) {
+            if (!listeDate.contains(ph_courant.getLivraisonPrevueDate())) {
+                listeDate.add(ph_courant.getLivraisonPrevueDate());
+                listePointDeLivraisonAdapter.addSectionHeaderItem(ph_courant);
+                listePointLivraison.add(ph_courant.getDepotDestinataireReference());
+                listePointDeLivraisonAdapter.addItem(ph_courant);
+            }
+
+            if(!listePointLivraison.contains(ph_courant.getDepotDestinataireReference()))
+            {
+                listePointLivraison.add(ph_courant.getDepotDestinataireReference());
+                listePointDeLivraisonAdapter.addItem(ph_courant);
+            }
+        }
+
+        ph_preparation_ListView.setDivider(null);
+        ph_preparation_ListView.setAdapter(listePointDeLivraisonAdapter);
     }
 }
