@@ -174,7 +174,7 @@ abstract class Scanner : ServiceActivity() {
 
                 val texte = result.text ?: return
 
-                if(texte.uppercase().startsWith("PHITAG") || texte.uppercase().startsWith("PHI"))
+                if(texte.uppercase().startsWith("PHITAG") || texte.uppercase().startsWith("PHI") || texte.uppercase().startsWith("DDS"))
                     onCodeScanned(normalize(texte))
                 else
                 {

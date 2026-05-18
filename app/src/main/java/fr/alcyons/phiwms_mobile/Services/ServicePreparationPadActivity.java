@@ -44,6 +44,7 @@ import java.util.Objects;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerDocumentActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoIdentificationDocument;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_PreparationOpenHelper;
@@ -347,7 +348,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
             scanDocumentBundle.putString("Context", "Preparation");
         } else {
             if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
-                scanDocumentIntent = new Intent(ServicePreparationPadActivity.this, BarcodeCaptureActivity.class);
+                scanDocumentIntent = new Intent(ServicePreparationPadActivity.this, ScannerPhotoIdentificationDocument.class);
                 scanDocumentBundle.putBoolean("modeRafale", false);
             } else {
                 scanDocumentIntent = new Intent(ServicePreparationPadActivity.this, ScannerDocumentActivity.class);
@@ -365,7 +366,7 @@ public class ServicePreparationPadActivity extends ServiceAvecConnexionActivity 
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CodesEchangesActivites.RETOUR_DOCUMENT) {
             if (data != null) {
-                String code = Objects.requireNonNull(data.getExtras()).getString("code");
+                String code = data.getStringExtra("numeroDocument");
                 if (code != null) {
                     int idPreparation = 0;
                     try {
