@@ -1,160 +1,240 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="fr.alcyons.phiwms_mobile.ParametresServeur.ServiceParametresServeurActivity">
+    android:orientation="vertical"
+    android:background="#F0F4FF">
 
+    <!-- ═══════════════════════════════
+         BARRE DE TITRE
+    ═══════════════════════════════ -->
     <LinearLayout
         android:id="@+id/parametreServeur"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_below="@+id/parametreUtilisateur">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:background="@color/bleu_fonce_alcyons"
-        android:gravity="center"
-        android:padding="5dp"
-        android:weightSum="1">
+        android:gravity="center_vertical"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="14dp">
 
         <ImageView
             android:id="@+id/flecheRetour"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="10dp"
             android:background="@drawable/ic_arrow_back"
-            android:backgroundTint="@color/blanc"/>
+            android:backgroundTint="#FFFFFF"
+            android:contentDescription="@null" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Préférence Réseaux"
-            android:textColor="@android:color/white"
-            android:fontFamily="sans-serif"
-            android:textSize="20sp"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:gravity="center" />
-
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/texteIntro"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@id/formulaireConnexion"
-            android:layout_margin="10dp"
-            android:gravity="center_vertical"
-            android:text="@string/parametreServeurIntroduction" />
-
-        <LinearLayout
-            android:id="@+id/formulaireConnexion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerInParent="true"
-            android:layout_centerVertical="true"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
-
-            <EditText
-                android:id="@+id/ipServeur"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@android:color/black"
-                android:fontFamily="sans-serif"
-                android:hint="@string/parametreIpServeur"
-                android:nextFocusDown="@+id/numeroPort"
-                android:maxLines="1"
-                android:textColor="@android:color/black"
-                android:textColorHint="@android:color/black"
-                android:textCursorDrawable="@null"/>
-
-            <EditText
-                android:id="@+id/numeroPort"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@android:color/black"
-                android:fontFamily="sans-serif"
-                android:hint="@string/parametreNumeroPort"
-                android:inputType="number"
-                android:textColor="@android:color/black"
-                android:textColorHint="@android:color/black"
-                android:textCursorDrawable="@null"/>
-
-            <EditText
-                android:id="@+id/versionAPI"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@android:color/black"
-                android:fontFamily="sans-serif"
-                android:hint="@string/parametreNumeroVersionApi"
-                android:inputType="number"
-                android:textColor="@android:color/black"
-                android:textColorHint="@android:color/black"
-                android:textCursorDrawable="@null"/>
-
-            <Button
-                android:id="@+id/boutonAlcyonsParametre"
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:layout_gravity="center"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
-                android:layout_weight="5"
-                android:background="@color/bleu_fonce_alcyons"
-                android:text="Parametre alcyons"
-                android:textColor="@android:color/white"
-                android:visibility="gone"/>
-
-                <Spinner
-                    android:id="@+id/alcyons_choix_client"
-                    android:layout_height="64dp"
-                    android:layout_width="match_parent"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="20dp"
-                    android:background="@drawable/background_cadre_bleu"
-                    android:entries="@array/liste_client_alcyons"
-                    android:visibility="gone"/>
-
-                <Button
-                    android:id="@+id/boutonTestConnexion"
-                    android:layout_width="match_parent"
-                    android:layout_height="35dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="20dp"
-                    android:background="@color/vert"
-                    android:text="@string/tester"
-                    android:textColor="@android:color/white"/>
-
-                <Button
-                    android:id="@+id/boutonValider"
-                    android:layout_width="match_parent"
-                    android:layout_height="35dp"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="20dp"
-                    android:background="@color/bleu_clair_alcyons"
-                    android:text="@string/valider"
-                    android:textColor="@android:color/white"
-                    android:onClick="Connexion"/>
-
-        </LinearLayout>
-
 
     </LinearLayout>
 
+    <!-- Séparateur accent -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/bleu_clair_alcyons" />
 
-</RelativeLayout>
+    <!-- ═══════════════════════════════
+         CONTENU
+    ═══════════════════════════════ -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <!-- Texte intro -->
+            <TextView
+                android:id="@+id/texteIntro"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/parametreServeurIntroduction"
+                android:textColor="@color/bleu_fonce_alcyons"
+                android:textSize="13sp"
+                android:alpha="0.8"
+                android:layout_marginBottom="16dp"
+                android:gravity="center" />
+
+            <!-- ═══════════════════════════════
+                 CARTE FORMULAIRE
+            ═══════════════════════════════ -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="3dp"
+                app:cardBackgroundColor="#FFFFFF">
+
+                <LinearLayout
+                    android:id="@+id/formulaireConnexion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- IP Serveur -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Adresse IP"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="11sp"
+                        android:alpha="0.7"
+                        android:layout_marginBottom="4dp" />
+
+                    <EditText
+                        android:id="@+id/ipServeur"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/parametreIpServeur"
+                        android:nextFocusDown="@+id/numeroPort"
+                        android:maxLines="1"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textColorHint="#90A4AE"
+                        android:textSize="15sp"
+                        android:background="@null"
+                        android:paddingVertical="8dp"
+                        android:layout_marginBottom="4dp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/bleu_clair_alcyons_transparent"
+                        android:layout_marginBottom="14dp" />
+
+                    <!-- Numéro de port -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Numéro de port"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="11sp"
+                        android:alpha="0.7"
+                        android:layout_marginBottom="4dp" />
+
+                    <EditText
+                        android:id="@+id/numeroPort"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/parametreNumeroPort"
+                        android:inputType="number"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textColorHint="#90A4AE"
+                        android:textSize="15sp"
+                        android:background="@null"
+                        android:paddingVertical="8dp"
+                        android:layout_marginBottom="4dp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/bleu_clair_alcyons_transparent"
+                        android:layout_marginBottom="14dp" />
+
+                    <!-- Version API -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Version API"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="11sp"
+                        android:alpha="0.7"
+                        android:layout_marginBottom="4dp" />
+
+                    <EditText
+                        android:id="@+id/versionAPI"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/parametreNumeroVersionApi"
+                        android:inputType="number"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textColorHint="#90A4AE"
+                        android:textSize="15sp"
+                        android:background="@null"
+                        android:paddingVertical="8dp"
+                        android:layout_marginBottom="4dp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/bleu_clair_alcyons_transparent"
+                        android:layout_marginBottom="14dp" />
+
+                    <!-- Bouton paramètre Alcyons (gone) -->
+                    <Button
+                        android:id="@+id/boutonAlcyonsParametre"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:background="@color/bleu_fonce_alcyons"
+                        android:text="Parametre alcyons"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp"
+                        android:visibility="gone" />
+
+                    <!-- Spinner choix client (gone) -->
+                    <Spinner
+                        android:id="@+id/alcyons_choix_client"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:background="@drawable/background_cadre_bleu"
+                        android:entries="@array/liste_client_alcyons"
+                        android:layout_marginBottom="8dp"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- ═══════════════════════════════
+                 BOUTONS ACTION
+            ═══════════════════════════════ -->
+
+            <!-- Tester la connexion -->
+            <Button
+                android:id="@+id/boutonTestConnexion"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="14dp"
+                android:background="@color/vert"
+                android:text="@string/tester"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="15sp" />
+
+            <!-- Valider -->
+            <Button
+                android:id="@+id/boutonValider"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/bleu_fonce_alcyons"
+                android:text="@string/valider"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:onClick="Connexion" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>
