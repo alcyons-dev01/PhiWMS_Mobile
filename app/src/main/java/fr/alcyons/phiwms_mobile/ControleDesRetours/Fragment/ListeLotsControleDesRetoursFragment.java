@@ -290,9 +290,7 @@ public class ListeLotsControleDesRetoursFragment extends Fragment implements Lot
         quantiteRestant = qteDeclaree - quantiteRetournee;
     }
 
-    public void onMenuSaveClick() {
-        if (listener != null) { listener.onLotsControleValides(); }
-    }
+    public void onMenuSaveClick() { if (listener != null) { listener.onLotsControleValides(); } }
 
     private void enregistrementRetourLigne(Retour_Ligne retourLigneBase, Stock_Lot_Emplacement_Light stockCourant)
     {

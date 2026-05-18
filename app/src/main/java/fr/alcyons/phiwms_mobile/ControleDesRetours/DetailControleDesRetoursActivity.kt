@@ -5,11 +5,16 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.ImageView
 import android.widget.AdapterView
 import android.widget.LinearLayout
 import android.widget.Spinner
@@ -18,6 +23,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.widget.NestedScrollView
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import com.android.volley.Response
 import com.android.volley.VolleyError
@@ -44,8 +50,14 @@ import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light
 import fr.alcyons.phiwms_mobile.ControleDesRetours.Fragment.ControleRetourLignesFragment
 import fr.alcyons.phiwms_mobile.ControleDesRetours.Fragment.ListeLotsControleDesRetoursFragment
+import fr.alcyons.phiwms_mobile.Fragment.RechercheFragment
+import fr.alcyons.phiwms_mobile.Fragment.ScannerFragment
+import fr.alcyons.phiwms_mobile.Fragment.ScannerInputFragment
+import fr.alcyons.phiwms_mobile.Interfaces.RechercheAdjustable
+import fr.alcyons.phiwms_mobile.Interfaces.ScanDebounce
 import fr.alcyons.phiwms_mobile.Outils.Alerte
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites
+import fr.alcyons.phiwms_mobile.Outils.GestionCodeScanne
 import fr.alcyons.phiwms_mobile.R
 import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity
 import fr.alcyons.phiwms_mobile.Services.ServiceControleRetoursActivity
@@ -60,13 +72,18 @@ import java.util.Random
 
 class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
     ControleRetourLignesFragment.OnElementSelectionneListener,
-    ListeLotsControleDesRetoursFragment.OnLotsControleValidesListener
+    ListeLotsControleDesRetoursFragment.OnLotsControleValidesListener,
+    RechercheFragment.OnElementRechercheListener,
+    RechercheAdjustable
 {
     companion object
     {
         private const val ANIMATION_DURATION_MS = 300L
+        private const val SCANNER_HEIGHT_DP = 300
         private const val DETAIL_FALLBACK_TRANSLATION_Y = 600f
         private const val RETOUR_SELECTIONNE_ID_ARG = "retourSelectionneID"
+        private const val SEARCH_DOMAIN_CONTROLE_RETOURS = "controleDesRetours"
+        private const val SCAN_DEBOUNCE_MS = 750L
     }
 
     private var retourSelectionne: Retour? = null
@@ -80,17 +97,29 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
 
     private var optionTri: Spinner? = null
     private var lancerScan: LinearLayout? = null
+    private var scannerLL: LinearLayout? = null
+    private var lancerRecherche: LinearLayout? = null
     private var aControlerLL: LinearLayout? = null
     private var controleLL: LinearLayout? = null
     private var actionButton: AppCompatButton? = null
+    private var scannerContainer: FragmentContainerView? = null
+    private var rechercheContainer: FragmentContainerView? = null
     private var aControlerContainer: FragmentContainerView? = null
     private var controleContainer: FragmentContainerView? = null
     private var detailContainer: FragmentContainerView? = null
+    private var textChercherTV: TextView? = null
+    private var searchInputET: EditText? = null
+    private var effacerRechercheIV: ImageView? = null
+    private var searchTextWatcher: TextWatcher? = null
 
+    private var scannerFragment: Fragment? = null
+    private var rechercheFragment: RechercheFragment? = null
     private var aControlerFragment: ControleRetourLignesFragment? = null
     private var controleFragment: ControleRetourLignesFragment? = null
     private var detailFragment: ListeLotsControleDesRetoursFragment? = null
 
+    private var isScannerOpen = false
+    private var isSearchOpen = false
     private var isAControlerOpen = false
     private var isControleOpen = false
     private var isDetailOpen = false
@@ -122,12 +151,19 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
     {
         optionTri = findViewById(R.id.optionTri)
         lancerScan = findViewById(R.id.lancerScan)
+        scannerLL = findViewById(R.id.scanner_LL)
+        lancerRecherche = findViewById(R.id.lancerRecherhe)
         aControlerLL = findViewById(R.id.aControler_LL)
         controleLL = findViewById(R.id.controle_LL)
         actionButton = findViewById(R.id.boutonAction)
+        scannerContainer = findViewById(R.id.scannerContainer)
+        rechercheContainer = findViewById(R.id.rechercheContainer)
         aControlerContainer = findViewById(R.id.referenceAControlerContainer)
         controleContainer = findViewById(R.id.referenceControleContainer)
         detailContainer = findViewById(R.id.detailContainer)
+        textChercherTV = findViewById(R.id.textChercher_TV)
+        searchInputET = findViewById(R.id.searchInput_ET)
+        effacerRechercheIV = findViewById(R.id.effacerRecherche_IV)
     }
 
     private fun setupUi()
@@ -165,7 +201,28 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
             override fun onNothingSelected(parent: AdapterView<*>?) = Unit
         }
 
-        lancerScan?.setOnClickListener { lancerScanner() }
+        val openScannerClickListener = View.OnClickListener {
+            if (isScannerOpen) closeScanner()
+            else
+            {
+                closeOpenedFragments()
+                openScanner()
+            }
+        }
+        lancerScan?.setOnClickListener(openScannerClickListener)
+        scannerLL?.setOnClickListener(openScannerClickListener)
+        lancerRecherche?.setOnClickListener {
+            if (isSearchOpen) closeSearch()
+            else
+            {
+                closeOpenedFragments()
+                showSearchInput()
+            }
+        }
+        effacerRechercheIV?.setOnClickListener {
+            searchInputET?.setText("")
+            closeSearch()
+        }
         aControlerLL?.setOnClickListener {
             if (isAControlerOpen) closeAControler()
             else
@@ -288,6 +345,197 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
         if (!isAControlerOpen && !isControleOpen && !isDetailOpen) { openAControler() }
     }
 
+    override fun onElementRechercher(element: Int) { scrollToItemOrDisplayAlert(element) }
+
+    override fun ajusterHauteurRecherche(hauteur: Int)
+    {
+        (rechercheContainer ?: return).layoutParams = ((rechercheContainer ?: return).layoutParams as LinearLayout.LayoutParams).also { it.height = if (hauteur == 0) 0 else LinearLayout.LayoutParams.WRAP_CONTENT }
+        (rechercheContainer ?: return).requestLayout()
+    }
+
+    private fun scrollToItemOrDisplayAlert(idProduit: Int)
+    {
+        val lignesAControler = getRetourLignesAControler().filter { retourLigne -> retourLigne.code_produit == idProduit }
+        val lignesControlees = getRetourLignesControlees().filter { retourLigne -> retourLigne.code_produit == idProduit }
+
+        if (lignesAControler.isEmpty() && lignesControlees.isEmpty())
+        {
+            Alerte.afficherAlerteInformation(this, layoutInflater, "Produit non trouvé", "Ce produit n'est pas dans la liste du contrôle des retours", false, false)
+            return
+        }
+
+        closeOpenedFragments()
+        if (lignesAControler.isNotEmpty()) { openAControler(lignesAControler) }
+        if (lignesControlees.isNotEmpty()) { openControle(lignesControlees) }
+        if (isSearchOpen) { closeSearch() }
+    }
+
+    private fun openScanner()
+    {
+        scannerContainer?.let { container ->
+            animateFixedHeightContainerOpen(container, SCANNER_HEIGHT_DP)
+            val fragment = createScannerFragment().also { scannerFragment = it }
+            setupScannerFragmentCallbacks(fragment)
+            supportFragmentManager.beginTransaction().replace(R.id.scannerContainer, fragment).commit()
+        }
+        isScannerOpen = true
+    }
+
+    private fun closeScanner()
+    {
+        closeContainer(scannerContainer) {
+            scannerFragment?.let { supportFragmentManager.beginTransaction().remove(it).commit() }
+            scannerFragment = null
+        }
+        isScannerOpen = false
+    }
+
+    private fun createScannerFragment(): Fragment
+    {
+        return when
+        {
+            isProfessionalScanner() -> ScannerInputFragment()
+            hasCamera() -> ScannerFragment()
+            else -> ScannerInputFragment()
+        }
+    }
+
+    private fun setupScannerFragmentCallbacks(fragment: Fragment)
+    {
+        when (fragment)
+        {
+            is ScannerInputFragment -> {
+                fragment.onCodeScanned = { code -> handleScannedCode(code) }
+                fragment.onCloseRequested = { closeScanner() }
+            }
+            is ScannerFragment -> {
+                fragment.onCodeScanned = { code -> handleScannedCode(code) }
+                fragment.onCloseRequested = { closeScanner() }
+            }
+        }
+        (fragment as ScanDebounce).setScanDebounce(SCAN_DEBOUNCE_MS)
+    }
+
+    private fun handleScannedCode(scannedCode: String)
+    {
+        val resultDecoupage = GestionCodeScanne.decoupageCode(scannedCode)
+        val codeIdentification = resultDecoupage["code"] ?: ""
+
+        if (codeIdentification.isEmpty())
+        {
+            Alerte.afficherAlerteInformation(this, layoutInflater, "Code non reconnu", "Le code scanné n'a pas pu être analysé: $scannedCode", false, false)
+            return
+        }
+
+        val produits = ProduitOpenHelper.getProduitsByIdentification(db, codeIdentification)
+        if (produits.isEmpty())
+        {
+            Alerte.afficherAlerteInformation(this, layoutInflater, "Produit non trouvé", "Aucun produit trouvé pour le code scanné: $codeIdentification", false, false)
+            return
+        }
+
+        scrollToItemOrDisplayAlert(produits.first().iD_produit)
+    }
+
+    private fun isProfessionalScanner(): Boolean
+    {
+        val manufacturer = Build.MANUFACTURER.uppercase()
+        val model = Build.MODEL.uppercase()
+        return manufacturer.contains("ZEBRA") ||
+                manufacturer.contains("HONEYWELL") ||
+                model.contains("TC") ||
+                model.contains("MC") ||
+                model.contains("CK") ||
+                model.contains("CT") ||
+                model.contains("CN")
+    }
+
+    private fun hasCamera(): Boolean { return packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY) }
+
+    private fun showSearchInput()
+    {
+        isSearchOpen = true
+
+        val searchInput = searchInputET ?: return
+        findViewById<ImageView>(R.id.chevronRecherche).visibility = View.GONE
+        textChercherTV?.visibility = View.GONE
+        searchInput.visibility = View.VISIBLE
+        effacerRechercheIV?.visibility = View.VISIBLE
+        searchInput.requestFocus()
+
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(searchInputET, InputMethodManager.SHOW_IMPLICIT)
+        attachSearchWatcher(searchInput)
+    }
+
+    private fun attachSearchWatcher(searchInput: EditText)
+    {
+        searchTextWatcher?.let(searchInput::removeTextChangedListener)
+        searchTextWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+
+            override fun afterTextChanged(s: Editable?)
+            {
+                val query = s.toString().trim()
+                if (query.isEmpty())
+                {
+                    rechercheFragment?.viderListe()
+                    return
+                }
+
+                openSearch()
+                rechercheFragment?.lancerRecherche(query, SEARCH_DOMAIN_CONTROLE_RETOURS, (retourSelectionne ?: return)._UID.toString())
+            }
+        }
+        searchInput.addTextChangedListener(searchTextWatcher)
+    }
+
+    private fun openSearch()
+    {
+        findViewById<NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled = false
+        rechercheContainer?.let { container ->
+            container.layoutParams = (container.layoutParams as LinearLayout.LayoutParams).also {
+                it.height = LinearLayout.LayoutParams.WRAP_CONTENT
+                it.weight = 0f
+            }
+            container.visibility = View.VISIBLE
+            container.translationY = -resources.displayMetrics.heightPixels.toFloat()
+            container.animate().translationY(0f).setDuration(ANIMATION_DURATION_MS).start()
+        }
+
+        if (rechercheFragment == null)
+        {
+            val frag = RechercheFragment().also { rechercheFragment = it }
+            supportFragmentManager.beginTransaction().replace(R.id.rechercheContainer, frag).commitNow()
+        }
+
+        isSearchOpen = true
+    }
+
+    private fun closeSearch()
+    {
+        hideSearchInput()
+        findViewById<NestedScrollView>(R.id.scrollView)?.isNestedScrollingEnabled = true
+        closeContainer(rechercheContainer) {
+            rechercheFragment?.let { supportFragmentManager.beginTransaction().remove(it).commit() }
+            rechercheFragment = null
+        }
+        isSearchOpen = false
+    }
+
+    private fun hideSearchInput()
+    {
+        findViewById<ImageView>(R.id.chevronRecherche).visibility = View.VISIBLE
+        textChercherTV?.visibility = View.VISIBLE
+        searchInputET?.visibility = View.GONE
+        effacerRechercheIV?.visibility = View.GONE
+        searchInputET?.text?.clear()
+
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow((searchInputET ?: return).windowToken, 0)
+    }
+
     private fun getRetourLignesAControler(): List<Retour_Ligne>
     {
         return listeRetourLigne.filter { ligne -> getQuantiteRetournee(ligne) < ligne.qte_Demander.toInt() }
@@ -393,6 +641,17 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
         container.animate().translationY(0f).setDuration(ANIMATION_DURATION_MS).start()
     }
 
+    private fun animateFixedHeightContainerOpen(container: FragmentContainerView, heightDp: Int)
+    {
+        container.layoutParams = (container.layoutParams as LinearLayout.LayoutParams).also {
+            it.height = (heightDp * resources.displayMetrics.density).toInt()
+            it.weight = 0f
+        }
+        container.visibility = View.VISIBLE
+        container.translationY = -resources.displayMetrics.heightPixels.toFloat()
+        container.animate().translationY(0f).setDuration(ANIMATION_DURATION_MS).start()
+    }
+
     private fun closeContainer(container: FragmentContainerView?, onComplete: () -> Unit)
     {
         (container ?: return).animate().translationY(-container.height.toFloat()).setDuration(ANIMATION_DURATION_MS).withEndAction {
@@ -410,6 +669,8 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
 
     private fun closeOpenedFragments()
     {
+        if (isScannerOpen) closeScanner()
+        if (isSearchOpen) closeSearch()
         if (isAControlerOpen) closeAControler()
         if (isControleOpen) closeControle()
         if (isDetailOpen) closeDetailFragment()
