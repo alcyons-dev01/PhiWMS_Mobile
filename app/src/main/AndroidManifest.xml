@@ -390,6 +390,12 @@
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation|keyboardHidden"/>
+    <activity
+        android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoIdentificationDocument"
+        android:parentActivityName="fr.alcyons.phiwms_mobile.BarcodeSearch.Scanner"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation|keyboardHidden"/>
 
     <activity
         android:name="fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerProduitActivity"
