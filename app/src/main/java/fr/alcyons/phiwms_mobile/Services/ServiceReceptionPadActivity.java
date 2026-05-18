@@ -48,6 +48,7 @@ import java.util.Objects;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerDocumentActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerPhotoIdentificationDocument;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
@@ -113,7 +114,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
                     Intent data = result.getData();
                     if (result.getResultCode() == CodesEchangesActivites.RESULT_OK) {
                         if (data != null) {
-                            String code = Objects.requireNonNull(data.getExtras()).getString("code");
+                            String code = data.getStringExtra("numeroDocument");
                             if (code != null) {
                                 Commande commandeSelectionne = CommandeOpenHelper.getCommandeByNumero(db, code);
                                 if (commandeSelectionne == null) {
@@ -453,7 +454,7 @@ public class ServiceReceptionPadActivity extends ServiceAvecConnexionActivity {
             scanDocumentBundle.putString("Context", "Reception");
         } else {
             if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
-                scanDocumentIntent = new Intent(ServiceReceptionPadActivity.this, BarcodeCaptureActivity.class);
+                scanDocumentIntent = new Intent(ServiceReceptionPadActivity.this, ScannerPhotoIdentificationDocument.class);
                 scanDocumentBundle.putBoolean("modeRafale", false);
             } else {
                 scanDocumentIntent = new Intent(ServiceReceptionPadActivity.this, ScannerDocumentActivity.class);

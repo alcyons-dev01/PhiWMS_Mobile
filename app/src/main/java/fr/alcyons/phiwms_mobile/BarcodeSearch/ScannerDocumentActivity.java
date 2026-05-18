@@ -84,7 +84,7 @@ public class ScannerDocumentActivity extends ServiceActivity {
             public void onClick(View v) {
                 Intent scannerSearchOnlyIntent = new Intent();
                 Bundle scannerSearchOnlyBundle = new Bundle();
-                scannerSearchOnlyBundle.putString("code", code);
+                scannerSearchOnlyBundle.putString("numeroDocument", code);
                 scannerSearchOnlyBundle.putBoolean("close", true);
                 scannerSearchOnlyIntent.putExtras(scannerSearchOnlyBundle);
                 ScannerDocumentActivity.this.setResult(RESULT_OK, scannerSearchOnlyIntent);
@@ -132,7 +132,7 @@ public class ScannerDocumentActivity extends ServiceActivity {
 
                     if(code != null && !code.isEmpty()){
                         Intent resultIntent = new Intent();
-                        resultIntent.putExtra("code", code);
+                        resultIntent.putExtra("numeroDocument", code);
                         setResult(BarcodeCaptureActivity.RESULT_OK, resultIntent);
                         finish();
                     }
