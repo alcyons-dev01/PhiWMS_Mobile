@@ -5,219 +5,274 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <LinearLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="#F0F4FF">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_weight="1"
-            android:background="@color/bleu_fonce_alcyons"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="10dp">
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/np_designation"
-                android:layout_width="0dp"
+            <!-- ═══════════════════════════════
+                 HEADER : désignation + fermer
+            ═══════════════════════════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:maxLines="2"
-                android:ellipsize="middle"
-                android:textStyle="bold"
-                android:textSize="17dp"
-                android:text=""
-                android:textColor="@color/blanc"/>
+                android:orientation="horizontal"
+                android:background="@color/bleu_fonce_alcyons"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="12dp"
+                android:gravity="center_vertical">
 
-            <ImageView
-                android:id="@+id/np_quitterModale"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginLeft="10dp"
-                android:background="@drawable/ic_clear"/>
+                <TextView
+                    android:id="@+id/np_designation"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:text=""
+                    android:textColor="#FFFFFF" />
 
-        </LinearLayout>
+                <ImageView
+                    android:id="@+id/np_quitterModale"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/ic_clear"
+                    android:backgroundTint="#FFFFFF"
+                    android:contentDescription="@null" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2"
-            android:padding="5dp">
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/np_reference"
-                android:layout_width="0dp"
+            <!-- Séparateur accent -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/bleu_clair_alcyons" />
+
+            <!-- ═══════════════════════════════
+                 Référence + Conditionnement
+            ═══════════════════════════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text=""
-                android:textSize="14dp"
-                android:textColor="@color/noir"/>
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp">
 
-            <TextView
-                android:id="@+id/np_conditionnement"
-                android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/np_reference"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="12sp"
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:alpha="0.7" />
+
+                <TextView
+                    android:id="@+id/np_conditionnement"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="12sp"
+                    android:text=""
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:alpha="0.7"
+                    android:gravity="end" />
+
+            </LinearLayout>
+
+            <!-- Séparateur fin -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/bleu_clair_alcyons_transparent"
+                android:layout_marginHorizontal="14dp" />
+
+            <!-- ═══════════════════════════════
+                 ZONE STOCK
+            ═══════════════════════════════ -->
+            <LinearLayout
+                android:id="@+id/layoutStock"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="14dp"
-                android:text=""
-                android:textColor="@color/noir"
-                android:gravity="end"/>
+                android:orientation="vertical"
+                android:paddingTop="14dp"
+                android:paddingBottom="6dp">
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Saisissez votre stock"
+                    android:textSize="14sp"
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:layout_marginBottom="8dp" />
 
-    </LinearLayout>
+                <EditText
+                    android:id="@+id/np_qteStock"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="22sp"
+                    android:text=""
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:inputType="number"
+                    android:layout_gravity="center"
+                    android:selectAllOnFocus="true"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:background="@null"
+                    android:layout_marginBottom="8dp" />
 
-    <LinearLayout
-        android:id="@+id/layoutStock"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/bleu_clair_alcyons_transparent"
+                    android:layout_marginHorizontal="14dp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginTop="5dp"
-            android:textSize="18dp"
-            android:textColor="@color/orange"
-            android:text="Saisissez votre stock"
-            android:gravity="center"/>
+            </LinearLayout>
 
-        <EditText
-            android:id="@+id/np_qteStock"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:textSize="20dp"
-            android:text=""
-            android:textColor="@color/orange"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:inputType="number"
-            android:layout_gravity="center"
-            android:selectAllOnFocus="true"
-            android:focusable="true"
-            android:focusableInTouchMode="true"/>
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/bleu_clair_alcyons"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/np_valider_stock"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="10dp">
-
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="@drawable/ic_check_circle"
-            android:backgroundTint="@color/bleu_clair_alcyons"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layoutdotation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/bleu_fonce_alcyons"
-            android:layout_marginBottom="25dp"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2"
-            android:layout_gravity="center">
-
-            <TextView
-                android:layout_width="0dp"
+            <!-- Bouton valider stock -->
+            <LinearLayout
+                android:id="@+id/np_valider_stock"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="18dp"
-                android:textColor="@color/bleu_clair_alcyons"
-                android:text="Besoin"
+                android:orientation="vertical"
                 android:gravity="center"
-                android:layout_gravity="center"/>
+                android:paddingVertical="12dp">
 
-            <TextView
-                android:layout_width="0dp"
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/ic_check_circle"
+                    android:backgroundTint="@color/bleu_clair_alcyons"
+                    android:contentDescription="@null" />
+
+            </LinearLayout>
+
+            <!-- ═══════════════════════════════
+                 ZONE DOTATION (gone par défaut)
+            ═══════════════════════════════ -->
+            <LinearLayout
+                android:id="@+id/layoutdotation"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="18dp"
-                android:textColor="@color/vert"
-                android:text="Demandé"
-                android:gravity="center"/>
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Séparateur section -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/bleu_fonce_alcyons"
+                    android:layout_marginBottom="14dp" />
+
+                <!-- Labels Besoin / Demandé -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:layout_marginBottom="6dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="13sp"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:text="Besoin"
+                        android:gravity="center"
+                        android:alpha="0.7" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="13sp"
+                        android:textColor="@color/vert"
+                        android:text="Demandé"
+                        android:gravity="center" />
+
+                </LinearLayout>
+
+                <!-- Valeurs Besoin / Demandé -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:id="@+id/np_qteBesoin"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="22sp"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:text=""
+                        android:gravity="center"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/np_qteDemande"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="22sp"
+                        android:text=""
+                        android:textColor="@color/vert"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:inputType="number"
+                        android:selectAllOnFocus="true"
+                        android:background="@null" />
+
+                </LinearLayout>
+
+                <!-- Séparateur fin -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/bleu_clair_alcyons_transparent"
+                    android:layout_marginHorizontal="14dp" />
+
+                <!-- Bouton valider dotation -->
+                <LinearLayout
+                    android:id="@+id/np_valider"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingVertical="12dp">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/ic_check_circle"
+                        android:backgroundTint="@color/vert"
+                        android:contentDescription="@null" />
+
+                </LinearLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2">
-
-            <TextView
-                android:id="@+id/np_qteBesoin"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:textSize="20dp"
-                android:textColor="@color/bleu_clair_alcyons"
-                android:text=""
-                android:gravity="center"
-                android:layout_gravity="center"
-                android:textStyle="bold"/>
-
-            <EditText
-                android:id="@+id/np_qteDemande"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:textSize="20dp"
-                android:text=""
-                android:textColor="@color/vert"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:inputType="number"
-                android:layout_gravity="center"
-                android:selectAllOnFocus="true"/>
-        </LinearLayout>
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/bleu_clair_alcyons"/>
-
-        <LinearLayout
-            android:id="@+id/np_valider"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="10dp">
-
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:background="@drawable/ic_check_circle"
-                android:backgroundTint="@color/vert"/>
-
-        </LinearLayout>
-    </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 </LinearLayout>

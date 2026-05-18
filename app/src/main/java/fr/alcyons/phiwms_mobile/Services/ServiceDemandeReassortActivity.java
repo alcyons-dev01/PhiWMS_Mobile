@@ -109,6 +109,8 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
         textLancerScan.startAnimation(anim);
         iconLancerScan.startAnimation(anim);
 
+        ((TextView) findViewById(R.id.titre)).setText("Demande Plan de soin");
+
         // Récupération et initialisation de l'action de la listView
         phReassortListView = findViewById(R.id.listeView);
         phReassortListView.setOnItemClickListener((parent, view, position, id) -> {

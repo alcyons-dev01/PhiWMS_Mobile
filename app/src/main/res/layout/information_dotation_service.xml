@@ -1,201 +1,221 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@android:color/white">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
 
-    <!--android:onClick="affichageInfoDepot"-->
+    <!-- ═══════════════════════════════
+         HEADER : nom demande
+    ═══════════════════════════════ -->
     <LinearLayout
         android:id="@+id/layout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/bleu_clair_alcyons">
+        android:background="@color/bleu_fonce_alcyons"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="14dp">
 
         <TextView
             android:id="@+id/nomDemande"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text=""
-            android:layout_weight="1"
-            android:textColor="@color/blanc"
+            android:textColor="#FFFFFF"
             android:textStyle="bold"
             android:textSize="18sp" />
 
     </LinearLayout>
 
+    <!-- Séparateur accent -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/bleu_clair_alcyons" />
+
+    <!-- ═══════════════════════════════
+         BOUTON CLÔTURER AVANT LE
+    ═══════════════════════════════ -->
     <LinearLayout
         android:id="@+id/layoutBoutonEnvoyer"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="52dp"
         android:orientation="horizontal"
         android:background="@drawable/background_plein_vert_radius"
-        android:layout_below="@+id/layout1"
-        android:paddingTop="2dp"
-        android:paddingBottom="2dp"
-        android:layout_marginVertical="5dp"
-        android:layout_marginHorizontal="5dp"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginVertical="8dp"
         android:gravity="center_vertical"
-        android:layout_gravity="center_vertical">
+        android:paddingHorizontal="12dp">
 
-        <LinearLayout
-            android:id="@+id/layoutTextAEnvoyer"
+        <TextView
+            android:id="@+id/textEnvoi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="À clôturer avant le : "
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/dateEnvoiListe"
             android:layout_width="0dp"
-            android:layout_height="30dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="9"
-            android:weightSum="3"
-            android:layout_marginStart="5dp">
-
-            <TextView
-                android:id="@+id/textEnvoi"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="À clôturer avant le : "
-                android:textColor="#000000"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:layout_marginLeft="10dp"
-                android:layout_gravity="center_vertical"
-                android:gravity="center_vertical"/>
-
-            <TextView
-                android:id="@+id/dateEnvoiListe"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:text=""
-                android:textColor="@color/bleu_fonce_alcyons"
-                android:textSize="17sp"
-                android:textStyle="bold"
-                android:layout_gravity="center_vertical"
-                android:gravity="center_vertical"/>
-
-        </LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=""
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:id="@+id/layoutValider"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="right">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center">
 
             <ImageView
                 android:id="@+id/iconEnvoi"
-                android:layout_width="wrap_content"
+                android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="5dp"
                 android:background="@drawable/ic_send_black"
-                android:textAlignment="center" />
+                android:backgroundTint="#FFFFFF"
+                android:contentDescription="@null" />
+
         </LinearLayout>
 
     </LinearLayout>
 
-    <LinearLayout
+    <!-- ═══════════════════════════════
+         RÉSUMÉ : nb références
+    ═══════════════════════════════ -->
+    <androidx.cardview.widget.CardView
         android:id="@+id/resumerDemande"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@color/orange"
-        android:layout_below="@+id/layoutBoutonEnvoyer"
-        android:paddingLeft="5dp"
-        android:paddingVertical="5dp">
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginBottom="4dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="2dp"
+        app:cardBackgroundColor="#FFF3E0">
 
-        <TextView
-            android:id="@+id/nbElementCommander"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="@color/noir"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="10dp">
 
-        <TextView
-            android:id="@+id/titre"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Références commandés sur "
-            android:textColor="#000000"
-            android:textSize="16sp"
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"/>
+            <TextView
+                android:id="@+id/nbElementCommander"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/orange"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/nbElementTotal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="@color/noir"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+            <TextView
+                android:id="@+id/titre"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text=" Références commandées sur "
+                android:textColor="@color/bleu_fonce_alcyons"
+                android:textSize="14sp"
+                android:layout_marginHorizontal="4dp" />
 
+            <TextView
+                android:id="@+id/nbElementTotal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/orange"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
+        </LinearLayout>
 
-    <LinearLayout
+    </androidx.cardview.widget.CardView>
+
+    <!-- ═══════════════════════════════
+         BARRE DE RECHERCHE
+    ═══════════════════════════════ -->
+    <androidx.cardview.widget.CardView
         android:id="@+id/layoutRecherche"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:layout_below="@+id/resumerDemande"
-        android:orientation="horizontal"
-        android:background="@drawable/background_cadre_bleu">
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginVertical="4dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="2dp"
+        app:cardBackgroundColor="#FFFFFF">
 
-        <ImageView
-            android:id="@+id/iconRecherche"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="5dp"
-            android:layout_gravity="center"
-            android:textAlignment="center"
-            android:title="Search"
-            android:background="@drawable/ic_search_black"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp">
 
-        <EditText
-            android:id="@+id/searchBarDemande"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginEnd="10dp"
-            android:inputType="text"
-            android:maxLines="1"
-            android:hint="Rechercher une référence"/>
+            <ImageView
+                android:id="@+id/iconRecherche"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/ic_search_black"
+                android:backgroundTint="@color/bleu_clair_alcyons"
+                android:contentDescription="@null" />
 
-        <ImageView
-            android:id="@+id/removeSearchDemande"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="5dp"
-            android:layout_gravity="center"
-            android:textAlignment="center"
-            android:title="Search"
-            android:visibility="gone"
-            android:background="@drawable/ic_croix_noir"/>
-    </LinearLayout>
+            <EditText
+                android:id="@+id/searchBarDemande"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="text"
+                android:maxLines="1"
+                android:hint="Rechercher une référence"
+                android:background="@null"
+                android:textColor="@color/bleu_fonce_alcyons"
+                android:textColorHint="#90A4AE"
+                android:textSize="14sp" />
 
+            <ImageView
+                android:id="@+id/removeSearchDemande"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/ic_croix_noir"
+                android:backgroundTint="@color/bleu_clair_alcyons"
+                android:visibility="gone"
+                android:contentDescription="@null" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- ═══════════════════════════════
+         LISTE
+    ═══════════════════════════════ -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/layoutRecherche"
-        android:orientation="vertical"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="4dp">
 
         <ListView
             android:id="@+id/listeView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:descendantFocusability="beforeDescendants">
-
-        </ListView>
-
+            android:descendantFocusability="beforeDescendants"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:clipToPadding="false" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-</RelativeLayout>
+</LinearLayout>
