@@ -1,146 +1,171 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:padding="6dp">
 
-    <LinearLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:background="@drawable/background_element_liste"
-        android:orientation="horizontal"
-        android:weightSum="5">
+        app:cardCornerRadius="12dp"
+        app:cardElevation="3dp"
+        app:cardBackgroundColor="#F0F4FF">
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="3.75"
-            android:orientation="vertical"
-            android:padding="5dp">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
+            <!-- ═══════════════════════════════
+                 COLONNE GAUCHE : infos produit
+            ═══════════════════════════════ -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="5">
+                android:layout_weight="3.75"
+                android:orientation="vertical">
 
+                <!-- Header : nb colis + référence -->
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1.5">
+                    android:background="@color/bleu_fonce_alcyons"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="10dp">
 
                     <ImageView
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:background="@drawable/ic_colis"/>
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/ic_colis"
+                        android:backgroundTint="#FFFFFF"
+                        android:layout_marginEnd="6dp"
+                        android:contentDescription="@null" />
 
                     <TextView
                         android:id="@+id/nbColis"
                         android:layout_width="wrap_content"
-                        android:layout_height="25dp"
-                        android:gravity="center_horizontal|center_vertical"
-                        android:text="nbColis"
-                        android:layout_marginLeft="10dp"
-                        android:textColor="@android:color/holo_red_light"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/rouge"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="10dp" />
+
+                    <TextView
+                        android:id="@+id/referenceProduit"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text=""
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
 
+                <!-- Séparateur accent -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/bleu_clair_alcyons" />
 
+                <!-- Désignation -->
                 <TextView
-                    android:id="@+id/referenceProduit"
-                    android:layout_width="0dp"
+                    android:id="@+id/designationProduit"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="3.5"
-                    android:text="référence"
-                    android:paddingLeft="10dp"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp"
-                    android:textStyle="bold"  />
+                    android:text=""
+                    android:textColor="@color/bleu_fonce_alcyons"
+                    android:textSize="13sp"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="10dp"
+                    android:maxLines="2"
+                    android:ellipsize="end" />
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="5"
-                android:layout_marginTop="5dp">
+            <!-- ═══════════════════════════════
+                 SÉPARATEUR VERTICAL
+            ═══════════════════════════════ -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/bleu_clair_alcyons" />
 
-                <TextView
-                    android:id="@+id/designationProduit"
+            <!-- ═══════════════════════════════
+                 COLONNE DROITE : qté + actions
+            ═══════════════════════════════ -->
+            <LinearLayout
+                android:id="@+id/layoutValidation"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.25"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="#F0F4FF">
+
+                <!-- Quantité livrée -->
+                <LinearLayout
+                    android:id="@+id/layout_qteLivrer"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:layout_weight="5"
-                    android:text="designation"
-                    android:textColor="@android:color/black"/>
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/qte_livree"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:gravity="center"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 
-        </LinearLayout>
+                <!-- Séparateur vertical fin -->
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/bleu_clair_alcyons_transparent" />
 
-        <LinearLayout
-            android:id="@+id/layoutValidation"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1.25"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:id="@+id/layout_qteLivrer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_gravity="center_vertical"
-                android:orientation="vertical"
-                android:layout_marginRight="5dp">
-
-                <TextView
-                    android:id="@+id/qte_livree"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="1000"
-                    android:gravity="right"
-                    android:textColor="@android:color/black"
-                    android:textSize="20dp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <ImageView
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="@color/blanc"/>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:gravity="right"
-                android:layout_marginLeft="5dp">
-
-                <ImageView
-                    android:id="@+id/Accepter"
+                <!-- Boutons Accepter / Refuser -->
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
-                    android:src="@drawable/ic_check"/>
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center">
 
-                <ImageView
-                    android:id="@+id/Refuser"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
-                    android:src="@drawable/ic_clear"
-                    android:visibility="gone" />
+                    <ImageView
+                        android:id="@+id/Accepter"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_check"
+                        android:backgroundTint="@color/vert"
+                        android:layout_marginBottom="6dp"
+                        android:contentDescription="@null" />
 
+                    <ImageView
+                        android:id="@+id/Refuser"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_clear"
+                        android:backgroundTint="@color/rouge"
+                        android:visibility="gone"
+                        android:contentDescription="@null" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 </LinearLayout>
