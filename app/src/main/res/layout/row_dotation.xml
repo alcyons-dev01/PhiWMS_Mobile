@@ -102,7 +102,7 @@
                     android:layout_weight="1"
                     android:text=""
                     android:gravity="center"
-                    android:textColor="#BBDEFB"
+                    android:textColor="@color/bleu_fonce_alcyons"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
