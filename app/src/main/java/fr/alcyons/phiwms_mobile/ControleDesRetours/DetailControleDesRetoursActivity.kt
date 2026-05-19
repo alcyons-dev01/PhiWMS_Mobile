@@ -17,6 +17,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.AdapterView
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
@@ -94,10 +95,10 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
     private var pm: PackageManager? = null
     private var triChoisi: String? = null
     private var premierPassage = false
+    private var hauteurListeFragment = 0
 
     private var optionTri: Spinner? = null
     private var lancerScan: LinearLayout? = null
-    private var scannerLL: LinearLayout? = null
     private var lancerRecherche: LinearLayout? = null
     private var aControlerLL: LinearLayout? = null
     private var controleLL: LinearLayout? = null
@@ -135,6 +136,7 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
         initializeData()
         bindViews()
         setupUi()
+        setupResponsiveListHeight()
         setupListeners()
         setupOnBackPressedCallback()
     }
@@ -151,7 +153,6 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
     {
         optionTri = findViewById(R.id.optionTri)
         lancerScan = findViewById(R.id.lancerScan)
-        scannerLL = findViewById(R.id.scanner_LL)
         lancerRecherche = findViewById(R.id.lancerRecherhe)
         aControlerLL = findViewById(R.id.aControler_LL)
         controleLL = findViewById(R.id.controle_LL)
@@ -168,7 +169,6 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
 
     private fun setupUi()
     {
-        findViewById<TextView>(R.id.intitule).text = retourSelectionne?.intitule.orEmpty()
         findViewById<TextView>(R.id.numero).text = retourSelectionne?.numero.orEmpty()
 
         triChoisi = ParametreUtilisateurOpenHelper.getChoixTriRetourLigne(db)
@@ -177,6 +177,25 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
             ParametreUtilisateurOpenHelper.mettreAJourTriRetourLigne(db, 0, "Designation")
             triChoisi = ParametreUtilisateurOpenHelper.getChoixTriRetourLigne(db)
         }
+    }
+
+    private fun setupResponsiveListHeight()
+    {
+        val frameContenu = findViewById<RelativeLayout>(R.id.frameLayout)
+        frameContenu.post {
+            hauteurListeFragment = calculateListHeight(frameContenu.height)
+            resizeOpenListContainers()
+        }
+    }
+
+    private fun calculateListHeight(frameHeight: Int): Int
+    {
+        val widthDp = resources.displayMetrics.run { widthPixels / density }
+        return (frameHeight * when {
+            widthDp < 400 -> 0.35
+            widthDp < 600 -> 0.65
+            else -> 0.75
+        }).toInt()
     }
 
     private fun setupListeners()
@@ -210,7 +229,6 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
             }
         }
         lancerScan?.setOnClickListener(openScannerClickListener)
-        scannerLL?.setOnClickListener(openScannerClickListener)
         lancerRecherche?.setOnClickListener {
             if (isSearchOpen) closeSearch()
             else
@@ -560,7 +578,7 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
     {
         val retour = retourSelectionne ?: return
         aControlerContainer?.let { container ->
-            openContainer(container)
+            openListContainer(container)
             val frag = ControleRetourLignesFragment.newInstance(ArrayList(lignes), retour).also { aControlerFragment = it }
             supportFragmentManager.beginTransaction().replace(R.id.referenceAControlerContainer, frag).commitNow()
             scrollTo(container)
@@ -582,7 +600,7 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
         if (lignes.isEmpty()) { return }
         val retour = retourSelectionne ?: return
         controleContainer?.let { container ->
-            openContainer(container)
+            openListContainer(container)
             val frag = ControleRetourLignesFragment.newInstance(ArrayList(lignes), retour).also { controleFragment = it }
             supportFragmentManager.beginTransaction().replace(R.id.referenceControleContainer, frag).commitNow()
             scrollTo(container)
@@ -641,6 +659,37 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
         container.animate().translationY(0f).setDuration(ANIMATION_DURATION_MS).start()
     }
 
+    private fun openListContainer(container: FragmentContainerView)
+    {
+        if (hauteurListeFragment <= 0)
+        {
+            val frameContenu = findViewById<RelativeLayout>(R.id.frameLayout)
+            frameContenu.post {
+                hauteurListeFragment = calculateListHeight(frameContenu.height)
+                applyListContainerHeight(container)
+            }
+        }
+        else { applyListContainerHeight(container) }
+        container.visibility = View.VISIBLE
+        container.translationY = 0f
+        container.alpha = 0f
+        container.animate().alpha(1f).setDuration(200L).start()
+    }
+
+    private fun applyListContainerHeight(container: FragmentContainerView)
+    {
+        container.layoutParams = (container.layoutParams as LinearLayout.LayoutParams).also {
+            it.height = hauteurListeFragment
+            it.weight = 0f
+        }
+    }
+
+    private fun resizeOpenListContainers()
+    {
+        if (isAControlerOpen) { aControlerContainer?.let { applyListContainerHeight(it) } }
+        if (isControleOpen) { controleContainer?.let { applyListContainerHeight(it) } }
+    }
+
     private fun animateFixedHeightContainerOpen(container: FragmentContainerView, heightDp: Int)
     {
         container.layoutParams = (container.layoutParams as LinearLayout.LayoutParams).also {
@@ -663,8 +712,8 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
 
     private fun scrollTo(container: View)
     {
-        val scrollView = findViewById<NestedScrollView>(R.id.scrollView)
-        scrollView.post { scrollView.smoothScrollTo(0, container.top) }
+        val scrollView = findViewById<NestedScrollView?>(R.id.scrollView)
+        scrollView?.post { scrollView.smoothScrollTo(0, container.top) }
     }
 
     private fun closeOpenedFragments()

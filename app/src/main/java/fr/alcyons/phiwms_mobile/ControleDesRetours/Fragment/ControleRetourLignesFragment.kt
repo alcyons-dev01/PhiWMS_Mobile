@@ -19,7 +19,6 @@ class ControleRetourLignesFragment : Fragment()
     {
         private const val ARG_LISTE = "liste"
         private const val ARG_RETOUR = "retour"
-        private const val MAX_LIST_HEIGHT_DP = 420
 
         fun newInstance(liste: ArrayList<Retour_Ligne>, retour: Retour): ControleRetourLignesFragment =
             ControleRetourLignesFragment().apply {
@@ -50,7 +49,7 @@ class ControleRetourLignesFragment : Fragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
-        return inflater.inflate(R.layout.fragment_aretourner, container, false)
+        return inflater.inflate(R.layout.fragment_controle_retour_lignes, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
@@ -91,26 +90,7 @@ class ControleRetourLignesFragment : Fragment()
     {
         adapter = Retour_Ligne_ControleRetoursAdapter_2025(requireContext(), liste, db, retour)
         listeRetourLigneLV.adapter = adapter
-        updateListHeight()
-    }
-
-    private fun updateListHeight()
-    {
-        listeRetourLigneLV.post {
-            if (!this::adapter.isInitialized || adapter.count == 0) return@post
-
-            val maxHeightPx = (MAX_LIST_HEIGHT_DP * resources.displayMetrics.density).toInt()
-            val firstItem = adapter.getView(0, null, listeRetourLigneLV)
-            firstItem.measure(
-                View.MeasureSpec.makeMeasureSpec(listeRetourLigneLV.width, View.MeasureSpec.EXACTLY),
-                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-            )
-
-            var totalHeight = firstItem.measuredHeight * adapter.count
-            totalHeight += listeRetourLigneLV.dividerHeight * (adapter.count - 1)
-            totalHeight += listeRetourLigneLV.paddingTop + listeRetourLigneLV.paddingBottom
-            listeRetourLigneLV.layoutParams.height = totalHeight.coerceAtMost(maxHeightPx)
-            listeRetourLigneLV.requestLayout()
-        }
+        listeRetourLigneLV.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+        listeRetourLigneLV.requestLayout()
     }
 }
