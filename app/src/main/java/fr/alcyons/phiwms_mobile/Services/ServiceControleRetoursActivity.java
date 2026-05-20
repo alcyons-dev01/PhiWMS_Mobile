@@ -60,7 +60,7 @@ import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.ControleDesRetours.DetailControleDesRetoursActivity;
-import fr.alcyons.phiwms_mobile.ListViewAdapters.RetourDestructionAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.ControleDesRetoursAdapter;
 import fr.alcyons.phiwms_mobile.MenuActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.R;
@@ -73,7 +73,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
     private List<Retour> retourListBase = null;
     private List<String> listeDepotLivraison = null;
     private ListView retourListView = null;
-    private RetourDestructionAdapter retourDestructionAdapter = null;
+    private ControleDesRetoursAdapter controleDesRetoursAdapter = null;
     private ArrayAdapter<String> autoCompleteAdapter = null;
     private AutoCompleteTextView autoComplete = null;
     private PackageManager pm = null;
@@ -93,7 +93,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         // Initialisation de la liste et de l'action sur l'un de ses items
         this.retourListView = this.findViewById(R.id.listeView);
         this.retourListView.setOnItemClickListener((parent, view, position, id) -> {
-            final Retour retourSelectionne = (Retour) this.retourDestructionAdapter.getItem(position);
+            final Retour retourSelectionne = (Retour) this.controleDesRetoursAdapter.getItem(position);
 
             final Bundle serviceControleRetours_Bundle = ServiceControleRetoursActivity.super.getBundle();
             assert null != retourSelectionne;
@@ -121,10 +121,8 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                         {
                             this.afficherSnackBarControleDesRetours();
                             /* Code nécessaire à l'affichage de la liste */
-                            this.retourDestructionAdapter = new RetourDestructionAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
-                            // Permet d'enlever le séparateur entre deux éléments d'une listeView
-                            this.retourListView.setDivider(this.footer);
-                            this.retourListView.setAdapter(this.retourDestructionAdapter);
+                            this.controleDesRetoursAdapter = new ControleDesRetoursAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
+                            this.retourListView.setAdapter(this.controleDesRetoursAdapter);
 
                             if (this.retourList.isEmpty())
                             {
@@ -148,10 +146,8 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                     else
                     {
                         /* Code nécessaire à l'affichage de la liste */
-                        this.retourDestructionAdapter = new RetourDestructionAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
-                        // Permet d'enlever le séparateur entre deux éléments d'une listeView
-                        this.retourListView.setDivider(this.footer);
-                        this.retourListView.setAdapter(this.retourDestructionAdapter);
+                        this.controleDesRetoursAdapter = new ControleDesRetoursAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
+                        this.retourListView.setAdapter(this.controleDesRetoursAdapter);
 
                         if (this.retourList.isEmpty())
                         {
@@ -165,10 +161,8 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                 else
                 {
                     /* Code nécessaire à l'affichage de la liste */
-                    this.retourDestructionAdapter = new RetourDestructionAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
-                    // Permet d'enlever le séparateur entre deux éléments d'une listeView
-                    this.retourListView.setDivider(this.footer);
-                    this.retourListView.setAdapter(this.retourDestructionAdapter);
+                    this.controleDesRetoursAdapter = new ControleDesRetoursAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
+                    this.retourListView.setAdapter(this.controleDesRetoursAdapter);
 
                     if (this.retourList.isEmpty())
                     {
@@ -224,10 +218,8 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                 if(this.connexionDirecte)
                 {
                     /* Code nécessaire à l'affichage de la liste */
-                    this.retourDestructionAdapter = new RetourDestructionAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
-                    // Permet d'enlever le séparateur entre deux éléments d'une listeView
-                    this.retourListView.setDivider(this.footer);
-                    this.retourListView.setAdapter(this.retourDestructionAdapter);
+                    this.controleDesRetoursAdapter = new ControleDesRetoursAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
+                    this.retourListView.setAdapter(this.controleDesRetoursAdapter);
                     this.initializeAutoComplete();
 
                     if (this.retourList.isEmpty())
@@ -304,9 +296,8 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
             }
         }
 
-        this.retourDestructionAdapter = new RetourDestructionAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
-        this.retourListView.setDivider(this.footer);
-        this.retourListView.setAdapter(this.retourDestructionAdapter);
+        this.controleDesRetoursAdapter = new ControleDesRetoursAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
+        this.retourListView.setAdapter(this.controleDesRetoursAdapter);
         this.invalidateOptionsMenu();
     }
 
@@ -391,10 +382,8 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
 
                     //lancerScan();
                     /* Code nécessaire à l'affichage de la liste */
-                    this.retourDestructionAdapter = new RetourDestructionAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
-                    // Permet d'enlever le séparateur entre deux éléments d'une listeView
-                    this.retourListView.setDivider(this.footer);
-                    this.retourListView.setAdapter(this.retourDestructionAdapter);
+                    this.controleDesRetoursAdapter = new ControleDesRetoursAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
+                    this.retourListView.setAdapter(this.controleDesRetoursAdapter);
                     this.initializeAutoComplete();
 
                     if (this.retourList.isEmpty())
@@ -429,7 +418,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
     }
     @Override public boolean onPrepareOptionsMenu(final Menu menu)
     {
-        super.prepareOptionsMenu(menu, this.retourDestructionAdapter, null, "Produit, Intitulé, N°...");
+        super.prepareOptionsMenu(menu, this.controleDesRetoursAdapter, null, "Produit, Intitulé, N°...");
         final MenuItem item = menu.findItem(R.id.menuDatamatrix);
         item.setOnMenuItemClickListener(item1 -> {
             this.lancerScan();
@@ -510,27 +499,24 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
     {
         this.retourList.sort(Comparator.comparing(Retour::getNumero));
 
-        this.retourDestructionAdapter = new RetourDestructionAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
-        this.retourListView.setDivider(this.footer);
-        this.retourListView.setAdapter(this.retourDestructionAdapter);
+        this.controleDesRetoursAdapter = new ControleDesRetoursAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
+        this.retourListView.setAdapter(this.controleDesRetoursAdapter);
     }
 
     public void onClickTriDate()
     {
         this.retourList.sort(Comparator.comparing(Retour::getDate_retour));
 
-        this.retourDestructionAdapter = new RetourDestructionAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
-        this.retourListView.setDivider(this.footer);
-        this.retourListView.setAdapter(this.retourDestructionAdapter);
+        this.controleDesRetoursAdapter = new ControleDesRetoursAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
+        this.retourListView.setAdapter(this.controleDesRetoursAdapter);
     }
 
     public void onClickTriDepot()
     {
         this.retourList.sort(Comparator.comparing(Retour::getRef_Depot_Origine));
 
-        this.retourDestructionAdapter = new RetourDestructionAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
-        this.retourListView.setDivider(this.footer);
-        this.retourListView.setAdapter(this.retourDestructionAdapter);
+        this.controleDesRetoursAdapter = new ControleDesRetoursAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
+        this.retourListView.setAdapter(this.controleDesRetoursAdapter);
     }
 
     private void afficherSnackBarControleDesRetours()
