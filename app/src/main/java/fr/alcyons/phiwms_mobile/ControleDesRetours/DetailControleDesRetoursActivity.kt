@@ -588,7 +588,7 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
 
     private fun getRetourLignesControlees(): List<Retour_Ligne>
     {
-        return listeRetourLigne.filter { ligne -> getQuantiteRetournee(ligne) >= ligne.qte_Demander.toInt() }
+        return Retour_LigneOpenHelper.getAllRetourLignesNegByRetour(db, retourSelectionne).filter { ligne -> ligne.qte_Retourner > 0 }
     }
 
     private fun getQuantiteRetournee(ligne: Retour_Ligne): Int

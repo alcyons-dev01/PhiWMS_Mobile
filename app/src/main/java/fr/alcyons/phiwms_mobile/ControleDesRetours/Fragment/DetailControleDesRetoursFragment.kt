@@ -22,7 +22,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.RetourOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Retour_LigneOpenHelper
@@ -75,6 +77,7 @@ class DetailControleDesRetoursFragment : Fragment()
     private var maxQuantite = 0
     private var lastQuantityClickAt = 0L
     private var nouveauLot = false
+    private var insertedOrUpdatedNewLot = false
 
     companion object
     {
@@ -180,7 +183,7 @@ class DetailControleDesRetoursFragment : Fragment()
 
     private fun initializeFirstSelection()
     {
-        val premiereLigneRetournee = getRetourLignesRetournees().firstOrNull()
+        val premiereLigneRetournee = if (retourLigneBase._UID < 0) { retourLigneBase } else { getRetourLignesRetournees().firstOrNull() }
         if (premiereLigneRetournee != null)
         {
             val stock = lotsDisponibles.firstOrNull { sameLot(it, premiereLigneRetournee) }
@@ -218,9 +221,10 @@ class DetailControleDesRetoursFragment : Fragment()
         maxQuantite = getMaxQuantitePourStock(stock, ligneRetournee)
         restantTV.text = maxQuantite.toString()
         numeroLotET.setText(stock.lot.orEmpty())
-        numeroLotET.isFocusable = false
-        numeroLotET.isFocusableInTouchMode = false
-        numeroLotET.isClickable = false
+        val allowLotNameEdit = ligneRetournee?._UID ?: 0 < 0
+        numeroLotET.isFocusable = allowLotNameEdit
+        numeroLotET.isFocusableInTouchMode = allowLotNameEdit
+        numeroLotET.isClickable = allowLotNameEdit
         datePeremptionViews.spinnerMois.isEnabled = false
         datePeremptionViews.spinnerAnnee.isEnabled = false
         bandeauNouveauLotLL.visibility = View.GONE
@@ -326,18 +330,25 @@ class DetailControleDesRetoursFragment : Fragment()
     private fun enregistrerLigne()
     {
         val quantite = verifierQuantiteSaisie() ?: return
-        val stock = if (nouveauLot) { getOrCreateManualStock(quantite) } else { stockSelectionne }
+        val isLotNameChanged = isSelectedLotNameChanged()
+        if (isLotNameChanged && quantite > getQuantiteRestanteSansSelection())
+        {
+            Alerte.afficherAlerteInformation(requireContext(), LayoutInflater.from(requireContext()), "Erreur", "La quantité ne peut pas dépasser ${getQuantiteRestanteSansSelection()}", false, false)
+            return
+        }
+
+        val stock = if (nouveauLot || isLotNameChanged) { getOrCreateManualStock(quantite) } else { stockSelectionne }
         if (stock == null)
         {
             Alerte.afficherAlerteInformation(requireContext(), LayoutInflater.from(requireContext()), "Erreur", "Veuillez sélectionner un lot", false, false)
             return
         }
 
-        val ligneExistante = retourLigneSelectionnee ?: getRetourLigneForStock(stock)
+        val ligneExistante = if (isLotNameChanged) { getRetourLigneForStock(stock, retourLigneSelectionnee?._UID) } else { retourLigneSelectionnee ?: getRetourLigneForStock(stock) }
 
         if (quantite == 0)
         {
-            if (ligneExistante != null) { supprimerRetourLigne(ligneExistante, stock) }
+            if (!isLotNameChanged && ligneExistante != null) { supprimerRetourLigne(ligneExistante, stock) }
             onValider?.invoke()
             return
         }
@@ -358,6 +369,7 @@ class DetailControleDesRetoursFragment : Fragment()
             nouvelleLigne.serie_Retourner = stock.serie
             nouvelleLigne.peremptionDate = stock.peremptionDate
             Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(db, nouvelleLigne)
+            if (nouveauLot || isLotNameChanged) { markRetourLigneForSync(nouvelleLigne, DBOpenHelper.ActionsEAS.AJOUT) }
         }
 
         stock.qte_Preparer = quantite
@@ -367,12 +379,23 @@ class DetailControleDesRetoursFragment : Fragment()
             if (stockId > 0) { stockId *= -1 }
             stock._UID = stockId
             Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, stock)
+            markStockForSync(stock, DBOpenHelper.ActionsEAS.AJOUT)
         }
         else
         {
             Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock)
+            if (nouveauLot || isLotNameChanged) { markStockForSync(stock, DBOpenHelper.ActionsEAS.MAJ) }
         }
+        syncNewLotIfNeeded()
         onValider?.invoke()
+    }
+
+    private fun isSelectedLotNameChanged(): Boolean
+    {
+        val selectedStock = stockSelectionne ?: return false
+        val selectedLine = retourLigneSelectionnee ?: return false
+        if (selectedLine._UID >= 0) { return false }
+        return numeroLotET.text.toString().trim() != selectedStock.lot.orEmpty().trim()
     }
 
     private fun getOrCreateManualStock(quantite: Int): Stock_Lot_Emplacement_Light?
@@ -384,7 +407,7 @@ class DetailControleDesRetoursFragment : Fragment()
             return null
         }
 
-        val datePeremption = getSelectedPeremptionDate()
+        val datePeremption = if (!nouveauLot && stockSelectionne?.peremptionDate?.isNotBlank() == true) { stockSelectionne?.peremptionDate.orEmpty() } else { getSelectedPeremptionDate() }
         val stockExistant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(db, produit, depot, numeroLot, "")
         if (stockExistant != null && stockExistant.peremptionDate.orEmpty().trim() == datePeremption)
         {
@@ -404,6 +427,25 @@ class DetailControleDesRetoursFragment : Fragment()
             quantite,
             ""
         )
+    }
+
+    private fun markRetourLigneForSync(ligne: Retour_Ligne, action: String)
+    {
+        insertedOrUpdatedNewLot = true
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE, ligne.phiMR4UUID, ligne._UID, action)
+    }
+
+    private fun markStockForSync(stock: Stock_Lot_Emplacement_Light, action: String)
+    {
+        insertedOrUpdatedNewLot = true
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Stock_Lot_EmplacementLightOpenHelper.Constantes.TABLE_STOCK_LOT_EMPLACEMENT, stock.phiMR4UUID, stock._UID, action)
+    }
+
+    private fun syncNewLotIfNeeded()
+    {
+        if (!insertedOrUpdatedNewLot) { return }
+        val activity = requireActivity() as DetailControleDesRetoursActivity
+        ElementASynchroniserOpenHelper.toutSynchroniser(activity, db, activity.utilisateurConnecte, true)
     }
 
     private fun demanderConfirmationSiSuppressionNecessaire()
@@ -521,9 +563,9 @@ class DetailControleDesRetoursFragment : Fragment()
         return Retour_LigneOpenHelper.getAllRetourLignesByRetourProduitNeg(db, retourCourant, retourLigneBase.code_produit)
     }
 
-    private fun getRetourLigneForStock(stock: Stock_Lot_Emplacement_Light): Retour_Ligne?
+    private fun getRetourLigneForStock(stock: Stock_Lot_Emplacement_Light, excludedUid: Int? = null): Retour_Ligne?
     {
-        return getRetourLignesRetournees().firstOrNull { sameLot(stock, it) }
+        return getRetourLignesRetournees().firstOrNull { sameLot(stock, it) && (excludedUid == null || it._UID != excludedUid) }
     }
 
     private fun sameLot(stock: Stock_Lot_Emplacement_Light, ligne: Retour_Ligne): Boolean

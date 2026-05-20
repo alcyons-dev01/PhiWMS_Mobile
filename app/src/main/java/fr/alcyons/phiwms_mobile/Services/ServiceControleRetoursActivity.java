@@ -19,6 +19,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -68,8 +70,12 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
 {
     private Context context = null;
     private List<Retour> retourList = null;
+    private List<Retour> retourListBase = null;
+    private List<String> listeDepotLivraison = null;
     private ListView retourListView = null;
     private RetourDestructionAdapter retourDestructionAdapter = null;
+    private ArrayAdapter<String> autoCompleteAdapter = null;
+    private AutoCompleteTextView autoComplete = null;
     private PackageManager pm = null;
     private boolean connexionDirecte = false;
     private ActivityResultLauncher<Intent> resultScanDocument = null;
@@ -79,6 +85,8 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_liste_refresh);
         this.retourList = new ArrayList<>();
+        this.retourListBase = new ArrayList<>();
+        this.listeDepotLivraison = new ArrayList<>();
         this.context = ServiceControleRetoursActivity.this;
         this.pm = ServiceControleRetoursActivity.this.getPackageManager();
 
@@ -194,6 +202,8 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         else
         {
             this.retourList = RetourOpenHelper.getRetoursByEnAttenteDe(this.db, this.getString(R.string.RepriseDemandee));
+            this.retourListBase = new ArrayList<>(this.retourList);
+            this.populateDepotList(this.retourListBase);
             if (this.retourList.isEmpty())
             {
                 if(this.connexionDirecte)
@@ -218,6 +228,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                     // Permet d'enlever le séparateur entre deux éléments d'une listeView
                     this.retourListView.setDivider(this.footer);
                     this.retourListView.setAdapter(this.retourDestructionAdapter);
+                    this.initializeAutoComplete();
 
                     if (this.retourList.isEmpty())
                     {
@@ -235,6 +246,76 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         }
 
         this.invalidateOptionsMenu();
+    }
+
+    private void populateDepotList(final List<Retour> retoursSource)
+    {
+        this.listeDepotLivraison.clear();
+        this.listeDepotLivraison.add("Tous");
+        for (final Retour retour : retoursSource)
+        {
+            final String depotOrigine = this.getDepotLivraison(retour);
+            if (!this.listeDepotLivraison.contains(depotOrigine)) { this.listeDepotLivraison.add(depotOrigine); }
+        }
+    }
+
+    private void initializeAutoComplete()
+    {
+        this.autoComplete = this.findViewById(R.id.listeFiltre);
+        if (null == this.autoComplete) { return; }
+
+        this.listeDepotLivraison.sort((a, b) -> {
+            if (a.equals("Tous")) return -1;
+            if (b.equals("Tous")) return 1;
+            return a.compareTo(b);
+        });
+
+        this.autoCompleteAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_depot, this.listeDepotLivraison);
+        this.autoComplete.setAdapter(this.autoCompleteAdapter);
+        this.autoComplete.setThreshold(100);
+        if (!this.listeDepotLivraison.isEmpty()) { this.autoComplete.setText(this.listeDepotLivraison.get(0), false); }
+
+        final int hauteurEcran = this.getResources().getDisplayMetrics().heightPixels;
+        this.autoComplete.setDropDownHeight(hauteurEcran / 3);
+        this.autoComplete.setDropDownBackgroundResource(android.R.color.white);
+        this.autoComplete.post(() -> {
+            final int dpToPx = (int) (12.0F * this.getResources().getDisplayMetrics().density);
+            this.autoComplete.setDropDownWidth(this.findViewById(R.id.listeFiltre_LL).getWidth() - dpToPx);
+        });
+
+        this.autoComplete.setOnClickListener(v -> this.autoComplete.showDropDown());
+        this.findViewById(R.id.chevronFiltre).setOnClickListener(v -> this.autoComplete.showDropDown());
+        this.autoComplete.setOnItemClickListener((parent, view, position, id) -> this.filterRetoursByDepot(position));
+    }
+
+    private void filterRetoursByDepot(final int position)
+    {
+        final String depotNom = this.listeDepotLivraison.get(position);
+        this.autoComplete.setText(depotNom, false);
+        this.autoComplete.dismissDropDown();
+
+        this.retourList = new ArrayList<>();
+        if (depotNom.contentEquals("Tous")) { this.retourList.addAll(this.retourListBase); }
+        else
+        {
+            for (final Retour retourCourant : this.retourListBase)
+            {
+                if (this.getDepotLivraison(retourCourant).contentEquals(depotNom)) { this.retourList.add(retourCourant); }
+            }
+        }
+
+        this.retourDestructionAdapter = new RetourDestructionAdapter(ServiceControleRetoursActivity.this, this.db, this.retourList, this.utilisateurConnecte);
+        this.retourListView.setDivider(this.footer);
+        this.retourListView.setAdapter(this.retourDestructionAdapter);
+        this.invalidateOptionsMenu();
+    }
+
+    private String getDepotLivraison(final Retour retour)
+    {
+        final String[] intitule_tab = retour.getIntitule().split(":");
+        String depotOrigine = intitule_tab[0];
+        if (retour.getRef_Depot_Origine().contains("-PAD-") && this.utilisateurConnecte.getIdentifiant().toLowerCase().contains("alcyons")) { depotOrigine = "XXX-PAD-XXX"; }
+        return depotOrigine;
     }
 
     @NonNull private Intent getRetourVersServiceConnexionDirectIntent()
@@ -273,6 +354,10 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                 {
                     final JSONArray retoursJSONArray = response.getJSONArray("PH_Retours");
                     this.viderTablesConcernees();
+                    this.retourList.clear();
+                    this.retourListBase.clear();
+                    this.listeDepotLivraison.clear();
+                    this.listeDepotLivraison.add("Tous");
                     long rowID;
                     for (int i = 0; i < retoursJSONArray.length(); i++)
                     {
@@ -285,6 +370,9 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                             if (-1L != rowID)
                             {
                                 this.retourList.add(retour);
+                                this.retourListBase.add(retour);
+                                final String depotOrigine = this.getDepotLivraison(retour);
+                                if (!this.listeDepotLivraison.contains(depotOrigine)) { this.listeDepotLivraison.add(depotOrigine); }
 
                                 final JSONArray retourLignesJSONArray= retourJSONObject.getJSONArray("ph_retour_ligne");
                                 for (int k = 0; k < retourLignesJSONArray.length(); k++) { Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(this.db, new Retour_Ligne(retourLignesJSONArray.getJSONObject(k))); }
@@ -293,7 +381,13 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                     }
 
                     final Retour retour_alcyons = RetourOpenHelper.getRetourEssaiAlcyons(this.db);
-                    if(null != retour_alcyons) { this.retourList.add(retour_alcyons); }
+                    if(null != retour_alcyons)
+                    {
+                        this.retourList.add(retour_alcyons);
+                        this.retourListBase.add(retour_alcyons);
+                        final String depotOrigine = this.getDepotLivraison(retour_alcyons);
+                        if (!this.listeDepotLivraison.contains(depotOrigine)) { this.listeDepotLivraison.add(depotOrigine); }
+                    }
 
                     //lancerScan();
                     /* Code nécessaire à l'affichage de la liste */
@@ -301,6 +395,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                     // Permet d'enlever le séparateur entre deux éléments d'une listeView
                     this.retourListView.setDivider(this.footer);
                     this.retourListView.setAdapter(this.retourDestructionAdapter);
+                    this.initializeAutoComplete();
 
                     if (this.retourList.isEmpty())
                     {
