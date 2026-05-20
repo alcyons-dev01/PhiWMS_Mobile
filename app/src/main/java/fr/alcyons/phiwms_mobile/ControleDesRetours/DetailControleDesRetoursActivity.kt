@@ -50,7 +50,7 @@ import fr.alcyons.phiwms_mobile.Classes.Retour
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light
 import fr.alcyons.phiwms_mobile.ControleDesRetours.Fragment.ControleRetourLignesFragment
-import fr.alcyons.phiwms_mobile.ControleDesRetours.Fragment.ListeLotsControleDesRetoursFragment
+import fr.alcyons.phiwms_mobile.ControleDesRetours.Fragment.DetailControleDesRetoursFragment
 import fr.alcyons.phiwms_mobile.Fragment.RechercheFragment
 import fr.alcyons.phiwms_mobile.Fragment.ScannerFragment
 import fr.alcyons.phiwms_mobile.Fragment.ScannerInputFragment
@@ -73,7 +73,6 @@ import java.util.Random
 
 class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
     ControleRetourLignesFragment.OnElementSelectionneListener,
-    ListeLotsControleDesRetoursFragment.OnLotsControleValidesListener,
     RechercheFragment.OnElementRechercheListener,
     RechercheAdjustable
 {
@@ -117,7 +116,7 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
     private var rechercheFragment: RechercheFragment? = null
     private var aControlerFragment: ControleRetourLignesFragment? = null
     private var controleFragment: ControleRetourLignesFragment? = null
-    private var detailFragment: ListeLotsControleDesRetoursFragment? = null
+    private var detailFragment: DetailControleDesRetoursFragment? = null
 
     private var isScannerOpen = false
     private var isSearchOpen = false
@@ -621,7 +620,13 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
     {
         closeOpenedFragments()
         detailContainer?.let { container ->
-            val fragment = ListeLotsControleDesRetoursFragment.newInstance(retourLigne._UID, retourLigne.code_produit).also { detailFragment = it }
+            val fragment = DetailControleDesRetoursFragment.newInstance(retourLigne).also { detailFragment = it }
+            fragment.onFermer = { closeDetailFragment() }
+            fragment.onValider = {
+                closeDetailFragment()
+                refreshRetourData()
+                openAControler()
+            }
             supportFragmentManager.beginTransaction().replace(R.id.detailContainer, fragment).commitNow()
             container.visibility = View.VISIBLE
             container.translationY = container.height.toFloat().takeIf { it > 0f } ?: DETAIL_FALLBACK_TRANSLATION_Y
@@ -639,13 +644,6 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
             detailFragment = null
         }.start()
         isDetailOpen = false
-    }
-
-    override fun onLotsControleValides()
-    {
-        closeDetailFragment()
-        refreshRetourData()
-        openAControler()
     }
 
     private fun openContainer(container: FragmentContainerView)

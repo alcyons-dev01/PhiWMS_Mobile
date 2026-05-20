@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="#99302E"
+            android:background="@color/bleu_clair_alcyons"
             android:padding="12dp">
 
             <TextView
@@ -52,7 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="#FFF4F4"
+            android:background="#f4f4ff"
             android:padding="10dp"
             android:weightSum="5"
             android:gravity="center_vertical">
@@ -94,7 +94,7 @@
                 android:layout_marginStart="4dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="#FFF8E1">
+                app:cardBackgroundColor="#e1f8ff">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -117,7 +117,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Ref."
-                        android:textColor="#F57F17"
+                        android:textColor="#177ff5"
                         android:textSize="10sp"
                         android:gravity="center"/>
 
