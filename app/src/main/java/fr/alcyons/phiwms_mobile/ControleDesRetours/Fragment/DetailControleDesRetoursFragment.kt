@@ -1,6 +1,6 @@
 package fr.alcyons.phiwms_mobile.ControleDesRetours.Fragment
 
-import android.content.Intent
+import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -11,6 +11,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.EditorInfo
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
@@ -31,13 +32,10 @@ import fr.alcyons.phiwms_mobile.Classes.Produit
 import fr.alcyons.phiwms_mobile.Classes.Retour
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light
-import fr.alcyons.phiwms_mobile.ControleDesRetours.CreationLotControleDesRetoursActivity
 import fr.alcyons.phiwms_mobile.ControleDesRetours.DetailControleDesRetoursActivity
 import fr.alcyons.phiwms_mobile.Outils.Alerte
-import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites
 import fr.alcyons.phiwms_mobile.PreparationPUFetPAD.Adapter.LotAdapter
 import fr.alcyons.phiwms_mobile.R
-import fr.alcyons.phiwms_mobile.ServiceActivity
 import java.util.Calendar
 import java.util.Objects
 import java.util.Random
@@ -64,6 +62,7 @@ class DetailControleDesRetoursFragment : Fragment()
     private lateinit var numeroLotET: EditText
     private lateinit var layoutListeLot: LinearLayout
     private lateinit var layoutLotPeremption: LinearLayout
+    private lateinit var bandeauNouveauLotLL: LinearLayout
     private lateinit var effacerLotIV: ImageView
     private lateinit var quantiteCompteeET: EditText
     private lateinit var restantTV: TextView
@@ -75,6 +74,7 @@ class DetailControleDesRetoursFragment : Fragment()
     private var retourLigneSelectionnee: Retour_Ligne? = null
     private var maxQuantite = 0
     private var lastQuantityClickAt = 0L
+    private var nouveauLot = false
 
     companion object
     {
@@ -125,6 +125,7 @@ class DetailControleDesRetoursFragment : Fragment()
         numeroLotET = view.findViewById(R.id.numeroLot_ET)
         layoutListeLot = view.findViewById(R.id.layoutListeLot_LL)
         layoutLotPeremption = view.findViewById(R.id.layoutLotPeremption_LL)
+        bandeauNouveauLotLL = view.findViewById(R.id.bandeauNouveauLot_LL)
         effacerLotIV = view.findViewById(R.id.effacerLot_IV)
         quantiteCompteeET = view.findViewById(R.id.quantiteComptee_ET)
         restantTV = view.findViewById(R.id.restantAControler_TV)
@@ -200,7 +201,7 @@ class DetailControleDesRetoursFragment : Fragment()
         when
         {
             position == 0 -> clearSelection()
-            position == lotsDisponibles.size + 1 -> ouvrirCreationLotManuelle()
+            position == lotsDisponibles.size + 1 -> showManualLotEntry()
             else -> {
                 val stock = lotsDropdown[position]
                 lotView.setText(stock.lot, false)
@@ -211,11 +212,18 @@ class DetailControleDesRetoursFragment : Fragment()
 
     private fun applySelection(stock: Stock_Lot_Emplacement_Light, ligneRetournee: Retour_Ligne?)
     {
+        nouveauLot = false
         stockSelectionne = stock
         retourLigneSelectionnee = ligneRetournee
         maxQuantite = getMaxQuantitePourStock(stock, ligneRetournee)
         restantTV.text = maxQuantite.toString()
         numeroLotET.setText(stock.lot.orEmpty())
+        numeroLotET.isFocusable = false
+        numeroLotET.isFocusableInTouchMode = false
+        numeroLotET.isClickable = false
+        datePeremptionViews.spinnerMois.isEnabled = false
+        datePeremptionViews.spinnerAnnee.isEnabled = false
+        bandeauNouveauLotLL.visibility = View.GONE
         layoutListeLot.visibility = View.GONE
         layoutLotPeremption.visibility = View.VISIBLE
 
@@ -227,9 +235,16 @@ class DetailControleDesRetoursFragment : Fragment()
 
     private fun clearSelection()
     {
+        nouveauLot = false
         stockSelectionne = null
         retourLigneSelectionnee = null
         maxQuantite = 0
+        bandeauNouveauLotLL.visibility = View.GONE
+        numeroLotET.isFocusable = false
+        numeroLotET.isFocusableInTouchMode = false
+        numeroLotET.isClickable = false
+        datePeremptionViews.spinnerMois.isEnabled = false
+        datePeremptionViews.spinnerAnnee.isEnabled = false
         quantiteCompteeET.setText("0")
         restantTV.text = getQuantiteRestanteSansSelection().toString()
         showLotPicker()
@@ -237,13 +252,47 @@ class DetailControleDesRetoursFragment : Fragment()
 
     private fun showLotPicker()
     {
+        nouveauLot = false
         stockSelectionne = null
         retourLigneSelectionnee = null
         numeroLotET.setText("")
         lotView.setText(SELECT_LOT_LABEL, false)
+        bandeauNouveauLotLL.visibility = View.GONE
+        numeroLotET.isFocusable = false
+        numeroLotET.isFocusableInTouchMode = false
+        numeroLotET.isClickable = false
+        datePeremptionViews.spinnerMois.isEnabled = false
+        datePeremptionViews.spinnerAnnee.isEnabled = false
         layoutLotPeremption.visibility = View.GONE
         layoutListeLot.visibility = View.VISIBLE
         lotView.post { lotView.showDropDown() }
+    }
+
+    private fun showManualLotEntry()
+    {
+        nouveauLot = true
+        stockSelectionne = null
+        retourLigneSelectionnee = null
+        maxQuantite = getQuantiteRestanteSansSelection()
+        restantTV.text = maxQuantite.toString()
+        quantiteCompteeET.setText(maxQuantite.toString())
+        numeroLotET.setText("")
+        bandeauNouveauLotLL.visibility = View.VISIBLE
+        layoutListeLot.visibility = View.GONE
+        layoutLotPeremption.visibility = View.VISIBLE
+        datePeremptionViews.layout.visibility = View.VISIBLE
+        datePeremptionViews.spinnerMois.isEnabled = true
+        datePeremptionViews.spinnerAnnee.isEnabled = true
+        datePeremptionViews.spinnerMois.setSelection(0)
+        datePeremptionViews.spinnerAnnee.setSelection(YEAR_RANGE_BEFORE.coerceAtMost(datePeremptionViews.spinnerAnnee.adapter.count - 1))
+        numeroLotET.apply {
+            isFocusable = true
+            isFocusableInTouchMode = true
+            isClickable = true
+            requestFocus()
+        }
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(numeroLotET, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun setupQuantiteButtons(view: View)
@@ -276,14 +325,14 @@ class DetailControleDesRetoursFragment : Fragment()
 
     private fun enregistrerLigne()
     {
-        val stock = stockSelectionne
+        val quantite = verifierQuantiteSaisie() ?: return
+        val stock = if (nouveauLot) { getOrCreateManualStock(quantite) } else { stockSelectionne }
         if (stock == null)
         {
             Alerte.afficherAlerteInformation(requireContext(), LayoutInflater.from(requireContext()), "Erreur", "Veuillez sélectionner un lot", false, false)
             return
         }
 
-        val quantite = verifierQuantiteSaisie() ?: return
         val ligneExistante = retourLigneSelectionnee ?: getRetourLigneForStock(stock)
 
         if (quantite == 0)
@@ -312,8 +361,49 @@ class DetailControleDesRetoursFragment : Fragment()
         }
 
         stock.qte_Preparer = quantite
-        Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock)
+        if (stock._UID == 0)
+        {
+            var stockId = Random().nextInt()
+            if (stockId > 0) { stockId *= -1 }
+            stock._UID = stockId
+            Stock_Lot_EmplacementLightOpenHelper.insererUnStock_Lot_EmplacementEnBDD(db, stock)
+        }
+        else
+        {
+            Stock_Lot_EmplacementLightOpenHelper.mettreAJourUnStockLotEmplacement(db, stock)
+        }
         onValider?.invoke()
+    }
+
+    private fun getOrCreateManualStock(quantite: Int): Stock_Lot_Emplacement_Light?
+    {
+        val numeroLot = numeroLotET.text.toString().trim()
+        if (numeroLot.isEmpty())
+        {
+            Alerte.afficherAlerteInformation(requireContext(), LayoutInflater.from(requireContext()), "Erreur", "Veuillez saisir un numéro de lot", false, false)
+            return null
+        }
+
+        val datePeremption = getSelectedPeremptionDate()
+        val stockExistant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByProduitLotSerieEtDepot(db, produit, depot, numeroLot, "")
+        if (stockExistant != null && stockExistant.peremptionDate.orEmpty().trim() == datePeremption)
+        {
+            return stockExistant
+        }
+
+        val emplacement = retourLigneBase.retourPUI_Emplacement?.takeIf { it.isNotBlank() } ?: produit.emplacement_PUI_Defaut.orEmpty()
+        val zone = retourLigneBase.retourPUI_Zone?.takeIf { it.isNotBlank() } ?: produit.zone_PUI_Defaut.orEmpty()
+        return Stock_Lot_Emplacement_Light(
+            quantite.toDouble(),
+            numeroLot,
+            datePeremption,
+            emplacement,
+            depot.depot_Reference,
+            zone,
+            produit.getID_produit(),
+            quantite,
+            ""
+        )
     }
 
     private fun demanderConfirmationSiSuppressionNecessaire()
@@ -367,29 +457,6 @@ class DetailControleDesRetoursFragment : Fragment()
         return quantite
     }
 
-    private fun ouvrirCreationLotManuelle()
-    {
-        val bundle = (requireActivity() as ServiceActivity).bundle
-        bundle.putInt("produitID", produit.getID_produit())
-        bundle.putInt("depotID", depot.getDepot_UID())
-        bundle.putInt("retourUID", retourCourant._UID)
-        bundle.putInt("retourLigneID", retourLigneBase._UID)
-        val intent = Intent(requireContext(), CreationLotControleDesRetoursActivity::class.java)
-        intent.putExtras(bundle)
-        startActivityForResult(intent, CodesEchangesActivites.RETOUR_LOT)
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
-    {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CodesEchangesActivites.RETOUR_LOT)
-        {
-            configureLots()
-            onValider?.invoke()
-        }
-    }
-
     private fun configureDatePeremption()
     {
         val adapterMois = android.widget.ArrayAdapter(requireContext(), R.layout.spinner_date_item, getListeMoisDatePicker())
@@ -423,6 +490,17 @@ class DetailControleDesRetoursFragment : Fragment()
         val adapter = datePeremptionViews.spinnerAnnee.adapter
         val positionAnnee = (0 until adapter.count).indexOfFirst { adapter.getItem(it).toString() == annee }
         if (positionAnnee >= 0) { datePeremptionViews.spinnerAnnee.setSelection(positionAnnee) }
+    }
+
+    private fun getSelectedPeremptionDate(): String
+    {
+        val moisIndex = datePeremptionViews.spinnerMois.selectedItemPosition + 1
+        val annee = datePeremptionViews.spinnerAnnee.selectedItem.toString()
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.YEAR, annee.toInt())
+        calendar.set(Calendar.MONTH, moisIndex - 1)
+        val jour = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+        return "$annee-${String.format("%02d", moisIndex)}-$jour"
     }
 
     private fun getMaxQuantitePourStock(stock: Stock_Lot_Emplacement_Light, ligneRetournee: Retour_Ligne?): Int

@@ -196,12 +196,6 @@
         android:configChanges="orientation|screenSize"/>
 
     <activity
-        android:name="fr.alcyons.phiwms_mobile.ControleDesRetours.ListeLotsControleDesRetoursActivity"
-        android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:configChanges="orientation|screenSize"/>
-
-    <activity
         android:name="fr.alcyons.phiwms_mobile.ControleDesRetours.ListeZoneCreationActivity"
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
@@ -212,12 +206,6 @@
         android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
         android:theme="@style/AppTheme.NoActionBar"
         android:configChanges="orientation|screenSize"/>
-
-        <activity
-            android:name="fr.alcyons.phiwms_mobile.ControleDesRetours.CreationLotControleDesRetoursActivity"
-            android:parentActivityName="fr.alcyons.phiwms_mobile.ServiceActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:configChanges="orientation|screenSize"/>
 
     <!-- Quarantaine -->
     <activity
