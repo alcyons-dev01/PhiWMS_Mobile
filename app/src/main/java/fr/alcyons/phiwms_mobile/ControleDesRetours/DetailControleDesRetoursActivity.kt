@@ -169,7 +169,8 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
 
     private fun setupUi()
     {
-        findViewById<TextView>(R.id.numero).text = retourSelectionne?.numero.orEmpty()
+        findViewById<TextView>(R.id.numero).text = "Numéro retour : #" + retourSelectionne?.numero.orEmpty()
+        findViewById<TextView>(R.id.motif).text = "Motif : " + retourSelectionne?.motif.orEmpty()
 
         triChoisi = ParametreUtilisateurOpenHelper.getChoixTriRetourLigne(db)
         if (triChoisi == null)
