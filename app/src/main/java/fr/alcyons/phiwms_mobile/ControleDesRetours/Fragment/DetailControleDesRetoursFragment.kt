@@ -43,6 +43,7 @@ import java.util.Objects
 import java.util.Random
 import kotlin.math.max
 import kotlin.math.min
+import android.util.Log
 
 class DetailControleDesRetoursFragment : Fragment()
 {

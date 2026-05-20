@@ -58,7 +58,10 @@ public class Retour_Ligne_ControleRetoursAdapter_2025 extends ArrayAdapter {
         viewHolder.qteRetourner = (TextView) convertView.findViewById(R.id.QteRetourner);
         viewHolder.qteAControler = (TextView) convertView.findViewById(R.id.QteARetourner);
         viewHolder.labelQteBandeau = (TextView) convertView.findViewById(R.id.labelQteBandeau);
+        viewHolder.linearLayoutLotDatePeremption = (LinearLayout) convertView.findViewById(R.id.linearLayoutLotDatePeremption);
+        viewHolder.labelLot = (TextView) convertView.findViewById(R.id.labelLot);
         viewHolder.lotRetourne = (TextView) convertView.findViewById(R.id.lotRetourne);
+        viewHolder.labelDatePeremption = (TextView) convertView.findViewById(R.id.labelDatePeremption);
         viewHolder.datePeremption = (TextView) convertView.findViewById(R.id.datePeremption);
         viewHolder.numSerieProduit = (TextView) convertView.findViewById(R.id.numSerie);
         viewHolder.labelSerie = (TextView) convertView.findViewById(R.id.labelSerie);
@@ -77,7 +80,6 @@ public class Retour_Ligne_ControleRetoursAdapter_2025 extends ArrayAdapter {
             viewHolder.designation.setText(retourLigne.getProduit_Designation());
             viewHolder.referenceProduit.setText(retourLigne.getProduit_Reference());
             viewHolder.fournisseur.setText(retourLigne.getProduit_Fournisseur());
-            viewHolder.lotRetourne.setText(RetourPUIQuantiteHelper.getDisplayedLot(retourLigne));
             viewHolder.numSerieProduit.setText(retourLigne.getSerie_Retourner());
 
             if(retourLigne.getSerie_Retourner() == null || retourLigne.getSerie_Retourner().contentEquals(""))
@@ -100,9 +102,6 @@ public class Retour_Ligne_ControleRetoursAdapter_2025 extends ArrayAdapter {
             }
             catch (ParseException e) {e.printStackTrace();}
 
-            viewHolder.datePeremption.setText(dateAAfficher);
-            viewHolder.setDatePeremptionColor(date);
-
             if(retourLigne.get_UID() < 0)
             {
                 viewHolder.layoutZoneEmplacement.setVisibility(View.VISIBLE);
@@ -114,6 +113,10 @@ public class Retour_Ligne_ControleRetoursAdapter_2025 extends ArrayAdapter {
                 viewHolder.qteRetourner.setText(String.valueOf((int) retourLigne.getQte_Retourner()));
                 viewHolder.qteAControler.setVisibility(View.GONE);
                 viewHolder.bottomDivider.setVisibility(View.VISIBLE);
+
+                viewHolder.lotRetourne.setText(RetourPUIQuantiteHelper.getDisplayedLot(retourLigne));
+                viewHolder.datePeremption.setText(dateAAfficher);
+                viewHolder.setDatePeremptionColor(date);
             }
             else
             {
@@ -128,6 +131,12 @@ public class Retour_Ligne_ControleRetoursAdapter_2025 extends ArrayAdapter {
                 viewHolder.qteAControler.setVisibility(View.VISIBLE);
                 viewHolder.qteAControler.setText(String.valueOf(Math.max(0, (int) retourLigne.getQte_Demander() - qteRetourner)));
                 viewHolder.bottomDivider.setVisibility(View.GONE);
+
+                viewHolder.linearLayoutLotDatePeremption.setVisibility(View.GONE);
+                viewHolder.labelLot.setVisibility(View.GONE);
+                viewHolder.lotRetourne.setVisibility(View.GONE);
+                viewHolder.labelDatePeremption.setVisibility(View.GONE);
+                viewHolder.datePeremption.setVisibility(View.GONE);
             }
         }
 
@@ -141,7 +150,10 @@ public class Retour_Ligne_ControleRetoursAdapter_2025 extends ArrayAdapter {
         public TextView labelQteBandeau;
         public TextView qteRetourner;
         public TextView qteAControler;
+        public LinearLayout linearLayoutLotDatePeremption;
+        public TextView labelLot;
         public TextView lotRetourne;
+        public TextView labelDatePeremption;
         public TextView datePeremption;
         public TextView numSerieProduit;
         public TextView labelSerie;

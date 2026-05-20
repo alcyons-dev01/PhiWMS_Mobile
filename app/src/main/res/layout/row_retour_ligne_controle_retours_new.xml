@@ -94,6 +94,7 @@
                     android:orientation="vertical">
 
                     <LinearLayout
+                        android:id="@+id/linearLayoutLotDatePeremption"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="6dp"
@@ -160,6 +161,7 @@
                             android:orientation="vertical">
 
                             <TextView
+                                android:id="@+id/labelDatePeremption"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Péremption"
