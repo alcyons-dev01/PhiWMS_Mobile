@@ -202,27 +202,11 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
     private fun calculateResponsiveListHeight(frameHeight: Int): Int
     {
         val widthDp = resources.displayMetrics.run { widthPixels / density }
-
-        // Certains conteneurs (NestedScrollView, CardView, marges...) peuvent réduire
-        // la hauteur mesurée de frameHeight. Pour assurer un rendu cohérent avec
-        // la préparation, on calcule la hauteur disponible à partir de la hauteur
-        // écran et on retire l'espace réservé à l'en-tête et au bouton d'action.
-        val screenHeight = resources.displayMetrics.heightPixels
-        val headerHeight = try { findViewById<LinearLayout>(R.id.barreDeTitre)?.height ?: 0 } catch (e: Exception) { 0 }
-        val buttonHeight = try { actionButton?.height ?: findViewById<AppCompatButton>(R.id.boutonAction)?.height ?: 0 } catch (e: Exception) { 0 }
-
-        // Petite marge de sécurité (en px)
-        val safetyMargin = (16 * resources.displayMetrics.density).toInt()
-
-        val availableHeight = (screenHeight - headerHeight - buttonHeight - safetyMargin).coerceAtLeast(frameHeight)
-
-        val multiplier = when {
+        return (frameHeight * when {
             widthDp < 400 -> 0.35
             widthDp < 600 -> 0.65
             else -> 0.75
-        }
-
-        return (availableHeight * multiplier).toInt()
+        }).toInt()
     }
 
     private fun setupListeners()

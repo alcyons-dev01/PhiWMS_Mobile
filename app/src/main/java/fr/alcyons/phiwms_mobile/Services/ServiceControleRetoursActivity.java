@@ -243,7 +243,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
     private void populateDepotList(final List<Retour> retoursSource)
     {
         this.listeDepotLivraison.clear();
-        this.listeDepotLivraison.add("Tous");
+        this.listeDepotLivraison.add("Tous les dépôts");
         for (final Retour retour : retoursSource)
         {
             final String depotOrigine = this.getDepotLivraison(retour);
@@ -257,8 +257,8 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         if (null == this.autoComplete) { return; }
 
         this.listeDepotLivraison.sort((a, b) -> {
-            if (a.equals("Tous")) return -1;
-            if (b.equals("Tous")) return 1;
+            if (a.equals("Tous les dépôts")) return -1;
+            if (b.equals("Tous les dépôts")) return 1;
             return a.compareTo(b);
         });
 
@@ -287,7 +287,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
         this.autoComplete.dismissDropDown();
 
         this.retourList = new ArrayList<>();
-        if (depotNom.contentEquals("Tous")) { this.retourList.addAll(this.retourListBase); }
+        if (depotNom.contentEquals("Tous les dépôts")) { this.retourList.addAll(this.retourListBase); }
         else
         {
             for (final Retour retourCourant : this.retourListBase)
@@ -348,7 +348,7 @@ public class ServiceControleRetoursActivity extends ServiceAvecConnexionActivity
                     this.retourList.clear();
                     this.retourListBase.clear();
                     this.listeDepotLivraison.clear();
-                    this.listeDepotLivraison.add("Tous");
+                    this.listeDepotLivraison.add("Tous les dépôts");
                     long rowID;
                     for (int i = 0; i < retoursJSONArray.length(); i++)
                     {
