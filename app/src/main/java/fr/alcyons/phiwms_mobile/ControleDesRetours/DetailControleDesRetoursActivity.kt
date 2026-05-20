@@ -138,6 +138,7 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
         setupResponsiveListHeight()
         setupListeners()
         setupOnBackPressedCallback()
+        openDefaultFragment()
     }
 
     private fun initializeData()
@@ -372,7 +373,7 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
         controleFragment?.updateList(ArrayList(controlees), retourSelectionne ?: return)
         if (isAControlerOpen && aControler.isEmpty()) { closeAControler() }
         if (isControleOpen && controlees.isEmpty()) { closeControle() }
-        if (!isAControlerOpen && !isControleOpen && !isDetailOpen)
+        if (!isScannerOpen && !isSearchOpen && !isAControlerOpen && !isControleOpen && !isDetailOpen)
         {
             if (aControler.isNotEmpty()) { openAControler(aControler) }
             else if (controlees.isNotEmpty()) { openControle(controlees) }
@@ -413,6 +414,16 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
             supportFragmentManager.beginTransaction().replace(R.id.scannerContainer, fragment).commit()
         }
         isScannerOpen = true
+    }
+
+    private fun openDefaultFragment()
+    {
+        scannerContainer?.post {
+            if (!isScannerOpen && !isSearchOpen && !isAControlerOpen && !isControleOpen && !isDetailOpen)
+            {
+                openScanner()
+            }
+        }
     }
 
     private fun closeScanner()
