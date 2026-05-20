@@ -182,12 +182,23 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
     {
         val frameContenu = findViewById<RelativeLayout>(R.id.frameLayout)
         frameContenu.post {
-            hauteurListeFragment = calculateListHeight(frameContenu.height)
+            hauteurListeFragment = calculateResponsiveListHeight(frameContenu.height)
             resizeOpenListContainers()
         }
     }
 
-    private fun calculateListHeight(frameHeight: Int): Int
+    private fun ensureListHeight(): Int
+    {
+        if (hauteurListeFragment > 0) { return hauteurListeFragment }
+        val frameContenu = findViewById<RelativeLayout>(R.id.frameLayout)
+        if (frameContenu.height > 0)
+        {
+            hauteurListeFragment = calculateResponsiveListHeight(frameContenu.height)
+        }
+        return hauteurListeFragment
+    }
+
+    private fun calculateResponsiveListHeight(frameHeight: Int): Int
     {
         val widthDp = resources.displayMetrics.run { widthPixels / density }
         return (frameHeight * when {
@@ -359,7 +370,13 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
 
         aControlerFragment?.updateList(ArrayList(aControler), retourSelectionne ?: return)
         controleFragment?.updateList(ArrayList(controlees), retourSelectionne ?: return)
-        if (!isAControlerOpen && !isControleOpen && !isDetailOpen) { openAControler() }
+        if (isAControlerOpen && aControler.isEmpty()) { closeAControler() }
+        if (isControleOpen && controlees.isEmpty()) { closeControle() }
+        if (!isAControlerOpen && !isControleOpen && !isDetailOpen)
+        {
+            if (aControler.isNotEmpty()) { openAControler(aControler) }
+            else if (controlees.isNotEmpty()) { openControle(controlees) }
+        }
     }
 
     override fun onElementRechercher(element: Int) { scrollToItemOrDisplayAlert(element) }
@@ -575,6 +592,11 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
 
     private fun openAControler(lignes: List<Retour_Ligne> = getRetourLignesAControler())
     {
+        if (lignes.isEmpty())
+        {
+            if (isAControlerOpen) { closeAControler() }
+            return
+        }
         val retour = retourSelectionne ?: return
         aControlerContainer?.let { container ->
             openListContainer(container)
@@ -659,15 +681,18 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
 
     private fun openListContainer(container: FragmentContainerView)
     {
-        if (hauteurListeFragment <= 0)
+        if (ensureListHeight() <= 0)
         {
             val frameContenu = findViewById<RelativeLayout>(R.id.frameLayout)
             frameContenu.post {
-                hauteurListeFragment = calculateListHeight(frameContenu.height)
+                hauteurListeFragment = calculateResponsiveListHeight(frameContenu.height)
                 applyListContainerHeight(container)
             }
         }
-        else { applyListContainerHeight(container) }
+        else
+        {
+            applyListContainerHeight(container)
+        }
         container.visibility = View.VISIBLE
         container.translationY = 0f
         container.alpha = 0f

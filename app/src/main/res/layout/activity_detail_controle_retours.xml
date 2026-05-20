@@ -215,7 +215,7 @@
                             android:background="@color/rouge"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
-                            android:padding="14dp">
+                            android:padding="12dp">
 
                             <TextView
                                 android:layout_width="0dp"
@@ -223,8 +223,9 @@
                                 android:layout_weight="1"
                                 android:text="À CONTRÔLER"
                                 android:textColor="#FFFFFF"
-                                android:textSize="18sp"
-                                android:textStyle="bold" />
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.1" />
 
                             <TextView
                                 android:id="@+id/nbReferenceAControler_TV"
@@ -235,12 +236,12 @@
                                 android:paddingHorizontal="10dp"
                                 android:paddingVertical="2dp"
                                 android:textColor="#FFFFFF"
-                                android:textSize="16sp"
+                                android:textSize="15sp"
                                 android:textStyle="bold" />
 
                             <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
                                 android:src="@drawable/chevron_down_24dp"
                                 app:tint="#FFFFFF" />
                         </LinearLayout>
@@ -273,7 +274,7 @@
                             android:background="@color/vert"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
-                            android:padding="14dp">
+                            android:padding="12dp">
 
                             <TextView
                                 android:layout_width="0dp"
@@ -281,8 +282,9 @@
                                 android:layout_weight="1"
                                 android:text="CONTRÔLÉ"
                                 android:textColor="#FFFFFF"
-                                android:textSize="18sp"
-                                android:textStyle="bold" />
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.1" />
 
                             <TextView
                                 android:id="@+id/nbReferenceControle_TV"
@@ -293,12 +295,12 @@
                                 android:paddingHorizontal="10dp"
                                 android:paddingVertical="2dp"
                                 android:textColor="#FFFFFF"
-                                android:textSize="16sp"
+                                android:textSize="15sp"
                                 android:textStyle="bold" />
 
                             <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
                                 android:src="@drawable/chevron_down_24dp"
                                 app:tint="#FFFFFF" />
                         </LinearLayout>
