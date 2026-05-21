@@ -28,15 +28,13 @@ import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.R;
 import fr.alcyons.phiwms_mobile.ViewModel.ReceptionPuiViewModel;
 
-import static fr.alcyons.phiwms_mobile.BaseDeDonnees.CommandeOpenHelper.viderTableCommandes;
+public class ReceptionPadApiRequest extends JsonObjectRequest {
 
-public class ReceptionPuiApiRequest extends JsonObjectRequest {
-
-    private static final String TAG = "ReceptionPuiApiRequest";
+    private static final String TAG = "ReceptionPadApiRequest";
 
     private final String token;
 
-    private ReceptionPuiApiRequest(String url,
+    private ReceptionPadApiRequest(String url,
                                    String token,
                                    Context context,
                                    SQLiteDatabase db,
@@ -48,7 +46,7 @@ public class ReceptionPuiApiRequest extends JsonObjectRequest {
                 error -> {
                     Log.e(TAG, "Erreur réseau", error);
                     onErreur.onErreur(
-                            "Veuillez contacter la société Alcyons ! \n Référence : Requete Service Reception PUI");
+                            "Veuillez contacter la société Alcyons ! \n Référence : HTTP Service Réception PAD");
                 });
         this.token = token;
     }
@@ -61,14 +59,14 @@ public class ReceptionPuiApiRequest extends JsonObjectRequest {
         return headers;
     }
 
-    public static ReceptionPuiApiRequest creer(Context context,
+    public static ReceptionPadApiRequest creer(Context context,
                                                SQLiteDatabase db,
                                                String url,
                                                Utilisateur utilisateur,
                                                ReceptionPuiViewModel viewModel,
                                                ReceptionApiCallbacks.OnSuccessCallback onSuccess,
                                                ReceptionApiCallbacks.OnErreurCallback onErreur) {
-        return new ReceptionPuiApiRequest(
+        return new ReceptionPadApiRequest(
                 url, utilisateur.getToken(),
                 context, db, viewModel, onSuccess, onErreur);
     }
@@ -96,14 +94,11 @@ public class ReceptionPuiApiRequest extends JsonObjectRequest {
                                          ReceptionApiCallbacks.OnErreurCallback onErreur) throws Exception {
         String erreur = response.getString("erreur");
         if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-            onErreur.onErreur("Votre session de connexion est invalide, veuillez vous reconnecter");
+            onErreur.onErreur("Votre session est invalide, veuillez vous reconnecter.");
         } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
-            onErreur.onErreur("Votre session de connexion est expirée, veuillez vous reconnecter");
-        } else if (erreur.equals("Aucun PH_Commande trouvé")) {
-            onErreur.onErreur("Aucune réception PUI à traiter");
+            onErreur.onErreur("Votre session a expiré, veuillez vous reconnecter.");
         } else {
-            onErreur.onErreur(
-                    "Veuillez contacter la société Alcyons ! \n Référence : Requete Service Reception PUI");
+            onErreur.onErreur("Aucune réception PAD à traiter");
         }
     }
 
@@ -113,8 +108,7 @@ public class ReceptionPuiApiRequest extends JsonObjectRequest {
                                             ReceptionApiCallbacks.OnSuccessCallback onSuccess) throws Exception {
         JSONArray commandesJson = response.getJSONArray("PH_Commandes");
 
-        viderTableCommandes(db);
-        supprimerReliquatsExistants(db);
+        viderTablesConcernees(db);
 
         List<Commande> commandes = new ArrayList<>();
 
@@ -126,7 +120,7 @@ public class ReceptionPuiApiRequest extends JsonObjectRequest {
             boolean aDesReliquats = insererReliquats(db, reliquatsJson);
             if (aDesReliquats) {
                 long rowId = CommandeOpenHelper.insererUneCommandeEnBDD(db, commande);
-                if (rowId != -1) {
+                if (rowId != -1 && commande.getRef_Depot_Dest().contains("-PAD")) {
                     commandes.add(commande);
                 }
             }
@@ -136,10 +130,15 @@ public class ReceptionPuiApiRequest extends JsonObjectRequest {
         new Handler(Looper.getMainLooper()).post(onSuccess::onTerminee);
     }
 
-    private static void supprimerReliquatsExistants(SQLiteDatabase db) {
-        List<PH_Reliquat> aSupprimer = PH_ReliquatOpenHelper.getPH_ReliquatBase(db);
-        for (PH_Reliquat r : aSupprimer) {
-            PH_ReliquatOpenHelper.supprimerUnPHReliquat(db, r);
+    private static void viderTablesConcernees(SQLiteDatabase db) {
+        for (Commande commande : CommandeOpenHelper.getAllCommandes(db)) {
+            if (!commande.getNumero().contentEquals("RECALCYONS01")) {
+                for (PH_Reliquat reliquat : PH_ReliquatOpenHelper
+                        .getPH_ReliquatBaseByCommandeNumero(db, commande.getNumero())) {
+                    PH_ReliquatOpenHelper.supprimerUnPHReliquat(db, reliquat);
+                }
+                CommandeOpenHelper.supprimerUneCommande(db, commande);
+            }
         }
     }
 
@@ -147,10 +146,6 @@ public class ReceptionPuiApiRequest extends JsonObjectRequest {
         boolean aDesReliquats = false;
         for (int j = 0; j < reliquatsJson.length(); j++) {
             PH_Reliquat reliquat = new PH_Reliquat(reliquatsJson.getJSONObject(j));
-            PH_Reliquat existant = PH_ReliquatOpenHelper.getPH_ReliquatById(db, reliquat.getReliquat_UID());
-            if (existant != null) {
-                PH_ReliquatOpenHelper.supprimerUnPHReliquat(db, existant);
-            }
             long id = PH_ReliquatOpenHelper.insererPH_ReliquatEnBDD(db, reliquat);
             if (id != -1) aDesReliquats = true;
         }
