@@ -369,6 +369,8 @@ class DetailControleDesRetoursFragment : Fragment()
             nouvelleLigne.lot_Retourner = stock.lot
             nouvelleLigne.serie_Retourner = stock.serie
             nouvelleLigne.peremptionDate = stock.peremptionDate
+            nouvelleLigne.retourPUI_Zone = stock.zone
+            nouvelleLigne.retourPUI_Emplacement = stock.emplacement
             Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(db, nouvelleLigne)
             if (nouveauLot || isLotNameChanged) { markRetourLigneForSync(nouvelleLigne, DBOpenHelper.ActionsEAS.AJOUT) }
         }
