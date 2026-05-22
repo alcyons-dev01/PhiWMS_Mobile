@@ -184,18 +184,22 @@ class DetailControleDesRetoursFragment : Fragment()
 
     private fun initializeFirstSelection()
     {
-        val premiereLigneRetournee = if (retourLigneBase._UID < 0) { retourLigneBase } else { getRetourLignesRetournees().firstOrNull() }
-        if (premiereLigneRetournee != null)
+        // Si la fragment est ouverte pour une ligne déjà retournée (UID < 0),
+        // on restaure la sélection précédente (comportement attendu pour la liste Contrôle).
+        // Si elle est ouverte depuis la liste AControler (ligne de base, UID >= 0),
+        // ne pas auto-sélectionner le lot utilisé : se comporter comme un premier clic.
+        if (retourLigneBase._UID < 0)
         {
-            val stock = lotsDisponibles.firstOrNull { sameLot(it, premiereLigneRetournee) }
+            val stock = lotsDisponibles.firstOrNull { sameLot(it, retourLigneBase) }
             if (stock != null)
             {
                 lotView.setText(stock.lot, false)
-                applySelection(stock, premiereLigneRetournee)
+                applySelection(stock, retourLigneBase)
                 return
             }
         }
 
+        // Par défaut (ouverture depuis AControler), afficher quantité à 0 et restant normal
         quantiteCompteeET.setText("0")
         restantTV.text = getQuantiteRestanteSansSelection().toString()
     }

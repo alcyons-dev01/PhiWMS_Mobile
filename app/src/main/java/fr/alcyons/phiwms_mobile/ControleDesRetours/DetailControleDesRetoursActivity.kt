@@ -798,8 +798,13 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
             }
         }
 
-        if (retourComplet) onMenuSaveClick()
-        else Alerte.afficherAlerteConfirmation(this, layoutInflater, getBundle(), "Toutes les références n'ont pas été retournées, souhaitez vous continuer ?", false, true, this)
+        if (retourComplet) {
+            // Toujours demander confirmation avant de valider le contrôle
+            Alerte.afficherAlerteConfirmation(this, layoutInflater, getBundle(), "Souhaitez-vous valider le contrôle ?", false, true, this)
+        }
+        else {
+            Alerte.afficherAlerteConfirmation(this, layoutInflater, getBundle(), "Toutes les références n'ont pas été retournées, souhaitez vous continuer ?", false, true, this)
+        }
     }
 
     fun onMenuSaveClick()
