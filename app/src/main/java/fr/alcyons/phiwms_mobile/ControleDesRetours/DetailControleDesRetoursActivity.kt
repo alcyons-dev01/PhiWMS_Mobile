@@ -119,7 +119,6 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
     private var detailFragment: DetailControleDesRetoursFragment? = null
 
     private var isScannerOpen = false
-    private var isScannerClosing = false
     private var isSearchOpen = false
     private var isAControlerOpen = false
     private var isControleOpen = false
@@ -412,7 +411,6 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
 
     private fun openScanner()
     {
-        hauteurListeFragment = 0
         scannerContainer?.let { container ->
             animateFixedHeightContainerOpen(container, SCANNER_HEIGHT_DP)
             val fragment = createScannerFragment().also { scannerFragment = it }
@@ -434,12 +432,9 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
 
     private fun closeScanner()
     {
-        isScannerClosing = true
         closeContainer(scannerContainer) {
             scannerFragment?.let { supportFragmentManager.beginTransaction().remove(it).commit() }
             scannerFragment = null
-            hauteurListeFragment = 0
-            isScannerClosing = false
         }
         isScannerOpen = false
     }
@@ -701,13 +696,6 @@ class DetailControleDesRetoursActivity : ServiceAvecConnexionActivity(),
 
     private fun openListContainer(container: FragmentContainerView)
     {
-        if (isScannerClosing)
-        {
-            container.postDelayed({ openListContainer(container) }, ANIMATION_DURATION_MS)
-            return
-        }
-
-        hauteurListeFragment = 0
         if (ensureListHeight() <= 0)
         {
             val frameContenu = findViewById<RelativeLayout>(R.id.frameLayout)
