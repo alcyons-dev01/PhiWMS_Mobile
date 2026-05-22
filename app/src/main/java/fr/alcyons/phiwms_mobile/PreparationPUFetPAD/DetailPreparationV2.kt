@@ -178,12 +178,15 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         val frameContenu = findViewById<RelativeLayout>(R.id.frameLayout)
         frameContenu.post {
             hauteurDetailFragment = frameContenu.height / 2
+            Log.d("DetailPreparationV2", "widthDp: ${resources.displayMetrics.widthPixels / resources.displayMetrics.density}, widthPixels: ${resources.displayMetrics.widthPixels}, density: ${resources.displayMetrics.density}")
             val widthDp = resources.displayMetrics.run { widthPixels / density }
-            hauteurListeFragment = (frameContenu.height * when {
-                widthDp < 400  -> 0.35   // petit écran  (Zebra MC33, PDA industriels)
-                widthDp < 600  -> 0.65   // écran normal (smartphones classiques)
-                else           -> 0.75   // grand écran  (tablettes, grands smartphones)
-            }).toInt()
+            val multiplier = when {
+                widthDp < 400 -> 0.35
+                widthDp < 600 -> 0.65
+                else -> 0.75
+            }
+            Log.d("DetailPreparationV2", "frameContenu.height: ${frameContenu.height} (${frameContenu.height}*${multiplier} = ${frameContenu.height * multiplier})")
+            hauteurListeFragment = (frameContenu.height * multiplier).toInt()
         }
 
         lancerScan.setOnClickListener {
