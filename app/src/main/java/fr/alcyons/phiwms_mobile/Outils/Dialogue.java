@@ -2,6 +2,8 @@ package fr.alcyons.phiwms_mobile.Outils;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -54,7 +56,7 @@ public class Dialogue {
         layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
 
         window.setAttributes(layoutParams);
-
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.setCancelable(false);
 
         signaturePad = (SignaturePad) dialog.findViewById(R.id.signaturePad);
@@ -95,7 +97,7 @@ public class Dialogue {
         layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
 
         window.setAttributes(layoutParams);
-
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.setCancelable(false);
 
         commentaireEditText = (EditText) dialog.findViewById(R.id.commentaireEditText);
@@ -139,7 +141,7 @@ public class Dialogue {
         layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
 
         window.setAttributes(layoutParams);
-
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.setCancelable(true);
 
         signaturePad = (SignaturePad) dialog.findViewById(R.id.signaturePad);

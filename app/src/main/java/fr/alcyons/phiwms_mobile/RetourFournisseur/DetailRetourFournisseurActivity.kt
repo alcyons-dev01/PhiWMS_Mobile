@@ -14,6 +14,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ListView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -86,7 +87,7 @@ class DetailRetourFournisseurActivity : ServiceActivity(), RechercheFragment.OnE
     private var scannerFragment: Fragment? = null
     private var rechercheFragment: RechercheFragment? = null
     private var aRetournerFournisseurFragment: ARetournerFournisseurFragment? = null
-
+    private var hauteurListeFragment = 0
     // State
     private var isScannerOpen: Boolean = false
     private var isSearchOpen: Boolean = false
@@ -117,6 +118,15 @@ class DetailRetourFournisseurActivity : ServiceActivity(), RechercheFragment.OnE
     public override fun onResume()
     {
         super.onResume()
+        val frameContenu = findViewById<RelativeLayout>(R.id.frameLayout)
+        frameContenu.post {
+            val widthDp = resources.displayMetrics.run { widthPixels / density }
+            hauteurListeFragment = (frameContenu.height * when {
+                widthDp < 400  -> 0.35   // petit écran  (Zebra MC33, PDA industriels)
+                widthDp < 600  -> 0.65   // écran normal (smartphones classiques)
+                else           -> 0.75   // grand écran  (tablettes, grands smartphones)
+            }).toInt()
+        }
         this.invalidateOptionsMenu()
 
         this.loadData()
@@ -153,7 +163,7 @@ class DetailRetourFournisseurActivity : ServiceActivity(), RechercheFragment.OnE
                 this.closeOpenedFragments()
                 this.openACompter()
             }
-            this.aRetournerFournisseurFragment?.scrollToPosition(position)
+            //this.aRetournerFournisseurFragment?.scrollToPosition(position)
         }
         else { Alerte.afficherAlerteInformation(this@DetailRetourFournisseurActivity, this.layoutInflater, "Produit non trouvé", "Ce produit n'est pas dans la liste de retour fournisseur", false, false) }
     }
@@ -495,7 +505,6 @@ class DetailRetourFournisseurActivity : ServiceActivity(), RechercheFragment.OnE
         this.isSearchOpen = true
 
         // Bascule TextView → EditText dans le header
-        this.findViewById<ImageView>(R.id.chevronRecherche).visibility = View.GONE
         (textChercher_TV ?: return).visibility = View.GONE
         (searchInput_ET ?: return).visibility = View.VISIBLE
         (effacerRecherche_IV ?: return).visibility = View.VISIBLE
@@ -539,7 +548,6 @@ class DetailRetourFournisseurActivity : ServiceActivity(), RechercheFragment.OnE
 
     private fun hideSearchInput()
     {
-        this.findViewById<ImageView>(R.id.chevronRecherche).visibility = View.VISIBLE
         (textChercher_TV ?: return).visibility = View.VISIBLE
         (searchInput_ET ?: return).visibility = View.GONE
         (effacerRecherche_IV ?: return).visibility = View.GONE
@@ -554,7 +562,7 @@ class DetailRetourFournisseurActivity : ServiceActivity(), RechercheFragment.OnE
     {
         this.referenceARetournerFournisseurContainer.apply {
             (this ?: return@apply).layoutParams = (this.layoutParams as LinearLayout.LayoutParams).also {
-                it.height = LinearLayout.LayoutParams.WRAP_CONTENT
+                it.height = hauteurListeFragment
                 it.weight = 0f
             }
             this.visibility = View.VISIBLE

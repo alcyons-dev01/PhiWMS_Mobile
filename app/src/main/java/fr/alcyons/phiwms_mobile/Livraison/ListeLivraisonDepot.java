@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
@@ -23,6 +24,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -34,6 +36,7 @@ import androidx.core.app.ActivityCompat;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 import com.itextpdf.text.DocumentException;
 
@@ -65,6 +68,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.ListeLivraisonDepotAdapter;
+import fr.alcyons.phiwms_mobile.ListViewAdapters.Retour_Ligne_QuarantaineAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.CodesEchangesActivites;
 import fr.alcyons.phiwms_mobile.Outils.Dialogue;
@@ -86,9 +90,7 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
     ListView ph_preparation_ListView;
     ListeLivraisonDepotAdapter ph_preparation_livraisonAdapter;
     PackageManager pm;
-
     boolean connexionDirecte;
-
     List<String> listeDepotLivraison;
     Dialogue dialogue;
     String signatureNameChauffeur;
@@ -98,118 +100,16 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
     String subject;
     String body;
     Dialog alertePatientezDialog;
-
     String depotReference;
     String dateLivraison;
-
     Depot depot;
-    
-    FloatingActionMenu floatingMenu;
-    FloatingActionButton boutonSignatureLivreur;
-    FloatingActionButton boutonPatientAbsent;
-    FloatingActionButton boutonToutRefuser;
     ActionUtilisateur new_action_utilisateur;
 
-    public View.OnClickListener clicboutonSignerLivreur = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            floatingMenu.close(true);
-            afficherAlerteValidationAllLivraison(ListeLivraisonDepot.this, ListeLivraisonDepot.this.getLayoutInflater());
-        }
-    };
-
-    public View.OnClickListener clicboutonToutRefuser = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            floatingMenu.close(true);
-            for(PH_Preparation ph_preparation_courant : ph_preparation_List)
-            {
-                List<PH_Preparation_Ligne> liste_ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, ph_preparation_courant);
-                for(PH_Preparation_Ligne ph_preparation_ligne : liste_ph_preparation_ligne)
-                {
-                    ph_preparation_ligne.setAccepter(false);
-                    ph_preparation_ligne.setQte_livrer(0);
-                    PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
-                }
-            }
-            AfficherSignature();
-        }
-    };
-
-    public View.OnClickListener clicboutonPatientAbsent = new View.OnClickListener() {
-        @SuppressLint("SimpleDateFormat")
-        @Override
-        public void onClick(View v) {
-            floatingMenu.close(true);
-            boolean confirmer = Alerte.afficherAlerte(ListeLivraisonDepot.this, "Confirmer", "Confirmez-vous que le patient est absent ?", "OuiNon");
-            if(confirmer)
-            {
-                for(PH_Preparation ph_preparation_Selectionne : ph_preparation_List) {
-                    ph_preparation_Selectionne.setStatut("Refuser");
-                    ph_preparation_Selectionne.setMotif("Patient absent");
-                    List<PH_Preparation_Ligne> liste_ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, ph_preparation_Selectionne);
-
-                    for (PH_Preparation_Ligne preparation_ligne : liste_ph_preparation_ligne) {
-                        preparation_ligne.setQte_livrer(0);
-                        PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, preparation_ligne);
-                        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, preparation_ligne.getPhiMR4UUID(), preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
-                    }
-                    PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, ph_preparation_Selectionne);
-
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation_Selectionne.getPhiMR4UUID(), ph_preparation_Selectionne.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
-
-                    // Tentative de lancer la sychronisation
-                    if (statutConnexion) {
-                        ElementASynchroniserOpenHelper.toutSynchroniser(ListeLivraisonDepot.this, db, utilisateurConnecte, true);
-                    }
-
-                    @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-                    Date dateDuJour = new Date();
-                    dateFormat.format(dateDuJour);
-                    String date;
-                    dateFormat = new SimpleDateFormat("yyyyMMdd");
-                    dateDuJour = new Date();
-                    date = dateFormat.format(dateDuJour);
-
-                    subject = "phiwms_mobile - " + depot.getNom() + " - Livraisons N°" + ph_preparation_Selectionne.getUID() + " Refusé - " + date;
-
-                    body = "Madame, Monsieur, \n \n" +
-                            "La livraison N°" + ph_preparation_Selectionne.getUID() + " à destination de " + depot.getNom() + " a été refusé car le patient est absent. \n" +
-                            "Ceci est un message automatique merci de ne pas répondre\n\n";
-
-                    // Récupération Mail Pharmacie
-                    String email = ParametresServeurOpenHelper.getMailPharmacie(db);
-                    if (utilisateurConnecte.getEtablissement().contentEquals("ADH")) {
-                        email = "livraison.pui@adh-asso.net";
-                    }
-                    if (utilisateurConnecte.getIdentifiant().toUpperCase().contentEquals("ALCYONS")) {
-                        email = "dev01@alcyons.fr";
-                    }
-
-                    if (email != null) {
-                        new SendEmailTask().execute(email);
-                        onBackPressed();
-                    }
-                }
-            }
-        }
-    };
-    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_liste_livraison_depot);
         context = ListeLivraisonDepot.this;
-        floatingMenu = findViewById(R.id.floatingMenu);
-        boutonSignatureLivreur = findViewById(R.id.boutonSignatureLivreur);
-        boutonPatientAbsent = findViewById(R.id.boutonPatientAbsent);
-        boutonToutRefuser = findViewById(R.id.boutonToutRefuser);
-
-        boutonSignatureLivreur.setOnClickListener(clicboutonSignerLivreur);
-
-        boutonPatientAbsent.setOnClickListener(clicboutonPatientAbsent);
-
-        boutonToutRefuser.setOnClickListener(clicboutonToutRefuser);
 
         depotReference = intent.getStringExtra("depotRef");
         dateLivraison = intent.getStringExtra("dateLivraison");
@@ -234,6 +134,101 @@ public class ListeLivraisonDepot  extends ServiceAvecConnexionActivity {
         connexionDirecte = ParametreUtilisateurOpenHelper.getConnexionDirecte(db);
 
         passageParOnCreate = true;
+
+        findViewById(R.id.floatingMenu).setOnClickListener(v -> {
+                BottomSheetDialog dialog = new BottomSheetDialog(this);
+                View sheetView = getLayoutInflater().inflate(R.layout.aide_saisie_livraison, null);
+                dialog.setContentView(sheetView);
+
+                dialog.setCanceledOnTouchOutside(false);
+                dialog.setCancelable(false);
+
+                // Fond transparent
+                FrameLayout bottomSheet = dialog.findViewById(
+                        com.google.android.material.R.id.design_bottom_sheet);
+                if (bottomSheet != null) {
+                    bottomSheet.setBackgroundColor(Color.TRANSPARENT);
+                }
+
+                sheetView.findViewById(R.id.boutonToutRefuser).setOnClickListener(v2 -> {
+                    for(PH_Preparation ph_preparation_courant : ph_preparation_List)
+                    {
+                        List<PH_Preparation_Ligne> liste_ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, ph_preparation_courant);
+                        for(PH_Preparation_Ligne ph_preparation_ligne : liste_ph_preparation_ligne)
+                        {
+                            ph_preparation_ligne.setAccepter(false);
+                            ph_preparation_ligne.setQte_livrer(0);
+                            PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
+                        }
+                    }
+                    AfficherSignature();
+                    dialog.dismiss();
+                });
+                sheetView.findViewById(R.id.boutonPatientAbsent).setOnClickListener(v2 -> {
+                    boolean confirmer = Alerte.afficherAlerte(ListeLivraisonDepot.this, "Confirmer", "Confirmez-vous que le patient est absent ?", "OuiNon");
+                    if(confirmer)
+                    {
+                        for(PH_Preparation ph_preparation_Selectionne : ph_preparation_List) {
+                            ph_preparation_Selectionne.setStatut("Refuser");
+                            ph_preparation_Selectionne.setMotif("Patient absent");
+                            List<PH_Preparation_Ligne> liste_ph_preparation_ligne = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, ph_preparation_Selectionne);
+
+                            for (PH_Preparation_Ligne preparation_ligne : liste_ph_preparation_ligne) {
+                                preparation_ligne.setQte_livrer(0);
+                                PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, preparation_ligne);
+                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, preparation_ligne.getPhiMR4UUID(), preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+                            }
+                            PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, ph_preparation_Selectionne);
+
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation_Selectionne.getPhiMR4UUID(), ph_preparation_Selectionne.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+
+                            // Tentative de lancer la sychronisation
+                            if (statutConnexion) {
+                                ElementASynchroniserOpenHelper.toutSynchroniser(ListeLivraisonDepot.this, db, utilisateurConnecte, true);
+                            }
+
+                            @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+                            Date dateDuJour = new Date();
+                            dateFormat.format(dateDuJour);
+                            String date;
+                            dateFormat = new SimpleDateFormat("yyyyMMdd");
+                            dateDuJour = new Date();
+                            date = dateFormat.format(dateDuJour);
+
+                            subject = "phiwms_mobile - " + depot.getNom() + " - Livraisons N°" + ph_preparation_Selectionne.getUID() + " Refusé - " + date;
+
+                            body = "Madame, Monsieur, \n \n" +
+                                    "La livraison N°" + ph_preparation_Selectionne.getUID() + " à destination de " + depot.getNom() + " a été refusé car le patient est absent. \n" +
+                                    "Ceci est un message automatique merci de ne pas répondre\n\n";
+
+                            // Récupération Mail Pharmacie
+                            String email = ParametresServeurOpenHelper.getMailPharmacie(db);
+                            if (utilisateurConnecte.getEtablissement().contentEquals("ADH")) {
+                                email = "livraison.pui@adh-asso.net";
+                            }
+                            if (utilisateurConnecte.getIdentifiant().toUpperCase().contentEquals("ALCYONS")) {
+                                email = "dev01@alcyons.fr";
+                            }
+
+                            if (email != null) {
+                                new SendEmailTask().execute(email);
+                                onBackPressed();
+                            }
+                        }
+                        dialog.dismiss();
+                    }
+                    else
+                        dialog.dismiss();
+                });
+                sheetView.findViewById(R.id.boutonSignatureLivreur).setOnClickListener(v2 -> {
+                    afficherAlerteValidationAllLivraison(ListeLivraisonDepot.this, ListeLivraisonDepot.this.getLayoutInflater());
+                    dialog.dismiss();
+                });
+
+                sheetView.findViewById(R.id.btnFermerBottomSheet).setOnClickListener(v2 -> dialog.dismiss());
+
+                dialog.show();
+        });
     }
 
     @Override

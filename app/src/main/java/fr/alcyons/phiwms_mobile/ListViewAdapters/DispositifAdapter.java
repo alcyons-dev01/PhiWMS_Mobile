@@ -49,7 +49,7 @@ public class DispositifAdapter extends ArrayAdapter {
             viewHolder.fournisseur = (TextView) convertView.findViewById(R.id.nomFournisseur);
             viewHolder.type = (TextView) convertView.findViewById(R.id.type);
 
-            viewHolder.separateur1 = (ImageView) convertView.findViewById(R.id.separateur1);
+            viewHolder.separateur1 = (View) convertView.findViewById(R.id.separateur1);
 
             viewHolder.tableRowHaut = (TableRow) convertView.findViewById(R.id.tableRowHaut);
             viewHolder.logoPosition1 = (ImageView) convertView.findViewById(R.id.symboleusageunique);
@@ -164,7 +164,7 @@ public class DispositifAdapter extends ArrayAdapter {
         public TextView nom;
         public TextView type;
         public TextView fournisseur;
-        public ImageView separateur1;
+        public View separateur1;
         public TableRow tableRowHaut;
         public TableRow tableRowBas;
         public ImageView logoPosition1;

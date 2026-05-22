@@ -1,31 +1,29 @@
 package fr.alcyons.phiwms_mobile.Livraison;
 
-import static com.google.android.gms.vision.L.TAG;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.clans.fab.FloatingActionButton;
-import com.github.clans.fab.FloatingActionMenu;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.itextpdf.text.DocumentException;
 
 import java.io.ByteArrayOutputStream;
@@ -73,553 +71,98 @@ import static fr.alcyons.phiwms_mobile.AuthentificationActivity.hasPermissions;
 
 public class InformationLivraisonActivity extends ServiceActivity {
 
+    private static final String TAG = "InformationLivraison";
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static final String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
-    List<String> liste_produit_refuser;
-    PH_Preparation ph_preparation_Selectionne;
-    Dialogue dialogue;
-    String filename;
-    String signatureNameChauffeur;
-    String subject;
-    String body;
 
-    // Boutons
-    FloatingActionMenu floatingMenu;
-    FloatingActionButton boutonSignatureLivreur;
-    FloatingActionButton boutonPatientAbsent;
-    FloatingActionButton boutonToutRefuser;
+    // ═══════════════════════════════════════════
+    // Données métier
+    // ═══════════════════════════════════════════
+    private PH_Preparation phPreparationSelectionnee;
+    private List<PH_Preparation_Ligne> lignesList;
+    private List<String> listeProduitRefuser;
+    private Depot depot;
+    private String adresse;
+    private ActionUtilisateur newActionUtilisateur;
 
-    Depot depot;
-    String adresse;
-    List<PH_Preparation_Ligne> ph_preparation_ligne_List;
+    // ═══════════════════════════════════════════
+    // Email
+    // ═══════════════════════════════════════════
+    private String filename;
+    private String signatureNameChauffeur;
+    private String subject;
+    private String body;
 
-    ListView ph_preparationLigne_ListView;
-    PH_Preparation_Ligne_LivraisonAdapter ph_preparation_ligne_livraisonAdapter;
-    List<PH_Preparation_Ligne> tempPh_preparation_ligne_List;
+    // ═══════════════════════════════════════════
+    // Photo
+    // ═══════════════════════════════════════════
+    private Bitmap photoLivraisonBitmap;
+    private String photoLivraisonPhotoName;
 
-    //gestion de la photo
-    String photoProduitsChemin;
-    Bitmap photoLivraisonBitmap;
-    String photoLivraisonPhotoName;
-    ActionUtilisateur new_action_utilisateur;
+    // ═══════════════════════════════════════════
+    // UI
+    // ═══════════════════════════════════════════
+    private ListView listView;
+    private PH_Preparation_Ligne_LivraisonAdapter adapter;
+    private Dialogue dialogue;
 
-    public View.OnClickListener clicValidationSignature = new View.OnClickListener() {
-        @SuppressLint("SimpleDateFormat")
-        @Override
-        public void onClick(View v) {
+    // ═══════════════════════════════════════════
+    // Listeners
+    // ═══════════════════════════════════════════
+    private final View.OnClickListener onClickListenerValider = v -> {
+        enregistrerLivraison();
+    };
+    private final View.OnClickListener clicValidationSignature = v -> {
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        String date = dateFormat.format(new Date());
 
-            // Création du pdf
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-            Date dateDuJour = new Date();
-            dateFormat.format(dateDuJour);
-            String date;
-            dateFormat = new SimpleDateFormat("yyyyMMdd");
-            dateDuJour = new Date();
-            date = dateFormat.format(dateDuJour);
+        filename             = phPreparationSelectionnee.getUID() + "_" + date + "_Livraison.pdf";
+        signatureNameChauffeur = phPreparationSelectionnee.getUID() + "_" + date + "_LivraisonSignature";
 
-            filename = ph_preparation_Selectionne.getUID() + "_" + date + "_Livraison.pdf";
-            signatureNameChauffeur = ph_preparation_Selectionne.getUID() + "_" + date + "_LivraisonSignature";
+        verifyStoragePermissions(this);
 
-            //Sauvegarde de la signature dans une image
-            verifyStoragePermissions(InformationLivraisonActivity.this);
-            Bitmap bitmap = dialogue.signaturePad.getSignatureBitmap();
-            OutilsGestionPhotos.saveExternalStorageImageJPEG(InformationLivraisonActivity.this, bitmap, signatureNameChauffeur);
+        Bitmap bitmap = dialogue.signaturePad.getSignatureBitmap();
+        OutilsGestionPhotos.saveExternalStorageImageJPEG(this, bitmap, signatureNameChauffeur);
 
-            if(bitmap != null)
-            {
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                byte[] byteArray = stream.toByteArray();
-                String img_str = Base64.encodeToString(byteArray, Base64.DEFAULT);
-                ph_preparation_Selectionne.setSignature_Livraison(img_str);
-            }
-
-            dialogue.dialog.dismiss();
-
-            dialogue = new Dialogue(InformationLivraisonActivity.this, onClickListenerValider, utilisateurConnecte);
-            dialogue.padCommentairePhotoLivraison();
+        if (bitmap != null) {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            String img_str = Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
+            phPreparationSelectionnee.setSignature_Livraison(img_str);
         }
+
+        dialogue.dialog.dismiss();
+        dialogue = new Dialogue(this, onClickListenerValider, utilisateurConnecte);
+        dialogue.padCommentairePhotoLivraison();
     };
 
-    View.OnClickListener onClickListenerValider = new View.OnClickListener() {
-        @SuppressLint("SimpleDateFormat")
-        @Override
-        public void onClick(View v) {
-
-            //Récupération du commentaire
-            String commentaireSaisie = dialogue.commentaireEditText.getText().toString();
-            if(!commentaireSaisie.contentEquals(""))
-            {
-                ph_preparation_Selectionne.setCommentaires(commentaireSaisie);
-            }
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date dateDuJour = new Date();
-            String date = dateFormat.format(dateDuJour);
-            ph_preparation_Selectionne.setLivraisonDate(date);
-            ph_preparation_Selectionne.setLivree(true);
-            PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, ph_preparation_Selectionne);
-
-            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation_Selectionne.getPhiMR4UUID(), ph_preparation_Selectionne.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
-
-            // Tentative de lancer la sychronisation
-            if (statutConnexion) {
-                ElementASynchroniserOpenHelper.toutSynchroniser(InformationLivraisonActivity.this, db, utilisateurConnecte, true);
-            }
-
-            //Création de l'action utilisateur
-            Random random = new Random();
-            int actionId = random.nextInt();
-            if(actionId > 0)
-                actionId= actionId*-1;
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date dateDestruction =new Date();
-            String date_string = parseFormat.format(dateDestruction);
-            new_action_utilisateur = new ActionUtilisateur(actionId, utilisateurConnecte.getId(), date_string, serviceActuel.getId(), utilisateurConnecte.getEtablissementId(), "En attente", ph_preparation_Selectionne.getUID(), "", "Livraison");
-            ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
-            //fin de la création de l'action utilisateur
-
-
-            //mise à jour des PH_Preparations Ligne dans la BDD
-            for(PH_Preparation_Ligne preparation_ligne_courant : ph_preparation_ligne_List)
-            {
-                if(preparation_ligne_courant.getQte_APreparer() != preparation_ligne_courant.getQte_livrer())
-                {
-                    liste_produit_refuser.add(preparation_ligne_courant.getProduitDesignation()+" -> Quantité à préparer : "+preparation_ligne_courant.getQte_APreparer()+" - Quantité livrée : "+preparation_ligne_courant.getQte_livrer());
-                }
-
-                PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, preparation_ligne_courant);
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, preparation_ligne_courant.getPhiMR4UUID(), preparation_ligne_courant.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
-
-                ActionUtilisateur_Ligne actionUtilisateur_ligne = getActionUtilisateurLigne(preparation_ligne_courant);
-                ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(db, actionUtilisateur_ligne);
-            }
-
-
-            //Construction mail
-            Depot depot = DepotOpenHelper.getDepotParID(db, ph_preparation_Selectionne.getDepotDestinataireID());
-            String commentaire = ph_preparation_Selectionne.getCommentaires();
-            if(commentaire == null || commentaire.contentEquals(""))
-            {
-                commentaire = "Pas de commentaire saisie";
-            }
-
-            subject = "phiwms_mobile - "+ depot.getNom() + " - Livraisons N°" + ph_preparation_Selectionne.getUID() + " - " + date;
-
-            //Sauvegarde de la signature dans une image
-            if (photoLivraisonBitmap != null) {
-
-                dateFormat = new SimpleDateFormat("yyyyMMdd");
-                dateDuJour = new Date();
-                date = dateFormat.format(dateDuJour);
-
-                photoLivraisonPhotoName = ph_preparation_Selectionne.getUID() + "_" + date + "_LivraisonPhoto";
-
-                verifyStoragePermissions(InformationLivraisonActivity.this);
-            }
-
-            String preparer_par = "";
-            String valider_par = "";
-            String livrer_par = "";
-            Utilisateur userLivreur = UtilisateurOpenHelper.getUtilisateurByID(db, ph_preparation_Selectionne.getLivreur_userID());
-            if(userLivreur != null)
-            {
-                livrer_par = userLivreur.getNom()+" "+userLivreur.getPrenom();
-            }
-            if(ph_preparation_Selectionne.getPreparateur() != null)
-            {
-                String[] tab_preparateur = ph_preparation_Selectionne.getPreparateur().split("\\(");
-                preparer_par = tab_preparateur[0];
-                String[] tab_valider_par = tab_preparateur[1].split("\\)");
-                valider_par = tab_valider_par[0];
-            }
-
-            //Verifier le livré par
-            if(liste_produit_refuser.isEmpty())
-            {
-                body = "Madame, Monsieur, \n \n" +
-                        "La livraison N°" + ph_preparation_Selectionne.getUID() + " à destination de " + depot.getNom() + " a été réalisée. \n" +
-                        "Préparé par "+preparer_par+"\n"+
-                        "Validé par "+valider_par+"\n"+
-                        "Livré par "+livrer_par+"\n"+
-                        "Vous pourrez trouver ci-joint le bon de livraison signé. \n" +
-                        "Commentaire : "+commentaire+"\n\n"+
-                        "Ceci est un message automatique merci de ne pas répondre\n\n";
-            }
-            else
-            {
-                StringBuilder text_produit_refuser = new StringBuilder();
-                for(String refus_courant : liste_produit_refuser)
-                {
-                    text_produit_refuser.append(refus_courant).append("\n");
-                }
-                body = "Madame, Monsieur, \n \n" +
-                        "La livraison N°" + ph_preparation_Selectionne.getUID() + " à destination de " + depot.getNom() + " a été réalisée. \n" +
-                        "Préparé par "+preparer_par+"\n"+
-                        "Validé par "+valider_par+"\n"+
-                        "Livré par "+livrer_par+"\n"+
-                        "Les produits suivant n'ont pas étaient livrés ou sont livrés en partie : \n\n"+text_produit_refuser+"\n"+
-                        "Vous pourrez trouver ci-joint le bon de livraison signé. \n" +
-                        "Commentaire : "+commentaire+"\n\n"+
-
-                        "Ceci est un message automatique merci de ne pas répondre\n\n";
-            }
-
-
-            try {
-                OutilsGestionPDF outilsGestionPDF = new OutilsGestionPDF(true);
-                outilsGestionPDF.createLivraisonV2(InformationLivraisonActivity.this, filename, signatureNameChauffeur, db, ph_preparation_Selectionne);
-            } catch (IOException e) {
-                Log.e(TAG, "IOException :", e);
-            } catch (DocumentException e) {
-                Log.e(TAG, "DocumentException :", e);
-            }
-
-            // Récupération Mail Pharmacie
-            String email = ParametresServeurOpenHelper.getMailPharmacie(db);
-            if(utilisateurConnecte.getEtablissement().contentEquals("ADH"))
-            {
-                email = "livraison.pui@adh-asso.net";
-            }
-            if(utilisateurConnecte.getIdentifiant().toUpperCase().contentEquals("ALCYONS"))
-            {
-                email = "dev01@alcyons.fr";
-            }
-
-            if (email != null) {
-                new SendEmailTask().execute(email);
-            }
-
-            dialogue.dialog.dismiss();
-            ph_preparation_Selectionne.setLivreur_userID(utilisateurConnecte.getId());
-            mettreAJourPhPreparation(ph_preparation_Selectionne);
-            Toast.makeText(InformationLivraisonActivity.this, "Livraison effectuée", Toast.LENGTH_SHORT).show();
-
-            onBackPressed();
-        }
-    };
-
-    @NonNull
-    private ActionUtilisateur_Ligne getActionUtilisateurLigne(PH_Preparation_Ligne preparation_ligne_courant) {
-        Random randomactionligne = new Random();
-        int actionligneId = randomactionligne.nextInt();
-        if(actionligneId > 0)
-            actionligneId= actionligneId*-1;
-
-        return new ActionUtilisateur_Ligne(actionligneId, new_action_utilisateur.getId(), "Ph_Preparation_Ligne", preparation_ligne_courant.get_UID(), "", 0, preparation_ligne_courant.getQte_livrer(), preparation_ligne_courant.getProduitDesignation());
-    }
-
-    public View.OnClickListener clicboutonSignerLivreur = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            floatingMenu.close(true);
-            dialogue = new Dialogue(InformationLivraisonActivity.this, clicValidationSignature, utilisateurConnecte);
-            dialogue.signaturePadOpen(true);
-        }
-    };
-
-    public View.OnClickListener clicboutonToutRefuser = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            floatingMenu.close(true);
-            for(int i = 0; i < ph_preparation_ligne_livraisonAdapter.getCount(); i++)
-            {
-                View view = ph_preparationLigne_ListView.getChildAt(i);
-                view.findViewById(R.id.Accepter).setVisibility(View.GONE);
-                view.findViewById(R.id.Refuser).setVisibility(View.VISIBLE);
-                view.findViewById(R.id.layoutValidation).setBackgroundColor(InformationLivraisonActivity.this.getColor(R.color.rouge2));
-                ph_preparation_ligne_List.get(i).setAccepter(false);
-                ph_preparation_ligne_List.get(i).setQte_livrer(0);
-
-                PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne_List.get(i));
-                ph_preparation_ligne_livraisonAdapter.notifyDataSetChanged();
-            }
-
-        }
-    };
-
-    public View.OnClickListener clicboutonPatientAbsent = new View.OnClickListener() {
-        @SuppressLint("SimpleDateFormat")
-        @Override
-        public void onClick(View v) {
-            floatingMenu.close(true);
-            boolean confirmer = Alerte.afficherAlerte(InformationLivraisonActivity.this, "Confirmer", "Confirmez-vous que le patient est absent ?", "OuiNon");
-            if(confirmer)
-            {
-                ph_preparation_Selectionne.setStatut("Refuser");
-                ph_preparation_Selectionne.setMotif("Patient absent");
-                for(PH_Preparation_Ligne preparation_ligne : ph_preparation_ligne_List)
-                {
-                    preparation_ligne.setQte_livrer(0);
-                    PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, preparation_ligne);
-                    ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, preparation_ligne.getPhiMR4UUID(), preparation_ligne.get_UID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
-                }
-                PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, ph_preparation_Selectionne);
-
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation_Selectionne.getPhiMR4UUID(), ph_preparation_Selectionne.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
-                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR, new_action_utilisateur.getPhiMR4UUID(), new_action_utilisateur.getId(), DBOpenHelper.ActionsEAS.AJOUT);
-
-                // Tentative de lancer la sychronisation
-                if (statutConnexion) {
-                    ElementASynchroniserOpenHelper.toutSynchroniser(InformationLivraisonActivity.this, db, utilisateurConnecte, true);
-                }
-
-                @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-                Date dateDuJour = new Date();
-                dateFormat.format(dateDuJour);
-                String date;
-                dateFormat = new SimpleDateFormat("yyyyMMdd");
-                dateDuJour = new Date();
-                date = dateFormat.format(dateDuJour);
-
-                subject = "phiwms_mobile - "+ depot.getNom() + " - Livraisons N°" + ph_preparation_Selectionne.getUID() + " Refusé - " + date;
-                body = "Madame, Monsieur, \n \n" +
-                        "La livraison N°" + ph_preparation_Selectionne.getUID() + " à destination de " + depot.getNom() + " a été refusé car le patient est absent. \n" +
-                        "Ceci est un message automatique merci de ne pas répondre\n\n";
-
-                // Récupération Mail Pharmacie
-                String email = ParametresServeurOpenHelper.getMailPharmacie(db);
-                if(utilisateurConnecte.getEtablissement().contentEquals("ADH"))
-                {
-                    email = "livraison.pui@adh-asso.net";
-                }
-                if(utilisateurConnecte.getIdentifiant().toUpperCase().contentEquals("ALCYONS"))
-                {
-                    email = "dev01@alcyons.fr";
-                }
-
-                if (email != null) {
-                    new SendEmailTask().execute(email);
-                    onBackPressed();
-                }
-
-            }
-        }
-    };
-
-    //clic sur le numéro de téléphone ouvre le téléphone pour appeler le correspondant
-    public void telephoneDepot(View v) {
-        // Demande des autorisations
-        int PERMISSION_ALL = 1;
-        String[] PERMISSIONS = {
-                Manifest.permission.CALL_PHONE
-        };
-        if (!hasPermissions(this, PERMISSIONS)) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
-        } else {
-            Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:" + depot.getTel()));
-            startActivity(intent);
-        }
-    }
-
-    //clic sur l'adresse du dépôt ouvre Google Maps
-    public void adresseDepot(View v) {
-        String map = "https://www.google.com/maps/search/?api=1&query=" + adresse;
-        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(map));
-        startActivity(i);
-    }
-
+    // ═══════════════════════════════════════════
+    // Cycle de vie
+    // ═══════════════════════════════════════════
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_information_livraison);
 
-        //gestion de la photo
-        photoProduitsChemin = "chemin";
-
-        ph_preparation_Selectionne = PH_PreparationOpenHelper.getPH_PreparationByID(db, intent.getIntExtra("ph_preparationUID_Selectionne", 0));
-        ph_preparation_ligne_List = PH_Preparation_LigneOpenHelper.getALivrerPHPreparationLignesParPHPreparation(db, ph_preparation_Selectionne);
-
-        //gestion des floating boutons et du menu
-        floatingMenu = findViewById(R.id.floatingMenu);
-        boutonSignatureLivreur = findViewById(R.id.boutonSignatureLivreur);
-        boutonPatientAbsent = findViewById(R.id.boutonPatientAbsent);
-        boutonToutRefuser = findViewById(R.id.boutonToutRefuser);
-
-        boutonSignatureLivreur.setOnClickListener(clicboutonSignerLivreur);
-
-        boutonPatientAbsent.setOnClickListener(clicboutonPatientAbsent);
-
-        boutonToutRefuser.setOnClickListener(clicboutonToutRefuser);
-
-        //gestion liste
-        //initialisation des listes
-        liste_produit_refuser = new ArrayList<>();
-        ph_preparationLigne_ListView = findViewById(R.id.listeView);
-        tempPh_preparation_ligne_List = PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparation(db, ph_preparation_Selectionne);
-
-        ph_preparation_ligne_List = new ArrayList<>();
-
-        for (PH_Preparation_Ligne ph_preparation_ligne : tempPh_preparation_ligne_List) {
-            if (ph_preparation_ligne.getQte_livrer() > 0) {
-                ph_preparation_ligne_List.add(ph_preparation_ligne);
-            }
-        }
-
-        ph_preparation_ligne_List.sort(Comparator.comparing(PH_Preparation_Ligne::getProduitDesignation));
-
-        if (savedInstanceState != null) {
-            ph_preparation_Selectionne = PH_PreparationOpenHelper.getPH_PreparationByID(db, savedInstanceState.getInt("ph_preparationUID_Selectionne"));
-        }
-
-        for (PH_Preparation_Ligne ph_preparation_ligne : ph_preparation_ligne_List) {
-            ph_preparation_ligne.setAccepter(true);
-            PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne);
-        }
-
-        // Transformation de la date au format yyyy-MM-dd à dd/MM/yyyy
-        String dateLivraison = "";
-        Date dateLivraisonPrevue;
-
-        @SuppressLint("SimpleDateFormat") DateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
-        @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
-        try {
-            dateLivraisonPrevue = dateDecodeur.parse(ph_preparation_Selectionne.getLivraisonPrevueDate());
-
-            if (dateLivraisonPrevue != null) {
-                dateLivraison = dateFormat.format(dateLivraisonPrevue);
-            }
-        } catch (ParseException e) {
-            Log.e(TAG, "ParseException :", e);
-        }
-
-        //Récupération du dépot concerné par la livraison
-        depot = DepotOpenHelper.getDepotParReference(db, ph_preparation_Selectionne.getDepotDestinataireReference());
-
-        // Affichage des informations de base
-        ((TextView) findViewById(R.id.uidPHPreparation)).setText("N°" + String.valueOf(ph_preparation_Selectionne.getUID()).trim());
-        ((TextView) findViewById(R.id.livraisonPrevueDate)).setText(dateLivraison);
-
-        ((TextView) findViewById(R.id.identiteClient)).setText(depot.getNom().trim());
-
-        ((TextView) findViewById(R.id.telephone)).setText(depot.getTel().trim());
-
-        if (!ph_preparation_Selectionne.isURGENT()) {
-            findViewById(R.id.isUrgent).setVisibility(View.GONE);
-        }
-
-        if(!ph_preparation_Selectionne.getCommentaires().contentEquals("") && ph_preparation_Selectionne.getCommentaires() != null)
-        {
-            ((TextView) findViewById(R.id.commentaire)).setText(ph_preparation_Selectionne.getCommentaires().trim());
-        }
-        else
-        {
-            findViewById(R.id.zoneCommentaire).setVisibility(View.GONE);
-            findViewById(R.id.separateur2).setVisibility(View.GONE);
-        }
-
-        adresse = "";
-
-        if (depot.getDepot_Reference().contains("PAD") && depot.isPAD_Utiliser_Adresse_Vacances()) {
-            adresse = depot.getPAD_Vacances_Adr1() + ", ";
-            if (depot.getPAD_Vacances_Adr2().length() > 1) {
-                adresse += depot.getPAD_Vacances_Adr2() + ", ";
-            }
-            adresse += depot.getPAD_Vacances_CP() + " " + depot.getPAD_Vacances_Ville();
-        } else {
-            adresse = depot.getAdresse1() + ", ";
-            if (depot.getAdresse2().length() > 1) {
-                adresse += depot.getAdresse2() + ", ";
-            }
-            adresse += depot.getCP() + " " + depot.getVille();
-        }
-
-        ((TextView) findViewById(R.id.adresse)).setText(adresse.trim());
-        findViewById(R.id.layoutIdentite).setOnClickListener(v -> {
-            if(findViewById(R.id.layoutAdresse).getVisibility() == View.GONE)
-            {
-                findViewById(R.id.layoutAdresse).setVisibility(View.VISIBLE);
-                findViewById(R.id.deployerAdresse).setVisibility(View.GONE);
-                findViewById(R.id.replierAdresse).setVisibility(View.VISIBLE);
-            }
-            else
-            {
-                findViewById(R.id.layoutAdresse).setVisibility(View.GONE);
-                findViewById(R.id.deployerAdresse).setVisibility(View.VISIBLE);
-                findViewById(R.id.replierAdresse).setVisibility(View.GONE);
-            }
-        });
-
+        initialiserDonnees(savedInstanceState);
+        initialiserVues();
+        configurerChevronAdresse();
     }
 
     @Override
     public void onResume() {
         super.onResume();
         invalidateOptionsMenu();
-
-        int nbColisVE = 0;
-
-        List<PH_Preparation_Ligne> tempPh_preparation_ligne_List;
-        tempPh_preparation_ligne_List = PH_Preparation_LigneOpenHelper.getALivrerPHPreparationLignesParPHPreparation(db, ph_preparation_Selectionne);
-
-
-        for (PH_Preparation_Ligne ph_preparation_ligne : tempPh_preparation_ligne_List) {
-            int qte = ph_preparation_ligne.getQte_livrer();
-            Produit produit = ProduitOpenHelper.getProduitByID(db, ph_preparation_ligne.getProduitID());
-
-            if (produit != null) {
-
-                int conditionnementSet = produit.getCond_achat();
-                int nombreColis = 0;
-
-                if (qte > 0 && conditionnementSet > 0) {
-                    nombreColis = qte / conditionnementSet;
-                    if ((qte % conditionnementSet) != 0) {
-                        nombreColis++;
-                    }
-                }
-                if (qte > 0) {
-                    if (nombreColis == 0) {
-                        nombreColis = 1;
-                    }
-                }
-
-                nbColisVE += nombreColis;
-            }
-        }
-        ((TextView) findViewById(R.id.montantTTC)).setText(String.valueOf((int)ph_preparation_Selectionne.getMontant_TTC()));
-        ((TextView) findViewById(R.id.poidsTotal)).setText(String.valueOf((int)ph_preparation_Selectionne.getPoids()));
-        ((TextView) findViewById(R.id.volume)).setText(String.valueOf((int)ph_preparation_Selectionne.getVolume()));
-        ((TextView) findViewById(R.id.nbRef)).setText(String.valueOf(tempPh_preparation_ligne_List.size()));
-        ((TextView) findViewById(R.id.nbColis)).setText(String.valueOf(nbColisVE));
-
-        ph_preparation_ligne_livraisonAdapter = new PH_Preparation_Ligne_LivraisonAdapter(InformationLivraisonActivity.this, ph_preparation_ligne_List);
-        ph_preparationLigne_ListView.setDivider(footer);
-        ph_preparationLigne_ListView.setAdapter(ph_preparation_ligne_livraisonAdapter);
-
-        ph_preparationLigne_ListView.setOnItemClickListener((parent, view, position, id) -> {
-            if(floatingMenu.isOpened())
-            {
-                floatingMenu.close(true);
-            }
-            else
-            {
-                if (ph_preparation_ligne_List.get(position).getAccepter()) {
-                    ph_preparation_ligne_List.get(position).setAccepter(false);
-                    ph_preparation_ligne_List.get(position).setQte_livrer(0);
-                    PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne_List.get(position));
-
-                    view.findViewById(R.id.Accepter).setVisibility(View.GONE);
-                    view.findViewById(R.id.Refuser).setVisibility(View.VISIBLE);
-
-                } else {
-                    ph_preparation_ligne_List.get(position).setAccepter(true);
-                    ph_preparation_ligne_List.get(position).setQte_livrer(ph_preparation_ligne_List.get(position).getQte_APreparer());
-                    PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ph_preparation_ligne_List.get(position));
-                    view.findViewById(R.id.Accepter).setVisibility(View.VISIBLE);
-                    view.findViewById(R.id.Refuser).setVisibility(View.GONE);
-                }
-                ph_preparation_ligne_livraisonAdapter.notifyDataSetChanged();
-            }
-        });
-
+        actualiserIndicateurs();
+        initialiserListView();
+        configurerFab();
+        configurerClicLignes();
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -631,36 +174,32 @@ public class InformationLivraisonActivity extends ServiceActivity {
         return true;
     }
 
-    public void onClickMenuPhoto()
-    {
-        Intent informationLivraison_Intent = new Intent(InformationLivraisonActivity.this, PrisePhoto.class);
-        Bundle informationLivraison_Bundle = InformationLivraisonActivity.super.getBundle();
-        informationLivraison_Bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
-        informationLivraison_Bundle.putInt("serviceSelectionneID", serviceActuel.getId());
-        informationLivraison_Bundle.putInt("preparationUID", ph_preparation_Selectionne.getUID());
-        informationLivraison_Bundle.putString("contexte", "priseDePhotoLivraison");
-        informationLivraison_Intent.putExtras(informationLivraison_Bundle);
-        InformationLivraisonActivity.this.startActivityForResult(informationLivraison_Intent, CodesEchangesActivites.RETOUR_PRISE_PHOTO);
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(this, ServiceLivraisonActivity.class);
+        intent.putExtras(super.getBundle());
+        startActivity(intent);
+        finish();
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case CodesEchangesActivites.RESULT_SIGNATURE: {
-                if (data != null) {
-                    InformationLivraisonActivity.this.finish();
-                }
-            }
-            break;
+            case CodesEchangesActivites.RESULT_SIGNATURE:
+                if (data != null) finish();
+                break;
+
             case CodesEchangesActivites.RETOUR_PRISE_PHOTO:
-                if(data != null)
-                {
-                    photoProduitsChemin = Objects.requireNonNull(data.getExtras()).getString("photoProduit");
-                    if (photoProduitsChemin != null && !photoProduitsChemin.contentEquals("")) {
+                if (data != null) {
+                    String chemin = Objects.requireNonNull(data.getExtras()).getString("photoProduit");
+                    if (chemin != null && !chemin.isEmpty()) {
                         try {
-                            photoLivraisonBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(photoProduitsChemin));
+                            photoLivraisonBitmap = MediaStore.Images.Media.getBitmap(
+                                    getContentResolver(), Uri.parse(chemin));
                         } catch (IOException e) {
-                            Log.e(TAG, "IOException :", e);
+                            Log.e(TAG, "Erreur lecture photo", e);
                         }
                     }
                 }
@@ -668,81 +207,509 @@ public class InformationLivraisonActivity extends ServiceActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent serviceLivraison_Intent = new Intent(InformationLivraisonActivity.this, ServiceLivraisonActivity.class);
-        Bundle serviceLivraison_Bundle = InformationLivraisonActivity.super.getBundle();
-        serviceLivraison_Intent.putExtras(serviceLivraison_Bundle);
-        InformationLivraisonActivity.this.startActivity(serviceLivraison_Intent);
-        InformationLivraisonActivity.this.finish();
+    // ═══════════════════════════════════════════
+    // Initialisation
+    // ═══════════════════════════════════════════
+    private void initialiserDonnees(Bundle savedInstanceState) {
+        listeProduitRefuser = new ArrayList<>();
+
+        int uid = (savedInstanceState != null)
+                ? savedInstanceState.getInt("ph_preparationUID_Selectionne")
+                : intent.getIntExtra("ph_preparationUID_Selectionne", 0);
+
+        phPreparationSelectionnee = PH_PreparationOpenHelper.getPH_PreparationByID(db, uid);
+
+        List<PH_Preparation_Ligne> toutes = PH_Preparation_LigneOpenHelper
+                .getAllPHPreparationLignesParPHPreparation(db, phPreparationSelectionnee);
+
+        lignesList = new ArrayList<>();
+        for (PH_Preparation_Ligne ligne : toutes) {
+            if (ligne.getQte_livrer() > 0) lignesList.add(ligne);
+        }
+        lignesList.sort(Comparator.comparing(PH_Preparation_Ligne::getProduitDesignation));
+
+        for (PH_Preparation_Ligne ligne : lignesList) {
+            ligne.setAccepter(true);
+            PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ligne);
+        }
+
+        depot  = DepotOpenHelper.getDepotParReference(db, phPreparationSelectionnee.getDepotDestinataireReference());
+        adresse = construireAdresse();
     }
 
-    public void mettreAJourPhPreparation(PH_Preparation ph_preparation) {
+    @SuppressLint("SetTextI18n")
+    private void initialiserVues() {
+        listView = findViewById(R.id.listeView);
 
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date dateDuJour = new Date();
-        String date = dateFormat.format(dateDuJour);
+        // Date de livraison
+        String dateLivraison = formaterDate(phPreparationSelectionnee.getLivraisonPrevueDate(),
+                "yyyy-MM-dd", "dd/MM/yyyy");
 
-        ph_preparation.setLivree(true);
-        ph_preparation.setLivraisonDate(date);
-        if (ph_preparation.getStatut().contains("en")) {
-            ph_preparation.setStatut("Délivrée en partie");
+        ((TextView) findViewById(R.id.uidPHPreparation))
+                .setText("N°" + phPreparationSelectionnee.getUID());
+        ((TextView) findViewById(R.id.livraisonPrevueDate)).setText(dateLivraison);
+        ((TextView) findViewById(R.id.identiteClient)).setText(depot.getNom().trim());
+        ((TextView) findViewById(R.id.telephone)).setText(depot.getTel().trim());
+        ((TextView) findViewById(R.id.adresse)).setText(adresse.trim());
+
+        // URGENT
+        if (!phPreparationSelectionnee.isURGENT()) {
+            findViewById(R.id.isUrgent).setVisibility(View.GONE);
+        }
+
+        // Commentaire
+        String commentaire = phPreparationSelectionnee.getCommentaires();
+        if (commentaire != null && !commentaire.isEmpty()) {
+            ((TextView) findViewById(R.id.commentaire)).setText(commentaire.trim());
         } else {
-            ph_preparation.setStatut("Délivrée");
+            findViewById(R.id.zoneCommentaire).setVisibility(View.GONE);
+        }
+    }
+
+    private void actualiserIndicateurs() {
+        List<PH_Preparation_Ligne> lignes = PH_Preparation_LigneOpenHelper
+                .getALivrerPHPreparationLignesParPHPreparation(db, phPreparationSelectionnee);
+
+        int nbColis = calculerNbColis(lignes);
+
+        ((TextView) findViewById(R.id.montantTTC)).setText(String.valueOf((int) phPreparationSelectionnee.getMontant_TTC()));
+        ((TextView) findViewById(R.id.poidsTotal)).setText(String.valueOf((int) phPreparationSelectionnee.getPoids()));
+        ((TextView) findViewById(R.id.volume)).setText(String.valueOf((int) phPreparationSelectionnee.getVolume()));
+        ((TextView) findViewById(R.id.nbRef)).setText(String.valueOf(lignes.size()));
+        ((TextView) findViewById(R.id.nbColis)).setText(String.valueOf(nbColis));
+    }
+
+    private void initialiserListView() {
+        adapter = new PH_Preparation_Ligne_LivraisonAdapter(this, lignesList);
+        listView.setDivider(footer);
+        listView.setAdapter(adapter);
+    }
+
+    // ═══════════════════════════════════════════
+    // Configuration UI
+    // ═══════════════════════════════════════════
+    private void configurerChevronAdresse() {
+        findViewById(R.id.layoutIdentite).setOnClickListener(v -> {
+            View layoutAdresse   = findViewById(R.id.layoutAdresse);
+            View deployer        = findViewById(R.id.deployerAdresse);
+            View replier         = findViewById(R.id.replierAdresse);
+
+            boolean estVisible = layoutAdresse.getVisibility() == View.VISIBLE;
+            layoutAdresse.setVisibility(estVisible ? View.GONE : View.VISIBLE);
+            deployer.setVisibility(estVisible ? View.VISIBLE : View.GONE);
+            replier.setVisibility(estVisible ? View.GONE : View.VISIBLE);
+        });
+    }
+
+    private void configurerFab() {
+        findViewById(R.id.floatingMenu).setOnClickListener(v -> ouvrirBottomSheet());
+    }
+
+    private void configurerClicLignes() {
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            PH_Preparation_Ligne ligne = lignesList.get(position);
+            boolean accepter = !ligne.getAccepter();
+
+            ligne.setAccepter(accepter);
+            ligne.setQte_livrer(accepter ? ligne.getQte_APreparer() : 0);
+            PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ligne);
+
+            view.findViewById(R.id.Accepter).setVisibility(accepter ? View.VISIBLE : View.GONE);
+            view.findViewById(R.id.Refuser).setVisibility(accepter ? View.GONE : View.VISIBLE);
+
+            adapter.notifyDataSetChanged();
+        });
+    }
+
+    // ═══════════════════════════════════════════
+    // Bottom Sheet
+    // ═══════════════════════════════════════════
+    private void ouvrirBottomSheet() {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View sheetView = getLayoutInflater().inflate(R.layout.aide_saisie_livraison, null);
+        dialog.setContentView(sheetView);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
+
+        FrameLayout bottomSheet = dialog.findViewById(
+                com.google.android.material.R.id.design_bottom_sheet);
+        if (bottomSheet != null) bottomSheet.setBackgroundColor(Color.TRANSPARENT);
+
+        sheetView.findViewById(R.id.btnFermerBottomSheet)
+                .setOnClickListener(v -> dialog.dismiss());
+
+        sheetView.findViewById(R.id.boutonToutRefuser)
+                .setOnClickListener(v -> {
+                    toutRefuser();
+                    dialog.dismiss();
+                });
+
+        sheetView.findViewById(R.id.boutonPatientAbsent)
+                .setOnClickListener(v -> gererPatientAbsent(dialog));
+
+        sheetView.findViewById(R.id.boutonSignatureLivreur)
+                .setOnClickListener(v -> {
+                    dialogue = new Dialogue(this, clicValidationSignature, utilisateurConnecte);
+                    dialogue.signaturePadOpen(true);
+                    dialog.dismiss();
+                });
+
+        dialog.show();
+    }
+
+    // ═══════════════════════════════════════════
+    // Actions métier
+    // ═══════════════════════════════════════════
+    private void toutRefuser() {
+        for (int i = 0; i < adapter.getCount(); i++) {
+            View view = listView.getChildAt(i);
+            if (view != null) {
+                view.findViewById(R.id.Accepter).setVisibility(View.GONE);
+                view.findViewById(R.id.Refuser).setVisibility(View.VISIBLE);
+                view.findViewById(R.id.layoutValidation)
+                        .setBackgroundColor(getColor(R.color.rouge2));
+            }
+            lignesList.get(i).setAccepter(false);
+            lignesList.get(i).setQte_livrer(0);
+            PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, lignesList.get(i));
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    private void gererPatientAbsent(BottomSheetDialog dialog) {
+        boolean confirmer = Alerte.afficherAlerte(this, "Confirmer",
+                "Confirmez-vous que le patient est absent ?", "OuiNon");
+
+        if (!confirmer) {
+            dialog.dismiss();
+            return;
         }
 
-        PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, ph_preparation);
+        phPreparationSelectionnee.setStatut("Refuser");
+        phPreparationSelectionnee.setMotif("Patient absent");
 
-        // Ajout du PH_Preparation au ElementASynchroniser
-        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION, ph_preparation.getPhiMR4UUID(), ph_preparation.getUID(), ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+        for (PH_Preparation_Ligne ligne : lignesList) {
+            ligne.setQte_livrer(0);
+            PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ligne);
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db,
+                    PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE,
+                    ligne.getPhiMR4UUID(), ligne.get_UID(),
+                    ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+        }
 
-        // Tentative de lancer la sychronisation
+        PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, phPreparationSelectionnee);
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db,
+                PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION,
+                phPreparationSelectionnee.getPhiMR4UUID(),
+                phPreparationSelectionnee.getUID(),
+                ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+
         if (statutConnexion) {
-            ElementASynchroniserOpenHelper.toutSynchroniser(InformationLivraisonActivity.this, db, utilisateurConnecte, true);
+            ElementASynchroniserOpenHelper.toutSynchroniser(this, db, utilisateurConnecte, true);
+        }
+
+        @SuppressLint("SimpleDateFormat")
+        String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        subject = "phiwms_mobile - " + depot.getNom()
+                + " - Livraisons N°" + phPreparationSelectionnee.getUID()
+                + " Refusé - " + date;
+        body = "Madame, Monsieur, \n\n"
+                + "La livraison N°" + phPreparationSelectionnee.getUID()
+                + " à destination de " + depot.getNom()
+                + " a été refusée car le patient est absent.\n"
+                + "Ceci est un message automatique merci de ne pas répondre\n\n";
+
+        String email = getEmail();
+        if (email != null) {
+            new SendEmailTask().execute(email);
+            onBackPressed();
         }
     }
 
-    // Fonction permettant de vérifier la permissions de stockage
+    private void enregistrerLivraison() {
+        // Commentaire
+        String commentaire = dialogue.commentaireEditText.getText().toString();
+        if (!commentaire.isEmpty()) {
+            phPreparationSelectionnee.setCommentaires(commentaire);
+        }
+
+        @SuppressLint("SimpleDateFormat")
+        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        phPreparationSelectionnee.setLivraisonDate(date);
+        phPreparationSelectionnee.setLivree(true);
+        PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, phPreparationSelectionnee);
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db,
+                PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION,
+                phPreparationSelectionnee.getPhiMR4UUID(),
+                phPreparationSelectionnee.getUID(),
+                ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+
+        if (statutConnexion) {
+            ElementASynchroniserOpenHelper.toutSynchroniser(this, db, utilisateurConnecte, true);
+        }
+
+        creerActionUtilisateur();
+        enregistrerLignes();
+        construireEmail();
+
+        try {
+            new OutilsGestionPDF(true).createLivraisonV2(this, filename,
+                    signatureNameChauffeur, db, phPreparationSelectionnee);
+        } catch (IOException | DocumentException e) {
+            Log.e(TAG, "Erreur création PDF", e);
+        }
+
+        String email = getEmail();
+        if (email != null) new SendEmailTask().execute(email);
+
+        dialogue.dialog.dismiss();
+        phPreparationSelectionnee.setLivreur_userID(utilisateurConnecte.getId());
+        mettreAJourPhPreparation(phPreparationSelectionnee);
+        Toast.makeText(this, "Livraison effectuée", Toast.LENGTH_SHORT).show();
+        onBackPressed();
+    }
+
+    private void creerActionUtilisateur() {
+        Random random = new Random();
+        int actionId = -Math.abs(random.nextInt());
+
+        @SuppressLint("SimpleDateFormat")
+        String dateString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+
+        newActionUtilisateur = new ActionUtilisateur(actionId,
+                utilisateurConnecte.getId(), dateString, serviceActuel.getId(),
+                utilisateurConnecte.getEtablissementId(), "En attente",
+                phPreparationSelectionnee.getUID(), "", "Livraison");
+
+        ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, newActionUtilisateur);
+    }
+
+    private void enregistrerLignes() {
+        for (PH_Preparation_Ligne ligne : lignesList) {
+            if (ligne.getQte_APreparer() != ligne.getQte_livrer()) {
+                listeProduitRefuser.add(ligne.getProduitDesignation()
+                        + " -> Qté à préparer : " + ligne.getQte_APreparer()
+                        + " - Qté livrée : " + ligne.getQte_livrer());
+            }
+            PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, ligne);
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db,
+                    PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE,
+                    ligne.getPhiMR4UUID(), ligne.get_UID(),
+                    ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+
+            ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(
+                    db, buildActionLigne(ligne));
+        }
+    }
+
+    @NonNull
+    private ActionUtilisateur_Ligne buildActionLigne(PH_Preparation_Ligne ligne) {
+        int id = -Math.abs(new Random().nextInt());
+        return new ActionUtilisateur_Ligne(id, newActionUtilisateur.getId(),
+                "Ph_Preparation_Ligne", ligne.get_UID(), "",
+                0, ligne.getQte_livrer(), ligne.getProduitDesignation());
+    }
+
+    private void construireEmail() {
+        Depot depotDest = DepotOpenHelper.getDepotParID(db, phPreparationSelectionnee.getDepotDestinataireID());
+        @SuppressLint("SimpleDateFormat")
+        String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
+
+        String commentaire = phPreparationSelectionnee.getCommentaires();
+        if (commentaire == null || commentaire.isEmpty()) commentaire = "Pas de commentaire saisi";
+
+        String preparerPar = "", validerPar = "", livrerPar = "";
+
+        Utilisateur livreur = UtilisateurOpenHelper.getUtilisateurByID(
+                db, phPreparationSelectionnee.getLivreur_userID());
+        if (livreur != null) livrerPar = livreur.getNom() + " " + livreur.getPrenom();
+
+        if (phPreparationSelectionnee.getPreparateur() != null) {
+            String[] parts = phPreparationSelectionnee.getPreparateur().split("\\(");
+            preparerPar = parts[0];
+            validerPar = parts[1].replace(")", "");
+        }
+
+        subject = "phiwms_mobile - " + depotDest.getNom()
+                + " - Livraisons N°" + phPreparationSelectionnee.getUID()
+                + " - " + date;
+
+        if (listeProduitRefuser.isEmpty()) {
+            body = buildBodyLivraisonComplete(depotDest, preparerPar, validerPar, livrerPar, commentaire);
+        } else {
+            body = buildBodyLivraisonPartielle(depotDest, preparerPar, validerPar, livrerPar, commentaire);
+        }
+
+        if (photoLivraisonBitmap != null) {
+            photoLivraisonPhotoName = phPreparationSelectionnee.getUID()
+                    + "_" + date + "_LivraisonPhoto";
+            verifyStoragePermissions(this);
+        }
+    }
+
+    private String buildBodyLivraisonComplete(Depot d, String prep, String valid, String livr, String commentaire) {
+        return "Madame, Monsieur,\n\n"
+                + "La livraison N°" + phPreparationSelectionnee.getUID()
+                + " à destination de " + d.getNom() + " a été réalisée.\n"
+                + "Préparé par " + prep + "\n"
+                + "Validé par " + valid + "\n"
+                + "Livré par " + livr + "\n"
+                + "Vous pourrez trouver ci-joint le bon de livraison signé.\n"
+                + "Commentaire : " + commentaire + "\n\n"
+                + "Ceci est un message automatique merci de ne pas répondre\n\n";
+    }
+
+    private String buildBodyLivraisonPartielle(Depot d, String prep, String valid, String livr, String commentaire) {
+        StringBuilder refus = new StringBuilder();
+        for (String r : listeProduitRefuser) refus.append(r).append("\n");
+
+        return "Madame, Monsieur,\n\n"
+                + "La livraison N°" + phPreparationSelectionnee.getUID()
+                + " à destination de " + d.getNom() + " a été réalisée.\n"
+                + "Préparé par " + prep + "\n"
+                + "Validé par " + valid + "\n"
+                + "Livré par " + livr + "\n"
+                + "Les produits suivants n'ont pas été livrés ou sont livrés en partie :\n\n"
+                + refus
+                + "\nVous pourrez trouver ci-joint le bon de livraison signé.\n"
+                + "Commentaire : " + commentaire + "\n\n"
+                + "Ceci est un message automatique merci de ne pas répondre\n\n";
+    }
+
+    // ═══════════════════════════════════════════
+    // Utilitaires
+    // ═══════════════════════════════════════════
+    private String construireAdresse() {
+        String adr;
+        if (depot.getDepot_Reference().contains("PAD") && depot.isPAD_Utiliser_Adresse_Vacances()) {
+            adr = depot.getPAD_Vacances_Adr1() + ", ";
+            if (depot.getPAD_Vacances_Adr2().length() > 1) adr += depot.getPAD_Vacances_Adr2() + ", ";
+            adr += depot.getPAD_Vacances_CP() + " " + depot.getPAD_Vacances_Ville();
+        } else {
+            adr = depot.getAdresse1() + ", ";
+            if (depot.getAdresse2().length() > 1) adr += depot.getAdresse2() + ", ";
+            adr += depot.getCP() + " " + depot.getVille();
+        }
+        return adr;
+    }
+
+    private String formaterDate(String dateStr, String formatEntree, String formatSortie) {
+        try {
+            @SuppressLint("SimpleDateFormat") DateFormat decodeur = new SimpleDateFormat(formatEntree);
+            @SuppressLint("SimpleDateFormat") DateFormat encodeur = new SimpleDateFormat(formatSortie);
+            Date date = decodeur.parse(dateStr);
+            return date != null ? encodeur.format(date) : "";
+        } catch (ParseException e) {
+            Log.e(TAG, "Erreur formatage date", e);
+            return "";
+        }
+    }
+
+    private int calculerNbColis(List<PH_Preparation_Ligne> lignes) {
+        int total = 0;
+        for (PH_Preparation_Ligne ligne : lignes) {
+            int qte = ligne.getQte_livrer();
+            if (qte <= 0) continue;
+
+            Produit produit = ProduitOpenHelper.getProduitByID(db, ligne.getProduitID());
+            if (produit == null) continue;
+
+            int cond = produit.getCond_achat();
+            int colis = (cond > 0) ? (qte / cond) + (qte % cond != 0 ? 1 : 0) : 1;
+            total += Math.max(colis, 1);
+        }
+        return total;
+    }
+
+    private String getEmail() {
+        String email = ParametresServeurOpenHelper.getMailPharmacie(db);
+        if ("ADH".equals(utilisateurConnecte.getEtablissement()))
+            email = "livraison.pui@adh-asso.net";
+        if ("ALCYONS".equalsIgnoreCase(utilisateurConnecte.getIdentifiant()))
+            email = "dev01@alcyons.fr";
+        return email;
+    }
+
+    public void mettreAJourPhPreparation(PH_Preparation preparation) {
+        @SuppressLint("SimpleDateFormat")
+        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+
+        preparation.setLivree(true);
+        preparation.setLivraisonDate(date);
+        preparation.setStatut(preparation.getStatut().contains("en") ? "Délivrée en partie" : "Délivrée");
+
+        PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, preparation);
+        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db,
+                PH_PreparationOpenHelper.Constantes.TABLE_PH_PREPARATION,
+                preparation.getPhiMR4UUID(), preparation.getUID(),
+                ElementASynchroniserOpenHelper.ActionsEAS.MAJ);
+
+        if (statutConnexion) {
+            ElementASynchroniserOpenHelper.toutSynchroniser(this, db, utilisateurConnecte, true);
+        }
+    }
+
+    // ═══════════════════════════════════════════
+    // Permissions
+    // ═══════════════════════════════════════════
     public static void verifyStoragePermissions(Activity activity) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    activity,
-                    PERMISSIONS_STORAGE,
-                    REQUEST_EXTERNAL_STORAGE
-            );
+        if (ActivityCompat.checkSelfPermission(activity,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
         }
     }
 
-    // Class permettant d'envoyer un email
-    private class SendEmailTask extends AsyncTask<String, Object, Object> {
+    // ═══════════════════════════════════════════
+    // Navigation
+    // ═══════════════════════════════════════════
+    public void telephoneDepot(View v) {
+        String[] perms = { Manifest.permission.CALL_PHONE };
+        if (!hasPermissions(this, perms)) {
+            ActivityCompat.requestPermissions(this, perms, 1);
+        } else {
+            startActivity(new Intent(Intent.ACTION_DIAL,
+                    Uri.parse("tel:" + depot.getTel())));
+        }
+    }
 
+    public void adresseDepot(View v) {
+        String map = "https://www.google.com/maps/search/?api=1&query=" + adresse;
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(map)));
+    }
+
+    public void onClickMenuPhoto() {
+        Intent intent = new Intent(this, PrisePhoto.class);
+        Bundle bundle = super.getBundle();
+        bundle.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
+        bundle.putInt("serviceSelectionneID", serviceActuel.getId());
+        bundle.putInt("preparationUID", phPreparationSelectionnee.getUID());
+        bundle.putString("contexte", "priseDePhotoLivraison");
+        intent.putExtras(bundle);
+        startActivityForResult(intent, CodesEchangesActivites.RETOUR_PRISE_PHOTO);
+    }
+
+    // ═══════════════════════════════════════════
+    // Envoi email (AsyncTask)
+    // ═══════════════════════════════════════════
+    private class SendEmailTask extends AsyncTask<String, Void, Void> {
         @Override
-        protected Object doInBackground(String... email) {
-
-            Mail sender = new Mail(InformationLivraisonActivity.this, email[0], true, db, utilisateurConnecte);
+        protected Void doInBackground(String... params) {
+            String email = params[0];
+            Mail sender = new Mail(InformationLivraisonActivity.this, email, true, db, utilisateurConnecte);
             try {
-                if(filename == null || filename.contentEquals(""))
-                {
+                if (filename == null || filename.isEmpty()) {
                     sender.sendMailVerification(subject, body);
-                }
-                else if(photoLivraisonPhotoName == null || photoLivraisonPhotoName.contentEquals(""))
-                {
-                    sender.sendMail(subject, body, "Documents/"+filename);
-                }
-                else
-                {
-                    sender.sendMailPDFAndPhoto(subject, body, "Documents/"+filename, "Documents/"+photoLivraisonPhotoName + ".jpeg");
+                } else if (photoLivraisonPhotoName == null || photoLivraisonPhotoName.isEmpty()) {
+                    sender.sendMail(subject, body, "Documents/" + filename);
+                } else {
+                    sender.sendMailPDFAndPhoto(subject, body,
+                            "Documents/" + filename,
+                            "Documents/" + photoLivraisonPhotoName + ".jpeg");
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Exception :", e);
+                Log.e(TAG, "Erreur envoi email", e);
             }
-            return "executed";
+            return null;
         }
     }
 }
-

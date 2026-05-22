@@ -60,7 +60,7 @@ public class PhReassortAdapter extends ArrayAdapter {
             viewHolder.reference = (TextView) convertView.findViewById(R.id.reference);
             viewHolder.qteConditionnement = (TextView) convertView.findViewById(R.id.qteConditionnement);
             viewHolder.qte_a_preparer = (TextView) convertView.findViewById(R.id.qte_a_preparer);
-            viewHolder.separateur_iv = (ImageView) convertView.findViewById(R.id.separateur);
+            viewHolder.separateur_iv = (View) convertView.findViewById(R.id.separateur);
             convertView.setTag(viewHolder);
         }
 
@@ -101,7 +101,7 @@ public class PhReassortAdapter extends ArrayAdapter {
         public TextView qteConditionnement;
         public TextView qte_a_preparer;
 
-        public ImageView separateur_iv;
+        public View separateur_iv;
 
     }
 

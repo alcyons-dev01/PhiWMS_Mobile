@@ -17,7 +17,7 @@ android {
         targetSdk 34
 
         versionCode getVersionCode()
-        versionName "3.26.05.15.01"
+        versionName "3.26.05.19"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
@@ -122,6 +122,9 @@ dependencies {
     implementation 'androidx.camera:camera-camera2:1.5.3'
     implementation 'androidx.camera:camera-lifecycle:1.5.3'
     implementation 'androidx.camera:camera-view:1.5.3'
+
+    implementation "androidx.lifecycle:lifecycle-viewmodel:2.7.0"
+    implementation "androidx.lifecycle:lifecycle-livedata:2.7.0"
 
 // ML Kit Barcode Scanning
     implementation 'com.google.mlkit:barcode-scanning:17.3.0'

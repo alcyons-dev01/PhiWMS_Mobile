@@ -3,94 +3,126 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="8dp">
 
-    <LinearLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/noirtransparent60">
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="#F0F4FF">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2">
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/typeSignataire"
-                android:layout_width="0dp"
+            <!-- ═══════════════════════════════
+                 HEADER : titre + fermer
+            ═══════════════════════════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Signature "
-                android:textColor="@color/noirtransparent60"
-                android:textSize="16dp"
-                android:textStyle="bold"
-                android:layout_marginLeft="10dp"
-                android:layout_gravity="center_vertical"/>
+                android:orientation="horizontal"
+                android:background="@color/bleu_fonce_alcyons"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="12dp">
 
+                <TextView
+                    android:id="@+id/typeSignataire"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Signature"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/layoutFermePAD"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="X"
-                    android:layout_weight="1"
-                    android:textColor="@color/rouge"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:text="✕"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical|end"
-                    android:gravity="right"
-                    android:layout_marginRight="10dp"
-                    android:textSize="20dp"/>
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:alpha="0.7" />
 
-        </LinearLayout>
+            </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <com.github.gcacace.signaturepad.views.SignaturePad
-                android:id="@+id/signaturePad"
+            <!-- Séparateur accent -->
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_margin="10dp"
-                android:background="@drawable/arriere_plan_pad_signature"/>
+                android:layout_height="2dp"
+                android:background="@color/bleu_clair_alcyons" />
+
+            <!-- ═══════════════════════════════
+                 ZONE DE SIGNATURE
+            ═══════════════════════════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <com.github.gcacace.signaturepad.views.SignaturePad
+                    android:id="@+id/signaturePad"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:background="@drawable/arriere_plan_pad_signature" />
+
+            </LinearLayout>
+
+            <!-- Séparateur fin -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/bleu_clair_alcyons_transparent"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- ═══════════════════════════════
+                 BOUTONS : Effacer + Valider
+            ═══════════════════════════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp"
+                android:paddingBottom="14dp"
+                android:weightSum="2">
+
+                <Button
+                    android:id="@+id/boutonEffacer"
+                    android:layout_width="0dp"
+                    android:layout_height="46dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:text="Effacer"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:background="@color/rouge" />
+
+                <Button
+                    android:id="@+id/boutonValider"
+                    android:layout_width="0dp"
+                    android:layout_height="46dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:text="Valider"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:background="@color/vert" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center"
-            android:weightSum="2">
+    </androidx.cardview.widget.CardView>
 
-            <Button
-                android:id="@+id/boutonEffacer"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="Effacer"
-                android:textColor="@android:color/white"
-                android:textStyle="bold"
-                android:clickable="true"
-                android:background="@android:color/holo_red_dark"
-                android:layout_marginRight="5dp"/>
-
-            <Button
-                android:id="@+id/boutonValider"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="Valider"
-                android:textColor="@android:color/white"
-                android:textStyle="bold"
-                android:clickable="true"
-                android:background="@color/vert"
-                android:layout_marginLeft="5dp"/>
-
-        </LinearLayout>
-
-    </LinearLayout>
 </LinearLayout>

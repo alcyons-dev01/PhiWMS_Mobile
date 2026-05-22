@@ -1,117 +1,163 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:padding="6dp">
 
-    <LinearLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="4">
-
+        app:cardCornerRadius="12dp"
+        app:cardElevation="3dp"
+        app:cardBackgroundColor="#F0F4FF">
 
         <LinearLayout
-            android:id="@+id/layoutDesignation"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:orientation="vertical"
-            android:background="@drawable/background_element_liste"
-            android:layout_margin="5dp"
-            android:padding="5dp">
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/nomProduit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textStyle="bold"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:textColor="#000000"
-                android:textSize="16dp"/>
-
+            <!-- ═══════════════════════════════
+                 COLONNE GAUCHE : infos produit
+            ═══════════════════════════════ -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:id="@+id/layoutDesignation"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="2">
+                android:layout_weight="3"
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/refProduit"
-                    android:layout_width="0dp"
+                <!-- Header : nom produit -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text=""
-                    android:textColor="#000000"
-                    android:textSize="14dp"/>
+                    android:background="@color/bleu_fonce_alcyons"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="10dp">
 
-                <TextView
-                    android:id="@+id/fournisseurProduit"
-                    android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/nomProduit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textStyle="bold"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- Séparateur accent -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/bleu_clair_alcyons" />
+
+                <!-- Référence + Fournisseur -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    android:text=""
-                    android:textColor="#000000"
-                    android:textSize="14dp"/>
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="6dp"
+                    android:weightSum="2">
 
+                    <TextView
+                        android:id="@+id/refProduit"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text=""
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="11sp"
+                        android:alpha="0.7" />
+
+                    <TextView
+                        android:id="@+id/fournisseurProduit"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:text=""
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="11sp"
+                        android:alpha="0.7" />
+
+                </LinearLayout>
+
+                <!-- Séparateur fin -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/bleu_clair_alcyons_transparent"
+                    android:layout_marginHorizontal="12dp"
+                    android:layout_marginBottom="6dp" />
+
+                <!-- GTIN + icône datamatrix -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="12dp"
+                    android:paddingBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/ic_datamatrix"
+                        android:backgroundTint="@color/bleu_clair_alcyons"
+                        android:layout_marginEnd="6dp"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:id="@+id/gtinProduit"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text=""
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="12sp"
+                        android:alpha="0.8" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="3dp"
-                android:layout_marginBottom="3dp"
-                android:background="@color/noir"/>
+            <!-- ═══════════════════════════════
+                 SÉPARATEUR VERTICAL
+            ═══════════════════════════════ -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/bleu_clair_alcyons" />
 
+            <!-- ═══════════════════════════════
+                 COLONNE DROITE : photo produit
+            ═══════════════════════════════ -->
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="1">
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#FFFFFF"
+                android:gravity="center"
+                android:visibility="gone">
 
                 <ImageView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/photoProduit"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/ic_datamatrix"
-                    android:backgroundTint="@color/bleu_clair_alcyons"/>
-
-                <TextView
-                    android:id="@+id/gtinProduit"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text=""
-                    android:gravity="center_vertical"
-                    android:paddingLeft="5dp"
-                    android:textColor="#000000"
-                    android:textSize="15dp"/>
+                    android:scaleType="centerCrop"
+                    android:contentDescription="@null" />
 
             </LinearLayout>
 
         </LinearLayout>
 
+    </androidx.cardview.widget.CardView>
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <ImageView
-                android:id="@+id/photoProduit"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-
-        </LinearLayout>
-
-
-    </LinearLayout>
-
-
-
-
-</RelativeLayout>
+</LinearLayout>

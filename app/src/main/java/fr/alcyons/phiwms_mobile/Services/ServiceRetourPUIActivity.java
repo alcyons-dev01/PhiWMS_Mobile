@@ -451,7 +451,7 @@ public class ServiceRetourPUIActivity extends ServiceAvecConnexionActivity
 
         final MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_action, menu);
-        menu.findItem(R.id.menuDatamatrix).setVisible(true);
+        menu.findItem(R.id.menuDatamatrix).setVisible(false);
 
         return true;
     }

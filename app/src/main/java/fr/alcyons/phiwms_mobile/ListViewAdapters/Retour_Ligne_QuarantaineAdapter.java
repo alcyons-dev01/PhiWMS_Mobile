@@ -255,13 +255,16 @@ public class Retour_Ligne_QuarantaineAdapter extends ArrayAdapter<Retour_Ligne> 
         if (estModifiable) {
             // Mode modifiable : date picker + datamatrix
             FrameLayout zoneDate = vh.zoneDate;
-            if (zoneDate == null) return;
+            if (zoneDate != null)
+            {
+                zoneDate.setOnClickListener(v -> {
+                    DatePickerFragment f = new DatePickerFragment();
+                    f.setViewHolder(vh, rl, db);
+                    f.show(((AppCompatActivity) context).getSupportFragmentManager(), "datePicker");
+                });
+            }
 
-            zoneDate.setOnClickListener(v -> {
-                DatePickerFragment f = new DatePickerFragment();
-                f.setViewHolder(vh, rl, db);
-                f.show(((AppCompatActivity) context).getSupportFragmentManager(), "datePicker");
-            });
+
 
             LinearLayout zoneDataMatrix = vh.dataMatrix;
             if (zoneDataMatrix != null) {

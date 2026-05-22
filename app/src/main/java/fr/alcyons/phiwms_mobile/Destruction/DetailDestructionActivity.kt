@@ -14,6 +14,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ListView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -82,6 +83,8 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
     private var searchInput_ET: EditText? = null
     private var effacerRecherche_IV: ImageView? = null
     private var actionButton: AppCompatButton? = null
+    private var hauteurListeFragment = 0
+
 
     // Fragments
     private var scannerFragment: Fragment? = null
@@ -118,6 +121,15 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
     public override fun onResume()
     {
         super.onResume()
+        val frameContenu = findViewById<RelativeLayout>(R.id.frameLayout)
+        frameContenu.post {
+            val widthDp = resources.displayMetrics.run { widthPixels / density }
+            hauteurListeFragment = (frameContenu.height * when {
+                widthDp < 400  -> 0.35   // petit écran  (Zebra MC33, PDA industriels)
+                widthDp < 600  -> 0.65   // écran normal (smartphones classiques)
+                else           -> 0.75   // grand écran  (tablettes, grands smartphones)
+            }).toInt()
+        }
         this.invalidateOptionsMenu()
 
         this.loadData()
@@ -154,7 +166,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
                 this.closeOpenedFragments()
                 this.openACompter()
             }
-            this.aDetruireFragment?.scrollToPosition(position)
+            //this.aDetruireFragment?.scrollToPosition(position)
         }
         else { Alerte.afficherAlerteInformation(this@DetailDestructionActivity, this.layoutInflater, "Produit non trouvé", "Ce produit n'est pas dans la liste de destruction", false, false) }
     }
@@ -167,7 +179,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
         
         val actionUtilisateur = this.createActionUtilisateur()
         val successCount = this.processRetourLignes(actionUtilisateur)
-        
+
         if (successCount == this.adapter?.mRetour_Lignes?.size)
         {
             this.updateRetourAfterValidation(retour)
@@ -496,7 +508,6 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
         this.isSearchOpen = true
 
         // Bascule TextView → EditText dans le header
-        this.findViewById<ImageView>(R.id.chevronRecherche).visibility = View.GONE
         (textChercher_TV ?: return).visibility = View.GONE
         (searchInput_ET ?: return).visibility = View.VISIBLE
         (effacerRecherche_IV ?: return).visibility = View.VISIBLE
@@ -540,7 +551,6 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
 
     private fun hideSearchInput()
     {
-        this.findViewById<ImageView>(R.id.chevronRecherche).visibility = View.VISIBLE
         (textChercher_TV ?: return).visibility = View.VISIBLE
         (searchInput_ET ?: return).visibility = View.GONE
         (effacerRecherche_IV ?: return).visibility = View.GONE
@@ -555,7 +565,7 @@ class DetailDestructionActivity : ServiceActivity(), RechercheFragment.OnElement
     {
         this.referenceADetruireContainer.apply {
             (this ?: return@apply).layoutParams = (this.layoutParams as LinearLayout.LayoutParams).also {
-                it.height = LinearLayout.LayoutParams.WRAP_CONTENT
+                it.height = hauteurListeFragment
                 it.weight = 0f
             }
             this.visibility = View.VISIBLE

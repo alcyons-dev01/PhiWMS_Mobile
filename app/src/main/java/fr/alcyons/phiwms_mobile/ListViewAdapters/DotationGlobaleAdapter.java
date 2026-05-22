@@ -127,7 +127,7 @@ public class DotationGlobaleAdapter extends ArrayAdapter {
         public TextView qteConditionnement;
         public TextView qte_a_preparer;
 
-        public ImageView separateur_iv;
+        public View separateur_iv;
 
     }
 

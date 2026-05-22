@@ -5,130 +5,115 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
 import fr.alcyons.phiwms_mobile.R;
 
-public class Retour_Ligne_DestructionAdapter extends ArrayAdapter
-{
-    // OTHERS
+public class Retour_Ligne_DestructionAdapter extends RecyclerView.Adapter<Retour_Ligne_DestructionAdapter.ViewHolder> {
+
+    public interface OnItemClickListener {
+        void onItemClick(Retour_Ligne item);
+    }
+
+    private final Context context;
     public final List<Retour_Ligne> mRetour_Lignes;
 
-    // UI
-    final Context mContext;
-    private final List<Retour_LigneViewHolder> retourLigneViewHolderList;
+    public Retour_Ligne_DestructionAdapter(Context context, List<Retour_Ligne> liste) {
+        this.context = context;
+        this.mRetour_Lignes = liste;
+    }
 
-    public Retour_Ligne_DestructionAdapter(final Context context, final List<Retour_Ligne> retour_Lignes)
-    {
-        super(context, 0, retour_Lignes);
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public final TextView designation;
+        public final TextView referenceProduit;
+        public final TextView fournisseur;
+        public final LinearLayout informationLot;
+        public final TextView lot;
+        public final TextView datePeremption;
+        public final TextView serie;
+        public final TextView labelSerie;
+        public final LinearLayout bandeauQteADetruire;
+        public final TextView qteRetourner;
 
-        this.mRetour_Lignes = retour_Lignes;
-        this.mContext = context;
-
-        this.retourLigneViewHolderList = new ArrayList<>();
-        for (int i = 0; i < this.mRetour_Lignes.size(); i++)
-        {
-            final Retour_LigneViewHolder viewHolder = new Retour_LigneViewHolder();
-            this.retourLigneViewHolderList.add(viewHolder);
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            designation       = itemView.findViewById(R.id.designationProduit);
+            referenceProduit  = itemView.findViewById(R.id.referenceProduit);
+            fournisseur       = itemView.findViewById(R.id.nomFournisseur);
+            informationLot    = itemView.findViewById(R.id.InformationLot_LL);
+            lot               = itemView.findViewById(R.id.lotRetourne);
+            datePeremption    = itemView.findViewById(R.id.datePeremption);
+            serie             = itemView.findViewById(R.id.numSerie);
+            labelSerie        = itemView.findViewById(R.id.labelSerie);
+            bandeauQteADetruire = itemView.findViewById(R.id.bandeauQteADetruire);
+            qteRetourner      = itemView.findViewById(R.id.QteRetourner);
         }
     }
 
     @NonNull
-    @Override public View getView(final int position, View convertView, @NonNull final ViewGroup parent)
-    {
-        final Retour_LigneViewHolder viewHolder = this.retourLigneViewHolderList.get(position);
-
-        convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_a_detruire, parent, false);
-
-        // Récupération des objets graphiques
-        viewHolder.designation = convertView.findViewById(R.id.designationProduit);
-        viewHolder.referenceProduit = convertView.findViewById(R.id.referenceProduit);
-        viewHolder.fournisseur = convertView.findViewById(R.id.nomFournisseur);
-        viewHolder.informationLot = convertView.findViewById(R.id.InformationLot_LL);
-        viewHolder.lot = convertView.findViewById(R.id.lotRetourne);
-        viewHolder.datePeremption = convertView.findViewById(R.id.datePeremption);
-        viewHolder.serie = convertView.findViewById(R.id.numSerie);
-        viewHolder.labelSerie = convertView.findViewById(R.id.labelSerie);
-        viewHolder.bandeauQteADetruire = convertView.findViewById(R.id.bandeauQteADetruire);
-        viewHolder.qteRetourner = convertView.findViewById(R.id.QteRetourner);
-
-        final Retour_Ligne retour_LigneCourant = (Retour_Ligne) getItem(position);
-
-        // Affichage des valeurs
-        viewHolder.designation.setText(retour_LigneCourant.getProduit_Designation());
-        viewHolder.referenceProduit.setText(retour_LigneCourant.getProduit_Reference());
-        viewHolder.fournisseur.setText(retour_LigneCourant.getProduit_Fournisseur());
-        viewHolder.informationLot.setVisibility(View.VISIBLE);
-        viewHolder.lot.setText(retour_LigneCourant.getLot_Retourner());
-        //gestion du numéro de série
-        viewHolder.serie.setText(retour_LigneCourant.getSerie_Retourner());
-        viewHolder.bandeauQteADetruire.setVisibility(View.VISIBLE);
-        viewHolder.qteRetourner.setText((double) 0 == retour_LigneCourant.getQte_Retourner() ? "" : String.valueOf((int) retour_LigneCourant.getQte_Retourner()));
-
-        Date date = null;
-        String dateAAfficher = "";
-        final DateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
-        try
-        {
-            if (10 <= retour_LigneCourant.getPeremptionDate().length() && !retour_LigneCourant.getPeremptionDate().contentEquals("0000-00-00"))
-            {
-                date = dateDecodeur.parse(retour_LigneCourant.getPeremptionDate().substring(0, 10));
-                final DateFormat dateFormat = new SimpleDateFormat("MM/yy");
-                assert null != date;
-                dateAAfficher = dateFormat.format(date);
-            }
-        }
-        catch (final ParseException e) { e.printStackTrace(); }
-
-        viewHolder.datePeremption.setText(dateAAfficher);
-        viewHolder.setDatePeremptionColor(date);
-
-        return convertView;
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context)
+                .inflate(R.layout.row_a_detruire, parent, false);
+        return new ViewHolder(view);
     }
 
-    public class Retour_LigneViewHolder
-    {
-        public TextView designation = null;
-        public TextView referenceProduit = null;
-        public TextView fournisseur = null;
-        public LinearLayout informationLot = null;
-        public TextView lot = null;
-        public TextView datePeremption = null;
-        public TextView serie = null;
-        public TextView labelSerie = null;
-        public LinearLayout bandeauQteADetruire = null;
-        TextView qteRetourner = null;
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Retour_Ligne item = mRetour_Lignes.get(position);
 
-        public void setDatePeremptionColor(final Date date)
-        {
-            if (null != date)
-            {
+        holder.designation.setText(item.getProduit_Designation());
+        holder.referenceProduit.setText(item.getProduit_Reference());
+        holder.fournisseur.setText(item.getProduit_Fournisseur());
+        holder.informationLot.setVisibility(View.VISIBLE);
+        holder.lot.setText(item.getLot_Retourner());
+        holder.serie.setText(item.getSerie_Retourner());
+        holder.bandeauQteADetruire.setVisibility(View.VISIBLE);
+        holder.qteRetourner.setText(item.getQte_Retourner() == 0.0 ? "" : String.valueOf((int) item.getQte_Retourner()));
 
-                final Date dateDuJour = new Date();
-                final long diff = dateDuJour.getTime() - date.getTime();
-                final int delai = (int) (diff / (long) (1000 * 60 * 60 * 24));
+        // Gestion de la date de péremption avec couleur
+        Date dateParsed = null;
+        String dateAAfficher = "";
 
-                final int delai30jours = -30;
-                final int delai60jours = -60;
-
-                if (delai30jours <= delai) { this.datePeremption.setTextColor(Retour_Ligne_DestructionAdapter.this.mContext.getResources().getColor(R.color.rouge2)); }
-                else if (delai60jours <= delai) { this.datePeremption.setTextColor(Retour_Ligne_DestructionAdapter.this.mContext.getResources().getColor(R.color.orange2)); }
-                else { this.datePeremption.setTextColor(Retour_Ligne_DestructionAdapter.this.mContext.getResources().getColor(R.color.vert)); }
+        try {
+            String peremption = item.getPeremptionDate();
+            if (peremption != null && peremption.length() >= 10 && !peremption.contentEquals("0000-00-00")) {
+                SimpleDateFormat dateDecodeur = new SimpleDateFormat("yyyy-MM-dd");
+                dateParsed = dateDecodeur.parse(peremption.substring(0, 10));
+                if (dateParsed != null) {
+                    dateAAfficher = new SimpleDateFormat("MM/yy").format(dateParsed);
+                }
             }
-            else { this.datePeremption.setTextColor(Color.BLACK); }
-
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
+
+        holder.datePeremption.setText(dateAAfficher);
+        holder.datePeremption.setTextColor(getCouleurPeremption(dateParsed));
+    }
+
+    @Override
+    public int getItemCount() {
+        return mRetour_Lignes.size();
+    }
+
+    private int getCouleurPeremption(Date date) {
+        if (date == null) return Color.BLACK;
+
+        long diff = (new Date().getTime() - date.getTime()) / (1000 * 60 * 60 * 24);
+
+        if (diff >= -30)  return context.getResources().getColor(R.color.rouge2);
+        if (diff >= -60)  return context.getResources().getColor(R.color.orange2);
+        return context.getResources().getColor(R.color.vert);
     }
 }

@@ -41,6 +41,8 @@ import java.util.Map;
 import java.util.Objects;
 
 import fr.alcyons.phiwms_mobile.BarcodeSearch.BarcodeCaptureActivity;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.Scanner;
+import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerIdentificationProduit;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerProduitActivity;
 import fr.alcyons.phiwms_mobile.BarcodeSearch.ScannerSearchOnlyActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
@@ -62,9 +64,6 @@ import fr.alcyons.phiwms_mobile.ServiceAvecConnexionActivity;
 public class ListeReferenceActivity extends ServiceAvecConnexionActivity {
     Liste_ReferenceAdapter listeReferenceAdapter;
     List<Produit> listProduit;
-    String tri_choisi;
-    ArrayAdapter<CharSequence> Spinneradapter;
-    Spinner optionTri;
     ListView referenceListeView;
     PackageManager pm;
     Depot depotCourant;
@@ -79,42 +78,9 @@ public class ListeReferenceActivity extends ServiceAvecConnexionActivity {
 
         //initialisation
         referenceListeView = (ListView) findViewById(R.id.listeView);
-        optionTri = (Spinner) findViewById(R.id.optionTri);
         listProduit = new ArrayList<>();
         depotCourant = DepotOpenHelper.getDepotParID(db, intent.getExtras().getInt("depotUID_Selectionne"));
-        tri_choisi= "Désignation";
-        Spinneradapter = ArrayAdapter.createFromResource(this, R.array.option_tri_reference, R.layout.spinner_item);
-        Spinneradapter.setDropDownViewResource(R.layout.spinner_item);
-        optionTri.setAdapter(Spinneradapter);
-
-
-        optionTri.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
-            @Override
-            public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
-                ((TextView) arg0.getChildAt(0)).setVisibility(View.INVISIBLE);
-                String optionSelect = arg0.getItemAtPosition(position).toString();
-                switch (optionSelect)
-                {
-                    case "Désignation":
-                        onClickTriDesignation();
-                        break;
-
-                    case "Catégorie":
-                        onClickTriCategorie();
-                        break;
-
-                    case "Fournisseur":
-                        onClickTriFournisseur();
-                        break;
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
+        ((TextView) findViewById(R.id.nomDepot)).setText(depotCourant.getNom());
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -145,13 +111,8 @@ public class ListeReferenceActivity extends ServiceAvecConnexionActivity {
         else
         {
             listProduit = ProduitOpenHelper.getAllProduits(db);
-            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listProduit.size()));
             listeReferenceAdapter = new Liste_ReferenceAdapter(ListeReferenceActivity.this, db, listProduit, depotCourant);
             referenceListeView.setAdapter(listeReferenceAdapter);
-            if (tri_choisi != null) {
-                int spinnerPosition = Spinneradapter.getPosition(tri_choisi);
-                optionTri.setSelection(spinnerPosition);
-            }
         }
 
         referenceListeView.setOnItemClickListener((parent, view, position, id) -> {
@@ -202,13 +163,8 @@ public class ListeReferenceActivity extends ServiceAvecConnexionActivity {
                             passageParOnCreate = false;
 
                             listProduit = ProduitOpenHelper.getAllProduits(db);
-                            ((TextView) findViewById(R.id.nbElementInAdapter)).setText(String.valueOf(listProduit.size()));
                             listeReferenceAdapter = new Liste_ReferenceAdapter(ListeReferenceActivity.this, db, listProduit, depotCourant);
                             referenceListeView.setAdapter(listeReferenceAdapter);
-                            if (tri_choisi != null) {
-                                int spinnerPosition = Spinneradapter.getPosition(tri_choisi);
-                                optionTri.setSelection(spinnerPosition);
-                            }
                             invalidateOptionsMenu();
 
                             new Handler(Looper.getMainLooper()).postDelayed(this::arreterSpinner, 500);
@@ -237,8 +193,7 @@ public class ListeReferenceActivity extends ServiceAvecConnexionActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CodesEchangesActivites.RETOUR_CODE_GS1) {
             String code = data.getStringExtra("code");
-            assert code != null;
-            if (!code.contentEquals("")) {
+            if (code != null && !code.contentEquals("")) {
                 if(code.toUpperCase().startsWith("PHITAGREF:"))
                 {
                     String[] codeDecoupe = code.split(":");
@@ -323,37 +278,6 @@ public class ListeReferenceActivity extends ServiceAvecConnexionActivity {
         invalidateOptionsMenu();
     }
 
-    public void onClickTriDesignation()
-    {
-        tri_choisi = "Désignation";
-        if( listeReferenceAdapter == null ) {
-            return;
-        }
-        listeReferenceAdapter.produitList.sort(Comparator.comparing(Produit::getDesignation_interne));
-        listeReferenceAdapter.notifyDataSetChanged();
-    }
-
-    public void onClickTriCategorie()
-    {
-        tri_choisi = "Catégorie";
-        if( listeReferenceAdapter == null ) {
-            return;
-        }
-        listeReferenceAdapter.produitList.sort(Comparator.comparing(Produit::getCategorie));
-        listeReferenceAdapter.notifyDataSetChanged();
-    }
-
-    public void onClickTriFournisseur()
-    {
-        tri_choisi = "Fournisseur";
-        if( listeReferenceAdapter == null ) {
-            return;
-        }
-        listeReferenceAdapter.produitList.sort(Comparator.comparing(Produit::getFournisseur));
-        listeReferenceAdapter.notifyDataSetChanged();
-    }
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -390,7 +314,7 @@ public class ListeReferenceActivity extends ServiceAvecConnexionActivity {
         {
             if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
             {
-                rechercheProduitIntent = new Intent(ListeReferenceActivity.this, BarcodeCaptureActivity.class);
+                rechercheProduitIntent = new Intent(ListeReferenceActivity.this, ScannerIdentificationProduit.class);
             }
             else
             {
