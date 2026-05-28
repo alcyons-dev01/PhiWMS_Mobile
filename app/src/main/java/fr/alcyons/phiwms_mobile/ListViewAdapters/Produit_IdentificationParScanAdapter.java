@@ -142,7 +142,9 @@ public class Produit_IdentificationParScanAdapter extends ArrayAdapter {
                 for (Produit produitCourant : produits) {
                     // Vérifie le début du premier mot
                     String produitDesignation = Normalizer.normalize(produitCourant.getDesignation_interne().toLowerCase(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
-                    if (produitDesignation.startsWith(chaineToSearch)) {
+                    String refFournisseur = Normalizer.normalize(produitCourant.getRef_fourni().toLowerCase(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+                    String fournisseur = Normalizer.normalize(produitCourant.getFournisseur().toLowerCase(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+                    if (produitDesignation.contains(chaineToSearch) || refFournisseur.contains(chaineToSearch) || fournisseur.contains(chaineToSearch)) {
                         produitTrouveList.add(produitCourant);
                     } else {
                         // Vérifie le début de chaque mot

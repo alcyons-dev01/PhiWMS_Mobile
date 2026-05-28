@@ -2,8 +2,10 @@ package fr.alcyons.phiwms_mobile.IdentificationParScan;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,10 +15,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.core.view.MenuItemCompat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +45,8 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
     String codeInconnue = null;
     InputMethodManager imm;
     ListView listViewProduits;
+    boolean rechercheAuto = false;
+    Menu optionsMenu;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -48,32 +54,25 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_liste_identification_par_scan);
         imm = (InputMethodManager) ListeProduitsIdentificationParScanActivity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        // Récupération de la liste_view à remplir
         listViewProduits = findViewById(R.id.listeView);
         listeAAfficher = new ArrayList<>();
 
         if (intent.getExtras().getString("codeGS1") != null) {
             final String codeGS1 = intent.getExtras().getString("codeGS1");
             listeAAfficher = ProduitOpenHelper.getProduitsParGTINAvecSansAI(db, codeGS1);
-
-            if(listeAAfficher.isEmpty())
-            {
+            if (listeAAfficher.isEmpty()) {
                 listeAAfficher = ProduitOpenHelper.getProduitsParGTIN(db, codeGS1.substring(2));
             }
-
-        } else if(intent.getExtras().getString("codeInconnue") != null){
+        } else if (intent.getExtras().getString("codeInconnue") != null) {
             codeInconnue = intent.getExtras().getString("codeInconnue");
             listeAAfficher = ProduitOpenHelper.getProduitsParCodeInconnue(db, codeInconnue);
-        }
-        else
-        {
+        } else {
             listeAAfficher = ProduitOpenHelper.getProduitsIdentifier(db);
         }
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                //ListeProduitsIdentificationParScanActivity.this.finish();
                 Intent intent = new Intent(ListeProduitsIdentificationParScanActivity.this, NavigationActivity.class);
                 Bundle extras = ListeProduitsIdentificationParScanActivity.this.getBundle();
                 extras.putInt("utilisateurConnecteID", utilisateurConnecte.getId());
@@ -89,26 +88,22 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
         ((TextView) findViewById(R.id.nbIdentifier)).setText(String.valueOf(nombreProduitIdentifier));
         ((TextView) findViewById(R.id.nbNonIdentifier)).setText(String.valueOf(nombreProduitNonIdentifier));
 
-        ((LinearLayout) findViewById(R.id.linearProduitIdentifie)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listeAAfficher = ProduitOpenHelper.getProduitsIdentifier(db);
-                adapter.replaceData(listeAAfficher);
-                ((LinearLayout) findViewById(R.id.linearProduitIdentifie)).setAlpha(1F);
-                ((LinearLayout) findViewById(R.id.linearProduitNonIdentifie)).setAlpha(0.5F);
-                listViewProduits.smoothScrollToPositionFromTop(0, 0, 250);
-            }
+        ((LinearLayout) findViewById(R.id.linearProduitIdentifie)).setOnClickListener(v -> {
+            listeAAfficher = ProduitOpenHelper.getProduitsIdentifier(db);
+            adapter.replaceData(listeAAfficher);
+            ((LinearLayout) findViewById(R.id.linearProduitIdentifie)).setAlpha(1F);
+            ((LinearLayout) findViewById(R.id.linearProduitNonIdentifie)).setAlpha(0.5F);
+            listViewProduits.smoothScrollToPositionFromTop(0, 0, 250);
+            fermerRecherche();
         });
 
-        ((LinearLayout) findViewById(R.id.linearProduitNonIdentifie)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listeAAfficher = ProduitOpenHelper.getProduitsNonIdentifier(db);
-                adapter.replaceData(listeAAfficher);
-                ((LinearLayout) findViewById(R.id.linearProduitNonIdentifie)).setAlpha(1F);
-                ((LinearLayout) findViewById(R.id.linearProduitIdentifie)).setAlpha(0.5F);
-                listViewProduits.smoothScrollToPositionFromTop(0, 0, 250);
-            }
+        ((LinearLayout) findViewById(R.id.linearProduitNonIdentifie)).setOnClickListener(v -> {
+            listeAAfficher = ProduitOpenHelper.getProduitsNonIdentifier(db);
+            adapter.replaceData(listeAAfficher);
+            ((LinearLayout) findViewById(R.id.linearProduitNonIdentifie)).setAlpha(1F);
+            ((LinearLayout) findViewById(R.id.linearProduitIdentifie)).setAlpha(0.5F);
+            listViewProduits.smoothScrollToPositionFromTop(0, 0, 250);
+            ouvrirRechercheAuto();
         });
     }
 
@@ -116,15 +111,15 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
     public void onResume() {
         super.onResume();
         invalidateOptionsMenu();
-        //gestion de la liste
+
         if (listeAAfficher.size() == 1) {
             passerAuDetailProduit(listeAAfficher.get(0));
         } else if (listeAAfficher.size() > 1) {
         } else {
             listeAAfficher = ProduitOpenHelper.getProduitsNonIdentifier(db);
+            rechercheAuto = true;
         }
 
-        // Affichage de la liste
         if (adapter == null) {
             adapter = new Produit_IdentificationParScanAdapter(this, listeAAfficher, db);
             listViewProduits.setAdapter(adapter);
@@ -141,16 +136,12 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
 
     public void passerAuDetailProduit(Produit produitSelectionne) {
         Intent newIntent = new Intent(ListeProduitsIdentificationParScanActivity.this, DetailProduitIdentificationParScanActivity.class);
-
-        // Récupération des éléments à transmettre à la prochaine activité
         Bundle extras = ListeProduitsIdentificationParScanActivity.super.getBundle();
         extras.putInt("produitSelectionneID", produitSelectionne.getID_produit());
         String codeGS1 = Objects.requireNonNull(intent.getExtras()).getString("codeGS1");
         extras.putString("codeGS1", codeGS1);
         extras.putString("codeInconnue", codeInconnue);
         newIntent.putExtras(extras);
-
-        // Appel de la prochaine activité
         ListeProduitsIdentificationParScanActivity.this.startActivity(newIntent);
         ListeProduitsIdentificationParScanActivity.this.finish();
         listeAAfficher = new ArrayList<>();
@@ -160,26 +151,63 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        //Récupération du menu
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_action, menu);
         menu.findItem(R.id.menuDatamatrix).setVisible(true);
         return true;
     }
 
-    // Nécessaire afin d'avoir l'item Search
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        super.prepareOptionsMenu(menu, adapter, null, "Désignation produit...");
+        super.prepareOptionsMenu(menu, adapter, null, "Désignation, Référence, Fournisseur");
+        this.optionsMenu = menu;
+
         MenuItem item = menu.findItem(R.id.menuDatamatrix);
         item.setOnMenuItemClickListener(item1 -> {
             retourScan();
             return true;
         });
+
+        // 👇 Ouverture automatique de la barre de recherche si rechercheAuto est vrai
+        if (rechercheAuto) {
+            ouvrirRechercheAuto();
+        }
+
         return true;
     }
-    private void retourScan()
-    {
+
+    private void ouvrirRechercheAuto() {
+        if (optionsMenu == null) return; // sécurité
+        MenuItem searchItem = optionsMenu.findItem(R.id.rechercheMenu);
+        if (searchItem != null) {
+            searchItem.expandActionView();
+            androidx.appcompat.widget.SearchView searchView =
+                    (androidx.appcompat.widget.SearchView) searchItem.getActionView();
+            if (searchView != null) {
+                searchView.post(() -> {
+                    searchView.requestFocus();
+                    imm.showSoftInput(searchView.findFocus(), InputMethodManager.SHOW_IMPLICIT);
+                });
+            }
+        }
+    }
+
+    private void fermerRecherche() {
+        if (optionsMenu == null) return;
+        MenuItem searchItem = optionsMenu.findItem(R.id.rechercheMenu);
+        if (searchItem != null && searchItem.isActionViewExpanded()) {
+            androidx.appcompat.widget.SearchView searchView =
+                    (androidx.appcompat.widget.SearchView) searchItem.getActionView();
+            if (searchView != null) {
+                searchView.setQuery("", false); // 👈 vide le texte sans déclencher le filtre
+                searchView.clearFocus();
+                imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0); // 👈 ferme le clavier
+            }
+            searchItem.collapseActionView(); // 👈 ferme la barre de recherche
+        }
+    }
+
+    private void retourScan() {
         Intent newIntent = new Intent(ListeProduitsIdentificationParScanActivity.this, ServiceIdentificationParScanActivity.class);
         newIntent.putExtras(ListeProduitsIdentificationParScanActivity.super.getBundle());
         ListeProduitsIdentificationParScanActivity.this.startActivity(newIntent);
