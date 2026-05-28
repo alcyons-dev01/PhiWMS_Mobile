@@ -74,12 +74,9 @@ class RechercheFragment : Fragment() {
 
     fun lancerRecherche(query: String, typeDoc: String = "", numDoc: String = "") {
         val resultats = when (typeDoc) {
-            "reception"        -> PH_ReliquatOpenHelper.getDesignationReliquatByNumero(db, query, numDoc)
-            "preparation",
-            "retourFournisseur",
-            "destruction",
-            "retourPUI"        -> ProduitOpenHelper.getProduitByDesignation(db, query)
-            else               -> ProduitOpenHelper.getProduitByDesignation(db, query)
+            "reception" -> PH_ReliquatOpenHelper.getDesignationReliquatByNumero(db, query, numDoc)
+            "preparation", "retourFournisseur", "destruction", "retourPUI", "controleDesRetours" -> ProduitOpenHelper.getProduitByDesignation(db, query)
+            else -> ProduitOpenHelper.getProduitByDesignation(db, query)
         }
 
         adapter.mettreAJourListe(resultats)
