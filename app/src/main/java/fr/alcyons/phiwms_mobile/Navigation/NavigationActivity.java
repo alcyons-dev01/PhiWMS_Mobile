@@ -4,8 +4,11 @@ import static com.google.android.gms.vision.L.TAG;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -22,6 +25,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
@@ -55,6 +59,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -325,16 +331,13 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
         super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_action, menu);
-        menu.findItem(R.id.deleteMenu).setVisible(false);
-        menu.findItem(R.id.menuDatamatrix).setVisible(false);
-        menu.findItem(R.id.menuRecherche).setVisible(true);
-        menu.findItem(R.id.menuInformation).setVisible(true);
+        menu.findItem(R.id.menuUtilisateur).setVisible(true);
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
+        /*if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
             MenuItem item = menu.findItem(R.id.menuDatamatrix);
             item.setOnMenuItemClickListener(item1 -> {
                 lancerScan();
@@ -371,7 +374,22 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
             actionListView.setAdapter(navigationAdapter);
             actionListView.setDivider(footer);
             return true;
-        });
+        });*/
+        MenuItem item = menu.findItem(R.id.menuUtilisateur);
+        item.setVisible(true);
+
+        View actionView = item.getActionView();
+        TextView tvInitials = actionView != null ? actionView.findViewById(R.id.tvUserInitials) : null;
+
+        // Récupérer le nom depuis votre session/préférences
+        if (tvInitials != null) {
+            tvInitials.setText(getInitials(utilisateurConnecte.getNom()+" "+utilisateurConnecte.getPrenom()));
+        }
+
+        // Gérer le clic
+        if (actionView != null) {
+            actionView.setOnClickListener(v -> showUserMenu(v));
+        }
 
         return true;
     }
@@ -819,6 +837,104 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
             {
                 mapServiceIndicateur.put(service_courant.getNom(), serviceIndicateurValeur.get(positionService));
             }
+        }
+    }
+
+    private String getInitials(String name) {
+        if (name == null || name.trim().isEmpty()) return "";
+
+        String[] parts = name.trim().split("\\s+");
+        StringBuilder initials = new StringBuilder();
+
+        for (int i = 0; i < Math.min(2, parts.length); i++) {
+            if (!parts[i].isEmpty()) {
+                initials.append(Character.toUpperCase(parts[i].charAt(0)));
+            }
+        }
+
+        return initials.toString();
+    }
+
+    private void showUserMenu(View anchor) {
+        PopupMenu popup = new PopupMenu(this, anchor);
+        popup.getMenuInflater().inflate(R.menu.menu_user_options, popup.getMenu());
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            popup.setForceShowIcon(true);
+        } else {
+            // Fallback pour versions antérieures
+            forceShowIcons(popup);
+        }
+
+        popup.setOnMenuItemClickListener(menuItem -> {
+            int id = menuItem.getItemId();
+            if (id == R.id.action_profil) {
+
+                return true;
+            } else if (id == R.id.action_deconnexion) {
+                Alerte.afficherAlerteConfirmation(NavigationActivity.this, this.getLayoutInflater(), this.getBundle(), "Souhaitez-vous vous déconnecter de PhiWMS", false, true, NavigationActivity.this);
+                return true;
+            }
+            else if(id == R.id.action_information_service)
+            {
+                actionListView = (ListView) findViewById(R.id.listeView);
+                if(navigationAdapter != null)
+                {
+                    if(!navigationAdapter.afficherInfo)
+                    {
+                        navigationAdapter = new NavigationAdapter(NavigationActivity.this, utilisateurConnecte, db, liste_service, mapServiceIndicateur, perimetreFonctionnelCourant.getNom(), true);
+                    }
+                    else
+                    {
+                        navigationAdapter = new NavigationAdapter(NavigationActivity.this, utilisateurConnecte, db, liste_service, mapServiceIndicateur, perimetreFonctionnelCourant.getNom(), false);
+                    }
+                }
+                else
+                {
+                    navigationAdapter = new NavigationAdapter(NavigationActivity.this, utilisateurConnecte, db, liste_service, mapServiceIndicateur, perimetreFonctionnelCourant.getNom(), false);
+
+                }
+
+                actionListView.setAdapter(navigationAdapter);
+                actionListView.setDivider(footer);
+                return true;
+            }
+            else if(id==R.id.action_recherche_service)
+            {
+                rechercherService();
+                return true;
+            }
+
+            return false;
+        });
+
+        popup.show();
+    }
+
+    public void confirmationService()
+    {
+        // 2. Nettoyer les données de session
+        // Si vous utilisez SharedPreferences
+        SharedPreferences prefs = getSharedPreferences("session", Context.MODE_PRIVATE);
+        prefs.edit().clear().apply();
+
+        // 3. Fermer toutes les activités et quitter l'application
+        finishAffinity(); // ferme toutes les Activity de la pile
+        System.exit(0);  // force la fermeture complète du processus
+    }
+
+    private void forceShowIcons(PopupMenu popup) {
+        try {
+            Field field = PopupMenu.class.getDeclaredField("mPopup");
+            field.setAccessible(true);
+            Object helper = field.get(popup);
+            if (helper != null) {
+                Method method = helper.getClass().getDeclaredMethod("setForceShowIcon", boolean.class);
+                method.setAccessible(true);
+                method.invoke(helper, true);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

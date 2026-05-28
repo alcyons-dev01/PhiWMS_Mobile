@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_profil"
+        android:icon="@drawable/ic_person"
+        android:title="Profil"
+        android:iconTint="@color/bleu_fonce_alcyons"/>
+
+    <item
+        android:id="@+id/action_information_service"
+        android:icon="@drawable/ic_info"
+        android:title="Informations service"
+        android:iconTint="@color/bleu_fonce_alcyons"/>
+
+    <item
+        android:id="@+id/action_recherche_service"
+        android:icon="@drawable/ic_search"
+        android:title="Recherche service"
+        android:iconTint="@color/bleu_fonce_alcyons"/>
+
+    <item
+        android:id="@+id/action_deconnexion"
+        android:icon="@drawable/ic_logout"
+        android:title="Déconnexion"
+        android:iconTint="@color/rouge"/>
+
+</menu>

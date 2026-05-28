@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:paddingEnd="8dp">
+
+    <TextView
+        android:id="@+id/tvUserInitials"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_user_avatar"
+        android:gravity="center"
+        android:text="AB"
+        android:textColor="@color/blanc"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+</FrameLayout>
