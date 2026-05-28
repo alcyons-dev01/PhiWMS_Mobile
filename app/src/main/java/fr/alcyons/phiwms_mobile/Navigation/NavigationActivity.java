@@ -47,6 +47,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.UtilisateurOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.ElementASynchroniser;
 import fr.alcyons.phiwms_mobile.Classes.PerimetreFonctionnel;
 import fr.alcyons.phiwms_mobile.Classes.Service;
+import fr.alcyons.phiwms_mobile.FermetureAutomatiqueReceiver;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.ListPerimetreAdapter;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.NavigationAdapter;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
@@ -90,6 +91,9 @@ public class NavigationActivity extends ServiceAvecConnexionActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
+
+        FermetureAutomatiqueReceiver.programmerProchaineFermeture(this);
+
         pm = NavigationActivity.this.getPackageManager();
         etablissement = Objects.requireNonNull(intent.getExtras()).getString("etablissement");
         if (etablissement == null) {
