@@ -17,7 +17,7 @@ android {
         targetSdk 34
 
         versionCode getVersionCode()
-        versionName "3.26.05.28"
+        versionName "3.26.05.28.01"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
@@ -135,6 +135,4 @@ configurations {
 
 apply plugin: 'com.google.gms.google-services'
 
-//tous les jours à 22h on quitte
-//mettre un menu en haut avec déconnexion et information service
 //voir pour accélérer le premier chargement
