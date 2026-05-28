@@ -184,7 +184,7 @@ class DetailControleDesRetoursFragment : Fragment()
 
     private fun initializeFirstSelection()
     {
-        // Si la fragment est ouverte pour une ligne déjà retournée (UID < 0),
+        // Si le fragment est ouvert pour une ligne déjà contrôlée (UID < 0),
         // on restaure la sélection précédente (comportement attendu pour la liste Contrôle).
         // Si elle est ouverte depuis la liste AControler (ligne de base, UID >= 0),
         // ne pas auto-sélectionner le lot utilisé : se comporter comme un premier clic.
@@ -376,7 +376,6 @@ class DetailControleDesRetoursFragment : Fragment()
             nouvelleLigne.retourPUI_Zone = stock.zone
             nouvelleLigne.retourPUI_Emplacement = stock.emplacement
             Retour_LigneOpenHelper.insererUnRetour_LigneEnBDD(db, nouvelleLigne)
-            if (nouveauLot || isLotNameChanged) { markRetourLigneForSync(nouvelleLigne, DBOpenHelper.ActionsEAS.AJOUT) }
         }
 
         stock.qte_Preparer = quantite
@@ -434,12 +433,6 @@ class DetailControleDesRetoursFragment : Fragment()
             quantite,
             ""
         )
-    }
-
-    private fun markRetourLigneForSync(ligne: Retour_Ligne, action: String)
-    {
-        insertedOrUpdatedNewLot = true
-        ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Retour_LigneOpenHelper.Constantes.TABLE_RETOUR_LIGNE, ligne.phiMR4UUID, ligne._UID, action)
     }
 
     private fun markStockForSync(stock: Stock_Lot_Emplacement_Light, action: String)
