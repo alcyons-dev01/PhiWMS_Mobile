@@ -85,31 +85,57 @@ public class PH_RetourMotifOpenHelper extends DBOpenHelper {
                         String erreur = "";
                         boolean etat = true;
                         int resultCount = response.getInt("resultCount");
+
                         if (resultCount == 0) {
                             erreur = response.getString("erreur");
                             etat = false;
                             if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                //viderBasesDeDonnees(db);
                                 erreur = "Votre session a expirée, veuillez vous reconnecter.";
                             } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                 erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
                             } else if (!erreur.contentEquals("Aucun PH_RetourMotif trouvé")) {
                                 erreur = "Erreur API Motifs de retour";
                             }
+                            // ⬇️ Pas d'insertion → mise à jour directe de la modale sur le thread UI
+                            ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+
                         } else {
-
+                            // Parsing sur le thread UI (rapide)
                             JSONArray phRetourMotifJSONArray = response.getJSONArray("PH_RetourMotif");
-
+                            final List<PH_RetourMotif> listeRetourMotifs = new ArrayList<>();
                             for (int i = 0; i < phRetourMotifJSONArray.length(); i++) {
-                                JSONObject phRetourMotifJSONObject = phRetourMotifJSONArray.getJSONObject(i);
-
-                                PH_RetourMotif phRetourMotif = new PH_RetourMotif(phRetourMotifJSONObject);
-
-                                // insertion du service en bdd
-                                long rowID = insererPH_RetourMotifEnBDD(db, phRetourMotif);
+                                listeRetourMotifs.add(new PH_RetourMotif(phRetourMotifJSONArray.getJSONObject(i)));
                             }
+
+                            // Insertion sur un thread background
+                            new Thread(() -> {
+                                boolean etatThread = true;
+                                String erreurThread = "";
+
+                                db.beginTransaction();
+                                try {
+                                    for (PH_RetourMotif phRetourMotif : listeRetourMotifs) {
+                                        insererPH_RetourMotifEnBDD(db, phRetourMotif);
+                                    }
+                                    db.setTransactionSuccessful();
+                                } catch (Exception e) {
+                                    etatThread = false;
+                                    erreurThread = "Erreur lors de l'insertion des motifs de retour";
+                                    e.printStackTrace();
+                                } finally {
+                                    db.endTransaction();
+                                }
+
+                                // ⬇️ Mise à jour de la modale sur le thread UI une fois tout terminé
+                                final boolean resultatFinal = etatThread;
+                                final String erreurFinale = erreurThread;
+                                new android.os.Handler(android.os.Looper.getMainLooper()).post(() ->
+                                        ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, resultatFinal, erreurFinale)
+                                );
+
+                            }).start();
                         }
-                        ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

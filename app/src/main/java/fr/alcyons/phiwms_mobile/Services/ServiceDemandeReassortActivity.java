@@ -31,9 +31,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper;
@@ -111,11 +113,11 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
     // Initialisation UI
     // ═══════════════════════════════════════════
     private void bindVues() {
-        textLancerScan         = findViewById(R.id.textLancerScan);
-        iconLancerScan         = findViewById(R.id.iconLancerScan);
-        sousTitreDate          = findViewById(R.id.sousTitreDate);
-        layoutSynchronisation  = findViewById(R.id.layoutSyncronisationPreparations);
-        phReassortListView     = findViewById(R.id.listeView);
+        textLancerScan        = findViewById(R.id.textLancerScan);
+        iconLancerScan        = findViewById(R.id.iconLancerScan);
+        sousTitreDate         = findViewById(R.id.sousTitreDate);
+        layoutSynchronisation = findViewById(R.id.layoutSyncronisationPreparations);
+        phReassortListView    = findViewById(R.id.listeView);
     }
 
     private void demarrerAnimationScan() {
@@ -213,7 +215,11 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
             if (nbResultat == 0) {
                 gererReponseVide(response);
             } else {
-                traiterPreparations(response.getJSONArray("PH_Preparations"));
+                // ✅ Précharger toutes les préparations existantes en Map avant la boucle
+                Map<String, PH_Preparation> preparationsExistantes =
+                        PH_PreparationOpenHelper.getAllPreparationsEnMap(db);
+
+                traiterPreparations(response.getJSONArray("PH_Preparations"), preparationsExistantes);
             }
 
             rafraichirAdapter();
@@ -241,22 +247,31 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
         }
     }
 
-    private void traiterPreparations(JSONArray preparationsArray) throws JSONException {
-        List<Integer> uidsEnInstance = PH_PreparationOpenHelper.getUIDDotationGlobaleEnInstance(db);
+    private void traiterPreparations(JSONArray preparationsArray,
+                                     Map<String, PH_Preparation> preparationsExistantes)
+            throws JSONException {
+
+        // ✅ Charger les UIDs en instance une seule fois avant la boucle
+        List<Integer> uidsEnInstance =
+                PH_PreparationOpenHelper.getUIDDotationGlobaleEnInstance(db);
 
         for (int i = 0; i < preparationsArray.length(); i++) {
-            JSONObject obj = preparationsArray.getJSONObject(i);
-            traiterUnePreparation(obj, uidsEnInstance);
+            traiterUnePreparation(
+                    preparationsArray.getJSONObject(i),
+                    uidsEnInstance,
+                    preparationsExistantes);
         }
     }
 
-    private void traiterUnePreparation(JSONObject obj, List<Integer> uidsEnInstance)
+    private void traiterUnePreparation(JSONObject obj,
+                                       List<Integer> uidsEnInstance,
+                                       Map<String, PH_Preparation> preparationsExistantes)
             throws JSONException {
 
-        String nomListe  = obj.getString("Liste");
-        int uid          = obj.getInt("UID");
-        String statut    = obj.getString("Statut");
-        String dateLivr  = obj.getString("LivraisonPrevueDate");
+        String nomListe = obj.getString("Liste");
+        int uid         = obj.getInt("UID");
+        String statut   = obj.getString("Statut");
+        String dateLivr = obj.getString("LivraisonPrevueDate");
 
         // Nettoyage des UIDs en instance
         int pos = uidsEnInstance.indexOf(uid);
@@ -264,35 +279,41 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
             uidsEnInstance.remove(pos);
         }
 
-        // Upsert PH_Preparation
-        PH_Preparation preparation = PH_PreparationOpenHelper
-                .getDemandeDemandeReassortEnInstance(db, nomListe, dateLivr);
+        // ✅ Utiliser la Map préchargée au lieu d'une requête BDD par itération
+        String clePreparation = nomListe + "_" + dateLivr;
+        PH_Preparation preparation = preparationsExistantes.get(clePreparation);
 
         if (preparation == null) {
             preparation = new PH_Preparation(obj);
             PH_PreparationOpenHelper.insererUnPH_PreparationEnBDD(db, preparation);
+            // Ajouter à la Map pour les éventuels doublons dans le JSON
+            preparationsExistantes.put(clePreparation, preparation);
         } else {
             preparation.setStatut(statut);
             PH_PreparationOpenHelper.mettreAJourUnPHPreparation(db, preparation);
         }
 
-        // Upsert lignes
         traiterLignes(obj.getJSONArray("ph_preparation_lignes"), preparation);
     }
 
     private void traiterLignes(JSONArray lignesArray, PH_Preparation preparation)
             throws JSONException {
 
-        for (int j = 0; j < lignesArray.length(); j++) {
-            JSONObject ligneObj  = lignesArray.getJSONObject(j);
-            int codeProduit      = ligneObj.getInt("produitID");
+        // ✅ Précharger toutes les lignes de cette préparation en Map avant la boucle
+        Map<Integer, PH_Preparation_Ligne> lignesExistantes =
+                PH_Preparation_LigneOpenHelper.getLignesParPreparationEnMap(db, preparation);
 
-            PH_Preparation_Ligne ligne = PH_Preparation_LigneOpenHelper
-                    .getPHPreparationLignesParPHPreparationAndProduit(db, preparation, codeProduit);
+        for (int j = 0; j < lignesArray.length(); j++) {
+            JSONObject ligneObj = lignesArray.getJSONObject(j);
+            int codeProduit     = ligneObj.getInt("produitID");
+
+            // ✅ Utiliser la Map au lieu d'une requête BDD par ligne
+            PH_Preparation_Ligne ligne = lignesExistantes.get(codeProduit);
 
             if (ligne == null) {
                 ligne = new PH_Preparation_Ligne(ligneObj, preparation.getUID());
                 PH_Preparation_LigneOpenHelper.insererUnPH_Preparation_LigneEnBDD(db, ligne);
+                lignesExistantes.put(codeProduit, ligne);
             } else {
                 ligne.setQte_APreparer(ligneObj.getInt("Qte_APreparer"));
                 ligne.setQte_Demander(ligneObj.getInt("Qte_Demander"));
@@ -309,43 +330,63 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
     private void rafraichirAdapter() {
         arreterSpinner();
 
-        List<PH_Reassort> reassortListe = PH_ReassortOpenHelper.getPH_Reassort(db);
+        // ✅ Opérations BDD + calculs sur thread background
+        new Thread(() -> {
 
-        if (reassortListe.isEmpty()) {
-            vide = true;
-            nomServiceVide = "PH_Reassort";
-            naviguerVersNavigation();
-            return;
-        }
+            List<PH_Reassort> reassortListe = PH_ReassortOpenHelper.getPH_Reassort(db);
 
-        enrichirDatesLivraison(reassortListe);
-        trierParDate(reassortListe);
+            if (reassortListe.isEmpty()) {
+                new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                    vide = true;
+                    nomServiceVide = "PH_Reassort";
+                    naviguerVersNavigation();
+                });
+                return;
+            }
 
-        ElementASynchroniserOpenHelper.toutSynchroniser(this, db, utilisateurConnecte, false);
+            enrichirDatesLivraison(reassortListe);
+            trierParDate(reassortListe);
 
-        reassortAdapter = new ReassortAdapter(this, db, utilisateurConnecte);
-        peuplerAdapter(reassortListe);
+            // ✅ Retour sur thread UI uniquement pour l'adapter
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                ElementASynchroniserOpenHelper.toutSynchroniser(
+                        this, db, utilisateurConnecte, false);
 
-        phReassortListView.setDivider(footer);
-        phReassortListView.setAdapter(reassortAdapter);
-        sousTitreDate.setVisibility(View.VISIBLE);
-        layoutSynchronisation.setVisibility(View.GONE);
+                reassortAdapter = new ReassortAdapter(this, db, utilisateurConnecte);
+                peuplerAdapter(reassortListe);
 
-        invalidateOptionsMenu();
+                phReassortListView.setDivider(footer);
+                phReassortListView.setAdapter(reassortAdapter);
+                sousTitreDate.setVisibility(View.VISIBLE);
+                layoutSynchronisation.setVisibility(View.GONE);
+                invalidateOptionsMenu();
+            });
+
+        }).start();
     }
 
     private void enrichirDatesLivraison(List<PH_Reassort> liste) {
         @SuppressLint("SimpleDateFormat")
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-        for (PH_Reassort reassort : liste) {
-            Depot depot = DepotOpenHelper.getDepotParReference(db, reassort.getDepot_Reference());
-            String date = EVENTOpenHelper.getDateProchaineLivraison(db, depot.getDepot_UID());
+        // ✅ Charger tous les dépôts en une seule requête et indexer par référence
+        List<Depot> tousLesDepots = DepotOpenHelper.getDepotsParType(db, "%");
+        Map<String, Depot> depotParReference = new HashMap<>();
+        for (Depot depot : tousLesDepots) {
+            depotParReference.put(depot.getDepot_Reference(), depot);
+        }
 
-            if (date == null || date.isEmpty()) {
-                Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.DAY_OF_YEAR, 1);
-                date = dateFormat.format(cal.getTime());
+        for (PH_Reassort reassort : liste) {
+            Depot depot = depotParReference.get(reassort.getDepot_Reference());
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DAY_OF_YEAR, 1);
+            String date = dateFormat.format(cal.getTime());
+            if (depot != null)
+            {
+                date = EVENTOpenHelper.getDateProchaineLivraison(db, depot.getDepot_UID());
+                if (date == null || date.isEmpty()) {
+                    date = dateFormat.format(cal.getTime());
+                }
             }
 
             reassort.setDateLivraison(date);
@@ -367,12 +408,13 @@ public class ServiceDemandeReassortActivity extends ServiceAvecConnexionActivity
     }
 
     private void peuplerAdapter(List<PH_Reassort> liste) {
-        List<String> datesVues  = new ArrayList<>();
-        List<String> depotsVus  = new ArrayList<>();
+        // ✅ Set à la place de List pour contains() en O(1)
+        Set<String> datesVues = new HashSet<>();
+        Set<String> depotsVus = new HashSet<>();
 
         for (PH_Reassort reassort : liste) {
-            boolean nouvelleDate  = !datesVues.contains(reassort.getDateLivraison());
-            boolean nouveauDepot  = !depotsVus.contains(reassort.getDepot_Reference());
+            boolean nouvelleDate = !datesVues.contains(reassort.getDateLivraison());
+            boolean nouveauDepot = !depotsVus.contains(reassort.getDepot_Reference());
 
             if (nouvelleDate || nouveauDepot) {
                 datesVues.add(reassort.getDateLivraison());

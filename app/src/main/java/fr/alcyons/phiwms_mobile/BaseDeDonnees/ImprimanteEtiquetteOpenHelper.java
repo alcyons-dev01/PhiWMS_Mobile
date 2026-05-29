@@ -134,6 +134,7 @@ public class ImprimanteEtiquetteOpenHelper  extends DBOpenHelper {
                             String erreur = "";
                             boolean etat = true;
                             int resultCount = response.getInt("resultCount");
+
                             if (resultCount == 0) {
                                 etat = false;
                                 erreur = response.getString("erreur");
@@ -149,27 +150,60 @@ public class ImprimanteEtiquetteOpenHelper  extends DBOpenHelper {
                                     context.startActivity(intent);
                                 } else if (!erreur.contentEquals("Aucune imprimante trouvée")) {
                                     Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete insererBDDLocaleImprimanteEtiquette", "alerte");
-                                }
-                                else
-                                {
+                                } else {
                                     erreur = "";
                                     etat = true;
                                 }
-                            } else {
-                                viderTableImprimante_Etiquette(db);
-                                JSONArray imprimanteEtiquette_JSONArray = response.getJSONArray("Imprimante_Etiquette");
-                                for (int i = 0; i < imprimanteEtiquette_JSONArray.length(); i++) {
-                                    JSONObject imprimante_JSONObject = imprimanteEtiquette_JSONArray.getJSONObject(i);
-                                    ImprimanteEtiquette imprimanteEtiquette = new ImprimanteEtiquette(imprimante_JSONObject);
-                                    insererUneImprimanteEnBDD(db, imprimanteEtiquette);
+                                // ⬇️ Pas d'insertion → mise à jour directe de la modale sur le thread UI
+                                String activity_name = context.getClass().getSimpleName();
+                                if (activity_name.contentEquals("ServiceConnexionDirecteActivity")) {
+                                    ((ServiceConnexionDirecteActivity) context).gestionProgressBar();
                                 }
+                                ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+
+                            } else {
+                                // Parsing sur le thread UI (rapide)
+                                JSONArray imprimanteEtiquette_JSONArray = response.getJSONArray("Imprimante_Etiquette");
+                                final List<ImprimanteEtiquette> listeImprimantes = new ArrayList<>();
+                                for (int i = 0; i < imprimanteEtiquette_JSONArray.length(); i++) {
+                                    listeImprimantes.add(new ImprimanteEtiquette(imprimanteEtiquette_JSONArray.getJSONObject(i)));
+                                }
+
+                                // Insertion sur un thread background
+                                new Thread(() -> {
+                                    boolean etatThread = true;
+                                    String erreurThread = "";
+
+                                    viderTableImprimante_Etiquette(db);
+
+                                    db.beginTransaction();
+                                    try {
+                                        for (ImprimanteEtiquette imprimanteEtiquette : listeImprimantes) {
+                                            insererUneImprimanteEnBDD(db, imprimanteEtiquette);
+                                        }
+                                        db.setTransactionSuccessful();
+                                    } catch (Exception e) {
+                                        etatThread = false;
+                                        erreurThread = "Erreur lors de l'insertion des imprimantes étiquettes";
+                                        e.printStackTrace();
+                                    } finally {
+                                        db.endTransaction();
+                                    }
+
+                                    // ⬇️ Mise à jour de la modale sur le thread UI une fois tout terminé
+                                    final boolean resultatFinal = etatThread;
+                                    final String erreurFinale = erreurThread;
+                                    new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                                        String activity_name = context.getClass().getSimpleName();
+                                        if (activity_name.contentEquals("ServiceConnexionDirecteActivity")) {
+                                            ((ServiceConnexionDirecteActivity) context).gestionProgressBar();
+                                        }
+                                        ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, resultatFinal, erreurFinale);
+                                    });
+
+                                }).start();
                             }
-                            String activity_name = context.getClass().getSimpleName();
-                            if(activity_name.contentEquals("ServiceConnexionDirecteActivity"))
-                            {
-                                ((ServiceConnexionDirecteActivity) context).gestionProgressBar();
-                            }
-                            ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

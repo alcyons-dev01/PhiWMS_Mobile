@@ -24,8 +24,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -114,29 +116,58 @@ public class EVENTOpenHelper extends DBOpenHelper {
                 String erreur = "";
                 boolean etat = true;
                 int resultCount = response.getInt("resultCount");
+
                 if (resultCount == 0) {
                     etat = false;
                     erreur = response.getString("erreur");
                     if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                        //DBOpenHelper.viderBasesDeDonnees(db);
                         erreur = "Votre session a expirée, veuillez vous reconnecter.";
                     } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                         erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
                     } else if (!erreur.equals("Aucun Events trouvé")) {
-                    }
-                    else{
+                        // pas de message d'erreur spécifique comme dans l'original
+                    } else {
                         etat = true;
                     }
-                } else {
-                    JSONArray eventJSONArray = response.getJSONArray("EVENTS");
-                    for (int i = 0; i < eventJSONArray.length(); i++) {
-                        JSONObject eventJSONObject = eventJSONArray.getJSONObject(i);
-                        EVENT event = new EVENT(eventJSONObject);
+                    // ⬇️ Pas d'insertion → mise à jour directe de la modale sur le thread UI
+                    ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
 
-                        long rowID = EVENTOpenHelper.insererEVENTEnBDD(db, event);
+                } else {
+                    // Parsing sur le thread UI (rapide)
+                    JSONArray eventJSONArray = response.getJSONArray("EVENTS");
+                    final List<EVENT> listeEvents = new ArrayList<>();
+                    for (int i = 0; i < eventJSONArray.length(); i++) {
+                        listeEvents.add(new EVENT(eventJSONArray.getJSONObject(i)));
                     }
+
+                    // Insertion sur un thread background
+                    new Thread(() -> {
+                        boolean etatThread = true;
+                        String erreurThread = "";
+
+                        db.beginTransaction();
+                        try {
+                            for (EVENT event : listeEvents) {
+                                EVENTOpenHelper.insererEVENTEnBDD(db, event);
+                            }
+                            db.setTransactionSuccessful();
+                        } catch (Exception e) {
+                            etatThread = false;
+                            erreurThread = "Erreur lors de l'insertion des events";
+                            e.printStackTrace();
+                        } finally {
+                            db.endTransaction();
+                        }
+
+                        // ⬇️ Mise à jour de la modale sur le thread UI une fois tout terminé
+                        final boolean resultatFinal = etatThread;
+                        final String erreurFinale = erreurThread;
+                        new android.os.Handler(android.os.Looper.getMainLooper()).post(() ->
+                                ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, resultatFinal, erreurFinale)
+                        );
+
+                    }).start();
                 }
-                ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
 
             } catch (JSONException e) {
                 e.printStackTrace();

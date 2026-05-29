@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.provider.BaseColumns;
 import android.util.Log;
 
@@ -28,6 +29,7 @@ import java.util.Map;
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Emplacement;
 import fr.alcyons.phiwms_mobile.Classes.Depot_Zone;
+import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
 import fr.alcyons.phiwms_mobile.R;
@@ -131,40 +133,130 @@ public class EmplacementOpenHelper extends DBOpenHelper {
                                 boolean etat = true;
                                 String erreur = "";
                                 int resultCount = response.getInt("resultCount");
+
                                 if (resultCount == 0) {
                                     erreur = response.getString("erreur");
                                     etat = false;
                                     if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                        //viderBasesDeDonnees(db);
                                         erreur = "Votre session a expirée, veuillez vous reconnecter.";
                                     } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                         erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
                                     } else if (!erreur.equals("Aucun Depot_Emplacement trouvé")) {
                                         erreur = "Erreur API Emplacements";
                                     }
+                                    // ⬇️ Pas d'insertion → mise à jour directe de la modale sur le thread UI
+                                    ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+
                                 } else {
-                                    viderTableDepotEmplacements(db);
+                                    // Parsing sur le thread UI (rapide)
+                                    final List<Depot_Emplacement> listeEmplacement = new ArrayList<>();
                                     JSONArray depotEmplacementJSONArray = response.getJSONArray("Depot_Emplacements");
-                                    int compteurReussite = 0;
-
                                     for (int i = 0; i < depotEmplacementJSONArray.length(); i++) {
-                                        // Récupération du service courant
-                                        JSONObject depotEmplacementJSONObject = depotEmplacementJSONArray.getJSONObject(i);
+                                        listeEmplacement.add(new Depot_Emplacement(depotEmplacementJSONArray.getJSONObject(i)));
+                                    }
+                                    final int finalResultCount = resultCount;
 
-                                        Depot_Emplacement depotEmplacement = new Depot_Emplacement(depotEmplacementJSONObject);
+                                    // Insertion sur un thread background
+                                    new Thread(() -> {
+                                        boolean etatThread = true;
+                                        String erreurThread = "";
+                                        int compteurReussite = 0;
 
-                                        // insertion du service en bdd
-                                        long rowID = insererUnDepotEmplacementEnBDD(db, depotEmplacement);
-                                        if (rowID != -1) {
-                                            compteurReussite++;
+                                        viderTableDepotEmplacements(db);
+
+                                        // Compiler le statement une seule fois avant la boucle
+                                        SQLiteStatement stmt = db.compileStatement(
+                                                "INSERT INTO " + EmplacementOpenHelper.Constantes.TABLE_DEPOT_EMPLACEMENT + " ("
+                                                        + EmplacementOpenHelper.Constantes.CLE_COL_ADRESSAGE_DEPOT_EMPLACEMENT + ","
+                                                        + EmplacementOpenHelper.Constantes.CLE_COL_HALL_DEPOT_EMPLACEMENT + ","
+                                                        + EmplacementOpenHelper.Constantes.CLE_COL_PALETIER_DEPOT_EMPLACEMENT + ","
+                                                        + EmplacementOpenHelper.Constantes.CLE_COL_ALVEOLE_DEPOT_EMPLACEMENT + ","
+                                                        + EmplacementOpenHelper.Constantes.CLE_COL_NIVEAU_DEPOT_EMPLACEMENT + ","
+                                                        + EmplacementOpenHelper.Constantes.CLE_COL_ZONE_ID_DEPOT_EMPLACEMENT + ","
+                                                        + EmplacementOpenHelper.Constantes.CLE_COL_DEPOT_ID_DEPOT_EMPLACEMENT + ","
+                                                        + EmplacementOpenHelper.Constantes.CLE_COL_DEPOT_REFERENCE_DEPOT_EMPLACEMENT + ","
+                                                        + EmplacementOpenHelper.Constantes.CLE_COL_UID_DEPOT_EMPLACEMENT + ","
+                                                        + EmplacementOpenHelper.Constantes.CLE_COL_CODE_GLN_DEPOT_EMPLACEMENT
+                                                        + ") VALUES (?,?,?,?,?,?,?,?,?,?)"
+                                        );
+
+                                        db.beginTransaction();
+                                        try {
+                                            for (Depot_Emplacement depotEmplacement : listeEmplacement) {
+                                                stmt.clearBindings();
+
+                                                // TEXT — bindString ou bindNull
+                                                if (depotEmplacement.getAdressage() != null)
+                                                    stmt.bindString(1, depotEmplacement.getAdressage());
+                                                else stmt.bindNull(1);
+
+                                                if (depotEmplacement.getHall() != null)
+                                                    stmt.bindString(2, depotEmplacement.getHall());
+                                                else stmt.bindNull(2);
+
+                                                if (depotEmplacement.getPaletier() != null)
+                                                    stmt.bindString(3, depotEmplacement.getPaletier());
+                                                else stmt.bindNull(3);
+
+                                                if (depotEmplacement.getAlveole() != null)
+                                                    stmt.bindString(4, depotEmplacement.getAlveole());
+                                                else stmt.bindNull(4);
+
+                                                if (depotEmplacement.getNiveau() != null)
+                                                    stmt.bindString(5, depotEmplacement.getNiveau());
+                                                else stmt.bindNull(5);
+
+                                                // INTEGER — bindLong ou bindNull
+                                                // ZoneID
+                                                try { stmt.bindLong(6, depotEmplacement.getZoneID()); }
+                                                catch (Exception e) { stmt.bindNull(6); }
+
+                                                // DepotID
+                                                try { stmt.bindLong(7, depotEmplacement.getDepotID()); }
+                                                catch (Exception e) { stmt.bindNull(7); }
+
+                                                if (depotEmplacement.getDepot_Reference() != null)
+                                                    stmt.bindString(8, depotEmplacement.getDepot_Reference());
+                                                else stmt.bindNull(8);
+
+                                                // _UID
+                                                try { stmt.bindLong(9, depotEmplacement.get_UID()); }
+                                                catch (Exception e) { stmt.bindNull(9); }
+
+                                                if (depotEmplacement.getCode_GLN() != null)
+                                                    stmt.bindString(10, depotEmplacement.getCode_GLN());
+                                                else stmt.bindNull(10);
+
+                                                long rowID = stmt.executeInsert();
+                                                if (rowID != -1) {
+                                                    compteurReussite++;
+                                                }
+                                            }
+                                            db.setTransactionSuccessful();
+                                        } catch (Exception e) {
+                                            etatThread = false;
+                                            erreurThread = "Erreur lors de l'insertion des emplacements";
+                                            e.printStackTrace();
+                                        } finally {
+                                            db.endTransaction();
+                                            stmt.close(); // ✅ Toujours fermer le statement
                                         }
-                                    }
-                                    if (resultCount != compteurReussite) {
-                                        erreur = String.valueOf(resultCount - compteurReussite) + " emplacements n'ont pas été insérés.";
-                                        etat = false;
-                                    }
+
+                                        if (finalResultCount != compteurReussite) {
+                                            erreurThread = String.valueOf(finalResultCount - compteurReussite) + " emplacements n'ont pas été insérés.";
+                                            etatThread = false;
+                                        }
+
+                                        // ⬇️ Mise à jour de la modale sur le thread UI une fois l'insertion terminée
+                                        final boolean resultatFinal = etatThread;
+                                        final String erreurFinale = erreurThread;
+                                        new android.os.Handler(android.os.Looper.getMainLooper()).post(() ->
+                                                ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, resultatFinal, erreurFinale)
+                                        );
+
+                                    }).start();
                                 }
-                                ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }

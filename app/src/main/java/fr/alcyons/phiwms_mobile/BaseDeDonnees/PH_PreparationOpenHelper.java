@@ -51,6 +51,17 @@ public class PH_PreparationOpenHelper extends DBOpenHelper {
         db.delete(Constantes.TABLE_PH_PREPARATION, null, null);
     }
 
+    public static Map<String, PH_Preparation> getAllPreparationsEnMap(SQLiteDatabase db) {
+        Map<String, PH_Preparation> map = new HashMap<>();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION, null);
+        while (cursor.moveToNext()) {
+            PH_Preparation p = new PH_Preparation(cursor);
+            map.put(p.getListe() + "_" + p.getLivraisonDate(), p);
+        }
+        cursor.close();
+        return map;
+    }
+
     public static PH_Preparation getDemandeDemandeReassortEnInstance(SQLiteDatabase db, String Liste, String DateProchaineLivraison) {
         PH_Preparation ph_preparation = null;
 

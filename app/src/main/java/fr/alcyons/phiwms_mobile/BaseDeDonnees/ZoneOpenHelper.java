@@ -209,45 +209,78 @@ public class ZoneOpenHelper extends DBOpenHelper {
                                 boolean etat = true;
                                 String erreur = "";
                                 int resultCount = response.getInt("resultCount");
+
                                 if (resultCount == 0) {
                                     erreur = response.getString("erreur");
                                     etat = false;
                                     if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                        //viderBasesDeDonnees(db);
                                         erreur = "Votre session a expirée, veuillez vous reconnecter.";
                                     } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                         erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
                                     } else if (!erreur.contentEquals("Aucun Depot_Zone trouvé")) {
                                         erreur = "Erreur API Zones";
                                     }
+                                    // ⬇️ Pas d'insertion → mise à jour directe de la modale sur le thread UI
+                                    ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+
                                 } else {
                                     int nbZone = getNbDepotsZones(db);
-                                    if(nbZone != resultCount)
-                                    {
-                                        viderTableDepotZones(db);
+
+                                    if (nbZone != resultCount) {
+                                        // Parsing sur le thread UI (rapide)
                                         JSONArray depotZoneJSONArray = response.getJSONArray("Depot_Zones");
-                                        int compteurReussite = 0;
-
+                                        final List<Depot_Zone> listeZone = new ArrayList<>();
                                         for (int i = 0; i < depotZoneJSONArray.length(); i++) {
-                                            // Récupération du service courant
-                                            JSONObject depotZoneJSONObject = depotZoneJSONArray.getJSONObject(i);
+                                            listeZone.add(new Depot_Zone(depotZoneJSONArray.getJSONObject(i)));
+                                        }
 
-                                            Depot_Zone depotZone = new Depot_Zone(depotZoneJSONObject);
+                                        final int finalResultCount = resultCount;
 
-                                            // insertion du service en bdd
-                                            long rowID = insererUnDepotZoneEnBDD(db, depotZone);
+                                        // Insertion sur un thread background
+                                        new Thread(() -> {
+                                            boolean etatThread = true;
+                                            String erreurThread = "";
+                                            int compteurReussite = 0;
 
-                                            if (rowID != -1) {
-                                                compteurReussite++;
+                                            viderTableDepotZones(db);
+
+                                            db.beginTransaction();
+                                            try {
+                                                for (Depot_Zone depotZone : listeZone) {
+                                                    long rowID = insererUnDepotZoneEnBDD(db, depotZone);
+                                                    if (rowID != -1) {
+                                                        compteurReussite++;
+                                                    }
+                                                }
+                                                db.setTransactionSuccessful();
+                                            } catch (Exception e) {
+                                                etatThread = false;
+                                                erreurThread = "Erreur lors de l'insertion des zones";
+                                                e.printStackTrace();
+                                            } finally {
+                                                db.endTransaction();
                                             }
-                                        }
-                                        if (resultCount != compteurReussite) {
-                                            erreur = String.valueOf(resultCount - compteurReussite) + " zones n'ont pas été insérées.";
-                                            etat = false;
-                                        }
+
+                                            if (finalResultCount != compteurReussite) {
+                                                erreurThread = String.valueOf(finalResultCount - compteurReussite) + " zones n'ont pas été insérées.";
+                                                etatThread = false;
+                                            }
+
+                                            // ⬇️ Mise à jour de la modale sur le thread UI une fois tout terminé
+                                            final boolean resultatFinal = etatThread;
+                                            final String erreurFinale = erreurThread;
+                                            new android.os.Handler(android.os.Looper.getMainLooper()).post(() ->
+                                                    ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, resultatFinal, erreurFinale)
+                                            );
+
+                                        }).start();
+
+                                    } else {
+                                        // ⬇️ Pas d'insertion nécessaire (nbZone == resultCount) → mise à jour directe
+                                        ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
                                     }
                                 }
-                                ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }

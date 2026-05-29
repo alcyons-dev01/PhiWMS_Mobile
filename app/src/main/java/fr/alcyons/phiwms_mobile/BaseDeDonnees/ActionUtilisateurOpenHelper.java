@@ -220,35 +220,61 @@ public class ActionUtilisateurOpenHelper extends DBOpenHelper {
                         String erreur = "";
                         boolean etat = true;
                         int resultCount = response.getInt("resultCount");
+
                         if (resultCount == 0) {
                             etat = false;
                             erreur = response.getString("erreur");
                             if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                //viderBasesDeDonnees(db);
                                 erreur = "Votre session a expirée, veuillez vous reconnecter.";
                             } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                 erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
                             } else if (!erreur.equals("Aucune Action Utilisateur trouvée")) {
                                 erreur = "";
                                 etat = true;
-
-                            }
-                            else{
+                            } else {
                                 etat = true;
                             }
+                            // ⬇️ Pas d'insertion → mise à jour directe de la modale sur le thread UI
+                            ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+
                         } else {
-
-                            viderTableActionUtilisateur(db);
+                            // Parsing sur le thread UI (rapide)
                             JSONArray actionUtilisateurJSONArray = response.getJSONArray("ActionUtilisateur");
-
+                            final List<ActionUtilisateur> listeActionsUtilisateur = new ArrayList<>();
                             for (int i = 0; i < actionUtilisateurJSONArray.length(); i++) {
-                                JSONObject actionUtilisateurJSONObject = actionUtilisateurJSONArray.getJSONObject(i);
-                                ActionUtilisateur actionUtilisateur = new ActionUtilisateur(actionUtilisateurJSONObject);
-
-                                long rowID = insererActionUtilisateurEnBDD(db, actionUtilisateur);
+                                listeActionsUtilisateur.add(new ActionUtilisateur(actionUtilisateurJSONArray.getJSONObject(i)));
                             }
+
+                            // Insertion sur un thread background
+                            new Thread(() -> {
+                                boolean etatThread = true;
+                                String erreurThread = "";
+
+                                viderTableActionUtilisateur(db);
+
+                                db.beginTransaction();
+                                try {
+                                    for (ActionUtilisateur actionUtilisateur : listeActionsUtilisateur) {
+                                        insererActionUtilisateurEnBDD(db, actionUtilisateur);
+                                    }
+                                    db.setTransactionSuccessful();
+                                } catch (Exception e) {
+                                    etatThread = false;
+                                    erreurThread = "Erreur lors de l'insertion des actions utilisateur";
+                                    e.printStackTrace();
+                                } finally {
+                                    db.endTransaction();
+                                }
+
+                                // ⬇️ Mise à jour de la modale sur le thread UI une fois tout terminé
+                                final boolean resultatFinal = etatThread;
+                                final String erreurFinale = erreurThread;
+                                new android.os.Handler(android.os.Looper.getMainLooper()).post(() ->
+                                        ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, resultatFinal, erreurFinale)
+                                );
+
+                            }).start();
                         }
-                        ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
 
                     } catch (JSONException e) {
                         e.printStackTrace();

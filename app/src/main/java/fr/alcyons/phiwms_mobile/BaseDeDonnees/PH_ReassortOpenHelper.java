@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.provider.BaseColumns;
 import android.util.Log;
 
@@ -75,41 +76,133 @@ public class PH_ReassortOpenHelper extends DBOpenHelper {
                     String erreur = "";
                     boolean etat = true;
                     int resultCount = response.getInt("resultCount");
+
                     if (resultCount == 0) {
                         etat = false;
                         erreur = response.getString("erreur");
                         if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                            //DBOpenHelper.viderBasesDeDonnees(db);
                             erreur = "Votre session a expirée, veuillez vous reconnecter.";
                         } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                             erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
                         } else if (!erreur.equals("Aucun PH_Reassort trouvé")) {
                             erreur = "Erreur API Réassort";
-                        }
-                        else{
+                        } else {
                             etat = true;
                         }
+                        // ⬇️ Pas d'insertion → mise à jour directe de la modale sur le thread UI
+                        ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+
                     } else {
+                        // Parsing sur le thread UI (rapide)
+                        final List<PH_Reassort> listeReassorts = new ArrayList<>();
+                        final List<PH_Reassort_Ligne> listeReassortLignes = new ArrayList<>();
 
                         JSONArray reassortJSONArray = response.getJSONArray("PH_Reassorts");
-
                         for (int i = 0; i < reassortJSONArray.length(); i++) {
                             JSONObject reassortJSONObject = reassortJSONArray.getJSONObject(i);
-                            PH_Reassort reassort = new PH_Reassort(reassortJSONObject);
+                            listeReassorts.add(new PH_Reassort(reassortJSONObject));
 
-                            long rowID = insererPH_ReassortEnBDD(db, reassort);
-                            if(reassortJSONObject.has("ph_reassort_lignes"))
-                            {
+                            if (reassortJSONObject.has("ph_reassort_lignes")) {
                                 JSONArray reassortLigneJsonArray = reassortJSONObject.getJSONArray("ph_reassort_lignes");
                                 for (int j = 0; j < reassortLigneJsonArray.length(); j++) {
-                                    JSONObject detailDotationJSONObject = reassortLigneJsonArray.getJSONObject(j);
-                                    PH_Reassort_Ligne reassort_ligne = new PH_Reassort_Ligne(detailDotationJSONObject);
-                                    long detailRowID = PH_Reassort_LigneOpenHelper.insererPH_Reassort_LigneEnBDD(db, reassort_ligne);
+                                    listeReassortLignes.add(new PH_Reassort_Ligne(reassortLigneJsonArray.getJSONObject(j)));
                                 }
                             }
                         }
+
+                        // Insertion sur un thread background
+                        new Thread(() -> {
+                            boolean etatThread = true;
+                            String erreurThread = "";
+
+                            SQLiteStatement stmtReassort = db.compileStatement(
+                                    "INSERT INTO " + PH_ReassortOpenHelper.Constantes.TABLE_PH_REASSORT + " ("
+                                            + PH_ReassortOpenHelper.Constantes.CLE_COL_CODE_PH_REASSORT + ","
+                                            + PH_ReassortOpenHelper.Constantes.CLE_COL_LISTE_PH_REASSORT + ","
+                                            + PH_ReassortOpenHelper.Constantes.CLE_COL_SYS_DT_MAJ_PH_REASSORT + ","
+                                            + PH_ReassortOpenHelper.Constantes.CLE_COL_SYS_HEURE_MAJ_PH_REASSORT + ","
+                                            + PH_ReassortOpenHelper.Constantes.CLE_COL_SYS_USER_MAJ_PH_REASSORT + ","
+                                            + PH_ReassortOpenHelper.Constantes.CLE_COL_DEPOT_REFERENCE_PH_REASSORT + ","
+                                            + PH_ReassortOpenHelper.Constantes.CLE_COL_FREQUENCE_PH_REASSORT + ","
+                                            + PH_ReassortOpenHelper.Constantes.CLE_COL_SYNCHRODM_MEDICAMENT_PH_REASSORT + ","
+                                            + PH_ReassortOpenHelper.Constantes.CLE_COL_SYNCHRODM_DMDMS_PH_REASSORT + ","
+                                            + PH_ReassortOpenHelper.Constantes.CLE_COL_VALORISATION_TTC_PH_REASSORT
+                                            + ") VALUES (?,?,?,?,?,?,?,?,?,?)"
+                            );
+
+                            SQLiteStatement stmtReassortLigne = db.compileStatement(
+                                    "INSERT INTO " + PH_Reassort_LigneOpenHelper.Constantes.TABLE_PH_REASSORT_LIGNE + " ("
+                                            + PH_Reassort_LigneOpenHelper.Constantes.CLE_COL_REASSORT_UID_PH_REASSORT_LIGNE + ","
+                                            + PH_Reassort_LigneOpenHelper.Constantes.CLE_COL_PRODUIT_ID_PH_REASSORT_LIGNE + ","
+                                            + PH_Reassort_LigneOpenHelper.Constantes.CLE_COL_DESIGNATION_INT_PH_REASSORT_LIGNE + ","
+                                            + PH_Reassort_LigneOpenHelper.Constantes.CLE_COL_CONDITIONNEMENT_PH_REASSORT_LIGNE + ","
+                                            + PH_Reassort_LigneOpenHelper.Constantes.CLE_COL_QUANTITE_PH_REASSORT_LIGNE + ","
+                                            + PH_Reassort_LigneOpenHelper.Constantes.CLE_COL_PRODUIT_REFERENCE_PH_REASSORT_LIGNE + ","
+                                            + PH_Reassort_LigneOpenHelper.Constantes.CLE_COL_ZONE_STOCKAGE_PH_REASSORT_LIGNE + ","
+                                            + PH_Reassort_LigneOpenHelper.Constantes.CLE_COL_CATEGORIE_PH_REASSORT_LIGNE + ","
+                                            + PH_Reassort_LigneOpenHelper.Constantes.CLE_COL_SYS_DT_MAJ_PH_REASSORT_LIGNE + ","
+                                            + PH_Reassort_LigneOpenHelper.Constantes.CLE_COL_SYS_HEURE_MAJ_PH_REASSORT_LIGNE + ","
+                                            + PH_Reassort_LigneOpenHelper.Constantes.CLE_COL_SYS_USER_MAJ_PH_REASSORT_LIGNE + ","
+                                            + PH_Reassort_LigneOpenHelper.Constantes.CLE_COL_STOCK_MINIMUM_PH_REASSORT_LIGNE + ","
+                                            + PH_Reassort_LigneOpenHelper.Constantes.CLE_COL__UID_PH_REASSORT_LIGNE
+                                            + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
+                            );
+
+                            db.beginTransaction();
+                            try {
+                                for (PH_Reassort reassort : listeReassorts) {
+                                    stmtReassort.clearBindings();
+                                    stmtReassort.bindLong(1,   reassort.getCode());
+                                    bindStringOrNull(stmtReassort, 2,  reassort.getListe());
+                                    bindStringOrNull(stmtReassort, 3,  reassort.getSYS_DT_MAJ());
+                                    bindStringOrNull(stmtReassort, 4,  reassort.getSYS_HEURE_MAJ());
+                                    bindStringOrNull(stmtReassort, 5,  reassort.getSYS_USER_MAJ());
+                                    bindStringOrNull(stmtReassort, 6,  reassort.getDepot_Reference());
+                                    bindStringOrNull(stmtReassort, 7,  reassort.getFrequence());
+                                    stmtReassort.bindLong(8,   reassort.isSynchroDM_Medicament() ? 1 : 0);
+                                    stmtReassort.bindLong(9,   reassort.isSynchroDM_DMDMS() ? 1 : 0);
+                                    stmtReassort.bindLong(10,  reassort.getValorisation_TTC());
+                                    stmtReassort.executeInsert();
+                                }
+
+                                for (PH_Reassort_Ligne reassortLigne : listeReassortLignes) {
+                                    stmtReassortLigne.clearBindings();
+                                    stmtReassortLigne.bindLong(1,   reassortLigne.getReassort_UID());
+                                    stmtReassortLigne.bindLong(2,   reassortLigne.getProduit_ID());
+                                    bindStringOrNull(stmtReassortLigne, 3,  reassortLigne.getDesignation_int());
+                                    stmtReassortLigne.bindLong(4,   reassortLigne.getConditionnement());
+                                    stmtReassortLigne.bindLong(5,   reassortLigne.getQuantite());
+                                    bindStringOrNull(stmtReassortLigne, 6,  reassortLigne.getProduit_Reference());
+                                    bindStringOrNull(stmtReassortLigne, 7,  reassortLigne.getZone_stockage());
+                                    bindStringOrNull(stmtReassortLigne, 8,  reassortLigne.getCategorie());
+                                    bindStringOrNull(stmtReassortLigne, 9,  reassortLigne.getSYS_DT_MAJ());
+                                    bindStringOrNull(stmtReassortLigne, 10, reassortLigne.getSYS_HEURE_MAJ());
+                                    bindStringOrNull(stmtReassortLigne, 11, reassortLigne.getSYS_USER_MAJ());
+                                    stmtReassortLigne.bindLong(12,  reassortLigne.getStock_Minimum());
+                                    stmtReassortLigne.bindLong(13,  reassortLigne.get_UID());
+                                    stmtReassortLigne.executeInsert();
+                                }
+
+                                db.setTransactionSuccessful();
+                            } catch (Exception e) {
+                                etatThread = false;
+                                erreurThread = "Erreur lors de l'insertion des réassorts";
+                                e.printStackTrace();
+                            } finally {
+                                db.endTransaction();
+                                stmtReassort.close();
+                                stmtReassortLigne.close();
+                            }
+
+                            // ⬇️ Mise à jour de la modale sur le thread UI une fois tout terminé
+                            final boolean resultatFinal = etatThread;
+                            final String erreurFinale = erreurThread;
+                            new android.os.Handler(android.os.Looper.getMainLooper()).post(() ->
+                                    ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, resultatFinal, erreurFinale)
+                            );
+
+                        }).start();
                     }
-                    ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -249,5 +342,10 @@ public class PH_ReassortOpenHelper extends DBOpenHelper {
                 + Constantes.CLE_COL_VALORISATION_TTC_PH_REASSORT + " " + Constantes.TYPE_COL_VALORISATION_TTC_PH_REASSORT
                 + " ); ";
 
+    }
+
+    private static void bindStringOrNull(SQLiteStatement stmt, int index, String value) {
+        if (value != null) stmt.bindString(index, value);
+        else stmt.bindNull(index);
     }
 }

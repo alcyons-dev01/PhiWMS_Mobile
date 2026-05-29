@@ -80,52 +80,82 @@ public class PH_Demande_MotifOpenHelper extends DBOpenHelper {
                             String erreur = "";
                             boolean etat = true;
                             int resultCount = response.getInt("resultCount");
+
                             if (resultCount == 0) {
                                 erreur = response.getString("erreur");
                                 etat = false;
                                 if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                    //DBOpenHelper.viderBasesDeDonnees(db);
                                     erreur = "Votre session a expirée, veuillez vous reconnecter.";
                                 } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                     erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
                                 } else if (!erreur.equals("Aucun PH_Depots trouvé")) {
                                     erreur = "Erreur API Dépots";
-                                }
-                                else
-                                {
+                                } else {
                                     etat = true;
                                 }
+                                // ⬇️ Pas d'insertion → mise à jour directe de la modale sur le thread UI
+                                String activityName = context.getClass().getSimpleName();
+                                if (activityName.contentEquals("AuthentificationActivity")) {
+                                    ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+                                } else if (activityName.contentEquals("ServiceConnexionDirecteActivity")) {
+                                    ((ServiceConnexionDirecteActivity) context).gestionProgressBar();
+                                }
+
                             } else {
-                                viderTablePHDemande(db);
-                                int compteurReussite = 0;
-
+                                // Parsing sur le thread UI (rapide)
                                 JSONArray motifJSONArrayAll = response.getJSONArray("PH_Demande_Motif");
-                                for(int j = 0; j < motifJSONArrayAll.length(); j++)
-                                {
-                                    // Récupération du service courant
-                                    JSONObject motifJSONObject = motifJSONArrayAll.getJSONObject(j);
-                                    PH_Demande_Motif motif = new PH_Demande_Motif(motifJSONObject);
-                                    // insertion du service en bdd
-                                    long rowID = insererUnMotifEnBDD(db, motif);
-                                    if (rowID != -1) {
-                                        compteurReussite++;
-                                    }
+                                final List<PH_Demande_Motif> listeMotifs = new ArrayList<>();
+                                for (int j = 0; j < motifJSONArrayAll.length(); j++) {
+                                    listeMotifs.add(new PH_Demande_Motif(motifJSONArrayAll.getJSONObject(j)));
                                 }
 
-                                if (resultCount != compteurReussite) {
-                                    erreur = String.valueOf(resultCount - compteurReussite) + " motif n'ont pas été insérées.";
-                                    etat = false;
-                                }
+                                final int finalResultCount = resultCount;
+
+                                // Insertion sur un thread background
+                                new Thread(() -> {
+                                    boolean etatThread = true;
+                                    String erreurThread = "";
+                                    int compteurReussite = 0;
+
+                                    viderTablePHDemande(db);
+
+                                    db.beginTransaction();
+                                    try {
+                                        for (PH_Demande_Motif motif : listeMotifs) {
+                                            long rowID = insererUnMotifEnBDD(db, motif);
+                                            if (rowID != -1) {
+                                                compteurReussite++;
+                                            }
+                                        }
+                                        db.setTransactionSuccessful();
+                                    } catch (Exception e) {
+                                        etatThread = false;
+                                        erreurThread = "Erreur lors de l'insertion des motifs";
+                                        e.printStackTrace();
+                                    } finally {
+                                        db.endTransaction();
+                                    }
+
+                                    if (finalResultCount != compteurReussite) {
+                                        erreurThread = String.valueOf(finalResultCount - compteurReussite) + " motif n'ont pas été insérés.";
+                                        etatThread = false;
+                                    }
+
+                                    // ⬇️ Mise à jour de la modale sur le thread UI une fois tout terminé
+                                    final boolean resultatFinal = etatThread;
+                                    final String erreurFinale = erreurThread;
+                                    new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                                        String activityName = context.getClass().getSimpleName();
+                                        if (activityName.contentEquals("AuthentificationActivity")) {
+                                            ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, resultatFinal, erreurFinale);
+                                        } else if (activityName.contentEquals("ServiceConnexionDirecteActivity")) {
+                                            ((ServiceConnexionDirecteActivity) context).gestionProgressBar();
+                                        }
+                                    });
+
+                                }).start();
                             }
-                            String activityName = context.getClass().getSimpleName();
-                            if(activityName.contentEquals("AuthentificationActivity"))
-                            {
-                                ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
-                            }
-                            else if(activityName.contentEquals("ServiceConnexionDirecteActivity"))
-                            {
-                                ((ServiceConnexionDirecteActivity) context).gestionProgressBar();
-                            }
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

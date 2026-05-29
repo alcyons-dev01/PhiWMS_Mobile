@@ -166,12 +166,6 @@ public class AuthentificationActivity extends MainActivity {
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
         setContentView(R.layout.activity_authentification);
 
-        //ouverture CGU
-        /*findViewById(R.id.versCGU).setOnClickListener(v -> {
-            Intent versCGU = new Intent(AuthentificationActivity.this, CguActivity.class);
-            AuthentificationActivity.this.startActivity(versCGU);
-        });*/
-
         try {
             Context context = getApplicationContext();
             PackageManager pm = context.getPackageManager();
@@ -635,7 +629,18 @@ public class AuthentificationActivity extends MainActivity {
                 if(utilisateurConnecte.getIdentifiant().toLowerCase().contentEquals("alcyons"))
                 {
                     int nbProduit = ProduitOpenHelper.getNbProduit(db);
-                    if(nbProduit == 0)
+                    afficherAlerteConnexion();
+                    // Si l'identification s'est bien passé, on récupère le plan d'habilitation de l'utilisateur connecté
+                    // Activer les notifications pour l'utilisateur
+                    UtilisateurOpenHelper.mettreAJourUtilisateur(db, utilisateurConnecte);
+
+                    mettreAJourBDD();
+
+                    /**
+                     * Mettre en place le mode dev
+                     */
+
+                    /*if(nbProduit == 0)
                     {
                         afficherAlerteConnexion();
                         // Si l'identification s'est bien passé, on récupère le plan d'habilitation de l'utilisateur connecté
@@ -647,7 +652,7 @@ public class AuthentificationActivity extends MainActivity {
                     else
                     {
                         passerActiviteSuivante();
-                    }
+                    }*/
                 }
                 else
                 {

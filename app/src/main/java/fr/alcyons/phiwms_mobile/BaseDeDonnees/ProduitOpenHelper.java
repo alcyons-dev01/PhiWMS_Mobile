@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.provider.BaseColumns;
 import android.util.Log;
 
@@ -287,7 +288,7 @@ public class ProduitOpenHelper extends DBOpenHelper {
 
     public static List<Produit> getProduitsNonIdentifier(SQLiteDatabase db) {
         List<Produit> produitList = new ArrayList<>();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + Constantes.CLE_COL_GTIN_PRODUIT + "= \"\" AND "+Constantes.CLE_COL_CODE_INCONNU+"= \"\" AND "+Constantes.CLE_COL_ARRET_COMMANDE_PRODUIT+" != 1 ORDER BY "+Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT, new String[]{});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + Constantes.CLE_COL_GTIN_PRODUIT + "= \"\" AND "+Constantes.CLE_COL_CODE_INCONNU+"= \"\" ORDER BY "+Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT, new String[]{});
 
         while (cursor.moveToNext()) {
             Produit produit = new Produit(cursor);
@@ -300,7 +301,7 @@ public class ProduitOpenHelper extends DBOpenHelper {
 
     public static List<Produit> getProduitsIdentifier(SQLiteDatabase db) {
         List<Produit> produitList = new ArrayList<>();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + Constantes.CLE_COL_GTIN_PRODUIT + "!= \"\" OR "+Constantes.CLE_COL_CODE_INCONNU+"!= \"\" AND "+Constantes.CLE_COL_ARRET_COMMANDE_PRODUIT+" != 1 ORDER BY "+Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT, new String[]{});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + Constantes.CLE_COL_GTIN_PRODUIT + "!= \"\" OR "+Constantes.CLE_COL_CODE_INCONNU+"!= \"\" ORDER BY "+Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT, new String[]{});
 
         while (cursor.moveToNext()) {
             Produit produit = new Produit(cursor);
@@ -314,7 +315,7 @@ public class ProduitOpenHelper extends DBOpenHelper {
 
     public static List<Produit> getProduitsParGTIN(SQLiteDatabase db, String produitGTIN) {
         List<Produit> produitList = new ArrayList<>();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + Constantes.CLE_COL_GTIN_PRODUIT + "=? AND "+Constantes.CLE_COL_ARRET_COMMANDE_PRODUIT+" != 1 ", new String[]{produitGTIN});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PRODUIT + " WHERE " + Constantes.CLE_COL_GTIN_PRODUIT + "=?", new String[]{produitGTIN});
 
         while (cursor.moveToNext()) {
             Produit produit = new Produit(cursor);
@@ -674,48 +675,364 @@ public class ProduitOpenHelper extends DBOpenHelper {
                                 boolean etat = true;
                                 String erreur = "";
                                 int resultCount = response.getInt("resultCount");
+
                                 if (resultCount == 0) {
                                     erreur = response.getString("erreur");
                                     etat = false;
                                     if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                        //viderBasesDeDonnees(db);
                                         erreur = " Votre identifiant de connexion est invalide, veuillez vous reconnecter.";
                                     } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                         erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
                                     } else if (!erreur.contentEquals("Aucun PH_Produit trouvé")) {
                                         erreur = "Erreur API Produits";
                                     }
+                                    // ⬇️ Pas d'insertion → mise à jour directe de la modale sur le thread UI
+                                    String activityName = context.getClass().getSimpleName();
+                                    if (activityName.contentEquals("AuthentificationActivity")) {
+                                        ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+                                    } else if (activityName.contentEquals("ServiceConnexionDirecteActivity")) {
+                                        ((ServiceConnexionDirecteActivity) context).gestionProgressBar();
+                                    }
+
                                 } else {
-                                    viderTableProduit(db);
+                                    // Parsing sur le thread UI (rapide)
                                     JSONArray produitJSONArray = response.getJSONArray("PH_Produits");
-                                    int compteurReussite = 0;
-
+                                    final List<Produit> listeProduits = new ArrayList<>();
                                     for (int i = 0; i < produitJSONArray.length(); i++) {
-                                        // Récupération du service courant
-                                        JSONObject produitJSONObject = produitJSONArray.getJSONObject(i);
+                                        listeProduits.add(new Produit(produitJSONArray.getJSONObject(i)));
+                                    }
 
-                                        Produit produit = new Produit(produitJSONObject);
+                                    final int finalResultCount = resultCount;
 
-                                        // insertion du service en bdd
-                                        long rowID = insererUnProduitEnBDD(db, produit);
-                                        if (rowID != -1) {
-                                            compteurReussite++;
+                                    // Insertion sur un thread background
+                                    new Thread(() -> {
+                                        boolean etatThread = true;
+                                        String erreurThread = "";
+                                        int compteurReussite = 0;
+
+                                        viderTableProduit(db);
+
+                                        SQLiteStatement stmt = db.compileStatement(
+                                                "INSERT INTO " + Constantes.TABLE_PRODUIT + " ("
+                                                        + Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT + ","   // 1  TEXT
+                                                        + Constantes.CLE_COL_REF_FOURNI_PRODUIT + ","            // 2  TEXT
+                                                        + Constantes.CLE_COL_INFORMATION_IMPORTANTES_PRODUIT + ","// 3  TEXT
+                                                        + Constantes.CLE_COL_CONDITION_USAGE_UNIQUE_PRODUIT + "," // 4  INTEGER
+                                                        + Constantes.CLE_COL_STERILE_PRODUIT + ","               // 5  INTEGER
+                                                        + Constantes.CLE_COL_STERILISATION_MODE_PRODUIT + ","    // 6  TEXT
+                                                        + Constantes.CLE_COL_NEPASRESTERILISER_PRODUIT + ","     // 7  INTEGER
+                                                        + Constantes.CLE_COL_CATEGORIE_PRODUIT + ","             // 8  TEXT
+                                                        + Constantes.CLE_COL_FOURNISSEUR_PRODUIT + ","           // 9  TEXT
+                                                        + Constantes.CLE_COL_PRIX_UNITAIRE_PRODUIT + ","         // 10 REAL
+                                                        + Constantes.CLE_COL_FORME_PRODUIT + ","                 // 11 TEXT
+                                                        + Constantes.CLE_COL_CONTENANT_PRODUIT + ","             // 12 TEXT
+                                                        + Constantes.CLE_COL_MATERIAUX_PRODUIT + ","             // 13 TEXT
+                                                        + Constantes.CLE_COL_STATUT_PRODUIT + ","                // 14 TEXT
+                                                        + Constantes.CLE_COL_SECTEUR_PRODUIT + ","               // 15 TEXT
+                                                        + Constantes.CLE_COL_COMMENTAIRE_PRODUIT + ","           // 16 TEXT
+                                                        + Constantes.CLE_COL_RISQUE_PHT_PRODUIT + ","            // 17 INTEGER
+                                                        + Constantes.CLE_COL_RISQUE_LATEX_PRODUIT + ","          // 18 INTEGER
+                                                        + Constantes.CLE_COL_RISQUE_SUBSTANCE_PRESENCE_PRODUIT + "," // 19 TEXT
+                                                        + Constantes.CLE_COL_CONSERVATION_PRODUIT + ","          // 20 TEXT
+                                                        + Constantes.CLE_COL_TEMPERATURE_REFRIGERE_PRODUIT + "," // 21 INTEGER
+                                                        + Constantes.CLE_COL_TEMPERATURE_AMBIANTE_PRODUIT + ","  // 22 INTEGER
+                                                        + Constantes.CLE_COL_CONSERVATION_TEMPERATURE_MIN_PRODUIT + "," // 23 REAL
+                                                        + Constantes.CLE_COL_CONSERVATION_TEMPERATURE_MAX_PRODUIT + "," // 24 REAL
+                                                        + Constantes.CLE_COL_CONSERVATION_ABRI_PRODUIT + ","     // 25 INTEGER
+                                                        + Constantes.CLE_COL_CONSERVATION_SEC_PRODUIT + ","      // 26 INTEGER
+                                                        + Constantes.CLE_COL_CONDITION_FRAGILE_PRODUIT + ","     // 27 INTEGER
+                                                        + Constantes.CLE_COL_MEDICAMENT_RISQUE_PRODUIT + ","     // 28 INTEGER
+                                                        + Constantes.CLE_COL_CONTRE_INDICATIONS_PRODUIT + ","    // 29 TEXT
+                                                        + Constantes.CLE_COL_EFFETS_INDESIRABLES_PRODUIT + ","   // 30 TEXT
+                                                        + Constantes.CLE_COL_MEDICAMENT_DOTATION_URGENCE_PRODUIT + "," // 31 INTEGER
+                                                        + Constantes.CLE_COL_MEDICAMENT_LISTE_PRODUIT + ","      // 32 TEXT
+                                                        + Constantes.CLE_COL_POSOLOGIE_PRODUIT + ","             // 33 TEXT
+                                                        + Constantes.CLE_COL_VOIE_PRODUIT + ","                  // 34 TEXT
+                                                        + Constantes.CLE_COL_INDICATION_THERAPEUTIQUE_PRODUIT + "," // 35 TEXT
+                                                        + Constantes.CLE_COL_UI_CONVERSION_PRODUIT + ","         // 36 REAL
+                                                        + Constantes.CLE_COL_MEDICAMENT_CTJ_PRODUIT + ","        // 37 REAL
+                                                        + Constantes.CLE_COL_TAUX_DE_TVA_PRODUIT + ","           // 38 REAL
+                                                        + Constantes.CLE_COL_GTIN_PRODUIT + ","                  // 39 TEXT
+                                                        + Constantes.CLE_COL_N_INTERNE_PRODUIT + ","             // 40 TEXT
+                                                        + Constantes.CLE_COL_DESIGNATION_EXT_PRODUIT + ","       // 41 TEXT
+                                                        + Constantes.CLE_COL_PEREMPTION_PRODUIT + ","            // 42 INTEGER
+                                                        + Constantes.CLE_COL_MARCHE_OBTENU_PRODUIT + ","         // 43 INTEGER
+                                                        + Constantes.CLE_COL_ORDONNANCE_PRODUIT + ","            // 44 INTEGER
+                                                        + Constantes.CLE_COL_SUIVI_LOT_PRODUIT + ","             // 45 INTEGER
+                                                        + Constantes.CLE_COL_REASSORT_PRODUIT + ","              // 46 INTEGER
+                                                        + Constantes.CLE_COL_INCLU_AU_PANEL_PRODUIT + ","        // 47 INTEGER
+                                                        + Constantes.CLE_COL_RESPECT_COND_ACHAT_PRODUIT + ","    // 48 INTEGER
+                                                        + Constantes.CLE_COL_ARRET_DIS_PRODUIT + ","             // 49 INTEGER
+                                                        + Constantes.CLE_COL_GRATUIT_PRODUIT + ","               // 50 INTEGER
+                                                        + Constantes.CLE_COL_ARRET_COMMANDE_PRODUIT + ","        // 51 INTEGER
+                                                        + Constantes.CLE_COL_PREV_A_COMMANDER_PRODUIT + ","      // 52 INTEGER
+                                                        + Constantes.CLE_COL_INSCRIRE_A_ORDONNANCIER_PRODUIT + "," // 53 INTEGER
+                                                        + Constantes.CLE_COL_CONDITION_REFUS_SI_ENDOMAGE_PRODUIT + "," // 54 INTEGER
+                                                        + Constantes.CLE_COL_CONDITION_PEREMPTION_PRODUIT + ","  // 55 INTEGER
+                                                        + Constantes.CLE_COL_TRACABILITE_REF_PRODUIT + ","       // 56 INTEGER
+                                                        + Constantes.CLE_COL_TRACABILITE_SN_PRODUIT + ","        // 57 INTEGER
+                                                        + Constantes.CLE_COL_RISQUE_VOIR_NOTICE_PRODUIT + ","    // 58 INTEGER
+                                                        + Constantes.CLE_COL_RISQUE_VOIR_RECOMMANDATION_PRODUIT + "," // 59 INTEGER
+                                                        + Constantes.CLE_COL_DISTRIBUTION_NOMINATIVE_ACTIVE_PRODUIT + "," // 60 INTEGER
+                                                        + Constantes.CLE_COL_REGLE_BON_USAGE_ACTIVE_PRODUIT + "," // 61 INTEGER
+                                                        + Constantes.CLE_COL_LIVRET_THERAPEUTIQUE_PRODUIT + ","  // 62 INTEGER
+                                                        + Constantes.CLE_COL_DATE_CREATION_PRODUIT + ","         // 63 TEXT
+                                                        + Constantes.CLE_COL_DATE_ARRET_COM_PRODUIT + ","        // 64 TEXT
+                                                        + Constantes.CLE_COL_DATE_ARRET_DIS_PRODUIT + ","        // 65 TEXT
+                                                        + Constantes.CLE_COL_DATE_DER_PHOTO_PRODUIT + ","        // 66 TEXT
+                                                        + Constantes.CLE_COL_SYS_DT_MAJ_PRODUIT + ","           // 67 TEXT
+                                                        + Constantes.CLE_COL_SYS_HEURE_MAJ_PRODUIT + ","        // 68 TEXT
+                                                        + Constantes.CLE_COL_ZONE_PUI_DEFAUT_PRODUIT + ","       // 69 TEXT
+                                                        + Constantes.CLE_COL_UNITE_PRODUIT + ","                 // 70 TEXT
+                                                        + Constantes.CLE_COL_VILLE_PRODUIT + ","                 // 71 TEXT
+                                                        + Constantes.CLE_COL_TYPE_ERREUR_PRODUIT + ","           // 72 TEXT
+                                                        + Constantes.CLE_COL_A_CORRIGER_PRODUIT + ","            // 73 TEXT
+                                                        + Constantes.CLE_COL_REASSORT_STATUT_PRODUIT + ","       // 74 TEXT
+                                                        + Constantes.CLE_COL_MODE_DE_DISTRIBUTION_PRODUIT + ","  // 75 TEXT
+                                                        + Constantes.CLE_COL_REF_MARCHE_PRODUIT + ","            // 76 TEXT
+                                                        + Constantes.CLE_COL_DEVISE_PRODUIT + ","                // 77 TEXT
+                                                        + Constantes.CLE_COL_SYS_USER_MAJ_PRODUIT + ","         // 78 TEXT
+                                                        + Constantes.CLE_COL_PANEL_PRODUIT + ","                 // 79 TEXT
+                                                        + Constantes.CLE_COL_TYPE_FRANCO_PRODUIT + ","           // 80 TEXT
+                                                        + Constantes.CLE_COL_UCD_CODE_PRODUIT + ","              // 81 TEXT
+                                                        + Constantes.CLE_COL_CODE_CIP_PRODUIT + ","              // 82 TEXT
+                                                        + Constantes.CLE_COL_HISTO_PRIX_UNITAIRE_PRODUIT + ","   // 83 TEXT
+                                                        + Constantes.CLE_COL_DCI_PRODUIT + ","                   // 84 TEXT
+                                                        + Constantes.CLE_COL_COMMENTAIRE_COMMANDE_PRODUIT + ","  // 85 TEXT
+                                                        + Constantes.CLE_COL_CODE_LPP_PRODUIT + ","              // 86 TEXT
+                                                        + Constantes.CLE_COL_PHOTO_PRODUIT + ","                 // 87 TEXT
+                                                        + Constantes.CLE_COL_EMPLACEMENT_PUI_DEFAUT_PRODUIT + "," // 88 TEXT
+                                                        + Constantes.CLE_COL_DOCUMENTATION_PATH_PRODUIT + ","    // 89 TEXT
+                                                        + Constantes.CLE_COL_REAPPROVISIONNEMENT_CLASSE_PRODUIT + "," // 90 TEXT
+                                                        + Constantes.CLE_COL_ZONE_UF_DEFAUT_PRODUIT + ","        // 91 TEXT
+                                                        + Constantes.CLE_COL_EMPLACEMENT_UF_DEFAUT_PRODUIT + "," // 92 TEXT
+                                                        + Constantes.CLE_COL_HEMADIALYSE_REFERENCE_PRODUIT + "," // 93 TEXT
+                                                        + Constantes.CLE_COL_XFORME_PRODUIT + ","                // 94 TEXT
+                                                        + Constantes.CLE_COL_RISQUE_SUBSTANCE_ABSENCE_PRODUIT + "," // 95 TEXT
+                                                        + Constantes.CLE_COL_DOCUMENTATION_WEB_PATH_PRODUIT + "," // 96 TEXT
+                                                        + Constantes.CLE_COL_MOMENT_INJECTION_PRODUIT + ","      // 97 TEXT
+                                                        + Constantes.CLE_COL_COMMENT_INJECTE_PRODUIT + ","       // 98 TEXT
+                                                        + Constantes.CLE_COL_COMPOSITION_PRODUIT + ","           // 99 TEXT
+                                                        + Constantes.CLE_COL_ZONE_PAD_DEFAUT_PRODUIT + ","       // 100 TEXT
+                                                        + Constantes.CLE_COL_EMPLACEMENT_PAD_DEFAUT_PRODUIT + "," // 101 TEXT
+                                                        + Constantes.CLE_COL_UCD_NOMCOURT_PRODUIT + ","          // 102 TEXT
+                                                        + Constantes.CLE_COL_PHIE_SYNCHRO_PRODUIT + ","          // 103 TEXT
+                                                        + Constantes.CLE_COL_CODE_FOURN_PRODUIT + ","            // 104 INTEGER
+                                                        + Constantes.CLE_COL_DUREE_PEREMPTION_PRODUIT + ","      // 105 INTEGER
+                                                        + Constantes.CLE_COL_RGB_RED_PRODUIT + ","               // 106 INTEGER
+                                                        + Constantes.CLE_COL_RGB_GREEN_PRODUIT + ","             // 107 INTEGER
+                                                        + Constantes.CLE_COL_RGB_BLUE_PRODUIT + ","              // 108 INTEGER
+                                                        + Constantes.CLE_COL_CLASSE_NUMERO_PRODUIT + ","         // 109 INTEGER
+                                                        + Constantes.CLE_COL_NB_LIGNE_CODE_BARRE_PRODUIT + ","   // 110 INTEGER
+                                                        + Constantes.CLE_COL_STOCK_GLOBAL_PRODUIT + ","          // 111 REAL
+                                                        + Constantes.CLE_COL_VALEUR_STOCK_GLOBAL_PRODUIT + ","   // 112 REAL
+                                                        + Constantes.CLE_COL_COND_FRANCO_PRODUIT + ","           // 113 REAL
+                                                        + Constantes.CLE_COL_STOCK_CLOT_PRODUIT + ","            // 114 REAL
+                                                        + Constantes.CLE_COL_VALEUR_STOCK_ACTUEL_PRODUIT + ","   // 115 INTEGER
+                                                        + Constantes.CLE_COL_COND_ACHAT_PRODUIT + ","            // 116 REAL
+                                                        + Constantes.CLE_COL_COND_DISTRIB_PRODUIT + ","          // 117 REAL
+                                                        + Constantes.CLE_COL_SEUIL_ALERTE_PRODUIT + ","          // 118 REAL
+                                                        + Constantes.CLE_COL_QTE_REASSORT_PRODUIT + ","          // 119 REAL
+                                                        + Constantes.CLE_COL_NOUVEAU_PU_PRODUIT + ","            // 120 REAL
+                                                        + Constantes.CLE_COL_COND_ACHAT_GROS_VOLUME_PRODUIT + "," // 121 REAL
+                                                        + Constantes.CLE_COL_COULEUR_PRODUIT + ","               // 122 REAL
+                                                        + Constantes.CLE_COL_INVENTAIRE1_PUMP_HT_PRODUIT + ","   // 123 REAL
+                                                        + Constantes.CLE_COL_PUMP_TTC_EXERCICE_PREC_PRODUIT + "," // 124 REAL
+                                                        + Constantes.CLE_COL_QTE_INVENTAIRE_EXERCICE_PREC_PRODUIT + "," // 125 REAL
+                                                        + Constantes.CLE_COL_STOCK_ACTUEL_PRODUIT + ","          // 126 REAL
+                                                        + Constantes.CLE_COL_QTE_A_COMMANDER_PRODUIT + ","       // 127 REAL
+                                                        + Constantes.CLE_COL_PUMP_TTC_DERNIERE_CLOTURE_PRODUIT + "," // 128 REAL
+                                                        + Constantes.CLE_COL_POIDS_PRODUIT + ","                 // 129 REAL
+                                                        + Constantes.CLE_COL_VOLUME_PRODUIT + ","                // 130 REAL
+                                                        + Constantes.CLE_COL_CONSERVATION_HYDRO_MIN_PRODUIT + "," // 131 REAL
+                                                        + Constantes.CLE_COL_CONSERVATION_HYDRO_MAX_PRODUIT + "," // 132 REAL
+                                                        + Constantes.CLE_COL_CONSERVATION_PRESSION_MIN_PRODUIT + "," // 133 REAL
+                                                        + Constantes.CLE_COL_CONSERVATION_PRESSION_MAX_PRODUIT + "," // 134 REAL
+                                                        + Constantes.CLE_COL_ID_PRODUIT + ","                    // 135 INTEGER
+                                                        + Constantes.CLE_COL_CODE_INCONNU + ","                  // 136 TEXT
+                                                        + Constantes.CLE_COL_SUIVI_SERIALISATION + ","           // 137 INTEGER
+                                                        + Constantes.CLE_COL_SERIALISER_RECEPTION_DELIVRANCE     // 138 INTEGER
+                                                        + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+                                        );
+
+                                        db.beginTransaction();
+                                        try {
+                                            for (Produit produit : listeProduits) {
+                                                stmt.clearBindings();
+                                                bindStringOrNull(stmt, 1,   produit.getDesignation_interne());
+                                                bindStringOrNull(stmt, 2,   produit.getRef_fourni());
+                                                bindStringOrNull(stmt, 3,   produit.getInformations_importantes());
+                                                stmt.bindLong(4,            produit.isCondition_usage_unique() ? 1 : 0);
+                                                stmt.bindLong(5,            produit.isSterile() ? 1 : 0);
+                                                bindStringOrNull(stmt, 6,   produit.getSterilisation_Mode());
+                                                stmt.bindLong(7,            produit.isNePasResteriliser() ? 1 : 0);
+                                                bindStringOrNull(stmt, 8,   produit.getCategorie());
+                                                bindStringOrNull(stmt, 9,   produit.getFournisseur());
+                                                stmt.bindDouble(10,         produit.getPrix_unitaire());
+                                                bindStringOrNull(stmt, 11,  produit.getForme());
+                                                bindStringOrNull(stmt, 12,  produit.getContenant());
+                                                bindStringOrNull(stmt, 13,  produit.getMateriaux());
+                                                bindStringOrNull(stmt, 14,  produit.getStatut());
+                                                bindStringOrNull(stmt, 15,  produit.getSecteur());
+                                                bindStringOrNull(stmt, 16,  produit.getCommentaire());
+                                                stmt.bindLong(17,           produit.isRisque_PHT() ? 1 : 0);
+                                                stmt.bindLong(18,           produit.isRisque_latex() ? 1 : 0);
+                                                bindStringOrNull(stmt, 19,  produit.getRisque_Substance_presence());
+                                                bindStringOrNull(stmt, 20,  produit.getConservation());
+                                                stmt.bindLong(21,           produit.isTemperature_Refrigere() ? 1 : 0);
+                                                stmt.bindLong(22,           produit.isTemperature_Ambiante() ? 1 : 0);
+                                                stmt.bindDouble(23,         produit.getConservation_temperature_min());
+                                                stmt.bindDouble(24,         produit.getConservation_temperature_Max());
+                                                stmt.bindLong(25,           produit.isConservation_abri() ? 1 : 0);
+                                                stmt.bindLong(26,           produit.isConservation_sec() ? 1 : 0);
+                                                stmt.bindLong(27,           produit.isCondition_Fragile() ? 1 : 0);
+                                                stmt.bindLong(28,           produit.isMedicament_Risque() ? 1 : 0);
+                                                bindStringOrNull(stmt, 29,  produit.getContre_indications());
+                                                bindStringOrNull(stmt, 30,  produit.getEffets_indesirables());
+                                                stmt.bindLong(31,           produit.isMedicament_dotation_urgence() ? 1 : 0);
+                                                bindStringOrNull(stmt, 32,  produit.getMedicament_Liste());
+                                                bindStringOrNull(stmt, 33,  produit.getPosologie());
+                                                bindStringOrNull(stmt, 34,  produit.getVoie());
+                                                bindStringOrNull(stmt, 35,  produit.getIndication_therapeutique());
+                                                stmt.bindDouble(36,         produit.getUI_Conversion());
+                                                stmt.bindDouble(37,         produit.getMedicament_CTJ());
+                                                stmt.bindDouble(38,         produit.getTaux_de_TVA());
+                                                bindStringOrNull(stmt, 39,  produit.getGTIN());
+                                                bindStringOrNull(stmt, 40,  produit.getN_interne());
+                                                bindStringOrNull(stmt, 41,  produit.getDesignation_ext());
+                                                stmt.bindLong(42,           produit.isPeremption() ? 1 : 0);
+                                                stmt.bindLong(43,           produit.isMarche_Obtenu() ? 1 : 0);
+                                                stmt.bindLong(44,           produit.isOrdonnance() ? 1 : 0);
+                                                stmt.bindLong(45,           produit.isSuivi_Lot() ? 1 : 0);
+                                                stmt.bindLong(46,           produit.isReassort() ? 1 : 0);
+                                                stmt.bindLong(47,           produit.isInclu_au_panel() ? 1 : 0);
+                                                stmt.bindLong(48,           produit.isRespect_Cond_Achat() ? 1 : 0);
+                                                stmt.bindLong(49,           produit.isArret_Dis() ? 1 : 0);
+                                                stmt.bindLong(50,           produit.isGratuit() ? 1 : 0);
+                                                stmt.bindLong(51,           produit.isArret_Commande() ? 1 : 0);
+                                                stmt.bindLong(52,           produit.isPrev_A_commander() ? 1 : 0);
+                                                stmt.bindLong(53,           produit.isInscrire_a_ordonnancier() ? 1 : 0);
+                                                stmt.bindLong(54,           produit.isCondition_Refus_Si_Endomage() ? 1 : 0);
+                                                stmt.bindLong(55,           produit.isCondition_peremption() ? 1 : 0);
+                                                stmt.bindLong(56,           produit.isTracabilite_ref() ? 1 : 0);
+                                                stmt.bindLong(57,           produit.isTracabilite_SN() ? 1 : 0);
+                                                stmt.bindLong(58,           produit.isRisque_voir_notice() ? 1 : 0);
+                                                stmt.bindLong(59,           produit.isRisque_Voir_Recommandation() ? 1 : 0);
+                                                stmt.bindLong(60,           produit.isDistribution_Nominative_Active() ? 1 : 0);
+                                                stmt.bindLong(61,           produit.isRegle_Bon_Usage_Active() ? 1 : 0);
+                                                stmt.bindLong(62,           produit.isLivret_Therapeutique() ? 1 : 0);
+                                                bindStringOrNull(stmt, 63,  produit.getDate_Creation_Produit());
+                                                bindStringOrNull(stmt, 64,  produit.getDate_arret_com());
+                                                bindStringOrNull(stmt, 65,  produit.getDate_Arret_Dis());
+                                                bindStringOrNull(stmt, 66,  produit.getDate_der_photo());
+                                                bindStringOrNull(stmt, 67,  produit.getSYS_DT_MAJ());
+                                                bindStringOrNull(stmt, 68,  produit.getSYS_HEURE_MAJ());
+                                                bindStringOrNull(stmt, 69,  produit.getZone_PUI_Defaut());
+                                                bindStringOrNull(stmt, 70,  produit.getUnite());
+                                                bindStringOrNull(stmt, 71,  produit.getVille());
+                                                bindStringOrNull(stmt, 72,  produit.getType_erreur());
+                                                bindStringOrNull(stmt, 73,  produit.getA_corriger());
+                                                bindStringOrNull(stmt, 74,  produit.getReassort_Statut());
+                                                bindStringOrNull(stmt, 75,  produit.getMode_de_Distribution());
+                                                bindStringOrNull(stmt, 76,  produit.getRef_marche());
+                                                bindStringOrNull(stmt, 77,  produit.getDevise());
+                                                bindStringOrNull(stmt, 78,  produit.getSYS_USER_MAJ());
+                                                bindStringOrNull(stmt, 79,  produit.getPanel());
+                                                bindStringOrNull(stmt, 80,  produit.getType_franco());
+                                                bindStringOrNull(stmt, 81,  produit.getUCD_Code());
+                                                bindStringOrNull(stmt, 82,  produit.getCode_CIP());
+                                                bindStringOrNull(stmt, 83,  produit.getHisto_Prix_Unitaire());
+                                                bindStringOrNull(stmt, 84,  produit.getDCI());
+                                                bindStringOrNull(stmt, 85,  produit.getCommentaire_Commande());
+                                                bindStringOrNull(stmt, 86,  produit.getCode_LPP());
+                                                bindStringOrNull(stmt, 87,  produit.getPhoto());
+                                                bindStringOrNull(stmt, 88,  produit.getEmplacement_PUI_Defaut());
+                                                bindStringOrNull(stmt, 89,  produit.getDocumentation_Path());
+                                                bindStringOrNull(stmt, 90,  produit.getReapprovisionnement_Classe());
+                                                bindStringOrNull(stmt, 91,  produit.getZone_UF_Defaut());
+                                                bindStringOrNull(stmt, 92,  produit.getEmplacement_UF_Defaut());
+                                                bindStringOrNull(stmt, 93,  produit.getHemadialyse_Reference());
+                                                bindStringOrNull(stmt, 94,  produit.getXForme());
+                                                bindStringOrNull(stmt, 95,  produit.getRisque_Substance_absence());
+                                                bindStringOrNull(stmt, 96,  produit.getDocumentation_Web_Path());
+                                                bindStringOrNull(stmt, 97,  produit.getMoment_Injection());
+                                                bindStringOrNull(stmt, 98,  produit.getComment_Injecte());
+                                                bindStringOrNull(stmt, 99,  produit.getComposition());
+                                                bindStringOrNull(stmt, 100, produit.getZone_PAD_Defaut());
+                                                bindStringOrNull(stmt, 101, produit.getEmplacement_PAD_Defaut());
+                                                bindStringOrNull(stmt, 102, produit.getUCD_NomCourt());
+                                                bindStringOrNull(stmt, 103, produit.getPHIE_Synchro());
+                                                stmt.bindLong(104,          produit.getCode_fourn());
+                                                stmt.bindLong(105,          produit.getDuree_peremption());
+                                                stmt.bindLong(106,          produit.getRGB_Red());
+                                                stmt.bindLong(107,          produit.getRGB_Green());
+                                                stmt.bindLong(108,          produit.getRGB_Blue());
+                                                stmt.bindLong(109,          produit.getClasse_numero());
+                                                stmt.bindLong(110,          produit.getNb_Ligne_Code_Barre());
+                                                stmt.bindDouble(111,        produit.getStock_Global());
+                                                stmt.bindDouble(112,        produit.getValeur_Stock_Global());
+                                                stmt.bindDouble(113,        produit.getCond_franco());
+                                                stmt.bindDouble(114,        produit.getStock_clot());
+                                                stmt.bindLong(115,          produit.getValeur_stock_actuel());
+                                                stmt.bindDouble(116,        produit.getCond_achat());
+                                                stmt.bindDouble(117,        produit.getCond_distrib());
+                                                stmt.bindDouble(118,        produit.getSeuil_alerte());
+                                                stmt.bindDouble(119,        produit.getQte_Reassort());
+                                                stmt.bindDouble(120,        produit.getNouveau_PU());
+                                                stmt.bindDouble(121,        produit.getCond_Achat_Gros_volume());
+                                                stmt.bindDouble(122,        produit.getCouleur());
+                                                stmt.bindDouble(123,        produit.getInventaire1_PUMP_HT());
+                                                stmt.bindDouble(124,        produit.getPUMP_TTC_Exercice_Prec());
+                                                stmt.bindDouble(125,        produit.getQte_inventaire_exercice_prec());
+                                                stmt.bindDouble(126,        produit.getStock_Actuel());
+                                                stmt.bindDouble(127,        produit.getQte_a_commander());
+                                                stmt.bindDouble(128,        produit.getPUMP_TTC_derniere_cloture());
+                                                stmt.bindDouble(129,        produit.getPoids());
+                                                stmt.bindDouble(130,        produit.getVolume());
+                                                stmt.bindDouble(131,        produit.getConservation_hydro_min());
+                                                stmt.bindDouble(132,        produit.getConservation_hydro_max());
+                                                stmt.bindDouble(133,        produit.getConservation_pression_min());
+                                                stmt.bindDouble(134,        produit.getConservation_pression_max());
+                                                stmt.bindLong(135,          produit.getID_produit());
+                                                bindStringOrNull(stmt, 136, produit.getCodeInconnue());
+                                                stmt.bindLong(137,          produit.isSuivi_Serialisation() ? 1 : 0);
+                                                stmt.bindLong(138,          produit.isSerialiser_Reception_Delivrance() ? 1 : 0);
+
+                                                long rowID = stmt.executeInsert();
+                                                if (rowID != -1) {
+                                                    compteurReussite++;
+                                                }
+                                            }
+                                            db.setTransactionSuccessful();
+                                        } catch (Exception e) {
+                                            etatThread = false;
+                                            erreurThread = "Erreur lors de l'insertion des produits";
+                                            e.printStackTrace();
+                                        } finally {
+                                            db.endTransaction();
+                                            stmt.close();
                                         }
-                                    }
-                                    if (resultCount != compteurReussite) {
-                                        erreur = String.valueOf(resultCount - compteurReussite) + " produits n'ont pas été insérés.";
-                                        etat = false;
-                                    }
+
+                                        if (finalResultCount != compteurReussite) {
+                                            erreurThread = String.valueOf(finalResultCount - compteurReussite) + " produits n'ont pas été insérés.";
+                                            etatThread = false;
+                                        }
+
+                                        // ⬇️ Mise à jour de la modale sur le thread UI une fois tout terminé
+                                        final boolean resultatFinal = etatThread;
+                                        final String erreurFinale = erreurThread;
+                                        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                                            String activityName = context.getClass().getSimpleName();
+                                            if (activityName.contentEquals("AuthentificationActivity")) {
+                                                ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, resultatFinal, erreurFinale);
+                                            } else if (activityName.contentEquals("ServiceConnexionDirecteActivity")) {
+                                                ((ServiceConnexionDirecteActivity) context).gestionProgressBar();
+                                            }
+                                        });
+
+                                    }).start();
                                 }
-                                String activityName = context.getClass().getSimpleName();
-                                if(activityName.contentEquals("AuthentificationActivity"))
-                                {
-                                    ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
-                                }
-                                else if(activityName.contentEquals("ServiceConnexionDirecteActivity"))
-                                {
-                                    ((ServiceConnexionDirecteActivity) context).gestionProgressBar();
-                                }
+
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -1490,5 +1807,18 @@ public class ProduitOpenHelper extends DBOpenHelper {
                 + Constantes.CLE_COL_SUIVI_SERIALISATION + " " + Constantes.TYPE_COL_SUIVI_SERIALISATION + ","
                 + Constantes.CLE_COL_SERIALISER_RECEPTION_DELIVRANCE + " " + Constantes.TYPE_COL_SERIALISER_RECEPTION_DELIVRANCE
                 + ");";
+    }
+
+    private static void bindStringOrNull(SQLiteStatement stmt, int index, String value) {
+        if (value != null) stmt.bindString(index, value);
+        else stmt.bindNull(index);
+    }
+
+    private static void bindLongOrNull(SQLiteStatement stmt, int index, int value) {
+        stmt.bindLong(index, value); // int ne peut pas être null en Java
+    }
+
+    private static void bindDoubleOrNull(SQLiteStatement stmt, int index, double value) {
+        stmt.bindDouble(index, value); // double ne peut pas être null en Java
     }
 }

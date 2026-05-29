@@ -25,7 +25,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
@@ -132,6 +134,7 @@ public class Parametres_SerialisationOpenHelper  extends DBOpenHelper {
                             String erreur = "";
                             boolean etat = true;
                             int resultCount = response.getInt("resultCount");
+
                             if (resultCount == 0) {
                                 etat = false;
                                 erreur = response.getString("erreur");
@@ -148,21 +151,56 @@ public class Parametres_SerialisationOpenHelper  extends DBOpenHelper {
                                 } else if (!erreur.contentEquals("Aucun Paramètres sérialisation trouvé")) {
                                     Alerte.afficherAlerte(context, "Erreur Requete", "Veuillez contacter la société Alcyons ! \n Référence à transmettre : Requete insererBDDLocaleParametreSerialisation", "alerte");
                                 }
-                            } else {
-                                viderTableParametres_Serialisation(db);
-                                JSONArray serialisation_JSONArray = response.getJSONArray("Parametres_Serialisation");
-                                for (int i = 0; i < serialisation_JSONArray.length(); i++) {
-                                    JSONObject serialisation_JSONObject = serialisation_JSONArray.getJSONObject(i);
-                                    Parametres_Serialisation parametresSerialisation = new Parametres_Serialisation(serialisation_JSONObject);
-                                    Parametres_SerialisationOpenHelper.insererParametres_Serialisation(db, parametresSerialisation);
+                                // ⬇️ Pas d'insertion → mise à jour directe de la modale sur le thread UI
+                                String activity_name = context.getClass().getSimpleName();
+                                if (activity_name.contentEquals("ServiceConnexionDirecteActivity")) {
+                                    ((ServiceConnexionDirecteActivity) context).gestionProgressBar();
                                 }
+                                ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+
+                            } else {
+                                // Parsing sur le thread UI (rapide)
+                                JSONArray serialisation_JSONArray = response.getJSONArray("Parametres_Serialisation");
+                                final List<Parametres_Serialisation> listeParametresSerialisation = new ArrayList<>();
+                                for (int i = 0; i < serialisation_JSONArray.length(); i++) {
+                                    listeParametresSerialisation.add(new Parametres_Serialisation(serialisation_JSONArray.getJSONObject(i)));
+                                }
+
+                                // Insertion sur un thread background
+                                new Thread(() -> {
+                                    boolean etatThread = true;
+                                    String erreurThread = "";
+
+                                    viderTableParametres_Serialisation(db);
+
+                                    db.beginTransaction();
+                                    try {
+                                        for (Parametres_Serialisation parametresSerialisation : listeParametresSerialisation) {
+                                            Parametres_SerialisationOpenHelper.insererParametres_Serialisation(db, parametresSerialisation);
+                                        }
+                                        db.setTransactionSuccessful();
+                                    } catch (Exception e) {
+                                        etatThread = false;
+                                        erreurThread = "Erreur lors de l'insertion des paramètres de sérialisation";
+                                        e.printStackTrace();
+                                    } finally {
+                                        db.endTransaction();
+                                    }
+
+                                    // ⬇️ Mise à jour de la modale sur le thread UI une fois tout terminé
+                                    final boolean resultatFinal = etatThread;
+                                    final String erreurFinale = erreurThread;
+                                    new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                                        String activity_name = context.getClass().getSimpleName();
+                                        if (activity_name.contentEquals("ServiceConnexionDirecteActivity")) {
+                                            ((ServiceConnexionDirecteActivity) context).gestionProgressBar();
+                                        }
+                                        ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, resultatFinal, erreurFinale);
+                                    });
+
+                                }).start();
                             }
-                            String activity_name = context.getClass().getSimpleName();
-                            if(activity_name.contentEquals("ServiceConnexionDirecteActivity"))
-                            {
-                                ((ServiceConnexionDirecteActivity) context).gestionProgressBar();
-                            }
-                            ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

@@ -11,7 +11,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Preparation_Ligne;
 
@@ -23,6 +26,19 @@ public class PH_Preparation_LigneOpenHelper extends DBOpenHelper {
 
     public static void viderTablePH_Preparation_Lignes(SQLiteDatabase db) {
         db.delete(Constantes.TABLE_PH_PREPARATION_LIGNE, null, null);
+    }
+
+    public static Map<Integer, PH_Preparation_Ligne> getLignesParPreparationEnMap(SQLiteDatabase db, PH_Preparation preparation) {
+        Map<Integer, PH_Preparation_Ligne> map = new HashMap<>();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_PH_PREPARATION_LIGNE
+                        + " WHERE " + Constantes.CLE_COL_PREPARATIONID_PH_PREPARATION_LIGNE + "=?",
+                new String[]{String.valueOf(preparation.getUID())});
+        while (cursor.moveToNext()) {
+            PH_Preparation_Ligne ligne = new PH_Preparation_Ligne(cursor);
+            map.put(ligne.getProduitID(), ligne);
+        }
+        cursor.close();
+        return map;
     }
 
     public static int getCountPHPreparationLignesParPHPreparation(SQLiteDatabase db, PH_Preparation phPreparation) {

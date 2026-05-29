@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.provider.BaseColumns;
 import android.util.Log;
 
@@ -253,91 +254,279 @@ public class DepotOpenHelper extends DBOpenHelper {
                                 String erreur = "";
                                 boolean etat = true;
                                 int resultCount = response.getInt("resultCount");
+
                                 if (resultCount == 0) {
                                     erreur = response.getString("erreur");
                                     etat = false;
                                     if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                        //viderBasesDeDonnees(db);
                                         erreur = "Votre session a expirée, veuillez vous reconnecter.";
                                     } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                         erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
                                     } else if (!erreur.equals("Aucun PH_Depots trouvé")) {
                                         erreur = "Erreur API Dépots";
                                     }
+                                    // ⬇️ Pas d'insertion → mise à jour directe de la modale sur le thread UI
+                                    String activityName = context.getClass().getSimpleName();
+                                    if (activityName.contentEquals("AuthentificationActivity")) {
+                                        ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+                                    } else if (activityName.contentEquals("ServiceConnexionDirecteActivity")) {
+                                        ((ServiceConnexionDirecteActivity) context).gestionProgressBar();
+                                    }
+
                                 } else {
-                                    viderTableDepot(db);
+                                    // Parsing sur le thread UI (rapide)
                                     JSONArray depotJSONArrayAll = response.getJSONArray("PH_Depots");
-                                    int compteurReussite = 0;
+                                    final List<Depot> listeDepots = new ArrayList<>();
 
                                     for (int i = 0; i < depotJSONArrayAll.length(); i++) {
-                                        // Récupération du service courant
                                         JSONObject depotJSONObject = depotJSONArrayAll.getJSONObject(i);
-
                                         Depot depot = new Depot(depotJSONObject);
 
-                                        //gestion depot alcyons
-                                        if(utilisateur.getIdentifiant().toLowerCase().contentEquals("alcyons") && depot.getStructure().contentEquals("PAD"))
-                                        {
+                                        // Gestion depot alcyons
+                                        if (utilisateur.getIdentifiant().toLowerCase().contentEquals("alcyons")
+                                                && depot.getStructure().contentEquals("PAD")) {
                                             depot.setNom("XXX PAD");
                                             String[] tab_reference = depot.getDepot_Reference().split("-");
-                                            String new_ref = tab_reference[tab_reference.length-1];
-                                            //depot.setDepot_Reference("XXXX - PAD - "+new_ref);
+                                            String new_ref = tab_reference[tab_reference.length - 1];
                                             depot.setAdresse1("50 avenue du lac marion");
                                             depot.setCP("64200");
                                             depot.setVille("Biarritz");
                                             depot.setTel("0559225008");
                                         }
 
-                                        // insertion du service en bdd
-                                        long rowID = insererUnDepotEnBDD(db, depot);
-                                        if (rowID != -1) {
-                                            compteurReussite++;
-                                        }
+                                        listeDepots.add(depot);
                                     }
 
-                                    /*for(int j = 0; j < depotJSONArrayAll.length(); j++)
-                                    {
-                                        JSONArray depotJSONArray = depotJSONArrayAll.getJSONArray(j);
-                                        for (int i = 0; i < depotJSONArray.length(); i++) {
-                                            // Récupération du service courant
-                                            JSONObject depotJSONObject = depotJSONArray.getJSONObject(i);
+                                    final int finalResultCount = resultCount;
 
-                                            Depot depot = new Depot(depotJSONObject);
+                                    // Insertion sur un thread background
+                                    new Thread(() -> {
+                                        boolean etatThread = true;
+                                        String erreurThread = "";
+                                        int compteurReussite = 0;
 
-                                            //gestion depot alcyons
-                                            if(utilisateur.getIdentifiant().toLowerCase().contentEquals("alcyons") && depot.getStructure().contentEquals("PAD"))
-                                            {
-                                                depot.setNom("XXX PAD");
-                                                String[] tab_reference = depot.getDepot_Reference().split("-");
-                                                String new_ref = tab_reference[tab_reference.length-1];
-                                                //depot.setDepot_Reference("XXXX - PAD - "+new_ref);
-                                                depot.setAdresse1("50 avenue du lac marion");
-                                                depot.setCP("64200");
-                                                depot.setVille("Biarritz");
-                                                depot.setTel("0559225008");
+                                        viderTableDepot(db);
+                                        SQLiteStatement stmtDepot = db.compileStatement(
+                                                "INSERT INTO " + DepotOpenHelper.Constantes.TABLE_DEPOT + " ("
+                                                        + DepotOpenHelper.Constantes.CLE_COL_DEPOT_REFERENCE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_NOM_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_ADRESSE1_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_ADRESSE2_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_CP_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_VILLE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_TEL_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_FAX_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_STRUCTURE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_RESPONSABLE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_IPP_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_Patient_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_HOR_OUV_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_R_ADRESSE1_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_R_ADRESSE2_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_R_CP_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_R_VILLE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_R_TEL_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_R_FAX_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_SYS_DT_MAJ_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_SYS_HEURE_MAJ_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_SYS_USER_MAJ_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_DIALYSE_FREQUENCE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_VACANCES_ADR1_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_VACANCES_ADR2_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_VACANCES_CP_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_VACANCES_VILLE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_VACANCES_PAYS_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_VACANCES_TEL_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_VACANCES_COMMENTAIRES_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_LOCALISATION_POCHES_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_PRECISION_LOCALISATION_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_COORDONNEES_GPS_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_VEHICULE_LIVRAISON_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_LIVRAISON_SEMAINE_1_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_EMAIL_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_PLAN_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PRATICIENT_PAR_DEFAUT_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_LIEU_TRAITEMENT_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_ESCALIER_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_DIGICODE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_LIVRAISON_JOUR_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_LIVRAISON_SEMAINE_2_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_TOURNEE_NOM_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_SECTION_ANALYTIQUE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_SYMBOLE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_REF_DEPOT_PHI_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_LIVRAISON_SEMAINE_3_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_LIVRAISON_SEMAINE_4_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_LIVRAISON_SEMAINE_5_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_COMMENTAIRE_COMMANDE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_CAHP_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_HORAIRE_LIVRAISON_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_ATIR_REFERENCE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_DM_LOCALISATION_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_REFERENCE_DEPOT_AVANT_PHI_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_LIVRAISON_FREQUENCE_TYPE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_DOSSIER_DOCUMENT_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PROTOCOLESTD_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_FINESSGEO_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_LIVRAISON_DIRECTE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_ACCES_CHARIOT_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_ACCES_ROLL_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_ACCES_MANUELLE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_ARCHIVE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_UTILISER_ADRESSE_VACANCES_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_ASCENSEUR_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_SERVICE_EXTERNE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_ACCUSE_RECEPTION_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_INVENTAIRE_FIN_DE_MOIS_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_RAZ_STOCK_INVENTAIRE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_JOURS_DE_RESERVE_PAR_LIVRAISON_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_ID_UF_RATTACHEMENT_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_LIVRAISON_PERIODE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_COMMENTAIRE_LIVRAISON_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_STATUT_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_ID_LIEU_TRAITEMENT_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_ETAGE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_TOURNEE_CODE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_PAD_ID_PRET_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_ETABLISSEMENT_UID_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_NOMBRE_POSTES_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_LIVRAISON_NB_SEMAINES_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_LATITUDE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_LONGITUDE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_ORDRE_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_JOURS_DE_RESERVE_PAR_DEFAUT_DEPOT + ","
+                                                        + DepotOpenHelper.Constantes.CLE_COL_ID_DEPOT
+                                                        + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+                                        );
+
+                                        db.beginTransaction();
+                                        try {
+                                            for (Depot depot : listeDepots) {
+                                                stmtDepot.clearBindings();
+                                                bindStringOrNull(stmtDepot, 1,  depot.getDepot_Reference());
+                                                bindStringOrNull(stmtDepot, 2,  depot.getNom());
+                                                bindStringOrNull(stmtDepot, 3,  depot.getAdresse1());
+                                                bindStringOrNull(stmtDepot, 4,  depot.getAdresse2());
+                                                bindStringOrNull(stmtDepot, 5,  depot.getCP());
+                                                bindStringOrNull(stmtDepot, 6,  depot.getVille());
+                                                bindStringOrNull(stmtDepot, 7,  depot.getTel());
+                                                bindStringOrNull(stmtDepot, 8,  depot.getFax());
+                                                bindStringOrNull(stmtDepot, 9,  depot.getStructure());
+                                                bindStringOrNull(stmtDepot, 10, depot.getResponsable());
+                                                bindStringOrNull(stmtDepot, 11, depot.getPAD_IPP());
+                                                bindStringOrNull(stmtDepot, 12, depot.getPAD_Patient());
+                                                bindStringOrNull(stmtDepot, 13, depot.getHor_ouv());
+                                                bindStringOrNull(stmtDepot, 14, depot.getR_adresse1());
+                                                bindStringOrNull(stmtDepot, 15, depot.getR_adresse2());
+                                                bindStringOrNull(stmtDepot, 16, depot.getR_CP());
+                                                bindStringOrNull(stmtDepot, 17, depot.getR_Ville());
+                                                bindStringOrNull(stmtDepot, 18, depot.getR_tel());
+                                                bindStringOrNull(stmtDepot, 19, depot.getR_fax());
+                                                bindStringOrNull(stmtDepot, 20, depot.getSYS_DT_MAJ());
+                                                bindStringOrNull(stmtDepot, 21, depot.getSYS_HEURE_MAJ());
+                                                bindStringOrNull(stmtDepot, 22, depot.getSYS_USER_MAJ());
+                                                bindStringOrNull(stmtDepot, 23, depot.getDialyse_Frequence());
+                                                bindStringOrNull(stmtDepot, 24, depot.getPAD_Vacances_Adr1());
+                                                bindStringOrNull(stmtDepot, 25, depot.getPAD_Vacances_Adr2());
+                                                bindStringOrNull(stmtDepot, 26, depot.getPAD_Vacances_CP());
+                                                bindStringOrNull(stmtDepot, 27, depot.getPAD_Vacances_Ville());
+                                                bindStringOrNull(stmtDepot, 28, depot.getPAD_Vacances_Pays());
+                                                bindStringOrNull(stmtDepot, 29, depot.getPAD_Vacances_Tel());
+                                                bindStringOrNull(stmtDepot, 30, depot.getPAD_Vacances_Commentaires());
+                                                bindStringOrNull(stmtDepot, 31, depot.getPAD_Localisation_Poches());
+                                                bindStringOrNull(stmtDepot, 32, depot.getPAD_Precision_Localisation());
+                                                bindStringOrNull(stmtDepot, 33, depot.getPAD_Coordonnees_GPS());
+                                                bindStringOrNull(stmtDepot, 34, depot.getPAD_Vehicule_Livraison());
+                                                bindStringOrNull(stmtDepot, 35, depot.getLivraison_Semaine_1());
+                                                bindStringOrNull(stmtDepot, 36, depot.getPAD_Email());
+                                                bindStringOrNull(stmtDepot, 37, depot.getPAD_Plan());
+                                                bindStringOrNull(stmtDepot, 38, depot.getPraticient_Par_defaut());
+                                                bindStringOrNull(stmtDepot, 39, depot.getPAD_Lieu_Traitement());
+                                                bindStringOrNull(stmtDepot, 40, depot.getPAD_escalier());
+                                                bindStringOrNull(stmtDepot, 41, depot.getPAD_digicode());
+                                                bindStringOrNull(stmtDepot, 42, depot.getLivraison_Jour());
+                                                bindStringOrNull(stmtDepot, 43, depot.getLivraison_Semaine_2());
+                                                bindStringOrNull(stmtDepot, 44, depot.getTournee_nom());
+                                                bindStringOrNull(stmtDepot, 45, depot.getSection_Analytique());
+                                                bindStringOrNull(stmtDepot, 46, depot.getSymbole());
+                                                bindStringOrNull(stmtDepot, 47, depot.getRef_Depot_Phi());
+                                                bindStringOrNull(stmtDepot, 48, depot.getLivraison_Semaine_3());
+                                                bindStringOrNull(stmtDepot, 49, depot.getLivraison_Semaine_4());
+                                                bindStringOrNull(stmtDepot, 50, depot.getLivraison_Semaine_5());
+                                                bindStringOrNull(stmtDepot, 51, depot.getCommentaire_Commande());
+                                                bindStringOrNull(stmtDepot, 52, depot.getCAHP());
+                                                bindStringOrNull(stmtDepot, 53, depot.getHoraire_livraison());
+                                                bindStringOrNull(stmtDepot, 54, depot.getATIR_Reference_Depot());
+                                                bindStringOrNull(stmtDepot, 55, depot.getDM_Localisation());
+                                                bindStringOrNull(stmtDepot, 56, depot.getReference_Depot_Avant_PHI());
+                                                bindStringOrNull(stmtDepot, 57, depot.getLivraison_Frequence_Type());
+                                                bindStringOrNull(stmtDepot, 58, depot.getDossier_document());
+                                                bindStringOrNull(stmtDepot, 59, depot.getProtocoleStd());
+                                                bindStringOrNull(stmtDepot, 60, depot.getFInessGeo());
+                                                stmtDepot.bindLong(61,  depot.isLivraison_Directe() ? 1 : 0);
+                                                stmtDepot.bindLong(62,  depot.isPAD_Acces_Chariot() ? 1 : 0);
+                                                stmtDepot.bindLong(63,  depot.isPAD_Acces_Roll() ? 1 : 0);
+                                                stmtDepot.bindLong(64,  depot.isPAD_Acces_Manuelle() ? 1 : 0);
+                                                stmtDepot.bindLong(65,  depot.isArchive() ? 1 : 0);
+                                                stmtDepot.bindLong(66,  depot.isPAD_Utiliser_Adresse_Vacances() ? 1 : 0);
+                                                stmtDepot.bindLong(67,  depot.isPAD_Ascenceur() ? 1 : 0);
+                                                stmtDepot.bindLong(68,  depot.isService_externe() ? 1 : 0);
+                                                stmtDepot.bindLong(69,  depot.isAccuse_Reception() ? 1 : 0);
+                                                stmtDepot.bindLong(70,  depot.isInventaire_fin_de_Mois() ? 1 : 0);
+                                                stmtDepot.bindLong(71,  depot.isRAZ_Stock_Inventaire() ? 1 : 0);
+                                                stmtDepot.bindLong(72,  depot.getJours_de_reserve_par_livraison());
+                                                stmtDepot.bindLong(73,  depot.getID_UF_Rattachement());
+                                                stmtDepot.bindLong(74,  depot.getLivraison_Periode());
+                                                bindStringOrNull(stmtDepot, 75, depot.getPAD_Commentaire_Livraison());
+                                                bindStringOrNull(stmtDepot, 76, depot.getStatut());
+                                                stmtDepot.bindLong(77,  depot.getPAD_ID_Lieu_Traitement());
+                                                stmtDepot.bindLong(78,  depot.getPAD_etage());
+                                                stmtDepot.bindLong(79,  depot.getTournee_code());
+                                                stmtDepot.bindLong(80,  depot.getPAD_ID_Pret());
+                                                stmtDepot.bindLong(81,  depot.getEtablissement_UID());
+                                                stmtDepot.bindLong(82,  depot.getNombre_Postes());
+                                                stmtDepot.bindLong(83,  depot.getLivraison_Nb_Semaines());
+                                                stmtDepot.bindDouble(84, depot.getLatitude());
+                                                stmtDepot.bindDouble(85, depot.getLongitude());
+                                                stmtDepot.bindLong(86,  depot.getOrdre());
+                                                stmtDepot.bindLong(87,  depot.getJours_de_reserve_par_defaut());
+                                                stmtDepot.bindLong(88,  depot.getDepot_UID());
+
+                                                long rowID = stmtDepot.executeInsert();
+                                                if (rowID != -1) {
+                                                    compteurReussite++;
+                                                }
                                             }
-
-                                            // insertion du service en bdd
-                                            long rowID = insererUnDepotEnBDD(db, depot);
-                                            if (rowID != -1) {
-                                                compteurReussite++;
-                                            }
+                                            db.setTransactionSuccessful();
+                                        } catch (Exception e) {
+                                            etatThread = false;
+                                            erreurThread = "Erreur lors de l'insertion des dépots";
+                                            e.printStackTrace();
+                                        } finally {
+                                            db.endTransaction();
+                                            stmtDepot.close();
                                         }
-                                    }*/
-                                    if (resultCount != compteurReussite) {
-                                        erreur = String.valueOf(resultCount - compteurReussite) + " depots n'ont pas été insérées.";
-                                        etat = false;
-                                    }
+
+                                        if (finalResultCount != compteurReussite) {
+                                            erreurThread = String.valueOf(finalResultCount - compteurReussite) + " depots n'ont pas été insérés.";
+                                            etatThread = false;
+                                        }
+
+                                        // ⬇️ Mise à jour de la modale sur le thread UI une fois tout terminé
+                                        final boolean resultatFinal = etatThread;
+                                        final String erreurFinale = erreurThread;
+                                        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                                            String activityName = context.getClass().getSimpleName();
+                                            if (activityName.contentEquals("AuthentificationActivity")) {
+                                                ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, resultatFinal, erreurFinale);
+                                            } else if (activityName.contentEquals("ServiceConnexionDirecteActivity")) {
+                                                ((ServiceConnexionDirecteActivity) context).gestionProgressBar();
+                                            }
+                                        });
+
+                                    }).start();
                                 }
-                                String activityName = context.getClass().getSimpleName();
-                                if(activityName.contentEquals("AuthentificationActivity"))
-                                {
-                                    ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
-                                }
-                                else if(activityName.contentEquals("ServiceConnexionDirecteActivity"))
-                                {
-                                    ((ServiceConnexionDirecteActivity) context).gestionProgressBar();
-                                }
+
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -855,5 +1044,10 @@ public class DepotOpenHelper extends DBOpenHelper {
                 return this.getValue() > customObject.getValue() ? 1 : -1;
             }
         }
+    }
+
+    private static void bindStringOrNull(SQLiteStatement stmt, int index, String value) {
+        if (value != null) stmt.bindString(index, value);
+        else stmt.bindNull(index);
     }
 }

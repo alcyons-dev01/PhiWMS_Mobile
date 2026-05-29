@@ -222,73 +222,113 @@ public class ServiceOpenHelper extends DBOpenHelper {
                                 String erreur = "";
                                 boolean etat = true;
                                 int resultCount = response.getInt("resultCount");
+
                                 if (resultCount == 0) {
                                     erreur = response.getString("erreur");
                                     etat = false;
                                     if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                        //viderBasesDeDonnees(db);
                                         erreur = "Votre session a expirée, veuillez vous reconnecter.";
                                     } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                         erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
                                     } else if (!erreur.contentEquals("Aucun SYS_Services trouvé")) {
                                         erreur = "Erreur API Services";
                                     }
+                                    // ⬇️ Pas d'insertion → mise à jour directe de la modale sur le thread UI
+                                    String activityName = context.getClass().getSimpleName();
+                                    if (activityName.contentEquals("AuthentificationActivity")) {
+                                        ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+                                    } else if (activityName.contentEquals("ServiceConnexionDirecteActivity")) {
+                                        ((ServiceConnexionDirecteActivity) context).gestionProgressBar();
+                                    }
+
                                 } else {
-                                    viderTableService(db);
+                                    // Parsing sur le thread UI (rapide)
                                     JSONArray serviceJSONArray = response.getJSONArray("Services");
-                                    int compteurReussite = 0;
+                                    final List<Service> listeServices = new ArrayList<>();
 
                                     for (int i = 0; i < serviceJSONArray.length(); i++) {
-                                        // Récupération du service courant
                                         JSONObject serviceJSONObject = serviceJSONArray.getJSONObject(i);
 
-                                        // Récupération des attributs du service courant
-                                        int idServiceCourant = serviceJSONObject.getInt("_UID");
-                                        String nomServiceCourant = serviceJSONObject.getString("name");
-                                        int ordreServiceCourant = serviceJSONObject.getInt("ordre");
-                                        int idPerimetreFonctionnelServiceCourant = serviceJSONObject.getInt("perimetreFonctionnel_id");
+                                        int idServiceCourant                         = serviceJSONObject.getInt("_UID");
+                                        String nomServiceCourant                     = serviceJSONObject.getString("name");
+                                        int ordreServiceCourant                      = serviceJSONObject.getInt("ordre");
+                                        int idPerimetreFonctionnelServiceCourant     = serviceJSONObject.getInt("perimetreFonctionnel_id");
                                         String nomPerimetreFonctionnelServiceCourant = serviceJSONObject.getString("perimetreFonctionnel");
-                                        String statutServiceCourant = serviceJSONObject.getString("statut");
-                                        int indicateurServiceCourant = 0;
-                                        String descriptionServiceCourant = serviceJSONObject.getString("description");
-                                        String videoServiceCourant = serviceJSONObject.getString("video");
-                                        String whitePaperServiceCourant= serviceJSONObject.getString("whitePaper");
-                                        int score = serviceJSONObject.getInt("score");
-                                        String activiteMobile = serviceJSONObject.getString("activiteMobile");
+                                        String statutServiceCourant                  = serviceJSONObject.getString("statut");
+                                        int indicateurServiceCourant                 = 0;
+                                        String descriptionServiceCourant             = serviceJSONObject.getString("description");
+                                        String videoServiceCourant                   = serviceJSONObject.getString("video");
+                                        String whitePaperServiceCourant              = serviceJSONObject.getString("whitePaper");
+                                        int score                                    = serviceJSONObject.getInt("score");
+                                        String activiteMobile                        = serviceJSONObject.getString("activiteMobile");
+
+                                        // Récupération du phiwms_mobileuuid depuis la BDD existante (lecture avant le thread)
                                         int phiwms_mobileuuid = 0;
                                         Service serviceBDD = ServiceOpenHelper.getServiceByID(db, idServiceCourant);
-                                        if(serviceBDD != null)
-                                        {
+                                        if (serviceBDD != null) {
                                             phiwms_mobileuuid = serviceBDD.getPhiMR4UUID();
                                         }
-                                        // Création du service
-                                        Service service = new Service(idServiceCourant, nomServiceCourant, ordreServiceCourant, idPerimetreFonctionnelServiceCourant, nomPerimetreFonctionnelServiceCourant, statutServiceCourant, indicateurServiceCourant,descriptionServiceCourant, videoServiceCourant, whitePaperServiceCourant, score, phiwms_mobileuuid, activiteMobile);
 
-                                        // insertion du service en bdd
-                                        long rowID = insererUnServiceEnBD(db, service);
-                                        if (rowID != -1) {
-                                            compteurReussite++;
+                                        listeServices.add(new Service(
+                                                idServiceCourant, nomServiceCourant, ordreServiceCourant,
+                                                idPerimetreFonctionnelServiceCourant, nomPerimetreFonctionnelServiceCourant,
+                                                statutServiceCourant, indicateurServiceCourant, descriptionServiceCourant,
+                                                videoServiceCourant, whitePaperServiceCourant, score, phiwms_mobileuuid, activiteMobile
+                                        ));
+                                    }
+
+                                    final int finalResultCount = resultCount;
+
+                                    // Insertion sur un thread background
+                                    new Thread(() -> {
+                                        boolean etatThread = true;
+                                        String erreurThread = "";
+                                        int compteurReussite = 0;
+
+                                        viderTableService(db);
+
+                                        db.beginTransaction();
+                                        try {
+                                            for (Service service : listeServices) {
+                                                long rowID = insererUnServiceEnBD(db, service);
+                                                if (rowID != -1) {
+                                                    compteurReussite++;
+                                                }
+                                            }
+                                            db.setTransactionSuccessful();
+                                        } catch (Exception e) {
+                                            etatThread = false;
+                                            erreurThread = "Erreur lors de l'insertion des services";
+                                            e.printStackTrace();
+                                        } finally {
+                                            db.endTransaction();
                                         }
-                                    }
-                                    if (resultCount != compteurReussite) {
-                                        erreur = "Veuillez contacter la société Alcyons ! \n " + String.valueOf(resultCount - compteurReussite) + " services n'ont pas été insérés.";
-                                        etat = false;
-                                    }
-                                    // Vider en BDD locale la liste des périmètres fonctionnels
-                                    PerimetreFonctionnelOpenHelper.viderTablePerimetreFonctionnel(db);
 
-                                    // Inserer en BDD locales les périmètres fonctionnels en fonction des services
-                                    PerimetreFonctionnelOpenHelper.insererPerimetresFonctionnels(db);
+                                        if (finalResultCount != compteurReussite) {
+                                            erreurThread = "Veuillez contacter la société Alcyons ! \n "
+                                                    + (finalResultCount - compteurReussite) + " services n'ont pas été insérés.";
+                                            etatThread = false;
+                                        }
+
+                                        // Périmètres fonctionnels après l'insertion des services
+                                        PerimetreFonctionnelOpenHelper.viderTablePerimetreFonctionnel(db);
+                                        PerimetreFonctionnelOpenHelper.insererPerimetresFonctionnels(db);
+
+                                        // ⬇️ Mise à jour de la modale sur le thread UI une fois tout terminé
+                                        final boolean resultatFinal = etatThread;
+                                        final String erreurFinale = erreurThread;
+                                        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                                            String activityName = context.getClass().getSimpleName();
+                                            if (activityName.contentEquals("AuthentificationActivity")) {
+                                                ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, resultatFinal, erreurFinale);
+                                            } else if (activityName.contentEquals("ServiceConnexionDirecteActivity")) {
+                                                ((ServiceConnexionDirecteActivity) context).gestionProgressBar();
+                                            }
+                                        });
+
+                                    }).start();
                                 }
-                                String activityName = context.getClass().getSimpleName();
-                                if(activityName.contentEquals("AuthentificationActivity"))
-                                {
-                                    ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
-                                }
-                                else if(activityName.contentEquals("ServiceConnexionDirecteActivity"))
-                                {
-                                    ((ServiceConnexionDirecteActivity) context).gestionProgressBar();
-                                }
+
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }

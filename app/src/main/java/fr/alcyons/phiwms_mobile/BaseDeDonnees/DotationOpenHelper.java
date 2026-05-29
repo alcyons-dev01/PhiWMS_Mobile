@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.provider.BaseColumns;
 import android.util.Log;
 
@@ -221,50 +222,208 @@ public class DotationOpenHelper extends DBOpenHelper {
                         String erreur = "";
                         boolean etat = true;
                         int resultCount = response.getInt("resultCount");
+
                         if (resultCount == 0) {
                             etat = false;
                             erreur = response.getString("erreur");
                             if (erreur.equals(context.getString(R.string.tokenInvalide))) {
-                                //viderBasesDeDonnees(db);
                                 erreur = "Votre session a expirée, veuillez vous reconnecter.";
                             } else if (erreur.equals(context.getString(R.string.tokenExpire))) {
                                 erreur = "Votre session de connexion est expirée, veuillez vous reconnecter.";
                             } else if (!erreur.equals("Aucune Dotation trouvée")) {
                                 erreur = "Erreur API Dotations";
-                            }
-                            else{
+                            } else {
                                 etat = true;
                             }
+                            // ⬇️ Pas d'insertion → mise à jour directe de la modale sur le thread UI
+                            ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
+
                         } else {
+                            // Parsing sur le thread UI (rapide)
+                            final List<Dotation> listeDotations = new ArrayList<>();
+                            final List<Detail_Dot> listeDetailDots = new ArrayList<>();
+                            final List<EVENT> listeEvents = new ArrayList<>();
 
                             JSONArray dotationJSONArray = response.getJSONArray("Dotations");
-
                             for (int i = 0; i < dotationJSONArray.length(); i++) {
                                 JSONObject dotationJSONObject = dotationJSONArray.getJSONObject(i);
-                                Dotation dotation = new Dotation(dotationJSONObject);
+                                listeDotations.add(new Dotation(dotationJSONObject));
 
-                                long rowID = insererDotationEnBDD(db, dotation);
-                                if(dotationJSONObject.has("detail_dots"))
-                                {
+                                if (dotationJSONObject.has("detail_dots")) {
                                     JSONArray DetailDotJsonArray = dotationJSONObject.getJSONArray("detail_dots");
                                     for (int j = 0; j < DetailDotJsonArray.length(); j++) {
-                                        JSONObject detailDotationJSONObject = DetailDotJsonArray.getJSONObject(j);
-                                        Detail_Dot detail_dot = new Detail_Dot(detailDotationJSONObject);
-                                        long detailRowID = Detail_DotOpenHelper.insererDetail_DotEnBDD(db, detail_dot);
+                                        listeDetailDots.add(new Detail_Dot(DetailDotJsonArray.getJSONObject(j)));
                                     }
                                 }
                             }
-                            if(response.has("Events")) {
+
+                            if (response.has("Events")) {
                                 JSONArray eventJSONArray = response.getJSONArray("Events");
                                 for (int i = 0; i < eventJSONArray.length(); i++) {
-                                    JSONObject eventJSONObject = eventJSONArray.getJSONObject(i);
-                                    EVENT event = new EVENT(eventJSONObject);
-
-                                    long rowID = EVENTOpenHelper.insererEVENTEnBDD(db, event);
+                                    listeEvents.add(new EVENT(eventJSONArray.getJSONObject(i)));
                                 }
                             }
+
+                            // Insertion sur un thread background
+                            new Thread(() -> {
+                                boolean etatThread = true;
+                                String erreurThread = "";
+                                SQLiteStatement stmtDotation = db.compileStatement(
+                                        "INSERT INTO " + DotationOpenHelper.Constantes.TABLE_DOTATION + " ("
+                                                + DotationOpenHelper.Constantes.CLE_COL__UID_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_INTITULE_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_REF_DEPOT_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_DEBUT_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_FIN_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_INTERROMPU_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_NB_SEMAINE_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_VALORISATION_TTC_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_DOTATION_STD_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_COMMENTAIRE_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_DEPOT_UID_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_NB_PATIENTS_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_TOURNEE_REFERENCE_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_SYS_DT_MAJ_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_SYS_HEURE_MAJ_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_SYS_USER_MAJ_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_TECH_UID_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_URGENCE_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_SECURISE_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_TAUXSTOCKIDEAL_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_INSTALLATION_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_PLEINVIDE_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_PROTOCOLE_UID_DOTATION + ","
+                                                + DotationOpenHelper.Constantes.CLE_COL_COMMANDEAB_DOTATION
+                                                + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+                                );
+
+                                SQLiteStatement stmtDetailDot = db.compileStatement(
+                                        "INSERT INTO " + Detail_DotOpenHelper.Constantes.TABLE_DETAIL_DOT + " ("
+                                                + Detail_DotOpenHelper.Constantes.CLE_COL_DOTATION_UID_DETAIL_DOT + ","
+                                                + Detail_DotOpenHelper.Constantes.CLE_COL_CODE_PRODUIT_DETAIL_DOT + ","
+                                                + Detail_DotOpenHelper.Constantes.CLE_COL_DESIGNATION_DETAIL_DOT + ","
+                                                + Detail_DotOpenHelper.Constantes.CLE_COL_COND_DETAIL_DOT + ","
+                                                + Detail_DotOpenHelper.Constantes.CLE_COL_QTE_DETAIL_DOT + ","
+                                                + Detail_DotOpenHelper.Constantes.CLE_COL_REF_FOUR_DETAIL_DOT + ","
+                                                + Detail_DotOpenHelper.Constantes.CLE_COL_CATEGORIE_DETAIL_DOT + ","
+                                                + Detail_DotOpenHelper.Constantes.CLE_COL_LIVRAISON_DIRECTE_DETAIL_DOT + ","
+                                                + Detail_DotOpenHelper.Constantes.CLE_COL_SYS_DT_MAJ_DETAIL_DOT + ","
+                                                + Detail_DotOpenHelper.Constantes.CLE_COL_SYS_HEURE_MAJ_DETAIL_DOT + ","
+                                                + Detail_DotOpenHelper.Constantes.CLE_COL_SYS_USER_MAJ_DETAIL_DOT + ","
+                                                + Detail_DotOpenHelper.Constantes.CLE_COL__UID_DETAIL_DOT + ","
+                                                + Detail_DotOpenHelper.Constantes.CLE_COL_VALEUR_TTC_DETAIL_DOT + ","
+                                                + Detail_DotOpenHelper.Constantes.CLE_COL_STOCK_MINIMUM_DETAIL_DOT + ","
+                                                + Detail_DotOpenHelper.Constantes.CLE_COL_PLEINVIDE_ADRESSAGE_DETAIL_DOT
+                                                + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+                                );
+
+                                SQLiteStatement stmtEvent = db.compileStatement(
+                                        "INSERT INTO " + EVENTOpenHelper.Constantes.TABLE_EVENT + " ("
+                                                + EVENTOpenHelper.Constantes.CLE_COL__UID_EVENT + ","
+                                                + EVENTOpenHelper.Constantes.CLE_COL_DATE_EVENT_EVENT + ","
+                                                + EVENTOpenHelper.Constantes.CLE_COL_ID_RESSOURCE_EVENT + ","
+                                                + EVENTOpenHelper.Constantes.CLE_COL_JOUR_EVENT_EVENT + ","
+                                                + EVENTOpenHelper.Constantes.CLE_COL_SEMAINE_EVENT_EVENT + ","
+                                                + EVENTOpenHelper.Constantes.CLE_COL_MOIS_DE_EVENT + ","
+                                                + EVENTOpenHelper.Constantes.CLE_COL_JOUR_DE_EVENT + ","
+                                                + EVENTOpenHelper.Constantes.CLE_COL_ANNEE_DE_EVENT + ","
+                                                + EVENTOpenHelper.Constantes.CLE_COL_MOIS_LIVRAISON_EVENT + ","
+                                                + EVENTOpenHelper.Constantes.CLE_COL_MOISREFERENCE_EVENT + ","
+                                                + EVENTOpenHelper.Constantes.CLE_COL_TOURNEEID_EVENT
+                                                + ") VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+                                );
+
+                                db.beginTransaction();
+                                try {
+                                    // ⬇️ Insertion des Dotations
+                                    for (Dotation dotation : listeDotations) {
+                                        stmtDotation.clearBindings();
+                                        stmtDotation.bindLong(1,   dotation.get_UID());
+                                        bindStringOrNull(stmtDotation, 2,  dotation.getIntitule());
+                                        bindStringOrNull(stmtDotation, 3,  dotation.getRef_Depot());
+                                        bindStringOrNull(stmtDotation, 4,  dotation.getDebut());
+                                        bindStringOrNull(stmtDotation, 5,  dotation.getFin());
+                                        stmtDotation.bindLong(6,   dotation.isInterrompu() ? 1 : 0);
+                                        stmtDotation.bindLong(7,   dotation.getNB_Semaine());
+                                        stmtDotation.bindLong(8,   dotation.getValorisation_TTC());
+                                        bindStringOrNull(stmtDotation, 9,  dotation.getDotation_Std());
+                                        bindStringOrNull(stmtDotation, 10, dotation.getCommentaire());
+                                        stmtDotation.bindLong(11,  dotation.getDepot_UID());
+                                        stmtDotation.bindLong(12,  dotation.getNb_patients());
+                                        bindStringOrNull(stmtDotation, 13, dotation.getTournee_Reference());
+                                        bindStringOrNull(stmtDotation, 14, dotation.getSYS_DT_MAJ());
+                                        bindStringOrNull(stmtDotation, 15, dotation.getSYS_HEURE_MAJ());
+                                        bindStringOrNull(stmtDotation, 16, dotation.getSYS_USER_MAJ());
+                                        stmtDotation.bindLong(17,  dotation.getTech_UID());
+                                        stmtDotation.bindLong(18,  dotation.isURGENCE() ? 1 : 0);
+                                        stmtDotation.bindLong(19,  dotation.isSECURISE() ? 1 : 0);
+                                        stmtDotation.bindLong(20,  dotation.getTauxStockIdeal());
+                                        stmtDotation.bindLong(21,  dotation.isINSTALLATION() ? 1 : 0);
+                                        stmtDotation.bindLong(22,  dotation.isPLEINVIDE() ? 1 : 0);
+                                        stmtDotation.bindLong(23,  dotation.getProtocole_UID());
+                                        stmtDotation.bindLong(24,  dotation.isCommandeAB() ? 1 : 0);
+                                        stmtDotation.executeInsert();
+                                    }
+
+                                    // ⬇️ Insertion des Detail_Dot
+                                    for (Detail_Dot detail_dot : listeDetailDots) {
+                                        stmtDetailDot.clearBindings();
+                                        stmtDetailDot.bindLong(1,   detail_dot.getDotation_UID());
+                                        stmtDetailDot.bindLong(2,   detail_dot.getCode_produit());
+                                        bindStringOrNull(stmtDetailDot, 3,  detail_dot.getDesignation());
+                                        stmtDetailDot.bindLong(4,   detail_dot.getCond());
+                                        stmtDetailDot.bindLong(5,   detail_dot.getQte());
+                                        bindStringOrNull(stmtDetailDot, 6,  detail_dot.getRef_four());
+                                        bindStringOrNull(stmtDetailDot, 7,  detail_dot.getCategorie());
+                                        stmtDetailDot.bindLong(8,   detail_dot.isLivraison_Directe() ? 1 : 0);
+                                        bindStringOrNull(stmtDetailDot, 9,  detail_dot.getSYS_DT_MAJ());
+                                        bindStringOrNull(stmtDetailDot, 10, detail_dot.getSYS_HEURE_MAJ());
+                                        bindStringOrNull(stmtDetailDot, 11, detail_dot.getSYS_USER_MAJ());
+                                        stmtDetailDot.bindLong(12,  detail_dot.get_UID());
+                                        stmtDetailDot.bindLong(13,  detail_dot.getValeur_TTC());
+                                        stmtDetailDot.bindLong(14,  detail_dot.getStock_minimum());
+                                        bindStringOrNull(stmtDetailDot, 15, detail_dot.getPleinVide_Adressage());
+                                        stmtDetailDot.executeInsert();
+                                    }
+
+                                    // ⬇️ Insertion des Events
+                                    for (EVENT event : listeEvents) {
+                                        stmtEvent.clearBindings();
+                                        stmtEvent.bindLong(1,   event.get_UID());
+                                        bindStringOrNull(stmtEvent, 2,  event.getDate_event());
+                                        stmtEvent.bindLong(3,   event.getID_Ressource());
+                                        bindStringOrNull(stmtEvent, 4,  event.getJour_event());
+                                        stmtEvent.bindLong(5,   event.getSemaine_event());
+                                        bindStringOrNull(stmtEvent, 6,  event.getMois_de());
+                                        bindStringOrNull(stmtEvent, 7,  event.getJour_de());
+                                        bindStringOrNull(stmtEvent, 8,  event.getAnnee_de());
+                                        bindStringOrNull(stmtEvent, 9,  event.getMois_livraison());
+                                        bindStringOrNull(stmtEvent, 10, event.getMoisReference());
+                                        stmtEvent.bindLong(11,  event.getTourneeID());
+                                        stmtEvent.executeInsert();
+                                    }
+
+                                    db.setTransactionSuccessful();
+                                } catch (Exception e) {
+                                    etatThread = false;
+                                    erreurThread = "Erreur lors de l'insertion des dotations";
+                                    e.printStackTrace();
+                                } finally {
+                                    db.endTransaction();
+                                    stmtDotation.close();
+                                    stmtDetailDot.close();
+                                    stmtEvent.close();
+                                }
+
+                                // ⬇️ Mise à jour de la modale sur le thread UI une fois tout terminé
+                                final boolean resultatFinal = etatThread;
+                                final String erreurFinale = erreurThread;
+                                new android.os.Handler(android.os.Looper.getMainLooper()).post(() ->
+                                        ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, resultatFinal, erreurFinale)
+                                );
+
+                            }).start();
                         }
-                        ((AuthentificationActivity) context).insertionDeTableEffectuee(tableNom, etat, erreur);
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -415,6 +574,12 @@ public class DotationOpenHelper extends DBOpenHelper {
                 + Constantes.CLE_COL_COMMANDEAB_DOTATION + " " + Constantes.TYPE_COL_COMMANDEAB_DOTATION
                 + " ); ";
 
+    }
+
+    // ✅ Méthodes utilitaires (à ajouter dans DotationOpenHelper)
+    private static void bindStringOrNull(SQLiteStatement stmt, int index, String value) {
+        if (value != null) stmt.bindString(index, value);
+        else stmt.bindNull(index);
     }
 }
 
