@@ -67,7 +67,8 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
             codeInconnue = intent.getExtras().getString("codeInconnue");
             listeAAfficher = ProduitOpenHelper.getProduitsParCodeInconnue(db, codeInconnue);
         } else {
-            listeAAfficher = ProduitOpenHelper.getProduitsIdentifier(db);
+            ((LinearLayout) findViewById(R.id.linearProduitIdentifie)).setAlpha(0.5F);
+            listeAAfficher = ProduitOpenHelper.getAllProduits(db);
         }
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -115,8 +116,9 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
         if (listeAAfficher.size() == 1) {
             passerAuDetailProduit(listeAAfficher.get(0));
         } else if (listeAAfficher.size() > 1) {
+            rechercheAuto = true;
         } else {
-            listeAAfficher = ProduitOpenHelper.getProduitsNonIdentifier(db);
+            listeAAfficher = ProduitOpenHelper.getAllProduits(db);
             rechercheAuto = true;
         }
 
