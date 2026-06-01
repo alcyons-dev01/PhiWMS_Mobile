@@ -16,6 +16,8 @@ import android.util.Log;
 
 import java.io.Serializable;
 
+import fr.alcyons.phiwms_mobile.Classes.Produit_Identification;
+
 public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
 
     public DBOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -68,6 +70,7 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         db.delete(TABLE_IMPRIMANTE_ETIQUETTE, null, null);
         db.delete(TABLE_STOCK_UTILISE, null, null);
         db.delete(TABLE_PRODUIT_PLACE, null, null);
+        db.delete(Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE, null, null);
     }
 
     @Override
@@ -119,6 +122,7 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         db.execSQL(ImprimanteEtiquetteOpenHelper.Constantes.CREATION_TABLE_IMPRIMANTE_ETIQUETTE);
         db.execSQL(StockUtilisesOpenHelper.Constantes.CREATION_TABLE_STOCK_UTILISE);
         db.execSQL(ProduitPlaceOpenHelper.Constantes.CREATION_TABLE_PRODUIT_PLACE);
+        db.execSQL(Produit_IdentificationOpenHelper.Constantes.CREATION_TABLE_PRODUIT_IDENTIFICATION);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -188,6 +192,12 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         int inventaireLigneTempEtablissementUIDColumn = inventaireLigneTempEtablissementUIDCursor.getColumnIndex("Etablissement_UID");
         if (inventaireLigneTempEtablissementUIDColumn < 0) {
             db.execSQL("ALTER TABLE " + TABLE_INVENTAIRE_LIGNE_TEMP + " ADD COLUMN Etablissement_UID INTEGER");
+        }
+
+        Cursor ProduitIdentificationExisteCursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"
+                + Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE + "'", null);
+        if (ProduitIdentificationExisteCursor.getCount() == 0) {
+            db.execSQL(Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE);
         }
     }
 
