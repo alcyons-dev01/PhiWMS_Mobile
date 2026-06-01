@@ -197,7 +197,7 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         Cursor ProduitIdentificationExisteCursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"
                 + Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE + "'", null);
         if (ProduitIdentificationExisteCursor.getCount() == 0) {
-            db.execSQL(Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE);
+            db.execSQL(Produit_IdentificationOpenHelper.Constantes.CREATION_TABLE_PRODUIT_IDENTIFICATION);
         }
     }
 

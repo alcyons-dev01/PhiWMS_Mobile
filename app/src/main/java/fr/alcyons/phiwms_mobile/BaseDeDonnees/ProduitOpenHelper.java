@@ -28,6 +28,7 @@ import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.Classes.Produit_Identification;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.ConnexionDirecte.ServiceConnexionDirecteActivity;
 import fr.alcyons.phiwms_mobile.Outils.OutilsGestionConnexionReseau;
@@ -702,6 +703,12 @@ public class ProduitOpenHelper extends DBOpenHelper {
                                         listeProduits.add(new Produit(produitJSONArray.getJSONObject(i)));
                                     }
 
+                                    JSONArray produitIdentificationJSONArray = response.getJSONArray("Produits_Identification");
+                                    final List<Produit_Identification> listeProduitsIdentification = new ArrayList<>();
+                                    for (int i = 0; i < produitIdentificationJSONArray.length(); i++) {
+                                        listeProduitsIdentification.add(new Produit_Identification(produitIdentificationJSONArray.getJSONObject(i)));
+                                    }
+
                                     final int finalResultCount = resultCount;
 
                                     // Insertion sur un thread background
@@ -714,145 +721,156 @@ public class ProduitOpenHelper extends DBOpenHelper {
 
                                         SQLiteStatement stmt = db.compileStatement(
                                                 "INSERT INTO " + Constantes.TABLE_PRODUIT + " ("
-                                                        + Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT + ","   // 1  TEXT
-                                                        + Constantes.CLE_COL_REF_FOURNI_PRODUIT + ","            // 2  TEXT
-                                                        + Constantes.CLE_COL_INFORMATION_IMPORTANTES_PRODUIT + ","// 3  TEXT
-                                                        + Constantes.CLE_COL_CONDITION_USAGE_UNIQUE_PRODUIT + "," // 4  INTEGER
-                                                        + Constantes.CLE_COL_STERILE_PRODUIT + ","               // 5  INTEGER
-                                                        + Constantes.CLE_COL_STERILISATION_MODE_PRODUIT + ","    // 6  TEXT
-                                                        + Constantes.CLE_COL_NEPASRESTERILISER_PRODUIT + ","     // 7  INTEGER
-                                                        + Constantes.CLE_COL_CATEGORIE_PRODUIT + ","             // 8  TEXT
-                                                        + Constantes.CLE_COL_FOURNISSEUR_PRODUIT + ","           // 9  TEXT
-                                                        + Constantes.CLE_COL_PRIX_UNITAIRE_PRODUIT + ","         // 10 REAL
-                                                        + Constantes.CLE_COL_FORME_PRODUIT + ","                 // 11 TEXT
-                                                        + Constantes.CLE_COL_CONTENANT_PRODUIT + ","             // 12 TEXT
-                                                        + Constantes.CLE_COL_MATERIAUX_PRODUIT + ","             // 13 TEXT
-                                                        + Constantes.CLE_COL_STATUT_PRODUIT + ","                // 14 TEXT
-                                                        + Constantes.CLE_COL_SECTEUR_PRODUIT + ","               // 15 TEXT
-                                                        + Constantes.CLE_COL_COMMENTAIRE_PRODUIT + ","           // 16 TEXT
-                                                        + Constantes.CLE_COL_RISQUE_PHT_PRODUIT + ","            // 17 INTEGER
-                                                        + Constantes.CLE_COL_RISQUE_LATEX_PRODUIT + ","          // 18 INTEGER
-                                                        + Constantes.CLE_COL_RISQUE_SUBSTANCE_PRESENCE_PRODUIT + "," // 19 TEXT
-                                                        + Constantes.CLE_COL_CONSERVATION_PRODUIT + ","          // 20 TEXT
-                                                        + Constantes.CLE_COL_TEMPERATURE_REFRIGERE_PRODUIT + "," // 21 INTEGER
-                                                        + Constantes.CLE_COL_TEMPERATURE_AMBIANTE_PRODUIT + ","  // 22 INTEGER
-                                                        + Constantes.CLE_COL_CONSERVATION_TEMPERATURE_MIN_PRODUIT + "," // 23 REAL
-                                                        + Constantes.CLE_COL_CONSERVATION_TEMPERATURE_MAX_PRODUIT + "," // 24 REAL
-                                                        + Constantes.CLE_COL_CONSERVATION_ABRI_PRODUIT + ","     // 25 INTEGER
-                                                        + Constantes.CLE_COL_CONSERVATION_SEC_PRODUIT + ","      // 26 INTEGER
-                                                        + Constantes.CLE_COL_CONDITION_FRAGILE_PRODUIT + ","     // 27 INTEGER
-                                                        + Constantes.CLE_COL_MEDICAMENT_RISQUE_PRODUIT + ","     // 28 INTEGER
-                                                        + Constantes.CLE_COL_CONTRE_INDICATIONS_PRODUIT + ","    // 29 TEXT
-                                                        + Constantes.CLE_COL_EFFETS_INDESIRABLES_PRODUIT + ","   // 30 TEXT
-                                                        + Constantes.CLE_COL_MEDICAMENT_DOTATION_URGENCE_PRODUIT + "," // 31 INTEGER
-                                                        + Constantes.CLE_COL_MEDICAMENT_LISTE_PRODUIT + ","      // 32 TEXT
-                                                        + Constantes.CLE_COL_POSOLOGIE_PRODUIT + ","             // 33 TEXT
-                                                        + Constantes.CLE_COL_VOIE_PRODUIT + ","                  // 34 TEXT
-                                                        + Constantes.CLE_COL_INDICATION_THERAPEUTIQUE_PRODUIT + "," // 35 TEXT
-                                                        + Constantes.CLE_COL_UI_CONVERSION_PRODUIT + ","         // 36 REAL
-                                                        + Constantes.CLE_COL_MEDICAMENT_CTJ_PRODUIT + ","        // 37 REAL
-                                                        + Constantes.CLE_COL_TAUX_DE_TVA_PRODUIT + ","           // 38 REAL
-                                                        + Constantes.CLE_COL_GTIN_PRODUIT + ","                  // 39 TEXT
-                                                        + Constantes.CLE_COL_N_INTERNE_PRODUIT + ","             // 40 TEXT
-                                                        + Constantes.CLE_COL_DESIGNATION_EXT_PRODUIT + ","       // 41 TEXT
-                                                        + Constantes.CLE_COL_PEREMPTION_PRODUIT + ","            // 42 INTEGER
-                                                        + Constantes.CLE_COL_MARCHE_OBTENU_PRODUIT + ","         // 43 INTEGER
-                                                        + Constantes.CLE_COL_ORDONNANCE_PRODUIT + ","            // 44 INTEGER
-                                                        + Constantes.CLE_COL_SUIVI_LOT_PRODUIT + ","             // 45 INTEGER
-                                                        + Constantes.CLE_COL_REASSORT_PRODUIT + ","              // 46 INTEGER
-                                                        + Constantes.CLE_COL_INCLU_AU_PANEL_PRODUIT + ","        // 47 INTEGER
-                                                        + Constantes.CLE_COL_RESPECT_COND_ACHAT_PRODUIT + ","    // 48 INTEGER
-                                                        + Constantes.CLE_COL_ARRET_DIS_PRODUIT + ","             // 49 INTEGER
-                                                        + Constantes.CLE_COL_GRATUIT_PRODUIT + ","               // 50 INTEGER
-                                                        + Constantes.CLE_COL_ARRET_COMMANDE_PRODUIT + ","        // 51 INTEGER
-                                                        + Constantes.CLE_COL_PREV_A_COMMANDER_PRODUIT + ","      // 52 INTEGER
-                                                        + Constantes.CLE_COL_INSCRIRE_A_ORDONNANCIER_PRODUIT + "," // 53 INTEGER
-                                                        + Constantes.CLE_COL_CONDITION_REFUS_SI_ENDOMAGE_PRODUIT + "," // 54 INTEGER
-                                                        + Constantes.CLE_COL_CONDITION_PEREMPTION_PRODUIT + ","  // 55 INTEGER
-                                                        + Constantes.CLE_COL_TRACABILITE_REF_PRODUIT + ","       // 56 INTEGER
-                                                        + Constantes.CLE_COL_TRACABILITE_SN_PRODUIT + ","        // 57 INTEGER
-                                                        + Constantes.CLE_COL_RISQUE_VOIR_NOTICE_PRODUIT + ","    // 58 INTEGER
-                                                        + Constantes.CLE_COL_RISQUE_VOIR_RECOMMANDATION_PRODUIT + "," // 59 INTEGER
-                                                        + Constantes.CLE_COL_DISTRIBUTION_NOMINATIVE_ACTIVE_PRODUIT + "," // 60 INTEGER
-                                                        + Constantes.CLE_COL_REGLE_BON_USAGE_ACTIVE_PRODUIT + "," // 61 INTEGER
-                                                        + Constantes.CLE_COL_LIVRET_THERAPEUTIQUE_PRODUIT + ","  // 62 INTEGER
-                                                        + Constantes.CLE_COL_DATE_CREATION_PRODUIT + ","         // 63 TEXT
-                                                        + Constantes.CLE_COL_DATE_ARRET_COM_PRODUIT + ","        // 64 TEXT
-                                                        + Constantes.CLE_COL_DATE_ARRET_DIS_PRODUIT + ","        // 65 TEXT
-                                                        + Constantes.CLE_COL_DATE_DER_PHOTO_PRODUIT + ","        // 66 TEXT
-                                                        + Constantes.CLE_COL_SYS_DT_MAJ_PRODUIT + ","           // 67 TEXT
-                                                        + Constantes.CLE_COL_SYS_HEURE_MAJ_PRODUIT + ","        // 68 TEXT
-                                                        + Constantes.CLE_COL_ZONE_PUI_DEFAUT_PRODUIT + ","       // 69 TEXT
-                                                        + Constantes.CLE_COL_UNITE_PRODUIT + ","                 // 70 TEXT
-                                                        + Constantes.CLE_COL_VILLE_PRODUIT + ","                 // 71 TEXT
-                                                        + Constantes.CLE_COL_TYPE_ERREUR_PRODUIT + ","           // 72 TEXT
-                                                        + Constantes.CLE_COL_A_CORRIGER_PRODUIT + ","            // 73 TEXT
-                                                        + Constantes.CLE_COL_REASSORT_STATUT_PRODUIT + ","       // 74 TEXT
-                                                        + Constantes.CLE_COL_MODE_DE_DISTRIBUTION_PRODUIT + ","  // 75 TEXT
-                                                        + Constantes.CLE_COL_REF_MARCHE_PRODUIT + ","            // 76 TEXT
-                                                        + Constantes.CLE_COL_DEVISE_PRODUIT + ","                // 77 TEXT
-                                                        + Constantes.CLE_COL_SYS_USER_MAJ_PRODUIT + ","         // 78 TEXT
-                                                        + Constantes.CLE_COL_PANEL_PRODUIT + ","                 // 79 TEXT
-                                                        + Constantes.CLE_COL_TYPE_FRANCO_PRODUIT + ","           // 80 TEXT
-                                                        + Constantes.CLE_COL_UCD_CODE_PRODUIT + ","              // 81 TEXT
-                                                        + Constantes.CLE_COL_CODE_CIP_PRODUIT + ","              // 82 TEXT
-                                                        + Constantes.CLE_COL_HISTO_PRIX_UNITAIRE_PRODUIT + ","   // 83 TEXT
-                                                        + Constantes.CLE_COL_DCI_PRODUIT + ","                   // 84 TEXT
-                                                        + Constantes.CLE_COL_COMMENTAIRE_COMMANDE_PRODUIT + ","  // 85 TEXT
-                                                        + Constantes.CLE_COL_CODE_LPP_PRODUIT + ","              // 86 TEXT
-                                                        + Constantes.CLE_COL_PHOTO_PRODUIT + ","                 // 87 TEXT
-                                                        + Constantes.CLE_COL_EMPLACEMENT_PUI_DEFAUT_PRODUIT + "," // 88 TEXT
-                                                        + Constantes.CLE_COL_DOCUMENTATION_PATH_PRODUIT + ","    // 89 TEXT
-                                                        + Constantes.CLE_COL_REAPPROVISIONNEMENT_CLASSE_PRODUIT + "," // 90 TEXT
-                                                        + Constantes.CLE_COL_ZONE_UF_DEFAUT_PRODUIT + ","        // 91 TEXT
-                                                        + Constantes.CLE_COL_EMPLACEMENT_UF_DEFAUT_PRODUIT + "," // 92 TEXT
-                                                        + Constantes.CLE_COL_HEMADIALYSE_REFERENCE_PRODUIT + "," // 93 TEXT
-                                                        + Constantes.CLE_COL_XFORME_PRODUIT + ","                // 94 TEXT
-                                                        + Constantes.CLE_COL_RISQUE_SUBSTANCE_ABSENCE_PRODUIT + "," // 95 TEXT
-                                                        + Constantes.CLE_COL_DOCUMENTATION_WEB_PATH_PRODUIT + "," // 96 TEXT
-                                                        + Constantes.CLE_COL_MOMENT_INJECTION_PRODUIT + ","      // 97 TEXT
-                                                        + Constantes.CLE_COL_COMMENT_INJECTE_PRODUIT + ","       // 98 TEXT
-                                                        + Constantes.CLE_COL_COMPOSITION_PRODUIT + ","           // 99 TEXT
-                                                        + Constantes.CLE_COL_ZONE_PAD_DEFAUT_PRODUIT + ","       // 100 TEXT
-                                                        + Constantes.CLE_COL_EMPLACEMENT_PAD_DEFAUT_PRODUIT + "," // 101 TEXT
-                                                        + Constantes.CLE_COL_UCD_NOMCOURT_PRODUIT + ","          // 102 TEXT
-                                                        + Constantes.CLE_COL_PHIE_SYNCHRO_PRODUIT + ","          // 103 TEXT
-                                                        + Constantes.CLE_COL_CODE_FOURN_PRODUIT + ","            // 104 INTEGER
-                                                        + Constantes.CLE_COL_DUREE_PEREMPTION_PRODUIT + ","      // 105 INTEGER
-                                                        + Constantes.CLE_COL_RGB_RED_PRODUIT + ","               // 106 INTEGER
-                                                        + Constantes.CLE_COL_RGB_GREEN_PRODUIT + ","             // 107 INTEGER
-                                                        + Constantes.CLE_COL_RGB_BLUE_PRODUIT + ","              // 108 INTEGER
-                                                        + Constantes.CLE_COL_CLASSE_NUMERO_PRODUIT + ","         // 109 INTEGER
-                                                        + Constantes.CLE_COL_NB_LIGNE_CODE_BARRE_PRODUIT + ","   // 110 INTEGER
-                                                        + Constantes.CLE_COL_STOCK_GLOBAL_PRODUIT + ","          // 111 REAL
-                                                        + Constantes.CLE_COL_VALEUR_STOCK_GLOBAL_PRODUIT + ","   // 112 REAL
-                                                        + Constantes.CLE_COL_COND_FRANCO_PRODUIT + ","           // 113 REAL
-                                                        + Constantes.CLE_COL_STOCK_CLOT_PRODUIT + ","            // 114 REAL
-                                                        + Constantes.CLE_COL_VALEUR_STOCK_ACTUEL_PRODUIT + ","   // 115 INTEGER
-                                                        + Constantes.CLE_COL_COND_ACHAT_PRODUIT + ","            // 116 REAL
-                                                        + Constantes.CLE_COL_COND_DISTRIB_PRODUIT + ","          // 117 REAL
-                                                        + Constantes.CLE_COL_SEUIL_ALERTE_PRODUIT + ","          // 118 REAL
-                                                        + Constantes.CLE_COL_QTE_REASSORT_PRODUIT + ","          // 119 REAL
-                                                        + Constantes.CLE_COL_NOUVEAU_PU_PRODUIT + ","            // 120 REAL
-                                                        + Constantes.CLE_COL_COND_ACHAT_GROS_VOLUME_PRODUIT + "," // 121 REAL
-                                                        + Constantes.CLE_COL_COULEUR_PRODUIT + ","               // 122 REAL
-                                                        + Constantes.CLE_COL_INVENTAIRE1_PUMP_HT_PRODUIT + ","   // 123 REAL
-                                                        + Constantes.CLE_COL_PUMP_TTC_EXERCICE_PREC_PRODUIT + "," // 124 REAL
-                                                        + Constantes.CLE_COL_QTE_INVENTAIRE_EXERCICE_PREC_PRODUIT + "," // 125 REAL
-                                                        + Constantes.CLE_COL_STOCK_ACTUEL_PRODUIT + ","          // 126 REAL
-                                                        + Constantes.CLE_COL_QTE_A_COMMANDER_PRODUIT + ","       // 127 REAL
-                                                        + Constantes.CLE_COL_PUMP_TTC_DERNIERE_CLOTURE_PRODUIT + "," // 128 REAL
-                                                        + Constantes.CLE_COL_POIDS_PRODUIT + ","                 // 129 REAL
-                                                        + Constantes.CLE_COL_VOLUME_PRODUIT + ","                // 130 REAL
-                                                        + Constantes.CLE_COL_CONSERVATION_HYDRO_MIN_PRODUIT + "," // 131 REAL
-                                                        + Constantes.CLE_COL_CONSERVATION_HYDRO_MAX_PRODUIT + "," // 132 REAL
-                                                        + Constantes.CLE_COL_CONSERVATION_PRESSION_MIN_PRODUIT + "," // 133 REAL
-                                                        + Constantes.CLE_COL_CONSERVATION_PRESSION_MAX_PRODUIT + "," // 134 REAL
-                                                        + Constantes.CLE_COL_ID_PRODUIT + ","                    // 135 INTEGER
-                                                        + Constantes.CLE_COL_CODE_INCONNU + ","                  // 136 TEXT
-                                                        + Constantes.CLE_COL_SUIVI_SERIALISATION + ","           // 137 INTEGER
-                                                        + Constantes.CLE_COL_SERIALISER_RECEPTION_DELIVRANCE     // 138 INTEGER
+                                                        + Constantes.CLE_COL_DESIGNATION_INTERNE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_REF_FOURNI_PRODUIT + ","
+                                                        + Constantes.CLE_COL_INFORMATION_IMPORTANTES_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CONDITION_USAGE_UNIQUE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_STERILE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_STERILISATION_MODE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_NEPASRESTERILISER_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CATEGORIE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_FOURNISSEUR_PRODUIT + ","
+                                                        + Constantes.CLE_COL_PRIX_UNITAIRE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_FORME_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CONTENANT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_MATERIAUX_PRODUIT + ","
+                                                        + Constantes.CLE_COL_STATUT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_SECTEUR_PRODUIT + ","
+                                                        + Constantes.CLE_COL_COMMENTAIRE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_RISQUE_PHT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_RISQUE_LATEX_PRODUIT + ","
+                                                        + Constantes.CLE_COL_RISQUE_SUBSTANCE_PRESENCE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CONSERVATION_PRODUIT + ","
+                                                        + Constantes.CLE_COL_TEMPERATURE_REFRIGERE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_TEMPERATURE_AMBIANTE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CONSERVATION_TEMPERATURE_MIN_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CONSERVATION_TEMPERATURE_MAX_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CONSERVATION_ABRI_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CONSERVATION_SEC_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CONDITION_FRAGILE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_MEDICAMENT_RISQUE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CONTRE_INDICATIONS_PRODUIT + ","
+                                                        + Constantes.CLE_COL_EFFETS_INDESIRABLES_PRODUIT + ","
+                                                        + Constantes.CLE_COL_MEDICAMENT_DOTATION_URGENCE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_MEDICAMENT_LISTE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_POSOLOGIE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_VOIE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_INDICATION_THERAPEUTIQUE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_UI_CONVERSION_PRODUIT + ","
+                                                        + Constantes.CLE_COL_MEDICAMENT_CTJ_PRODUIT + ","
+                                                        + Constantes.CLE_COL_TAUX_DE_TVA_PRODUIT + ","
+                                                        + Constantes.CLE_COL_GTIN_PRODUIT + ","
+                                                        + Constantes.CLE_COL_N_INTERNE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_DESIGNATION_EXT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_PEREMPTION_PRODUIT + ","
+                                                        + Constantes.CLE_COL_MARCHE_OBTENU_PRODUIT + ","
+                                                        + Constantes.CLE_COL_ORDONNANCE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_SUIVI_LOT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_REASSORT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_INCLU_AU_PANEL_PRODUIT + ","
+                                                        + Constantes.CLE_COL_RESPECT_COND_ACHAT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_ARRET_DIS_PRODUIT + ","
+                                                        + Constantes.CLE_COL_GRATUIT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_ARRET_COMMANDE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_PREV_A_COMMANDER_PRODUIT + ","
+                                                        + Constantes.CLE_COL_INSCRIRE_A_ORDONNANCIER_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CONDITION_REFUS_SI_ENDOMAGE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CONDITION_PEREMPTION_PRODUIT + ","
+                                                        + Constantes.CLE_COL_TRACABILITE_REF_PRODUIT + ","
+                                                        + Constantes.CLE_COL_TRACABILITE_SN_PRODUIT + ","
+                                                        + Constantes.CLE_COL_RISQUE_VOIR_NOTICE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_RISQUE_VOIR_RECOMMANDATION_PRODUIT + ","
+                                                        + Constantes.CLE_COL_DISTRIBUTION_NOMINATIVE_ACTIVE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_REGLE_BON_USAGE_ACTIVE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_LIVRET_THERAPEUTIQUE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_DATE_CREATION_PRODUIT + ","
+                                                        + Constantes.CLE_COL_DATE_ARRET_COM_PRODUIT + ","
+                                                        + Constantes.CLE_COL_DATE_ARRET_DIS_PRODUIT + ","
+                                                        + Constantes.CLE_COL_DATE_DER_PHOTO_PRODUIT + ","
+                                                        + Constantes.CLE_COL_SYS_DT_MAJ_PRODUIT + ","
+                                                        + Constantes.CLE_COL_SYS_HEURE_MAJ_PRODUIT + ","
+                                                        + Constantes.CLE_COL_ZONE_PUI_DEFAUT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_UNITE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_VILLE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_TYPE_ERREUR_PRODUIT + ","
+                                                        + Constantes.CLE_COL_A_CORRIGER_PRODUIT + ","
+                                                        + Constantes.CLE_COL_REASSORT_STATUT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_MODE_DE_DISTRIBUTION_PRODUIT + ","
+                                                        + Constantes.CLE_COL_REF_MARCHE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_DEVISE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_SYS_USER_MAJ_PRODUIT + ","
+                                                        + Constantes.CLE_COL_PANEL_PRODUIT + ","
+                                                        + Constantes.CLE_COL_TYPE_FRANCO_PRODUIT + ","
+                                                        + Constantes.CLE_COL_UCD_CODE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CODE_CIP_PRODUIT + ","
+                                                        + Constantes.CLE_COL_HISTO_PRIX_UNITAIRE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_DCI_PRODUIT + ","
+                                                        + Constantes.CLE_COL_COMMENTAIRE_COMMANDE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CODE_LPP_PRODUIT + ","
+                                                        + Constantes.CLE_COL_PHOTO_PRODUIT + ","
+                                                        + Constantes.CLE_COL_EMPLACEMENT_PUI_DEFAUT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_DOCUMENTATION_PATH_PRODUIT + ","
+                                                        + Constantes.CLE_COL_REAPPROVISIONNEMENT_CLASSE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_ZONE_UF_DEFAUT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_EMPLACEMENT_UF_DEFAUT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_HEMADIALYSE_REFERENCE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_XFORME_PRODUIT + ","
+                                                        + Constantes.CLE_COL_RISQUE_SUBSTANCE_ABSENCE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_DOCUMENTATION_WEB_PATH_PRODUIT + ","
+                                                        + Constantes.CLE_COL_MOMENT_INJECTION_PRODUIT + ","
+                                                        + Constantes.CLE_COL_COMMENT_INJECTE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_COMPOSITION_PRODUIT + ","
+                                                        + Constantes.CLE_COL_ZONE_PAD_DEFAUT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_EMPLACEMENT_PAD_DEFAUT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_UCD_NOMCOURT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_PHIE_SYNCHRO_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CODE_FOURN_PRODUIT + ","
+                                                        + Constantes.CLE_COL_DUREE_PEREMPTION_PRODUIT + ","
+                                                        + Constantes.CLE_COL_RGB_RED_PRODUIT + ","
+                                                        + Constantes.CLE_COL_RGB_GREEN_PRODUIT + ","
+                                                        + Constantes.CLE_COL_RGB_BLUE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CLASSE_NUMERO_PRODUIT + ","
+                                                        + Constantes.CLE_COL_NB_LIGNE_CODE_BARRE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_STOCK_GLOBAL_PRODUIT + ","
+                                                        + Constantes.CLE_COL_VALEUR_STOCK_GLOBAL_PRODUIT + ","
+                                                        + Constantes.CLE_COL_COND_FRANCO_PRODUIT + ","
+                                                        + Constantes.CLE_COL_STOCK_CLOT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_VALEUR_STOCK_ACTUEL_PRODUIT + ","
+                                                        + Constantes.CLE_COL_COND_ACHAT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_COND_DISTRIB_PRODUIT + ","
+                                                        + Constantes.CLE_COL_SEUIL_ALERTE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_QTE_REASSORT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_NOUVEAU_PU_PRODUIT + ","
+                                                        + Constantes.CLE_COL_COND_ACHAT_GROS_VOLUME_PRODUIT + ","
+                                                        + Constantes.CLE_COL_COULEUR_PRODUIT + ","
+                                                        + Constantes.CLE_COL_INVENTAIRE1_PUMP_HT_PRODUIT + ","
+                                                        + Constantes.CLE_COL_PUMP_TTC_EXERCICE_PREC_PRODUIT + ","
+                                                        + Constantes.CLE_COL_QTE_INVENTAIRE_EXERCICE_PREC_PRODUIT + ","
+                                                        + Constantes.CLE_COL_STOCK_ACTUEL_PRODUIT + ","
+                                                        + Constantes.CLE_COL_QTE_A_COMMANDER_PRODUIT + ","
+                                                        + Constantes.CLE_COL_PUMP_TTC_DERNIERE_CLOTURE_PRODUIT + ","
+                                                        + Constantes.CLE_COL_POIDS_PRODUIT + ","
+                                                        + Constantes.CLE_COL_VOLUME_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CONSERVATION_HYDRO_MIN_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CONSERVATION_HYDRO_MAX_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CONSERVATION_PRESSION_MIN_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CONSERVATION_PRESSION_MAX_PRODUIT + ","
+                                                        + Constantes.CLE_COL_ID_PRODUIT + ","
+                                                        + Constantes.CLE_COL_CODE_INCONNU + ","
+                                                        + Constantes.CLE_COL_SUIVI_SERIALISATION + ","
+                                                        + Constantes.CLE_COL_SERIALISER_RECEPTION_DELIVRANCE
                                                         + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+                                        );
+
+                                        SQLiteStatement stmtProduitIdentification = db.compileStatement(
+                                                "INSERT INTO " + Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE + " ("
+                                                        + Produit_IdentificationOpenHelper.Constantes.CLE_COL_CODE_PRODUIT + ","
+                                                        + Produit_IdentificationOpenHelper.Constantes.CLE_COL_IDENTIFICATION + ","
+                                                        + Produit_IdentificationOpenHelper.Constantes.CLE_COL_TYPE_CODE + ","
+                                                        + Produit_IdentificationOpenHelper.Constantes.CLE_COL_NATURE_IDENTIFICATION + ","
+                                                        + Produit_IdentificationOpenHelper.Constantes.CLE_COL_ETABLISSEMENT_UID
+                                                        + ") VALUES (?,?,?,?,?)"
+
                                         );
 
                                         db.beginTransaction();
@@ -1003,6 +1021,18 @@ public class ProduitOpenHelper extends DBOpenHelper {
                                                     compteurReussite++;
                                                 }
                                             }
+
+                                            for (Produit_Identification produitIdentification : listeProduitsIdentification) {
+                                                stmtProduitIdentification.clearBindings();
+                                                stmtProduitIdentification.bindDouble(1,produitIdentification.getCodeProduit());
+                                                bindStringOrNull(stmt, 2, produitIdentification.getIdentification());
+                                                bindStringOrNull(stmt, 3, produitIdentification.getTypeCode());
+                                                bindStringOrNull(stmt, 4, produitIdentification.getNatureIdentification());
+                                                stmtProduitIdentification.bindDouble(5, produitIdentification.getEtablissementUID());
+
+                                                stmtProduitIdentification.executeInsert();
+                                            }
+
                                             db.setTransactionSuccessful();
                                         } catch (Exception e) {
                                             etatThread = false;
