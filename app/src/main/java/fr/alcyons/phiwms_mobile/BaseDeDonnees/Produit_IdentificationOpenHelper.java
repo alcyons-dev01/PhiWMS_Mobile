@@ -2,6 +2,7 @@ package fr.alcyons.phiwms_mobile.BaseDeDonnees;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.provider.BaseColumns;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
+import fr.alcyons.phiwms_mobile.Classes.PH_Reassort;
 import fr.alcyons.phiwms_mobile.Classes.Produit_Identification;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.R;
@@ -35,6 +37,21 @@ public class Produit_IdentificationOpenHelper extends DBOpenHelper {
     public Produit_IdentificationOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
     }
+
+    public static String getIdentificationUnitaire(SQLiteDatabase db, int codeProduit) {
+        String identification = "";
+        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_IDENTIFICATION_REFERENCE + " WHERE " + Constantes.CLE_COL_CODE_PRODUIT + "=? AND "+Constantes.CLE_COL_NATURE_IDENTIFICATION+" = 'Unitaire'", new String[]{String.valueOf(codeProduit)});
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+            Produit_Identification produitIdentification = new Produit_Identification(cursor);
+            identification = produitIdentification.getIdentification();
+        }
+
+        cursor.close();
+        cursor = null;
+        return identification;
+    }
+
 
     public static void viderTableIdentificationReference(SQLiteDatabase db) {
         db.delete(Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE, null, null);

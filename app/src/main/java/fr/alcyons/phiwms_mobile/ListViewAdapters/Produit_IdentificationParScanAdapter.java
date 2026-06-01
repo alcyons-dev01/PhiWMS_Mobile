@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Produit_IdentificationOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.OriginalActivity;
@@ -83,15 +84,42 @@ public class Produit_IdentificationParScanAdapter extends ArrayAdapter {
         viewHolder.nom.setText(produitCourant.getDesignation_interne());
         viewHolder.refProduit.setText(produitCourant.getRef_fourni());
         viewHolder.fournisseurProduit.setText(produitCourant.getFournisseur());
-        if(produitCourant.getGTIN().contentEquals("") && produitCourant.getGTIN() != null)
+
+        /**
+         * Gestion de la table identification
+         */
+        String gtin = "";
+        String codeInconnu = "";
+
+        gtin = Produit_IdentificationOpenHelper.getIdentificationUnitaire(db, produitCourant.getID_produit());
+
+        if(gtin.contentEquals(""))
         {
-            viewHolder.gtinProduit.setText(produitCourant.getCodeInconnue());
+            gtin = produitCourant.getGTIN();
+            if(gtin == null || gtin.contentEquals(""))
+            {
+                gtin = "";
+                codeInconnu = produitCourant.getCodeInconnue();
+
+                if(codeInconnu == null)
+                    codeInconnu = "";
+            }
+        }
+
+        if(!gtin.contentEquals(""))
+        {
+            viewHolder.gtinProduit.setText(gtin);
+            viewHolder.gtinProduit.setTextColor(context.getResources().getColorStateList(R.color.vert));
+            viewHolder.gtinProduit.setTextColor(context.getResources().getColorStateList(R.color.orange));
+        }
+        else if(!codeInconnu.contentEquals(""))
+        {
+            viewHolder.gtinProduit.setText(codeInconnu);
             viewHolder.gtinProduit.setTextColor(context.getResources().getColorStateList(R.color.orange));
         }
         else
         {
-            viewHolder.gtinProduit.setText(produitCourant.getGTIN());
-            viewHolder.gtinProduit.setTextColor(context.getResources().getColorStateList(R.color.vert));
+            viewHolder.gtinProduit.setText("");
         }
 
         return convertView;

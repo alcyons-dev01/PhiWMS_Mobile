@@ -52,6 +52,7 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
     public void onResume() {
         super.onResume();
         invalidateOptionsMenu();
+        firstPassage = false;
         if (firstPassage) {
             if(android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.toLowerCase().contains("honeywell") || android.os.Build.MANUFACTURER.toLowerCase().contains("google"))
             {
@@ -86,6 +87,14 @@ public class ServiceIdentificationParScanActivity extends ServiceActivity {
                     firstPassage = false;
                 }
             }
+        }
+        else
+        {
+            Intent newIntent = new Intent(ServiceIdentificationParScanActivity.this, ListeProduitsIdentificationParScanActivity.class);
+            Bundle extras = ServiceIdentificationParScanActivity.super.getBundle();
+            newIntent.putExtras(extras);
+            ServiceIdentificationParScanActivity.this.startActivity(newIntent);
+            ServiceIdentificationParScanActivity.this.finish();
         }
     }
     @Override

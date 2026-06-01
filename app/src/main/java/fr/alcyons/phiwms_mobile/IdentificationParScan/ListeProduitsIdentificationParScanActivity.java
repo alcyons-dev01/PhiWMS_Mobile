@@ -95,7 +95,7 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
             ((LinearLayout) findViewById(R.id.linearProduitIdentifie)).setAlpha(1F);
             ((LinearLayout) findViewById(R.id.linearProduitNonIdentifie)).setAlpha(0.5F);
             listViewProduits.smoothScrollToPositionFromTop(0, 0, 250);
-            fermerRecherche();
+            ouvrirRechercheAuto();
         });
 
         ((LinearLayout) findViewById(R.id.linearProduitNonIdentifie)).setOnClickListener(v -> {
@@ -117,9 +117,11 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
             passerAuDetailProduit(listeAAfficher.get(0));
         } else if (listeAAfficher.size() > 1) {
             rechercheAuto = true;
+            ouvrirRechercheAuto();
         } else {
             listeAAfficher = ProduitOpenHelper.getAllProduits(db);
             rechercheAuto = true;
+            ouvrirRechercheAuto();
         }
 
         if (adapter == null) {
