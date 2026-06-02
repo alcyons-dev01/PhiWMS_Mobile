@@ -148,8 +148,6 @@ public class DetailProduitIdentificationParScanActivity extends ServiceActivity 
 
         if(produitSelectionne.getClasse_numero() == 1)
         {
-            ((LinearLayout) findViewById(R.id.zoneClassATC)).setVisibility(View.VISIBLE);
-            ((LinearLayout) findViewById(R.id.zoneDCI)).setVisibility(View.VISIBLE);
             String classeATC = "";
             if(produitSelectionne.getClasseATC() != null)
                 classeATC = produitSelectionne.getClasseATC();
