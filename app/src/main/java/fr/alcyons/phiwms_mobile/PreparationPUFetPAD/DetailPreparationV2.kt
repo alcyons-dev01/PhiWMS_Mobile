@@ -44,6 +44,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_SerialisationOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ParametresServeurOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Produit_IdentificationOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.StockUtilisesOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Stock_Lot_EmplacementLightOpenHelper
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur
@@ -1014,11 +1015,11 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
                         tabDateSQL[tabDateSQL.size - 1].takeLast(2) + tabDateSQL[1] + tabDateSQL[0]
                 }
 
-                val produitIdentifier: List<Produit> =
-                    ProduitOpenHelper.getProduitsByIdentification(db, codeIdentification)
+                val produitIdentification = Produit_IdentificationOpenHelper.getIdentificationsByIdentification(db, codeIdentification)
 
-                if (!produitIdentifier.isEmpty() && produitIdentifier.size == 1) {
-                    val produit = produitIdentifier[0]
+                if(produitIdentification != null)
+                {
+                    val produit = ProduitOpenHelper.getProduitByID(db, produitIdentification.codeProduit)
 
                     var preparationLigneCourant = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByProduitLotSerieNegPreparation(db, produit.iD_produit, preparationCourante.uid, numeroLotIdentification, numeroSerieIdentification)
 
@@ -1086,7 +1087,9 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
                             }
                         }
                     }
-                } else {
+                }
+                else
+                {
                     withContext(Dispatchers.Main) {
                         alerteVisible = true // ← on lève le flag avant d'afficher
                         afficherAlerteAvecCallback(
@@ -1098,6 +1101,25 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
                         }
                     }
                 }
+
+                /*val produitIdentifier: List<Produit> =
+                    ProduitOpenHelper.getProduitsByIdentification(db, codeIdentification)
+
+                if (!produitIdentifier.isEmpty() && produitIdentifier.size == 1) {
+                    val produit = produitIdentifier[0]
+
+                } else {
+                    withContext(Dispatchers.Main) {
+                        alerteVisible = true // ← on lève le flag avant d'afficher
+                        afficherAlerteAvecCallback(
+                            "Erreur",
+                            "Produit inconnu en base de données"
+                        ) {
+                            alerteVisible = false // ← on baisse le flag à la fermeture
+                            ouvrirScanner()
+                        }
+                    }
+                }*/
 
                 scannerProcessing = false
             }

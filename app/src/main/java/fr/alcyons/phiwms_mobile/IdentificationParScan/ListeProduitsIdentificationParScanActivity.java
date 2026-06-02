@@ -95,7 +95,7 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
             ((LinearLayout) findViewById(R.id.linearProduitIdentifie)).setAlpha(1F);
             ((LinearLayout) findViewById(R.id.linearProduitNonIdentifie)).setAlpha(0.5F);
             listViewProduits.smoothScrollToPositionFromTop(0, 0, 250);
-            fermerRecherche();
+            ouvrirRechercheAuto();
         });
 
         ((LinearLayout) findViewById(R.id.linearProduitNonIdentifie)).setOnClickListener(v -> {
@@ -156,7 +156,7 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
         super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_action, menu);
-        menu.findItem(R.id.menuDatamatrix).setVisible(true);
+        menu.findItem(R.id.menuDatamatrix).setVisible(false);
         return true;
     }
 
@@ -173,7 +173,8 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
 
         // 👇 Ouverture automatique de la barre de recherche si rechercheAuto est vrai
         if (rechercheAuto) {
-            ouvrirRechercheAuto();
+            rechercheAuto = false; // évite la répétition sur chaque invalidate
+            getWindow().getDecorView().post(() -> ouvrirRechercheAuto());
         }
 
         return true;

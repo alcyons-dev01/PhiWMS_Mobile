@@ -64,7 +64,21 @@ public class Produit_IdentificationOpenHelper extends DBOpenHelper {
         cursor.close();
         cursor = null;
         return Liste;
-    }   
+    }
+
+    public static Produit_Identification getIdentificationsByIdentification(SQLiteDatabase db, String identification) {
+        Produit_Identification produitIdentification = null;
+
+        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_IDENTIFICATION_REFERENCE + " WHERE " + Constantes.CLE_COL_IDENTIFICATION + "=?", new String[]{identification});
+        if (cursor.getCount() >= 1) {
+            cursor.moveToFirst();
+            produitIdentification = new Produit_Identification(cursor);
+        }
+
+        cursor.close();
+        cursor = null;
+        return produitIdentification;
+    }
     
     public static List<Produit_Identification> getProduitIdentification(SQLiteDatabase db, String identification) {
         List<Produit_Identification> Liste = new ArrayList<>();

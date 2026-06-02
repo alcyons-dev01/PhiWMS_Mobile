@@ -67,6 +67,7 @@ import java.util.Random
 import fr.alcyons.phiwms_mobile.Interfaces.RechercheAdjustable
 import androidx.core.view.isVisible
 import androidx.core.graphics.drawable.toDrawable
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Produit_IdentificationOpenHelper
 
 class DetailReception_V2 : ServiceAvecConnexionActivity(),
     RechercheFragment.OnElementRechercheListener,
@@ -667,7 +668,89 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                     datePeremptionSerialisation =
                         tabDateSQL[tabDateSQL.size - 1].takeLast(2) + tabDateSQL[1] + tabDateSQL[0]
                 }
-                val produitIdentifier: List<Produit> =
+
+
+                val produitIdentification = Produit_IdentificationOpenHelper.getIdentificationsByIdentification(db, codeIdentification)
+
+                if(produitIdentification != null)
+                {
+                    val produit = ProduitOpenHelper.getProduitByID(db, produitIdentification.codeProduit)
+                    var reliquatcourant = PH_ReliquatOpenHelper.getPH_ReliquatByUnIdProduitetNumeroLotSerie(db, produit.iD_produit, receptionCourant.numero, numeroLotIdentification, numeroSerieIdentification)
+
+                    if(reliquatcourant != null)
+                    {
+                        if(produit.isSuivi_Serialisation && produit.isSerialiser_Reception_Delivrance && numeroSerieIdentification != "")
+                        {
+                            withContext(Dispatchers.Main) {
+                                alerteVisible = true // ← on lève le flag avant d'afficher
+                                afficherAlerteAvecCallback(
+                                    "Erreur",
+                                    "Numero de série déjà scanné"
+                                ) {
+                                    alerteVisible = false // ← on baisse le flag à la fermeture
+                                    ouvrirScanner()
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ouvrirDetailFragment(reliquatcourant)
+                        }
+                    }
+                    else
+                    {
+                        reliquatcourant = PH_ReliquatOpenHelper.getPH_ReliquatBaseByUnIdProduitetNumero(db, produit.iD_produit, receptionCourant.numero)
+
+                        if(reliquatcourant != null)
+                        {
+                            val randomreliquat = Random()
+                            var reliquatId = randomreliquat.nextInt()
+                            if (reliquatId > 0) reliquatId = reliquatId * -1
+
+                            reliquatcourant.setReliquat_UID(reliquatId)
+                            reliquatcourant.lot = numeroLotIdentification
+                            reliquatcourant.serie = numeroSerieIdentification
+                            reliquatcourant.peremptionDate = datePeremptionSQL
+                            reliquatcourant.scanValue = ""
+                            reliquatcourant.bL_Numero = ""
+
+                            //ajout de la serialisation si suivi par série
+                            if(produit.isSuivi_Serialisation && produit.isSerialiser_Reception_Delivrance && numeroSerieIdentification != "")
+                                Serialisation.Serialisation_Creer(utilisateurConnecte.id, "G110", codeIdentification, "GTIN", numeroLotIdentification, datePeremptionSerialisation, numeroSerieIdentification, "CDE", receptionCourant.numero).toInt()
+
+
+                            ouvrirDetailFragment(reliquatcourant)
+                        }
+                        else
+                        {
+                            withContext(Dispatchers.Main) {
+                                alerteVisible = true // ← on lève le flag avant d'afficher
+                                afficherAlerteAvecCallback(
+                                    "Erreur",
+                                    "Référence non présente dans la réception"
+                                ) {
+                                    alerteVisible = false // ← on baisse le flag à la fermeture
+                                    ouvrirScanner()
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    withContext(Dispatchers.Main) {
+                        alerteVisible = true // ← on lève le flag avant d'afficher
+                        afficherAlerteAvecCallback(
+                            "Erreur",
+                            "Produit inconnu en base de données"
+                        ) {
+                            alerteVisible = false // ← on baisse le flag à la fermeture
+                            ouvrirScanner()
+                        }
+                    }
+                }
+
+                /*val produitIdentifier: List<Produit> =
                     ProduitOpenHelper.getProduitsByIdentification(db, codeIdentification)
 
                 if (!produitIdentifier.isEmpty() && produitIdentifier.size == 1) {
@@ -744,7 +827,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                             ouvrirScanner()
                         }
                     }
-                }
+                }*/
 
                 scannerProcessing = false
             }
