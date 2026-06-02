@@ -21,6 +21,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import fr.alcyons.phiwms_mobile.Interfaces.ScanDebounce
+import fr.alcyons.phiwms_mobile.Interfaces.ScannerControllable
 import fr.alcyons.phiwms_mobile.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +30,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ScannerInputFragment : Fragment(), ScanDebounce
+class ScannerInputFragment : Fragment(), ScanDebounce, ScannerControllable
 {
 
     private lateinit var scannerInput_ET: EditText
@@ -37,9 +38,12 @@ class ScannerInputFragment : Fragment(), ScanDebounce
     private lateinit var btnActiveSon: ImageButton
     private lateinit var btnInactiveSon: ImageButton
     private lateinit var btnClose: ImageButton
+    private lateinit var viewBtnClose: View
     private lateinit var layoutFondValidation: LinearLayout
 
     private var isSoundOn = true
+    override var btnCloseVisible: Boolean = true
+
     private var type = ""
     private var part1: String? = null
     private var part1Time: Long = 0L
@@ -69,7 +73,12 @@ class ScannerInputFragment : Fragment(), ScanDebounce
         btnActiveSon         = view.findViewById(R.id.btnActiveSon)
         btnInactiveSon       = view.findViewById(R.id.btnInactiveSon)
         btnClose             = view.findViewById(R.id.btnClose)
+        viewBtnClose         = view.findViewById(R.id.viewBtnClose)
         layoutFondValidation = view.findViewById(R.id.layoutFondValidation)
+
+        btnClose.visibility = if (btnCloseVisible) View.VISIBLE else View.GONE
+        viewBtnClose.visibility = if (btnCloseVisible) View.VISIBLE else View.GONE
+
 
         // Focus automatique pour recevoir les scans dès l'ouverture
         scannerInput_ET.requestFocus()
@@ -291,6 +300,10 @@ class ScannerInputFragment : Fragment(), ScanDebounce
     override fun onDestroy() {
         super.onDestroy()
         toneGenerator.release()
+    }
+
+    override fun masquerBtnClose() {
+        view?.findViewById<ImageButton>(R.id.btnClose)?.visibility = View.GONE
     }
 
     override fun onResume() {

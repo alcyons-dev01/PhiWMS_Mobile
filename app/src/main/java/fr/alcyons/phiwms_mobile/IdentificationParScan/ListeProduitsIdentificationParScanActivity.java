@@ -137,7 +137,8 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
     }
 
     public void passerAuDetailProduit(Produit produitSelectionne) {
-        Intent newIntent = new Intent(ListeProduitsIdentificationParScanActivity.this, DetailProduitIdentificationParScanActivity.class);
+        //Intent newIntent = new Intent(ListeProduitsIdentificationParScanActivity.this, DetailProduitIdentificationParScanActivity.class);
+        Intent newIntent = new Intent(ListeProduitsIdentificationParScanActivity.this, DetailIdentificationParScan.class);
         Bundle extras = ListeProduitsIdentificationParScanActivity.super.getBundle();
         extras.putInt("produitSelectionneID", produitSelectionne.getID_produit());
         String codeGS1 = Objects.requireNonNull(intent.getExtras()).getString("codeGS1");

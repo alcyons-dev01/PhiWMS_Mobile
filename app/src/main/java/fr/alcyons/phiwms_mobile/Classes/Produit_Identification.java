@@ -2,6 +2,7 @@ package fr.alcyons.phiwms_mobile.Classes;
 
 import android.database.Cursor;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -92,6 +93,23 @@ public class Produit_Identification implements Serializable, Comparable {
     public void setPhiwms_mobileUUID(int phiwms_mobileUUID) {
         this.phiwms_mobileUUID = phiwms_mobileUUID;
     }
+
+    public JSONObject toJson() {
+        JSONObject produitPlaceJson = new JSONObject();
+
+        try {
+            produitPlaceJson.put("codeProduit", codeProduit);
+            produitPlaceJson.put("identification", identification);
+            produitPlaceJson.put("typeCode", typeCode);
+            produitPlaceJson.put("natureIdentification", natureIdentification);
+            produitPlaceJson.put("Etablissement_UID", etablissementUID);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return produitPlaceJson;
+    }
+
 
     @Override
     public boolean equals(Object obj) {

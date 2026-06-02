@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@android:color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="10dp">
+
+        <!-- Badge icône nature -->
+        <FrameLayout
+            android:id="@+id/badgeNature_FL"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/badge_nature_carton">
+
+            <ImageView
+                android:id="@+id/iconeNature_IV"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_colis" />
+
+        </FrameLayout>
+
+        <!-- Textes : nature + code -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/natureIdentification_TV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CARTON"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="@color/bleu_fonce_alcyons"
+                android:alpha="0.5"
+                android:letterSpacing="0.05" />
+
+            <TextView
+                android:id="@+id/codeIdentification_TV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/bleu_fonce_alcyons"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+        </LinearLayout>
+
+        <!-- Bouton supprimer -->
+        <FrameLayout
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/background_cadre_rouge"
+            android:backgroundTint="@color/rouge">
+
+            <ImageButton
+                android:id="@+id/btnSupprimerCode"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_close"
+                android:background="@android:color/transparent"
+                app:tint="@color/blanc"
+                android:scaleType="centerInside"
+                android:contentDescription="Supprimer ce code" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

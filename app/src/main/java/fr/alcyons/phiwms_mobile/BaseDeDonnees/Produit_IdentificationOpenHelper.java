@@ -29,6 +29,7 @@ import java.util.Map;
 import fr.alcyons.phiwms_mobile.AuthentificationActivity;
 import fr.alcyons.phiwms_mobile.Classes.PH_Reassort;
 import fr.alcyons.phiwms_mobile.Classes.Produit_Identification;
+import fr.alcyons.phiwms_mobile.Classes.Produit_Place;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
 import fr.alcyons.phiwms_mobile.R;
 
@@ -52,6 +53,43 @@ public class Produit_IdentificationOpenHelper extends DBOpenHelper {
         return identification;
     }
 
+    public static List<Produit_Identification> getIdentificationsByCodeProduit(SQLiteDatabase db, int codeProduit) {
+        List<Produit_Identification> Liste = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_IDENTIFICATION_REFERENCE + " WHERE " + Constantes.CLE_COL_CODE_PRODUIT + "=?", new String[]{String.valueOf(codeProduit)});
+        while (cursor.moveToNext()) {
+            Liste.add(new Produit_Identification(cursor));
+        }
+
+        cursor.close();
+        cursor = null;
+        return Liste;
+    }   
+    
+    public static List<Produit_Identification> getProduitIdentification(SQLiteDatabase db, String identification) {
+        List<Produit_Identification> Liste = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_IDENTIFICATION_REFERENCE + " WHERE " + Constantes.CLE_COL_IDENTIFICATION + "=?", new String[]{identification});
+        while (cursor.moveToNext()) {
+            Liste.add(new Produit_Identification(cursor));
+        }
+
+        cursor.close();
+        cursor = null;
+        return Liste;
+    }
+
+    public static Produit_Identification getProduitIdentificationByphiwms_mobileUUID(SQLiteDatabase db, int id) {
+        Produit_Identification produitIdentification = null;
+        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_IDENTIFICATION_REFERENCE + " WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " =? ", new String[]{String.valueOf(id)});
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+            produitIdentification = new Produit_Identification(cursor);
+        }
+        cursor.close();
+        cursor = null;
+        return produitIdentification;
+    }
 
     public static void viderTableIdentificationReference(SQLiteDatabase db) {
         db.delete(Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE, null, null);
@@ -252,7 +290,7 @@ public class Produit_IdentificationOpenHelper extends DBOpenHelper {
     }
 
     public static class Constantes implements BaseColumns {
-        public static final String TABLE_IDENTIFICATION_REFERENCE = "Identification_Reference";
+        public static final String TABLE_IDENTIFICATION_REFERENCE = "produitidentification";
 
         public static final String CLE_COL_CODE_PRODUIT = "codeProduit";
         public static final int NUM_COL_CODE_PRODUIT = 1;

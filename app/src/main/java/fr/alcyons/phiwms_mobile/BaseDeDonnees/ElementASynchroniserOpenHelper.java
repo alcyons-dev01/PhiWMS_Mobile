@@ -41,6 +41,7 @@ import fr.alcyons.phiwms_mobile.Classes.PH_Reliquat;
 import fr.alcyons.phiwms_mobile.Classes.PH_Serialisation;
 import fr.alcyons.phiwms_mobile.Classes.PH_Utiliser;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.Classes.Produit_Identification;
 import fr.alcyons.phiwms_mobile.Classes.Produit_Place;
 import fr.alcyons.phiwms_mobile.Classes.Retour;
 import fr.alcyons.phiwms_mobile.Classes.Retour_Ligne;
@@ -159,6 +160,9 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                 break;
             case ProduitPlaceOpenHelper.Constantes.TABLE_PRODUIT_PLACE:
                 url += ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriProduitPlace;
+                break;
+            case Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE:
+                url += ParametresServeurOpenHelper.getPartieCommuneUrls(db) + Urls.uriProduitIdentification;
                 break;
         }
         return url;
@@ -421,6 +425,17 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                         body.put("ProduitPlace", produitPlaceJSON);
                     }
                     break;
+                case Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE:
+                    Produit_Identification produitIdentification = Produit_IdentificationOpenHelper.getProduitIdentificationByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
+                    if (produitIdentification == null) {
+                        // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
+                        return;
+                    }
+                    JSONObject produitIdentificationJSON = produitIdentification.toJson();
+                    if (produitIdentificationJSON != null) {
+                        body.put("ProduitIdentification", produitIdentificationJSON);
+                    }
+                    break;
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -547,6 +562,10 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                             case ProduitPlaceOpenHelper.Constantes.TABLE_PRODUIT_PLACE:
                                 rowId = nbResultats;
                                 break;
+                            case Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE:
+                                contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, nouvelId);
+                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + element.getIdDansTableConcernee(), null);
+                                break;
                         }
                         if (rowId == -1) {
                             Alerte.afficherAlerte(context, "Erreur", "Une erreur réseau est survenue. Votre action sera exécuté ultérieurement (erreur MAJ synchronisationEdit : "+element.getTableConcernee()+")", "alerte");
@@ -660,6 +679,9 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                     break;
                 case StockUtilisesOpenHelper.Constantes.TABLE_STOCK_UTILISE:
                     body.put("stock_utilises", listeId);
+                    break;
+                case Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE:
+                    body.put("ProduitIdentification", listeId);
                     break;
             }
         } catch (JSONException e) {

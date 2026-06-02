@@ -50,6 +50,7 @@ import java.util.Locale
                 code = idreference
             } else {
                 codeinconnu = coderecue
+                type = "Inconnu"
             }
 
             var mapRetourner = HashMap<String, String>()

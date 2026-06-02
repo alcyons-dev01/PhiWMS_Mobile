@@ -18,6 +18,7 @@ import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
 import fr.alcyons.phiwms_mobile.Interfaces.ScanDebounce
+import fr.alcyons.phiwms_mobile.Interfaces.ScannerControllable
 import fr.alcyons.phiwms_mobile.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +27,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ScannerFragment : Fragment(), ScanDebounce
+class ScannerFragment : Fragment(), ScanDebounce, ScannerControllable
 {
 
     private lateinit var barcodeView: DecoratedBarcodeView
@@ -34,10 +35,12 @@ class ScannerFragment : Fragment(), ScanDebounce
     private lateinit var btnActiveSon: ImageButton
     private lateinit var btnInactiveSon: ImageButton
     private lateinit var btnClose: ImageButton
+    private lateinit var viewBtnClose: View
     private lateinit var layoutFondValidation : LinearLayout
 
     private var flashOn = false
     private var isSoundOn = true
+    override var btnCloseVisible: Boolean = true
     private var type = ""
     private var part1: String? = null
     private var part1Time: Long = 0L
@@ -70,7 +73,11 @@ class ScannerFragment : Fragment(), ScanDebounce
         btnActiveSon  = view.findViewById(R.id.btnActiveSon)
         btnInactiveSon= view.findViewById(R.id.btnInactiveSon)
         btnClose      = view.findViewById(R.id.btnClose)
+        viewBtnClose  = view.findViewById(R.id.viewBtnClose)
         layoutFondValidation = view.findViewById(R.id.layoutFondValidation)
+
+        btnClose.visibility = if (btnCloseVisible) View.VISIBLE else View.GONE
+        viewBtnClose.visibility = if (btnCloseVisible) View.VISIBLE else View.GONE
 
         btnClose.setOnClickListener { onCloseRequested?.invoke() }
 
@@ -171,6 +178,10 @@ class ScannerFragment : Fragment(), ScanDebounce
         if ((c.startsWith("01") || c.startsWith("02")) && c.length > 16) return true
         if (looksLikeHibc(c)) return true
         return false
+    }
+
+    override fun masquerBtnClose() {
+        view?.findViewById<ImageButton>(R.id.btnClose)?.visibility = View.GONE
     }
 
     override fun onResume()  { super.onResume();  barcodeView.resume() }

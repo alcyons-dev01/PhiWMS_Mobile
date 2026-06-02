@@ -703,10 +703,13 @@ public class ProduitOpenHelper extends DBOpenHelper {
                                         listeProduits.add(new Produit(produitJSONArray.getJSONObject(i)));
                                     }
 
-                                    JSONArray produitIdentificationJSONArray = response.getJSONArray("Produits_Identification");
                                     final List<Produit_Identification> listeProduitsIdentification = new ArrayList<>();
-                                    for (int i = 0; i < produitIdentificationJSONArray.length(); i++) {
-                                        listeProduitsIdentification.add(new Produit_Identification(produitIdentificationJSONArray.getJSONObject(i)));
+                                    if(response.has("Produits_Identification"))
+                                    {
+                                        JSONArray produitIdentificationJSONArray = response.getJSONArray("Produits_Identification");
+                                        for (int i = 0; i < produitIdentificationJSONArray.length(); i++) {
+                                            listeProduitsIdentification.add(new Produit_Identification(produitIdentificationJSONArray.getJSONObject(i)));
+                                        }
                                     }
 
                                     final int finalResultCount = resultCount;
@@ -718,6 +721,7 @@ public class ProduitOpenHelper extends DBOpenHelper {
                                         int compteurReussite = 0;
 
                                         viderTableProduit(db);
+                                        Produit_IdentificationOpenHelper.viderTableIdentificationReference(db);
 
                                         SQLiteStatement stmt = db.compileStatement(
                                                 "INSERT INTO " + Constantes.TABLE_PRODUIT + " ("
@@ -1025,9 +1029,9 @@ public class ProduitOpenHelper extends DBOpenHelper {
                                             for (Produit_Identification produitIdentification : listeProduitsIdentification) {
                                                 stmtProduitIdentification.clearBindings();
                                                 stmtProduitIdentification.bindDouble(1,produitIdentification.getCodeProduit());
-                                                bindStringOrNull(stmt, 2, produitIdentification.getIdentification());
-                                                bindStringOrNull(stmt, 3, produitIdentification.getTypeCode());
-                                                bindStringOrNull(stmt, 4, produitIdentification.getNatureIdentification());
+                                                bindStringOrNull(stmtProduitIdentification, 2, produitIdentification.getIdentification());
+                                                bindStringOrNull(stmtProduitIdentification, 3, produitIdentification.getTypeCode());
+                                                bindStringOrNull(stmtProduitIdentification, 4, produitIdentification.getNatureIdentification());
                                                 stmtProduitIdentification.bindDouble(5, produitIdentification.getEtablissementUID());
 
                                                 stmtProduitIdentification.executeInsert();
@@ -1041,6 +1045,7 @@ public class ProduitOpenHelper extends DBOpenHelper {
                                         } finally {
                                             db.endTransaction();
                                             stmt.close();
+                                            stmtProduitIdentification.close();
                                         }
 
                                         if (finalResultCount != compteurReussite) {

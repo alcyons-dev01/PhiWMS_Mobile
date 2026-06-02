@@ -302,6 +302,7 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         public static final String uriImprimanteEtiquette = "imprimanteEtiquette/";
         public static final String uriStockUtilises = "stock_utilises/";
         public static final String uriProduitPlace = "produitplace/";
+        public static final String uriProduitIdentification = "produitidentification/";
     }
 
     public static class ActionsEAS {
