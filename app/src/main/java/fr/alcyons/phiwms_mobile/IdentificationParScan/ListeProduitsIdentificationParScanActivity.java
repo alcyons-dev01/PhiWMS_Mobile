@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.Produit_IdentificationOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Produit_IdentificationParScanAdapter;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
@@ -83,11 +84,12 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
             }
         });
 
-        int nombreProduitIdentifier = ProduitOpenHelper.getNbProduitIdentifier(db);
-        int nombreProduitNonIdentifier = ProduitOpenHelper.getNbProduitNonIdentifier(db);
+        int nbProduitBase = ProduitOpenHelper.getNbProduit(db);
+        int nbProduitIdentifierDistinct = Produit_IdentificationOpenHelper.getNbProduitIdentifier(db);
 
-        ((TextView) findViewById(R.id.nbIdentifier)).setText(String.valueOf(nombreProduitIdentifier));
-        ((TextView) findViewById(R.id.nbNonIdentifier)).setText(String.valueOf(nombreProduitNonIdentifier));
+
+        ((TextView) findViewById(R.id.nbIdentifier)).setText(String.valueOf(nbProduitIdentifierDistinct));
+        ((TextView) findViewById(R.id.nbNonIdentifier)).setText(String.valueOf(nbProduitBase - nbProduitIdentifierDistinct));
 
         ((LinearLayout) findViewById(R.id.linearProduitIdentifie)).setOnClickListener(v -> {
             listeAAfficher = ProduitOpenHelper.getProduitsIdentifier(db);

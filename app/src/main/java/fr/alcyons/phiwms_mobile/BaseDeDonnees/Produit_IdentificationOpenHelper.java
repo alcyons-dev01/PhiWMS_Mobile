@@ -105,6 +105,16 @@ public class Produit_IdentificationOpenHelper extends DBOpenHelper {
         return produitIdentification;
     }
 
+    public static int getNbProduitIdentifier(SQLiteDatabase db) {
+        int nbProduit = 0;
+        Cursor cursor = db.rawQuery(" SELECT DISTINCT("+Constantes.CLE_COL_CODE_PRODUIT+") FROM " + Constantes.TABLE_IDENTIFICATION_REFERENCE, new String[]{});
+
+        nbProduit = cursor.getCount();
+        cursor.close();
+        cursor = null;
+        return nbProduit;
+    }
+
     public static void viderTableIdentificationReference(SQLiteDatabase db) {
         db.delete(Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE, null, null);
     }
