@@ -1,5 +1,6 @@
 package fr.alcyons.phiwms_mobile.IdentificationParScan
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -13,15 +14,20 @@ import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Produit_IdentificationOpenHelper
+import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur
+import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne
 import fr.alcyons.phiwms_mobile.Classes.Produit
 import fr.alcyons.phiwms_mobile.Classes.Produit_Identification
 import fr.alcyons.phiwms_mobile.Fragment.ScannerFragment
@@ -35,7 +41,9 @@ import fr.alcyons.phiwms_mobile.Services.ServiceIdentificationParScanActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import androidx.core.graphics.drawable.toDrawable
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Random
 
 class DetailIdentificationParScan : ServiceActivity() {
 
@@ -277,6 +285,48 @@ class DetailIdentificationParScan : ServiceActivity() {
                 nouvelleIdentification.phiwms_mobileUUID,
                 DBOpenHelper.ActionsEAS.AJOUT
             )
+
+            /**
+             * Gestion de l'action utilisateur
+             */
+            val random: Random? = Random()
+            var actionId = random!!.nextInt()
+            if (actionId > 0) actionId = actionId * -1
+            @SuppressLint("SimpleDateFormat") val parseFormat =
+                SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+            val date = Date()
+            val date_string = parseFormat.format(date)
+            val new_action_utilisateur = ActionUtilisateur(
+                actionId,
+                utilisateurConnecte.id,
+                date_string,
+                serviceActuel.id,
+                utilisateurConnecte.etablissementId,
+                "En attente",
+                nouvelleIdentification.phiwms_mobileUUID,
+                "",
+                "ProduitIdentification"
+            )
+            ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur)
+
+            val randomactionligne = Random()
+            var actionligneId = randomactionligne.nextInt()
+            if (actionligneId > 0) actionligneId = actionligneId * -1
+            val actionUtilisateur_ligne = ActionUtilisateur_Ligne(
+                actionligneId,
+                new_action_utilisateur.id,
+                "Produit_Identification",
+                nouvelleIdentification.phiwms_mobileUUID,
+                "",
+                0,
+                0,
+                produitCourant.designation_interne
+            )
+            ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(
+                db,
+                actionUtilisateur_ligne
+            )
+
             ElementASynchroniserOpenHelper.toutSynchroniser(this@DetailIdentificationParScan, db, utilisateurConnecte, false)
 
 
