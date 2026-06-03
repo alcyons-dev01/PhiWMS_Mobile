@@ -285,6 +285,7 @@ class DetailIdentificationParScan : ServiceActivity() {
                 nouvelleIdentification.phiwms_mobileUUID,
                 DBOpenHelper.ActionsEAS.AJOUT
             )
+            ElementASynchroniserOpenHelper.toutSynchroniser(this@DetailIdentificationParScan, db, utilisateurConnecte, false)
 
             /**
              * Gestion de l'action utilisateur
@@ -307,6 +308,7 @@ class DetailIdentificationParScan : ServiceActivity() {
                 "",
                 "ProduitIdentification"
             )
+
             ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur)
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
                 db,
@@ -315,7 +317,6 @@ class DetailIdentificationParScan : ServiceActivity() {
                 new_action_utilisateur.id,
                 DBOpenHelper.ActionsEAS.AJOUT
             )
-
 
             val randomactionligne = Random()
             var actionligneId = randomactionligne.nextInt()
