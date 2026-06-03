@@ -209,7 +209,7 @@ class DetailIdentificationParScan : ServiceActivity() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             Produit_IdentificationOpenHelper.supprimerUneIdentificationEnBDD(db, item)
-            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE,item.phiwms_mobileUUID,item.phiwms_mobileUUID, DBOpenHelper.ActionsEAS.SUPPR)
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE,item.phiwms_mobileUUID,item.idPhiWMS, DBOpenHelper.ActionsEAS.SUPPR)
             ElementASynchroniserOpenHelper.toutSynchroniser(this@DetailIdentificationParScan, db, utilisateurConnecte, false)
             withContext(Dispatchers.Main) {
                 identificationAdapter.retirerItem(position)

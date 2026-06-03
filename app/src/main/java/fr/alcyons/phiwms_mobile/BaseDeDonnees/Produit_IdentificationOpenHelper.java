@@ -127,6 +127,7 @@ public class Produit_IdentificationOpenHelper extends DBOpenHelper {
         contentValues.put(Produit_IdentificationOpenHelper.Constantes.CLE_COL_TYPE_CODE, produitIdentification.getTypeCode());
         contentValues.put(Produit_IdentificationOpenHelper.Constantes.CLE_COL_NATURE_IDENTIFICATION, produitIdentification.getNatureIdentification());
         contentValues.put(Produit_IdentificationOpenHelper.Constantes.CLE_COL_ETABLISSEMENT_UID, produitIdentification.getEtablissementUID());
+        contentValues.put(Constantes.CLE_COL_ID_PHIWMS, produitIdentification.getIdPhiWMS());
 
         // Insertion du dépot en BDD
         long rowId = db.insert(Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE, null, contentValues);
@@ -336,6 +337,10 @@ public class Produit_IdentificationOpenHelper extends DBOpenHelper {
         public static final int NUM_COL_ETABLISSEMENT_UID = 5;
         public static final String TYPE_COL_ETABLISSEMENT_UID = "INTEGER";
 
+        public static final String CLE_COL_ID_PHIWMS = "idPhiWMS";
+        public static final int NUM_COL_ID_PHIWMS = 6;
+        public static final String TYPE_COL_ID_PHIWMS = "INTEGER";
+
         public static final String CREATION_TABLE_PRODUIT_IDENTIFICATION = "CREATE TABLE "
                 + Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE + "("
                 + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " " + DBOpenHelper.Constantes.TYPE_COL_phiwms_mobileUUID + " PRIMARY KEY,"
@@ -343,7 +348,8 @@ public class Produit_IdentificationOpenHelper extends DBOpenHelper {
                 + Produit_IdentificationOpenHelper.Constantes.CLE_COL_IDENTIFICATION + " " + Produit_IdentificationOpenHelper.Constantes.TYPE_COL_IDENTIFICATION + ","
                 + Produit_IdentificationOpenHelper.Constantes.CLE_COL_TYPE_CODE + " " + Produit_IdentificationOpenHelper.Constantes.TYPE_COL_TYPE_CODE + ","
                 + Produit_IdentificationOpenHelper.Constantes.CLE_COL_NATURE_IDENTIFICATION + " " + Produit_IdentificationOpenHelper.Constantes.TYPE_COL_NATURE_IDENTIFICATION + ","
-                + Produit_IdentificationOpenHelper.Constantes.CLE_COL_ETABLISSEMENT_UID + " " + Produit_IdentificationOpenHelper.Constantes.TYPE_COL_ETABLISSEMENT_UID
+                + Produit_IdentificationOpenHelper.Constantes.CLE_COL_ETABLISSEMENT_UID + " " + Produit_IdentificationOpenHelper.Constantes.TYPE_COL_ETABLISSEMENT_UID + ","
+                + Produit_IdentificationOpenHelper.Constantes.CLE_COL_ID_PHIWMS + " " + Produit_IdentificationOpenHelper.Constantes.TYPE_COL_ID_PHIWMS
                 + ");";
     }
 }

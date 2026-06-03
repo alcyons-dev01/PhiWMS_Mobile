@@ -17,6 +17,7 @@ public class Produit_Identification implements Serializable, Comparable {
     private String typeCode;
     private String natureIdentification;
     private int etablissementUID;
+    private int idPhiWMS;
     private int phiwms_mobileUUID = -1;
 
     public Produit_Identification(int codeProduit, String identification, String typeCode, String natureIdentification, int etablissementUID, int phiwms_mobileUUID) {
@@ -34,6 +35,7 @@ public class Produit_Identification implements Serializable, Comparable {
         this.typeCode = produitIdentificationJson.optString("typeCode");
         this.natureIdentification = produitIdentificationJson.optString("natureIdentification");
         this.etablissementUID = produitIdentificationJson.optInt("Etablissement_UID");
+        this.idPhiWMS = produitIdentificationJson.optInt("idPhiWMS");
     }
 
     public Produit_Identification(Cursor cursor) {
@@ -42,7 +44,7 @@ public class Produit_Identification implements Serializable, Comparable {
         this.typeCode = cursor.getString(Produit_IdentificationOpenHelper.Constantes.NUM_COL_TYPE_CODE);
         this.natureIdentification = cursor.getString(Produit_IdentificationOpenHelper.Constantes.NUM_COL_NATURE_IDENTIFICATION);
         this.etablissementUID = cursor.getInt(Produit_IdentificationOpenHelper.Constantes.NUM_COL_ETABLISSEMENT_UID);
-
+        this.idPhiWMS = cursor.getInt(Produit_IdentificationOpenHelper.Constantes.NUM_COL_ID_PHIWMS);
         this.phiwms_mobileUUID = cursor.getInt(DBOpenHelper.Constantes.NUM_COL_phiwms_mobileUUID);
     }
 
@@ -92,6 +94,14 @@ public class Produit_Identification implements Serializable, Comparable {
 
     public void setPhiwms_mobileUUID(int phiwms_mobileUUID) {
         this.phiwms_mobileUUID = phiwms_mobileUUID;
+    }
+
+    public int getIdPhiWMS() {
+        return idPhiWMS;
+    }
+
+    public void setIdPhiWMS(int idPhiWMS) {
+        this.idPhiWMS = idPhiWMS;
     }
 
     public JSONObject toJson() {

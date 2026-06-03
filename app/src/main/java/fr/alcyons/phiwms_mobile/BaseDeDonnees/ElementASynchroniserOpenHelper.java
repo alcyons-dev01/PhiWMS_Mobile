@@ -570,6 +570,8 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                             case Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE:
                                 contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, nouvelId);
                                 rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + element.getIdDansTableConcernee(), null);
+                                contentValues.put(Produit_IdentificationOpenHelper.Constantes.CLE_COL_ID_PHIWMS, nouvelId);
+                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + element.getIdDansTableConcernee(), null);
 
                                 //Création de l'action utilisateur
                                 Random random= new Random();

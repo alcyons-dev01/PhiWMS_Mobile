@@ -872,8 +872,9 @@ public class ProduitOpenHelper extends DBOpenHelper {
                                                         + Produit_IdentificationOpenHelper.Constantes.CLE_COL_IDENTIFICATION + ","
                                                         + Produit_IdentificationOpenHelper.Constantes.CLE_COL_TYPE_CODE + ","
                                                         + Produit_IdentificationOpenHelper.Constantes.CLE_COL_NATURE_IDENTIFICATION + ","
-                                                        + Produit_IdentificationOpenHelper.Constantes.CLE_COL_ETABLISSEMENT_UID
-                                                        + ") VALUES (?,?,?,?,?)"
+                                                        + Produit_IdentificationOpenHelper.Constantes.CLE_COL_ETABLISSEMENT_UID + ","
+                                                        + Produit_IdentificationOpenHelper.Constantes.CLE_COL_ID_PHIWMS
+                                                        + ") VALUES (?,?,?,?,?,?)"
 
                                         );
 
@@ -1033,6 +1034,7 @@ public class ProduitOpenHelper extends DBOpenHelper {
                                                 bindStringOrNull(stmtProduitIdentification, 3, produitIdentification.getTypeCode());
                                                 bindStringOrNull(stmtProduitIdentification, 4, produitIdentification.getNatureIdentification());
                                                 stmtProduitIdentification.bindDouble(5, produitIdentification.getEtablissementUID());
+                                                stmtProduitIdentification.bindDouble(6, produitIdentification.getIdPhiWMS());
 
                                                 stmtProduitIdentification.executeInsert();
                                             }

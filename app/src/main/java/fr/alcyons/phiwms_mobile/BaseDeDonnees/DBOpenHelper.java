@@ -199,6 +199,12 @@ public class DBOpenHelper extends SQLiteOpenHelper implements Serializable {
         if (ProduitIdentificationExisteCursor.getCount() == 0) {
             db.execSQL(Produit_IdentificationOpenHelper.Constantes.CREATION_TABLE_PRODUIT_IDENTIFICATION);
         }
+
+        Cursor idPhiWMSProduitIdentifierCursor = db.rawQuery("SELECT * FROM " + Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE, null);
+        int idPhiWMSProduitIdentifierColumn = idPhiWMSProduitIdentifierCursor.getColumnIndex("idPhiWMS");
+        if (idPhiWMSProduitIdentifierColumn < 0) {
+            db.execSQL("ALTER TABLE " + Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE + " ADD COLUMN idPhiWMS INTEGER");
+        }
     }
 
     public SQLiteDatabase
