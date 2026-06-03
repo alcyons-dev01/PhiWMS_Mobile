@@ -308,6 +308,14 @@ class DetailIdentificationParScan : ServiceActivity() {
                 "ProduitIdentification"
             )
             ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur)
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
+                db,
+                ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR,
+                new_action_utilisateur.phiMR4UUID,
+                new_action_utilisateur.id,
+                DBOpenHelper.ActionsEAS.AJOUT
+            )
+
 
             val randomactionligne = Random()
             var actionligneId = randomactionligne.nextInt()
