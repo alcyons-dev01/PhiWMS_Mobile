@@ -103,6 +103,8 @@ class DetailFragment : Fragment() {
         val quantiteCompteeET = view.findViewById<EditText>(R.id.quantiteComptee_ET)
 
         var emplacementCourant = reliquatBase.emplacement
+        if(emplacementCourant == "null")
+            emplacementCourant = "RECEPTION"
         val emplacementAutoComplete = view.findViewById<AutoCompleteTextView>(R.id.emplacementLot_TV)
         val chevronEmplacement = view.findViewById<ImageView>(R.id.chevronEmplacement)
 
@@ -113,10 +115,10 @@ class DetailFragment : Fragment() {
         {
             listeEmplacements = EmplacementOpenHelper.getNomEmplacementsParZone(db, zoneCourante)
             if(listeEmplacements.isEmpty())
-                listeEmplacements.add("")
+                listeEmplacements.add("RECEPTION")
         }
         else
-            listeEmplacements.add("")
+            listeEmplacements.add("RECEPTION")
 
         val adapter = ArrayAdapter(requireContext(), R.layout.spinner_item_depot, listeEmplacements)
         emplacementAutoComplete.setAdapter(adapter)
@@ -149,7 +151,7 @@ class DetailFragment : Fragment() {
         //gestion des données
         if(emplacementCourant != "")
         {
-            view.findViewById<AutoCompleteTextView>(R.id.emplacementLot_TV).setText(reliquatBase.emplacement)
+            view.findViewById<AutoCompleteTextView>(R.id.emplacementLot_TV).setText(emplacementCourant)
         }
         else if(produit.emplacement_PUI_Defaut != "")
         {
