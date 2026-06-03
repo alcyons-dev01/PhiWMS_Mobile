@@ -286,59 +286,7 @@ class DetailIdentificationParScan : ServiceActivity() {
                 DBOpenHelper.ActionsEAS.AJOUT
             )
             ElementASynchroniserOpenHelper.toutSynchroniser(this@DetailIdentificationParScan, db, utilisateurConnecte, false)
-
-            /**
-             * Gestion de l'action utilisateur
-             */
-            val random: Random? = Random()
-            var actionId = random!!.nextInt()
-            if (actionId > 0) actionId = actionId * -1
-            @SuppressLint("SimpleDateFormat") val parseFormat =
-                SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-            val date = Date()
-            val date_string = parseFormat.format(date)
-            val new_action_utilisateur = ActionUtilisateur(
-                actionId,
-                utilisateurConnecte.id,
-                date_string,
-                serviceActuel.id,
-                utilisateurConnecte.etablissementId,
-                "En attente",
-                nouvelleIdentification.phiwms_mobileUUID,
-                "",
-                "ProduitIdentification"
-            )
-
-            ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur)
-            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
-                db,
-                ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR,
-                new_action_utilisateur.phiMR4UUID,
-                new_action_utilisateur.id,
-                DBOpenHelper.ActionsEAS.AJOUT
-            )
-
-            val randomactionligne = Random()
-            var actionligneId = randomactionligne.nextInt()
-            if (actionligneId > 0) actionligneId = actionligneId * -1
-            val actionUtilisateur_ligne = ActionUtilisateur_Ligne(
-                actionligneId,
-                new_action_utilisateur.id,
-                "Produit_Identification",
-                nouvelleIdentification.phiwms_mobileUUID,
-                "",
-                0,
-                0,
-                produitCourant.designation_interne
-            )
-            ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(
-                db,
-                actionUtilisateur_ligne
-            )
-
-            ElementASynchroniserOpenHelper.toutSynchroniser(this@DetailIdentificationParScan, db, utilisateurConnecte, false)
-
-
+            
             if (rowId != -1L) {
                 withContext(Dispatchers.Main) {
                     identificationAdapter.ajouterItem(nouvelleIdentification)

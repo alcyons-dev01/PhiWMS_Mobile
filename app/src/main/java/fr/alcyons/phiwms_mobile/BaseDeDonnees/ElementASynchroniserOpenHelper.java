@@ -1,5 +1,6 @@
 package fr.alcyons.phiwms_mobile.BaseDeDonnees;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.ContentValues;
 import android.content.Context;
@@ -17,14 +18,18 @@ import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.api.client.util.DateTime;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur;
 import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne;
@@ -565,6 +570,56 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                             case Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE:
                                 contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, nouvelId);
                                 rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + element.getIdDansTableConcernee(), null);
+
+                                Service serviceActuel = ServiceOpenHelper.getServiceByName(db, "Identification par scan");
+                                //Création de l'action utilisateur
+                                Random random= new Random();
+                                int actionId = random.nextInt();
+                                if (actionId > 0) actionId = actionId * -1;
+                                SimpleDateFormat parseFormat =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                Date date = new Date();
+                                String date_string = parseFormat.format(date);
+                                ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(
+                                        actionId,
+                                        utilisateur.getId(),
+                                        date_string,
+                                        serviceActuel.getId(),
+                                        utilisateur.getEtablissementId(),
+                                        "En attente",
+                                        nouvelId,
+                                        "",
+                                        "ProduitIdentification"
+                                );
+
+                                ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
+                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
+                                        db,
+                                        ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR,
+                                        new_action_utilisateur.getPhiMR4UUID(),
+                                        new_action_utilisateur.getId(),
+                                        DBOpenHelper.ActionsEAS.AJOUT
+                                );
+
+                                Produit_Identification produitIdentification = Produit_IdentificationOpenHelper.getProduitIdentificationByphiwms_mobileUUID(db, nouvelId);
+                                Produit produit = ProduitOpenHelper.getProduitByID(db, produitIdentification.getCodeProduit());
+                                int actionligneId = random.nextInt();
+                                if (actionligneId > 0) actionligneId = actionligneId * -1;
+                                ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(
+                                        actionligneId,
+                                        new_action_utilisateur.getId(),
+                                        "Produit_Identification",
+                                        nouvelId,
+                                        "",
+                                        0,
+                                        0,
+                                        produit.getDesignation_interne()
+                                );
+                                ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(
+                                        db,
+                                        actionUtilisateur_ligne
+                                );
+
+                                toutSynchroniser(context, db, utilisateur, false);
                                 break;
                         }
                         if (rowId == -1) {
