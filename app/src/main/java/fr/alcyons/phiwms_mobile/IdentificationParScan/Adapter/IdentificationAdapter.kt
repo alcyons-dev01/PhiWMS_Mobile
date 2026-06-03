@@ -37,7 +37,7 @@ class IdentificationAdapter(
         holder.natureLabel.text        = item.natureIdentification?.uppercase() ?: "INCONNU"
 
         when (item.natureIdentification?.uppercase()) {
-            "CARTON" -> {
+            "CONDITIONNEMENT" -> {
                 holder.badgeNature.setBackgroundResource(R.drawable.badge_nature_carton)
                 holder.iconeNature.setImageResource(R.drawable.ic_colis)
             }

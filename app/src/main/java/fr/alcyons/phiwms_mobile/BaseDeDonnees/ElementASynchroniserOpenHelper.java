@@ -571,7 +571,6 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                                 contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, nouvelId);
                                 rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + element.getIdDansTableConcernee(), null);
 
-                                Service serviceActuel = ServiceOpenHelper.getServiceByName(db, "Identification par scan");
                                 //Création de l'action utilisateur
                                 Random random= new Random();
                                 int actionId = random.nextInt();
@@ -583,7 +582,7 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                                         actionId,
                                         utilisateur.getId(),
                                         date_string,
-                                        serviceActuel.getId(),
+                                        0,
                                         utilisateur.getEtablissementId(),
                                         "En attente",
                                         nouvelId,

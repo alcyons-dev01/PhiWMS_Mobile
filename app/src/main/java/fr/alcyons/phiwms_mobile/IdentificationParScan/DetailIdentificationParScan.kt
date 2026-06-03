@@ -262,7 +262,7 @@ class DetailIdentificationParScan : ServiceActivity() {
      */
     private fun validerCode(code: String, isCarton: Boolean) {
         lifecycleScope.launch(Dispatchers.IO) {
-            val natureIdentification = if (isCarton) "Carton" else "Unitaire"
+            val natureIdentification = if (isCarton) "Conditionnement" else "Unitaire"
 
             val nouvelleIdentification = Produit_Identification(
                 produitCourant.iD_produit,
@@ -385,8 +385,6 @@ class DetailIdentificationParScan : ServiceActivity() {
                         GestionCodeScanne.decoupageCode(code)
                     val codeIdentification = resultDecoupage["code"]
                     typecodeidentification = resultDecoupage["type"]
-                    if(typecodeidentification == "GS1")
-                        typecodeidentification = "GTIN"
 
                     val produitIdentifier: List<Produit> =
                         ProduitOpenHelper.getProduitsByIdentification(db, codeIdentification)
