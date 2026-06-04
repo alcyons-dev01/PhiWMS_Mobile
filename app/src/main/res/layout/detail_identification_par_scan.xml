@@ -100,200 +100,227 @@
                         android:layout_marginVertical="4dp"
                         android:background="@color/bleu_clair_alcyons_transparent" />
 
-                    <!-- Catégorie -->
-                    <LinearLayout
-                        android:id="@+id/zoneCategorie"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:minHeight="28dp">
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Catégorie"
-                            android:textColor="@color/bleu_fonce_alcyons"
-                            android:textSize="10sp"
-                            android:alpha="0.6"
-                            android:gravity="center_vertical" />
-
-                        <TextView
-                            android:id="@+id/categorie"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text=""
-                            android:textColor="@color/bleu_fonce_alcyons"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:maxLines="1"
-                            android:ellipsize="end"
-                            android:gravity="end|center_vertical" />
-
-                    </LinearLayout>
-
-                    <View
-                        android:id="@+id/separateurCategorie"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="4dp"
-                        android:background="@color/bleu_clair_alcyons_transparent" />
 
                     <LinearLayout
-                        android:id="@+id/zoneConditionnement"
+                        android:id="@+id/zoneDetailsProduit"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:visibility="visible"
-                        android:gravity="center_vertical"
-                        android:minHeight="28dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="horizontal"
-                            android:layout_gravity="center_vertical">
-
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:src="@drawable/ic_colis"
-                                android:layout_gravity="center_vertical"/>
-
-                            <TextView
-                                android:id="@+id/condAchat"
-                                android:layout_width="0dp"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+                            <!-- Catégorie -->
+                            <LinearLayout
+                                android:id="@+id/zoneCategorie"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text=""
-                                android:textColor="@color/bleu_fonce_alcyons"
-                                android:textSize="15sp"
-                                android:textStyle="bold"
-                                android:maxLines="1"
-                                android:paddingLeft="4dp"
-                                android:ellipsize="end"/>
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:minHeight="28dp">
 
-                        </LinearLayout>
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Catégorie"
+                                    android:textColor="@color/bleu_fonce_alcyons"
+                                    android:textSize="10sp"
+                                    android:alpha="0.6"
+                                    android:gravity="center_vertical" />
 
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="horizontal"
-                            android:gravity="end|right"
-                            android:layout_gravity="right|center_vertical">
+                                <TextView
+                                    android:id="@+id/categorie"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text=""
+                                    android:textColor="@color/bleu_fonce_alcyons"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold"
+                                    android:maxLines="1"
+                                    android:ellipsize="end"
+                                    android:gravity="end|center_vertical" />
 
-                            <TextView
-                                android:id="@+id/condDistrib"
-                                android:layout_width="0dp"
+                            </LinearLayout>
+
+                            <View
+                                android:id="@+id/separateurCategorie"
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginVertical="4dp"
+                                android:background="@color/bleu_clair_alcyons_transparent" />
+
+                            <LinearLayout
+                                android:id="@+id/zoneConditionnement"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text=""
-                                android:textColor="@color/bleu_fonce_alcyons"
-                                android:textSize="15sp"
-                                android:textStyle="bold"
-                                android:maxLines="1"
-                                android:ellipsize="end"
-                                android:paddingRight="4dp"
-                                android:gravity="end|center_vertical" />
+                                android:orientation="horizontal"
+                                android:visibility="visible"
+                                android:gravity="center_vertical"
+                                android:minHeight="28dp">
 
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:src="@drawable/icon_produit"
-                                android:layout_gravity="center_vertical"/>
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="horizontal"
+                                    android:layout_gravity="center_vertical">
 
-                        </LinearLayout>
+                                    <ImageView
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:src="@drawable/ic_colis"
+                                        android:layout_gravity="center_vertical"/>
 
+                                    <TextView
+                                        android:id="@+id/condAchat"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text=""
+                                        android:textColor="@color/bleu_fonce_alcyons"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold"
+                                        android:maxLines="1"
+                                        android:paddingLeft="4dp"
+                                        android:ellipsize="end"/>
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="horizontal"
+                                    android:gravity="end|right"
+                                    android:layout_gravity="right|center_vertical">
+
+                                    <TextView
+                                        android:id="@+id/condDistrib"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text=""
+                                        android:textColor="@color/bleu_fonce_alcyons"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold"
+                                        android:maxLines="1"
+                                        android:ellipsize="end"
+                                        android:paddingRight="4dp"
+                                        android:gravity="end|center_vertical" />
+
+                                    <ImageView
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:src="@drawable/icon_produit"
+                                        android:layout_gravity="center_vertical"/>
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <View
+                                android:id="@+id/separateurConditionnement"
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginVertical="4dp"
+                                android:background="@color/bleu_clair_alcyons_transparent" />
+
+                            <!-- Classe ATC -->
+                            <LinearLayout
+                                android:id="@+id/zoneClassATC"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:visibility="visible"
+                                android:gravity="center_vertical"
+                                android:minHeight="28dp">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Classe ATC"
+                                    android:textColor="@color/bleu_fonce_alcyons"
+                                    android:textSize="10sp"
+                                    android:alpha="0.6"
+                                    android:gravity="center_vertical" />
+
+                                <TextView
+                                    android:id="@+id/classATC"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text=""
+                                    android:textColor="@color/bleu_fonce_alcyons"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold"
+                                    android:maxLines="1"
+                                    android:ellipsize="end"
+                                    android:gravity="end|center_vertical" />
+
+                            </LinearLayout>
+
+                            <View
+                                android:id="@+id/separateurATC"
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginVertical="4dp"
+                                android:background="@color/bleu_clair_alcyons_transparent" />
+
+                            <!-- DCI -->
+                            <LinearLayout
+                                android:id="@+id/zoneDCI"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:visibility="visible"
+                                android:gravity="center_vertical"
+                                android:minHeight="28dp">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="DCI"
+                                    android:textColor="@color/bleu_fonce_alcyons"
+                                    android:textSize="10sp"
+                                    android:alpha="0.6"
+                                    android:gravity="center_vertical" />
+
+                                <TextView
+                                    android:id="@+id/dci"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text=""
+                                    android:textColor="@color/bleu_fonce_alcyons"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold"
+                                    android:maxLines="1"
+                                    android:ellipsize="end"
+                                    android:gravity="end|center_vertical" />
+
+                            </LinearLayout>
                     </LinearLayout>
 
-                    <View
-                        android:id="@+id/separateurConditionnement"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="4dp"
-                        android:background="@color/bleu_clair_alcyons_transparent" />
 
-                    <!-- Classe ATC -->
                     <LinearLayout
-                        android:id="@+id/zoneClassATC"
+                        android:id="@+id/btnExpandProduit"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="32dp"
                         android:orientation="horizontal"
-                        android:visibility="visible"
-                        android:gravity="center_vertical"
-                        android:minHeight="28dp">
+                        android:gravity="center"
+                        android:background="?attr/selectableItemBackground">
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Classe ATC"
-                            android:textColor="@color/bleu_fonce_alcyons"
-                            android:textSize="10sp"
-                            android:alpha="0.6"
-                            android:gravity="center_vertical" />
-
-                        <TextView
-                            android:id="@+id/classATC"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text=""
-                            android:textColor="@color/bleu_fonce_alcyons"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:maxLines="1"
-                            android:ellipsize="end"
-                            android:gravity="end|center_vertical" />
+                        <ImageView
+                            android:id="@+id/iconeExpand"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_arrow_down"
+                            app:tint="@color/bleu_fonce_alcyons"
+                            android:scaleType="centerInside" />
 
                     </LinearLayout>
-
-                    <View
-                        android:id="@+id/separateurATC"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="4dp"
-                        android:background="@color/bleu_clair_alcyons_transparent" />
-
-                    <!-- DCI -->
-                    <LinearLayout
-                        android:id="@+id/zoneDCI"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:visibility="visible"
-                        android:gravity="center_vertical"
-                        android:minHeight="28dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="DCI"
-                            android:textColor="@color/bleu_fonce_alcyons"
-                            android:textSize="10sp"
-                            android:alpha="0.6"
-                            android:gravity="center_vertical" />
-
-                        <TextView
-                            android:id="@+id/dci"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text=""
-                            android:textColor="@color/bleu_fonce_alcyons"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:maxLines="1"
-                            android:ellipsize="end"
-                            android:gravity="end|center_vertical" />
-
-                    </LinearLayout>
-
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>

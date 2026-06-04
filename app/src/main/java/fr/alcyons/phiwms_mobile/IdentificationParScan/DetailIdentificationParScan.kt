@@ -90,6 +90,11 @@ class DetailIdentificationParScan : ServiceActivity() {
     private var positionEnAttenteSupression: Int = -1
     private var typecodeidentification: String? = ""
 
+    private lateinit var btnExpandProduit: LinearLayout
+    private lateinit var iconeExpand: ImageView
+    private lateinit var zoneDetailsProduit: LinearLayout
+    private var detailsProduitVisibles = false
+
     // ────────────────────────────────────────────────────────────
     // Cycle de vie
     // ────────────────────────────────────────────────────────────
@@ -109,6 +114,7 @@ class DetailIdentificationParScan : ServiceActivity() {
         )
 
         afficherProduit(produitCourant)
+        setupExpandProduit()
         chargerIdentificationsExistantes()
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -147,6 +153,9 @@ class DetailIdentificationParScan : ServiceActivity() {
         listeCodesIdentification = findViewById(R.id.listeCodesIdentification_RV)
         condAchat                = findViewById(R.id.condAchat)
         condDistrib              = findViewById(R.id.condDistrib)
+        btnExpandProduit         = findViewById(R.id.btnExpandProduit)
+        iconeExpand              = findViewById(R.id.iconeExpand)
+        zoneDetailsProduit       = findViewById(R.id.zoneDetailsProduit)
     }
 
     // ────────────────────────────────────────────────────────────
@@ -161,6 +170,19 @@ class DetailIdentificationParScan : ServiceActivity() {
         listeCodesIdentification.apply {
             layoutManager = LinearLayoutManager(this@DetailIdentificationParScan)
             adapter = identificationAdapter
+        }
+    }
+
+    private fun setupExpandProduit() {
+        btnExpandProduit.setOnClickListener {
+            detailsProduitVisibles = !detailsProduitVisibles
+
+            zoneDetailsProduit.visibility = if (detailsProduitVisibles) View.VISIBLE else View.GONE
+
+            iconeExpand.animate()
+                .rotation(if (detailsProduitVisibles) 180f else 0f)
+                .setDuration(200)
+                .start()
         }
     }
 
