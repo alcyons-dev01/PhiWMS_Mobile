@@ -7,8 +7,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.BaseColumns;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -55,6 +59,7 @@ import fr.alcyons.phiwms_mobile.Classes.StockUtilises;
 import fr.alcyons.phiwms_mobile.Classes.Stock_Lot_Emplacement_Light;
 import fr.alcyons.phiwms_mobile.Classes.TableTrace;
 import fr.alcyons.phiwms_mobile.Classes.Utilisateur;
+import fr.alcyons.phiwms_mobile.Interfaces.OnSynchronisationTerminee;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
 import fr.alcyons.phiwms_mobile.Outils.MedicalObjective;
 
@@ -602,6 +607,8 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                                 );
 
                                 Produit_Identification produitIdentification = Produit_IdentificationOpenHelper.getProduitIdentificationByphiwms_mobileUUID(db, nouvelId);
+                                produitIdentification.setIdPhiWMS(nouvelId);
+                                Produit_IdentificationOpenHelper.mettreAJourIdentificationReference(db, produitIdentification);
                                 Produit produit = ProduitOpenHelper.getProduitByID(db, produitIdentification.getCodeProduit());
                                 int actionligneId = random.nextInt();
                                 if (actionligneId > 0) actionligneId = actionligneId * -1;
@@ -864,5 +871,190 @@ public class ElementASynchroniserOpenHelper extends DBOpenHelper {
                 + CLE_COL_ID_ORIGINE_4D + " " + TYPE_COL_ID_ORIGINE_4D
                 + ");";
 
+    }
+
+
+    // Nouvelle surcharge avec callback
+    public static void toutSynchroniserAvecCallback(Context context, SQLiteDatabase db,
+                                                    Utilisateur utilisateur, boolean suppression,
+                                                    @Nullable OnSynchronisationTerminee callback) {
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_ELEMENT_A_SYNCHRONISER, null);
+        while (cursor.moveToNext()) {
+            ElementASynchroniser elementCourant = new ElementASynchroniser(cursor);
+            switch (elementCourant.getAction()) {
+                case ActionsEAS.AJOUT:
+                    // Callback uniquement pour TABLE_IDENTIFICATION_REFERENCE
+                    if (elementCourant.getTableConcernee().equals(
+                            Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE)) {
+                        editerElementEnBDDistanteAvecCallBack(context, db, elementCourant, utilisateur, suppression, callback);
+                    } else {
+                        editerElementEnBDDistanteAvecCallBack(context, db, elementCourant, utilisateur, suppression, null);
+                    }
+                    break;
+                case ActionsEAS.MAJ:
+                    editerElementEnBDDistanteAvecCallBack(context, db, elementCourant, utilisateur, suppression, null);
+                    break;
+                case ActionsEAS.SUPPR:
+                    supprimerElementASynchroniserBDDistante(context, db, elementCourant, utilisateur.getToken(), utilisateur);
+                    break;
+            }
+        }
+        cursor.close();
+        viderTableElementASynchroniser(db);
+    }
+
+    public static void editerElementEnBDDistanteAvecCallBack(Context context, SQLiteDatabase db,
+                                                 ElementASynchroniser element, Utilisateur utilisateur, boolean suppression,
+                                                 @Nullable OnSynchronisationTerminee callback) {
+
+        String urlRequete = getUrlTableConcernee(element.getTableConcernee(), db);
+        int ancien_id_action = 0;
+        if (element.getAction().equals(ActionsEAS.MAJ)) {
+            urlRequete += "update";
+        }
+        final RequestQueue requestQueue = Volley.newRequestQueue(context);
+
+        final JSONObject body = new JSONObject();
+        try {
+            switch (element.getTableConcernee()) {
+                case Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE:
+                    Produit_Identification produitIdentification = Produit_IdentificationOpenHelper.getProduitIdentificationByphiwms_mobileUUID(db, element.getIdDansTableConcernee());
+                    if (produitIdentification == null) {
+                        // Si on ne trouve pas l'élément en BD locale, c'est qu'il a déjà été supprimé localement, donc on empêche de tenter la modification
+                        return;
+                    }
+                    JSONObject produitIdentificationJSON = produitIdentification.toJson();
+                    if (produitIdentificationJSON != null) {
+                        body.put("ProduitIdentification", produitIdentificationJSON);
+                    }
+                    break;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        final int finalAncien_id_action = ancien_id_action;
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.POST, urlRequete, body, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    int nbResultats = response.getInt("resultCount");
+                    if (nbResultats == 1) {
+                        int nouvelId = response.getInt("succes");
+                        long rowId = -1;
+                        ContentValues contentValues = new ContentValues();
+                        switch (element.getTableConcernee()) {
+
+                            case Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE:
+                               // contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, nouvelId);
+                               // rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + element.getIdDansTableConcernee(), null);
+                                contentValues.put(Produit_IdentificationOpenHelper.Constantes.CLE_COL_ID_PHIWMS, nouvelId);
+                                rowId = db.update(element.getTableConcernee(), contentValues, DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + "=" + element.getIdDansTableConcernee(), null);
+
+                                //Création de l'action utilisateur
+                                Random random= new Random();
+                                int actionId = random.nextInt();
+                                if (actionId > 0) actionId = actionId * -1;
+                                SimpleDateFormat parseFormat =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                Date date = new Date();
+                                String date_string = parseFormat.format(date);
+                                ActionUtilisateur new_action_utilisateur = new ActionUtilisateur(
+                                        actionId,
+                                        utilisateur.getId(),
+                                        date_string,
+                                        0,
+                                        utilisateur.getEtablissementId(),
+                                        "En attente",
+                                        nouvelId,
+                                        "",
+                                        "ProduitIdentification"
+                                );
+
+                                ActionUtilisateurOpenHelper.insererActionUtilisateurEnBDD(db, new_action_utilisateur);
+                                ElementASynchroniserOpenHelper.ajouterElementASynchroniser(
+                                        db,
+                                        ActionUtilisateurOpenHelper.Constantes.TABLE_ACTION_UTILISATEUR,
+                                        new_action_utilisateur.getPhiMR4UUID(),
+                                        new_action_utilisateur.getId(),
+                                        DBOpenHelper.ActionsEAS.AJOUT
+                                );
+
+                                Produit_Identification produitIdentification = Produit_IdentificationOpenHelper.getProduitIdentificationByIdPhiWMS(db, nouvelId);
+                                produitIdentification.setIdPhiWMS(nouvelId);
+                                Produit_IdentificationOpenHelper.mettreAJourIdentificationReference(db, produitIdentification);
+                                Produit produit = ProduitOpenHelper.getProduitByID(db, produitIdentification.getCodeProduit());
+                                int actionligneId = random.nextInt();
+                                if (actionligneId > 0) actionligneId = actionligneId * -1;
+                                ActionUtilisateur_Ligne actionUtilisateur_ligne = new ActionUtilisateur_Ligne(
+                                        actionligneId,
+                                        new_action_utilisateur.getId(),
+                                        "Produit_Identification",
+                                        nouvelId,
+                                        "",
+                                        0,
+                                        0,
+                                        produit.getDesignation_interne()
+                                );
+                                ActionUtilisateur_LigneOpenHelper.insererActionUtilisateurLigneEnBDD(
+                                        db,
+                                        actionUtilisateur_ligne
+                                );
+
+                                toutSynchroniser(context, db, utilisateur, false);
+                                // ✅ Callback après que tout soit traité côté serveur
+                                if (callback != null) {
+                                    new Handler(Looper.getMainLooper()).post(() -> callback.onTerminee(nouvelId));
+                                }
+                                break;
+                        }
+                        if (rowId == -1) {
+                            Alerte.afficherAlerte(context, "Erreur", "Une erreur réseau est survenue. Votre action sera exécuté ultérieurement (erreur MAJ synchronisationEdit : "+element.getTableConcernee()+")", "alerte");
+                        }
+                    } else if (nbResultats == 0) {
+                        Alerte.afficherAlerte(context, "Erreur", "Une erreur réseau est survenue. Votre action sera exécuté ultérieurement (erreur requete : synchronisationEdit : "+element.getTableConcernee()+")", "alerte");
+                    }
+                } catch (JSONException exception) {
+                    exception.printStackTrace();
+                }
+
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("Volley", "Error");
+                        //Alerte.afficherAlerte(context, "Erreur", "Veuillez contacter la société Alcyons (erreur volley : "+error.getMessage()+" : "+element.getTableConcernee()+")", "alerte");
+                    }
+                }) {
+
+            /**
+             * Passing some request headers
+             */
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Authorization", utilisateur.getToken());
+                //headers.put("Content-Type", "application/json;charset=utf-8");
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+        };
+        obreq.setRetryPolicy(new RetryPolicy() {
+            @Override
+            public int getCurrentTimeout() {
+                return 50000;
+            }
+
+            @Override
+            public int getCurrentRetryCount() {
+                return 50000;
+            }
+
+            @Override
+            public void retry(VolleyError error) throws VolleyError {
+
+            }
+        });
+        // Adds the JSON object request "obreq" to the request queue
+        requestQueue.add(obreq);
     }
 }

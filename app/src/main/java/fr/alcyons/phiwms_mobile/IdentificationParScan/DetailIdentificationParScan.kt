@@ -1,14 +1,18 @@
 package fr.alcyons.phiwms_mobile.IdentificationParScan
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.StyleSpan
 import android.view.Gravity
 import android.view.View
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -20,14 +24,10 @@ import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateurOpenHelper
-import fr.alcyons.phiwms_mobile.BaseDeDonnees.ActionUtilisateur_LigneOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ElementASynchroniserOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Produit_IdentificationOpenHelper
-import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur
-import fr.alcyons.phiwms_mobile.Classes.ActionUtilisateur_Ligne
 import fr.alcyons.phiwms_mobile.Classes.Produit
 import fr.alcyons.phiwms_mobile.Classes.Produit_Identification
 import fr.alcyons.phiwms_mobile.Fragment.ScannerFragment
@@ -41,9 +41,6 @@ import fr.alcyons.phiwms_mobile.Services.ServiceIdentificationParScanActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Random
 
 class DetailIdentificationParScan : ServiceActivity() {
 
@@ -260,7 +257,7 @@ class DetailIdentificationParScan : ServiceActivity() {
      * Insère la nouvelle identification en BDD,
      * puis ajoute la ligne dans le RecyclerView.
      */
-    private fun validerCode(code: String, isCarton: Boolean) {
+    private fun validerCode(code: String?, isCarton: Boolean) {
         lifecycleScope.launch(Dispatchers.IO) {
             val natureIdentification = if (isCarton) "Conditionnement" else "Unitaire"
 
@@ -285,28 +282,17 @@ class DetailIdentificationParScan : ServiceActivity() {
                 nouvelleIdentification.phiwms_mobileUUID,
                 DBOpenHelper.ActionsEAS.AJOUT
             )
-            ElementASynchroniserOpenHelper.toutSynchroniser(this@DetailIdentificationParScan, db, utilisateurConnecte, false)
-            
-            if (rowId != -1L) {
-                withContext(Dispatchers.Main) {
-                    identificationAdapter.ajouterItem(nouvelleIdentification)
-                    // Scroll automatique vers la nouvelle ligne
-                    listeCodesIdentification.smoothScrollToPosition(
-                        identificationAdapter.itemCount - 1
-                    )
-                    // Réinitialise la zone action
-                    codeScanne.text = ""
-                    zoneAction.visibility = View.GONE
-                    scannerProcessing = false
-                }
-            } else {
-                withContext(Dispatchers.Main) {
-                    alerteVisible = true
-                    afficherAlerteAvecCallback(
-                        "Erreur",
-                        "Impossible d'enregistrer le code"
-                    ) { alerteVisible = false }
-                }
+
+            ElementASynchroniserOpenHelper.toutSynchroniserAvecCallback(
+                this@DetailIdentificationParScan, db, utilisateurConnecte, false
+            ) { nouvelId ->
+                nouvelleIdentification.idPhiWMS = nouvelId
+                Produit_IdentificationOpenHelper.mettreAJourIdentificationReference(db, nouvelleIdentification)
+                identificationAdapter.ajouterItem(nouvelleIdentification)
+                listeCodesIdentification.smoothScrollToPosition(identificationAdapter.itemCount - 1)
+                codeScanne.text = ""
+                zoneAction.visibility = View.GONE
+                scannerProcessing = false
             }
         }
     }
@@ -386,14 +372,18 @@ class DetailIdentificationParScan : ServiceActivity() {
                     val codeIdentification = resultDecoupage["code"]
                     typecodeidentification = resultDecoupage["type"]
 
-                    val produitIdentifier: List<Produit> =
-                        ProduitOpenHelper.getProduitsByIdentification(db, codeIdentification)
+                    //on recherche dans la table de produit identification
+                    val listeIdentificationExistante =
+                        Produit_IdentificationOpenHelper.getProduitIdentification(
+                            db,
+                            codeIdentification
+                        )
 
-                    if (produitIdentifier.isNotEmpty() && produitIdentifier.size == 1) {
+                    if (listeIdentificationExistante.isNotEmpty()) {
                         withContext(Dispatchers.Main) {
                             alerteVisible = true
                             afficherAlerteAvecCallback(
-                                "Erreur",
+                                "Information",
                                 "Le code scanné est déjà identifié"
                             ) {
                                 alerteVisible = false
@@ -401,32 +391,17 @@ class DetailIdentificationParScan : ServiceActivity() {
                             }
                         }
                     } else {
-                        //on recherche dans la table de produit identification
-                        val listeIdentificationExistante =
-                            Produit_IdentificationOpenHelper.getProduitIdentification(
-                                db,
-                                codeIdentification
-                            )
+                        withContext(Dispatchers.Main) {
+                            afficherAlerteValidationAvecCallback(
+                                codeIdentification,
+                                produitCourant.designation_interne ?: ""
+                            ) { isCarton ->
+                                validerCode(codeIdentification, isCarton)
+                            }
 
-                        if (listeIdentificationExistante.isNotEmpty()) {
-                            withContext(Dispatchers.Main) {
-                                alerteVisible = true
-                                afficherAlerteAvecCallback(
-                                    "Erreur",
-                                    "Le code scanné est déjà identifié"
-                                ) {
-                                    alerteVisible = false
-                                    scannerProcessing = false
-                                }
-                            }
-                        } else {
-                            withContext(Dispatchers.Main) {
-                                codeScanne.text = codeIdentification
-                                zoneAction.visibility = View.VISIBLE
-                            }
                         }
-
                     }
+
                 }
             }
         }
@@ -494,6 +469,49 @@ class DetailIdentificationParScan : ServiceActivity() {
         layout.findViewById<LinearLayout>(R.id.buttonOk).setOnClickListener {
             alertDialog.dismiss()
             onDismiss()
+        }
+    }
+
+    private fun afficherAlerteValidationAvecCallback(code: String?, designation: String, onDismiss: (isCarton: Boolean) -> Unit) {
+        val builder = AlertDialog.Builder(this)
+        val layout  = layoutInflater.inflate(R.layout.alerte_confirmation_identification, null)
+
+        val texte = "Ajouter l'identification suivante : $code pour la référence : $designation"
+        val spannable = SpannableString(texte)
+
+        // Met $code en gras
+        val debutCode = texte.indexOf(code ?: "")
+        val finCode = debutCode + (code?.length ?: 0)
+        spannable.setSpan(StyleSpan(Typeface.BOLD), debutCode, finCode, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+        // Met $designation en gras
+        val debutDesignation = texte.indexOf(designation)
+        val finDesignation = debutDesignation + designation.length
+        spannable.setSpan(StyleSpan(Typeface.BOLD), debutDesignation, finDesignation, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+        layout.findViewById<TextView>(R.id.textIdentification).text = spannable
+        builder.setView(layout)
+
+        val alertDialog = builder.create()
+        alertDialog.window?.setGravity(Gravity.CENTER)
+        alertDialog.window?.setBackgroundDrawable(
+            Color.TRANSPARENT.toDrawable()
+        )
+        alertDialog.show()
+
+        layout.findViewById<ImageView>(R.id.fermerModale).setOnClickListener {
+            scannerProcessing = false
+            alertDialog.dismiss()
+        }
+
+        layout.findViewById<LinearLayout>(R.id.boutonUnitaire).setOnClickListener {
+            alertDialog.dismiss()
+            onDismiss(false)
+        }
+
+        layout.findViewById<LinearLayout>(R.id.boutonCarton).setOnClickListener {
+            alertDialog.dismiss()
+            onDismiss(true)
         }
     }
 

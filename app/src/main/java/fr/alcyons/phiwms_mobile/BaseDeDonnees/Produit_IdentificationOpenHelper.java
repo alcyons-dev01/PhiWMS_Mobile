@@ -105,6 +105,18 @@ public class Produit_IdentificationOpenHelper extends DBOpenHelper {
         return produitIdentification;
     }
 
+    public static Produit_Identification getProduitIdentificationByIdPhiWMS(SQLiteDatabase db, int id) {
+        Produit_Identification produitIdentification = null;
+        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_IDENTIFICATION_REFERENCE + " WHERE " + Constantes.CLE_COL_ID_PHIWMS + " =? ", new String[]{String.valueOf(id)});
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+            produitIdentification = new Produit_Identification(cursor);
+        }
+        cursor.close();
+        cursor = null;
+        return produitIdentification;
+    }
+
     public static int getNbProduitIdentifier(SQLiteDatabase db) {
         int nbProduit = 0;
         Cursor cursor = db.rawQuery(" SELECT DISTINCT("+Constantes.CLE_COL_CODE_PRODUIT+") FROM " + Constantes.TABLE_IDENTIFICATION_REFERENCE, new String[]{});
@@ -307,7 +319,7 @@ public class Produit_IdentificationOpenHelper extends DBOpenHelper {
         contentValues.put(Produit_IdentificationOpenHelper.Constantes.CLE_COL_TYPE_CODE, produitIdentification.getTypeCode());
         contentValues.put(Produit_IdentificationOpenHelper.Constantes.CLE_COL_NATURE_IDENTIFICATION, produitIdentification.getNatureIdentification());
         contentValues.put(Produit_IdentificationOpenHelper.Constantes.CLE_COL_ETABLISSEMENT_UID, produitIdentification.getEtablissementUID());
-
+        contentValues.put(Constantes.CLE_COL_ID_PHIWMS, produitIdentification.getIdPhiWMS());
         contentValues.put(DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID, produitIdentification.getPhiwms_mobileUUID());
 
         // Insertion du dépot en BDD

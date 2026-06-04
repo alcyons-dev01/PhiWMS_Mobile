@@ -18,27 +18,33 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/bleu_fonce_alcyons"
-            android:padding="8dp"
-            android:gravity="center">
+            android:padding="8dp">
 
             <TextView
                 android:id="@+id/titre"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Confirmation"
                 android:textSize="20sp"
-                android:gravity="center"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold"/>
+
+            <ImageView
+                android:id="@+id/fermerModale"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_clear"
+                android:layout_gravity="center"/>
 
         </LinearLayout>
 
         <!-- Message -->
         <TextView
-            android:id="@+id/messageFin"
+            android:id="@+id/textIdentification"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Voulez-vous recevoir une copie du mail ?"
+            android:text="Ajouter l'identification suivante : "
             android:gravity="center"
             android:background="#F0F4FF"
             android:paddingVertical="24dp"
@@ -63,7 +69,7 @@
 
             <!-- Annuler -->
             <LinearLayout
-                android:id="@+id/buttonAnnuler"
+                android:id="@+id/boutonCarton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -74,15 +80,15 @@
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/ic_clear"
+                    android:src="@drawable/ic_colis"
                     app:tint="@color/rouge"
                     android:layout_marginBottom="4dp"/>
 
                 <TextView
-                    android:id="@+id/TitreAnnulation"
+                    android:id="@+id/TitreCarton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Annuler"
+                    android:text="Conditionnement"
                     android:textColor="#FFFFFF"
                     android:textSize="13sp"/>
 
@@ -96,7 +102,7 @@
 
             <!-- Confirmer -->
             <LinearLayout
-                android:id="@+id/buttonOk"
+                android:id="@+id/boutonUnitaire"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -107,15 +113,15 @@
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/ic_check_circle"
-                    app:tint="@color/bleu_clair_alcyons"
+                    android:src="@drawable/icon_produit"
+                    app:tint="@color/vert"
                     android:layout_marginBottom="4dp"/>
 
                 <TextView
-                    android:id="@+id/TitreConfirmation"
+                    android:id="@+id/TitreUnitaire"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Confirmer"
+                    android:text="Unitaire"
                     android:textColor="#FFFFFF"
                     android:textSize="13sp"/>
 
