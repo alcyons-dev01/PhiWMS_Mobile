@@ -471,7 +471,7 @@ class DetailFragment : Fragment() {
                         preparationLigneBasePreparation.qte_APreparer-=quantite
                         PH_Preparation_LigneOpenHelper.mettreAJourUnPHPreparationLigne(db, preparationLigneBasePreparation)
 
-                        if (!produit.isSuivi_Lot)
+                        if (!produit.isSuivi_Lot && lot.isEmpty())
                             lot = "LOT NON TRACÉ"
 
                         val moisIndex =

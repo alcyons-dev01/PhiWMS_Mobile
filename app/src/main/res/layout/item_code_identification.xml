@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="8dp"
-    android:layout_marginVertical="4dp"
+    android:layout_marginHorizontal="2dp"
+    android:layout_marginVertical="2dp"
     app:cardCornerRadius="12dp"
     app:cardElevation="2dp"
     app:cardBackgroundColor="@android:color/white">
@@ -14,21 +14,21 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="10dp">
+        android:paddingHorizontal="4dp"
+        android:paddingVertical="4dp">
 
         <!-- Badge icône nature -->
         <FrameLayout
             android:id="@+id/badgeNature_FL"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_marginEnd="12dp"
             android:background="@drawable/badge_nature_carton">
 
             <ImageView
                 android:id="@+id/iconeNature_IV"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
                 android:layout_gravity="center"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_colis" />
@@ -58,7 +58,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:textStyle="bold"
                 android:textColor="@color/bleu_fonce_alcyons"
                 android:maxLines="1"
@@ -68,8 +68,8 @@
 
         <!-- Bouton supprimer -->
         <FrameLayout
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_marginStart="10dp"
             android:background="@drawable/background_cadre_rouge"
             android:backgroundTint="@color/rouge">

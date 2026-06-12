@@ -178,12 +178,23 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         // Dans onCreate(), après setContentView
         val frameContenu = findViewById<RelativeLayout>(R.id.frameLayout)
         frameContenu.post {
-            hauteurDetailFragment = frameContenu.height / 2
+            android.util.Log.d("DEBUG_FRAME", "frameContenu.height = ${frameContenu.height}")
+
+            /*hauteurDetailFragment = frameContenu.height / 2
             val widthDp = resources.displayMetrics.run { widthPixels / density }
             hauteurListeFragment = (frameContenu.height * when {
                 widthDp < 400  -> 0.35   // petit écran  (Zebra MC33, PDA industriels)
                 widthDp < 600  -> 0.65   // écran normal (smartphones classiques)
                 else           -> 0.75   // grand écran  (tablettes, grands smartphones)
+            }).toInt()*/
+            val screenHeight = resources.displayMetrics.heightPixels
+            android.util.Log.d("DEBUG_FRAME", "screenHeight = $screenHeight")
+            hauteurDetailFragment = screenHeight / 2
+            val widthDp = resources.displayMetrics.run { widthPixels / density }
+            hauteurListeFragment = (screenHeight * when {
+                widthDp < 400  -> 0.30
+                widthDp < 600  -> 0.50
+                else           -> 0.65
             }).toInt()
         }
 
@@ -240,10 +251,9 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
 
             val obreq: JsonObjectRequest = getJsonObjectRequest(urlRequete)
             requestQueue.add<JSONObject?>(obreq)
-            ouvrirScanner()
-
         } else {
-          gestionVisuelle()
+            gestionVisuelle()
+            ouvrirAPreparer()
         }
     }
     private fun getJsonObjectRequest(urlRequete: String?): JsonObjectRequest {
@@ -306,6 +316,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
                         passageParOnCreate = false
                         arreterSpinner()
                         gestionVisuelle()
+                        ouvrirAPreparer()
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
@@ -804,10 +815,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         }
 
         if (liste.isNotEmpty()) {
-            val frag = APreparerFragment.newInstance(liste)
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.referenceAPreparerContainer, frag)
-                .commitNow()
+            android.util.Log.d("DEBUG_HAUTEUR", "hauteurListeFragment = $hauteurListeFragment")
 
             referenceAPreparerContainer.apply {
                 layoutParams = (layoutParams as LinearLayout.LayoutParams).also {
@@ -823,6 +831,11 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
                     .setDuration(200)
                     .start()
             }
+
+            val frag = APreparerFragment.newInstance(liste)
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.referenceAPreparerContainer, frag)
+                .commitNow()
 
             aPreparerVisible = true
         }
