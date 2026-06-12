@@ -474,8 +474,7 @@ class DetailFragment : Fragment() {
                         if (!produit.isSuivi_Lot && lot.isEmpty())
                             lot = "LOT NON TRACÉ"
 
-                        val moisIndex =
-                            spinnerMoisDatePeremptionSP.selectedItemPosition + 1 // 1-based
+                        val moisIndex = spinnerMoisDatePeremptionSP.selectedItemPosition + 1
                         val annee = spinnerAnneeDatePeremptionSP.selectedItem.toString()
                         // Dernier jour du mois sélectionné
                         val calendar = Calendar.getInstance()
@@ -496,9 +495,10 @@ class DetailFragment : Fragment() {
                             datePeremption = datePeremption_String
 
                         val phPreparationLigneliste =
-                            PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparationNeg(
+                            PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparationAndProduitNeg(
                                 db,
-                                preparationCourante
+                                preparationCourante,
+                                produit.iD_produit
                             )
                         var phPreparationLigneCourant: PH_Preparation_Ligne = preparationLigneBase
 
@@ -508,7 +508,7 @@ class DetailFragment : Fragment() {
                             if (prepaLigneCourant.lotNumero.trim { it <= ' ' }.contentEquals(
                                     lot
                                         .trim { it <= ' ' }) && prepaLigneCourant.peremptionDate
-                                    .trim { it <= ' ' }.contentEquals(datePeremption) && prepaLigneCourant.serieNumero == ""
+                                    .trim { it <= ' ' }.contentEquals(datePeremption) && prepaLigneCourant.serieNumero == "" && prepaLigneCourant.produitID == preparationLigneBase.produitID
                             ) {
                                 phPreparationLigneCourant = prepaLigneCourant
                                 existe = true

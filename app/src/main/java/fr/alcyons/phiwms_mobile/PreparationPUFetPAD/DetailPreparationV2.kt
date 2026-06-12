@@ -1103,14 +1103,88 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
                 }
                 else
                 {
-                    withContext(Dispatchers.Main) {
-                        alerteVisible = true // ← on lève le flag avant d'afficher
-                        afficherAlerteAvecCallback(
-                            "Erreur",
-                            "Produit inconnu en base de données"
-                        ) {
-                            alerteVisible = false // ← on baisse le flag à la fermeture
-                            ouvrirScanner()
+                    val produitIdentifier: List<Produit> = ProduitOpenHelper.getProduitsByIdentification(db, codeIdentification)
+
+                    if (!produitIdentifier.isEmpty() && produitIdentifier.size == 1) {
+                        val produit = produitIdentifier[0]
+
+                        var preparationLigneCourant = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByProduitLotSerieNegPreparation(db, produit.iD_produit, preparationCourante.uid, numeroLotIdentification, numeroSerieIdentification)
+
+                        if(preparationLigneCourant != null)
+                        {
+                            if(produit.isSuivi_Serialisation && !produit.isSerialiser_Reception_Delivrance && numeroSerieIdentification != "")
+                            {
+                                withContext(Dispatchers.Main) {
+                                    alerteVisible = true // ← on lève le flag avant d'afficher
+                                    afficherAlerteAvecCallback(
+                                        "Erreur",
+                                        "Numero de série déjà scanné"
+                                    ) {
+                                        alerteVisible = false // ← on baisse le flag à la fermeture
+                                        ouvrirScanner()
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                ouvrirDetailFragment(preparationLigneCourant)
+                            }
+                        }
+                        else
+                        {
+                            preparationLigneCourant = PH_Preparation_LigneOpenHelper.getUnPHPreparationLignesBaseParPHPreparationetProduit(db, preparationCourante,produit.iD_produit)
+
+                            if(preparationLigneCourant != null)
+                            {
+                                val randomreliquat = Random()
+                                var preparationLigneId = randomreliquat.nextInt()
+                                if (preparationLigneId > 0) preparationLigneId = preparationLigneId * -1
+
+                                preparationLigneCourant._UID = preparationLigneId
+                                preparationLigneCourant.lotNumero = numeroLotIdentification
+                                preparationLigneCourant.serieNumero = numeroSerieIdentification
+                                preparationLigneCourant.peremptionDate = datePeremptionSQL
+
+                                val stockCourant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByLotPeremptionEtDepot(db, numeroLotIdentification, datePeremptionSQL, depotOrigine)
+                                if(stockCourant != null)
+                                    preparationLigneCourant.emplacementParDefaut = stockCourant.emplacement
+                                else
+                                {
+                                    preparationLigneCourant.emplacementParDefaut = produit.emplacement_PUI_Defaut
+                                }
+
+                                //ajout de la serialisation si suivi par série
+                                if(produit.isSuivi_Serialisation && !produit.isSerialiser_Reception_Delivrance && numeroSerieIdentification != "")
+                                    Serialisation.Serialisation_Creer(utilisateurConnecte.id, "G110", codeIdentification, "GTIN", numeroLotIdentification, datePeremptionSerialisation, numeroSerieIdentification, "DELIVRANCE", preparationCourante.uid.toString()).toInt()
+
+
+                                ouvrirDetailFragment(preparationLigneCourant)
+                            }
+                            else
+                            {
+                                withContext(Dispatchers.Main) {
+                                    alerteVisible = true // ← on lève le flag avant d'afficher
+                                    afficherAlerteAvecCallback(
+                                        "Erreur",
+                                        "Référence non présente dans la préparation"
+                                    ) {
+                                        alerteVisible = false // ← on baisse le flag à la fermeture
+                                        ouvrirScanner()
+                                    }
+                                }
+                            }
+                        }
+
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            alerteVisible = true // ← on lève le flag avant d'afficher
+                            afficherAlerteAvecCallback(
+                                "Erreur",
+                                "Produit inconnu en base de données"
+                            ) {
+                                alerteVisible = false // ← on baisse le flag à la fermeture
+                                ouvrirScanner()
+                            }
                         }
                     }
                 }
