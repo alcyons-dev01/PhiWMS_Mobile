@@ -67,6 +67,7 @@ import java.util.Random
 import fr.alcyons.phiwms_mobile.Interfaces.RechercheAdjustable
 import androidx.core.view.isVisible
 import androidx.core.graphics.drawable.toDrawable
+import fr.alcyons.phiwms_mobile.BaseDeDonnees.PH_Preparation_LigneOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Produit_IdentificationOpenHelper
 
 class DetailReception_V2 : ServiceAvecConnexionActivity(),
@@ -154,6 +155,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         }
 
         lancerScan.setOnClickListener {
+            if (detailVisible) return@setOnClickListener
             if (scannerVisible) {
                 fermerScanner()
             } else {
@@ -163,6 +165,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         }
 
         lancerRecherhe.setOnClickListener {
+            if (detailVisible) return@setOnClickListener
             if (rechercheVisible) {
                 fermerRecherche()
             } else {
@@ -177,6 +180,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         }
 
         aReceptionner_LL.setOnClickListener {
+            if (detailVisible) return@setOnClickListener
             if (aCompterVisible) {
                 fermerAReceptionner()
             } else {
@@ -186,6 +190,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         }
 
         receptionner_LL.setOnClickListener {
+            if (detailVisible) return@setOnClickListener
             if (CompterVisible) {
                 fermerReceptionner()
             } else {
@@ -226,7 +231,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
             findViewById<CardView>(R.id.btnValiderReception_CV).visibility = View.GONE
 
         findViewById<CardView>(R.id.btnValiderReception_CV).setOnClickListener { _: View? ->
-            demandeConfirmationValidation(layoutInflater) { resultat ->
+            demandeConfirmationValidation(layoutInflater, "Souhaitez-vous valider la réception de la commande ?") { resultat ->
                 if (resultat)
                     if(receptionner(receptionCourant))
                         validerReception()
@@ -249,10 +254,40 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
 
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        if (detailVisible)
-            fermerDetailFragment()
+        if (detailVisible) return
         else {
-            retourService(bundle)
+            val listeLigne = ArrayList(
+                PH_ReliquatOpenHelper
+                    .getPH_ReliquatNegByCommandeNumero(
+                        db,
+                        receptionCourant.numero
+                    )
+            )
+            if (listeLigne.isEmpty()) {
+                retourService(bundle)
+            } else {
+                demandeConfirmationValidation(layoutInflater, "Souhaitez-vous garder les lignes saisies") { resultat ->
+                    if(resultat)
+                    {
+                        retourService(bundle)
+                    }
+                    else
+                    {
+                        for(ligneCourante in listeLigne)
+                        {
+                            PH_ReliquatOpenHelper.supprimerUnPHReliquat(db, ligneCourante)
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_ReliquatOpenHelper.Constantes.TABLE_PH_RELIQUAT, ligneCourante.phiMR4UUID, ligneCourante.reliquat_UID, DBOpenHelper.ActionsEAS.SUPPR)
+                        }
+
+                        ElementASynchroniserOpenHelper.toutSynchroniser(this@DetailReception_V2,
+                            db,
+                            utilisateurConnecte,
+                            false)
+
+                        retourService(bundle)
+                    }
+                }
+            }
         }
     }
 
@@ -635,11 +670,11 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
     }
 
     private fun fermerFragment() {
+        if (detailVisible) return
         if (scannerVisible) fermerScanner()
         if (rechercheVisible) fermerRecherche()
         if (aCompterVisible) fermerAReceptionner()
         if (CompterVisible) fermerReceptionner()
-        if (detailVisible) fermerDetailFragment()
     }
 
     private fun traiterCodeScanne(code: String) {
@@ -657,7 +692,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                 val codeIdentification = resultDecoupage["code"]
                 val numeroLotIdentification = resultDecoupage["lot"]
                 val peremptionIdentification = resultDecoupage["peremption"]
-                val numeroSerieIdentification = resultDecoupage["serie"]
+                var numeroSerieIdentification = resultDecoupage["serie"]
                 val tabDateSQL = peremptionIdentification?.split("/")
                 var datePeremptionSQL = ""
                 var datePeremptionSerialisation = ""
@@ -669,12 +704,15 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                         tabDateSQL[tabDateSQL.size - 1].takeLast(2) + tabDateSQL[1] + tabDateSQL[0]
                 }
 
-
                 val produitIdentification = Produit_IdentificationOpenHelper.getIdentificationsByIdentification(db, codeIdentification)
 
                 if(produitIdentification != null)
                 {
                     val produit = ProduitOpenHelper.getProduitByID(db, produitIdentification.codeProduit)
+                    if(!produit.isSuivi_Serialisation || !produit.isSerialiser_Reception_Delivrance)
+                    {
+                        numeroSerieIdentification = ""
+                    }
                     var reliquatcourant = PH_ReliquatOpenHelper.getPH_ReliquatByUnIdProduitetNumeroLotSerie(db, produit.iD_produit, receptionCourant.numero, numeroLotIdentification, numeroSerieIdentification)
 
                     if(reliquatcourant != null)
@@ -743,7 +781,10 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
 
                     if (!produitIdentifier.isEmpty() && produitIdentifier.size == 1) {
                         val produit = produitIdentifier[0]
-
+                        if(!produit.isSuivi_Serialisation || !produit.isSerialiser_Reception_Delivrance)
+                        {
+                            numeroSerieIdentification = ""
+                        }
                         var reliquatcourant = PH_ReliquatOpenHelper.getPH_ReliquatByUnIdProduitetNumeroLotSerie(db, produit.iD_produit, receptionCourant.numero, numeroLotIdentification, numeroSerieIdentification)
 
                         if(reliquatcourant != null)
@@ -1106,7 +1147,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         }
     }
 
-    fun demandeConfirmationValidation(inflater: LayoutInflater, onResultat: (Boolean) -> Unit) {
+    fun demandeConfirmationValidation(inflater: LayoutInflater, text: String, onResultat: (Boolean) -> Unit) {
         val builder = context.let { AlertDialog.Builder(it) }
         val layout = inflater.inflate(R.layout.alerte_confirmation, null)
 
@@ -1114,7 +1155,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
         val buttonAnnuler = layout.findViewById<LinearLayout>(R.id.buttonAnnuler)
         val messageTextView = layout.findViewById<TextView>(R.id.messageFin)
 
-        messageTextView.text = "Souhaitez-vous valider la réception de la commande ?"
+        messageTextView.text = text
         layout.findViewById<TextView>(R.id.TitreAnnulation).text = "Non"
         layout.findViewById<TextView>(R.id.TitreConfirmation).text = "Oui"
 
