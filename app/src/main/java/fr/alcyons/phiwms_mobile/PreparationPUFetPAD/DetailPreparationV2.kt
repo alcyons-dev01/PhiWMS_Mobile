@@ -199,6 +199,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         }
 
         lancerScan.setOnClickListener {
+            if (detailVisible) return@setOnClickListener
             if (scannerVisible) {
                 fermerScanner()
             } else {
@@ -208,6 +209,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         }
 
         lancerRecherhe.setOnClickListener {
+            if (detailVisible) return@setOnClickListener
             if (rechercheVisible) {
                 fermerRecherche()
             } else {
@@ -222,6 +224,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         }
 
         aPreparer_LL.setOnClickListener {
+            if (detailVisible) return@setOnClickListener
             if (aPreparerVisible) {
                 fermerAPreparer()
             } else {
@@ -231,6 +234,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         }
 
         preparer_LL.setOnClickListener {
+            if (detailVisible) return@setOnClickListener
             if (preparerVisible) {
                 fermerPreparer()
             } else {
@@ -373,7 +377,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
             masquerBoutonValider()
 
         findViewById<CardView>(R.id.btnValiderPreparation_CV).setOnClickListener { v: View? ->
-            demandeConfirmationValidation(layoutInflater) { resultat ->
+            demandeConfirmationValidation(layoutInflater, "Souhaitez-vous valider la préparation ?") { resultat ->
                 if(resultat)
                 {
                     //Création de l'action utilisateur
@@ -612,10 +616,37 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
 
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        if (detailVisible)
-            fermerDetailFragment()
+        if (detailVisible) return
         else {
-            retourService(bundle)
+            //on vérifie la présence de ligne préparé
+            val listeLigne = ArrayList(PH_Preparation_LigneOpenHelper.getAllPHPreparationLignesParPHPreparationNeg(db, preparationCourante))
+
+            if (listeLigne.isEmpty()) {
+                retourService(bundle)
+            } else {
+                demandeConfirmationValidation(layoutInflater, "Souhaitez-vous garder les lignes saisies") { resultat ->
+                    if(resultat)
+                    {
+                        retourService(bundle)
+                    }
+                    else
+                    {
+                        for(ligneCourante in listeLigne)
+                        {
+                            PH_Preparation_LigneOpenHelper.supprimerUnPhPreparationLigne(db, ligneCourante)
+                            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, PH_Preparation_LigneOpenHelper.Constantes.TABLE_PH_PREPARATION_LIGNE, ligneCourante.phiMR4UUID, ligneCourante._UID, DBOpenHelper.ActionsEAS.SUPPR)
+                        }
+
+                        ElementASynchroniserOpenHelper.toutSynchroniser(this@DetailPreparationV2,
+                            db,
+                            utilisateurConnecte,
+                            false)
+
+                        retourService(bundle)
+                    }
+                }
+            }
+
         }
     }
 
@@ -994,7 +1025,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
     }
 
     private fun fermerFragment() {
-        if (detailVisible) fermerDetailFragment()
+        if (detailVisible) return
         if (scannerVisible) fermerScanner()
         if (rechercheVisible) fermerRecherche()
         if (aPreparerVisible) fermerAPreparer()
@@ -1034,7 +1065,10 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
                 {
                     val produit = ProduitOpenHelper.getProduitByID(db, produitIdentification.codeProduit)
 
-                    var preparationLigneCourant = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByProduitLotSerieNegPreparation(db, produit.iD_produit, preparationCourante.uid, numeroLotIdentification, numeroSerieIdentification)
+                    var preparationLigneCourant = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByProduitLotNegPreparation(db, produit.iD_produit, preparationCourante.uid, numeroLotIdentification)
+
+                    if(produit.isSuivi_Serialisation && !produit.isSerialiser_Reception_Delivrance && numeroSerieIdentification != "")
+                        preparationLigneCourant = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByProduitLotSerieNegPreparation(db, produit.iD_produit, preparationCourante.uid, numeroLotIdentification, numeroSerieIdentification)
 
                     if(preparationLigneCourant != null)
                     {
@@ -1068,7 +1102,8 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
 
                             preparationLigneCourant._UID = preparationLigneId
                             preparationLigneCourant.lotNumero = numeroLotIdentification
-                            preparationLigneCourant.serieNumero = numeroSerieIdentification
+                            if(produit.isSuivi_Serialisation && !produit.isSerialiser_Reception_Delivrance)
+                                preparationLigneCourant.serieNumero = numeroSerieIdentification
                             preparationLigneCourant.peremptionDate = datePeremptionSQL
 
                             val stockCourant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByLotPeremptionEtDepot(db, numeroLotIdentification, datePeremptionSQL, depotOrigine)
@@ -1108,7 +1143,10 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
                     if (!produitIdentifier.isEmpty() && produitIdentifier.size == 1) {
                         val produit = produitIdentifier[0]
 
-                        var preparationLigneCourant = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByProduitLotSerieNegPreparation(db, produit.iD_produit, preparationCourante.uid, numeroLotIdentification, numeroSerieIdentification)
+                        var preparationLigneCourant = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByProduitLotNegPreparation(db, produit.iD_produit, preparationCourante.uid, numeroLotIdentification)
+
+                        if(produit.isSuivi_Serialisation && !produit.isSerialiser_Reception_Delivrance && numeroSerieIdentification != "")
+                            preparationLigneCourant = PH_Preparation_LigneOpenHelper.getPH_Preparation_LigneByProduitLotSerieNegPreparation(db, produit.iD_produit, preparationCourante.uid, numeroLotIdentification, numeroSerieIdentification)
 
                         if(preparationLigneCourant != null)
                         {
@@ -1142,7 +1180,8 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
 
                                 preparationLigneCourant._UID = preparationLigneId
                                 preparationLigneCourant.lotNumero = numeroLotIdentification
-                                preparationLigneCourant.serieNumero = numeroSerieIdentification
+                                if(produit.isSuivi_Serialisation && !produit.isSerialiser_Reception_Delivrance)
+                                    preparationLigneCourant.serieNumero = numeroSerieIdentification
                                 preparationLigneCourant.peremptionDate = datePeremptionSQL
 
                                 val stockCourant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByLotPeremptionEtDepot(db, numeroLotIdentification, datePeremptionSQL, depotOrigine)
@@ -1308,7 +1347,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         }
     }
 
-    fun demandeConfirmationValidation(inflater: LayoutInflater, onResultat: (Boolean) -> Unit) {
+    fun demandeConfirmationValidation(inflater: LayoutInflater, text:(String), onResultat: (Boolean) -> Unit) {
         val builder = context?.let { AlertDialog.Builder(it) }
         val layout = inflater.inflate(R.layout.alerte_confirmation, null)
 
@@ -1316,7 +1355,7 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
         val buttonAnnuler = layout.findViewById<LinearLayout>(R.id.buttonAnnuler)
         val messageTextView = layout.findViewById<TextView>(R.id.messageFin)
 
-        messageTextView.text = "Souhaitez-vous valider la préparation ?"
+        messageTextView.text = text
         layout.findViewById<TextView>(R.id.TitreAnnulation).text = "Non"
         layout.findViewById<TextView>(R.id.TitreConfirmation).text = "Oui"
 
