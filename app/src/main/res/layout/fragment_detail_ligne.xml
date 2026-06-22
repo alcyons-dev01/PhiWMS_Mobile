@@ -288,34 +288,6 @@
 
                 </LinearLayout>
 
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:background="#33000000"/>
-
-                <LinearLayout
-                    android:id="@+id/layoutCartonOuvert_LL"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:gravity="center"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <TextView
-                        android:id="@+id/textCartonOuvert_TV"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="Carton ouvert (x1)"
-                        android:textColor="@color/bleu_fonce_alcyons"
-                        android:textSize="14sp"
-                        android:textStyle="bold"/>
-
-                </LinearLayout>
-
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

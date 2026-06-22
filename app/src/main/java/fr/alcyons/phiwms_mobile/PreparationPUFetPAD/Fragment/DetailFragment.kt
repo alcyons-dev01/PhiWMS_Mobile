@@ -104,8 +104,10 @@ class DetailFragment : Fragment() {
         this.preparationCourante = PH_PreparationOpenHelper.getPH_PreparationByID(db, preparationLigneBase.preparationID)
 
         // step modifiable selon le bouton actif (x10 / x100 / Carton ouvert)
-        var conditionnement: Int = preparationLigneBase.produitCondDistrib.toInt()
         val conditionnementCartonOuvert: Int = preparationLigneBase.produitCondDistrib.toInt()
+        val conditionnementX10: Int = conditionnementCartonOuvert * 10
+        val conditionnementX100: Int = conditionnementCartonOuvert * 100
+        var conditionnement: Int = conditionnementCartonOuvert
 
         val layoutListeLot_LL = view.findViewById<LinearLayout>(R.id.layoutListeLot_LL)
         val layoutLotPeremption_LL = view.findViewById<LinearLayout>(R.id.layoutLotPeremption_LL)
@@ -165,16 +167,21 @@ class DetailFragment : Fragment() {
         // caché tant qu'aucun lot n'est sélectionné ou saisi
         layoutCarton_CV.visibility = View.GONE
 
+        // textes dynamiques selon le conditionnement de distribution du produit
+        textMultiple10TV.text = "x" + conditionnementX10.toString()
+        textMultiple100TV.text = "x"+ conditionnementX100.toString()
+        textCartonOuvertTV.text = "x" + conditionnementCartonOuvert.toString()
+
         // état par défaut : Carton ouvert sélectionné
         selectionnerConditionnement(layoutCartonOuvertLL)
 
         layoutMultiple10LL.setOnClickListener {
-            conditionnement = 10
+            conditionnement = conditionnementX10
             selectionnerConditionnement(layoutMultiple10LL)
         }
 
         layoutMultiple100LL.setOnClickListener {
-            conditionnement = 100
+            conditionnement = conditionnementX100
             selectionnerConditionnement(layoutMultiple100LL)
         }
 

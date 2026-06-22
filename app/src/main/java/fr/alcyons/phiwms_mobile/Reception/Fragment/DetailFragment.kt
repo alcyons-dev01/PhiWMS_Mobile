@@ -85,7 +85,13 @@ class DetailFragment : Fragment() {
         } ?: return
 
         val produit = ProduitOpenHelper.getProduitByID(db, reliquatBase.produitID)
-        var conditionnement: Int = reliquatBase.conditionnementAchat
+
+        // step modifiable selon le bouton actif (Carton fermé / x10 / x100 / Carton ouvert)
+        val conditionnementCartonFerme: Int = reliquatBase.conditionnementAchat
+        val conditionnementX10: Int = conditionnementCartonFerme * 10
+        val conditionnementX100: Int = conditionnementCartonFerme * 100
+        var conditionnement: Int = conditionnementCartonFerme
+
         val layoutCarton_CV = view.findViewById<CardView>(R.id.layoutCarton_CV)
         val layoutMoinsLL = view.findViewById<ImageView>(R.id.layoutMoins_LL)
         val layoutPlusLL = view.findViewById<ImageView>(R.id.layoutPlus_LL)
@@ -211,13 +217,11 @@ class DetailFragment : Fragment() {
         val textCartonFermerTV = view.findViewById<TextView>(R.id.textCartonFermer_TV)
         val textMultiple10TV = view.findViewById<TextView>(R.id.textMultiple10_TV)
         val textMultiple100TV = view.findViewById<TextView>(R.id.textMultiple100_TV)
-        val textCartonOuvertTV = view.findViewById<TextView>(R.id.textCartonOuvert_TV)
 
         val boutonsConditionnement = listOf(
             layoutCartonFermerLL to textCartonFermerTV,
             layoutMultiple10LL to textMultiple10TV,
             layoutMultiple100LL to textMultiple100TV,
-            layoutCartonOuvertLL to textCartonOuvertTV
         )
 
         fun selectionnerConditionnement(actif: LinearLayout) {
@@ -240,27 +244,27 @@ class DetailFragment : Fragment() {
             }
         }
 
-        // État par défaut : Carton fermé sélectionné, step = conditionnement
+        // textes dynamiques selon le conditionnement d'achat du produit, préfixés par "x"
+        textCartonFermerTV.text = "x$conditionnementCartonFerme"
+        textMultiple10TV.text = "x$conditionnementX10"
+        textMultiple100TV.text = "x$conditionnementX100"
+
+        // État par défaut : Carton fermé sélectionné, step = conditionnementCartonFerme
         selectionnerConditionnement(layoutCartonFermerLL)
 
         layoutCartonFermerLL.setOnClickListener {
-            conditionnement = reliquatBase.conditionnementAchat
+            conditionnement = conditionnementCartonFerme
             selectionnerConditionnement(layoutCartonFermerLL)
         }
 
         layoutMultiple10LL.setOnClickListener {
-            conditionnement = 10
+            conditionnement = conditionnementX10
             selectionnerConditionnement(layoutMultiple10LL)
         }
 
         layoutMultiple100LL.setOnClickListener {
-            conditionnement = 100
+            conditionnement = conditionnementX100
             selectionnerConditionnement(layoutMultiple100LL)
-        }
-
-        layoutCartonOuvertLL.setOnClickListener {
-            conditionnement = 1
-            selectionnerConditionnement(layoutCartonOuvertLL)
         }
 
         layoutPlusLL.setOnClickListener { _: View? ->
