@@ -18,6 +18,7 @@ import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper
@@ -199,8 +200,69 @@ class DetailFragment : Fragment() {
             quantiteCompteeET.setText("0")
         }
 
-        //gestion du conditionnment
-        layoutCarton_CV.visibility = View.GONE
+        //gestion du conditionnement
+        layoutCarton_CV.visibility = View.VISIBLE
+
+        val layoutCartonFermerLL = view.findViewById<LinearLayout>(R.id.layoutCartonFermer_LL)
+        val layoutMultiple10LL = view.findViewById<LinearLayout>(R.id.layoutmultiple10)
+        val layoutMultiple100LL = view.findViewById<LinearLayout>(R.id.layoutmultiple100)
+        val layoutCartonOuvertLL = view.findViewById<LinearLayout>(R.id.layoutCartonOuvert_LL)
+
+        val textCartonFermerTV = view.findViewById<TextView>(R.id.textCartonFermer_TV)
+        val textMultiple10TV = view.findViewById<TextView>(R.id.textMultiple10_TV)
+        val textMultiple100TV = view.findViewById<TextView>(R.id.textMultiple100_TV)
+        val textCartonOuvertTV = view.findViewById<TextView>(R.id.textCartonOuvert_TV)
+
+        val boutonsConditionnement = listOf(
+            layoutCartonFermerLL to textCartonFermerTV,
+            layoutMultiple10LL to textMultiple10TV,
+            layoutMultiple100LL to textMultiple100TV,
+            layoutCartonOuvertLL to textCartonOuvertTV
+        )
+
+        fun selectionnerConditionnement(actif: LinearLayout) {
+            boutonsConditionnement.forEach { (layout, texte) ->
+                if (layout == actif) {
+                    layout.setBackgroundColor(
+                        ContextCompat.getColor(requireContext(), R.color.bleu_fonce_alcyons)
+                    )
+                    texte.setTextColor(ContextCompat.getColor(requireContext(), R.color.blanc))
+                } else {
+                    val outValue = android.util.TypedValue()
+                    requireContext().theme.resolveAttribute(
+                        android.R.attr.selectableItemBackground, outValue, true
+                    )
+                    layout.setBackgroundResource(outValue.resourceId)
+                    texte.setTextColor(
+                        ContextCompat.getColor(requireContext(), R.color.bleu_fonce_alcyons)
+                    )
+                }
+            }
+        }
+
+        // État par défaut : Carton fermé sélectionné, step = conditionnement
+        selectionnerConditionnement(layoutCartonFermerLL)
+
+        layoutCartonFermerLL.setOnClickListener {
+            conditionnement = reliquatBase.conditionnementAchat
+            selectionnerConditionnement(layoutCartonFermerLL)
+        }
+
+        layoutMultiple10LL.setOnClickListener {
+            conditionnement = 10
+            selectionnerConditionnement(layoutMultiple10LL)
+        }
+
+        layoutMultiple100LL.setOnClickListener {
+            conditionnement = 100
+            selectionnerConditionnement(layoutMultiple100LL)
+        }
+
+        layoutCartonOuvertLL.setOnClickListener {
+            conditionnement = 1
+            selectionnerConditionnement(layoutCartonOuvertLL)
+        }
+
         layoutPlusLL.setOnClickListener { _: View? ->
             var qteActuelle = quantiteCompteeET.text.toString().toInt()
             if (qteActuelle == -1)

@@ -198,7 +198,7 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/layoutCarton_CV"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
             app:cardCornerRadius="8dp"
             app:cardElevation="0dp"
             android:layout_marginBottom="10dp"
@@ -206,17 +206,19 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="horizontal">
 
                 <LinearLayout
                     android:id="@+id/layoutCartonFermer_LL"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:orientation="vertical"
-                    android:background="@color/bleu_fonce_alcyons"
-                    android:padding="12dp">
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <TextView
                         android:id="@+id/textCartonFermer_TV"
@@ -225,6 +227,62 @@
                         android:gravity="center"
                         android:text="Carton fermé"
                         android:textColor="@color/blanc"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#33000000"/>
+
+                <LinearLayout
+                    android:id="@+id/layoutmultiple10"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/textMultiple10_TV"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="x10"
+                        android:textColor="@color/bleu_fonce_alcyons"
+                        android:textSize="14sp"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#33000000"/>
+
+                <LinearLayout
+                    android:id="@+id/layoutmultiple100"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/textMultiple100_TV"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="x100"
+                        android:textColor="@color/bleu_fonce_alcyons"
                         android:textSize="14sp"
                         android:textStyle="bold"/>
 
@@ -238,10 +296,13 @@
                 <LinearLayout
                     android:id="@+id/layoutCartonOuvert_LL"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <TextView
                         android:id="@+id/textCartonOuvert_TV"

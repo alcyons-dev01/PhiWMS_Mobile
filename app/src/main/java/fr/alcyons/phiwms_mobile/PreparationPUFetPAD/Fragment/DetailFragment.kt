@@ -21,6 +21,7 @@ import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DBOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper
@@ -102,7 +103,10 @@ class DetailFragment : Fragment() {
         } ?: return
         this.preparationCourante = PH_PreparationOpenHelper.getPH_PreparationByID(db, preparationLigneBase.preparationID)
 
-        val conditionnement: Int = preparationLigneBase.produitCondDistrib.toInt()
+        // step modifiable selon le bouton actif (x10 / x100 / Carton ouvert)
+        var conditionnement: Int = preparationLigneBase.produitCondDistrib.toInt()
+        val conditionnementCartonOuvert: Int = preparationLigneBase.produitCondDistrib.toInt()
+
         val layoutListeLot_LL = view.findViewById<LinearLayout>(R.id.layoutListeLot_LL)
         val layoutLotPeremption_LL = view.findViewById<LinearLayout>(R.id.layoutLotPeremption_LL)
         val layoutMoinsLL = view.findViewById<ImageView>(R.id.layoutMoins_LL)
@@ -121,6 +125,64 @@ class DetailFragment : Fragment() {
         )
         val quantiteCompteeET = view.findViewById<EditText>(R.id.quantiteComptee_ET)
         val effacerLot = view.findViewById<ImageView>(R.id.effacerLot_IV)
+
+        // ─── Bloc multiplicateur (x10 / x100 / Carton ouvert) ───
+        val layoutCarton_CV = view.findViewById<CardView>(R.id.layoutCarton_CV)
+        val layoutMultiple10LL = view.findViewById<LinearLayout>(R.id.layoutmultiple10)
+        val layoutMultiple100LL = view.findViewById<LinearLayout>(R.id.layoutmultiple100)
+        val layoutCartonOuvertLL = view.findViewById<LinearLayout>(R.id.layoutCartonOuvert_LL)
+
+        val textMultiple10TV = view.findViewById<TextView>(R.id.textMultiple10_TV)
+        val textMultiple100TV = view.findViewById<TextView>(R.id.textMultiple100_TV)
+        val textCartonOuvertTV = view.findViewById<TextView>(R.id.textCartonOuvert_TV)
+
+        val boutonsConditionnement = listOf(
+            layoutMultiple10LL to textMultiple10TV,
+            layoutMultiple100LL to textMultiple100TV,
+            layoutCartonOuvertLL to textCartonOuvertTV
+        )
+
+        fun selectionnerConditionnement(actif: LinearLayout) {
+            boutonsConditionnement.forEach { (layout, texte) ->
+                if (layout == actif) {
+                    layout.setBackgroundColor(
+                        ContextCompat.getColor(requireContext(), R.color.bleu_fonce_alcyons)
+                    )
+                    texte.setTextColor(ContextCompat.getColor(requireContext(), R.color.blanc))
+                } else {
+                    val outValue = android.util.TypedValue()
+                    requireContext().theme.resolveAttribute(
+                        android.R.attr.selectableItemBackground, outValue, true
+                    )
+                    layout.setBackgroundResource(outValue.resourceId)
+                    texte.setTextColor(
+                        ContextCompat.getColor(requireContext(), R.color.bleu_fonce_alcyons)
+                    )
+                }
+            }
+        }
+
+        // caché tant qu'aucun lot n'est sélectionné ou saisi
+        layoutCarton_CV.visibility = View.GONE
+
+        // état par défaut : Carton ouvert sélectionné
+        selectionnerConditionnement(layoutCartonOuvertLL)
+
+        layoutMultiple10LL.setOnClickListener {
+            conditionnement = 10
+            selectionnerConditionnement(layoutMultiple10LL)
+        }
+
+        layoutMultiple100LL.setOnClickListener {
+            conditionnement = 100
+            selectionnerConditionnement(layoutMultiple100LL)
+        }
+
+        layoutCartonOuvertLL.setOnClickListener {
+            conditionnement = conditionnementCartonOuvert
+            selectionnerConditionnement(layoutCartonOuvertLL)
+        }
+        // ─── Fin bloc multiplicateur ───
 
         //gestion de la date de péremption
         var datePeremption_String = ""
@@ -189,6 +251,7 @@ class DetailFragment : Fragment() {
                     nouveauLot = true
                     view.findViewById<LinearLayout>(R.id.bandeauNouveauLot_LL).visibility =
                         View.VISIBLE
+                    layoutCarton_CV.visibility = View.VISIBLE
                     spinnerMoisDatePeremptionSP.setSelection(0)
                     spinnerAnneeDatePeremptionSP.setSelection(0)
                     layoutListeLot_LL.visibility = View.GONE
@@ -215,6 +278,7 @@ class DetailFragment : Fragment() {
                 } else {
                     view.findViewById<LinearLayout>(R.id.bandeauNouveauLot_LL).visibility =
                         View.GONE
+                    layoutCarton_CV.visibility = View.VISIBLE
                     //on affiche le lot et la date de péremption
                     view.findViewById<EditText>(R.id.numeroLot_ET).setText(stockSelectionne.lot)
                     view.findViewById<TextView>(R.id.emplacementLot_TV).text =
@@ -268,6 +332,7 @@ class DetailFragment : Fragment() {
                     view.postDelayed({
                         layoutListeLot_LL.visibility = View.VISIBLE
                         layoutLotPeremption_LL.visibility = View.GONE
+                        layoutCarton_CV.visibility = View.GONE
                         view.findViewById<View?>(R.id.chevronFiltre).performClick()
                     }, 200)
                 }
@@ -293,6 +358,7 @@ class DetailFragment : Fragment() {
             } else {
                 layoutPlusLL.setOnClickListener(null)
                 layoutMoinsLL.setOnClickListener(null)
+                layoutCarton_CV.visibility = View.GONE
                 view.findViewById<EditText>(R.id.numeroLot_ET).setText("")
             }
         }
@@ -323,6 +389,7 @@ class DetailFragment : Fragment() {
 
             layoutListeLot_LL.visibility = View.GONE
             layoutLotPeremption_LL.visibility = View.VISIBLE
+            layoutCarton_CV.visibility = View.VISIBLE
             effacerLot.visibility = View.GONE
 
             val stockCourant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByLotPeremptionEtDepot(db, preparationLigneBase.lotNumero, preparationLigneBase.peremptionDate, depot)
