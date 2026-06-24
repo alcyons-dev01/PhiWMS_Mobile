@@ -66,10 +66,15 @@
 
         </LinearLayout>
 
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/rouge"/>
+
         <!-- Bouton supprimer -->
         <FrameLayout
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
             android:layout_marginStart="10dp"
             android:background="@drawable/background_cadre_rouge"
             android:backgroundTint="@color/rouge">
@@ -79,7 +84,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_close"
+                android:src="@drawable/ic_moins"
                 android:background="@android:color/transparent"
                 app:tint="@color/blanc"
                 android:scaleType="centerInside"
