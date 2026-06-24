@@ -20,6 +20,7 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.DepotOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Produit_IdentificationOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Depot;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.Classes.Produit_Identification;
 import fr.alcyons.phiwms_mobile.OriginalActivity;
 import fr.alcyons.phiwms_mobile.Outils.MedicalObjective;
 import fr.alcyons.phiwms_mobile.R;
@@ -55,6 +56,7 @@ public class Produit_IdentificationParScanAdapter extends ArrayAdapter {
             viewHolder.refProduit = (TextView) convertView.findViewById(R.id.refProduit);
             viewHolder.fournisseurProduit = (TextView) convertView.findViewById(R.id.fournisseurProduit);
             viewHolder.gtinProduit = (TextView) convertView.findViewById(R.id.gtinProduit);
+            viewHolder.condAchat = (TextView) convertView.findViewById(R.id.condAchat);
             viewHolder.photoProduit = (ImageView) convertView.findViewById(R.id.photoProduit);
             viewHolder.layoutDesignation = (LinearLayout) convertView.findViewById(R.id.layoutDesignation);
             convertView.setTag(viewHolder);
@@ -84,33 +86,39 @@ public class Produit_IdentificationParScanAdapter extends ArrayAdapter {
         viewHolder.nom.setText(produitCourant.getDesignation_interne());
         viewHolder.refProduit.setText(produitCourant.getRef_fourni());
         viewHolder.fournisseurProduit.setText(produitCourant.getFournisseur());
+        viewHolder.condAchat.setText("(x"+produitCourant.getCond_achat()+")");
 
         /**
          * Gestion de la table identification
          */
-        String gtin = "";
+        List<Produit_Identification> gtin = new ArrayList<>();
         String codeInconnu = "";
 
-        gtin = Produit_IdentificationOpenHelper.getIdentificationUnitaire(db, produitCourant.getID_produit());
+        gtin = Produit_IdentificationOpenHelper.getIdentificationsByCodeProduit(db, produitCourant.getID_produit());
 
-        if(gtin.contentEquals(""))
+        String gtin_courant = "";
+        if(gtin.isEmpty())
         {
-            gtin = produitCourant.getGTIN();
-            if(gtin == null || gtin.contentEquals(""))
+             gtin_courant = produitCourant.getGTIN();
+            if(gtin_courant == null || gtin_courant.contentEquals(""))
             {
-                gtin = "";
+                gtin_courant = "";
                 codeInconnu = produitCourant.getCodeInconnue();
 
                 if(codeInconnu == null)
                     codeInconnu = "";
             }
         }
-
-        if(!gtin.contentEquals(""))
+        else
         {
-            viewHolder.gtinProduit.setText(gtin);
+            gtin_courant = gtin.get(0).getIdentification();
+        }
+
+        if(!gtin_courant.contentEquals(""))
+        {
+            viewHolder.gtinProduit.setText(gtin_courant);
             viewHolder.gtinProduit.setTextColor(context.getResources().getColorStateList(R.color.vert));
-            viewHolder.gtinProduit.setTextColor(context.getResources().getColorStateList(R.color.orange));
+            //viewHolder.gtinProduit.setTextColor(context.getResources().getColorStateList(R.color.orange));
         }
         else if(!codeInconnu.contentEquals(""))
         {
@@ -138,6 +146,7 @@ public class Produit_IdentificationParScanAdapter extends ArrayAdapter {
         public TextView refProduit;
         public TextView fournisseurProduit;
         public TextView gtinProduit;
+        public TextView condAchat;
         public ImageView photoProduit;
         public LinearLayout layoutDesignation;
     }

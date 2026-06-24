@@ -30,8 +30,8 @@ import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Produit_IdentificationOpenHelper
 import fr.alcyons.phiwms_mobile.Classes.Produit
 import fr.alcyons.phiwms_mobile.Classes.Produit_Identification
-import fr.alcyons.phiwms_mobile.Fragment.ScannerFragment
-import fr.alcyons.phiwms_mobile.Fragment.ScannerInputFragment
+import fr.alcyons.phiwms_mobile.Fragment.ScannerFragmentIdentification
+import fr.alcyons.phiwms_mobile.Fragment.ScannerInputFragmentIdentification
 import fr.alcyons.phiwms_mobile.Interfaces.ScannerControllable
 import fr.alcyons.phiwms_mobile.Outils.Alerte
 import fr.alcyons.phiwms_mobile.Outils.GestionCodeScanne
@@ -89,10 +89,12 @@ class DetailIdentificationParScan : ServiceActivity() {
     private var itemEnAttenteSupression: Produit_Identification? = null
     private var positionEnAttenteSupression: Int = -1
     private var typecodeidentification: String? = ""
+    private var lotidentification: String? = ""
 
     private lateinit var btnExpandProduit: LinearLayout
     private lateinit var iconeExpand: ImageView
     private lateinit var zoneDetailsProduit: LinearLayout
+    private lateinit var btnRevenirALaListe: LinearLayout
     private var detailsProduitVisibles = false
 
     // ────────────────────────────────────────────────────────────
@@ -122,6 +124,8 @@ class DetailIdentificationParScan : ServiceActivity() {
                 retourService(this@DetailIdentificationParScan.bundle)
             }
         })
+
+        btnRevenirALaListe.setOnClickListener { retourService(this@DetailIdentificationParScan.bundle) }
     }
 
     // ────────────────────────────────────────────────────────────
@@ -156,6 +160,7 @@ class DetailIdentificationParScan : ServiceActivity() {
         btnExpandProduit         = findViewById(R.id.btnExpandProduit)
         iconeExpand              = findViewById(R.id.iconeExpand)
         zoneDetailsProduit       = findViewById(R.id.zoneDetailsProduit)
+        btnRevenirALaListe       = findViewById(R.id.btnRevenirALaListe)
     }
 
     // ────────────────────────────────────────────────────────────
@@ -338,8 +343,8 @@ class DetailIdentificationParScan : ServiceActivity() {
         scannerFragment?.btnCloseVisible = false
 
         when (frag) {
-            is ScannerInputFragment -> { frag.onCodeScanned = { code -> traiterCodeScanne(code) } }
-            is ScannerFragment      -> { frag.onCodeScanned = { code -> traiterCodeScanne(code) } }
+            is ScannerInputFragmentIdentification -> { frag.onCodeScanned = { code -> traiterCodeScanne(code) } }
+            is ScannerFragmentIdentification      -> { frag.onCodeScanned = { code -> traiterCodeScanne(code) } }
         }
 
         supportFragmentManager.beginTransaction()
@@ -348,11 +353,11 @@ class DetailIdentificationParScan : ServiceActivity() {
     }
 
     private fun choisirFragmentScanner(): Fragment {
-        if (estScannerProfessionnel()) return ScannerInputFragment()
+        if (estScannerProfessionnel()) return ScannerInputFragmentIdentification()
         return if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
-            ScannerFragment()
+            ScannerFragmentIdentification()
         } else {
-            ScannerInputFragment()
+            ScannerInputFragmentIdentification()
         }
     }
 
@@ -375,6 +380,7 @@ class DetailIdentificationParScan : ServiceActivity() {
     private fun traiterCodeScanne(code: String) {
         if (!scannerProcessing && !alerteVisible) {
             typecodeidentification = ""
+            lotidentification = ""
             scannerProcessing = true
             lifecycleScope.launch(Dispatchers.IO) {
                 if (code.uppercase().startsWith("PHITAGPLACE")) {
@@ -389,41 +395,71 @@ class DetailIdentificationParScan : ServiceActivity() {
                         }
                     }
                 } else {
+                    var erreurScan = false
                     val resultDecoupage: HashMap<String, String> =
                         GestionCodeScanne.decoupageCode(code)
-                    val codeIdentification = resultDecoupage["code"]
+                    var codeIdentification = resultDecoupage["code"]
                     typecodeidentification = resultDecoupage["type"]
+                    lotidentification = resultDecoupage["lot"]
 
-                    //on recherche dans la table de produit identification
-                    val listeIdentificationExistante =
-                        Produit_IdentificationOpenHelper.getProduitIdentification(
-                            db,
-                            codeIdentification
-                        )
+                    if(codeIdentification == "" || codeIdentification == null)
+                    {
+                        if(lotidentification == "")
+                        {
+                            codeIdentification = code
+                            typecodeidentification = "Inconnu"
+                        }
+                        else
+                        {
+                            erreurScan = true
+                        }
+                    }
 
-                    if (listeIdentificationExistante.isNotEmpty()) {
+                    if(erreurScan)
+                    {
                         withContext(Dispatchers.Main) {
                             alerteVisible = true
                             afficherAlerteAvecCallback(
-                                "Information",
-                                "Le code scanné est déjà identifié"
+                                "Erreur",
+                                "Le code scanné n'est pas un code produit"
                             ) {
                                 alerteVisible = false
                                 scannerProcessing = false
                             }
                         }
-                    } else {
-                        withContext(Dispatchers.Main) {
-                            afficherAlerteValidationAvecCallback(
-                                codeIdentification,
-                                produitCourant.designation_interne ?: ""
-                            ) { isCarton ->
-                                validerCode(codeIdentification, isCarton)
-                            }
+                    }
+                    else
+                    {
+                        //on recherche dans la table de produit identification
+                        val listeIdentificationExistante =
+                            Produit_IdentificationOpenHelper.getProduitIdentification(
+                                db,
+                                codeIdentification
+                            )
 
+                        if (listeIdentificationExistante.isNotEmpty()) {
+                            withContext(Dispatchers.Main) {
+                                alerteVisible = true
+                                afficherAlerteAvecCallback(
+                                    "Information",
+                                    "Le code scanné est déjà identifié"
+                                ) {
+                                    alerteVisible = false
+                                    scannerProcessing = false
+                                }
+                            }
+                        } else {
+                            withContext(Dispatchers.Main) {
+                                afficherAlerteValidationAvecCallback(
+                                    codeIdentification,
+                                    produitCourant.designation_interne ?: ""
+                                ) { isCarton ->
+                                    validerCode(codeIdentification, isCarton)
+                                }
+
+                            }
                         }
                     }
-
                 }
             }
         }

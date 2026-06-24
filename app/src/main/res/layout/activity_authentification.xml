@@ -82,7 +82,7 @@
                         android:textSize="15sp"
                         android:textStyle="bold"
                         android:paddingVertical="6dp"
-                        android:text="alcyons"
+                        android:text=""
                         android:autofillHints=""/>
 
                 </LinearLayout>
@@ -129,7 +129,7 @@
                         android:textStyle="bold"
                         android:paddingVertical="6dp"
                         android:autofillHints=""
-                        android:text="helpdesk"/>
+                        android:text=""/>
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
