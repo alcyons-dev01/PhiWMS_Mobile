@@ -517,7 +517,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center"
-                    android:background="@color/bleu_fonce_alcyons"
+                    android:background="@color/bleu_clair_alcyons"
                     android:paddingVertical="14dp"
                     android:clickable="true"
                     android:focusable="true">
