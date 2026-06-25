@@ -751,6 +751,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                             reliquatcourant.peremptionDate = datePeremptionSQL
                             reliquatcourant.scanValue = ""
                             reliquatcourant.bL_Numero = ""
+                            reliquatcourant.qteLivraison = 0
 
                             //ajout de la serialisation si suivi par série
                             if(produit.isSuivi_Serialisation && produit.isSerialiser_Reception_Delivrance && numeroSerieIdentification != "")
@@ -823,6 +824,7 @@ class DetailReception_V2 : ServiceAvecConnexionActivity(),
                                 reliquatcourant.peremptionDate = datePeremptionSQL
                                 reliquatcourant.scanValue = ""
                                 reliquatcourant.bL_Numero = ""
+                                reliquatcourant.qteLivraison = 0
 
                                 //ajout de la serialisation si suivi par série
                                 if(produit.isSuivi_Serialisation && produit.isSerialiser_Reception_Delivrance && numeroSerieIdentification != "")
