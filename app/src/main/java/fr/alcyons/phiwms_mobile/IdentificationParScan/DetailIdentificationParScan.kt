@@ -232,6 +232,13 @@ class DetailIdentificationParScan : ServiceActivity() {
         val position = positionEnAttenteSupression.takeIf { it >= 0 } ?: return
 
         lifecycleScope.launch(Dispatchers.IO) {
+            val produitCourant = ProduitOpenHelper.getProduitByID(db, item.codeProduit)
+            produitCourant.gtin = ""
+            produitCourant.codeInconnue = ""
+            ProduitOpenHelper.mettreAJourProduit(db, produitCourant)
+            ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, ProduitOpenHelper.Constantes.TABLE_PRODUIT,produitCourant.phiMR4UUID,produitCourant.iD_produit, DBOpenHelper.ActionsEAS.MAJ)
+
+
             Produit_IdentificationOpenHelper.supprimerUneIdentificationEnBDD(db, item)
             ElementASynchroniserOpenHelper.ajouterElementASynchroniser(db, Produit_IdentificationOpenHelper.Constantes.TABLE_IDENTIFICATION_REFERENCE,item.phiwms_mobileUUID,item.idPhiWMS, DBOpenHelper.ActionsEAS.SUPPR)
             ElementASynchroniserOpenHelper.toutSynchroniser(this@DetailIdentificationParScan, db, utilisateurConnecte, false)
@@ -240,6 +247,8 @@ class DetailIdentificationParScan : ServiceActivity() {
                 // Nettoyage après usage
                 itemEnAttenteSupression = null
                 positionEnAttenteSupression = -1
+
+                //action utilisateur suppression de l'identification
             }
         }
     }
