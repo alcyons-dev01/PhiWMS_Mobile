@@ -1104,7 +1104,10 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
                             preparationLigneCourant.lotNumero = numeroLotIdentification
                             if(produit.isSuivi_Serialisation && !produit.isSerialiser_Reception_Delivrance)
                                 preparationLigneCourant.serieNumero = numeroSerieIdentification
+                            else
+                                preparationLigneCourant.serieNumero = ""
                             preparationLigneCourant.peremptionDate = datePeremptionSQL
+                            preparationLigneCourant.qte_preparer = 0
 
                             val stockCourant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByLotPeremptionEtDepot(db, numeroLotIdentification, datePeremptionSQL, depotOrigine)
                             if(stockCourant != null)
@@ -1182,7 +1185,10 @@ class DetailPreparationV2 : ServiceAvecConnexionActivity(),
                                 preparationLigneCourant.lotNumero = numeroLotIdentification
                                 if(produit.isSuivi_Serialisation && !produit.isSerialiser_Reception_Delivrance)
                                     preparationLigneCourant.serieNumero = numeroSerieIdentification
+                                else
+                                    preparationLigneCourant.serieNumero = ""
                                 preparationLigneCourant.peremptionDate = datePeremptionSQL
+                                preparationLigneCourant.qte_preparer = 0
 
                                 val stockCourant = Stock_Lot_EmplacementLightOpenHelper.getStockLotEmplacementByLotPeremptionEtDepot(db, numeroLotIdentification, datePeremptionSQL, depotOrigine)
                                 if(stockCourant != null)
