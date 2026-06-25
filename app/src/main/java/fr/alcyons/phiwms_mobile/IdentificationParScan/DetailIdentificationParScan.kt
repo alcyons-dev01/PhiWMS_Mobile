@@ -438,11 +438,12 @@ class DetailIdentificationParScan : ServiceActivity() {
                             )
 
                         if (listeIdentificationExistante.isNotEmpty()) {
+                            val produit = ProduitOpenHelper.getProduitByID(db, listeIdentificationExistante[0].codeProduit)
                             withContext(Dispatchers.Main) {
                                 alerteVisible = true
                                 afficherAlerteAvecCallback(
                                     "Information",
-                                    "Le code scanné est déjà identifié"
+                                    "Le code scanné est déjà identifié ("+produit.designation_interne+")"
                                 ) {
                                     alerteVisible = false
                                     scannerProcessing = false

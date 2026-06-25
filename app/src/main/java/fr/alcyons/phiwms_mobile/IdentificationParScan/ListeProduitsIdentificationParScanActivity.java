@@ -30,6 +30,7 @@ import java.util.Objects;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.ProduitOpenHelper;
 import fr.alcyons.phiwms_mobile.BaseDeDonnees.Produit_IdentificationOpenHelper;
 import fr.alcyons.phiwms_mobile.Classes.Produit;
+import fr.alcyons.phiwms_mobile.Classes.Produit_Identification;
 import fr.alcyons.phiwms_mobile.ListViewAdapters.Produit_IdentificationParScanAdapter;
 import fr.alcyons.phiwms_mobile.Navigation.NavigationActivity;
 import fr.alcyons.phiwms_mobile.Outils.Alerte;
@@ -92,7 +93,9 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
         ((TextView) findViewById(R.id.nbNonIdentifier)).setText(String.valueOf(nbProduitBase - nbProduitIdentifierDistinct));
 
         ((LinearLayout) findViewById(R.id.linearProduitIdentifie)).setOnClickListener(v -> {
-            listeAAfficher = ProduitOpenHelper.getProduitsIdentifier(db);
+            listeAAfficher = ProduitOpenHelper.getAllProduits(db);
+            List<Integer> listeProduitIdIdentifier = Produit_IdentificationOpenHelper.getProduitIdIdentification(db);
+            listeAAfficher.removeIf(produit -> !listeProduitIdIdentifier.contains(produit.getID_produit()));
             adapter.replaceData(listeAAfficher);
             ((LinearLayout) findViewById(R.id.linearProduitIdentifie)).setAlpha(1F);
             ((LinearLayout) findViewById(R.id.linearProduitNonIdentifie)).setAlpha(0.5F);
@@ -102,6 +105,8 @@ public class ListeProduitsIdentificationParScanActivity extends ServiceActivity 
 
         ((LinearLayout) findViewById(R.id.linearProduitNonIdentifie)).setOnClickListener(v -> {
             listeAAfficher = ProduitOpenHelper.getProduitsNonIdentifier(db);
+            List<Integer> listeProduitIdIdentifier = Produit_IdentificationOpenHelper.getProduitIdIdentification(db);
+            listeAAfficher.removeIf(produit -> listeProduitIdIdentifier.contains(produit.getID_produit()));
             adapter.replaceData(listeAAfficher);
             ((LinearLayout) findViewById(R.id.linearProduitNonIdentifie)).setAlpha(1F);
             ((LinearLayout) findViewById(R.id.linearProduitIdentifie)).setAlpha(0.5F);

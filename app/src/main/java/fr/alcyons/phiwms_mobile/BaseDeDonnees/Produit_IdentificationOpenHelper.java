@@ -93,6 +93,19 @@ public class Produit_IdentificationOpenHelper extends DBOpenHelper {
         return Liste;
     }
 
+    public static List<Integer> getProduitIdIdentification(SQLiteDatabase db) {
+        List<Integer> Liste = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_IDENTIFICATION_REFERENCE, new String[]{});
+        while (cursor.moveToNext()) {
+            Liste.add(new Produit_Identification(cursor).getCodeProduit());
+        }
+
+        cursor.close();
+        cursor = null;
+        return Liste;
+    }
+
     public static Produit_Identification getProduitIdentificationByphiwms_mobileUUID(SQLiteDatabase db, int id) {
         Produit_Identification produitIdentification = null;
         Cursor cursor = db.rawQuery(" SELECT * FROM " + Constantes.TABLE_IDENTIFICATION_REFERENCE + " WHERE " + DBOpenHelper.Constantes.CLE_COL_phiwms_mobileUUID + " =? ", new String[]{String.valueOf(id)});
