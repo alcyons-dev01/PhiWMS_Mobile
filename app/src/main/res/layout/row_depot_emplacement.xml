@@ -10,7 +10,7 @@
         android:orientation="horizontal"
         android:layout_gravity="center_horizontal"
         android:gravity="center"
-        android:weightSum="2"
+        android:weightSum="1"
         android:layout_marginStart="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
@@ -26,20 +26,21 @@
             android:textColor="#000000"
             android:textStyle="bold" />
 
-        <TextView
+        <!--<TextView
             android:id="@+id/dataMatrixEmplacement"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text=""
             android:textColor="#000000"
-            android:textStyle="bold" />
+            android:textStyle="bold" />-->
 
         <ImageView
             android:id="@+id/boutonScanDatamatrix"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_codebarre" />
+            android:background="@drawable/ic_location_grey"
+            android:backgroundTint="@color/bleu_clair_alcyons"/>
 
     </LinearLayout>
 </LinearLayout>

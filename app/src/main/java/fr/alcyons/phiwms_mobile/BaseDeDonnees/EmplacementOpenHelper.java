@@ -61,7 +61,7 @@ public class EmplacementOpenHelper extends DBOpenHelper {
     public static List<Depot_Emplacement> getEmplacementsParZone(SQLiteDatabase db, Depot_Zone depotZone) {
         List<Depot_Emplacement> depotEmplacementList = new ArrayList<>();
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_DEPOT_EMPLACEMENT + " WHERE " + Constantes.CLE_COL_ZONE_ID_DEPOT_EMPLACEMENT + "=?", new String[]{String.valueOf(depotZone.getZoneID())});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Constantes.TABLE_DEPOT_EMPLACEMENT + " WHERE " + Constantes.CLE_COL_ZONE_ID_DEPOT_EMPLACEMENT + "=? ORDER BY "+Constantes.CLE_COL_ADRESSAGE_DEPOT_EMPLACEMENT, new String[]{String.valueOf(depotZone.getZoneID())});
 
         while (cursor.moveToNext()) {
             Depot_Emplacement emplacement = new Depot_Emplacement(cursor);

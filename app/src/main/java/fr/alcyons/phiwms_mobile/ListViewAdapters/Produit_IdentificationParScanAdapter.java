@@ -99,15 +99,8 @@ public class Produit_IdentificationParScanAdapter extends ArrayAdapter {
         String gtin_courant = "";
         if(gtin.isEmpty())
         {
-             gtin_courant = produitCourant.getGTIN();
-            if(gtin_courant == null || gtin_courant.contentEquals(""))
-            {
-                gtin_courant = "";
-                codeInconnu = produitCourant.getCodeInconnue();
-
-                if(codeInconnu == null)
-                    codeInconnu = "";
-            }
+            codeInconnu = "";
+            gtin_courant = "";
         }
         else
         {

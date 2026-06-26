@@ -68,14 +68,14 @@ public class Depot_EmplacementAdapter extends ArrayAdapter implements Filterable
         if (viewHolder == null) {
             viewHolder = viewHolderList.get(position);
             viewHolder.nomEmplacement = (TextView) convertView.findViewById(R.id.nomEmplacement);
-            viewHolder.dataMatrixEmplacement = (TextView) convertView.findViewById(R.id.dataMatrixEmplacement);
+            //viewHolder.dataMatrixEmplacement = (TextView) convertView.findViewById(R.id.dataMatrixEmplacement);
             convertView.setTag(viewHolder);
         }
 
         Depot_Emplacement emplacementCourant = (Depot_Emplacement) getItem(position);
 
         viewHolder.nomEmplacement.setText(emplacementCourant.getAdressage());
-        viewHolder.dataMatrixEmplacement.setText(emplacementCourant.getCode_GLN());
+        //viewHolder.dataMatrixEmplacement.setText(emplacementCourant.getCode_GLN());
 
         return convertView;
     }
@@ -194,7 +194,7 @@ public class Depot_EmplacementAdapter extends ArrayAdapter implements Filterable
 
     public class Depot_EmplacementViewHolder {
         public TextView nomEmplacement;
-        public TextView dataMatrixEmplacement;
+        //public TextView dataMatrixEmplacement;
     }
 
 }
